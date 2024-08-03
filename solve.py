@@ -1,7 +1,7 @@
 import json
 import os
 from substrate import Substrate, ComputeText, ComputeJSON, sb
-from arc_util import load_tasks_from_file, task_sets, json_task_to_string, show_result, load_task_set
+from arc_util import task_sets, load_task_set
 from colored_grid import ColoredGrid
 from computed_result import ComputedResult
 from grid_problem import GridProblem
@@ -11,11 +11,8 @@ api_key = os.environ.get("SUBSTRATE_API_KEY")
 substrate = Substrate(api_key=api_key, timeout=60 * 5)
 id = "0520fde7"
 
-# challenges, solutions = load_tasks_from_file(task_set_name=task_sets["training"])
 challenges, solutions = load_task_set(task_set_name=task_sets["training"])
 challenge: GridProblem = challenges[id]
-
-# task_string = json_task_to_string(challenges, id, 0)
 
 
 json_prompt = f"""You have been tasked to solve a spatial reasoning test.
@@ -43,16 +40,8 @@ result = ComputeJSON(
     model="Llama3Instruct8B",
 )
 #
-# # a = RunPython(function=print_time)
 res = substrate.run(result)
 print(json.dumps(res.json, indent=2))
 
 solution = ComputedResult(outputs=[ColoredGrid(**j) for j in res.get(result).json_object["outputs"]])
 print(solution.comparison_report(solutions[id]))
-# "007bbfb7": [
-#     [
-#         [7, 0, 7, 0, 0, 0, 7, 0, 7], [7, 0, 7, 0, 0, 0, 7, 0, 7], [7, 7, 0, 0, 0, 0, 7, 7, 0],
-#         [7, 0, 7, 0, 0, 0, 7, 0, 7], [7, 0, 7, 0, 0, 0, 7, 0, 7], [7, 7, 0, 0, 0, 0, 7, 7, 0],
-#         [7, 0, 7, 7, 0, 7, 0, 0, 0], [7, 0, 7, 7, 0, 7, 0, 0, 0], [7, 7, 0, 7, 7, 0, 0, 0, 0]
-#     ]
-# ],
