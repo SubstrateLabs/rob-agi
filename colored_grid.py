@@ -32,7 +32,7 @@ class ColoredGrid(BaseModel):
             return False
 
     def __str__(self):
-        as_str = "["
+        as_str = "[\n"
         for row in self.values:
             as_str += f" {row},\n"
         as_str += "]"
@@ -62,3 +62,6 @@ class ColoredGrid(BaseModel):
     @classmethod
     def value_to_color(cls, val: int) -> str:
         return cls.colors[val]
+
+    def __eq__(self, other):
+        return self.values == other.values

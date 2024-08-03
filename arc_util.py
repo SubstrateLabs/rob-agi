@@ -85,7 +85,7 @@ def load_tasks_from_file(task_set_name) -> tuple[dict, dict]:
     return challenges, solutions
 
 
-def load_task_set(task_set_name) -> tuple[dict, dict]:
+def load_task_set(task_set_name) -> tuple[dict[str, GridProblem], dict[str, ComputedResult]]:
     challenges_json, solutions_json = load_tasks_from_file(task_set_name)
     challenges = {k: GridProblem.parse(id=k, **v) for k, v in challenges_json.items()}
     solutions = {k: ComputedResult(outputs=[ColoredGrid(values=g) for g in v]) for k, v in solutions_json.items()}

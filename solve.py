@@ -44,7 +44,7 @@ res = substrate.run(result)
 print(json.dumps(res.json, indent=2))
 
 solution = ComputedResult(outputs=[ColoredGrid(**j) for j in res.get(result).json_object["outputs"]])
-print(show_result(result=solution.outputs, expected=solutions[id]))
+print(solution.comparison_report(solutions[id]))
 # "007bbfb7": [
 #     [
 #         [7, 0, 7, 0, 0, 0, 7, 0, 7], [7, 0, 7, 0, 0, 0, 7, 0, 7], [7, 7, 0, 0, 0, 0, 7, 7, 0],
