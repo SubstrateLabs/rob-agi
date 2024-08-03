@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "arc-agi"
+version = "0.1.0"
+description = ""
+authors = ["Rob Cheung <kousun12@gmail.com>"]
+readme = "README.md"
+
+[tool.ruff]
+line-length = 120
+output-format = "grouped"
+target-version = "py37"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.5.6"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
