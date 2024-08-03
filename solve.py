@@ -22,12 +22,16 @@ json_prompt = f"""You have been tasked to solve a spatial reasoning test.
 You are given a few examples of a transform that you need to find.
 The goal is to find the function that fits the transform, then apply it to the test case.
 
-You were given the task:
+You were given this challenge:
 {challenge.to_task_description()}
 
 Your evaluation was:
 """
-final_task = "Respond with the JSON output for the test case."
+
+if len(challenge.test_cases) > 1:
+    final_task = f"Respond in JSON with the solutions for the {len(challenge.test_cases)} test cases in this task."
+else:
+    final_task = "Respond in JSON with the solution for the test case in this task."
 
 # write a python function that solves the test case. The function should validate correctly on all the train cases."""
 # challenge = GridProblem.parse(id=id, train=example["train"], test=example["test"])
@@ -35,7 +39,7 @@ final_task = "Respond with the JSON output for the test case."
 reason = ComputeText(prompt=get_initial_impression(challenge), model="Llama3Instruct70B")
 result = ComputeJSON(
     prompt=sb.concat(json_prompt, reason.future.text),
-    json_schema=ComputedResult.model_json_schema(),
+    json_schema=ComputedResult.json_schema(max_outputs=len(challenge.test_cases)),
     model="Llama3Instruct8B",
 )
 #
