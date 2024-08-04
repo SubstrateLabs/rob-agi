@@ -156,6 +156,7 @@ def attempt_challenge(challenge: GridProblem, reasoning: str) -> str:
     {SuccessfulSolve.field_summary()} 
     
     Make sure that the python function is valid and standalone. It should be named solve_{challenge.id} and take in a grid and return a grid. 
+    Show your work. Your solution should clearly and completely communicate the concepts used, the approach taken.
     """
     )
 

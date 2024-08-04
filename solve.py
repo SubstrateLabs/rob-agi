@@ -10,7 +10,7 @@ from io import StringIO
 from pprint import pprint
 from typing import List, Literal, Optional
 
-from substrate import Substrate, ComputeText, ComputeJSON, sb, FindOrCreateVectorStore, EmbedText, QueryVectorStore
+from substrate import Substrate, ComputeText, ComputeJSON, sb, FindOrCreateVectorStore, EmbedText, QueryVectorStore, Box
 from arc_util import task_sets, load_task_set
 from arc_vec import ResearchEvent, SolveAttempt
 from colored_grid import ColoredGrid
@@ -69,12 +69,13 @@ ModelType = Literal[
 # smart_model: ModelType = "Llama3Instruct70B"
 smart_model: ModelType = "claude-3-5-sonnet-20240620"
 json_model: ModelType = "Llama3Instruct8B"
+# json_model: ModelType = "Mixtral8x7BInstruct"
 
 task_set = "training"
 # task_set = "evaluation"
 challenges, solutions = load_task_set(task_set_name=task_sets[task_set])
 
-max_concurrent = 24
+max_concurrent = 48
 all_challenges = list(challenges.values())
 random.shuffle(all_challenges)
 
@@ -112,45 +113,70 @@ attempted = 0
 successful = 0
 
 
-async def attempt(challenge: GridProblem):
+async def attempt(challenge: GridProblem, with_solution=False, verbose=False):
     print(f"Attempting {challenge.id}")
     global attempted, successful
     if len(challenge.test_cases) > 1:
         final_task = f"Respond in JSON with the solutions for the {len(challenge.test_cases)} test cases in this task."
     else:
         final_task = "\n\nRespond in JSON with the solution for the test case in this task."
-    reason = ComputeText(prompt=get_initial_impression(challenge), model=smart_model, temperature=0.2)
+
+    debug_io = {}
+    solution_str = f"SOLUTION:\n\n{solutions[challenge.id].result_description()}" if with_solution else ""
+    impression_q = get_initial_impression(challenge)
+    reason = ComputeText(prompt=impression_q, model=smart_model, temperature=0.25)
+    debug_io["impression"] = {"in": impression_q, "out": reason.future.text}
+    if with_solution:
+        think_with_solution = sb.format(
+            "{impression_q}\nHere is your first impression:\n\n{impression}\n\nNow, here is the solution:\n\n{solution_str}\n\nRevise your approach if necessary to incorporate what you learned from the solution. The important part here is to identify the key concepts and procedures that are necessary to solve this problem. Be comprehensive, detailed, but also concise.",
+            impression_q=impression_q,
+            impression=reason.future.text,
+            solution_str=solution_str,
+        )
+        reason = ComputeText(prompt=think_with_solution, model=smart_model, temperature=0.2)
+        debug_io["think_with_solution"] = {"in": think_with_solution, "out": reason.future.text}
+    first_try = attempt_challenge(challenge, reason.future.text)
     make_attempt = ComputeText(
-        prompt=attempt_challenge(challenge, reason.future.text),
+        prompt=first_try,
         model=smart_model,
         temperature=0.2,
         max_tokens=3000,
     )
+    debug_io["attempt"] = {"in": first_try, "out": make_attempt.future.text}
+    parse_query = sb.concat(
+        "Extract this result to valid JSON:\n\n",
+        make_attempt.future.text,
+        "\n\n",
+    )
     parse_attempt = ComputeJSON(
-        prompt=sb.concat(
-            "Extract this result to valid JSON:\n\n",
-            make_attempt.future.text,
-            "\n\n",
-        ),
+        prompt=parse_query,
         # json_schema=SolveAttempt.simple_json_schema(),
         json_schema=SolveAttempt.model_json_schema(),
         # model="Mixtral8x7BInstruct",
         model=json_model,
         _max_retries=2,
-        temperature=0.3,
+        temperature=0.25,
         max_tokens=4000,
     )
+    debug_io["parse_attempt"] = {"in": parse_query, "out": parse_attempt.future.json_object}
+    compute_result_query = sb.concat(
+        extract_result(challenge), sb.jq(parse_attempt.future.json_object, "@json"), final_task
+    )
     result = ComputeJSON(
-        prompt=sb.concat(extract_result(challenge), sb.jq(parse_attempt.future.json_object, "@json"), final_task),
+        prompt=compute_result_query,
         json_schema=ComputedResult.json_schema(max_outputs=len(challenge.test_cases)),
         model=json_model,
-        temperature=0.3,
+        temperature=0.25,
         _max_retries=2,
     )
+    debug_io["computed_result"] = {"in": compute_result_query, "out": result.future.json_object}
+    extra_metadata = {"with_solution": with_solution}
     emb = EmbedText(
         text=sb.concat(challenge.to_task_description(), "\n\nComputed:\n", sb.jq(result.future.json_object, "@json")),
         collection_name=col_attempts.future.collection_name,
-        metadata=parse_attempt.future.json_object,
+        metadata=sb.jq(
+            parse_attempt.future.json_object, f". + {json.dumps(extra_metadata, indent=None, separators=(',', ':'))}"
+        ),
         embedded_metadata_keys=[
             "concepts_used",
             "approach",
@@ -160,11 +186,17 @@ async def attempt(challenge: GridProblem):
             "error_message",
             "computed_result",
         ],
+        hide=True,
         _max_retries=2,
     )
+    input_space = Box(value=debug_io)
     try:
-        res = await substrate.async_run(emb, result)
-        print(json.dumps(res.json, indent=2))
+        res = await substrate.async_run(emb, result, input_space)
+        if verbose:
+            print(json.dumps(res.json, indent=2))
+            print("----------------------------------")
+            print(res.get(input_space).value)
+            print("----------------------------------")
         solution = ComputedResult.model_validate(res.get(result).json_object)
         print(solution.comparison_report(solutions[challenge.id]))
         attempted += 1
@@ -172,7 +204,6 @@ async def attempt(challenge: GridProblem):
         print("Error running", e)
         traceback.print_exc()
         return
-    False and print(json.dumps(res.json, indent=2))
     if solution.validate(solutions[challenge.id]):
         successful += 1
         print(f"Solve Rate: {successful} of {attempted} ({successful / attempted:.2%})")
@@ -215,7 +246,7 @@ async def attempt_python(challenge: GridProblem):
         model="Mixtral8x7BInstruct",
         # model=json_model,
         _max_retries=2,
-        temperature=0.3,
+        temperature=0.25,
         max_tokens=4000,
     )
     # emb = EmbedText(
@@ -420,7 +451,7 @@ def distill_research():
 
 async def process_challenge(semaphore, challenge):
     async with semaphore:
-        return await attempt(challenge)
+        return await attempt(challenge, with_solution=True)
 
 
 async def solve_loop():
@@ -434,6 +465,12 @@ async def solve_loop():
         except Exception as e:
             traceback.print_exc()
             print(f"Error on task {i}: {e}")
+    print("\n\n===============================================")
+    print("FINAL STATS")
+    print(f"Attempted: {attempted}")
+    print(f"Successful: {successful}")
+    print(f"Solve Rate: {successful / attempted:.2%}")
+    print("===============================================\n\n")
 
 
 async def main():
@@ -442,7 +479,8 @@ async def main():
     id = "3bd67248"
     # id = "1f876c06"
     # challenge: GridProblem = challenges[id]
-    # attempt(challenge)
+    random_challenge = random.choice(all_challenges)
+    await attempt(random_challenge, with_solution=True, verbose=True)
 
     # ids = list(challenges.keys())[0:5]
     # challenge_list = [challenges[id] for id in ids]
