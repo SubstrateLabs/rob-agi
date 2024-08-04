@@ -12,7 +12,7 @@ from rob_agi.arc_util import load_task_set
 from rob_agi.arc_vec import ResearchEvent, SolveAttempt
 from rob_agi.computed_result import ComputedResult
 from rob_agi.grid_problem import GridProblem
-from solver_functions import (
+from rob_agi.solver_functions import (
     get_initial_impression,
     extract_result,
     gather_research,
@@ -25,6 +25,7 @@ api_key = os.environ.get("SUBSTRATE_API_KEY")
 substrate = Substrate(
     api_key=api_key, timeout=60 * 5, additional_headers={"x-substrate-fp": "1", "x-substrate-debug": "1"}
 )
+
 
 # Stores:
 # - Attempts
