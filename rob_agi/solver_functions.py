@@ -351,40 +351,23 @@ class ColoredGrid:
     """
 
 
-def run_eval(id: str, fn_code: str):
+def run_eval(id: str, fn_code: str, task_set="training"):
     from rob_agi.arc_util import load_task_set
     from rob_agi.colored_grid import ColoredGrid
 
-    task_set = "training"
-    # task_set = "evaluation"
     challenges, solutions = load_task_set(task_set_name=task_set)
     challenge = challenges[id]
-    exec("from rob_agi.colored_grid import ColoredGrid\n\n" + fn_code)
-    test_fn_handle = eval("solve_776ffc46")
-    results = []
+    exec(fn_code)
+
+    test_fn_handle = eval(f"solve_{id}")
+    results = {"examples": [], "test_cases": []}
     for i, example in enumerate(challenge.examples):
-        output = test_fn_handle(example.input)
-        print(f"Example {i + 1}:")
-        print(f"Input:")
-        print(example.input)
-        print(f"Output:")
-        print(output)
-        print(f"Expected:")
-        print(example.output)
-        print(f"Match: {output == example.output}")
-        print()
-        results.append(output == example.output)
+        output: ColoredGrid = test_fn_handle(example.input)
+        print(output.validate_report(example.output))
+        results["examples"].append(output == example.output)
 
     for i, test_case in enumerate(challenge.test_cases):
         output = test_fn_handle(test_case)
-        print(f"Test Case {i + 1}:")
-        print(f"Input:")
-        print(test_case)
-        print(f"Output:")
-        print(output)
-        print(f"Expected:")
-        print(solutions[id].outputs[i])
-        print(f"Match: {output == solutions[id].outputs[i]}")
-        print()
-        results.append(output == solutions[id].outputs[i])
+        print(output.validate_report(solutions[id].outputs[i]))
+        results["test_cases"].append(output == solutions[id].outputs[i])
     return results
