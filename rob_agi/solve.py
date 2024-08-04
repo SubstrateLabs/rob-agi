@@ -3,19 +3,15 @@ import base64
 import json
 import os
 import random
-import sys
 import time
 import traceback
-from io import StringIO
-from pprint import pprint
 from typing import List, Literal, Optional
 
 from substrate import Substrate, ComputeText, ComputeJSON, sb, FindOrCreateVectorStore, EmbedText, QueryVectorStore, Box
-from arc_util import task_sets, load_task_set
-from arc_vec import ResearchEvent, SolveAttempt
-from colored_grid import ColoredGrid
-from computed_result import ComputedResult
-from grid_problem import GridProblem
+from rob_agi.arc_util import load_task_set
+from rob_agi.arc_vec import ResearchEvent, SolveAttempt
+from rob_agi.computed_result import ComputedResult
+from rob_agi.grid_problem import GridProblem
 from solver_functions import (
     get_initial_impression,
     extract_result,
@@ -23,7 +19,6 @@ from solver_functions import (
     explain_research,
     arc_intro,
     attempt_challenge,
-    latest_research,
 )
 
 api_key = os.environ.get("SUBSTRATE_API_KEY")
@@ -73,7 +68,7 @@ json_model: ModelType = "Llama3Instruct8B"
 
 task_set = "training"
 # task_set = "evaluation"
-challenges, solutions = load_task_set(task_set_name=task_sets[task_set])
+challenges, solutions = load_task_set(task_set_name=task_set)
 
 max_concurrent = 48
 all_challenges = list(challenges.values())
@@ -93,7 +88,7 @@ def local_image_to_base64(image_path: str) -> str:
 
 
 def visual_parse(challenge: GridProblem):
-    path = "data/task_images"
+    path = "../data/task_images"
     image_path = os.path.join(path, f"{challenge.id}.png")
     if not os.path.exists(image_path):
         raise f"Image not found for task {challenge.id}"

@@ -2,9 +2,9 @@ from typing import List, Optional
 
 from substrate import sb
 
-from arc_vec import ResearchEvent, SuccessfulSolve
-from colored_grid import ColoredGrid
-from grid_problem import GridProblem
+from rob_agi.arc_vec import ResearchEvent, SuccessfulSolve
+from rob_agi.colored_grid import ColoredGrid
+from rob_agi.grid_problem import GridProblem
 
 latest_research = {
     "doc_id": "1722792113874098000",

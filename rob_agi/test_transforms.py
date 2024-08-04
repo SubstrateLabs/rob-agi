@@ -1,5 +1,5 @@
 import pytest
-from colored_grid import ColoredGrid
+from rob_agi.colored_grid import ColoredGrid
 
 
 @pytest.fixture

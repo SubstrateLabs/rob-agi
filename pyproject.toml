@@ -1,9 +1,11 @@
 [tool.poetry]
-name = "arc-agi"
+name = "rob-agi"
 version = "0.1.0"
 description = ""
 authors = ["Rob Cheung <kousun12@gmail.com>"]
 readme = "README.md"
+packages = [{include = "rob_agi"}]
+include = ["data/**/*"]
 
 [tool.ruff]
 line-length = 120
