@@ -38,9 +38,26 @@ MoA to solve
 
 
 Stores:
-- Solutions // things that have been solved
-  - What is the literal function that solves it
-  - What were the main ideas, observations, and functions that were important
-  - What was the process / plan
-  - What mistakes were made
-- 
+- Attempts
+  - summary 
+  - try number
+- Research Event Chain
+  - id is probably just timestamp 
+  - has a previous id
+  - keeps track of our current understanding of the entire challenge set
+- Latest Knowledge for each problem
+  - Solution (if solved)
+  - Summary of our latest guess
+  - Things we know about the problem
+  - Things we think are important
+  - Things we've tried
+  - Things that don't work
+  - Things that do work
+
+
+====================
+RESEARCH_PHASE
+====================
+For each problem, present what we know about it so far
+  - LatestKnowledge.summary
+

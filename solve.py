@@ -37,8 +37,6 @@ def local_image_to_base64(image_path: str) -> str:
         data = image_file.read()
         encoded = base64.b64encode(data).decode("utf-8")
         return f"data:image/png;base64,{encoded}"
-        # return f"data:image/jpeg;base64,"
-        # return
 
 
 def visual_parse(challenge: GridProblem):

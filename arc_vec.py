@@ -20,13 +20,13 @@ class KnowledgeGraph(BaseModel):
 
 
 class SolveAttempt(BaseModel):
-    main_ideas: str
-    """Short, dense, comprehensive description of the main idea behind the solution"""
+    concepts_used: List[str]
+    """List of important concepts used to solve the problem"""
     approach: str
     """Detailed approach and thinking taken to solve the problem"""
     python_function: str
     """
-    Python function that the user wrote to solve the problem
+    Python function that solves the problem both for the example cases and the test case.
     This function should be named `solve` and take in a single argument, `input` of type ColoredGrid and return a ColoredGrid
     Example:
     def solve(input: ColoredGrid) -> ColoredGrid:
@@ -34,7 +34,12 @@ class SolveAttempt(BaseModel):
     """
     was_successful: bool
     """Whether the attempt was successful or not"""
+    output_summary: Optional[str] = None
+    """Summary of the output after running the proposed solution"""
+    stdout: Optional[str] = None
+    """Standard output of the python function"""
     error_message: Optional[str] = None
+    """Error message if the attempt was not successful"""
 
 
 class ResearchEvent(BaseModel):
@@ -43,13 +48,9 @@ class ResearchEvent(BaseModel):
     space in general. In this phase we can ask questions, gather ideas, think about how to better understand and approach.
     """
 
-    open_questions: list[str]
-    """Unanswered questions that arise when observing new information"""
-    observations: list[str]
-    """Carefully considered observations about this new information that helps in understanding the problem space broadly"""
-    data: list[str]
-    """Specific data points to remember that may be generally useful in understanding the domain"""
-    necessary_concepts: list[str]
-    """Running list of ideas, concepts, and knowledge that is necessary to understand all the problems. This is a living document that grows and refactors as we learn more"""
-    ontology: KnowledgeGraph
-    """A graph of concepts and relationships that are relevant and important to keep in mind when thinking about the problem space"""
+    current_total_knowledge: str
+    """Organized, detailed summary of all the knowledge about the dataset that that we know so far. This is a living document that grows and refactors as we learn more and see more challenges. It is a place to make sure we don't forget anything important and distill the most important and useful information"""
+    ordered_concept_list: list[str]
+    """Running list of ideas, concepts, and knowledge that is necessary to solve all the challenges in the dataset. This list is ordered by importance and relevance. It changes over time as we see and solve more"""
+    new_knowledge: str
+    """New knowledge gained from the current research event. This will be incorporated into the current total knowledge, so should be a summary of the most important new things learned"""
