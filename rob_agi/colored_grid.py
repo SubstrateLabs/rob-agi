@@ -72,6 +72,15 @@ class ColoredGrid(BaseModel):
     def __eq__(self, other):
         return self.values == other.values
 
+    def validate_report(self, expected: "ColoredGrid") -> str:
+        result = ""
+        result += f"Output:\n"
+        result += str(self)
+        result += f"\nExpected:\n"
+        result += str(expected)
+        result += f"\nMatch: {self == expected}\n"
+        return result
+
     ##############################
     # Grid Operations:
     ##############################
