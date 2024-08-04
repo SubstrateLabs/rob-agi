@@ -10,7 +10,6 @@ Rough plan:
   - Generate an image of the problem
 - Find out a bunch of primitive functions like rotate, mirror, etc. according to distribution
 - Implement those functions
-
 - If you solve something, this is important
   - We need to save a clean version of the solution
     - Description of the problem
@@ -36,3 +35,12 @@ For any given problem, we will accrue information about attempts and what doesn'
 We can manually intervene when we know that it is struggling on something. We need a way for human to help out, and then for that help to be digested, incorporated, then remembered.
 There is maybe some basic visual processing we do
 MoA to solve
+
+
+Stores:
+- Solutions // things that have been solved
+  - What is the literal function that solves it
+  - What were the main ideas, observations, and functions that were important
+  - What was the process / plan
+  - What mistakes were made
+- 

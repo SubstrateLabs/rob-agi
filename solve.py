@@ -1,47 +1,85 @@
 import json
 import os
-from substrate import Substrate, ComputeText, ComputeJSON, sb
+from typing import List, Literal, Optional
+
+from substrate import Substrate, ComputeText, ComputeJSON, sb, FindOrCreateVectorStore
 from arc_util import task_sets, load_task_set
+from arc_vec import ResearchEvent
 from colored_grid import ColoredGrid
 from computed_result import ComputedResult
 from grid_problem import GridProblem
-from solver_functions import get_initial_impression
+from solver_functions import get_initial_impression, extract_result, gather_research
 
 api_key = os.environ.get("SUBSTRATE_API_KEY")
 substrate = Substrate(api_key=api_key, timeout=60 * 5)
-id = "0520fde7"
+collection = FindOrCreateVectorStore(collection_name="arc_events_raw", model="jina-v2")
+
+ModelType = Literal[
+    "Mistral7BInstruct",
+    "Mixtral8x7BInstruct",
+    "Llama3Instruct8B",
+    "Llama3Instruct70B",
+    "Llama3Instruct405B",
+    "Firellava13B",
+    "gpt-4o",
+    "gpt-4o-mini",
+    "claude-3-5-sonnet-20240620",
+]
+smart_model: ModelType = "Llama3Instruct70B"
+json_model: ModelType = "Llama3Instruct8B"
 
 challenges, solutions = load_task_set(task_set_name=task_sets["training"])
-challenge: GridProblem = challenges[id]
 
 
-json_prompt = f"""You have been tasked to solve a spatial reasoning test.
-You are given a few examples of a transform that you need to find.
-The goal is to find the function that fits the transform, then apply it to the test case.
+def first_try(challenge: GridProblem):
+    if len(challenge.test_cases) > 1:
+        final_task = f"Respond in JSON with the solutions for the {len(challenge.test_cases)} test cases in this task."
+    else:
+        final_task = "Respond in JSON with the solution for the test case in this task."
+    reason = ComputeText(prompt=get_initial_impression(challenge), model=smart_model)
+    result = ComputeJSON(
+        prompt=sb.concat(extract_result(challenge), reason.future.text, final_task),
+        json_schema=ComputedResult.json_schema(max_outputs=len(challenge.test_cases)),
+        model=json_model,
+    )
+    res = substrate.run(result)
+    print(json.dumps(res.json, indent=2))
+    solution = ComputedResult(outputs=[ColoredGrid(**j) for j in res.get(result).json_object["outputs"]])
+    print(solution.comparison_report(solutions[challenge.id]))
 
-You were given this challenge:
-{challenge.to_task_description()}
 
-Your evaluation was:
-"""
+def research_pass(challenge_list: List[GridProblem], prev_event: Optional[ResearchEvent] = None, passes=1):
+    prev_str = json.dumps(prev_event.model_dump()) if prev_event is not None else None
+    think = ComputeText(prompt=gather_research(challenge_list, previous_research=prev_str), model=smart_model)
 
-if len(challenge.test_cases) > 1:
-    final_task = f"Respond in JSON with the solutions for the {len(challenge.test_cases)} test cases in this task."
-else:
-    final_task = "Respond in JSON with the solution for the test case in this task."
+    research = ComputeJSON(
+        prompt=gather_research(challenge_list, think.future.text),
+        json_schema=ResearchEvent.model_json_schema(),
+        model=json_model,
+    )
+    tail = research
+    if passes > 1:
+        for i in range(passes - 1):
+            next_pass = ComputeJSON(
+                prompt=gather_research(challenge_list, sb.jq(tail.future.json_object, "@json")),
+                json_schema=ResearchEvent.model_json_schema(),
+                model=json_model,
+            )
+            tail = next_pass
 
-# write a python function that solves the test case. The function should validate correctly on all the train cases."""
-# challenge = GridProblem.parse(id=id, train=example["train"], test=example["test"])
+    res = substrate.run(tail)
+    print(json.dumps(res.json, indent=2))
+    return ResearchEvent.model_validate(res.get(tail).json_object)
 
-reason = ComputeText(prompt=get_initial_impression(challenge), model="Llama3Instruct70B")
-result = ComputeJSON(
-    prompt=sb.concat(json_prompt, reason.future.text),
-    json_schema=ComputedResult.json_schema(max_outputs=len(challenge.test_cases)),
-    model="Llama3Instruct8B",
-)
-#
-res = substrate.run(result)
-print(json.dumps(res.json, indent=2))
 
-solution = ComputedResult(outputs=[ColoredGrid(**j) for j in res.get(result).json_object["outputs"]])
-print(solution.comparison_report(solutions[id]))
+def main():
+    id = "0520fde7"
+    challenge: GridProblem = challenges[id]
+    # first_try(challenge)
+    ids = list(challenges.keys())[0:5]
+    challenge_list = [challenges[id] for id in ids]
+    research_pass(challenge_list)
+
+
+if __name__ == "__main__":
+    main()
