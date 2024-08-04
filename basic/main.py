@@ -16,14 +16,18 @@ improve_output_prompt = """
 Given the following string, please give me a valid JSON list.
 {input_text}
 """
+
+
 class JSONListOutput(BaseModel):
     output: list[list[int]]
 
+
 def init_substrate_client():
-    api_key = os.environ['SUBSTRATE_API_KEY']
+    api_key = os.environ["SUBSTRATE_API_KEY"]
     return Substrate(
         api_key=api_key,
     )
+
 
 def llm(prompt: str, model: str) -> dict:
     substrate = init_substrate_client()
@@ -42,8 +46,9 @@ def llm(prompt: str, model: str) -> dict:
         json_schema=JSONListOutput.model_json_schema(),
     )
     res = substrate.run(improve_output_node)
-    #print(res.json)
+    # print(res.json)
     return res.get(improve_output_node).json_object
+
 
 def generate_output(model: str, challenges: dict, task_id: str, retries: int = 2):
     task_prompt = json_task_to_string(
@@ -53,7 +58,8 @@ def generate_output(model: str, challenges: dict, task_id: str, retries: int = 2
     prompt = prompt_format.format(task_prompt)
     out = llm(prompt, model)
     print(out)
-    return out['output']
+    return out["output"]
+
 
 def define_node(model: str, challenges: dict, task_id: str):
     task_prompt = json_task_to_string(
@@ -76,9 +82,11 @@ def define_node(model: str, challenges: dict, task_id: str):
     )
     return improve_output_node
 
+
 def run_nodes(nodes: list) -> SubstrateResponse:
     substrate = init_substrate_client()
     return substrate.run(*nodes)
+
 
 def evaluate_training_concurrent(num_tasks: int = -1, model: str = "claude-3-5-sonnet-20240620"):
     challenges, solutions = load_training_tasks()
@@ -108,7 +116,7 @@ def evaluate_training_concurrent(num_tasks: int = -1, model: str = "claude-3-5-s
         print(f"Task: {task_id}")
         expected = solutions[task_id][0]
         try:
-            out = res.get(task_id_to_node[task_id]).json_object['output']
+            out = res.get(task_id_to_node[task_id]).json_object["output"]
         except ValidationError as e:
             print("Failed to pydanic output validaiton")
             failed_response += 1
@@ -128,6 +136,7 @@ def evaluate_training_concurrent(num_tasks: int = -1, model: str = "claude-3-5-s
             right += 1
     print(f"Failed to get response for {failed_response} outputs")
     return right, num_tasks
+
 
 def evaluate_training_synchronous(num_tasks: int = -1, model: str = "claude-3-5-sonnet-20240620"):
     challenges, solutions = load_training_tasks()
@@ -162,10 +171,11 @@ def evaluate_training_synchronous(num_tasks: int = -1, model: str = "claude-3-5-
         count += 1
     return right, num_tasks
 
+
 def evaluate_training(num_tasks: int = -1, model: str = "claude-3-5-sonnet-20240620", concurrent: bool = False):
-    print('##############################################')
+    print("##############################################")
     print("EVALUATING MODEL: ", model)
-    print('##############################################')
+    print("##############################################")
     if concurrent:
         right, total = evaluate_training_concurrent(num_tasks=num_tasks, model=model)
     else:
@@ -174,15 +184,16 @@ def evaluate_training(num_tasks: int = -1, model: str = "claude-3-5-sonnet-20240
     print(f"Accuracy: {right / total}")
     print()
 
+
 def main():
-    num_tasks = 10
+    num_tasks = 30
     concurrent = True
-    # evaluate_training(num_tasks=num_tasks, model="claude-3-5-sonnet-20240620", concurrent=concurrent)
+    evaluate_training(num_tasks=num_tasks, model="claude-3-5-sonnet-20240620", concurrent=concurrent)
     # evaluate_training(num_tasks=num_tasks, model="Llama3Instruct405B", concurrent=concurrent)
-    evaluate_training(num_tasks=num_tasks, model="Llama3Instruct70B", concurrent=concurrent)
+    # evaluate_training(num_tasks=num_tasks, model="Llama3Instruct70B", concurrent=concurrent)
     # evaluate_training(num_tasks=num_tasks, model="Llama3Instruct8B", concurrent=concurrent)
     # evaluate_training(num_tasks=num_tasks, model="gpt-4o", concurrent=concurrent)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

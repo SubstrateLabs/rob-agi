@@ -93,14 +93,21 @@ def attempt_challenge(challenge: GridProblem, reasoning: str) -> str:
     {challenge.to_task_description()}
     
     This is your latest reasoning:
+    
+    <REASONING>
     {reasoning}
+    </REASONING>
     
     The ColoredGrid class has many methods that can help you analyze and manipulate the grids:
+    <GRID_METHODS>
     {get_grid_class_overview()}
+    </GRID_METHODS>
     
-    Give it your best effort to consider all of that and solve the challenge in this JSON format:
+    Your solution should have the following fields:
     
-    {SuccessfulSolve.model_json_schema()} 
+    {SuccessfulSolve.field_summary()} 
+    
+    Make sure that the python function is valid and standalone. It should be named solve_{challenge.id} and take in a grid and return a grid. 
     """
     )
 

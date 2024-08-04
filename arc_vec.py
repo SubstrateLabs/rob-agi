@@ -1,4 +1,4 @@
-from typing import List, Optional, Any, Dict
+from typing import List, Optional, Any, Dict, get_type_hints
 
 from pydantic import BaseModel, Field
 
@@ -19,23 +19,11 @@ class KnowledgeGraph(BaseModel):
     edges: List[Edge] = Field(default_factory=list)
 
 
-class SolveAttempt(BaseModel):
-    task_id: str = Field(..., description="ID of the task being solved")
-    concepts_used: List[str] = Field(..., description="List of important concepts used to solve the problem")
-    approach: List[str] = Field(
-        ..., description="Detailed list of steps and thinking done to solve the problem, ordered"
-    )
-    python_function: str = Field(
-        ...,
-        description="""Python function that solves the problem both for the example cases and the test case. 
-        This function should be named `solve` and take in a single argument, `input` of type ColoredGrid and return a ColoredGrid
-        Example:
-        def solve(input: ColoredGrid) -> ColoredGrid:
-            pass""",
-    )
-    solution: List[List[int]] = Field(..., description="List of lists representing the solution grid")
-    stdout: Optional[str] = Field(None, description="Standard output of the python function")
-    error_message: Optional[str] = Field(None, description="Error message if the attempt was not successful")
+def simplify_type(type_hint):
+    type_str = str(type_hint)
+    if type_str.startswith("<class '") and type_str.endswith("'>"):
+        return type_str[8:-2]  # Remove <class '...'> wrapper
+    return type_str.replace("typing.", "")
 
 
 class SuccessfulSolve(BaseModel):
@@ -44,14 +32,42 @@ class SuccessfulSolve(BaseModel):
     approach: List[str] = Field(
         ..., description="Detailed list of steps and thinking done to solve the problem, ordered"
     )
+    solution: List[List[int]] = Field(..., description="List of lists representing the solution grid")
     python_function: str = Field(
         ...,
-        description="""Python function that solves the problem both for the example cases and the test case. 
-        This function should be named `solve` and take in a single argument, `input` of type ColoredGrid and return a ColoredGrid
-        Example:
-        def solve(input: ColoredGrid) -> ColoredGrid:
-            pass""",
+        description="Valid python function that solves the problem both for the example cases and the test case. This function should be named `solve_<challenge_id>` and take in a single argument, `input` of type ColoredGrid and return a ColoredGrid. The <challenge_id> should be replaced with the task_id of the challenge: def solve_<challenge_id>(input: ColoredGrid) -> ColoredGrid: ...",
     )
+
+    @classmethod
+    def field_summary(cls) -> str:
+        summary = [f"Model: {cls.__name__}\n"]
+        for name, field in cls.model_fields.items():
+            field_type = simplify_type(get_type_hints(cls)[name])
+            description = field.description or "No description"
+            description = " ".join(description.split())
+            summary.append(f"{name} ({field_type}): {description}")
+        return "\n".join(summary)
+
+
+class SolveAttempt(SuccessfulSolve):
+    stdout: Optional[str] = Field(None, description="Standard output of the python function")
+    error_message: Optional[str] = Field(None, description="Error message if the attempt was not successful")
+
+    @classmethod
+    def simple_json_schema(cls):
+        return {
+            "type": "object",
+            "properties": {
+                "task_id": {"type": "string"},
+                "concepts_used": {"type": "array", "items": {"type": "string"}},
+                "approach": {"type": "array", "items": {"type": "string"}},
+                "solution": {"type": "array", "items": {"type": "array", "items": {"type": "integer"}}},
+                "python_function": {"type": "string"},
+                "stdout": {"type": "string"},
+                "error_message": {"type": "string"},
+            },
+            "required": ["task_id", "concepts_used", "approach", "solution", "python_function"],
+        }
 
 
 class ResearchEvent(BaseModel):
