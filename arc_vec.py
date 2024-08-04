@@ -40,7 +40,7 @@ class SolveAttempt(BaseModel):
 class ResearchEvent(BaseModel):
     """
     Research phase happens at the beginning and periodically later. Its job is to gather information about the problem
-    space in general. In this phase we can ask questions, make hypotheses, and gather data.
+    space in general. In this phase we can ask questions, gather ideas, think about how to better understand and approach.
     """
 
     open_questions: list[str]
