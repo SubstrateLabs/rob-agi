@@ -31,5 +31,8 @@ class ComputedResult(BaseModel):
         if max_outputs is None:
             return schema
         schema["properties"]["outputs"]["maxItems"] = max_outputs
-        print(schema)
         return schema
+
+
+class MultipleComputedResults(BaseModel):
+    results: List[ComputedResult]

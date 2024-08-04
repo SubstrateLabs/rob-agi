@@ -37,6 +37,14 @@ class GridProblem(BaseModel):
 
         return task_string
 
+    def example_string(self):
+        task_string = ""
+        for i, example in enumerate(self.examples):
+            task_string += f"Example {i + 1}:\n"
+            task_string += f"Input:\n{str(example.input)}\n"
+            task_string += f"Output:\n{str(example.output)}\n\n"
+        return task_string
+
     @classmethod
     def parse(cls, id: str, train: List[Dict[str, Any]], test: List[Dict[str, Any]]) -> "GridProblem":
         examples_list = []
