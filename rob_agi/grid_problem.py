@@ -1,7 +1,7 @@
 from typing import Dict, Any, List
 
-from pydantic import BaseModel, model_validator
-from colored_grid import ColoredGrid
+from pydantic import BaseModel
+from rob_agi.colored_grid import ColoredGrid
 
 
 class Solution(BaseModel):

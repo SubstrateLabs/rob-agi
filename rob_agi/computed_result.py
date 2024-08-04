@@ -1,7 +1,7 @@
 from typing import List, Optional
 from pydantic import BaseModel, Field
 
-from colored_grid import ColoredGrid
+from rob_agi.colored_grid import ColoredGrid
 
 
 class ComputedResult(BaseModel):

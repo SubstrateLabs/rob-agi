@@ -2,9 +2,9 @@ import json
 from importlib import resources
 from pathlib import Path
 
-from colored_grid import ColoredGrid
-from computed_result import ComputedResult
-from grid_problem import GridProblem
+from rob_agi.colored_grid import ColoredGrid
+from rob_agi.computed_result import ComputedResult
+from rob_agi.grid_problem import GridProblem
 
 
 def get_data_path(filename):
