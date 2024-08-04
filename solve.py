@@ -1,3 +1,4 @@
+import base64
 import json
 import os
 from typing import List, Literal, Optional
@@ -29,6 +30,32 @@ smart_model: ModelType = "Llama3Instruct70B"
 json_model: ModelType = "Llama3Instruct8B"
 
 challenges, solutions = load_task_set(task_set_name=task_sets["training"])
+
+
+def local_image_to_base64(image_path: str) -> str:
+    with open(image_path, "rb") as image_file:
+        data = image_file.read()
+        encoded = base64.b64encode(data).decode("utf-8")
+        return f"data:image/png;base64,{encoded}"
+        # return f"data:image/jpeg;base64,"
+        # return
+
+
+def visual_parse(challenge: GridProblem):
+    path = "data/task_images"
+    image_path = os.path.join(path, f"{challenge.id}.png")
+    if not os.path.exists(image_path):
+        raise f"Image not found for task {challenge.id}"
+    uri = local_image_to_base64(image_path)
+    look_at = ComputeText(
+        prompt="This is an ARC reasoning challenge. The goal is to find the transform that takes the input grids to the output grids. The description of the transform is often simple to express in words. Look at these example input (top) output (bottom) pairs and suggest a high level solution. Concepts like symmetry, rotation, masking, and color patterns are often useful. Your final solution should be short, only a sentence or two.",
+        # model="Firellava13B",
+        model="claude-3-5-sonnet-20240620",
+        # model="gpt-4o",
+        image_uris=[uri],
+    )
+    res = substrate.run(look_at)
+    print(json.dumps(res.json, indent=2))
 
 
 def first_try(challenge: GridProblem):
@@ -73,12 +100,17 @@ def research_pass(challenge_list: List[GridProblem], prev_event: Optional[Resear
 
 
 def main():
-    id = "0520fde7"
+    # id = "0520fde7"
+    # 3bd67248
+    id = "3bd67248"
     challenge: GridProblem = challenges[id]
     # first_try(challenge)
-    ids = list(challenges.keys())[0:5]
-    challenge_list = [challenges[id] for id in ids]
-    research_pass(challenge_list)
+
+    # ids = list(challenges.keys())[0:5]
+    # challenge_list = [challenges[id] for id in ids]
+    # research_pass(challenge_list)
+
+    visual_parse(challenge)
 
 
 if __name__ == "__main__":

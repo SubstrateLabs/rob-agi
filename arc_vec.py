@@ -49,5 +49,7 @@ class ResearchEvent(BaseModel):
     """Carefully considered observations about this new information that helps in understanding the problem space broadly"""
     data: list[str]
     """Specific data points to remember that may be generally useful in understanding the domain"""
+    necessary_concepts: list[str]
+    """Running list of ideas, concepts, and knowledge that is necessary to understand all the problems. This is a living document that grows and refactors as we learn more"""
     ontology: KnowledgeGraph
     """A graph of concepts and relationships that are relevant and important to keep in mind when thinking about the problem space"""
