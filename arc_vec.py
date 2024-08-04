@@ -20,26 +20,38 @@ class KnowledgeGraph(BaseModel):
 
 
 class SolveAttempt(BaseModel):
-    concepts_used: List[str]
-    """List of important concepts used to solve the problem"""
-    approach: str
-    """Detailed approach and thinking taken to solve the problem"""
-    python_function: str
-    """
-    Python function that solves the problem both for the example cases and the test case.
-    This function should be named `solve` and take in a single argument, `input` of type ColoredGrid and return a ColoredGrid
-    Example:
-    def solve(input: ColoredGrid) -> ColoredGrid:
-       pass
-    """
-    was_successful: bool
-    """Whether the attempt was successful or not"""
-    output_summary: Optional[str] = None
-    """Summary of the output after running the proposed solution"""
-    stdout: Optional[str] = None
-    """Standard output of the python function"""
-    error_message: Optional[str] = None
-    """Error message if the attempt was not successful"""
+    task_id: str = Field(..., description="ID of the task being solved")
+    concepts_used: List[str] = Field(..., description="List of important concepts used to solve the problem")
+    approach: List[str] = Field(
+        ..., description="Detailed list of steps and thinking done to solve the problem, ordered"
+    )
+    python_function: str = Field(
+        ...,
+        description="""Python function that solves the problem both for the example cases and the test case. 
+        This function should be named `solve` and take in a single argument, `input` of type ColoredGrid and return a ColoredGrid
+        Example:
+        def solve(input: ColoredGrid) -> ColoredGrid:
+            pass""",
+    )
+    solution: List[List[int]] = Field(..., description="List of lists representing the solution grid")
+    stdout: Optional[str] = Field(None, description="Standard output of the python function")
+    error_message: Optional[str] = Field(None, description="Error message if the attempt was not successful")
+
+
+class SuccessfulSolve(BaseModel):
+    task_id: str = Field(..., description="ID of the task being solved")
+    concepts_used: List[str] = Field(..., description="List of important concepts used to solve the problem")
+    approach: List[str] = Field(
+        ..., description="Detailed list of steps and thinking done to solve the problem, ordered"
+    )
+    python_function: str = Field(
+        ...,
+        description="""Python function that solves the problem both for the example cases and the test case. 
+        This function should be named `solve` and take in a single argument, `input` of type ColoredGrid and return a ColoredGrid
+        Example:
+        def solve(input: ColoredGrid) -> ColoredGrid:
+            pass""",
+    )
 
 
 class ResearchEvent(BaseModel):
