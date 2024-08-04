@@ -6,8 +6,10 @@ from arc_vec import ResearchEvent, SuccessfulSolve
 from colored_grid import ColoredGrid
 from grid_problem import GridProblem
 
-latest_distillation = {
-    "current_total_knowledge": "The tasks involve transforming 2D colored grids represented as lists of lists, with colors encoded as numbers 0-9. Grids range from 1x1 to 30x30 in size. Transformations require pattern recognition, spatial reasoning, and rule application. Key aspects include: 1. Identifying color patterns, shapes, and structures within grids 2. Applying color-based transformations and mappings 3. Performing spatial operations like expanding, shifting, or compressing patterns 4. Implementing rule-based modifications based on grid structure and element relationships 5. Handling grid boundaries and edge cases 6. Executing conditional and multi-step transformations 7. Recognizing and utilizing anchor points or special colors 8. Filling shapes and propagating patterns directionally or symmetrically 9. Extracting sub-patterns and resizing grids 10. Creating frames, borders, and symmetrical arrangements Challenges often combine multiple concepts and require flexible thinking to identify and apply transformation rules to different grid sections or sub-patterns.",
+latest_research = {
+    "doc_id": "1722792113874098000",
+    "previous_id": "1722792087552733000",
+    "new_knowledge": "New insights from recent challenges include: \\\\n1. Grid expansion techniques: Some transformations involve expanding the grid by multiplying the size of each cell (e.g., 1x1 cells becoming 3x3 or 5x5).\\\\n2. Multi-scale pattern recognition: Patterns may need to be recognized and transformed across different scales within the same grid.\\\\n3. Element creation and pattern generation: Some transformations involve creating new elements or patterns that weren't present in the original grid.\\\\n4. Complex nested transformations: Challenges may require identifying patterns within patterns and applying different rules at each level.\\\\n5. Adaptive rule application: The same color or pattern might require different transformations based on its position or surrounding context.",
     "ordered_concept_list": [
         "Pattern Recognition",
         "Color Mapping and Replacement",
@@ -29,8 +31,54 @@ latest_distillation = {
         "Frame and Border Creation",
         "Diagonal Pattern Handling",
         "Modular Transformations",
+        "Shape Isolation",
+        "Position-dependent Transformations",
+        "Pattern Replication",
+        "Selective Element Preservation",
+        "Nested Pattern Recognition",
+        "Global Grid Transformations",
+        "Grid Expansion Techniques",
+        "Multi-scale Pattern Recognition",
+        "Element Creation and Pattern Generation",
     ],
-    "new_knowledge": "Recent challenges emphasize: 1. Identifying and filling hollow shapes, often based on 'seed' colors 2. Directional and symmetrical pattern propagation 3. Extracting and isolating specific patterns, resulting in grid compression 4. Complex multi-step transformations combining shape identification, filling, and propagation 5. Position-dependent transformation rules 6. Creating diagonal patterns and alternating color sequences 7. Grid expansion through pattern replication 8. Preserving certain elements while transforming others These observations highlight the need for a flexible approach capable of handling complex shapes, multiple transformation rules, and both expansion and compression of grid elements within a single challenge.",
+    "current_total_knowledge": "The tasks involve transforming 2D colored grids represented as lists of lists, with colors encoded as numbers 0-9. Grids range from 1x1 to 30x30 in size. Transformations require pattern recognition, spatial reasoning, and rule application. Key aspects include:\\\\n1. Identifying color patterns, shapes, and structures within grids\\\\n2. Applying color-based transformations and mappings\\\\n3. Performing spatial operations like expanding, shifting, or compressing patterns\\\\n4. Implementing rule-based modifications based on grid structure and element relationships\\\\n5. Handling grid boundaries and edge cases\\\\n6. Executing conditional and multi-step transformations\\\\n7. Recognizing and utilizing anchor points or special colors\\\\n8. Filling shapes and propagating patterns directionally or symmetrically\\\\n9. Extracting sub-patterns and resizing grids\\\\n10. Creating frames, borders, and symmetrical arrangements\\\\n11. Identifying and isolating specific shapes or patterns\\\\n12. Applying transformations based on relative positions within the grid\\\\n13. Replicating patterns to expand grids\\\\n14. Selectively preserving certain elements while transforming others\\\\n15. Creating diagonal patterns and alternating color sequences\\\\n16. Handling complex shape recognition and filling operations\\\\n17. Applying color-specific rules that may vary based on the input pattern\\\\n18. Implementing position-dependent transformation logic\\\\n19. Combining multiple transformation rules within a single challenge\\\\n20. Preserving grid structure while modifying internal elements\\\\n21. Recognizing and transforming nested patterns\\\\n22. Applying transformations that affect the entire grid based on specific elements\\\\n23. Implementing grid expansion techniques, such as multiplying cell sizes\\\\n24. Recognizing and transforming patterns across different scales\\\\n25. Applying transformations that create new elements or patterns\\\\nChallenges often combine multiple concepts and require flexible thinking to identify and apply transformation rules to different grid sections or sub-patterns. The approach needs to be sophisticated enough to handle complex shape recognition, multiple transformation rules, expansion and compression, position-dependent and color-specific logic, and selective preservation of elements.\\\\n\\\\nNew insights from recent challenges include: \\\\n1. Grid expansion techniques: Some transformations involve expanding the grid by multiplying the size of each cell (e.g., 1x1 cells becoming 3x3 or 5x5).\\\\n2. Multi-scale pattern recognition: Patterns may need to be recognized and transformed across different scales within the same grid.\\\\n3. Element creation and pattern generation: Some transformations involve creating new elements or patterns that weren't present in the original grid.\\\\n4. Complex nested transformations: Challenges may require identifying patterns within patterns and applying different rules at each level.\\\\n5. Adaptive rule application: The same color or pattern might require different transformations based on its position or surrounding context.\\\\nThese findings emphasize the need for a more sophisticated approach that can handle complex, multi-scale transformations, adaptive rule application, and the generation of new patterns or elements within the grid.",
+}
+latest_distillation = {
+    "doc_id": "1722793347075954000",
+    "current_total_knowledge": "The tasks involve transforming 2D colored grids represented as lists of lists, with colors encoded as numbers 0-9. Grids range from 1x1 to 30x30 in size. Transformations require pattern recognition, spatial reasoning, and rule application. Key aspects include:\\\\n1. Identifying color patterns, shapes, and structures within grids\\\\n2. Applying color-based transformations and mappings\\\\n3. Performing spatial operations like expanding, shifting, or compressing patterns\\\\n4. Implementing rule-based modifications based on grid structure and element relationships\\\\n5. Handling grid boundaries and edge cases\\\\n6. Executing conditional and multi-step transformations\\\\n7. Recognizing and utilizing anchor points or special colors\\\\n8. Filling shapes and propagating patterns directionally or symmetrically\\\\n9. Extracting sub-patterns and resizing grids\\\\n10. Creating frames, borders, and symmetrical arrangements\\\\n11. Applying transformations based on relative positions within the grid\\\\n12. Replicating patterns to expand grids\\\\n13. Selectively preserving certain elements while transforming others\\\\n14. Creating diagonal patterns and alternating color sequences\\\\n15. Handling complex shape recognition and filling operations\\\\n16. Applying color-specific rules that may vary based on the input pattern\\\\n17. Implementing position-dependent transformation logic\\\\n18. Combining multiple transformation rules within a single challenge\\\\n19. Recognizing and transforming nested patterns\\\\n20. Applying transformations that affect the entire grid based on specific elements\\\\nChallenges often combine multiple concepts and require flexible thinking to identify and apply transformation rules to different grid sections or sub-patterns.",
+    "ordered_concept_list": [
+        "Pattern Recognition",
+        "Color Mapping and Replacement",
+        "Spatial Reasoning",
+        "Rule Identification and Application",
+        "Grid Structure Analysis",
+        "Conditional Transformations",
+        "Multi-step Operations",
+        "Shape Identification and Filling",
+        "Boundary and Anchor Detection",
+        "Pattern Propagation",
+        "Directional Transformations",
+        "Symmetry and Mirroring",
+        "Sub-grid Identification and Transformation",
+        "Grid Resizing and Extraction",
+        "Complex Shape Recognition",
+        "Color-based Conditional Logic",
+        "Element Preservation",
+        "Frame and Border Creation",
+        "Diagonal Pattern Handling",
+        "Modular Transformations",
+        "Shape Isolation",
+        "Position-dependent Transformations",
+        "Pattern Replication",
+        "Selective Element Preservation",
+        "Nested Pattern Recognition",
+        "Global Grid Transformations",
+        "Grid Expansion Techniques",
+        "Multi-scale Pattern Recognition",
+        "Element Creation and Pattern Generation",
+    ],
+    "new_knowledge": "Recent challenges have revealed more advanced concepts:\\\\n1. Grid expansion techniques: Transformations may involve expanding the grid by multiplying cell sizes.\\\\n2. Multi-scale pattern recognition: Patterns may need to be recognized and transformed across different scales within the same grid.\\\\n3. Element creation and pattern generation: Some transformations create new elements or patterns not present in the original grid.\\\\n4. Complex nested transformations: Challenges may require identifying patterns within patterns and applying different rules at each level.\\\\n5. Adaptive rule application: The same color or pattern might require different transformations based on its position or surrounding context.\\\\n6. Color-based conditional logic: Different transformations are applied based on specific grid elements.\\\\n7. Diagonal patterns and alternating colors: Some challenges involve creating these in specific rows or columns.\\\\n8. Preserving elements selectively: Careful handling of different grid sections is required when preserving some elements while transforming others.",
+    "distillation": True,
 }
 
 

@@ -23,6 +23,7 @@ from solver_functions import (
     explain_research,
     arc_intro,
     attempt_challenge,
+    latest_research,
 )
 
 api_key = os.environ.get("SUBSTRATE_API_KEY")
@@ -366,7 +367,7 @@ def distill_research():
         collection_name="arc_research_events",
         query_strings=[
             arc_intro(short=True)
-            + "We need to find and distill all knowledge learned so far about solving these challenges"
+            + "We need to find and distill all knowledge learned so far about solving these challenges. Prefer recent, comprehensive, quality research items"
         ],
         top_k=12,
         include_metadata=True,
@@ -451,33 +452,8 @@ async def main():
     # return ResearchEvent.model_validate(res.get(tail).json_object)
 
     # visual_parse(challenge)
-    last = ResearchEvent(
-        current_total_knowledge="The tasks involve transforming 2D colored grids represented as lists of lists, with colors encoded as numbers 0-9. Grids range from 1x1 to 30x30 in size. Transformations require pattern recognition, spatial reasoning, and rule application. Key aspects include: 1. Identifying color patterns, shapes, and structures within grids 2. Applying color-based transformations and mappings 3. Performing spatial operations like expanding, shifting, or compressing patterns 4. Implementing rule-based modifications based on grid structure and element relationships 5. Handling grid boundaries and edge cases 6. Executing conditional and multi-step transformations 7. Recognizing and utilizing anchor points or special colors 8. Filling shapes and propagating patterns directionally or symmetrically 9. Extracting sub-patterns and resizing grids 10. Creating frames, borders, and symmetrical arrangements Challenges often combine multiple concepts and require flexible thinking to identify and apply transformation rules to different grid sections or sub-patterns.",
-        new_knowledge="Recent challenges emphasize: 1. Identifying and filling hollow shapes, often based on 'seed' colors 2. Directional and symmetrical pattern propagation 3. Extracting and isolating specific patterns, resulting in grid compression 4. Complex multi-step transformations combining shape identification, filling, and propagation 5. Position-dependent transformation rules 6. Creating diagonal patterns and alternating color sequences 7. Grid expansion through pattern replication 8. Preserving certain elements while transforming others These observations highlight the need for a flexible approach capable of handling complex shapes, multiple transformation rules, and both expansion and compression of grid elements within a single challenge.",
-        ordered_concept_list=[
-            "Pattern Recognition",
-            "Color Mapping and Replacement",
-            "Spatial Reasoning",
-            "Rule Identification and Application",
-            "Grid Structure Analysis",
-            "Conditional Transformations",
-            "Multi-step Operations",
-            "Shape Identification and Filling",
-            "Boundary and Anchor Detection",
-            "Pattern Propagation",
-            "Directional Transformations",
-            "Symmetry and Mirroring",
-            "Sub-grid Identification and Transformation",
-            "Grid Resizing and Extraction",
-            "Complex Shape Recognition",
-            "Color-based Conditional Logic",
-            "Element Preservation",
-            "Frame and Border Creation",
-            "Diagonal Pattern Handling",
-            "Modular Transformations",
-        ],
-    )
-    research_loop(prev_event=last)
+    # last = ResearchEvent(**latest_research)
+    # research_loop(prev_event=last)
     # distill_research()
 
     # await solve_loop()
