@@ -84,12 +84,12 @@ latest_distillation = {
 
 def arc_intro(short=False) -> str:
     base = """
-    This is a test of abstract and reasoning thinking skills. It presents puzzles where you see a few 
-    examples and must figure out the hidden rule. Then you apply this rule to new situations. It tests how well 
-    one can spot patterns, think abstractly, and solve problems creatively. It uses many different types of 
-    puzzles, so you need to be flexible in your thinking. The main challenge is understanding complex ideas 
-    from very little information, then using what you've learned in new ways.
-    """
+This is a test of abstract and reasoning thinking skills. It presents puzzles where you see a few 
+examples and must figure out the hidden rule. Then you apply this rule to new situations. It tests how well 
+one can spot patterns, think abstractly, and solve problems creatively. It uses many different types of 
+puzzles, so you need to be flexible in your thinking. The main challenge is understanding complex ideas 
+from very little information, then using what you've learned in new ways.
+"""
     if short:
         return base
     bullet_points = "\n- ".join(latest_distillation["ordered_concept_list"])
@@ -104,31 +104,30 @@ def arc_intro(short=False) -> str:
 
 
 def grid_setup() -> str:
-    return f"""The grids are represented as a list of lists where each inner list represents a row and each element in the row
-    represents a color.
-    Number values correspond to colored squares: {ColoredGrid.color_mapping_str}
-    
-    All grids are rectangular and can be between 1x1 and 30x30 in size.
-    """
+    return f"""The grids are represented as a list of lists where each inner list represents a row and each element in the row represents a color.
+Number values correspond to colored squares: {ColoredGrid.color_mapping_str}
+
+All grids are rectangular and can be between 1x1 and 30x30 in size.
+"""
 
 
 def get_initial_impression(challenge: GridProblem) -> str:
     return (
         arc_intro()
         + f"""Below is a challenge from the test. You are tasked to solve it.
-    The challenge involves transforming one colored 2D grid into another.
-    You will be given a few examples of the transform in the form of input output pairs.
-    You will also be given a test case that you need to solve.
-    The goal is to find the function that fits all the examples, then apply it to the test case to compute a solution. 
-    If you consider code here, only consider python pseudocode.
-    
-    {grid_setup()}
-    
-    Here is your current challenge:
+The challenge involves transforming one colored 2D grid into another.
+You will be given a few examples of the transform in the form of input output pairs.
+You will also be given a test case that you need to solve.
+The goal is to find the function that fits all the examples, then apply it to the test case to compute a solution. 
+If you consider code here, only consider python pseudocode.
 
-    {challenge.to_task_description()}
-    
-    """
+{grid_setup()}
+
+Here is your current challenge:
+
+{challenge.to_task_description()}
+
+"""
     )
 
 
@@ -137,27 +136,27 @@ def attempt_challenge(challenge: GridProblem, reasoning: str) -> str:
         arc_intro()
         + f"""Below is a challenge from the test. You are tasked to solve it.
 
-    This is the current challenge:
-    {challenge.to_task_description()}
-    
-    This is your latest reasoning:
-    
-    <REASONING>
-    {reasoning}
-    </REASONING>
-    
-    The ColoredGrid class has many methods that can help you analyze and manipulate the grids:
-    <GRID_METHODS>
-    {get_grid_class_overview()}
-    </GRID_METHODS>
-    
-    Your solution should have the following fields:
-    
-    {SuccessfulSolve.field_summary()} 
-    
-    Make sure that the python function is valid and standalone. It should be named solve_{challenge.id} and take in a grid and return a grid. 
-    Show your work. Your solution should clearly and completely communicate the concepts used, the approach taken.
-    """
+This is the current challenge:
+{challenge.to_task_description()}
+
+This is your latest reasoning:
+
+<REASONING>
+{reasoning}
+</REASONING>
+
+The ColoredGrid class has many methods that can help you analyze and manipulate the grids:
+<GRID_METHODS>
+{get_grid_class_overview()}
+</GRID_METHODS>
+
+Your solution should have the following fields:
+
+{SuccessfulSolve.field_summary()} 
+
+Make sure that the python function is valid and standalone. It should be named solve_{challenge.id} and take in a grid and return a grid. 
+Show your work. Your solution should clearly and completely communicate the concepts used, the approach taken.
+"""
     )
 
 
@@ -184,31 +183,31 @@ def gather_research(challenges: List[GridProblem], previous_research: Optional[s
     base = (
         arc_intro(short=True)
         + f"""Below is a collection of {len(challenges)} abstract reasoning challenges.
-    Each challenge involves transforming one colored 2D grid into another.
-    Each challenge contains a few examples of the transform demonstrated by input output pairs.
-    Each challenge also contains a test case that is unsolved.
-    The goal is to be able to identify the correct transformation and be able to implement it as a python function.
+Each challenge involves transforming one colored 2D grid into another.
+Each challenge contains a few examples of the transform demonstrated by input output pairs.
+Each challenge also contains a test case that is unsolved.
+The goal is to be able to identify the correct transformation and be able to implement it as a python function.
 
-    {grid_setup()}
-    
-    Your goal right now is to gather information about the problem space in general. You are in the research phase.
-    Take note of things that you think are important, keep questions in your mind if something is unclear,
-    and try to distill what you are taking in. 
-    
-    <CHALLENGES>
-    - {challenge_list}
-    </CHALLENGES>
-    """
+{grid_setup()}
+
+Your goal right now is to gather information about the problem space in general. You are in the research phase.
+Take note of things that you think are important, keep questions in your mind if something is unclear,
+and try to distill what you are taking in. 
+
+<CHALLENGES>
+- {challenge_list}
+</CHALLENGES>
+"""
     )
     if not previous_research:
         return base
 
     base += f"""
-        These are the notes from your previous research. Update them with new information.
-        Based on the new information refactor or refine your understanding of the problem space.
-        The goal is to maintain an organized, comprehensive, detailed summary of all the knowledge
-        we gain as we see and solve more challenges. 
-        """
+These are the notes from your previous research. Update them with new information.
+Based on the new information refactor or refine your understanding of the problem space.
+The goal is to maintain an organized, comprehensive, detailed summary of all the knowledge
+we gain as we see and solve more challenges. 
+"""
     return sb.concat(
         base, previous_research, "Come up with new current_total_knowledge, ordered_concept_list, and new_knowledge."
     )
@@ -216,28 +215,28 @@ def gather_research(challenges: List[GridProblem], previous_research: Optional[s
 
 def distill_research(event: ResearchEvent) -> str:
     return f"""You have been tasked with distilling this research pass.
-    The goal is to take the information gathered and summarize it in a way that is concise and informative.
-    This summary should be a living document that grows and refactors as we learn more and see more challenges.
-    It should be a place to make sure we don't forget anything important and distill the most important and useful information.
-    
-    The current total knowledge is:
-    {event.current_total_knowledge}
-    
-    The ordered concept list is:
-    {event.ordered_concept_list}
-    
-    The new knowledge gained is:
-    {event.new_knowledge}
-    """
+The goal is to take the information gathered and summarize it in a way that is concise and informative.
+This summary should be a living document that grows and refactors as we learn more and see more challenges.
+It should be a place to make sure we don't forget anything important and distill the most important and useful information.
+
+The current total knowledge is:
+{event.current_total_knowledge}
+
+The ordered concept list is:
+{event.ordered_concept_list}
+
+The new knowledge gained is:
+{event.new_knowledge}
+"""
 
 
 def extract_result(challenge: GridProblem) -> str:
     return f"""
-    You were given this challenge:
-    {challenge.to_task_description()}
+You were given this challenge:
+{challenge.to_task_description()}
 
-    Your evaluation was:
-    """
+Your evaluation was:
+"""
 
 
 def get_grid_class_overview() -> str:
