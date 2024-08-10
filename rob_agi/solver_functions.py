@@ -81,26 +81,23 @@ latest_distillation = {
     "distillation": True,
 }
 
+# You are a bot that is very good at solving puzzles. Below is a list of input and output pairs with a pattern.
+# Identify the pattern, then apply that pattern to the test input to give a final output.
+
 
 def arc_intro(short=False) -> str:
-    base = """
-This is a test of abstract and reasoning thinking skills. It presents puzzles where you see a few 
-examples and must figure out the hidden rule. Then you apply this rule to new situations. It tests how well 
-one can spot patterns, think abstractly, and solve problems creatively. It uses many different types of 
-puzzles, so you need to be flexible in your thinking. The main challenge is understanding complex ideas 
-from very little information, then using what you've learned in new ways.
-"""
+    base = """This is a test of abstract and reasoning thinking skills. It presents puzzles where you see a few examples and must figure out the pattern. Then you apply this pattern to a test input to solve. It measures how well you can spot patterns, think abstractly, and reason creatively. It uses many different types of ideas, so you need to be flexible in your thinking."""
     if short:
         return base
     bullet_points = "\n- ".join(latest_distillation["ordered_concept_list"])
     return f"""
-    {base}
-    
-    {latest_distillation["current_total_knowledge"]}
-    
-    The key concepts to keep in mind are:
-    {bullet_points}
-    """
+{base}
+
+{latest_distillation["current_total_knowledge"]}
+
+This list is not exhaustive, but some concepts to keep in mind are:
+
+{bullet_points}"""
 
 
 def grid_setup() -> str:
@@ -114,53 +111,56 @@ All grids are rectangular and can be between 1x1 and 30x30 in size.
 def get_initial_impression(challenge: GridProblem) -> str:
     return (
         arc_intro()
-        + f"""Below is a challenge from the test. You are tasked to solve it.
+        + f"""Below is a challenge. You are tasked to solve it.
 The challenge involves transforming one colored 2D grid into another.
-You will be given a few examples of the transform in the form of input output pairs.
-You will also be given a test case that you need to solve.
-The goal is to find the function that fits all the examples, then apply it to the test case to compute a solution. 
-If you consider code here, only consider python pseudocode.
+You will be given a few examples of the pattern in the form of input output pairs.
+You will also be given a test case that has just the input but no output yet.
+The goal is to find the pattern that fits all the examples, then apply it to the test case to compute a solution. 
 
 {grid_setup()}
 
 Here is your current challenge:
 
-{challenge.to_task_description()}"""
+<CHALLENGE>
+{challenge.to_task_description()}
+</CHALLENGE>
+"""
     )
 
 
 def attempt_challenge(challenge: GridProblem, reasoning: str) -> str:
     return (
         arc_intro()
-        + f"""Below is a challenge from the test. You are tasked to solve it.
+        + f"""Below is a challenge. You are tasked to solve it.
 
 This is the current challenge:
+<CHALLENGE>
 {challenge.to_task_description()}
+</CHALLENGE>
 
-This is your latest reasoning:
+This is some of your recent reasoning:
 
 <REASONING>
 {reasoning}
 </REASONING>
 
-The ColoredGrid class has many methods that can help you analyze and manipulate the grids:
+The ColoredGrid class has some methods that can help you analyze and manipulate the grids:
 <GRID_METHODS>
 {get_grid_class_overview()}
 </GRID_METHODS>
 
-Your solution should have the following fields:
+Your solution should fit the following model:
 
 {SuccessfulSolve.field_summary()} 
 
-Make sure that the python function is valid and standalone. It should be named solve_{challenge.id} and take in a grid and return a grid. 
-Show your work. Your solution should clearly and completely communicate the concepts used, the approach taken.
+Make sure that the python function is a valid standalone function that takes in a ColoredGrid and returns a ColoredGrid. It should be named `solve_{challenge.id}`. 
+Show your work. Your solution should clearly, completely, and succinctly communicate the concepts used, the approach taken.
 """
     )
 
 
 def explain_research():
     return """
-
 class ResearchEvent(BaseModel):
     #Research phase happens at the beginning and periodically later. Its job is to gather information about the problem
     #space in general. In this phase we can ask questions, gather ideas, think about how to better understand and approach.
@@ -231,7 +231,9 @@ The new knowledge gained is:
 def extract_result(challenge: GridProblem) -> str:
     return f"""
 You were given this challenge:
+<CHALLENGE>
 {challenge.to_task_description()}
+</CHALLENGE>
 
 Your evaluation was:
 """

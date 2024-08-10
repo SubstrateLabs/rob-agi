@@ -55,7 +55,7 @@ task_set = "training"
 # task_set = "evaluation"
 challenges, solutions = load_task_set(task_set_name=task_set)
 
-max_concurrent = 40
+max_concurrent = 20
 all_challenges = list(challenges.values())
 random.shuffle(all_challenges)
 
@@ -116,21 +116,55 @@ async def get_previous_tries(challenge: GridProblem):
     not_solved = sb.jq(solved.future.results[0], "length == 0")
     ir = Box(value={"has_attempts": has_attempts, "unsolved": not_solved})
     should_summ = sb.jq(ir.future.value, ".has_attempts and .unsolved")
+
+    past_attempts = sb.jq(
+        prev_attempts.future.results[0],
+        'group_by(.task_id) | map(.[0]) | map(.metadata.approach) | flatten | join("\n")',
+    )
+    best_past_attempt = sb.jq(
+        prev_attempts.future.results[0],
+        'first? | .metadata.approach? | if type == "array" then join("\n") else tostring end | . // ""',
+    )
+    past_solve_str = sb.jq(solved.future.results[0], 'map(.metadata.approach) | flatten | join("\n")')
+
+    past_str = If(has_attempts, best_past_attempt, challenge.to_task_description()).future.result
+
+    query_str = If(not_solved, past_str, past_solve_str).future.result
+    similar_unsolved = QueryVectorStore(
+        collection_name="arc_attempts",
+        model="jina-v2",
+        query_strings=[query_str],
+        top_k=1,
+        include_metadata=True,
+        include_values=False,
+        filters={"task_id": {"$ne": challenge.id}},
+    )
+    similar_solved = QueryVectorStore(
+        collection_name="arc_solves",
+        model="jina-v2",
+        query_strings=[query_str],
+        top_k=1,
+        include_metadata=True,
+        include_values=False,
+        filters={"task_id": {"$ne": challenge.id}},
+    )
     summary = If(
         should_summ,
         ComputeText(
             prompt=sb.format(
                 "{intro}\n\nBelow are learnings from past failed attempts at solving a particular problem. Summarize these failed attempts, including what seems to be important, what seems to work, what seems to not work, and what to investigate before the next attempt.\n\n<PAST_ATTEMPTS>{past_attempts}</PAST_ATTEMPTS>",
                 intro=arc_intro(short=True),
-                past_attempts=sb.jq(prev_attempts.future.results[0], "map(.metadata.doc)"),
+                past_attempts=past_attempts,
             ),
-            model=smart_model,
+            model=gpt,
             max_tokens=800,
         ).future.text,
         "",
     )
-
-    res = await substrate.async_run(summary)
+    related = Box(
+        value={"unsolved": similar_unsolved.future.results[0][0], "solved": similar_solved.future.results[0][0]}
+    )
+    res = await substrate.async_run(summary, related)
     solution = res.get(solved).results[0][0] if res.get(solved).results[0] else None
     most_recent_attempt = None
     for att in res.get(prev_attempts).results[0]:
@@ -140,22 +174,36 @@ async def get_previous_tries(challenge: GridProblem):
             elif att.metadata["time"] > most_recent_attempt.metadata["time"]:
                 most_recent_attempt = att
 
-    return solution, most_recent_attempt, res.get(summary).result
+    try:
+        final = solution, most_recent_attempt, res.get(summary).result, res.get(related).value
+    except Exception as e:
+        print("Error getting past attempts", e)
+        traceback.print_exc()
+        final = None, None, None, {}
+    return final
 
 
 async def attempt(challenge: GridProblem, run_remote=False, with_solution=False, verbose=False):
     global attempted, successful
     print(f"Checking past for {challenge.id}")
-    prev_solution, recent_attempt, summarize_learnings = await get_previous_tries(challenge)
+    prev_solution, recent_attempt, summarize_learnings, related = await get_previous_tries(challenge)
     if prev_solution:
-        print("Previous Solution:", prev_solution.metadata)
-        return
+        print("Previous Solution Found")
+        # return
 
     print(f"Attempting {challenge.id}")
     debug_io = {}
 
     solution_str = f"SOLUTION:\n\n{solutions[challenge.id].result_description()}" if with_solution else ""
     impression_q = get_initial_impression(challenge)
+    if related.get("unsolved"):
+        impression_q = sb.concat(
+            impression_q, "\n\nRelated unsolved task (possibly low signal):", related["unsolved"]["metadata"]["doc"]
+        )
+    if related.get("solved"):
+        impression_q = sb.concat(
+            impression_q, "\n\nRelated solved task (maybe relevant):", related["solved"]["metadata"]["doc"]
+        )
     if recent_attempt:
         impression_q = sb.concat(
             impression_q,
@@ -188,9 +236,9 @@ async def attempt(challenge: GridProblem, run_remote=False, with_solution=False,
     )
     debug_io["attempt"] = {"in": first_try, "out": make_attempt.future.text}
     parse_query = sb.concat(
-        "Extract this result to valid JSON:\n\n",
+        "From the following message, extract structured JSON:\n\n<RESPONSE>",
         make_attempt.future.text,
-        "\n\n",
+        "</RESPONSE>\n\n",
     )
     parse_attempt = ComputeJSON(
         prompt=parse_query,
@@ -246,16 +294,14 @@ async def attempt(challenge: GridProblem, run_remote=False, with_solution=False,
         return
     did_pass = solution.validate(solutions[challenge.id])
     try:
+        finish_ns = str(time.time_ns())
         extra_meta = {"with_solution": with_solution, "time": int(time.time())}
         if bool(run_py and res.get(run_py)):
-            print("----------------------", res.get(run_py))
             pytest_out = res.get(run_py).output
-            if pytest_out is not None:
-                if all(pytest_out.output.examples) and all(pytest_out.output.test_cases):
+            if pytest_out is not None and pytest_out.get("examples") and pytest_out.get("test_cases"):
+                if all(pytest_out["examples"]) and all(pytest_out["test_cases"]):
                     pytest_res = "pass"
-                elif all([not x for x in pytest_out.output.examples]) and all(
-                    [not x for x in pytest_out.output.test_cases]
-                ):
+                elif all([not x for x in pytest_out["examples"]]) and all([not x for x in pytest_out["test_cases"]]):
                     pytest_res = "fail"
                 else:
                     pytest_res = "partial"
@@ -269,7 +315,7 @@ async def attempt(challenge: GridProblem, run_remote=False, with_solution=False,
             await substrate.async_run(
                 EmbedText(
                     text=challenge.to_task_description(),
-                    collection_name=col_solves.future.collection_name,
+                    collection_name="arc_solves",
                     metadata={**res.get(parse_attempt).json_object, **extra_meta},
                     doc_id=challenge.id,
                     _max_retry=2,
@@ -283,7 +329,7 @@ async def attempt(challenge: GridProblem, run_remote=False, with_solution=False,
                         "\n\nComputed:\n",
                         solution.comparison_report(solutions[challenge.id]),
                     ),
-                    collection_name=col_attempts.future.collection_name,
+                    collection_name="arc_attempts",
                     metadata={**res.get(parse_attempt).json_object, **extra_meta},
                     embedded_metadata_keys=[
                         "concepts_used",
@@ -298,6 +344,7 @@ async def attempt(challenge: GridProblem, run_remote=False, with_solution=False,
                     ],
                     # hide=True,
                     _max_retries=2,
+                    doc_id=finish_ns,
                 )
             )
         print(f"\n\nWrote to {'solves' if did_pass else 'attempts'}")
@@ -315,12 +362,10 @@ async def attempt(challenge: GridProblem, run_remote=False, with_solution=False,
 
 def research_pass(challenge_list: List[GridProblem], prev_event: Optional[ResearchEvent] = None, passes=1):
     if prev_event:
-        pretty_fields = f"""
-
-Current Total Knowledge: {prev_event.current_total_knowledge}
+        pretty_fields = f"""Current Total Knowledge: {prev_event.current_total_knowledge}
 Ordered Concept List: {prev_event.ordered_concept_list}
 New Knowledge: {prev_event.new_knowledge}
-        """
+"""
         prev_str = pretty_fields + explain_research()
     else:
         prev_str = ""
@@ -398,18 +443,17 @@ def distill_research():
         model=smart_model,
         prompt=sb.format(
             """Listed below is a collection of research logs after exploring a set of spatial reasoning problems.
-    The goal is to distill the most important knowledge learned from all the research sessions.
-    The research logs contain summaries of the current total knowledge, ordered concept list, and new knowledge gained.
-    The distilled knowledge should capture the most important concepts and insights that will be necessary to solve the challenges in the dataset. 
-    The distillation process is also time to organize and prioritize the concepts and ideas that have been gathered.
-    
-    <RESEARCH_LOGS>
-    {logs}
-    </RESEARCH_LOGS>
-    
-    Based on the research logs, distill the most important knowledge learned so far.
-    Respond with a single new object with keys: current_total_knowledge, ordered_concept_list, new_knowledge
-        """,
+The goal is to distill the most important knowledge learned from all the research sessions.
+The research logs contain summaries of the current total knowledge, ordered concept list, and new knowledge gained.
+The distilled knowledge should capture the most important concepts and insights that will be necessary to solve the challenges in the dataset. 
+The distillation process is also time to organize and prioritize the concepts and ideas that have been gathered.
+
+<RESEARCH_LOGS>
+{logs}
+</RESEARCH_LOGS>
+
+Based on the research logs, distill the most important knowledge learned so far.
+Respond with a single new object with keys: current_total_knowledge, ordered_concept_list, new_knowledge""",
             logs=sb.jq(researches.future.results[0], "map(.metadata) | @json"),
         ),
     )
@@ -468,9 +512,14 @@ async def main():
     # id = "1f876c06"
     # challenge: GridProblem = challenges[id]
 
-    random_challenge = random.choice(all_challenges)
-    # so, rec, su = await get_previous_tries(random_challenge)
-    await attempt(random_challenge, with_solution=True, verbose=True, run_remote=True)
+    # random_challenge = random.choice(all_challenges)
+    # await attempt(random_challenge, with_solution=True, verbose=True, run_remote=True)
+
+    # so, rec, su, rel = await get_previous_tries(random_challenge)
+    # print("Previous Solution:", so.metadata if so else "None")
+    # print("Recent Attempt:", rec.metadata if rec else "None")
+    # print("Summary:", su)
+    # print("Related:", rel)
 
     # ids = list(challenges.keys())[0:5]
     # challenge_list = [challenges[id] for id in ids]
@@ -486,6 +535,8 @@ async def main():
 
     # distill_research()
 
+    for i in range(4):
+        await solve_loop()
     # await solve_loop()
 
 

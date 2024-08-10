@@ -40,7 +40,7 @@ class SuccessfulSolve(BaseModel):
 
     @classmethod
     def field_summary(cls) -> str:
-        summary = [f"Model: {cls.__name__}\n"]
+        summary = [f"{cls.__name__}:\n"]
         for name, field in cls.model_fields.items():
             field_type = simplify_type(get_type_hints(cls)[name])
             description = field.description or "No description"

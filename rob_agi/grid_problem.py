@@ -27,13 +27,19 @@ class GridProblem(BaseModel):
 
     def to_task_description(self) -> str:
         task_string = f"Task ID: {self.id}\n"
+        total_examples = len(self.examples)
         for i, example in enumerate(self.examples):
-            task_string += f"Example {i + 1}:\n"
+            task_string += "========\n"
+            task_string += f"Example ({i + 1} / {total_examples}):\n"
             task_string += f"Input:\n{str(example.input)}\n"
             task_string += f"Output:\n{str(example.output)}\n\n"
+            task_string += "========\n"
 
+        total_test_cases = len(self.test_cases)
         for i, test_case in enumerate(self.test_cases):
-            task_string += f"Test Case {i + 1}:\n{str(test_case)}\n\n"
+            task_string += "========\n"
+            task_string += f"Test Case to solve ({i + 1} / {total_test_cases}):\n{str(test_case)}\n\n"
+            task_string += "========\n"
 
         return task_string
 
