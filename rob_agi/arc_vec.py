@@ -50,8 +50,8 @@ class SuccessfulSolve(BaseModel):
 
 
 class SolveAttempt(SuccessfulSolve):
-    stdout: Optional[str] = Field(None, description="Standard output of the python function")
-    error_message: Optional[str] = Field(None, description="Error message if the attempt was not successful")
+    stdout: Optional[str] = Field(..., description="Standard output of the python function")
+    error_message: Optional[str] = Field(..., description="Error message if the attempt was not successful")
 
     @classmethod
     def simple_json_schema(cls):

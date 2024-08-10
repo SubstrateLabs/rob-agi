@@ -125,9 +125,7 @@ If you consider code here, only consider python pseudocode.
 
 Here is your current challenge:
 
-{challenge.to_task_description()}
-
-"""
+{challenge.to_task_description()}"""
     )
 
 

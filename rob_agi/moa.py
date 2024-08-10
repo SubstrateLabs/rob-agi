@@ -8,14 +8,17 @@ default_models = ["Llama3Instruct70B", "claude-3-5-sonnet-20240620", "gpt-4o"]
 default_decider = "claude-3-5-sonnet-20240620"
 
 
-def get_mixture(q, prev=None, models=None):
+def_max_tokens = 1800
+
+
+def get_mixture(q, prev=None, models=None, max_tokens=def_max_tokens):
     if models is None:
         models = default_models
     prompt = sb.concat(aggregate, "\n\nquestion: ", q, "\n\nprevious:\n\n", prev) if prev else q
-    return Box(value=[ComputeText(prompt=prompt, model=m, max_tokens=2048).future.text for m in models])
+    return Box(value=[ComputeText(prompt=prompt, model=m, max_tokens=max_tokens).future.text for m in models])
 
 
-def moa(question: str, num_layers=2, max_tokens: int = 2048, opts=None, models=None, decider=default_decider):
+def moa(question: str, num_layers=2, max_tokens: int = def_max_tokens, opts=None, models=None, decider=default_decider):
     if models is None:
         models = default_models
     if opts is None:
@@ -26,7 +29,7 @@ def moa(question: str, num_layers=2, max_tokens: int = 2048, opts=None, models=N
         return sb.jq(layers[-1].future.value, jq_list)
 
     for _ in range(num_layers - 1):
-        layers.append(get_mixture(question, prev=last_layer(), models=models))
+        layers.append(get_mixture(question, prev=last_layer(), models=models, max_tokens=max_tokens))
 
     final = ComputeText(prompt=sb.concat(aggregate, "\n\n", last_layer()), model=decider, max_tokens=max_tokens, **opts)
     box = Box(value={"layers": [l.future.value for l in layers], "text": final.future.text})

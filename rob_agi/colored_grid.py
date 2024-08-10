@@ -14,9 +14,10 @@ class ColoredGrid(BaseModel):
     0: black, 1: blue, 2: red, 3: green, 4: yellow, 5: gray, 6: magenta, 7: orange, 8: sky, 9: brown
     """
 
-    values: Annotated[
-        List[List[Annotated[int, Field(ge=0, le=9)]]], Field(min_length=1, max_length=30, min_items=1, max_items=30)
-    ]
+    # values: Annotated[
+    #     List[List[Annotated[int, Field(ge=0, le=9)]]], Field(min_length=1, max_length=30, min_items=1, max_items=30)
+    # ]
+    values: List[List[int]] = Field(..., description="List of lists representing the grid values")
 
     @field_validator("values")
     @classmethod
