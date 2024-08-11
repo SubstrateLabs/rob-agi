@@ -32,7 +32,7 @@ class SuccessfulSolve(BaseModel):
     approach: List[str] = Field(
         ..., description="Detailed list of steps and thinking done to solve the problem, ordered"
     )
-    solution: List[List[int]] = Field(..., description="List of lists representing the solution grid")
+    solutions: List[List[List[int]]] = Field(..., description="List of grids representing the solution(s)")
     python_function: str = Field(
         ...,
         description="Valid python function that solves the problem both for the example cases and the test case. This function should be named `solve_<challenge_id>` and take in a single argument, `input` of type ColoredGrid and return a ColoredGrid. The <challenge_id> should be replaced with the task_id of the challenge: def solve_<challenge_id>(input: ColoredGrid) -> ColoredGrid: ...",

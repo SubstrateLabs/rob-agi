@@ -18,12 +18,12 @@ class ComputedResult(BaseModel):
 
     def comparison_report(self, expected: "ComputedResult") -> str:
         result = ""
-        for i, output in enumerate(self.outputs):
+        for i, expectation in enumerate(expected.outputs):
             result += f"Actual {i + 1}:\n"
-            result += str(output)
+            result += str(self.outputs[i])
             result += f"\nExpected:\n"
-            result += str(expected.outputs[i])
-            result += f"\nChallenge Solved: {output == expected.outputs[i]}\n"
+            result += str(expectation)
+            result += f"\nChallenge Solved: {expectation == self.outputs[i]}\n"
         return result
 
     @classmethod

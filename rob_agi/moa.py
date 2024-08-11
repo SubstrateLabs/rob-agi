@@ -5,7 +5,9 @@ aggregate = """You have been provided with a set of responses from various open-
 jq_list = 'to_entries | map(((.key + 1) | tostring) + ". " + .value) | join("\n")'
 
 default_models = ["Llama3Instruct70B", "claude-3-5-sonnet-20240620", "gpt-4o"]
+# default_models = ["Llama3Instruct70B", "gpt-4o"]
 default_decider = "claude-3-5-sonnet-20240620"
+# default_decider = "gpt-4o"
 
 
 def_max_tokens = 1800

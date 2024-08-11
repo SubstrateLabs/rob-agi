@@ -1,4 +1,5 @@
 import json
+import time
 from importlib import resources
 from pathlib import Path
 
@@ -48,3 +49,41 @@ def load_task_set(task_set_name) -> tuple[dict[str, GridProblem], dict[str, Comp
         k: ComputedResult(outputs=[ColoredGrid(values=g) for g in v], task_id=k) for k, v in solutions_json.items()
     }
     return challenges, solutions
+
+
+def report_results(attempted, successful):
+    filename = "running-results.md"
+    write_path = Path(__file__).parent.parent / filename
+    datetime = time.strftime("%Y-%m-%d %H:%M:%S")
+    final_stats_markdown_table = "| Attempted | Successful | Solve Rate |\n|-----------|------------|------------|\n"
+    final_stats_markdown_table += f"| {attempted} | {successful} | {successful / attempted:.2%} |"
+    with open(write_path, "a") as f:
+        f.write("#### " + datetime)
+        f.write("\n\n")
+        f.write(final_stats_markdown_table)
+        f.write("\n\n")
+    print("\n\n===============================================")
+    print("FINAL STATS")
+    print(f"Attempted: {attempted}")
+    print(f"Successful: {successful}")
+    print(f"Solve Rate: {successful / attempted:.2%}")
+    print("===============================================\n\n")
+
+    # print("\n\n===============================================")
+    # print("FINAL STATS")
+    # print(f"Attempted: {attempted}")
+    # print(f"Successful: {successful}")
+    # print(f"Solve Rate: {successful / attempted:.2%}")
+    # print("===============================================\n\n")
+    # final_stats_markdown_table = "| Attempted | Successful | Solve Rate |\n|-----------|------------|------------|\n"
+    # final_stats_markdown_table += f"| {attempted} | {successful} | {successful / attempted:.2%} |"
+    # append_results(final_stats_markdown_table)
+
+
+append_results(3159, 805)
+# append_results("""===============================================
+# FINAL STATS
+# Attempted: 3159
+# Successful: 805
+# Solve Rate: 25.48%
+# ===============================================""")

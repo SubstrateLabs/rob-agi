@@ -235,7 +235,7 @@ You were given this challenge:
 {challenge.to_task_description()}
 </CHALLENGE>
 
-Your evaluation was:
+Your attempt:
 """
 
 

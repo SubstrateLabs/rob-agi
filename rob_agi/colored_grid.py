@@ -82,6 +82,34 @@ class ColoredGrid(BaseModel):
         result += f"\nMatch: {self == expected}\n"
         return result
 
+    def diff_string(self, expected_grid: "ColoredGrid") -> List[List[str]]:
+        actual = self.values
+        expected = expected_grid.values
+        if len(actual) != len(expected) or len(actual[0]) != len(expected[0]):
+            raise ValueError("Grids must have the same dimensions")
+
+        rows, cols = len(actual), len(actual[0])
+        diff = []
+
+        for i in range(rows):
+            diff_row = []
+            for j in range(cols):
+                if actual[i][j] == expected[i][j]:
+                    diff_row.append(actual[i][j])  # No change
+                else:
+                    diff_row.append(f"{actual[i][j]}->{expected[i][j]}")  # Show change
+            diff.append(diff_row)
+
+        return diff
+
+    @classmethod
+    def render_mono(cls, grid):
+        res = ""
+        for row in grid:
+            res += " ".join(str(cell).center(5) for cell in row)
+            res += "\n"
+        return res
+
     ##############################
     # Grid Operations:
     ##############################

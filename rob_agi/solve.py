@@ -20,8 +20,9 @@ from substrate import (
     RunPython,
     If,
 )
-from rob_agi.arc_util import load_task_set
+from rob_agi.arc_util import load_task_set, append_results, report_results
 from rob_agi.arc_vec import ResearchEvent, SolveAttempt
+from rob_agi.colored_grid import ColoredGrid
 from rob_agi.computed_result import ComputedResult
 from rob_agi.grid_problem import GridProblem
 from rob_agi.moa import moa
@@ -47,6 +48,7 @@ col_knowledge = FindOrCreateVectorStore(collection_name="arc_problems", model="j
 
 # smart_model = "Llama3Instruct70B"
 smart_model = "claude-3-5-sonnet-20240620"
+# smart_model = "gpt-4o"
 # json_model = "Llama3Instruct8B"
 json_model = "Mixtral8x7BInstruct"
 gpt = "gpt-4o"
@@ -55,7 +57,6 @@ task_set = "training"
 # task_set = "evaluation"
 challenges, solutions = load_task_set(task_set_name=task_set)
 
-max_concurrent = 20
 all_challenges = list(challenges.values())
 random.shuffle(all_challenges)
 
@@ -156,7 +157,7 @@ async def get_previous_tries(challenge: GridProblem):
                 intro=arc_intro(short=True),
                 past_attempts=past_attempts,
             ),
-            model=gpt,
+            model=smart_model,
             max_tokens=800,
         ).future.text,
         "",
@@ -236,9 +237,10 @@ async def attempt(challenge: GridProblem, run_remote=False, with_solution=False,
     )
     debug_io["attempt"] = {"in": first_try, "out": make_attempt.future.text}
     parse_query = sb.concat(
-        "From the following message, extract structured JSON:\n\n<RESPONSE>",
+        "From the following message, extract a result as structured JSON:\n\n<MESSAGE>",
         make_attempt.future.text,
-        "</RESPONSE>\n\n",
+        "</MESSAGE>\n",
+        f"In this case there should be {len(challenge.test_cases)} solutions. each solution is a grid, and a grid is a list of lists of ints.",
     )
     parse_attempt = ComputeJSON(
         prompt=parse_query,
@@ -259,37 +261,59 @@ async def attempt(challenge: GridProblem, run_remote=False, with_solution=False,
             kwargs=py_args,
             pip_install=["pydantic==2.8.2", "substrate", "git+https://github.com/SubstrateLabs/rob-agi.git@b6ff97c"],
         )
+        # todo - run and revise again if fails
+        # max_python_tries = 3
+        # If(sb.jq(run_py.future, '.stderr != null and .stderr != ""'), run_py.future,
+        #
+        #
+        #    )
+
         debug_io["run_py"] = {"in": py_args, "out": run_py.future}
     debug_io["parse_attempt"] = {"in": parse_query, "out": parse_attempt.future.json_object}
 
-    if len(challenge.test_cases) > 1:
-        final_task = f"Respond in JSON with the solutions for the {len(challenge.test_cases)} test cases in this task."
-    else:
-        final_task = "\n\nRespond in JSON with the solution for the test case in this task."
-    compute_result_query = sb.concat(
-        extract_result(challenge), sb.jq(parse_attempt.future.json_object, "@json"), final_task
-    )
-    result = ComputeJSON(
-        prompt=compute_result_query,
-        json_schema=to_strict_json_schema(ComputedResult),
-        model=gpt,
-        temperature=0.25,
-        _max_retries=2,
-    )
-    debug_io["computed_result"] = {"in": compute_result_query, "out": result.future.json_object}
+    # parse_solution = False
+    # if parse_solution:
+    #     if len(challenge.test_cases) > 1:
+    #         final_task = (
+    #             f"Respond in JSON with the solutions for the {len(challenge.test_cases)} test cases in this task."
+    #         )
+    #     else:
+    #         final_task = "\n\nRespond in JSON with the solution for the test case in this task."
+    #     compute_result_query = sb.concat(
+    #         extract_result(challenge), sb.jq(parse_attempt.future.json_object, "@json"), final_task
+    #     )
+    #     result = ComputeJSON(
+    #         prompt=compute_result_query,
+    #         json_schema=to_strict_json_schema(ComputedResult),
+    #         model=gpt,
+    #         temperature=0.25,
+    #         _max_retries=2,
+    #     )
+    #     debug_io["computed_result"] = {"in": compute_result_query, "out": result.future.json_object}
     input_space = Box(value=debug_io)
     try:
-        res = await substrate.async_run(result, input_space)
+        res = await substrate.async_run(parse_attempt, input_space)
         if verbose:
             print(json.dumps(res.json, indent=2))
             print("----------------------------------")
             print(res.get(input_space).value)
+            print(f"REQUEST_ID", res.request_id)
             print("----------------------------------")
-        solution = ComputedResult.model_validate(res.get(result).json_object)
-        print(solution.comparison_report(solutions[challenge.id]))
+        # solution = ComputedResult.model_validate(res.get(result).json_object)
+        pa = res.get(parse_attempt).json_object
+        if not pa:
+            print("~~~~~~~~~~~~~~~~~No parse attempt~~~~~~~~~~~~~~~")
+            print(json.dumps(res.json, indent=2))
+            print("-----------------No parse attempt---------------")
+            return
+        solution = ComputedResult(
+            task_id=challenge.id, outputs=[ColoredGrid(values=s) for s in pa.get("solutions") if s is not None]
+        )
+        comparison_report = solution.comparison_report(solutions[challenge.id])
+        print(comparison_report)
         attempted += 1
     except Exception as e:
-        print("Error running", e)
+        print(f"Error running {challenge.id}", e)
         traceback.print_exc()
         return
     did_pass = solution.validate(solutions[challenge.id])
@@ -322,6 +346,8 @@ async def attempt(challenge: GridProblem, run_remote=False, with_solution=False,
                 )
             )
         else:
+            # todo - diff string in emb
+            # diff_string = solution.outputs
             await substrate.async_run(
                 EmbedText(
                     text=sb.concat(
@@ -486,23 +512,21 @@ async def process_challenge(semaphore, challenge):
         return await attempt(challenge, with_solution=True, run_remote=True)
 
 
-async def solve_loop():
+async def solve_loop(max_concurrent=1, max_challenges=None):
     semaphore = asyncio.Semaphore(max_concurrent)
-    tasks = [process_challenge(semaphore, challenge) for challenge in all_challenges]
+    to_process = all_challenges[:max_challenges] if max_challenges else all_challenges
+    tasks = [process_challenge(semaphore, challenge) for challenge in to_process]
     for i, task in enumerate(asyncio.as_completed(tasks), 1):
         t0 = time.perf_counter()
         try:
             await task
-            print(f"Finished {i} of {len(all_challenges)} [{time.perf_counter() - t0:.2f}s]")
+            print(f"Finished {i} of {len(to_process)} [{time.perf_counter() - t0:.2f}s]")
         except Exception as e:
             traceback.print_exc()
             print(f"Error on task {i}: {e}")
-    print("\n\n===============================================")
-    print("FINAL STATS")
-    print(f"Attempted: {attempted}")
-    print(f"Successful: {successful}")
-    print(f"Solve Rate: {successful / attempted:.2%}")
-    print("===============================================\n\n")
+
+    # todo add errored
+    report_results(attempted=attempted, successful=successful)
 
 
 async def main():
@@ -535,9 +559,9 @@ async def main():
 
     # distill_research()
 
-    for i in range(4):
-        await solve_loop()
-    # await solve_loop()
+    for i in range(8):
+        await solve_loop(max_concurrent=20)
+    # await solve_loop(max_concurrent=4, max_challenges=8)
 
 
 if __name__ == "__main__":
