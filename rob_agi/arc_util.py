@@ -80,7 +80,7 @@ def report_results(attempted, successful):
     # append_results(final_stats_markdown_table)
 
 
-append_results(3159, 805)
+# append_results(3159, 805)
 # append_results("""===============================================
 # FINAL STATS
 # Attempted: 3159

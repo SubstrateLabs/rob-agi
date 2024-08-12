@@ -20,7 +20,7 @@ from substrate import (
     RunPython,
     If,
 )
-from rob_agi.arc_util import load_task_set, append_results, report_results
+from rob_agi.arc_util import load_task_set, report_results
 from rob_agi.arc_vec import ResearchEvent, SolveAttempt
 from rob_agi.colored_grid import ColoredGrid
 from rob_agi.computed_result import ComputedResult
