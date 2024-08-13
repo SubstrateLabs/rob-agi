@@ -120,7 +120,7 @@ The goal is to find the pattern that fits all the examples, then apply it to the
 
 {grid_setup()}
 
-Here is your current challenge:
+This is the challenge to solve:
 
 <CHALLENGE>
 {challenge.to_task_description()}
