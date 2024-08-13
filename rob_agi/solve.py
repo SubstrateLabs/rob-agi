@@ -272,7 +272,7 @@ def parse_python_fn_str(llm_response: str):
 
 
 async def run_py_fn(
-    challenge: GridProblem, python_fn: str, parsed: SolveAttempt, max_tries: int = 3, verbose=False
+    challenge: GridProblem, python_fn: str, parsed: SolveAttempt, max_tries: int = 1, verbose=False
 ) -> Optional[RunPythonOut]:
     async def _run(fn: str):
         print(f"Exec Py: {challenge.id}\n\n", fn)
@@ -280,7 +280,7 @@ async def run_py_fn(
         run_py = RunPython(
             function=run_eval,
             kwargs=py_args,
-            pip_install=["pydantic==2.8.2", "substrate", "git+https://github.com/SubstrateLabs/rob-agi.git@b6ff97c"],
+            pip_install=["pydantic==2.8.2", "substrate", "git+https://github.com/SubstrateLabs/rob-agi.git@da071c0"],
         )
         res = await substrate.async_run(run_py)
         out = res.get(run_py)
@@ -344,7 +344,11 @@ async def attempt(challenge: GridProblem, run_remote=False, with_solution=False,
         traceback.print_exc()
         return
     fn_code = parsed_python_fn if parsed_python_fn else parsed.python_function
-    run_py = await run_py_fn(challenge, python_fn=fn_code, parsed=parsed, verbose=verbose) if run_remote else None
+    run_py = (
+        await run_py_fn(challenge, python_fn=fn_code, parsed=parsed, verbose=verbose, max_tries=8)
+        if run_remote
+        else None
+    )
     attempted += 1
     try:
         # if verbose:
@@ -586,8 +590,8 @@ async def main():
     # id = "1f876c06"
     # challenge: GridProblem = challenges[id]
 
-    random_challenge = random.choice(all_challenges)
-    await attempt(random_challenge, with_solution=True, verbose=True, run_remote=True)
+    # random_challenge = random.choice(all_challenges)
+    # await attempt(random_challenge, with_solution=True, verbose=True, run_remote=True)
 
     # so, rec, su, rel = await get_previous_tries(random_challenge)
     # print("Previous Solution:", so.metadata if so else "None")
@@ -609,8 +613,8 @@ async def main():
 
     # distill_research()
 
-    # for i in range(8):
-    #     await solve_loop(max_concurrent=20)
+    for i in range(2):
+        await solve_loop(max_concurrent=20)
     # await solve_loop(max_concurrent=4, max_challenges=8)
 
 
