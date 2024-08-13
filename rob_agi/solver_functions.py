@@ -135,9 +135,9 @@ def attempt_challenge(challenge: GridProblem, reasoning: str, show_work: bool = 
         if show_work
         else ""
     )
-    return (
-        arc_intro()
-        + f"""Below is a challenge. You are tasked to solve it.
+    return sb.concat(
+        arc_intro(),
+        f"""Below is a challenge. You are tasked to solve it.
 
 <CHALLENGE>
 {challenge.to_task_description()}
@@ -146,7 +146,9 @@ def attempt_challenge(challenge: GridProblem, reasoning: str, show_work: bool = 
 Here is some of your recent reasoning:
 
 <REASONING>
-{reasoning}
+""",
+        reasoning,
+        f"""
 </REASONING>
 
 The ColoredGrid class has some methods, use them if they help solve the challenge
@@ -160,7 +162,7 @@ Your solution should fit the following model:
 
 Make sure that python_function is a valid standalone function that takes in a ColoredGrid and returns a ColoredGrid. It should be named `solve_{challenge.id}`. Any imports should be included in the function body. the function should be preceded by a python code fence (```python) and followed by a closing fence (```). 
 {show_str}
-"""
+""",
     )
 
 

@@ -27,7 +27,7 @@ from rob_agi.arc_vec import ResearchEvent, SolveAttempt
 from rob_agi.colored_grid import ColoredGrid
 from rob_agi.computed_result import ComputedResult
 from rob_agi.grid_problem import GridProblem
-from rob_agi.moa import moa
+from rob_agi.moa import moa, run_moa
 from rob_agi.solver_functions import (
     get_initial_impression,
     extract_result,
@@ -39,9 +39,7 @@ from rob_agi.solver_functions import (
 )
 
 api_key = os.environ.get("SUBSTRATE_API_KEY")
-substrate = Substrate(
-    api_key=api_key, timeout=60 * 2, additional_headers={"x-substrate-fp": "1", "x-substrate-debug": "1"}
-)
+substrate = Substrate(api_key=api_key, timeout=60 * 2, additional_headers={})
 
 col_attempts = FindOrCreateVectorStore(collection_name="arc_attempts", model="jina-v2")
 col_research = FindOrCreateVectorStore(collection_name="arc_research_events", model="jina-v2")
@@ -205,7 +203,6 @@ async def get_initial_thoughts(challenge: GridProblem, with_solution=False):
     prev_solution, recent_attempt, summarize_learnings, related = await get_previous_tries(challenge)
     impression_q = get_initial_impression(challenge)
 
-    py_solved = "unknown"
     if prev_solution:
         py_solved = prev_solution.metadata.get("py_test")
         print("Previous Solution Found, python verification:", py_solved)
@@ -213,6 +210,7 @@ async def get_initial_thoughts(challenge: GridProblem, with_solution=False):
             impression_q = sb.concat(
                 impression_q,
                 "\n\nYour previous solutions were able to produce the right answer to the test, but the python function did not work generally. Please consider this in your approach.",
+                f"<PREVIOUS_SUBMISSION>{prev_solution.metadata.get('python_function')}\n\n{prev_solution.metadata.get('py_run_error')}\n\n{prev_solution.metadata.get('py_run_logs')}</PREVIOUS_SUBMISSION>",
             )
     if related.get("unsolved"):
         impression_q = sb.concat(
@@ -233,19 +231,19 @@ async def get_initial_thoughts(challenge: GridProblem, with_solution=False):
 
     # reason = ComputeText(prompt=impression_q, model=smart_model, temperature=0.25)
     reason = moa(impression_q, max_tokens=1300)
-    solution_str = f"SOLUTION:\n\n{solutions[challenge.id].result_description()}" if with_solution else ""
+    solution_str = f"<SOLUTION>\n{solutions[challenge.id].result_description()}</SOLUTION>" if with_solution else ""
 
     if with_solution:
         think_with_solution = sb.format(
-            "{impression_q}\nHere is your first impression:\n\n{impression}\n\nNow, here is the solution:\n\n{solution_str}\n\nRevise your approach if necessary to incorporate what you learned from the solution. The important part here is to identify the key concepts and procedures that are necessary to solve this problem. Be comprehensive, detailed, but also concise.",
+            "<PAST_THINKING>{impression_q}</PAST_THINKING>\nGiven those past attempts your recent thinking is:<CURRENT_THINKING>\n\n{impression}\n</CURRENT_THINKING>\nNow, here is the correct solution:\n\n{solution_str}\n\nCome up with an approach that incorporates what you learned. The important part here is to identify the key steps that are necessary to solve this problem. Be comprehensive, detailed, but also concise.",
             impression_q=impression_q,
             impression=reason.future.value.text,
             solution_str=solution_str,
         )
-        sum = ComputeText(prompt=think_with_solution, model=smart_model, temperature=0.2)
+        solution_ct = ComputeText(prompt=think_with_solution, model=smart_model, temperature=0.2)
         # reason = moa(think_with_solution)
-        res = await substrate.async_run(sum)
-        return res.get(sum).text
+        res = await substrate.async_run(solution_ct)
+        return res.get(solution_ct).text
     else:
         res = await substrate.async_run(reason)
         return res.get(reason).value["text"]
@@ -254,11 +252,11 @@ async def get_initial_thoughts(challenge: GridProblem, with_solution=False):
 async def first_attempt(challenge: GridProblem, initial_thoughts: str) -> str:
     print(f"Attempting {challenge.id}")
     prompt = attempt_challenge(challenge, reasoning=initial_thoughts)
-    # attempt = ComputeText(prompt=prompt, model=smart_model, temperature=0.2, max_tokens=2400)
-    # return res.get(ct).text
-    attempt = moa(prompt, num_layers=3, max_tokens=2400)
-    res = await substrate.async_run(attempt)
-    return res.get(ct).value["text"]
+    # ct_try = ComputeText(prompt=prompt, model=smart_model, temperature=0.2, max_tokens=2400)
+    # return res.get(ct_try).text
+    moa_try = moa(prompt, num_layers=2)
+    res = await substrate.async_run(moa_try)
+    return res.get(moa_try).value["text"]
 
 
 async def parse_attempt(challenge: GridProblem, first_answer: str) -> SolveAttempt:
@@ -277,7 +275,6 @@ async def parse_attempt(challenge: GridProblem, first_answer: str) -> SolveAttem
         # model="Llama3Instruct70B",
         model=gpt,
         _max_retries=2,
-        temperature=0.2,
         max_tokens=3600,
     )
     res = await substrate.async_run(parsed)
@@ -298,7 +295,7 @@ async def run_py_fn(
     challenge: GridProblem, python_fn: str, parsed: SolveAttempt, max_tries: int = 1, verbose=False
 ) -> Optional[RunPythonOut]:
     async def _run(fn: str):
-        print(f"Exec Py: {challenge.id}\n\n", fn)
+        print(f"Exec Py: {challenge.id}\n\n")
         py_args = {"id": challenge.id, "fn_code": fn}
         run_py = RunPython(
             function=run_eval,
@@ -319,24 +316,36 @@ async def run_py_fn(
             results = curr_out.output
             examples = results.get("examples") if results else None
             test_cases = results.get("test_cases") if results else None
+            print("Results example, test", examples, test_cases)
             has_results = examples and test_cases
             if has_results and all(examples) and all(test_cases):
                 return curr_out
             else:
-                reasoning = f"The general approach is:\n\n{approach_list}\n\nBut the solution did not pass. Please revise the function and try again."
-                reasoning += f"Attempted function:\n\n{python_fn}"
+                reflection = f"The general approach was:\n\n{approach_list}\n\nBut the solution did not pass. We need to fix the function and try again."
+                reflection += f"The function that failed:\n\n```python\n{python_fn}\n```"
                 if examples:
-                    reasoning += f"Example input checks: {['Pass' if e else 'Fail' for e in examples]}"
+                    reflection += f"Example input results: {['Pass' if e else 'Fail' for e in examples]}"
                 if test_cases:
-                    reasoning += f"Test case input checks: {['Pass' if e else 'Fail' for e in test_cases]}"
-                reasoning += f"Error message:\n\n{curr_out.stderr}"
-                reasoning += f"Stdout:\n\n{curr_out.stdout}"
-                prompt = attempt_challenge(challenge, reasoning=reasoning, show_work=False)
-                prompt += "Based on that feedback, output a new function."
-                new_attempt = ComputeText(prompt=prompt, model=smart_model, temperature=0.2, max_tokens=1800)
-                new_res = await substrate.async_run(new_attempt)
-                new_fn = parse_python_fn_str(new_res.get(new_attempt).text)
+                    reflection += f"Test case input results: {['Pass' if e else 'Fail' for e in test_cases]}"
+                reflection += f"Error message: {curr_out.stderr or 'None'}"
+                reflection += f"Stdout: {curr_out.stdout or 'None'}"
+
+                diagnose = ComputeText(
+                    prompt="Above is a candidate solution to an ARC challenge problem.\n"
+                    + reflection
+                    + "\n\nDiagnose the issue with the attempt, explaining what went wrong and what needs to be fixed. Your diagnosis should be short but comprehensive. Do not include general advice that does not fix the issue.",
+                    model=smart_model,
+                    max_tokens=700,
+                )
+
+                past_reason = sb.concat(reflection, "\n\nIssue diagnosis:\n\n", diagnose.future.text)
+                prompt = attempt_challenge(challenge, reasoning=past_reason, show_work=False)
+
+                # new_attempt = ComputeText(prompt=prompt, model=smart_model, max_tokens=1900)
+                new_attempt_moa = await run_moa(prompt, max_tokens=1900, num_layers=1)
+                new_fn = parse_python_fn_str(new_attempt_moa["text"])
                 if new_fn:
+                    print("Parsed new function", new_fn == python_fn)
                     python_fn = new_fn
         except Exception as e:
             print(f"Error running python function on attempt {i}", e)
@@ -344,55 +353,17 @@ async def run_py_fn(
     return curr_out
 
 
-async def attempt(challenge: GridProblem, run_remote=False, with_solution=False, verbose=False):
+async def log_result(challenge: GridProblem, parsed: SolveAttempt, run_py: Optional[RunPythonOut], extra_meta: dict):
     global attempted, successful
-
-    print(f"Starting {challenge.id}")
-    initial_thoughts = await get_initial_thoughts(challenge, with_solution=with_solution)
-    if verbose:
-        print(" > INITIAL_THOUGHTS\n", initial_thoughts)
-
-    first_answer = await first_attempt(challenge, initial_thoughts)
-    if verbose:
-        print(" > FIRST_ATTEMPT\n", first_answer)
-
-    parsed_python_fn = parse_python_fn_str(first_answer)
-
-    try:
-        parsed = await parse_attempt(challenge, first_answer)
-        if verbose:
-            print(" > PARSED\n", parsed.model_dump())
-    except Exception as e:
-        print(f"Error parsing attempt {challenge.id}", e)
-        traceback.print_exc()
-        return
-    fn_code = parsed_python_fn if parsed_python_fn else parsed.python_function
-    run_py = (
-        await run_py_fn(challenge, python_fn=fn_code, parsed=parsed, verbose=verbose, max_tries=8)
-        if run_remote
-        else None
+    solution = ComputedResult(
+        task_id=challenge.id, outputs=[ColoredGrid(values=s) for s in parsed.solutions if s is not None]
     )
-    attempted += 1
-    try:
-        # if verbose:
-        #     print(json.dumps(res.json, indent=2))
-        #     print("----------------------------------")
-        #     print(res.get(input_space).value)
-        #     print(f"REQUEST_ID", res.request_id)
-        #     print("----------------------------------")
-        # solution = ComputedResult.model_validate(res.get(result).json_object)
-        solution = ComputedResult(
-            task_id=challenge.id, outputs=[ColoredGrid(values=s) for s in parsed.solutions if s is not None]
-        )
-        comparison_report = solution.comparison_report(solutions[challenge.id])
-        print(comparison_report)
-    except Exception as e:
-        print(f"Error running {challenge.id}", e)
-        traceback.print_exc()
-        return
+    comparison_report = solution.comparison_report(solutions[challenge.id])
+    print(comparison_report)
+
     did_pass = solution.validate(solutions[challenge.id])
     finish_ns = str(time.time_ns())
-    extra_meta = {"with_solution": with_solution, "time": int(time.time())}
+
     if bool(run_py):
         results = run_py.output
         examples = results.get("examples") if results else None
@@ -410,51 +381,78 @@ async def attempt(challenge: GridProblem, run_remote=False, with_solution=False,
     extra_meta["py_test"] = pytest_res
     extra_meta["py_run_error"] = run_py.stderr if run_py else None
     extra_meta["py_run_logs"] = run_py.stdout if run_py else None
-    try:
-        if did_pass:
-            successful += 1
-            await substrate.async_run(
-                EmbedText(
-                    text=challenge.to_task_description(),
-                    collection_name="arc_solves",
-                    metadata={**parsed.model_dump(), **extra_meta},
-                    doc_id=challenge.id,
-                    _max_retry=2,
-                )
+    write_nodes = []
+    if did_pass:
+        successful += 1
+        write_nodes.append(
+            EmbedText(
+                text=challenge.to_task_description(),
+                collection_name="arc_solves",
+                metadata={**parsed.model_dump(), **extra_meta},
+                doc_id=challenge.id,
+                _max_retry=2,
             )
-        else:
-            # todo - diff string in emb
-            # diff_string = solution.outputs
-            await substrate.async_run(
-                EmbedText(
-                    text=sb.concat(
-                        challenge.to_task_description(),
-                        "\n\nComputed:\n",
-                        solution.comparison_report(solutions[challenge.id]),
-                    ),
-                    collection_name="arc_attempts",
-                    metadata={**parsed.model_dump(), **extra_meta},
-                    embedded_metadata_keys=[
-                        # "concepts_used",
-                        "approach",
-                        "python_function",
-                        "solution",
-                        "stdout",
-                        "error_message",
-                        "computed_result",
-                        "py_test",
-                        "py_run_error",
-                    ],
-                    # hide=True,
-                    _max_retries=2,
-                    doc_id=finish_ns,
-                )
+        )
+    else:
+        # todo - diff string in emb
+        # diff_string = solution.outputs
+        write_nodes.append(
+            EmbedText(
+                text=sb.concat(
+                    challenge.to_task_description(),
+                    "\n\nComputed:\n",
+                    solution.comparison_report(solutions[challenge.id]),
+                ),
+                collection_name="arc_attempts",
+                metadata={**parsed.model_dump(), **extra_meta},
+                embedded_metadata_keys=[
+                    "approach",
+                    "python_function",
+                    "solution",
+                    "stdout",
+                    "error_message",
+                    "computed_result",
+                    "py_test",
+                    "py_run_error",
+                ],
+                _max_retries=2,
+                doc_id=finish_ns,
             )
-        print(f"\n\nWrote to {'solves' if did_pass else 'attempts'}")
-        print(f"Solve Rate: {successful} of {attempted} ({successful / attempted:.2%})")
-    except Exception as e:
-        print("Error embedding solve", e)
-        traceback.print_exc()
+        )
+    await substrate.async_run(*write_nodes)
+
+    print(f"\n\nWrote to {'solves' if did_pass else 'attempts'}")
+    print(f"Solve Rate: {successful} of {attempted} ({successful / attempted:.2%})")
+
+
+async def attempt(challenge: GridProblem, run_remote=False, with_solution=False, verbose=False):
+    global attempted, successful
+    attempted += 1
+
+    print(f"Starting {challenge.id}")
+    initial_thoughts = await get_initial_thoughts(challenge, with_solution=with_solution)
+    if verbose:
+        print(" > INITIAL_THOUGHTS\n", initial_thoughts)
+
+    first_answer = await first_attempt(challenge, initial_thoughts)
+    if verbose:
+        print(" > FIRST_ATTEMPT\n", first_answer)
+
+    parsed_python_fn = parse_python_fn_str(first_answer)
+    parsed = await parse_attempt(challenge, first_answer)
+    if verbose:
+        print(" > PARSED\n", parsed.model_dump())
+
+    if parsed_python_fn:
+        parsed.python_function = parsed_python_fn
+
+    run_py = (
+        await run_py_fn(challenge, python_fn=parsed.python_function, parsed=parsed, verbose=verbose, max_tries=8)
+        if run_remote
+        else None
+    )
+    extra_meta = {"with_solution": with_solution, "time": int(time.time())}
+    await log_result(challenge, parsed, run_py, extra_meta=extra_meta)
 
 
 # def save_research(event: ResearchEvent):
@@ -589,9 +587,11 @@ async def process_challenge(semaphore, challenge):
         return await attempt(challenge, with_solution=True, run_remote=True)
 
 
-async def solve_loop(max_concurrent=1, max_challenges=None):
+async def solve_loop(max_concurrent=1, to_process=None, max_challenges=None):
     semaphore = asyncio.Semaphore(max_concurrent)
-    to_process = all_challenges[:max_challenges] if max_challenges else all_challenges
+    to_process = all_challenges if not to_process else to_process
+    if max_challenges:
+        to_process = to_process[:max_challenges]
     tasks = [process_challenge(semaphore, challenge) for challenge in to_process]
     for i, task in enumerate(asyncio.as_completed(tasks), 1):
         t0 = time.perf_counter()
@@ -612,8 +612,8 @@ async def main():
     # id = "3bd67248"
     # id = "1f876c06"
     # challenge: GridProblem = challenges[id]
-    verfied = await get_all_verified()
-    verified_ids = [v.id for v in verfied]
+    verified_so_far = await get_all_verified()
+    verified_ids = [v.id for v in verified_so_far]
     print("Skipping previously solved:", len(verified_ids))
 
     to_process = [c for c in all_challenges if c.id not in verified_ids]
@@ -640,8 +640,8 @@ async def main():
 
     # distill_research()
 
-    # for i in range(2):
-    #     await solve_loop(max_concurrent=20)
+    # for i in range(1):
+    #     await solve_loop(max_concurrent=32, to_process=to_process)
     # await solve_loop(max_concurrent=4, max_challenges=8)
 
 
