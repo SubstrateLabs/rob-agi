@@ -89,15 +89,15 @@ def arc_intro(short=False) -> str:
     base = """This is a test of abstract and reasoning thinking skills. It presents puzzles where you see a few examples and must figure out the pattern. Then you apply this pattern to a test input to solve. It measures how well you can spot patterns, think abstractly, and reason creatively. It uses many different types of ideas, so you need to be flexible in your thinking."""
     if short:
         return base
-    bullet_points = "\n- ".join(latest_distillation["ordered_concept_list"])
-    return f"""
-{base}
+    # bullet_points = "\n- ".join(latest_distillation["ordered_concept_list"])
+    return f"""{base}"""
 
-{latest_distillation["current_total_knowledge"]}
 
-This list is not exhaustive, but some concepts to keep in mind are:
+# todo - not sure this helps
+# {latest_distillation["current_total_knowledge"]}
+# This list is not exhaustive, but some concepts to keep in mind are:
 
-{bullet_points}"""
+# {bullet_points}"""
 
 
 def grid_setup() -> str:
@@ -133,12 +133,11 @@ def attempt_challenge(challenge: GridProblem, reasoning: str) -> str:
         arc_intro()
         + f"""Below is a challenge. You are tasked to solve it.
 
-This is the current challenge:
 <CHALLENGE>
 {challenge.to_task_description()}
 </CHALLENGE>
 
-This is some of your recent reasoning:
+Here is some of your recent reasoning:
 
 <REASONING>
 {reasoning}

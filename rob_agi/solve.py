@@ -184,18 +184,12 @@ async def get_previous_tries(challenge: GridProblem):
     return final
 
 
-async def attempt(challenge: GridProblem, run_remote=False, with_solution=False, verbose=False):
-    global attempted, successful
+async def get_initial_thoughts(challenge: GridProblem, with_solution=False):
     print(f"Checking past for {challenge.id}")
     prev_solution, recent_attempt, summarize_learnings, related = await get_previous_tries(challenge)
     if prev_solution:
         print("Previous Solution Found")
         # return
-
-    print(f"Attempting {challenge.id}")
-    debug_io = {}
-
-    solution_str = f"SOLUTION:\n\n{solutions[challenge.id].result_description()}" if with_solution else ""
     impression_q = get_initial_impression(challenge)
     if related.get("unsolved"):
         impression_q = sb.concat(
@@ -216,8 +210,8 @@ async def attempt(challenge: GridProblem, run_remote=False, with_solution=False,
 
     # reason = ComputeText(prompt=impression_q, model=smart_model, temperature=0.25)
     reason = moa(impression_q, max_tokens=1300)
+    solution_str = f"SOLUTION:\n\n{solutions[challenge.id].result_description()}" if with_solution else ""
 
-    debug_io["impression"] = {"in": impression_q, "out": reason.future.value.text}
     if with_solution:
         think_with_solution = sb.format(
             "{impression_q}\nHere is your first impression:\n\n{impression}\n\nNow, here is the solution:\n\n{solution_str}\n\nRevise your approach if necessary to incorporate what you learned from the solution. The important part here is to identify the key concepts and procedures that are necessary to solve this problem. Be comprehensive, detailed, but also concise.",
@@ -227,14 +221,21 @@ async def attempt(challenge: GridProblem, run_remote=False, with_solution=False,
         )
         # reason = ComputeText(prompt=think_with_solution, model=smart_model, temperature=0.2)
         reason = moa(think_with_solution)
-        debug_io["think_with_solution"] = {"in": think_with_solution, "out": reason.future.value.text}
-    first_try = attempt_challenge(challenge, reason.future.value.text)
-    make_attempt = ComputeText(
-        prompt=first_try,
-        model=smart_model,
-        temperature=0.2,
-        max_tokens=3000,
-    )
+    res = await substrate.async_run(reason)
+    return res.get(reason).value["text"]
+
+
+async def attempt(challenge: GridProblem, run_remote=False, with_solution=False, verbose=False):
+    global attempted, successful
+
+    print(f"Attempting {challenge.id}")
+    debug_io = {}
+
+    initial_thoughts = await get_initial_thoughts(challenge, with_solution=with_solution)
+
+    first_try = attempt_challenge(challenge, initial_thoughts)
+    make_attempt = ComputeText(prompt=first_try, model=smart_model, temperature=0.2, max_tokens=3000)
+
     debug_io["attempt"] = {"in": first_try, "out": make_attempt.future.text}
     parse_query = sb.concat(
         "From the following message, extract a result as structured JSON:\n\n<MESSAGE>",
@@ -292,7 +293,7 @@ async def attempt(challenge: GridProblem, run_remote=False, with_solution=False,
     #     debug_io["computed_result"] = {"in": compute_result_query, "out": result.future.json_object}
     input_space = Box(value=debug_io)
     try:
-        res = await substrate.async_run(parse_attempt, input_space)
+        res = await substrate.async_run(parse_attempt)
         if verbose:
             print(json.dumps(res.json, indent=2))
             print("----------------------------------")
