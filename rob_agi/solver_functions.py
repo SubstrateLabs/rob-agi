@@ -3,7 +3,6 @@ from typing import List, Optional
 from substrate import sb
 
 from rob_agi.arc_vec import ResearchEvent, SuccessfulSolve
-from rob_agi.colored_grid import ColoredGrid
 from rob_agi.grid_problem import GridProblem
 
 latest_research = {
@@ -101,6 +100,8 @@ def arc_intro(short=False) -> str:
 
 
 def grid_setup() -> str:
+    from rob_agi.colored_grid import ColoredGrid
+
     return f"""The grids are represented as a list of lists where each inner list represents a row and each element in the row represents a color.
 Number values correspond to colored squares: {ColoredGrid.color_mapping_str}
 
@@ -324,12 +325,12 @@ def run_eval(id: str, fn_code: str, task_set="training"):
 
     challenges, solutions = load_task_set(task_set_name=task_set)
     challenge = challenges[id]
-    exec(fn_code)
+    exec("from rob_agi.colored_grid import ColoredGrid\n\n" + fn_code)
 
     test_fn_handle = eval(f"solve_{id}")
     results = {"examples": [], "test_cases": []}
     for i, example in enumerate(challenge.examples):
-        output: ColoredGrid = test_fn_handle(example.input)
+        output = test_fn_handle(example.input)
         print(output.validate_report(example.output))
         results["examples"].append(output == example.output)
 

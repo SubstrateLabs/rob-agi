@@ -188,12 +188,7 @@ async def get_previous_tries(challenge: GridProblem):
 
 async def get_initial_thoughts(challenge: GridProblem, with_solution=False):
     print(f"Checking past for {challenge.id}")
-    prev_solution, recent_attempt, summarize_learnings, related = (
-        None,
-        None,
-        None,
-        {},
-    )  # await get_previous_tries(challenge)
+    prev_solution, recent_attempt, summarize_learnings, related = await get_previous_tries(challenge)
     if prev_solution:
         print("Previous Solution Found")
         # return
@@ -280,7 +275,7 @@ async def run_py_fn(
     challenge: GridProblem, python_fn: str, parsed: SolveAttempt, max_tries: int = 3, verbose=False
 ) -> Optional[RunPythonOut]:
     async def _run(fn: str):
-        print(f"Exec Py: {challenge.id}")
+        print(f"Exec Py: {challenge.id}\n\n", fn)
         py_args = {"id": challenge.id, "fn_code": fn}
         run_py = RunPython(
             function=run_eval,
@@ -413,7 +408,7 @@ async def attempt(challenge: GridProblem, run_remote=False, with_solution=False,
                     collection_name="arc_attempts",
                     metadata={**parsed.model_dump(), **extra_meta},
                     embedded_metadata_keys=[
-                        "concepts_used",
+                        # "concepts_used",
                         "approach",
                         "python_function",
                         "solution",

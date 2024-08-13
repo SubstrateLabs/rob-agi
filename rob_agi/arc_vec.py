@@ -28,7 +28,7 @@ def simplify_type(type_hint):
 
 class SuccessfulSolve(BaseModel):
     task_id: str = Field(..., description="ID of the task being solved")
-    concepts_used: List[str] = Field(..., description="List of important concepts used to solve the problem")
+    # concepts_used: List[str] = Field(..., description="List of important concepts used to solve the problem")
     approach: List[str] = Field(
         ..., description="Detailed list of steps and thinking done to solve the problem, ordered"
     )
