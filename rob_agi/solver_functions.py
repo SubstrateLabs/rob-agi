@@ -321,13 +321,15 @@ class ColoredGrid(BaseModel):
 
 def run_eval(id: str, fn_code: str, task_set="training"):
     from rob_agi.arc_util import load_task_set
-    from rob_agi.colored_grid import ColoredGrid
 
     challenges, solutions = load_task_set(task_set_name=task_set)
     challenge = challenges[id]
-    exec("from rob_agi.colored_grid import ColoredGrid\n\n" + fn_code)
 
-    test_fn_handle = eval(f"solve_{id}")
+    namespace = {}
+    exec("from rob_agi.colored_grid import ColoredGrid", namespace)
+    exec(fn_code, namespace)
+    test_fn_handle = namespace[f"solve_{id}"]
+
     results = {"examples": [], "test_cases": []}
     for i, example in enumerate(challenge.examples):
         output = test_fn_handle(example.input)
