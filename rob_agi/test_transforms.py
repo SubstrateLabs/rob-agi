@@ -299,7 +299,24 @@ def test_apply_cellular_automaton():
         return 1 if sum(neighbors) >= 2 else 0
 
     result = grid.apply_cellular_automaton(rule)
+    
+    # Check the resulting grid
     assert result.values == [[0, 1, 0], [1, 1, 1], [0, 1, 0]]
+    
+    # Check individual cell transitions
+    assert result.get_cell(0, 0) == 0  # Should become 0 (less than 2 neighbors)
+    assert result.get_cell(0, 1) == 1  # Should become 1 (2 neighbors)
+    assert result.get_cell(1, 1) == 1  # Should stay 1 (4 neighbors)
+    
+    # Test with a different rule
+    def alternate_rule(neighbors):
+        return 1 if sum(neighbors) % 2 == 0 else 0
+
+    alternate_result = grid.apply_cellular_automaton(alternate_rule)
+    
+    # Check the resulting grid for the alternate rule
+    expected_alternate = [[1, 0, 1], [0, 0, 0], [1, 0, 1]]
+    assert alternate_result.values == expected_alternate
 
 
 def test_find_connected_regions_complex_exact():
