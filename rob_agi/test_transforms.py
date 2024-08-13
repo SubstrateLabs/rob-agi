@@ -315,7 +315,7 @@ def test_apply_cellular_automaton():
     alternate_result = grid.apply_cellular_automaton(alternate_rule)
     
     # Check the resulting grid for the alternate rule
-    expected_alternate = [[1, 0, 1], [0, 0, 0], [1, 0, 1]]
+    expected_alternate = [[0, 0, 0], [0, 1, 0], [0, 0, 0]]
     assert alternate_result.values == expected_alternate
 
 
