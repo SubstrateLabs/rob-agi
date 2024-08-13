@@ -438,6 +438,61 @@ def test_find_repeating_pattern_none():
     assert pattern is None or pattern.values == grid.values
 
 
+def test_invalid_grid_size():
+    with pytest.raises(ValueError):
+        ColoredGrid(values=[[1] * 31 for _ in range(31)])  # Exceeds max size
+
+def test_is_valid():
+    valid_grid = ColoredGrid(values=[[1, 2], [3, 4]])
+    assert valid_grid.is_valid == True
+
+    invalid_grid = ColoredGrid(values=[[1, 2], [3, 10]])  # 10 is not a valid color
+    assert invalid_grid.is_valid == False
+
+def test_rotate_180():
+    grid = ColoredGrid(values=[[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    rotated = grid.rotate_180()
+    assert rotated.values == [[9, 8, 7], [6, 5, 4], [3, 2, 1]]
+
+def test_subtract_with_negative_result():
+    grid1 = ColoredGrid(values=[[1, 2], [3, 4]])
+    grid2 = ColoredGrid(values=[[2, 3], [4, 5]])
+    result = grid1.subtract(grid2)
+    assert result.values == [[9, 9], [9, 9]]  # Wraps around in modulo 10
+
+def test_apply_cellular_automaton_game_of_life():
+    grid = ColoredGrid(values=[
+        [0, 1, 0],
+        [0, 1, 0],
+        [0, 1, 0]
+    ])
+
+    def game_of_life_rule(neighbors):
+        alive_neighbors = sum(neighbors)
+        return 1 if alive_neighbors == 2 or alive_neighbors == 3 else 0
+
+    next_generation = grid.apply_cellular_automaton(game_of_life_rule)
+    assert next_generation.values == [
+        [0, 0, 0],
+        [1, 1, 1],
+        [0, 0, 0]
+    ]
+
+def test_find_pattern_multiple_occurrences():
+    grid = ColoredGrid(values=[
+        [1, 2, 3, 1, 2],
+        [4, 5, 6, 4, 5],
+        [1, 2, 3, 1, 2]
+    ])
+    pattern = ColoredGrid(values=[[1, 2], [4, 5]])
+    occurrences = grid.find_pattern(pattern)
+    assert occurrences == [(0, 0), (0, 3), (2, 0), (2, 3)]
+
+def test_to_binary_edge_case():
+    grid = ColoredGrid(values=[[4, 5, 6], [5, 5, 5], [6, 5, 4]])
+    binary = grid.to_binary(5)
+    assert binary.values == [[0, 1, 1], [1, 1, 1], [1, 1, 0]]
+
 # Run the tests
 if __name__ == "__main__":
     pytest.main([__file__])
