@@ -128,7 +128,12 @@ Here is your current challenge:
     )
 
 
-def attempt_challenge(challenge: GridProblem, reasoning: str) -> str:
+def attempt_challenge(challenge: GridProblem, reasoning: str, show_work: bool = True) -> str:
+    show_str = (
+        "Show your work. Your solution should clearly, completely, and succinctly communicate the concepts used, the approach taken."
+        if show_work
+        else ""
+    )
     return (
         arc_intro()
         + f"""Below is a challenge. You are tasked to solve it.
@@ -143,17 +148,17 @@ Here is some of your recent reasoning:
 {reasoning}
 </REASONING>
 
-The ColoredGrid class has some methods that can help you analyze and manipulate the grids:
-<GRID_METHODS>
+The ColoredGrid class has some methods, use them if they help solve the challenge
+<COLORED_GRID_SUMMARY>
 {get_grid_class_overview()}
-</GRID_METHODS>
+</COLORED_GRID_SUMMARY>
 
 Your solution should fit the following model:
 
 {SuccessfulSolve.field_summary()} 
 
-Make sure that the python function is a valid standalone function that takes in a ColoredGrid and returns a ColoredGrid. It should be named `solve_{challenge.id}`. 
-Show your work. Your solution should clearly, completely, and succinctly communicate the concepts used, the approach taken.
+Make sure that python_function is a valid standalone function that takes in a ColoredGrid and returns a ColoredGrid. It should be named `solve_{challenge.id}`. Any imports should be included in the function body. the function should be preceded by a python code fence (```python) and followed by a closing fence (```). 
+{show_str}
 """
     )
 

@@ -20,6 +20,8 @@ from substrate import (
     RunPython,
     If,
 )
+from substrate.core.models import RunPythonOut
+
 from rob_agi.arc_util import load_task_set, report_results
 from rob_agi.arc_vec import ResearchEvent, SolveAttempt
 from rob_agi.colored_grid import ColoredGrid
@@ -38,7 +40,7 @@ from rob_agi.solver_functions import (
 
 api_key = os.environ.get("SUBSTRATE_API_KEY")
 substrate = Substrate(
-    api_key=api_key, timeout=60 * 5, additional_headers={"x-substrate-fp": "1", "x-substrate-debug": "1"}
+    api_key=api_key, timeout=60 * 2, additional_headers={"x-substrate-fp": "1", "x-substrate-debug": "1"}
 )
 
 col_attempts = FindOrCreateVectorStore(collection_name="arc_attempts", model="jina-v2")
@@ -186,7 +188,12 @@ async def get_previous_tries(challenge: GridProblem):
 
 async def get_initial_thoughts(challenge: GridProblem, with_solution=False):
     print(f"Checking past for {challenge.id}")
-    prev_solution, recent_attempt, summarize_learnings, related = await get_previous_tries(challenge)
+    prev_solution, recent_attempt, summarize_learnings, related = (
+        None,
+        None,
+        None,
+        {},
+    )  # await get_previous_tries(challenge)
     if prev_solution:
         print("Previous Solution Found")
         # return
@@ -219,31 +226,32 @@ async def get_initial_thoughts(challenge: GridProblem, with_solution=False):
             impression=reason.future.value.text,
             solution_str=solution_str,
         )
-        # reason = ComputeText(prompt=think_with_solution, model=smart_model, temperature=0.2)
-        reason = moa(think_with_solution)
-    res = await substrate.async_run(reason)
-    return res.get(reason).value["text"]
+        sum = ComputeText(prompt=think_with_solution, model=smart_model, temperature=0.2)
+        # reason = moa(think_with_solution)
+        res = await substrate.async_run(sum)
+        return res.get(sum).text
+    else:
+        res = await substrate.async_run(reason)
+        return res.get(reason).value["text"]
 
 
-async def attempt(challenge: GridProblem, run_remote=False, with_solution=False, verbose=False):
-    global attempted, successful
-
+async def first_attempt(challenge: GridProblem, initial_thoughts: str) -> str:
     print(f"Attempting {challenge.id}")
-    debug_io = {}
+    prompt = attempt_challenge(challenge, reasoning=initial_thoughts)
+    ct = ComputeText(prompt=prompt, model=smart_model, temperature=0.2, max_tokens=2400)
+    res = await substrate.async_run(ct)
+    return res.get(ct).text
 
-    initial_thoughts = await get_initial_thoughts(challenge, with_solution=with_solution)
 
-    first_try = attempt_challenge(challenge, initial_thoughts)
-    make_attempt = ComputeText(prompt=first_try, model=smart_model, temperature=0.2, max_tokens=3000)
-
-    debug_io["attempt"] = {"in": first_try, "out": make_attempt.future.text}
+async def parse_attempt(challenge: GridProblem, first_answer: str) -> SolveAttempt:
+    print(f"Parsing {challenge.id}")
     parse_query = sb.concat(
         "From the following message, extract a result as structured JSON:\n\n<MESSAGE>",
-        make_attempt.future.text,
+        first_answer,
         "</MESSAGE>\n",
         f"In this case there should be {len(challenge.test_cases)} solutions. each solution is a grid, and a grid is a list of lists of ints.",
     )
-    parse_attempt = ComputeJSON(
+    parsed = ComputeJSON(
         prompt=parse_query,
         # json_schema=SolveAttempt.simple_json_schema(),
         # json_schema=SolveAttempt.model_json_schema(),
@@ -251,97 +259,143 @@ async def attempt(challenge: GridProblem, run_remote=False, with_solution=False,
         # model="Llama3Instruct70B",
         model=gpt,
         _max_retries=2,
-        temperature=0.25,
-        max_tokens=4000,
+        temperature=0.2,
+        max_tokens=3600,
     )
-    run_py = None
-    if run_remote:
-        py_args = {"id": challenge.id, "fn_code": parse_attempt.future.json_object.python_function}
+    res = await substrate.async_run(parsed)
+    return SolveAttempt.parse_obj(res.get(parsed).json_object)
+
+
+def parse_python_fn_str(llm_response: str):
+    # find the stuff inside the python code fence:
+    parsed_python_fn = None
+    if "```python" in llm_response:
+        start = llm_response.split("```python")[1]
+        if "```" in start:
+            parsed_python_fn = start.split("```")[0]
+    return parsed_python_fn
+
+
+async def run_py_fn(
+    challenge: GridProblem, python_fn: str, parsed: SolveAttempt, max_tries: int = 3, verbose=False
+) -> Optional[RunPythonOut]:
+    async def _run(fn: str):
+        print(f"Exec Py: {challenge.id}")
+        py_args = {"id": challenge.id, "fn_code": fn}
         run_py = RunPython(
             function=run_eval,
             kwargs=py_args,
             pip_install=["pydantic==2.8.2", "substrate", "git+https://github.com/SubstrateLabs/rob-agi.git@b6ff97c"],
         )
-        # todo - run and revise again if fails
-        # max_python_tries = 3
-        # If(sb.jq(run_py.future, '.stderr != null and .stderr != ""'), run_py.future,
-        #
-        #
-        #    )
-
-        debug_io["run_py"] = {"in": py_args, "out": run_py.future}
-    debug_io["parse_attempt"] = {"in": parse_query, "out": parse_attempt.future.json_object}
-
-    # parse_solution = False
-    # if parse_solution:
-    #     if len(challenge.test_cases) > 1:
-    #         final_task = (
-    #             f"Respond in JSON with the solutions for the {len(challenge.test_cases)} test cases in this task."
-    #         )
-    #     else:
-    #         final_task = "\n\nRespond in JSON with the solution for the test case in this task."
-    #     compute_result_query = sb.concat(
-    #         extract_result(challenge), sb.jq(parse_attempt.future.json_object, "@json"), final_task
-    #     )
-    #     result = ComputeJSON(
-    #         prompt=compute_result_query,
-    #         json_schema=to_strict_json_schema(ComputedResult),
-    #         model=gpt,
-    #         temperature=0.25,
-    #         _max_retries=2,
-    #     )
-    #     debug_io["computed_result"] = {"in": compute_result_query, "out": result.future.json_object}
-    input_space = Box(value=debug_io)
-    try:
-        res = await substrate.async_run(parse_attempt)
+        res = await substrate.async_run(run_py)
+        out = res.get(run_py)
         if verbose:
-            print(json.dumps(res.json, indent=2))
-            print("----------------------------------")
-            print(res.get(input_space).value)
-            print(f"REQUEST_ID", res.request_id)
-            print("----------------------------------")
+            print(" > PY_OUT:\n", out)
+        return out
+
+    approach_list = "\n".join(parsed.approach)
+    curr_out = None
+    for i in range(max_tries):
+        try:
+            curr_out = await _run(fn=python_fn)
+            results = curr_out.output
+            examples = results.get("examples") if results else None
+            test_cases = results.get("test_cases") if results else None
+            has_results = examples and test_cases
+            if has_results and all(examples) and all(test_cases):
+                return curr_out
+            else:
+                reasoning = f"The general approach is:\n\n{approach_list}\n\nBut the solution did not pass. Please revise the function and try again."
+                reasoning += f"Attempted function:\n\n{python_fn}"
+                if examples:
+                    reasoning += f"Example input checks: {['Pass' if e else 'Fail' for e in examples]}"
+                if test_cases:
+                    reasoning += f"Test case input checks: {['Pass' if e else 'Fail' for e in test_cases]}"
+                reasoning += f"Error message:\n\n{curr_out.stderr}"
+                reasoning += f"Stdout:\n\n{curr_out.stdout}"
+                prompt = attempt_challenge(challenge, reasoning=reasoning, show_work=False)
+                prompt += "Based on that feedback, output a new function."
+                new_attempt = ComputeText(prompt=prompt, model=smart_model, temperature=0.2, max_tokens=1800)
+                new_res = await substrate.async_run(new_attempt)
+                new_fn = parse_python_fn_str(new_res.get(new_attempt).text)
+                if new_fn:
+                    python_fn = new_fn
+        except Exception as e:
+            print(f"Error running python function on attempt {i}", e)
+            traceback.print_exc()
+    return curr_out
+
+
+async def attempt(challenge: GridProblem, run_remote=False, with_solution=False, verbose=False):
+    global attempted, successful
+
+    print(f"Starting {challenge.id}")
+    initial_thoughts = await get_initial_thoughts(challenge, with_solution=with_solution)
+    if verbose:
+        print(" > INITIAL_THOUGHTS\n", initial_thoughts)
+
+    first_answer = await first_attempt(challenge, initial_thoughts)
+    if verbose:
+        print(" > FIRST_ATTEMPT\n", first_answer)
+
+    parsed_python_fn = parse_python_fn_str(first_answer)
+
+    try:
+        parsed = await parse_attempt(challenge, first_answer)
+        if verbose:
+            print(" > PARSED\n", parsed.model_dump())
+    except Exception as e:
+        print(f"Error parsing attempt {challenge.id}", e)
+        traceback.print_exc()
+        return
+    fn_code = parsed_python_fn if parsed_python_fn else parsed.python_function
+    run_py = await run_py_fn(challenge, python_fn=fn_code, parsed=parsed, verbose=verbose) if run_remote else None
+    attempted += 1
+    try:
+        # if verbose:
+        #     print(json.dumps(res.json, indent=2))
+        #     print("----------------------------------")
+        #     print(res.get(input_space).value)
+        #     print(f"REQUEST_ID", res.request_id)
+        #     print("----------------------------------")
         # solution = ComputedResult.model_validate(res.get(result).json_object)
-        pa = res.get(parse_attempt).json_object
-        if not pa:
-            print("~~~~~~~~~~~~~~~~~No parse attempt~~~~~~~~~~~~~~~")
-            print(json.dumps(res.json, indent=2))
-            print("-----------------No parse attempt---------------")
-            return
         solution = ComputedResult(
-            task_id=challenge.id, outputs=[ColoredGrid(values=s) for s in pa.get("solutions") if s is not None]
+            task_id=challenge.id, outputs=[ColoredGrid(values=s) for s in parsed.solutions if s is not None]
         )
         comparison_report = solution.comparison_report(solutions[challenge.id])
         print(comparison_report)
-        attempted += 1
     except Exception as e:
         print(f"Error running {challenge.id}", e)
         traceback.print_exc()
         return
     did_pass = solution.validate(solutions[challenge.id])
+    finish_ns = str(time.time_ns())
+    extra_meta = {"with_solution": with_solution, "time": int(time.time())}
+    if bool(run_py):
+        results = run_py.output
+        examples = results.get("examples") if results else None
+        test_cases = results.get("test_cases") if results else None
+        has_results = examples and test_cases
+        if has_results and all(examples) and all(test_cases):
+            pytest_res = "pass"
+        elif has_results and all([not x for x in examples]) and all([not x for x in test_cases]):
+            pytest_res = "fail"
+        else:
+            pytest_res = "partial"
+    else:
+        pytest_res = "unknown"
+
+    extra_meta["py_test"] = pytest_res
+    extra_meta["py_run_error"] = run_py.stderr if run_py else None
+    extra_meta["py_run_logs"] = run_py.stdout if run_py else None
     try:
-        finish_ns = str(time.time_ns())
-        extra_meta = {"with_solution": with_solution, "time": int(time.time())}
-        if bool(run_py and res.get(run_py)):
-            pytest_out = res.get(run_py).output
-            if pytest_out is not None and pytest_out.get("examples") and pytest_out.get("test_cases"):
-                if all(pytest_out["examples"]) and all(pytest_out["test_cases"]):
-                    pytest_res = "pass"
-                elif all([not x for x in pytest_out["examples"]]) and all([not x for x in pytest_out["test_cases"]]):
-                    pytest_res = "fail"
-                else:
-                    pytest_res = "partial"
-            else:
-                pytest_res = "unknown"
-            extra_meta["py_test"] = pytest_res
-            extra_meta["py_run_error"] = res.get(run_py).stderr
-            extra_meta["py_run_logs"] = res.get(run_py).stdout
         if did_pass:
             successful += 1
             await substrate.async_run(
                 EmbedText(
                     text=challenge.to_task_description(),
                     collection_name="arc_solves",
-                    metadata={**res.get(parse_attempt).json_object, **extra_meta},
+                    metadata={**parsed.model_dump(), **extra_meta},
                     doc_id=challenge.id,
                     _max_retry=2,
                 )
@@ -357,7 +411,7 @@ async def attempt(challenge: GridProblem, run_remote=False, with_solution=False,
                         solution.comparison_report(solutions[challenge.id]),
                     ),
                     collection_name="arc_attempts",
-                    metadata={**res.get(parse_attempt).json_object, **extra_meta},
+                    metadata={**parsed.model_dump(), **extra_meta},
                     embedded_metadata_keys=[
                         "concepts_used",
                         "approach",
@@ -537,8 +591,8 @@ async def main():
     # id = "1f876c06"
     # challenge: GridProblem = challenges[id]
 
-    # random_challenge = random.choice(all_challenges)
-    # await attempt(random_challenge, with_solution=True, verbose=True, run_remote=True)
+    random_challenge = random.choice(all_challenges)
+    await attempt(random_challenge, with_solution=True, verbose=True, run_remote=True)
 
     # so, rec, su, rel = await get_previous_tries(random_challenge)
     # print("Previous Solution:", so.metadata if so else "None")
@@ -560,8 +614,8 @@ async def main():
 
     # distill_research()
 
-    for i in range(8):
-        await solve_loop(max_concurrent=20)
+    # for i in range(8):
+    #     await solve_loop(max_concurrent=20)
     # await solve_loop(max_concurrent=4, max_challenges=8)
 
 
