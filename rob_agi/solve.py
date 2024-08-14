@@ -40,7 +40,7 @@ from rob_agi.solver_functions import (
 )
 
 api_key = os.environ.get("SUBSTRATE_API_KEY")
-substrate = Substrate(api_key=api_key, timeout=60 * 2, additional_headers={})
+substrate = Substrate(api_key=api_key, timeout=60 * 4, additional_headers={})
 
 col_attempts = FindOrCreateVectorStore(collection_name="arc_attempts", model="jina-v2")
 col_research = FindOrCreateVectorStore(collection_name="arc_research_events", model="jina-v2")
@@ -649,7 +649,7 @@ async def main():
 
     # distill_research()
 
-    for i in range(2):
+    for i in range(1):
         await solve_loop(max_concurrent=32, to_process=to_process)
     # await solve_loop(max_concurrent=4, max_challenges=8)
 
