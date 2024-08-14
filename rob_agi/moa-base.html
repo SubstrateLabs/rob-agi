@@ -15,16 +15,21 @@
         margin: 0;
         color: #333;
       }
+
       .container {
         display: flex;
         align-items: center;
         margin-top: 30px;
       }
+
       .main-content {
         display: flex;
         flex-direction: column;
         align-items: center;
+        font-size: 11px;
+        font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
       }
+
       .card {
         background-color: white;
         border-radius: 8px;
@@ -33,6 +38,7 @@
         width: 660px;
         margin-bottom: 20px;
       }
+
       .content {
         background-color: #f8fafc;
         border: 1px solid #e2e8f0;
@@ -44,12 +50,14 @@
         overflow-y: auto;
         white-space: pre-wrap;
       }
+
       .controls {
         display: flex;
         justify-content: center;
         align-items: center;
         margin-bottom: 16px;
       }
+
       button {
         background-color: #5f5695;
         color: white;
@@ -60,30 +68,35 @@
         transition: background-color 0.3s;
         margin: 4px;
       }
+
       button:hover:not(:disabled) {
         background-color: #5f5695;
         color: white;
         opacity: 0.8;
       }
+
       button:disabled {
         opacity: 0.3;
         cursor: not-allowed;
       }
+
       .view-toggle {
         display: flex;
         margin-bottom: 16px;
       }
+
       .view-toggle button {
         background-color: #5f5695;
         opacity: 0.3;
       }
+
       .view-toggle button.active {
         background-color: #5f5695;
         color: white;
         opacity: 1;
       }
+
       .question-txt {
-        text-align: center;
         font-size: 15px;
         color: #718096;
         margin-bottom: 24px;
@@ -91,14 +104,18 @@
         font-style: italic;
         opacity: 0.85;
         max-width: 658px;
-        max-height: 96px;
+        max-height: 136px;
         overflow: auto;
         border: 2px solid lightgrey;
         border-radius: 6px;
         padding: 12px;
         box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
         background-color: white;
+        white-space: pre-wrap;
+        text-align: left;
+        font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
       }
+
       .model-name {
         text-align: center;
         margin-top: -4px;
@@ -106,16 +123,19 @@
         font-size: 14px;
         color: #718096;
       }
+
       .vertical-controls {
         display: flex;
         flex-direction: column;
         margin-left: 20px;
       }
+
       .dot-container {
         display: flex;
         justify-content: center;
         margin-top: 10px;
       }
+
       .dot-container.vertical {
         flex-direction: column;
         position: absolute;
@@ -123,6 +143,7 @@
         top: 50%;
         transform: translateY(-50%);
       }
+
       .dot {
         width: 10px;
         height: 10px;
@@ -130,9 +151,11 @@
         background-color: #cbd5e0;
         margin: 0 5px;
       }
+
       .dot-container.vertical .dot {
         margin: 5px 0;
       }
+
       .dot.active {
         background-color: #5f5695;
       }
@@ -164,7 +187,7 @@
     </div>
 
     <script>
-      const question = "{{ question }}"
+      const question = "{{ question }}";
       const modelNames = "{{ model_names }}";
       const individualResults = "{{ individual }}";
       const aggResults = "{{ summaries }}";

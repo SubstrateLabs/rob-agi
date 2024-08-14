@@ -152,7 +152,7 @@ Here is some of your recent reasoning:
         f"""
 </REASONING>
 
-The ColoredGrid class has transform functions and is already defined in scope. 
+The ColoredGrid class is already defined in scope, and includes some functions that may be useful. 
 <COLORED_GRID_SUMMARY>
 {get_grid_class_overview()}
 </COLORED_GRID_SUMMARY>
