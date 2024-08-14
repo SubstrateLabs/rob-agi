@@ -117,6 +117,7 @@ The challenge involves transforming one colored 2D grid into another.
 You will be given a few examples of the pattern in the form of input output pairs.
 You will also be given a test case that has just the input but no output yet.
 The goal is to find the pattern that fits all the examples, then apply it to the test case to compute a solution. 
+When you think conceptually, there is usually a simple description of what is happening in terms of basic knowledge, so try to back in to it with visual intuition.
 
 {grid_setup()}
 
@@ -151,7 +152,7 @@ Here is some of your recent reasoning:
         f"""
 </REASONING>
 
-The ColoredGrid class has some methods, use them if they help solve the challenge
+The ColoredGrid class has transform functions and is already defined in scope. 
 <COLORED_GRID_SUMMARY>
 {get_grid_class_overview()}
 </COLORED_GRID_SUMMARY>
@@ -160,7 +161,7 @@ Your solution should fit the following model:
 
 {SuccessfulSolve.field_summary()} 
 
-Make sure that python_function is a valid standalone function that takes in a ColoredGrid and returns a ColoredGrid. It should be named `solve_{challenge.id}`. Any imports should be included in the function body. the function should be preceded by a python code fence (```python) and followed by a closing fence (```). 
+Make sure that the python function that you output is a valid standalone function that takes in a ColoredGrid and returns a ColoredGrid. It should be named `solve_{challenge.id}`. Any imports should be included in the function body. There should be nothing defined or referenced in the surrounding global scope. the function should be preceded by a python code fence (```python) and followed by a closing fence (```). 
 {show_str}
 """,
     )
@@ -332,7 +333,7 @@ def run_eval(id: str, fn_code: str, task_set="training"):
     exec(fn_code, namespace)
     test_fn_handle = namespace[f"solve_{id}"]
 
-    results = {"examples": [], "test_cases": []}
+    results = {"examples": [], "test_cases": [], "solutions": []}
     for i, example in enumerate(challenge.examples):
         output = test_fn_handle(example.input)
         print(output.validate_report(example.output))
@@ -341,5 +342,6 @@ def run_eval(id: str, fn_code: str, task_set="training"):
     for i, test_case in enumerate(challenge.test_cases):
         output = test_fn_handle(test_case)
         print(output.validate_report(solutions[id].outputs[i]))
+        results["solutions"].append(output)
         results["test_cases"].append(output == solutions[id].outputs[i])
     return results

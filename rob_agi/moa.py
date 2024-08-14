@@ -50,22 +50,33 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 async def run_moa(
-    question: str, num_layers=2, max_tokens: int = def_max_tokens, opts=None, models=None, decider=default_decider
+    question: str,
+    num_layers=2,
+    max_tokens: int = def_max_tokens,
+    opts=None,
+    models=None,
+    decider=default_decider,
+    filename_prefix="",
 ):
-    box = moa(question, num_layers=num_layers, max_tokens=max_tokens, opts=opts, models=models, decider=decider)
+    if models is None:
+        models = default_models
+    io = Box(value=question)
+    box = moa(io.future.value, num_layers=num_layers, max_tokens=max_tokens, opts=opts, models=models, decider=decider)
     res = await substrate.async_run(box)
     json_out = res.get(box).value
 
-    with open(os.path.join(current_dir, "index.html"), "r") as f:
+    with open(os.path.join(current_dir, "moa-base.html"), "r") as f:
         html_template = f.read()
 
     html = (
         html_template.replace('"{{ individual }}"', json.dumps(json_out["layers"], indent=2))
-        .replace('"{{ question }}"', json.dumps(question))
-        .replace('"{{ summaries }}"', f'[{json.dumps(json_out["final"])}]')
+        .replace('"{{ question }}"', json.dumps(res.get(io).value))
+        .replace('"{{ model_names }}"', json.dumps(models))
+        .replace('"{{ summaries }}"', f'[{json.dumps(json_out["text"])}]')
     )
 
-    with open(os.path.join(current_dir, "moa-out", f"moa-{str(time.time_ns())}.html"), "w") as f:
+    filename = "-".join([filename_prefix, str(time.time_ns())])
+    with open(os.path.join(current_dir, "moa-out", f"{filename}.html"), "w") as f:
         f.write(html)
 
     return json_out

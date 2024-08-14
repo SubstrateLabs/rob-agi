@@ -7,6 +7,7 @@ import time
 import traceback
 from typing import List, Optional
 
+import cloudpickle
 from openai.lib._pydantic import to_strict_json_schema
 from substrate import (
     Substrate,
@@ -212,14 +213,10 @@ async def get_initial_thoughts(challenge: GridProblem, with_solution=False):
                 "\n\nYour previous solutions were able to produce the right answer to the test, but the python function did not work generally. Please consider this in your approach.",
                 f"<PREVIOUS_SUBMISSION>{prev_solution.metadata.get('python_function')}\n\n{prev_solution.metadata.get('py_run_error')}\n\n{prev_solution.metadata.get('py_run_logs')}</PREVIOUS_SUBMISSION>",
             )
-    if related.get("unsolved"):
-        impression_q = sb.concat(
-            impression_q, "\n\nRelated unsolved task (possibly low signal):", related["unsolved"]["metadata"]["doc"]
-        )
+    # if related.get("unsolved"):
+    #     impression_q = sb.concat(impression_q, "\n\nOne similar unsolved task:", related["unsolved"]["metadata"]["doc"])
     if related.get("solved"):
-        impression_q = sb.concat(
-            impression_q, "\n\nRelated solved task (maybe relevant):", related["solved"]["metadata"]["doc"]
-        )
+        impression_q = sb.concat(impression_q, "\n\nOne similar solved solution:", related["solved"]["metadata"]["doc"])
     if recent_attempt:
         impression_q = sb.concat(
             impression_q,
@@ -230,7 +227,7 @@ async def get_initial_thoughts(challenge: GridProblem, with_solution=False):
         impression_q = sb.concat(impression_q, "\n\nLearnings from past attempts:", summarize_learnings)
 
     # reason = ComputeText(prompt=impression_q, model=smart_model, temperature=0.25)
-    reason = moa(impression_q, max_tokens=1300)
+    reason = moa(impression_q, max_tokens=1800, num_layers=1)
     solution_str = f"<SOLUTION>\n{solutions[challenge.id].result_description()}</SOLUTION>" if with_solution else ""
 
     if with_solution:
@@ -292,7 +289,7 @@ def parse_python_fn_str(llm_response: str):
 
 
 async def run_py_fn(
-    challenge: GridProblem, python_fn: str, parsed: SolveAttempt, max_tries: int = 1, verbose=False
+    challenge: GridProblem, parsed: SolveAttempt, max_tries: int = 1, verbose=False
 ) -> Optional[RunPythonOut]:
     async def _run(fn: str):
         print(f"Exec Py: {challenge.id}\n\n")
@@ -312,17 +309,26 @@ async def run_py_fn(
     curr_out = None
     for i in range(max_tries):
         try:
-            curr_out = await _run(fn=python_fn)
-            results = curr_out.output
+            curr_out = await _run(fn=parsed.python_function)
+            if curr_out.output is None and curr_out.pkl_output:
+                output_bytes = base64.b64decode(curr_out.pkl_output)
+                results = cloudpickle.loads(output_bytes)
+            else:
+                results = curr_out.output
+
+            parsed.stdout = curr_out.stdout
+            parsed.error_message = curr_out.stderr
+            parsed.solutions = [s.values for s in results.get("solutions")] if results else []
             examples = results.get("examples") if results else None
             test_cases = results.get("test_cases") if results else None
             print("Results example, test", examples, test_cases)
             has_results = examples and test_cases
+
             if has_results and all(examples) and all(test_cases):
                 return curr_out
             else:
                 reflection = f"The general approach was:\n\n{approach_list}\n\nBut the solution did not pass. We need to fix the function and try again."
-                reflection += f"The function that failed:\n\n```python\n{python_fn}\n```"
+                reflection += f"The function that failed:\n\n```python\n{parsed.python_function}\n```"
                 if examples:
                     reflection += f"Example input results: {['Pass' if e else 'Fail' for e in examples]}"
                 if test_cases:
@@ -334,7 +340,7 @@ async def run_py_fn(
                     prompt="Above is a candidate solution to an ARC challenge problem.\n"
                     + reflection
                     + "\n\nDiagnose the issue with the attempt, explaining what went wrong and what needs to be fixed. Your diagnosis should be short but comprehensive. Do not include general advice that does not fix the issue.",
-                    model=smart_model,
+                    model=gpt,
                     max_tokens=700,
                 )
 
@@ -342,11 +348,11 @@ async def run_py_fn(
                 prompt = attempt_challenge(challenge, reasoning=past_reason, show_work=False)
 
                 # new_attempt = ComputeText(prompt=prompt, model=smart_model, max_tokens=1900)
-                new_attempt_moa = await run_moa(prompt, max_tokens=1900, num_layers=1)
+                new_attempt_moa = await run_moa(prompt, max_tokens=4000, num_layers=2, filename_prefix=challenge.id)
                 new_fn = parse_python_fn_str(new_attempt_moa["text"])
                 if new_fn:
-                    print("Parsed new function", new_fn == python_fn)
-                    python_fn = new_fn
+                    print("Parsed new function", new_fn == parsed.python_function)
+                    parsed.python_function = new_fn
         except Exception as e:
             print(f"Error running python function on attempt {i}", e)
             traceback.print_exc()
@@ -379,8 +385,8 @@ async def log_result(challenge: GridProblem, parsed: SolveAttempt, run_py: Optio
         pytest_res = "unknown"
 
     extra_meta["py_test"] = pytest_res
-    extra_meta["py_run_error"] = run_py.stderr if run_py else None
-    extra_meta["py_run_logs"] = run_py.stdout if run_py else None
+    extra_meta["py_run_error"] = run_py.stderr if run_py else parsed.error_message
+    extra_meta["py_run_logs"] = run_py.stdout if run_py else parsed.stdout
     write_nodes = []
     if did_pass:
         successful += 1
@@ -446,11 +452,7 @@ async def attempt(challenge: GridProblem, run_remote=False, with_solution=False,
     if parsed_python_fn:
         parsed.python_function = parsed_python_fn
 
-    run_py = (
-        await run_py_fn(challenge, python_fn=parsed.python_function, parsed=parsed, verbose=verbose, max_tries=8)
-        if run_remote
-        else None
-    )
+    run_py = await run_py_fn(challenge, parsed=parsed, verbose=verbose, max_tries=8) if run_remote else None
     extra_meta = {"with_solution": with_solution, "time": int(time.time())}
     await log_result(challenge, parsed, run_py, extra_meta=extra_meta)
 
@@ -608,8 +610,6 @@ async def solve_loop(max_concurrent=1, to_process=None, max_challenges=None):
 
 async def main():
     # ensure_db()
-    # id = "0520fde7"
-    # id = "3bd67248"
     # id = "1f876c06"
     # challenge: GridProblem = challenges[id]
     verified_so_far = await get_all_verified()
@@ -617,7 +617,8 @@ async def main():
     print("Skipping previously solved:", len(verified_ids))
 
     to_process = [c for c in all_challenges if c.id not in verified_ids]
-    random_challenge = random.choice(to_process)
+    # random_challenge = random.choice(to_process)
+    random_challenge = challenges["c3f564a4"]
     await attempt(random_challenge, with_solution=True, verbose=True, run_remote=True)
 
     # so, rec, su, rel = await get_previous_tries(random_challenge)
