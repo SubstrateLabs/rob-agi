@@ -114,8 +114,8 @@ async def get_previous_tries(challenge: GridProblem):
     prev_attempts = QueryVectorStore(
         collection_name="arc_attempts",
         model="jina-v2",
-        query_strings=["correct response"],
-        top_k=10,
+        query_strings=["recent correct response"],
+        top_k=12,
         include_metadata=True,
         include_values=False,
         filters={"task_id": {"$eq": challenge.id}},
@@ -156,6 +156,8 @@ async def get_previous_tries(challenge: GridProblem):
         include_values=False,
         filters={"task_id": {"$ne": challenge.id}},
     )
+    passes = {"py_test": {"$eq": "pass"}}
+    is_not_task = {"task_id": {"$ne": challenge.id}}
     similar_solved = QueryVectorStore(
         collection_name="arc_solves",
         model="jina-v2",
@@ -163,7 +165,7 @@ async def get_previous_tries(challenge: GridProblem):
         top_k=1,
         include_metadata=True,
         include_values=False,
-        filters={"task_id": {"$ne": challenge.id}},
+        filters={"$and": [passes, is_not_task]},
     )
     summary = If(
         should_summ,
@@ -184,7 +186,8 @@ async def get_previous_tries(challenge: GridProblem):
     res = await substrate.async_run(summary, related)
     solution = res.get(solved).results[0][0] if res.get(solved).results[0] else None
     most_recent_attempt = None
-    for att in res.get(prev_attempts).results[0]:
+    all_prev_attempts = res.get(prev_attempts).results[0]
+    for att in all_prev_attempts:
         if att.metadata.get("time"):
             if most_recent_attempt is None:
                 most_recent_attempt = att
@@ -192,17 +195,29 @@ async def get_previous_tries(challenge: GridProblem):
                 most_recent_attempt = att
 
     try:
-        final = solution, most_recent_attempt, res.get(summary).result, res.get(related).value
+        final = {
+            "prev_solution": solution,
+            "prev_attempts": all_prev_attempts,
+            "recent_attempt": most_recent_attempt,
+            "learnings": res.get(summary).result,
+            "related": res.get(related).value,
+        }
     except Exception as e:
         print("Error getting past attempts", e)
         traceback.print_exc()
-        final = None, None, None, {}
+        final = {}
     return final
 
 
 async def get_initial_thoughts(challenge: GridProblem, with_solution=False):
     print(f"Checking past for {challenge.id}")
-    prev_solution, recent_attempt, summarize_learnings, related = await get_previous_tries(challenge)
+    check_past = await get_previous_tries(challenge)
+    prev_solution = check_past.get("prev_solution")
+    recent_attempt = check_past.get("recent_attempt")
+    summarize_learnings = check_past.get("learnings")
+    related = check_past.get("related")
+    prev_attempts = check_past.get("prev_attempts") or []
+
     impression_q = get_initial_impression(challenge)
 
     if prev_solution:
@@ -216,6 +231,11 @@ async def get_initial_thoughts(challenge: GridProblem, with_solution=False):
                 "\n\nYour previous solutions were able to produce the right answer to the test, but the python function did not work generally. Please consider this in your approach.",
                 f"<PREVIOUS_SUBMISSION>{prev_solution.metadata.get('python_function')}\n\n{prev_solution.metadata.get('py_run_error')}\n\n{prev_solution.metadata.get('py_run_logs')}</PREVIOUS_SUBMISSION>",
             )
+            if len(prev_attempts) > 2:
+                impression_q = sb.concat(
+                    impression_q,
+                    f"Note that there have been {len(prev_attempts)} previous attempts at this problem, indicating that it is a difficult one. You may need to think more abstractly here to solve it. What would a person see if they were looking at this colored grid? How would they most easily understand it?",
+                )
         elif py_solved == "pass":
             impression_q = sb.concat(
                 impression_q,
@@ -225,7 +245,9 @@ async def get_initial_thoughts(challenge: GridProblem, with_solution=False):
     # if related.get("unsolved"):
     #     impression_q = sb.concat(impression_q, "\n\nOne similar unsolved task:", related["unsolved"]["metadata"]["doc"])
     if related.get("solved"):
-        impression_q = sb.concat(impression_q, "\n\nOne similar solved solution:", related["solved"]["metadata"]["doc"])
+        impression_q = sb.concat(
+            impression_q, "\n\nExample solution from a different problem:", related["solved"]["metadata"]["doc"]
+        )
     if recent_attempt:
         impression_q = sb.concat(
             impression_q,
@@ -372,10 +394,22 @@ async def log_result(challenge: GridProblem, parsed: SolveAttempt, run_py: Optio
     solution = ComputedResult(
         task_id=challenge.id, outputs=[ColoredGrid(values=s) for s in parsed.solutions if s is not None]
     )
-    comparison_report = solution.comparison_report(solutions[challenge.id])
-    print(comparison_report)
+    try:
+        comparison_report = solution.comparison_report(solutions[challenge.id])
+        print(comparison_report)
+        did_pass = solution.validate(solutions[challenge.id])
+    except Exception as e:
+        print(f"Error comparing results: {challenge.id}", e)
+        print(
+            "=============================\n",
+            challenge.id,
+            solution.outputs,
+            solutions[challenge.id].outputs,
+            "=============================",
+        )
+        traceback.print_exc()
+        did_pass = False
 
-    did_pass = solution.validate(solutions[challenge.id])
     finish_ns = str(time.time_ns())
 
     if bool(run_py):
