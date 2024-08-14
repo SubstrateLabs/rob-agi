@@ -109,7 +109,7 @@ All grids are rectangular and can be between 1x1 and 30x30 in size.
 """
 
 
-def get_initial_impression(challenge: GridProblem) -> str:
+def problem_setup(challenge: GridProblem) -> str:
     return (
         arc_intro()
         + f"""Below is a challenge. You are tasked to solve it.
@@ -137,13 +137,8 @@ def attempt_challenge(challenge: GridProblem, reasoning: str, show_work: bool = 
         else ""
     )
     return sb.concat(
-        arc_intro(),
-        f"""Below is a challenge. You are tasked to solve it.
-
-<CHALLENGE>
-{challenge.to_task_description()}
-</CHALLENGE>
-
+        problem_setup(challenge),
+        f"""
 Here is some of your recent reasoning:
 
 <REASONING>

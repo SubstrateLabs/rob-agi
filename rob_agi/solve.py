@@ -30,7 +30,7 @@ from rob_agi.computed_result import ComputedResult
 from rob_agi.grid_problem import GridProblem
 from rob_agi.moa import moa, run_moa
 from rob_agi.solver_functions import (
-    get_initial_impression,
+    problem_setup,
     extract_result,
     gather_research,
     explain_research,
@@ -54,8 +54,8 @@ smart_model = "claude-3-5-sonnet-20240620"
 json_model = "Mixtral8x7BInstruct"
 gpt = "gpt-4o"
 
-task_set = "training"
-# task_set = "evaluation"
+# task_set = "training"
+task_set = "evaluation"
 challenges, solutions = load_task_set(task_set_name=task_set)
 
 all_challenges = list(challenges.values())
@@ -209,16 +209,20 @@ async def get_previous_tries(challenge: GridProblem):
     return final
 
 
-async def get_initial_thoughts(challenge: GridProblem, with_solution=False):
+async def get_initial_thoughts(challenge: GridProblem, with_solution=False, verbose=False):
     print(f"Checking past for {challenge.id}")
     check_past = await get_previous_tries(challenge)
+
     prev_solution = check_past.get("prev_solution")
     recent_attempt = check_past.get("recent_attempt")
     summarize_learnings = check_past.get("learnings")
     related = check_past.get("related")
     prev_attempts = check_past.get("prev_attempts") or []
 
-    impression_q = get_initial_impression(challenge)
+    if verbose:
+        print(" > CHECK_PAST\n", check_past)
+
+    impression_q = problem_setup(challenge)
 
     if prev_solution:
         py_solved = prev_solution.metadata.get("py_test")
@@ -324,7 +328,7 @@ async def run_py_fn(
 ) -> Optional[RunPythonOut]:
     async def _run(fn: str, run_count):
         print(f"Exec Py[{run_count}]: {challenge.id}\n\n")
-        py_args = {"id": challenge.id, "fn_code": fn}
+        py_args = {"id": challenge.id, "fn_code": fn, "task_set": task_set}
         run_py = RunPython(
             function=run_eval,
             kwargs=py_args,
@@ -366,6 +370,25 @@ async def run_py_fn(
                     reflection += f"Test case input results: {['Pass' if e else 'Fail' for e in test_cases]}"
                 reflection += f"Error message: {curr_out.stderr or 'None'}"
                 reflection += f"Stdout: {curr_out.stdout or 'None'}"
+                pytest_results = get_py_test(results)
+                examples = pytest_results.get("examples")
+                test_cases = pytest_results.get("test_cases")
+                examples_explanation = ""
+                if examples == "fail":
+                    examples_explanation = "The example inputs all failed to produce the correct output."
+                elif examples == "partial":
+                    examples_explanation = "The example inputs produced a mix of correct and incorrect outputs."
+                elif examples == "pass":
+                    examples_explanation = "The example inputs all produced the correct output."
+                test_explanation = ""
+                if test_cases == "fail":
+                    test_explanation = "The test cases all failed to produce the correct output."
+                elif test_cases == "partial":
+                    test_explanation = "The test cases produced a mix of correct and incorrect outputs."
+                elif test_cases == "pass":
+                    test_explanation = "The test cases all produced the correct output."
+
+                reflection += f"{examples_explanation}\n{test_explanation}"
 
                 diagnose = ComputeText(
                     prompt="Above is a candidate solution to an ARC challenge problem.\n"
@@ -389,11 +412,32 @@ async def run_py_fn(
     return curr_out
 
 
+def get_py_test(results: Optional[dict]):
+    if not results:
+        return {"examples": "unknown", "test_cases": "unknown"}
+    examples = results.get("examples") if results else None
+    test_cases = results.get("test_cases") if results else None
+    all_examples_pass = all(examples)
+    all_test_cases_pass = all(test_cases)
+    all_examples_fail = all([not x for x in examples])
+    all_test_cases_fail = all([not x for x in test_cases])
+
+    example_status = "pass" if all_examples_pass else "fail" if all_examples_fail else "partial"
+    test_status = "pass" if all_test_cases_pass else "fail" if all_test_cases_fail else "partial"
+    if not examples:
+        example_status = "unknown"
+    if not test_cases:
+        test_status = "unknown"
+
+    return {"examples": example_status, "test_cases": test_status}
+
+
 async def log_result(challenge: GridProblem, parsed: SolveAttempt, run_py: Optional[RunPythonOut], extra_meta: dict):
     global attempted, successful
     solution = ComputedResult(
         task_id=challenge.id, outputs=[ColoredGrid(values=s) for s in parsed.solutions if s is not None]
     )
+    comparison_report = ""
     try:
         comparison_report = solution.comparison_report(solutions[challenge.id])
         print(comparison_report)
@@ -413,20 +457,21 @@ async def log_result(challenge: GridProblem, parsed: SolveAttempt, run_py: Optio
     finish_ns = str(time.time_ns())
 
     if bool(run_py):
-        results = run_py.output
-        examples = results.get("examples") if results else None
-        test_cases = results.get("test_cases") if results else None
-        has_results = examples and test_cases
-        if has_results and all(examples) and all(test_cases):
-            pytest_res = "pass"
-        elif has_results and all([not x for x in examples]) and all([not x for x in test_cases]):
-            pytest_res = "fail"
+        gathered_py_test = get_py_test(run_py.output)
+        examples = gathered_py_test.get("examples")
+        test_cases = gathered_py_test.get("test_cases")
+        if examples == "pass" and test_cases == "pass":
+            pytest_rollup = "pass"
+        elif examples == "fail" and test_cases == "fail":
+            pytest_rollup = "fail"
+        elif examples == "partial" or test_cases == "partial":
+            pytest_rollup = "partial"
         else:
-            pytest_res = "partial"
+            pytest_rollup = "unknown"
     else:
-        pytest_res = "unknown"
+        pytest_rollup = "unknown"
 
-    extra_meta["py_test"] = pytest_res
+    extra_meta["py_test"] = pytest_rollup
     extra_meta["py_run_error"] = run_py.stderr if run_py else parsed.error_message
     extra_meta["py_run_logs"] = run_py.stdout if run_py else parsed.stdout
     write_nodes = []
@@ -447,8 +492,7 @@ async def log_result(challenge: GridProblem, parsed: SolveAttempt, run_py: Optio
         EmbedText(
             text=sb.concat(
                 challenge.to_task_description(),
-                "\n\nComputed:\n",
-                solution.comparison_report(solutions[challenge.id]),
+                f"\n\nComputed:\n{comparison_report}" if comparison_report else "",
             ),
             collection_name="arc_attempts",
             metadata={**parsed.model_dump(), **extra_meta},
@@ -477,7 +521,7 @@ async def attempt(challenge: GridProblem, run_remote=False, with_solution=False,
     attempted += 1
 
     print(f"Starting {challenge.id}")
-    initial_thoughts = await get_initial_thoughts(challenge, with_solution=with_solution)
+    initial_thoughts = await get_initial_thoughts(challenge, with_solution=with_solution, verbose=verbose)
     if verbose:
         print(" > INITIAL_THOUGHTS\n", initial_thoughts)
 
@@ -627,7 +671,7 @@ Respond with a single new object with keys: current_total_knowledge, ordered_con
 
 async def process_challenge(semaphore, challenge):
     async with semaphore:
-        return await attempt(challenge, with_solution=True, run_remote=True)
+        return await attempt(challenge, with_solution=False, run_remote=True)
 
 
 async def solve_loop(max_concurrent=1, to_process=None, max_challenges=None):
@@ -660,8 +704,8 @@ async def main():
     print("Skipping previously solved:", len(verified_ids))
 
     to_process = [c for c in all_challenges if c.id not in verified_ids]
-    # random_challenge = random.choice(to_process)
-    # await attempt(random_challenge, with_solution=True, verbose=True, run_remote=True)
+    random_challenge = random.choice(to_process)
+    await attempt(random_challenge, with_solution=False, verbose=True, run_remote=True)
 
     # so, rec, su, rel = await get_previous_tries(random_challenge)
     # print("Previous Solution:", so.metadata if so else "None")
@@ -683,8 +727,8 @@ async def main():
 
     # distill_research()
 
-    for i in range(1):
-        await solve_loop(max_concurrent=32, to_process=to_process)
+    # for i in range(1):
+    #     await solve_loop(max_concurrent=32, to_process=to_process)
     # await solve_loop(max_concurrent=4, max_challenges=8)
 
 
