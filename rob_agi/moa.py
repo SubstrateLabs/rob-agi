@@ -18,7 +18,7 @@ default_decider = "claude-3-5-sonnet-20240620"
 def_max_tokens = 1800
 
 api_key = os.environ.get("SUBSTRATE_API_KEY")
-substrate = Substrate(api_key=api_key, timeout=60 * 2, additional_headers={})
+substrate = Substrate(api_key=api_key, timeout=60 * 4, additional_headers={})
 
 
 def get_mixture(q, prev=None, models=None, max_tokens=def_max_tokens):

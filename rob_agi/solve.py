@@ -330,7 +330,7 @@ async def run_py_fn(
             parsed.solutions = (results.get("solutions") if results else []) or []
             examples = results.get("examples") if results else None
             test_cases = results.get("test_cases") if results else None
-            print("Results example, test", examples, test_cases)
+            print(f"Results example, test: {challenge.id}", examples, test_cases)
             has_results = examples and test_cases
 
             if has_results and all(examples) and all(test_cases):
@@ -360,7 +360,6 @@ async def run_py_fn(
                 new_attempt_moa = await run_moa(prompt, max_tokens=4000, num_layers=2, filename_prefix=challenge.id)
                 new_fn = parse_python_fn_str(new_attempt_moa["text"])
                 if new_fn:
-                    print("Parsed new function", new_fn == parsed.python_function)
                     parsed.python_function = new_fn
         except Exception as e:
             print(f"Error running python function on attempt {i}", e)
