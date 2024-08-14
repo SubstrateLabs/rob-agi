@@ -619,14 +619,14 @@ async def main():
     # ensure_db()
     # id = "1f876c06"
     # challenge: GridProblem = challenges[id]
+    # random_challenge = challenges["c3f564a4"]
     verified_so_far = await get_all_verified()
     verified_ids = [v.id for v in verified_so_far]
     print("Skipping previously solved:", len(verified_ids))
 
     to_process = [c for c in all_challenges if c.id not in verified_ids]
     # random_challenge = random.choice(to_process)
-    random_challenge = challenges["c3f564a4"]
-    await attempt(random_challenge, with_solution=True, verbose=True, run_remote=True)
+    # await attempt(random_challenge, with_solution=True, verbose=True, run_remote=True)
 
     # so, rec, su, rel = await get_previous_tries(random_challenge)
     # print("Previous Solution:", so.metadata if so else "None")
@@ -648,8 +648,8 @@ async def main():
 
     # distill_research()
 
-    # for i in range(1):
-    #     await solve_loop(max_concurrent=32, to_process=to_process)
+    for i in range(2):
+        await solve_loop(max_concurrent=32, to_process=to_process)
     # await solve_loop(max_concurrent=4, max_challenges=8)
 
 

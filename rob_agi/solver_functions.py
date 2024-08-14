@@ -117,7 +117,7 @@ The challenge involves transforming one colored 2D grid into another.
 You will be given a few examples of the pattern in the form of input output pairs.
 You will also be given a test case that has just the input but no output yet.
 The goal is to find the pattern that fits all the examples, then apply it to the test case to compute a solution. 
-When you think conceptually, there is usually a simple description of what is happening in terms of basic knowledge, so try to back in to it with visual intuition.
+When you think conceptually, there is usually a simple description of what is happening in terms of basic knowledge, so try to back in to it with visual intuition. Some are simple but for some you may need to be creative or imaginative.
 
 {grid_setup()}
 
