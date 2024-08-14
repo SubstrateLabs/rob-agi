@@ -55,7 +55,7 @@ def report_results(attempted, successful, errored):
     filename = "running-results.md"
     write_path = Path(__file__).parent.parent / filename
     datetime = time.strftime("%Y-%m-%d %H:%M:%S")
-    md_table = """
+    md_table = f"""
 | Attempted | Successful | Solve Rate | Errored |
 |-----------|------------|------------|------------|
 | {attempted} | {successful} | {successful / attempted:.2%} | {errored} |

@@ -19,12 +19,12 @@
 #### 2024-08-14 04:10:08
 
 | Attempted | Successful | Solve Rate | Errored |
-|-----------|------------|------------|------------|
-| {attempted} | {successful} | {successful / attempted:.2%} | {errored} |
+|-----------|------------|------------|---------|
+| 322       | 45         | 13.98%     | 22      |
 
 #### 2024-08-14 06:28:05
 
 | Attempted | Successful | Solve Rate | Errored |
-|-----------|------------|------------|------------|
-| {attempted} | {successful} | {successful / attempted:.2%} | {errored} |
+|-----------|------------|------------|---------|
+| 644       | 80         | 12.42%     | 64      |
 
