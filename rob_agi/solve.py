@@ -353,7 +353,10 @@ async def run_py_fn(
 
             parsed.stdout = curr_out.stdout
             parsed.error_message = curr_out.stderr
-            parsed.solutions = (results.get("solutions") if results else []) or []
+
+            if results and results.get("solutions"):
+                parsed.solutions = results.get("solutions")
+
             examples = results.get("examples") if results else None
             test_cases = results.get("test_cases") if results else None
             print(f"Results example, test: {challenge.id}", examples, test_cases)
@@ -365,33 +368,38 @@ async def run_py_fn(
                 reflection = f"The general approach was:\n\n{approach_list}\n\nBut the solution did not pass. We need to fix the function and try again."
                 reflection += f"The function that failed:\n\n```python\n{parsed.python_function}\n```"
                 if examples:
-                    reflection += f"Example input results: {['Pass' if e else 'Fail' for e in examples]}"
+                    reflection += f"Example input results: {['Pass' if e else 'Fail' for e in examples]}\n"
                 if test_cases:
-                    reflection += f"Test case input results: {['Pass' if e else 'Fail' for e in test_cases]}"
-                reflection += f"Error message: {curr_out.stderr or 'None'}"
-                reflection += f"Stdout: {curr_out.stdout or 'None'}"
+                    reflection += f"Test case input results: {['Pass' if e else 'Fail' for e in test_cases]}\n"
+                reflection += f"Error message: {curr_out.stderr or 'None'}\n"
+                reflection += f"Stdout: {curr_out.stdout or 'None'}\n"
                 pytest_results = get_py_test(results)
-                examples = pytest_results.get("examples")
-                test_cases = pytest_results.get("test_cases")
+
+                example_rollup = pytest_results.get("examples")
+                test_case_rollup = pytest_results.get("test_cases")
                 examples_explanation = ""
-                if examples == "fail":
+
+                if example_rollup == "fail":
                     examples_explanation = "The example inputs all failed to produce the correct output."
-                elif examples == "partial":
+                elif example_rollup == "partial":
                     examples_explanation = "The example inputs produced a mix of correct and incorrect outputs."
-                elif examples == "pass":
+                elif example_rollup == "pass":
                     examples_explanation = "The example inputs all produced the correct output."
                 test_explanation = ""
-                if test_cases == "fail":
-                    test_explanation = "The test cases all failed to produce the correct output."
-                elif test_cases == "partial":
-                    test_explanation = "The test cases produced a mix of correct and incorrect outputs."
-                elif test_cases == "pass":
-                    test_explanation = "The test cases all produced the correct output."
+                if test_cases:
+                    test_case_noun = "cases" if len(test_cases) > 1 else "case"
+                    all_str = " all" if len(test_cases) > 1 else ""
+                    if test_case_rollup == "fail":
+                        test_explanation = f"The test {test_case_noun}{all_str} failed to produce the correct output."
+                    elif test_case_rollup == "partial":
+                        test_explanation = f"The test {test_case_noun} produced a mix of correct and incorrect outputs."
+                    elif test_case_rollup == "pass":
+                        test_explanation = f"The test {test_case_noun}{all_str} produced the correct output."
 
                 reflection += f"{examples_explanation}\n{test_explanation}"
 
                 diagnose = ComputeText(
-                    prompt="Above is a candidate solution to an ARC challenge problem.\n"
+                    prompt="Below is a candidate solution to an ARC challenge problem.\n"
                     + reflection
                     + "\n\nDiagnose the issue with the attempt, explaining what went wrong and what needs to be fixed. Your diagnosis should be short but comprehensive. Do not include general advice that does not fix the issue.",
                     model=gpt,
@@ -403,13 +411,31 @@ async def run_py_fn(
 
                 # new_attempt = ComputeText(prompt=prompt, model=smart_model, max_tokens=1900)
                 new_attempt_moa = await run_moa(prompt, max_tokens=4000, num_layers=2, filename_prefix=challenge.id)
-                new_fn = parse_python_fn_str(new_attempt_moa["text"])
+                new_fn = find_new_fn(new_attempt_moa)
                 if new_fn:
                     parsed.python_function = new_fn
+
         except Exception as e:
             print(f"Error running python function on attempt {i}", e)
             traceback.print_exc()
     return curr_out
+
+
+def find_new_fn(moa_response: dict):
+    new_fn = parse_python_fn_str(moa_response["text"])
+    if new_fn:
+        return new_fn
+    try:
+        layers = moa_response["layers"]
+        for layer in reversed(layers):
+            for candidate in layer:
+                new_fn = parse_python_fn_str(candidate)
+                if new_fn:
+                    return new_fn
+    except Exception as e:
+        print("Error finding new fn", e, moa_response)
+        traceback.print_exc()
+    return None
 
 
 def get_py_test(results: Optional[dict]):

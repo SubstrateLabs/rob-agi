@@ -135,13 +135,11 @@ class ColoredGrid(BaseModel):
 
     def rotate_90(self, clockwise: bool = True) -> "ColoredGrid":
         """Rotate the grid 90 degrees clockwise or counterclockwise."""
-        print(f"Original grid:\n{self}")
         if clockwise:
             new_values = [list(row) for row in zip(*self.values[::-1])]
         else:
             new_values = [list(row) for row in zip(*self.values)][::-1]
         result = ColoredGrid(values=new_values)
-        print(f"Rotated grid ({'clockwise' if clockwise else 'counterclockwise'}):\n{result}")
         return result
 
     def flip_horizontal(self) -> "ColoredGrid":
@@ -338,9 +336,6 @@ class ColoredGrid(BaseModel):
         if original_color == new_color:
             return self.deep_copy()
 
-        print(f"Starting flood fill at ({row}, {col}) with color {new_color}")
-        print(f"Original grid:\n{self}")
-
         new_grid = self.deep_copy()
         stack = [(row, col)]
         filled_cells = 0
@@ -354,16 +349,12 @@ class ColoredGrid(BaseModel):
                     if 0 <= nr < rows and 0 <= nc < cols:
                         stack.append((nr, nc))
 
-        print(f"Filled {filled_cells} cells")
-        print(f"Resulting grid:\n{new_grid}")
         return new_grid
 
     def detect_rectangles(self) -> List[Tuple[int, int, int, int, int]]:
         rows, cols = self.get_dimensions()
         rectangles = []
         visited = set()
-
-        print(f"Detecting rectangles in grid:\n{self}")
 
         for r in range(rows):
             for c in range(cols):
@@ -379,13 +370,11 @@ class ColoredGrid(BaseModel):
 
                     if (bottom > r or right > c) and color != 0:  # Exclude single cells and color 0
                         rectangles.append((color, r, c, bottom, right))
-                        print(f"Found rectangle: color={color}, top-left=({r}, {c}), bottom-right=({bottom}, {right})")
 
                     for rr in range(r, bottom + 1):
                         for cc in range(c, right + 1):
                             visited.add((rr, cc))
 
-        print(f"Total rectangles detected: {len(rectangles)}")
         return rectangles
 
     def detect_lines(self) -> List[Tuple[int, List[Tuple[int, int]]]]:
@@ -564,9 +553,6 @@ class ColoredGrid(BaseModel):
         rows, cols = self.get_dimensions()
         new_values = [[0 for _ in range(cols)] for _ in range(rows)]
 
-        print(f"Applying cellular automaton to grid:\n{self}")
-        print("Rule applied:")
-
         for r in range(rows):
             for c in range(cols):
                 neighbors = [
@@ -577,10 +563,8 @@ class ColoredGrid(BaseModel):
                 ]
                 new_value = rule(neighbors)
                 new_values[r][c] = new_value
-                print(f"Cell ({r}, {c}): neighbors {neighbors} -> new value {new_value}")
 
         result = ColoredGrid(values=new_values)
-        print(f"Resulting grid after applying cellular automaton:\n{result}")
         return result
 
     def apply_function_to_regions(self, func: Callable[[List[Tuple[int, int]]], int]) -> "ColoredGrid":

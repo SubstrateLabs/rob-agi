@@ -112,7 +112,10 @@ All grids are rectangular and can be between 1x1 and 30x30 in size.
 def problem_setup(challenge: GridProblem) -> str:
     return (
         arc_intro()
-        + f"""Below is a challenge. You are tasked to solve it.
+        + f"""Below is a challenge. 
+        
+You are being tasked to solve it.
+
 The challenge involves transforming one colored 2D grid into another.
 You will be given a few examples of the pattern in the form of input output pairs.
 You will also be given a test case that has just the input but no output yet.
@@ -152,11 +155,22 @@ The ColoredGrid class is already defined in scope, and includes some functions t
 {get_grid_class_overview()}
 </COLORED_GRID_SUMMARY>
 
-Your solution should fit the following model:
+Important:
+Your solution should always be in this form:
 
 {SuccessfulSolve.field_summary()} 
 
-Make sure that the python function that you output is a valid standalone function that takes in a ColoredGrid and returns a ColoredGrid. It should be named `solve_{challenge.id}`. Any imports should be included in the function body. There should be nothing defined or referenced in the surrounding global scope. the function should be preceded by a python code fence (```python) and followed by a closing fence (```). 
+Make sure that the python function that you output is a valid standalone function that takes in a ColoredGrid and returns a ColoredGrid. 
+The function must be named `solve_{challenge.id}`. 
+Any imports should be included in the function body. 
+There should be nothing defined or referenced in the surrounding global scope. 
+The function should be preceded by a python code fence (```python) and followed by a closing fence (```). 
+e.g. the python function looks like:
+```python
+def solve_{challenge.id}(input_grid: ColoredGrid) -> ColoredGrid:
+    # Your solution here
+    return output_grid
+```
 {show_str}
 """,
     )

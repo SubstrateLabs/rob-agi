@@ -29,13 +29,11 @@ def simplify_type(type_hint):
 class SuccessfulSolve(BaseModel):
     task_id: str = Field(..., description="ID of the task being solved")
     # concepts_used: List[str] = Field(..., description="List of important concepts used to solve the problem")
-    approach: List[str] = Field(
-        ..., description="Detailed list of steps and thinking done to solve the problem, ordered"
-    )
+    approach: List[str] = Field(..., description="Detailed list of steps necessary to solve the problem, ordered")
     solutions: List[List[List[int]]] = Field(..., description="List of grids representing the solution(s)")
     python_function: str = Field(
         ...,
-        description="Valid python function that solves the problem both for the example cases and the test case. This function should be named `solve_<challenge_id>` and take in a single argument, `input` of type ColoredGrid and return a ColoredGrid. The <challenge_id> should be replaced with the task_id of the challenge: def solve_<challenge_id>(input: ColoredGrid) -> ColoredGrid: ...",
+        description="Standalone python function that solves the problem both for the example cases and the test case(s)",
     )
 
     @classmethod

@@ -4,9 +4,9 @@ import time
 
 from substrate import sb, Box, ComputeText, Substrate
 
-aggregate = """You have been provided with a set of responses from various open-source models to the latest user query. Your task is to synthesize these responses into a single, high-quality response. It is crucial to critically evaluate the information provided in these responses, recognizing that some of it may be biased or incorrect. Your response should not simply replicate the given answers but should offer a refined, accurate, and comprehensive reply to the instruction. Ensure your response is well-structured, well-considered, and adheres to the highest standards of accuracy and reliability. Do not respond as if we're having a conversation, just output the revised response."""
+aggregate = """You have been provided with a set of candidate responses to a query. Your task is to synthesize these responses into a single, high-quality response. It is crucial to critically evaluate the information provided in these responses, recognizing that some of it may be biased or incorrect. Your response should not simply replicate the given answers but should offer a refined, accurate, and comprehensive reply to the original query. Ensure your response is well-structured, well-considered, and adheres to the highest standards of accuracy and reliability. Do not respond as if we're having a conversation, just output the revised response."""
 
-jq_list = 'to_entries | map(((.key + 1) | tostring) + ". " + .value) | join("\n")'
+jq_list = 'to_entries | map("CANDIDATE" + ((.key + 1) | tostring) + ":\n" + .value) | join("\n=========\n")'
 
 # default_models = ["Llama3Instruct70B", "claude-3-5-sonnet-20240620", "gpt-4o"]
 default_models = ["claude-3-5-sonnet-20240620", "gpt-4o"]
@@ -24,7 +24,11 @@ substrate = Substrate(api_key=api_key, timeout=60 * 4, additional_headers={})
 def get_mixture(q, prev=None, models=None, max_tokens=def_max_tokens):
     if models is None:
         models = default_models
-    prompt = sb.concat(aggregate, "\n\nquestion: ", q, "\n\nprevious:\n\n", prev) if prev else q
+    prompt = (
+        sb.concat(aggregate, "\n\n<ORIGINAL_QUERY>", q, "\n</ORIGINAL_QUERY>\n<CANDIDATES>\n", prev, "\n</CANDIDATES>")
+        if prev
+        else q
+    )
     return Box(value=[ComputeText(prompt=prompt, model=m, max_tokens=max_tokens).future.text for m in models])
 
 
