@@ -93,6 +93,7 @@ def visual_parse(challenge: GridProblem):
 
 attempted = 0
 successful = 0
+errored_count = 0
 
 
 async def get_all_verified():
@@ -439,7 +440,7 @@ async def log_result(challenge: GridProblem, parsed: SolveAttempt, run_py: Optio
 
 
 async def attempt(challenge: GridProblem, run_remote=False, with_solution=False, verbose=False):
-    global attempted, successful
+    global attempted, successful, errored_count
     attempted += 1
 
     print(f"Starting {challenge.id}")
@@ -597,6 +598,7 @@ async def process_challenge(semaphore, challenge):
 
 
 async def solve_loop(max_concurrent=1, to_process=None, max_challenges=None):
+    global errored_count
     semaphore = asyncio.Semaphore(max_concurrent)
     to_process = all_challenges if not to_process else to_process
     if max_challenges:
@@ -608,11 +610,11 @@ async def solve_loop(max_concurrent=1, to_process=None, max_challenges=None):
             await task
             print(f"Finished {i} of {len(to_process)} [{time.perf_counter() - t0:.2f}s]")
         except Exception as e:
+            errored_count += 1
             traceback.print_exc()
             print(f"Error on task {i}: {e}")
 
-    # todo add errored
-    report_results(attempted=attempted, successful=successful)
+    report_results(attempted=attempted, successful=successful, errored=errored_count)
 
 
 async def main():

@@ -51,22 +51,27 @@ def load_task_set(task_set_name) -> tuple[dict[str, GridProblem], dict[str, Comp
     return challenges, solutions
 
 
-def report_results(attempted, successful):
+def report_results(attempted, successful, errored):
     filename = "running-results.md"
     write_path = Path(__file__).parent.parent / filename
     datetime = time.strftime("%Y-%m-%d %H:%M:%S")
-    final_stats_markdown_table = "| Attempted | Successful | Solve Rate |\n|-----------|------------|------------|\n"
-    final_stats_markdown_table += f"| {attempted} | {successful} | {successful / attempted:.2%} |"
+    md_table = """
+| Attempted | Successful | Solve Rate | Errored |
+|-----------|------------|------------|------------|
+| {attempted} | {successful} | {successful / attempted:.2%} | {errored} |
+"""
     with open(write_path, "a") as f:
         f.write("#### " + datetime)
-        f.write("\n\n")
-        f.write(final_stats_markdown_table)
-        f.write("\n\n")
+        f.write("\n")
+        f.write(md_table)
+        f.write("\n")
     print("\n\n===============================================")
     print("FINAL STATS")
     print(f"Attempted: {attempted}")
     print(f"Successful: {successful}")
+    print(f"Errored: {errored}")
     print(f"Solve Rate: {successful / attempted:.2%}")
+    print(f"Solve Adjusted: {successful / (attempted - errored):.2%}")
     print("===============================================\n\n")
 
     # print("\n\n===============================================")
