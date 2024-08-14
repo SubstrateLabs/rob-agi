@@ -65,6 +65,7 @@ def report_results(attempted, successful, errored):
         f.write("\n")
         f.write(md_table)
         f.write("\n")
+
     print("\n\n===============================================")
     print("FINAL STATS")
     print(f"Attempted: {attempted}")
@@ -74,18 +75,8 @@ def report_results(attempted, successful, errored):
     print(f"Solve Adjusted: {successful / (attempted - errored):.2%}")
     print("===============================================\n\n")
 
-    # print("\n\n===============================================")
-    # print("FINAL STATS")
-    # print(f"Attempted: {attempted}")
-    # print(f"Successful: {successful}")
-    # print(f"Solve Rate: {successful / attempted:.2%}")
-    # print("===============================================\n\n")
-    # final_stats_markdown_table = "| Attempted | Successful | Solve Rate |\n|-----------|------------|------------|\n"
-    # final_stats_markdown_table += f"| {attempted} | {successful} | {successful / attempted:.2%} |"
-    # append_results(final_stats_markdown_table)
 
-
-# append_results(3159, 805)
+# append_results(3159, 805, 10)
 # append_results("""===============================================
 # FINAL STATS
 # Attempted: 3159
