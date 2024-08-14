@@ -206,11 +206,19 @@ async def get_initial_thoughts(challenge: GridProblem, with_solution=False):
 
     if prev_solution:
         py_solved = prev_solution.metadata.get("py_test")
-        print("Previous Solution Found, python verification:", py_solved)
+        solve_time = prev_solution.metadata.get("time")
+        solve_time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(solve_time)) if solve_time else "Unknown"
+        print(f"Previous Solution Found[{solve_time_str}]:", py_solved)
         if py_solved == "fail" or py_solved == "partial":
             impression_q = sb.concat(
                 impression_q,
                 "\n\nYour previous solutions were able to produce the right answer to the test, but the python function did not work generally. Please consider this in your approach.",
+                f"<PREVIOUS_SUBMISSION>{prev_solution.metadata.get('python_function')}\n\n{prev_solution.metadata.get('py_run_error')}\n\n{prev_solution.metadata.get('py_run_logs')}</PREVIOUS_SUBMISSION>",
+            )
+        elif py_solved == "pass":
+            impression_q = sb.concat(
+                impression_q,
+                "\n\nYour previous solutions were able to produce the right answer to the test, and the python function worked generally. Don't change anything about your solution unless it improves it without breaking the test cases.",
                 f"<PREVIOUS_SUBMISSION>{prev_solution.metadata.get('python_function')}\n\n{prev_solution.metadata.get('py_run_error')}\n\n{prev_solution.metadata.get('py_run_logs')}</PREVIOUS_SUBMISSION>",
             )
     # if related.get("unsolved"):
@@ -228,9 +236,9 @@ async def get_initial_thoughts(challenge: GridProblem, with_solution=False):
 
     # reason = ComputeText(prompt=impression_q, model=smart_model, temperature=0.25)
     reason = moa(impression_q, max_tokens=1800, num_layers=1)
-    solution_str = f"<SOLUTION>\n{solutions[challenge.id].result_description()}</SOLUTION>" if with_solution else ""
 
     if with_solution:
+        solution_str = f"<SOLUTION>\n{solutions[challenge.id].result_description()}</SOLUTION>"
         think_with_solution = sb.format(
             "<PAST_THINKING>{impression_q}</PAST_THINKING>\nGiven those past attempts your recent thinking is:<CURRENT_THINKING>\n\n{impression}\n</CURRENT_THINKING>\nNow, here is the correct solution:\n\n{solution_str}\n\nCome up with an approach that incorporates what you learned. The important part here is to identify the key steps that are necessary to solve this problem. Be comprehensive, detailed, but also concise.",
             impression_q=impression_q,
@@ -291,8 +299,8 @@ def parse_python_fn_str(llm_response: str):
 async def run_py_fn(
     challenge: GridProblem, parsed: SolveAttempt, max_tries: int = 1, verbose=False
 ) -> Optional[RunPythonOut]:
-    async def _run(fn: str):
-        print(f"Exec Py: {challenge.id}\n\n")
+    async def _run(fn: str, run_count):
+        print(f"Exec Py[{run_count}]: {challenge.id}\n\n")
         py_args = {"id": challenge.id, "fn_code": fn}
         run_py = RunPython(
             function=run_eval,
@@ -302,14 +310,14 @@ async def run_py_fn(
         res = await substrate.async_run(run_py)
         out = res.get(run_py)
         if verbose:
-            print(" > PY_OUT:\n", out)
+            print(f" > PY_OUT[{run_count}]:\n", out)
         return out
 
     approach_list = "\n".join(parsed.approach)
     curr_out = None
     for i in range(max_tries):
         try:
-            curr_out = await _run(fn=parsed.python_function)
+            curr_out = await _run(fn=parsed.python_function, run_count=i)
             if curr_out.output is None and curr_out.pkl_output:
                 output_bytes = base64.b64decode(curr_out.pkl_output)
                 results = cloudpickle.loads(output_bytes)
@@ -318,7 +326,7 @@ async def run_py_fn(
 
             parsed.stdout = curr_out.stdout
             parsed.error_message = curr_out.stderr
-            parsed.solutions = [s.values for s in results.get("solutions")] if results else []
+            parsed.solutions = (results.get("solutions") if results else []) or []
             examples = results.get("examples") if results else None
             test_cases = results.get("test_cases") if results else None
             print("Results example, test", examples, test_cases)
@@ -399,32 +407,31 @@ async def log_result(challenge: GridProblem, parsed: SolveAttempt, run_py: Optio
                 _max_retry=2,
             )
         )
-    else:
-        # todo - diff string in emb
-        # diff_string = solution.outputs
-        write_nodes.append(
-            EmbedText(
-                text=sb.concat(
-                    challenge.to_task_description(),
-                    "\n\nComputed:\n",
-                    solution.comparison_report(solutions[challenge.id]),
-                ),
-                collection_name="arc_attempts",
-                metadata={**parsed.model_dump(), **extra_meta},
-                embedded_metadata_keys=[
-                    "approach",
-                    "python_function",
-                    "solution",
-                    "stdout",
-                    "error_message",
-                    "computed_result",
-                    "py_test",
-                    "py_run_error",
-                ],
-                _max_retries=2,
-                doc_id=finish_ns,
-            )
+    # todo - diff string in emb
+    # diff_string = solution.outputs
+    write_nodes.append(
+        EmbedText(
+            text=sb.concat(
+                challenge.to_task_description(),
+                "\n\nComputed:\n",
+                solution.comparison_report(solutions[challenge.id]),
+            ),
+            collection_name="arc_attempts",
+            metadata={**parsed.model_dump(), **extra_meta},
+            embedded_metadata_keys=[
+                "approach",
+                "python_function",
+                "solution",
+                "stdout",
+                "error_message",
+                "computed_result",
+                "py_test",
+                "py_run_error",
+            ],
+            _max_retries=2,
+            doc_id=finish_ns,
         )
+    )
     await substrate.async_run(*write_nodes)
 
     print(f"\n\nWrote to {'solves' if did_pass else 'attempts'}")

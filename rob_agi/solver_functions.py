@@ -342,6 +342,6 @@ def run_eval(id: str, fn_code: str, task_set="training"):
     for i, test_case in enumerate(challenge.test_cases):
         output = test_fn_handle(test_case)
         print(output.validate_report(solutions[id].outputs[i]))
-        results["solutions"].append(output)
+        results["solutions"].append(output.values)
         results["test_cases"].append(output == solutions[id].outputs[i])
     return results
