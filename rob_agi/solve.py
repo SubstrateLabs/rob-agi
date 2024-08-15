@@ -31,7 +31,6 @@ from rob_agi.grid_problem import GridProblem
 from rob_agi.moa import moa, run_moa
 from rob_agi.solver_functions import (
     problem_setup,
-    extract_result,
     gather_research,
     explain_research,
     arc_intro,
@@ -421,11 +420,11 @@ async def run_py_fn(
             break
         try:
             all_opt_results = await _run_all(to_try, i)
-            all_results = [r for r in all_opt_results if r]
-            if not all_results:
+            resolved_results = [r for r in all_opt_results if r]
+            if not resolved_results:
                 continue
 
-            curr_best = all_results[0]
+            curr_best = resolved_results[0] if not curr_best else curr_best
             for ri, sample_out in enumerate(all_opt_results):
                 if not sample_out:
                     continue
@@ -450,10 +449,11 @@ async def run_py_fn(
             test_cases = results.get("test_cases") if results else None
 
             reflection = f"The general approach was:\n\n{approach_list}\n\nBut the solution did not pass. We need to fix the function and try again."
-            reflection += f"The function that failed:\n\n```python\n{parsed.python_function}\n```"
+            if parsed.python_function:
+                reflection += f"The function that failed:\n\n```python\n{parsed.python_function}\n```"
             if examples:
                 reflection += f"Example input results: {['Pass' if e else 'Fail' for e in examples]}\n"
-            if test_cases:
+            if test_cases and with_solution:
                 reflection += f"Test case input results: {['Pass' if e else 'Fail' for e in test_cases]}\n"
             reflection += f"Error message: {curr_best.stderr or 'None'}\n"
             reflection += f"Stdout: {curr_best.stdout or 'None'}\n"
@@ -830,8 +830,8 @@ async def main():
     print("Skipping previously solved:", len(verified_ids))
 
     to_process = [c for c in all_challenges if c.id not in verified_ids]
-    random_challenge = random.choice(to_process)
-    await attempt(random_challenge, verbose=True, run_remote=True)
+    # random_challenge = random.choice(to_process)
+    # await attempt(random_challenge, verbose=True, run_remote=True)
 
     # so, rec, su, rel = await get_previous_tries(random_challenge)
     # print("Previous Solution:", so.metadata if so else "None")
@@ -853,8 +853,8 @@ async def main():
 
     # distill_research()
 
-    # for i in range(2):
-    #     await solve_loop(max_concurrent=48, to_process=to_process)
+    for i in range(2):
+        await solve_loop(max_concurrent=30, to_process=to_process)
     # await solve_loop(max_concurrent=4, max_challenges=8)
 
 
