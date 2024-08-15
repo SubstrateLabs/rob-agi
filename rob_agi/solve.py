@@ -58,6 +58,12 @@ gpt = "gpt-4o"
 task_set = "evaluation"
 challenges, solutions = load_task_set(task_set_name=task_set)
 with_solution = task_set == "train"
+remote_pip_deps = [
+    "pydantic==2.8.2",
+    "substrate",
+    "git+https://github.com/SubstrateLabs/rob-agi.git@d0e2896",
+    "numpy",
+]
 
 all_challenges = list(challenges.values())
 random.shuffle(all_challenges)
@@ -339,7 +345,10 @@ def score_output(py_out: RunPythonOut):
     if not results:
         return -1
     examples = results.get("examples") or []
-    test_cases = results.get("test_cases") or []
+    if with_solution:
+        test_cases = results.get("test_cases") or []
+    else:
+        test_cases = []
     agg = examples + test_cases
     return sum([10 for e in agg if e]) if agg else -1
 
@@ -352,27 +361,18 @@ async def run_py_fn(
     verbose=False,
 ) -> Optional[RunPythonOut]:
     async def _run(fn: str, run_label: str) -> RunPythonOut:
-        print(f"Exec Py[{run_label}]: {challenge.id}\n\n")
+        print(f"Exec Py[{run_label}]: {challenge.id}")
         py_args = {"id": challenge.id, "fn_code": fn, "task_set": task_set, "with_solution": with_solution}
-        run_py = RunPython(
-            function=run_eval,
-            kwargs=py_args,
-            pip_install=[
-                "pydantic==2.8.2",
-                "substrate",
-                "git+https://github.com/SubstrateLabs/rob-agi.git@a597b3a",
-                "numpy",
-            ],
-        )
+        run_py = RunPython(function=run_eval, kwargs=py_args, pip_install=remote_pip_deps)
         res = await substrate.async_run(run_py)
         out = res.get(run_py)
         if verbose:
-            print(f" > PY_OUT[{run_label}]:\n", out)
+            print(f" > PY_OUT[{run_label}]", out)
         return out
 
     async def _run_all(fns: List[str], run_count: int) -> List[Union[RunPythonOut, None]]:
         if verbose:
-            print(f" > TRYING {len(fns)} FNS")
+            print(f" > BATCH {len(fns)} FNS: {challenge.id}")
         tasks = [_run(fn, f"{run_count}.{idx}") for idx, fn in enumerate(fns)]
         all_res = await asyncio.gather(*tasks, return_exceptions=True)
         ret = []
@@ -418,9 +418,7 @@ async def run_py_fn(
                 s_test_cases = sample_res.get("test_cases") if sample_res else None
                 print(f"Results example, test: {challenge.id}", s_examples, s_test_cases)
                 has_res = s_examples and s_test_cases
-                if has_res and all(s_examples) and all(s_test_cases):
-                    print("---------------------------", "FOUND A WINNER", "---------------------------")
-                    print(sample_out, parsed)
+                if has_res and all(s_examples) and (not with_solution or all(s_test_cases)):
                     set_results(sample_out, to_try[ri])
                     return sample_out
 
@@ -560,7 +558,7 @@ async def log_result(challenge: GridProblem, parsed: SolveAttempt, run_py: Optio
         gathered_py_test = get_py_test(run_py.output)
         examples = gathered_py_test.get("examples")
         test_cases = gathered_py_test.get("test_cases")
-        if examples == "pass" and test_cases == "pass":
+        if examples == "pass" and (test_cases == "pass" or not with_solution):
             pytest_rollup = "pass"
         elif examples == "fail" and test_cases == "fail":
             pytest_rollup = "fail"
@@ -577,15 +575,18 @@ async def log_result(challenge: GridProblem, parsed: SolveAttempt, run_py: Optio
     write_nodes = []
     if did_pass:
         successful += 1
-        write_nodes.append(
-            EmbedText(
-                text=challenge.to_task_description(),
-                collection_name="arc_solves",
-                metadata={**parsed.model_dump(), **extra_meta},
-                doc_id=challenge.id,
-                _max_retry=2,
+        # NB for now only save to solves if we are "training"
+        if with_solution:
+            write_nodes.append(
+                EmbedText(
+                    text=challenge.to_task_description(),
+                    collection_name="arc_solves",
+                    metadata={**parsed.model_dump(), **extra_meta},
+                    embedded_metadata_keys=["approach", "python_function", "py_test"],
+                    doc_id=challenge.id,
+                    _max_retry=2,
+                )
             )
-        )
     # todo - diff string in emb
     # diff_string = solution.outputs
     write_nodes.append(
@@ -844,161 +845,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-
-
-Previous = {
-    "doc": "Task ID: 22eb0ac0\n========\nExample (1 / 3):\nInput:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [9, 0, 0, 0, 0, 0, 0, 0, 0, 6],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [8, 0, 0, 0, 0, 0, 0, 0, 0, 9],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [4, 0, 0, 0, 0, 0, 0, 0, 0, 4],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [6, 0, 0, 0, 0, 0, 0, 0, 0, 8],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n]\nOutput:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [9, 0, 0, 0, 0, 0, 0, 0, 0, 6],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [8, 0, 0, 0, 0, 0, 0, 0, 0, 9],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [6, 0, 0, 0, 0, 0, 0, 0, 0, 8],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n]\n\n========\n========\nExample (2 / 3):\nInput:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [8, 0, 0, 0, 0, 0, 0, 0, 0, 8],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [4, 0, 0, 0, 0, 0, 0, 0, 0, 2],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [3, 0, 0, 0, 0, 0, 0, 0, 0, 4],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [2, 0, 0, 0, 0, 0, 0, 0, 0, 3],\n]\nOutput:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [8, 8, 8, 8, 8, 8, 8, 8, 8, 8],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [4, 0, 0, 0, 0, 0, 0, 0, 0, 2],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [3, 0, 0, 0, 0, 0, 0, 0, 0, 4],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [2, 0, 0, 0, 0, 0, 0, 0, 0, 3],\n]\n\n========\n========\nExample (3 / 3):\nInput:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [2, 0, 0, 0, 0, 0, 0, 0, 0, 8],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [3, 0, 0, 0, 0, 0, 0, 0, 0, 4],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [5, 0, 0, 0, 0, 0, 0, 0, 0, 3],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [8, 0, 0, 0, 0, 0, 0, 0, 0, 2],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n]\nOutput:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [2, 0, 0, 0, 0, 0, 0, 0, 0, 8],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [3, 0, 0, 0, 0, 0, 0, 0, 0, 4],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [5, 0, 0, 0, 0, 0, 0, 0, 0, 3],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [8, 0, 0, 0, 0, 0, 0, 0, 0, 2],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n]\n\n========\n========\nTest Case to solve (1 / 1):\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [4, 0, 0, 0, 0, 0, 0, 0, 0, 2],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [3, 0, 0, 0, 0, 0, 0, 0, 0, 3],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [2, 0, 0, 0, 0, 0, 0, 0, 0, 9],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [6, 0, 0, 0, 0, 0, 0, 0, 0, 6],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [9, 0, 0, 0, 0, 0, 0, 0, 0, 4],\n]\n\n========\n",
-    "time": 1723541727,
-    "doc_id": "22eb0ac0",
-    "stdout": None,
-    "py_test": "pass",
-    "task_id": "22eb0ac0",
-    "approach": [
-        "Analyze the given examples to identify the pattern:",
-        "- Only rows 3 and 7 (0-based indexing) are subject to transformation.",
-        "- These rows are filled entirely with their first number if the first and last numbers match and are non-zero.",
-        "- All other rows remain unchanged.",
-        "Create a function that implements this logic:",
-        "- Copy the input grid to avoid modifying the original.",
-        "- Check rows 3 and 7 for the condition (first and last numbers match and are non-zero).",
-        "- If the condition is met, fill the entire row with that number.",
-        "- Return the modified grid.",
-        "Implement the function using ColoredGrid methods:",
-        "- Use get_cell() to check the first and last cells of rows 3 and 7.",
-        "- Use set_cell() to modify the cells if the condition is met.",
-        "Test the function with the provided examples and test case to ensure correctness.",
-    ],
-    "solutions": [
-        [
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [4, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [2, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [6, 6, 6, 6, 6, 6, 6, 6, 6, 6],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [9, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        ]
-    ],
-    "py_run_logs": "Output:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [9, 0, 0, 0, 0, 0, 0, 0, 0, 6],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [8, 0, 0, 0, 0, 0, 0, 0, 0, 9],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [6, 0, 0, 0, 0, 0, 0, 0, 0, 8],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n]\nExpected:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [9, 0, 0, 0, 0, 0, 0, 0, 0, 6],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [8, 0, 0, 0, 0, 0, 0, 0, 0, 9],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [6, 0, 0, 0, 0, 0, 0, 0, 0, 8],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n]\nMatch: True\n\nOutput:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [8, 8, 8, 8, 8, 8, 8, 8, 8, 8],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [4, 0, 0, 0, 0, 0, 0, 0, 0, 2],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [3, 0, 0, 0, 0, 0, 0, 0, 0, 4],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [2, 0, 0, 0, 0, 0, 0, 0, 0, 3],\n]\nExpected:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [8, 8, 8, 8, 8, 8, 8, 8, 8, 8],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [4, 0, 0, 0, 0, 0, 0, 0, 0, 2],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [3, 0, 0, 0, 0, 0, 0, 0, 0, 4],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [2, 0, 0, 0, 0, 0, 0, 0, 0, 3],\n]\nMatch: True\n\nOutput:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [2, 0, 0, 0, 0, 0, 0, 0, 0, 8],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [3, 0, 0, 0, 0, 0, 0, 0, 0, 4],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [5, 0, 0, 0, 0, 0, 0, 0, 0, 3],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [8, 0, 0, 0, 0, 0, 0, 0, 0, 2],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n]\nExpected:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [2, 0, 0, 0, 0, 0, 0, 0, 0, 8],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [3, 0, 0, 0, 0, 0, 0, 0, 0, 4],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [5, 0, 0, 0, 0, 0, 0, 0, 0, 3],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [8, 0, 0, 0, 0, 0, 0, 0, 0, 2],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n]\nMatch: True\n\nOutput:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [4, 0, 0, 0, 0, 0, 0, 0, 0, 2],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [3, 3, 3, 3, 3, 3, 3, 3, 3, 3],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [2, 0, 0, 0, 0, 0, 0, 0, 0, 9],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [6, 6, 6, 6, 6, 6, 6, 6, 6, 6],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [9, 0, 0, 0, 0, 0, 0, 0, 0, 4],\n]\nExpected:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [4, 0, 0, 0, 0, 0, 0, 0, 0, 2],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [3, 3, 3, 3, 3, 3, 3, 3, 3, 3],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [2, 0, 0, 0, 0, 0, 0, 0, 0, 9],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [6, 6, 6, 6, 6, 6, 6, 6, 6, 6],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [9, 0, 0, 0, 0, 0, 0, 0, 0, 4],\n]\nMatch: True\n\n",
-    "py_run_error": "",
-    "error_message": None,
-    "with_solution": True,
-    "python_function": "def solve_22eb0ac0(input: ColoredGrid) -> ColoredGrid:\n    output = input.deep_copy()\n    rows_to_check = [3, 7]\n    \n    for row in rows_to_check:\n        first = output.get_cell(row, 0)\n        last = output.get_cell(row, 9)\n        \n        if first == last and first != 0:\n            for col in range(10):\n                output.set_cell(row, col, first)\n    \n    return output",
-}
-Recent = {
-    "doc": "concepts_used: ['Pattern recognition', 'Row-based transformations', 'Conditional logic based on row content', 'Grid analysis and manipulation']\napproach: ['Analyze the input and output examples to identify the transformation pattern.', 'Observe that only certain rows are modified in the output.', 'Recognize that rows containing matching numbers at both ends are filled with that number.', 'Determine that this transformation only occurs for rows with indices 1, 5, and 7 (0-based indexing).', 'Develop a function to check if a row should be transformed and apply the transformation if needed.', 'Implement the solution using ColoredGrid methods to iterate through rows and modify them as required.']\npython_function: def solve_22eb0ac0(input: ColoredGrid) -> ColoredGrid:\n    def should_transform_row(row_index: int, row: List[int]) -> bool:\n        return row_index in [1, 5, 7] and row[0] == row[-1] and row[0] != 0\n\n    output = input.deep_copy()\n    height, width = output.get_dimensions()\n\n    for row in range(height):\n        if should_transform_row(row, [output.get_cell(row, col) for col in range(width)]):\n            fill_value = output.get_cell(row, 0)\n            for col in range(width):\n                output.set_cell(row, col, fill_value)\n\n    return output\nstdout: None\nerror_message: None\npy_test: unknown\npy_run_error: Traceback (most recent call last):\n  File \"/root/sandbox_execute.py\", line 23, in <module>\n    main(args.fn_path, args.args_path, args.out_path)\n  File \"/root/sandbox_execute.py\", line 11, in main\n    result = fn(*arg_list, **kwargs)\n  File \"/Users/robcheung/code/ARC-AGI/rob_agi/solver_functions.py\", line 364, in run_eval\n  File \"<string>\", line 2, in solve_22eb0ac0\nNameError: name 'List' is not defined. Did you mean: 'list'?\n\nTask ID: 22eb0ac0\n========\nExample (1 / 3):\nInput:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [9, 0, 0, 0, 0, 0, 0, 0, 0, 6],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [8, 0, 0, 0, 0, 0, 0, 0, 0, 9],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [4, 0, 0, 0, 0, 0, 0, 0, 0, 4],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [6, 0, 0, 0, 0, 0, 0, 0, 0, 8],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n]\nOutput:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [9, 0, 0, 0, 0, 0, 0, 0, 0, 6],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [8, 0, 0, 0, 0, 0, 0, 0, 0, 9],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [6, 0, 0, 0, 0, 0, 0, 0, 0, 8],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n]\n\n========\n========\nExample (2 / 3):\nInput:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [8, 0, 0, 0, 0, 0, 0, 0, 0, 8],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [4, 0, 0, 0, 0, 0, 0, 0, 0, 2],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [3, 0, 0, 0, 0, 0, 0, 0, 0, 4],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [2, 0, 0, 0, 0, 0, 0, 0, 0, 3],\n]\nOutput:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [8, 8, 8, 8, 8, 8, 8, 8, 8, 8],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [4, 0, 0, 0, 0, 0, 0, 0, 0, 2],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [3, 0, 0, 0, 0, 0, 0, 0, 0, 4],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [2, 0, 0, 0, 0, 0, 0, 0, 0, 3],\n]\n\n========\n========\nExample (3 / 3):\nInput:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [2, 0, 0, 0, 0, 0, 0, 0, 0, 8],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [3, 0, 0, 0, 0, 0, 0, 0, 0, 4],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [5, 0, 0, 0, 0, 0, 0, 0, 0, 3],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [8, 0, 0, 0, 0, 0, 0, 0, 0, 2],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n]\nOutput:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [2, 0, 0, 0, 0, 0, 0, 0, 0, 8],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [3, 0, 0, 0, 0, 0, 0, 0, 0, 4],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [5, 0, 0, 0, 0, 0, 0, 0, 0, 3],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [8, 0, 0, 0, 0, 0, 0, 0, 0, 2],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n]\n\n========\n========\nTest Case to solve (1 / 1):\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [4, 0, 0, 0, 0, 0, 0, 0, 0, 2],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [3, 0, 0, 0, 0, 0, 0, 0, 0, 3],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [2, 0, 0, 0, 0, 0, 0, 0, 0, 9],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [6, 0, 0, 0, 0, 0, 0, 0, 0, 6],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [9, 0, 0, 0, 0, 0, 0, 0, 0, 4],\n]\n\n========\n\n\nComputed:\nActual 1:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [3, 0, 0, 0, 0, 0, 0, 0, 0, 3],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [2, 0, 0, 0, 0, 0, 0, 0, 0, 9],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [6, 6, 6, 6, 6, 6, 6, 6, 6, 6],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [9, 0, 0, 0, 0, 0, 0, 0, 0, 4],\n]\nExpected:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [4, 0, 0, 0, 0, 0, 0, 0, 0, 2],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [3, 3, 3, 3, 3, 3, 3, 3, 3, 3],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [2, 0, 0, 0, 0, 0, 0, 0, 0, 9],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [6, 6, 6, 6, 6, 6, 6, 6, 6, 6],\n [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],\n [9, 0, 0, 0, 0, 0, 0, 0, 0, 4],\n]\nChallenge Solved: False",
-    "time": 1723372902,
-    "doc_id": "1723372902587074000",
-    "stdout": None,
-    "py_test": "unknown",
-    "task_id": "22eb0ac0",
-    "approach": [
-        "Analyze the input and output examples to identify the transformation pattern.",
-        "Observe that only certain rows are modified in the output.",
-        "Recognize that rows containing matching numbers at both ends are filled with that number.",
-        "Determine that this transformation only occurs for rows with indices 1, 5, and 7 (0-based indexing).",
-        "Develop a function to check if a row should be transformed and apply the transformation if needed.",
-        "Implement the solution using ColoredGrid methods to iterate through rows and modify them as required.",
-    ],
-    "solutions": [
-        [
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [3, 0, 0, 0, 0, 0, 0, 0, 0, 3],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [2, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [6, 6, 6, 6, 6, 6, 6, 6, 6, 6],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [9, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-        ]
-    ],
-    "py_run_logs": "",
-    "py_run_error": 'Traceback (most recent call last):\n  File "/root/sandbox_execute.py", line 23, in <module>\n    main(args.fn_path, args.args_path, args.out_path)\n  File "/root/sandbox_execute.py", line 11, in main\n    result = fn(*arg_list, **kwargs)\n  File "/Users/robcheung/code/ARC-AGI/rob_agi/solver_functions.py", line 364, in run_eval\n  File "<string>", line 2, in solve_22eb0ac0\nNameError: name \'List\' is not defined. Did you mean: \'list\'?\n',
-    "concepts_used": [
-        "Pattern recognition",
-        "Row-based transformations",
-        "Conditional logic based on row content",
-        "Grid analysis and manipulation",
-    ],
-    "error_message": None,
-    "with_solution": True,
-    "python_function": "def solve_22eb0ac0(input: ColoredGrid) -> ColoredGrid:\n    def should_transform_row(row_index: int, row: List[int]) -> bool:\n        return row_index in [1, 5, 7] and row[0] == row[-1] and row[0] != 0\n\n    output = input.deep_copy()\n    height, width = output.get_dimensions()\n\n    for row in range(height):\n        if should_transform_row(row, [output.get_cell(row, col) for col in range(width)]):\n            fill_value = output.get_cell(row, 0)\n            for col in range(width):\n                output.set_cell(row, col, fill_value)\n\n    return output",
-}
-Related = {
-    "unsolved": {
-        "id": "05c2859f00894ed782fa2def9d322df3",
-        "distance": -0.839758574962616,
-        "metadata": {
-            "doc": "concepts_used: ['Pattern Recognition', 'Grid Structure Analysis', 'Grid Resizing and Extraction', 'Spatial Reasoning', 'Multi-step Operations']\napproach: ['1. Analyze the input and output grids to identify the transformation pattern.', '2. Recognize that the output grid is 3x3 times larger than the input grid.', '3. Observe that the input grid is replicated in specific positions within the output grid.', '4. Identify that the input grid is placed in the top-left, center, and bottom-right of the output grid.', '5. Notice that the rest of the output grid is filled with zeros.', '6. Develop a strategy to create the output grid by expanding the input and placing copies strategically.']\nsolution: [[7, 0, 7, 0, 0, 0, 7, 0, 7], [7, 0, 7, 0, 0, 0, 7, 0, 7], [7, 7, 0, 0, 0, 0, 7, 7, 0], [0, 0, 0, 7, 0, 7, 0, 0, 0], [0, 0, 0, 7, 0, 7, 0, 0, 0], [0, 0, 0, 7, 7, 0, 0, 0, 0], [7, 0, 7, 0, 0, 0, 7, 0, 7], [7, 0, 7, 0, 0, 0, 7, 0, 7], [7, 7, 0, 0, 0, 0, 7, 7, 0]]\npython_function: def solve(input: ColoredGrid) -> ColoredGrid:\\\\(n        # Get the dimensions of the input grid\\\\n        height, width = input.get_dimensions()\\\\n\\\\n        # Create a new 3x3 larger grid filled with zeros\\\\n        output = ColoredGrid([[0 for _ in range(width * 3)] for _ in range(height * 3)])\\\\n\\\\n        # Copy the input grid to the top-left corner\\\\n        for i in range(height):\\\\n            for j in range(width):\\\\n                output.set_cell(i, j, input.get_cell(i, j))\\\\n\\\\n        # Copy the input grid to the center\\\\n        for i in range(height):\\\\n            for j in range(width):\\\\n                output.set_cell(i + height, j + width, input.get_cell(i, j))\\\\n\\\\n        # Copy the input grid to the bottom-right corner\\\\n        for i in range(height):\\\\n            for j in range(width):\\\\n                output.set_cell(i + 2*height, j + 2*width, input.get_cell(i, j))\\\\n\\\\n        return output\\\\n\nstdout: None\nerror_message: None\n\nTask ID: 007bbfb7\nExample 1:\nInput:\n[\n [0, 7, 7],\n [7, 7, 7],\n [0, 7, 7],\n]\nOutput:\n[\n [0, 0, 0, 0, 7, 7, 0, 7, 7],\n [0, 0, 0, 7, 7, 7, 7, 7, 7],\n [0, 0, 0, 0, 7, 7, 0, 7, 7],\n [0, 7, 7, 0, 7, 7, 0, 7, 7],\n [7, 7, 7, 7, 7, 7, 7, 7, 7],\n [0, 7, 7, 0, 7, 7, 0, 7, 7],\n [0, 0, 0, 0, 7, 7, 0, 7, 7],\n [0, 0, 0, 7, 7, 7, 7, 7, 7],\n [0, 0, 0, 0, 7, 7, 0, 7, 7],\n]\n\nExample 2:\nInput:\n[\n [4, 0, 4],\n [0, 0, 0],\n [0, 4, 0],\n]\nOutput:\n[\n [4, 0, 4, 0, 0, 0, 4, 0, 4],\n [0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 4, 0, 0, 0, 0, 0, 4, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 4, 0, 4, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 4, 0, 0, 0, 0],\n]\n\nExample 3:\nInput:\n[\n [0, 0, 0],\n [0, 0, 2],\n [2, 0, 2],\n]\nOutput:\n[\n [0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 2],\n [0, 0, 0, 0, 0, 0, 2, 0, 2],\n [0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 2, 0, 0, 0, 0, 0, 2],\n [2, 0, 2, 0, 0, 0, 2, 0, 2],\n]\n\nExample 4:\nInput:\n[\n [6, 6, 0],\n [6, 0, 0],\n [0, 6, 6],\n]\nOutput:\n[\n [6, 6, 0, 6, 6, 0, 0, 0, 0],\n [6, 0, 0, 6, 0, 0, 0, 0, 0],\n [0, 6, 6, 0, 6, 6, 0, 0, 0],\n [6, 6, 0, 0, 0, 0, 0, 0, 0],\n [6, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 6, 6, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 6, 6, 0, 6, 6, 0],\n [0, 0, 0, 6, 0, 0, 6, 0, 0],\n [0, 0, 0, 0, 6, 6, 0, 6, 6],\n]\n\nExample 5:\nInput:\n[\n [2, 2, 2],\n [0, 0, 0],\n [0, 2, 2],\n]\nOutput:\n[\n [2, 2, 2, 2, 2, 2, 2, 2, 2],\n [0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 2, 2, 0, 2, 2, 0, 2, 2],\n [0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 2, 2, 2, 2, 2, 2],\n [0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 2, 2, 0, 2, 2],\n]\n\nTest Case 1:\n[\n [7, 0, 7],\n [7, 0, 7],\n [7, 7, 0],\n]",
-            "doc_id": "05c2859f00894ed782fa2def9d322df3",
-            "stdout": None,
-            "task_id": "007bbfb7",
-            "approach": [
-                "1. Analyze the input and output grids to identify the transformation pattern.",
-                "2. Recognize that the output grid is 3x3 times larger than the input grid.",
-                "3. Observe that the input grid is replicated in specific positions within the output grid.",
-                "4. Identify that the input grid is placed in the top-left, center, and bottom-right of the output grid.",
-                "5. Notice that the rest of the output grid is filled with zeros.",
-                "6. Develop a strategy to create the output grid by expanding the input and placing copies strategically.",
-            ],
-            "solution": [
-                [7, 0, 7, 0, 0, 0, 7, 0, 7],
-                [7, 0, 7, 0, 0, 0, 7, 0, 7],
-                [7, 7, 0, 0, 0, 0, 7, 7, 0],
-                [0, 0, 0, 7, 0, 7, 0, 0, 0],
-                [0, 0, 0, 7, 0, 7, 0, 0, 0],
-                [0, 0, 0, 7, 7, 0, 0, 0, 0],
-                [7, 0, 7, 0, 0, 0, 7, 0, 7],
-                [7, 0, 7, 0, 0, 0, 7, 0, 7],
-                [7, 7, 0, 0, 0, 0, 7, 7, 0],
-            ],
-            "concepts_used": [
-                "Pattern Recognition",
-                "Grid Structure Analysis",
-                "Grid Resizing and Extraction",
-                "Spatial Reasoning",
-                "Multi-step Operations",
-            ],
-            "error_message": None,
-            "python_function": "def solve(input: ColoredGrid) -> ColoredGrid:\\\\(n        # Get the dimensions of the input grid\\\\n        height, width = input.get_dimensions()\\\\n\\\\n        # Create a new 3x3 larger grid filled with zeros\\\\n        output = ColoredGrid([[0 for _ in range(width * 3)] for _ in range(height * 3)])\\\\n\\\\n        # Copy the input grid to the top-left corner\\\\n        for i in range(height):\\\\n            for j in range(width):\\\\n                output.set_cell(i, j, input.get_cell(i, j))\\\\n\\\\n        # Copy the input grid to the center\\\\n        for i in range(height):\\\\n            for j in range(width):\\\\n                output.set_cell(i + height, j + width, input.get_cell(i, j))\\\\n\\\\n        # Copy the input grid to the bottom-right corner\\\\n        for i in range(height):\\\\n            for j in range(width):\\\\n                output.set_cell(i + 2*height, j + 2*width, input.get_cell(i, j))\\\\n\\\\n        return output\\\\n",
-        },
-    },
-    "solved": {
-        "id": "c9e6f938",
-        "distance": -0.8168575167655945,
-        "metadata": {
-            "doc": "Task ID: c9e6f938\n========\nExample (1 / 3):\nInput:\n[\n [0, 7, 0],\n [0, 0, 7],\n [0, 7, 7],\n]\nOutput:\n[\n [0, 7, 0, 0, 7, 0],\n [0, 0, 7, 7, 0, 0],\n [0, 7, 7, 7, 7, 0],\n]\n\n========\n========\nExample (2 / 3):\nInput:\n[\n [0, 0, 0],\n [0, 7, 7],\n [0, 0, 0],\n]\nOutput:\n[\n [0, 0, 0, 0, 0, 0],\n [0, 7, 7, 7, 7, 0],\n [0, 0, 0, 0, 0, 0],\n]\n\n========\n========\nExample (3 / 3):\nInput:\n[\n [0, 0, 0],\n [7, 0, 0],\n [0, 0, 0],\n]\nOutput:\n[\n [0, 0, 0, 0, 0, 0],\n [7, 0, 0, 0, 0, 7],\n [0, 0, 0, 0, 0, 0],\n]\n\n========\n========\nTest Case to solve (1 / 1):\n[\n [7, 7, 0],\n [0, 7, 0],\n [0, 0, 7],\n]\n\n========\n",
-            "time": 1723542962,
-            "doc_id": "c9e6f938",
-            "stdout": None,
-            "py_test": "pass",
-            "task_id": "c9e6f938",
-            "approach": [
-                "Analyze the given examples to identify the pattern:",
-                "- The output grid has twice the width of the input grid.",
-                "- The left half of the output grid is an exact copy of the input grid.",
-                "- The right half of the output grid is a horizontal mirror of the left half.",
-                "Develop a strategy to transform the input grid:",
-                "- Create a new grid with the same height as the input and double the width.",
-                "- Copy the input grid to the left half of the new grid.",
-                "- Mirror the left half to create the right half of the new grid.",
-                "Implement the solution in Python:",
-                "- Use the ColoredGrid class methods to manipulate the grid.",
-                "- Utilize the `expand` method to double the width of the grid.",
-                "- Use nested loops to copy and mirror the values.",
-                "Test the solution with the given test case and verify the result.",
-            ],
-            "solutions": [[[7, 7, 0, 0, 7, 7], [0, 7, 0, 0, 7, 0], [0, 0, 7, 7, 0, 0]]],
-            "py_run_logs": "Output:\n[\n [0, 7, 0, 0, 7, 0],\n [0, 0, 7, 7, 0, 0],\n [0, 7, 7, 7, 7, 0],\n]\nExpected:\n[\n [0, 7, 0, 0, 7, 0],\n [0, 0, 7, 7, 0, 0],\n [0, 7, 7, 7, 7, 0],\n]\nMatch: True\n\nOutput:\n[\n [0, 0, 0, 0, 0, 0],\n [0, 7, 7, 7, 7, 0],\n [0, 0, 0, 0, 0, 0],\n]\nExpected:\n[\n [0, 0, 0, 0, 0, 0],\n [0, 7, 7, 7, 7, 0],\n [0, 0, 0, 0, 0, 0],\n]\nMatch: True\n\nOutput:\n[\n [0, 0, 0, 0, 0, 0],\n [7, 0, 0, 0, 0, 7],\n [0, 0, 0, 0, 0, 0],\n]\nExpected:\n[\n [0, 0, 0, 0, 0, 0],\n [7, 0, 0, 0, 0, 7],\n [0, 0, 0, 0, 0, 0],\n]\nMatch: True\n\nOutput:\n[\n [7, 7, 0, 0, 7, 7],\n [0, 7, 0, 0, 7, 0],\n [0, 0, 7, 7, 0, 0],\n]\nExpected:\n[\n [7, 7, 0, 0, 7, 7],\n [0, 7, 0, 0, 7, 0],\n [0, 0, 7, 7, 0, 0],\n]\nMatch: True\n\n",
-            "py_run_error": "",
-            "error_message": None,
-            "with_solution": True,
-            "python_function": "def solve_c9e6f938(input: ColoredGrid) -> ColoredGrid:\n    height, width = input.get_dimensions()\n    \n    # Expand the grid to double the width\n    expanded_grid = input.expand(0, width, 0, 0, fill_color=0)\n    \n    # Mirror the left half to the right half\n    for row in range(height):\n        for col in range(width):\n            value = expanded_grid.get_cell(row, col)\n            expanded_grid.set_cell(row, 2 * width - 1 - col, value)\n    \n    return expanded_grid",
-        },
-    },
-}

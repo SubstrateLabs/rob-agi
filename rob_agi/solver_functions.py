@@ -291,6 +291,7 @@ class ColoredGrid(BaseModel):
     def __str__(self) -> str
     def __eq__(self, other) -> bool
     def __len__(self) -> int # number of rows, alias for num_rows 
+    def __getitem__(self, idx) -> List[int] # get row
     def validate_report(self, expected: ColoredGrid) -> str
     def diff_string(self, expected_grid: ColoredGrid) -> List[List[str]]
     def render_mono(cls, grid) -> str

@@ -84,6 +84,9 @@ class ColoredGrid(BaseModel):
     def __len__(self):
         return len(self.values)
 
+    def __getitem__(self, key):
+        return self.values[key]
+
     def validate_report(self, expected: "ColoredGrid") -> str:
         result = ""
         result += f"Output:\n"
