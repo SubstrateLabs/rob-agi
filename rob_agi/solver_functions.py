@@ -352,11 +352,12 @@ def run_eval(id: str, fn_code: str, task_set="training", with_solution=False):
     exec(fn_code, namespace)
     test_fn_handle = namespace[f"solve_{id}"]
 
-    results = {"examples": [], "test_cases": [], "solutions": []}
+    results = {"examples": [], "test_cases": [], "solutions": [], "example_solutions": []}
     for i, example in enumerate(challenge.examples):
         output = test_fn_handle(example.input)
         ColoredGrid.model_validate(output.model_dump())
         print(output.validate_report(example.output))
+        results["example_solutions"].append(output.values)
         results["examples"].append(output == example.output)
 
     for i, test_case in enumerate(challenge.test_cases):

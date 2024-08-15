@@ -340,17 +340,31 @@ def parse_python_fn_str(llm_response: str):
     return parsed_python_fn
 
 
-def score_output(py_out: RunPythonOut):
-    results = py_out.output
-    if not results:
+def score_output(py_out: RunPythonOut, challenge: GridProblem):
+    output_dict = py_out.output
+    if not output_dict or not output_dict.get("example_solutions"):
         return -1
-    examples = results.get("examples") or []
-    if with_solution:
-        test_cases = results.get("test_cases") or []
-    else:
-        test_cases = []
-    agg = examples + test_cases
-    return sum([10 for e in agg if e]) if agg else -1
+    ex_solutions = output_dict["example_solutions"]
+    score = 0
+    try:
+        for sol_idx, grid in enumerate(ex_solutions):
+            expected = challenge.examples[sol_idx].output.values
+            for row_idx, row in enumerate(grid):
+                for col_idx, cell in enumerate(row):
+                    if cell == expected[row_idx][col_idx]:
+                        score += 1
+        if with_solution:
+            test_sols = output_dict.get("solutions") or []
+            for sol_idx, grid in enumerate(test_sols):
+                expected = challenge.test_cases[sol_idx].values
+                for row_idx, row in enumerate(grid):
+                    for col_idx, cell in enumerate(row):
+                        if cell == expected[row_idx][col_idx]:
+                            score += 1
+    except Exception as e:
+        print("Error scoring output", e)
+        traceback.print_exc()
+    return score
 
 
 async def run_py_fn(
@@ -422,8 +436,8 @@ async def run_py_fn(
                     set_results(sample_out, to_try[ri])
                     return sample_out
 
-                sample_correct = score_output(sample_out)
-                best_count = score_output(curr_best)
+                sample_correct = score_output(sample_out, challenge)
+                best_count = score_output(curr_best, challenge)
                 if sample_correct > best_count:
                     set_results(sample_out, to_try[ri])
                     curr_best = sample_out
@@ -644,7 +658,7 @@ async def attempt(challenge: GridProblem, run_remote=False, verbose=False):
             functions=to_try,
             parsed=parsed,
             verbose=verbose,
-            max_tries=8,
+            max_tries=2,
         )
         if run_remote
         else None
