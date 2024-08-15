@@ -5,7 +5,7 @@ import os
 import random
 import time
 import traceback
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import cloudpickle
 from openai.lib._pydantic import to_strict_json_schema
@@ -323,11 +323,21 @@ def parse_python_fn_str(llm_response: str):
     return parsed_python_fn
 
 
+def correct_count(py_out: RunPythonOut):
+    results = py_out.output
+    examples = results.get("examples") if results else None
+    test_cases = results.get("test_cases") if results else None
+    has_results = examples and test_cases
+    if has_results:
+        return sum([1 for e in examples + test_cases if e])
+    return 0
+
+
 async def run_py_fn(
     challenge: GridProblem, parsed: SolveAttempt, max_tries: int = 1, verbose=False
 ) -> Optional[RunPythonOut]:
-    async def _run(fn: str, run_count):
-        print(f"Exec Py[{run_count}]: {challenge.id}\n\n")
+    async def _run(fn: str, run_label: str) -> RunPythonOut:
+        print(f"Exec Py[{run_label}]: {challenge.id}\n\n")
         py_args = {"id": challenge.id, "fn_code": fn, "task_set": task_set}
         run_py = RunPython(
             function=run_eval,
@@ -337,105 +347,137 @@ async def run_py_fn(
         res = await substrate.async_run(run_py)
         out = res.get(run_py)
         if verbose:
-            print(f" > PY_OUT[{run_count}]:\n", out)
+            print(f" > PY_OUT[{run_label}]:\n", out)
         return out
 
+    async def _run_all(fns: List[str], run_count: int) -> List[Union[RunPythonOut, None]]:
+        tasks = [_run(fn, f"{run_count}.{idx}") for idx, fn in enumerate(fns)]
+        all_res = await asyncio.gather(*tasks, return_exceptions=True)
+        ret = []
+        for res in all_res:
+            if isinstance(res, Exception):
+                print("Error running python function", res)
+                traceback.print_exception(type(res), res, res.__traceback__)
+                ret.append(None)
+            else:
+                if res.output is None and res.pkl_output:
+                    res.output = cloudpickle.loads(base64.b64decode(res.pkl_output))
+                ret.append(res)
+        return ret
+
+    def set_results(rpo: RunPythonOut, fn):
+        parsed.stdout = rpo.stdout
+        parsed.error_message = rpo.stderr
+        if results and results.get("solutions"):
+            parsed.solutions = results.get("solutions")
+        if fn:
+            parsed.python_function = fn
+
     approach_list = "\n".join(parsed.approach)
-    curr_out = None
+    curr_best = None
+    to_try = [parsed.python_function]
+
     for i in range(max_tries):
         try:
-            curr_out = await _run(fn=parsed.python_function, run_count=i)
-            if curr_out.output is None and curr_out.pkl_output:
-                output_bytes = base64.b64decode(curr_out.pkl_output)
-                results = cloudpickle.loads(output_bytes)
-            else:
-                results = curr_out.output
+            all_opt_results = await _run_all(to_try, i)
+            all_results = [r for r in all_opt_results if r]
+            if not all_results:
+                continue
 
-            parsed.stdout = curr_out.stdout
-            parsed.error_message = curr_out.stderr
+            curr_best = all_results[0]
+            for ri, sample_out in enumerate(all_results):
+                if not sample_out:
+                    continue
+                sample_res = sample_out.output
+                s_examples = sample_res.get("examples") if sample_res else None
+                s_test_cases = sample_res.get("test_cases") if sample_res else None
+                print(f"Results example, test: {challenge.id}", s_examples, s_test_cases)
+                has_res = s_examples and s_test_cases
+                sample_correct = correct_count(sample_out)
+                best_count = correct_count(curr_best)
+                if has_res and all(s_examples) and all(s_test_cases):
+                    set_results(sample_out, to_try[ri])
+                    return sample_out
+                elif sample_correct > best_count:
+                    set_results(sample_out, to_try[ri])
+                    curr_best = sample_out
 
-            if results and results.get("solutions"):
-                parsed.solutions = results.get("solutions")
+            results = curr_best.output
 
             examples = results.get("examples") if results else None
             test_cases = results.get("test_cases") if results else None
-            print(f"Results example, test: {challenge.id}", examples, test_cases)
-            has_results = examples and test_cases
 
-            if has_results and all(examples) and all(test_cases):
-                return curr_out
-            else:
-                reflection = f"The general approach was:\n\n{approach_list}\n\nBut the solution did not pass. We need to fix the function and try again."
-                reflection += f"The function that failed:\n\n```python\n{parsed.python_function}\n```"
-                if examples:
-                    reflection += f"Example input results: {['Pass' if e else 'Fail' for e in examples]}\n"
-                if test_cases:
-                    reflection += f"Test case input results: {['Pass' if e else 'Fail' for e in test_cases]}\n"
-                reflection += f"Error message: {curr_out.stderr or 'None'}\n"
-                reflection += f"Stdout: {curr_out.stdout or 'None'}\n"
-                pytest_results = get_py_test(results)
+            reflection = f"The general approach was:\n\n{approach_list}\n\nBut the solution did not pass. We need to fix the function and try again."
+            reflection += f"The function that failed:\n\n```python\n{parsed.python_function}\n```"
+            if examples:
+                reflection += f"Example input results: {['Pass' if e else 'Fail' for e in examples]}\n"
+            if test_cases:
+                reflection += f"Test case input results: {['Pass' if e else 'Fail' for e in test_cases]}\n"
+            reflection += f"Error message: {curr_best.stderr or 'None'}\n"
+            reflection += f"Stdout: {curr_best.stdout or 'None'}\n"
+            pytest_results = get_py_test(results)
 
-                example_rollup = pytest_results.get("examples")
-                test_case_rollup = pytest_results.get("test_cases")
-                examples_explanation = ""
+            example_rollup = pytest_results.get("examples")
+            test_case_rollup = pytest_results.get("test_cases")
+            examples_explanation = ""
 
-                if example_rollup == "fail":
-                    examples_explanation = "The example inputs all failed to produce the correct output."
-                elif example_rollup == "partial":
-                    examples_explanation = "The example inputs produced a mix of correct and incorrect outputs."
-                elif example_rollup == "pass":
-                    examples_explanation = "The example inputs all produced the correct output."
-                test_explanation = ""
-                if test_cases:
-                    test_case_noun = "cases" if len(test_cases) > 1 else "case"
-                    all_str = " all" if len(test_cases) > 1 else ""
-                    if test_case_rollup == "fail":
-                        test_explanation = f"The test {test_case_noun}{all_str} failed to produce the correct output."
-                    elif test_case_rollup == "partial":
-                        test_explanation = f"The test {test_case_noun} produced a mix of correct and incorrect outputs."
-                    elif test_case_rollup == "pass":
-                        test_explanation = f"The test {test_case_noun}{all_str} produced the correct output."
+            if example_rollup == "fail":
+                examples_explanation = "The example inputs all failed to produce the correct output."
+            elif example_rollup == "partial":
+                examples_explanation = "The example inputs produced a mix of correct and incorrect outputs."
+            elif example_rollup == "pass":
+                examples_explanation = "The example inputs all produced the correct output."
+            test_explanation = ""
+            if test_cases:
+                test_case_noun = "cases" if len(test_cases) > 1 else "case"
+                all_str = " all" if len(test_cases) > 1 else ""
+                if test_case_rollup == "fail":
+                    test_explanation = f"The test {test_case_noun}{all_str} failed to produce the correct output."
+                elif test_case_rollup == "partial":
+                    test_explanation = f"The test {test_case_noun} produced a mix of correct and incorrect outputs."
+                elif test_case_rollup == "pass":
+                    test_explanation = f"The test {test_case_noun}{all_str} produced the correct output."
 
-                reflection += f"{examples_explanation}\n{test_explanation}"
+            reflection += f"{examples_explanation}\n{test_explanation}"
 
-                diagnose = ComputeText(
-                    prompt="Below is a candidate solution to an ARC challenge problem.\n"
-                    + reflection
-                    + "\n\nDiagnose the issue with the attempt, explaining what went wrong and what needs to be fixed. Your diagnosis should be short but comprehensive. Do not include general advice that does not fix the issue.",
-                    model=gpt,
-                    max_tokens=700,
-                )
+            diagnose = ComputeText(
+                prompt="Below is a candidate solution to an ARC challenge problem.\n"
+                + reflection
+                + "\n\nDiagnose the issue with the attempt, explaining what went wrong and what needs to be fixed. Your diagnosis should be short but comprehensive. Do not include general advice that does not fix the issue.",
+                model=gpt,
+                max_tokens=700,
+            )
 
-                past_reason = sb.concat(reflection, "\n\nIssue diagnosis:\n\n", diagnose.future.text)
-                prompt = attempt_challenge(challenge, reasoning=past_reason, show_work=False)
+            past_reason = sb.concat(reflection, "\n\nIssue diagnosis:\n\n", diagnose.future.text)
+            prompt = attempt_challenge(challenge, reasoning=past_reason, show_work=False)
 
-                # new_attempt = ComputeText(prompt=prompt, model=smart_model, max_tokens=1900)
-                new_attempt_moa = await run_moa(prompt, max_tokens=4000, num_layers=2, filename_prefix=challenge.id)
-                new_fn = find_new_fn(new_attempt_moa)
-                if new_fn:
-                    parsed.python_function = new_fn
+            # new_attempt = ComputeText(prompt=prompt, model=smart_model, max_tokens=1900)
+            new_attempt_moa = await run_moa(prompt, max_tokens=4000, num_layers=2, filename_prefix=challenge.id)
+            new_fns = find_all_fns(new_attempt_moa)
+            to_try = new_fns
 
         except Exception as e:
             print(f"Error running python function on attempt {i}", e)
             traceback.print_exc()
-    return curr_out
+    return curr_best
 
 
-def find_new_fn(moa_response: dict):
+def find_all_fns(moa_response: dict) -> List[str]:
+    functions = []
     new_fn = parse_python_fn_str(moa_response["text"])
     if new_fn:
-        return new_fn
+        functions.append(new_fn)
     try:
         layers = moa_response["layers"]
         for layer in reversed(layers):
             for candidate in layer:
                 new_fn = parse_python_fn_str(candidate)
                 if new_fn:
-                    return new_fn
+                    functions.append(new_fn)
     except Exception as e:
         print("Error finding new fn", e, moa_response)
         traceback.print_exc()
-    return None
+    return functions
 
 
 def get_py_test(results: Optional[dict]):
@@ -753,8 +795,8 @@ async def main():
 
     # distill_research()
 
-    # for i in range(1):
-    #     await solve_loop(max_concurrent=32, to_process=to_process)
+    # for i in range(2):
+    #     await solve_loop(max_concurrent=48, to_process=to_process)
     # await solve_loop(max_concurrent=4, max_challenges=8)
 
 
