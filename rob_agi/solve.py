@@ -5,7 +5,7 @@ import os
 import random
 import time
 import traceback
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Tuple
 
 import cloudpickle
 from openai.lib._pydantic import to_strict_json_schema
@@ -210,13 +210,13 @@ async def get_previous_tries(challenge: GridProblem):
     return final
 
 
-async def get_initial_thoughts(challenge: GridProblem, verbose=False):
+async def get_initial_thoughts(challenge: GridProblem, verbose=False) -> Tuple[str, List[str]]:
     print(f"Checking past for {challenge.id}")
     check_past = await get_previous_tries(challenge)
 
     prev_solution = check_past.get("prev_solution")
     recent_attempt = check_past.get("recent_attempt")
-    summarize_learnings = check_past.get("learnings")
+    summarize_learnings = check_past.get("learnings") or ""
     related = check_past.get("related") or {}
     prev_attempts = check_past.get("prev_attempts") or []
 
@@ -274,12 +274,22 @@ async def get_initial_thoughts(challenge: GridProblem, verbose=False):
             solution_str=solution_str,
         )
         solution_ct = ComputeText(prompt=think_with_solution, model=smart_model, temperature=0.2)
-        # reason = moa(think_with_solution)
-        res = await substrate.async_run(solution_ct)
-        return res.get(solution_ct).text
     else:
-        res = await substrate.async_run(reason)
-        return res.get(reason).value["text"]
+        think = sb.format(
+            "<PAST_THINKING>{impression_q}</PAST_THINKING>\nGiven those past attempts your recent thinking is:<CURRENT_THINKING>\n\n{impression}\n</CURRENT_THINKING>\n\nCome up with an approach that incorporates what you learned. The important part here is to identify the key steps that are necessary to solve this problem. Be comprehensive, detailed, but also concise.",
+            impression_q=impression_q,
+            impression=reason.future.value.text,
+        )
+        solution_ct = ComputeText(prompt=think, model=gpt, temperature=0.2)
+
+    res = await substrate.async_run(solution_ct)
+    impression = res.get(solution_ct).text
+    moa_res = res.get(reason)
+    function_candidates = find_all_fns(moa_res.value)
+    additional_fn = parse_python_fn_str(impression)
+    if additional_fn and additional_fn not in function_candidates:
+        function_candidates.append(additional_fn)
+    return impression, function_candidates
 
 
 async def first_attempt(challenge: GridProblem, initial_thoughts: str) -> dict:
@@ -350,7 +360,7 @@ async def run_py_fn(
             pip_install=[
                 "pydantic==2.8.2",
                 "substrate",
-                "git+https://github.com/SubstrateLabs/rob-agi.git@940576f",
+                "git+https://github.com/SubstrateLabs/rob-agi.git@a597b3a",
                 "numpy",
             ],
         )
@@ -361,6 +371,8 @@ async def run_py_fn(
         return out
 
     async def _run_all(fns: List[str], run_count: int) -> List[Union[RunPythonOut, None]]:
+        if verbose:
+            print(f" > TRYING {len(fns)} FNS")
         tasks = [_run(fn, f"{run_count}.{idx}") for idx, fn in enumerate(fns)]
         all_res = await asyncio.gather(*tasks, return_exceptions=True)
         ret = []
@@ -491,7 +503,7 @@ def find_all_fns(moa_response: dict) -> List[str]:
         for layer in reversed(layers):
             for candidate in layer:
                 new_fn = parse_python_fn_str(candidate)
-                if new_fn:
+                if new_fn and new_fn not in functions:
                     functions.append(new_fn)
     except Exception as e:
         print("Error finding new fn", e, moa_response)
@@ -609,7 +621,7 @@ async def attempt(challenge: GridProblem, run_remote=False, verbose=False):
     attempted += 1
 
     print(f"Starting {challenge.id}")
-    initial_thoughts = await get_initial_thoughts(challenge, verbose=verbose)
+    initial_thoughts, starting_functions = await get_initial_thoughts(challenge, verbose=verbose)
     if verbose:
         print(" > INITIAL_THOUGHTS\n", initial_thoughts)
 
@@ -617,7 +629,7 @@ async def attempt(challenge: GridProblem, run_remote=False, verbose=False):
     if verbose:
         print(" > FIRST_ATTEMPT\n", first_answer)
 
-    to_try = find_all_fns(first_answer)
+    to_try = list(set(find_all_fns(first_answer) + starting_functions))
     parsed = await parse_attempt(challenge, first_answer["text"])
     if verbose:
         print(" > PARSED\n", parsed.model_dump())

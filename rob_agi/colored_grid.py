@@ -66,6 +66,14 @@ class ColoredGrid(BaseModel):
     def color_mapping_str(cls) -> str:
         return "\n".join([f"{k}: {v}" for k, v in cls.colors.items()])
 
+    @property
+    def num_rows(self) -> int:
+        return len(self.values)
+
+    @property
+    def num_cols(self) -> int:
+        return len(self.values[0])
+
     @classmethod
     def value_to_color(cls, val: int) -> str:
         return cls.colors[val]

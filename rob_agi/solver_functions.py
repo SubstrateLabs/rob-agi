@@ -118,8 +118,9 @@ You are being tasked to solve it.
 
 The challenge involves transforming one colored 2D grid into another.
 You will be given a few examples of the pattern in the form of input output pairs.
-You will also be given a test case that has just the input but no output yet.
+You will also be given one or more test cases which are unsolved (i.e. only the input is provided).
 The goal is first to identify the pattern that applies to all the example pairs. 
+Do not fixate on any one example, but try to find the idea that works for all of them.
 Next we will implement the python function that works for all the examples. Applying this function to each of the inputs should result in the corresponding outputs.
 Once we have found that function, we apply it to the test case(s) to compute the solution(s) to the challenge.
 Think conceptually; there is usually a description of what is happening in terms of basic knowledge, so try to back in to it with visual intuition. Some are simple but others require you to be creative or imaginative.
@@ -131,6 +132,22 @@ This is the challenge to solve:
 <CHALLENGE>
 {challenge.to_task_description()}
 </CHALLENGE>
+
+Important notes on the python function:
+Make sure that the python function that you output is a valid standalone function that takes in a ColoredGrid and returns a ColoredGrid. 
+The function must be named `solve_{challenge.id}`. 
+Any imports should be included in the function body. 
+There should be nothing defined or referenced in the surrounding global scope. 
+The function should be preceded by a python code fence (```python) and followed by a closing fence (```). 
+Only the function itself should be in the code fence. Do not include examples of the function being called.
+e.g. the python function looks like:
+
+```python
+def solve_{challenge.id}(input_grid: ColoredGrid) -> ColoredGrid:
+    # imports here
+    # Your solution here
+    return output_grid
+```
 """
     )
 
@@ -158,22 +175,6 @@ Important:
 Your solution should always be in this form:
 
 {SuccessfulSolve.field_summary()} 
-
-Important notes on the python function:
-Make sure that the python function that you output is a valid standalone function that takes in a ColoredGrid and returns a ColoredGrid. 
-The function must be named `solve_{challenge.id}`. 
-Any imports should be included in the function body. 
-There should be nothing defined or referenced in the surrounding global scope. 
-The function should be preceded by a python code fence (```python) and followed by a closing fence (```). 
-Only the function itself should be in the code fence. Do not include examples of the function being called.
-e.g. the python function looks like:
-
-```python
-def solve_{challenge.id}(input_grid: ColoredGrid) -> ColoredGrid:
-    # imports here
-    # Your solution here
-    return output_grid
-```
 """,
     )
 
@@ -278,6 +279,10 @@ class ColoredGrid(BaseModel):
     @property
     def is_valid(self) -> bool
     @property
+    def num_rows(self) -> int
+    @property
+    def num_cols(self) -> int
+    @property
     def colors(cls) -> dict[int, str]
     @property
     def color_mapping_str(cls) -> str
@@ -285,7 +290,7 @@ class ColoredGrid(BaseModel):
     # Instance methods
     def __str__(self) -> str
     def __eq__(self, other) -> bool
-    def __len__(self) -> int # number of rows 
+    def __len__(self) -> int # number of rows, alias for num_rows 
     def validate_report(self, expected: ColoredGrid) -> str
     def diff_string(self, expected_grid: ColoredGrid) -> List[List[str]]
     def render_mono(cls, grid) -> str
@@ -336,6 +341,7 @@ class ColoredGrid(BaseModel):
 
 def run_eval(id: str, fn_code: str, task_set="training", with_solution=False):
     from rob_agi.arc_util import load_task_set
+    from rob_agi.colored_grid import ColoredGrid
 
     challenges, solutions = load_task_set(task_set_name=task_set)
     challenge = challenges[id]
@@ -348,15 +354,17 @@ def run_eval(id: str, fn_code: str, task_set="training", with_solution=False):
     results = {"examples": [], "test_cases": [], "solutions": []}
     for i, example in enumerate(challenge.examples):
         output = test_fn_handle(example.input)
+        ColoredGrid.model_validate(output.model_dump())
         print(output.validate_report(example.output))
         results["examples"].append(output == example.output)
 
     for i, test_case in enumerate(challenge.test_cases):
         output = test_fn_handle(test_case)
+        ColoredGrid.model_validate(output.model_dump())
         results["solutions"].append(output.values)
         if with_solution:
             sol = solutions[id]
-            print(output.comparison_report(sol.outputs[i]))
+            print(output.validate_report(sol.outputs[i]))
             results["test_cases"].append(output == solutions[id].outputs[i])
         else:
             results["test_cases"].append(None)
