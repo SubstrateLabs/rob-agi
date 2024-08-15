@@ -64,6 +64,7 @@ remote_pip_deps = [
     "git+https://github.com/SubstrateLabs/rob-agi.git@673d3e5",
     "numpy",
 ]
+max_python_tries = 2
 
 all_challenges = list(challenges.values())
 random.shuffle(all_challenges)
@@ -371,11 +372,12 @@ async def run_py_fn(
     challenge: GridProblem,
     parsed: SolveAttempt,
     functions: List[str],
-    max_tries: int = 1,
+    max_tries: int = max_python_tries,
     verbose=False,
 ) -> Optional[RunPythonOut]:
     async def _run(fn: str, run_label: str) -> RunPythonOut:
-        print(f"Exec Py[{run_label}]: {challenge.id}")
+        if verbose:
+            print(f"Exec Py[{run_label}]: {challenge.id}")
         py_args = {"id": challenge.id, "fn_code": fn, "task_set": task_set, "with_solution": with_solution}
         run_py = RunPython(function=run_eval, kwargs=py_args, pip_install=remote_pip_deps)
         res = await substrate.async_run(run_py)
@@ -424,13 +426,13 @@ async def run_py_fn(
                 continue
 
             curr_best = all_results[0]
-            for ri, sample_out in enumerate(all_results):
+            for ri, sample_out in enumerate(all_opt_results):
                 if not sample_out:
                     continue
                 sample_res = sample_out.output
                 s_examples = sample_res.get("examples") if sample_res else None
                 s_test_cases = sample_res.get("test_cases") if sample_res else None
-                print(f"Results example, test: {challenge.id}", s_examples, s_test_cases)
+                print(f"Results [{i}.{ri}]: {challenge.id}", s_examples, s_test_cases)
                 has_res = s_examples and s_test_cases
                 if has_res and all(s_examples) and (not with_solution or all(s_test_cases)):
                     set_results(sample_out, to_try[ri])
@@ -496,7 +498,6 @@ async def run_py_fn(
             if verbose:
                 print(" > NEW_ATTEMPT\n")
             new_fns = find_all_fns(new_attempt_moa)
-            print("New functions:", "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n", new_fns)
             to_try = new_fns
 
         except Exception as e:
@@ -658,7 +659,7 @@ async def attempt(challenge: GridProblem, run_remote=False, verbose=False):
             functions=to_try,
             parsed=parsed,
             verbose=verbose,
-            max_tries=2,
+            max_tries=max_python_tries,
         )
         if run_remote
         else None
