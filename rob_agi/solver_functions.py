@@ -119,8 +119,10 @@ You are being tasked to solve it.
 The challenge involves transforming one colored 2D grid into another.
 You will be given a few examples of the pattern in the form of input output pairs.
 You will also be given a test case that has just the input but no output yet.
-The goal is to find the pattern that fits all the examples, then apply it to the test case to compute a solution. 
-When you think conceptually, there is usually a simple description of what is happening in terms of basic knowledge, so try to back in to it with visual intuition. Some are simple but for some you may need to be creative or imaginative.
+The goal is first to identify the pattern that applies to all the example pairs. 
+Next we will implement the python function that works for all the examples. Applying this function to each of the inputs should result in the corresponding outputs.
+Once we have found that function, we apply it to the test case(s) to compute the solution(s) to the challenge.
+Think conceptually; there is usually a description of what is happening in terms of basic knowledge, so try to back in to it with visual intuition. Some are simple but others require you to be creative or imaginative.
 
 {grid_setup()}
 
@@ -133,12 +135,7 @@ This is the challenge to solve:
     )
 
 
-def attempt_challenge(challenge: GridProblem, reasoning: str, show_work: bool = True) -> str:
-    show_str = (
-        "Show your work. Your solution should clearly, completely, and succinctly communicate the concepts used, the approach taken."
-        if show_work
-        else ""
-    )
+def attempt_challenge(challenge: GridProblem, reasoning: str) -> str:
     return sb.concat(
         problem_setup(challenge),
         f"""
@@ -150,28 +147,33 @@ Here is some of your recent reasoning:
         f"""
 </REASONING>
 
-The ColoredGrid class is already defined in scope, and includes some functions that may be useful. 
+The ColoredGrid class is already defined in scope. The method signatures are below. 
 <COLORED_GRID_SUMMARY>
 {get_grid_class_overview()}
 </COLORED_GRID_SUMMARY>
+
+numpy is also available for use if you need it.
 
 Important:
 Your solution should always be in this form:
 
 {SuccessfulSolve.field_summary()} 
 
+Important notes on the python function:
 Make sure that the python function that you output is a valid standalone function that takes in a ColoredGrid and returns a ColoredGrid. 
 The function must be named `solve_{challenge.id}`. 
 Any imports should be included in the function body. 
 There should be nothing defined or referenced in the surrounding global scope. 
 The function should be preceded by a python code fence (```python) and followed by a closing fence (```). 
+Only the function itself should be in the code fence. Do not include examples of the function being called.
 e.g. the python function looks like:
+
 ```python
 def solve_{challenge.id}(input_grid: ColoredGrid) -> ColoredGrid:
+    # imports here
     # Your solution here
     return output_grid
 ```
-{show_str}
 """,
     )
 
@@ -258,80 +260,81 @@ Your attempt:
 
 def get_grid_class_overview() -> str:
     return """
+# Method signatures for ColoredGrid
 class ColoredGrid(BaseModel):
     # Represents a grid of colored cells (integers 0-9).
     values: List[List[int]]  # The grid values
-
     # Class methods
     @classmethod
-    def value_to_color(cls, val: int) -> str: ...
+    def value_to_color(cls, val: int) -> str
     @classmethod
-    def from_subgrids(cls, subgrids: List[List[ColoredGrid]]) -> ColoredGrid: ...
+    def from_subgrids(cls, subgrids: List[List[ColoredGrid]]) -> ColoredGrid
     @classmethod
-    def from_rle(cls, rle: List[Tuple[int, int]], width: int) -> ColoredGrid: ...
+    def from_rle(cls, rle: List[Tuple[int, int]], width: int) -> ColoredGrid
     @classmethod
-    def from_base64(cls, base64_str: str) -> ColoredGrid: ...
+    def from_base64(cls, base64_str: str) -> ColoredGrid
 
     # Properties
     @property
-    def is_valid(self) -> bool: ...
+    def is_valid(self) -> bool
     @property
-    def colors(cls) -> dict[int, str]: ...
+    def colors(cls) -> dict[int, str]
     @property
-    def color_mapping_str(cls) -> str: ...
+    def color_mapping_str(cls) -> str
 
     # Instance methods
-    def __str__(self) -> str: ...
-    def __eq__(self, other) -> bool: ...
-    def validate_report(self, expected: ColoredGrid) -> str: ...
-    def diff_string(self, expected_grid: ColoredGrid) -> List[List[str]]: ...
-    def render_mono(cls, grid) -> str: ...
+    def __str__(self) -> str
+    def __eq__(self, other) -> bool
+    def __len__(self) -> int # number of rows 
+    def validate_report(self, expected: ColoredGrid) -> str
+    def diff_string(self, expected_grid: ColoredGrid) -> List[List[str]]
+    def render_mono(cls, grid) -> str
 
     # Grid operations
-    def get_dimensions(self) -> Tuple[int, int]: ...
-    def get_cell(self, row: int, col: int) -> int: ...
-    def set_cell(self, row: int, col: int, value: int) -> None: ...
-    def deep_copy(self) -> ColoredGrid: ...
-    def rotate_90(self, clockwise: bool = True) -> ColoredGrid: ...
-    def flip_horizontal(self) -> ColoredGrid: ...
-    def flip_vertical(self) -> ColoredGrid: ...
-    def count_color(self, color: int) -> int: ...
-    def get_unique_colors(self) -> Set[int]: ...
-    def get_color_frequencies(self) -> Dict[int, int]: ...
-    def get_bounding_box(self, color: int) -> Optional[Tuple[int, int, int, int]]: ...
-    def get_symmetry_axes(self) -> Tuple[bool, bool]: ...
-    def crop(self, top: int, left: int, bottom: int, right: int) -> ColoredGrid: ...
-    def expand(self, top: int, right: int, bottom: int, left: int, fill_color: int = 0) -> ColoredGrid: ...
-    def replace_color(self, old_color: int, new_color: int) -> ColoredGrid: ...
-    def apply_mask(self, mask: ColoredGrid, replace_color: int) -> ColoredGrid: ...
-    def find_pattern(self, pattern: ColoredGrid) -> List[Tuple[int, int]]: ...
-    def extract_subgrid(self, top: int, left: int, height: int, width: int) -> ColoredGrid: ...
-    def tile_grid(self, tiles: int) -> ColoredGrid: ...
-    def add(self, other: ColoredGrid, modulo: int = 10) -> ColoredGrid: ...
-    def subtract(self, other: ColoredGrid, modulo: int = 10) -> ColoredGrid: ...
-    def multiply(self, scalar: int, modulo: int = 10) -> ColoredGrid: ...
-    def split_into_subgrids(self, rows: int, cols: int) -> List[List[ColoredGrid]]: ...
-    def to_binary(self, threshold: int) -> ColoredGrid: ...
-    def compress_rle(self) -> List[Tuple[int, int]]: ...
-    def get_edge_cells(self) -> List[Tuple[int, int]]: ...
-    def flood_fill(self, row: int, col: int, new_color: int) -> ColoredGrid: ...
-    def detect_rectangles(self) -> List[Tuple[int, int, int, int, int]]: ...
-    def detect_lines(self) -> List[Tuple[int, List[Tuple[int, int]]]]: ...
-    def find_connected_regions(self, color: int) -> List[List[Tuple[int, int]]]: ...
-    def find_largest_object(self, color: int) -> List[Tuple[int, int]]: ...
-    def diff(self, other: ColoredGrid) -> ColoredGrid: ...
-    def similarity_score(self, other: ColoredGrid) -> float: ...
-    def find_repeating_pattern(self) -> Optional[ColoredGrid]: ...
-    def extrapolate_sequence(self, direction: Literal["right", "left", "up", "down", "up-right", "up-left", "down-right", "down-left"], steps: int = 1) -> ColoredGrid: ...
-    def find_center_of_mass(self) -> Tuple[float, float]: ...
-    def to_base64(self) -> str: ...
-    def find_color_transitions(self) -> List[Tuple[int, int, int, int]]: ...
-    def apply_cellular_automaton(self, rule: Callable[[List[int]], int]) -> ColoredGrid: ...
-    def apply_function_to_regions(self, func: Callable[[List[Tuple[int, int]]], int]) -> ColoredGrid: ...
+    def get_dimensions(self) -> Tuple[int, int]
+    def get_cell(self, row: int, col: int) -> int
+    def set_cell(self, row: int, col: int, value: int) -> None
+    def deep_copy(self) -> ColoredGrid
+    def rotate_90(self, clockwise: bool = True) -> ColoredGrid
+    def flip_horizontal(self) -> ColoredGrid
+    def flip_vertical(self) -> ColoredGrid
+    def count_color(self, color: int) -> int
+    def get_unique_colors(self) -> Set[int]
+    def get_color_frequencies(self) -> Dict[int, int]
+    def get_bounding_box(self, color: int) -> Optional[Tuple[int, int, int, int]]
+    def get_symmetry_axes(self) -> Tuple[bool, bool]
+    def crop(self, top: int, left: int, bottom: int, right: int) -> ColoredGrid
+    def expand(self, top: int, right: int, bottom: int, left: int, fill_color: int = 0) -> ColoredGrid
+    def replace_color(self, old_color: int, new_color: int) -> ColoredGrid
+    def apply_mask(self, mask: ColoredGrid, replace_color: int) -> ColoredGrid
+    def find_pattern(self, pattern: ColoredGrid) -> List[Tuple[int, int]]
+    def extract_subgrid(self, top: int, left: int, height: int, width: int) -> ColoredGrid
+    def tile_grid(self, tiles: int) -> ColoredGrid
+    def add(self, other: ColoredGrid, modulo: int = 10) -> ColoredGrid
+    def subtract(self, other: ColoredGrid, modulo: int = 10) -> ColoredGrid
+    def multiply(self, scalar: int, modulo: int = 10) -> ColoredGrid
+    def split_into_subgrids(self, rows: int, cols: int) -> List[List[ColoredGrid]]
+    def to_binary(self, threshold: int) -> ColoredGrid
+    def compress_rle(self) -> List[Tuple[int, int]]
+    def get_edge_cells(self) -> List[Tuple[int, int]]
+    def flood_fill(self, row: int, col: int, new_color: int) -> ColoredGrid
+    def detect_rectangles(self) -> List[Tuple[int, int, int, int, int]]
+    def detect_lines(self) -> List[Tuple[int, List[Tuple[int, int]]]]
+    def find_connected_regions(self, color: int) -> List[List[Tuple[int, int]]]
+    def find_largest_object(self, color: int) -> List[Tuple[int, int]]
+    def diff(self, other: ColoredGrid) -> ColoredGrid
+    def similarity_score(self, other: ColoredGrid) -> float
+    def find_repeating_pattern(self) -> Optional[ColoredGrid]
+    def extrapolate_sequence(self, direction: Literal["right", "left", "up", "down", "up-right", "up-left", "down-right", "down-left"], steps: int = 1) -> ColoredGrid
+    def find_center_of_mass(self) -> Tuple[float, float]
+    def to_base64(self) -> str
+    def find_color_transitions(self) -> List[Tuple[int, int, int, int]]
+    def apply_cellular_automaton(self, rule: Callable[[List[int]], int]) -> ColoredGrid
+    def apply_function_to_regions(self, func: Callable[[List[Tuple[int, int]]], int]) -> ColoredGrid
     """
 
 
-def run_eval(id: str, fn_code: str, task_set="training"):
+def run_eval(id: str, fn_code: str, task_set="training", with_solution=False):
     from rob_agi.arc_util import load_task_set
 
     challenges, solutions = load_task_set(task_set_name=task_set)
@@ -350,7 +353,11 @@ def run_eval(id: str, fn_code: str, task_set="training"):
 
     for i, test_case in enumerate(challenge.test_cases):
         output = test_fn_handle(test_case)
-        print(output.validate_report(solutions[id].outputs[i]))
         results["solutions"].append(output.values)
-        results["test_cases"].append(output == solutions[id].outputs[i])
+        if with_solution:
+            sol = solutions[id]
+            print(output.comparison_report(sol.outputs[i]))
+            results["test_cases"].append(output == solutions[id].outputs[i])
+        else:
+            results["test_cases"].append(None)
     return results

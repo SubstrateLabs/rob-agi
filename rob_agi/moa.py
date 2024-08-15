@@ -9,7 +9,7 @@ aggregate = """You have been provided with a set of candidate responses to a que
 jq_list = 'to_entries | map("CANDIDATE" + ((.key + 1) | tostring) + ":\n" + .value) | join("\n=========\n")'
 
 # default_models = ["Llama3Instruct70B", "claude-3-5-sonnet-20240620", "gpt-4o"]
-default_models = ["claude-3-5-sonnet-20240620", "gpt-4o"]
+default_models = ["claude-3-5-sonnet-20240620", "gpt-4o", "gpt-4o"]
 # default_models = ["Llama3Instruct70B", "gpt-4o"]
 default_decider = "claude-3-5-sonnet-20240620"
 # default_decider = "gpt-4o"
@@ -32,7 +32,7 @@ def get_mixture(q, prev=None, models=None, max_tokens=def_max_tokens):
     return Box(value=[ComputeText(prompt=prompt, model=m, max_tokens=max_tokens).future.text for m in models])
 
 
-def moa(question: str, num_layers=2, max_tokens: int = def_max_tokens, opts=None, models=None, decider=default_decider):
+def moa(question: str, num_layers=3, max_tokens: int = def_max_tokens, opts=None, models=None, decider=default_decider):
     if models is None:
         models = default_models
     if opts is None:

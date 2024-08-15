@@ -57,6 +57,7 @@ gpt = "gpt-4o"
 # task_set = "training"
 task_set = "evaluation"
 challenges, solutions = load_task_set(task_set_name=task_set)
+with_solution = task_set == "train"
 
 all_challenges = list(challenges.values())
 random.shuffle(all_challenges)
@@ -209,14 +210,14 @@ async def get_previous_tries(challenge: GridProblem):
     return final
 
 
-async def get_initial_thoughts(challenge: GridProblem, with_solution=False, verbose=False):
+async def get_initial_thoughts(challenge: GridProblem, verbose=False):
     print(f"Checking past for {challenge.id}")
     check_past = await get_previous_tries(challenge)
 
     prev_solution = check_past.get("prev_solution")
     recent_attempt = check_past.get("recent_attempt")
     summarize_learnings = check_past.get("learnings")
-    related = check_past.get("related")
+    related = check_past.get("related") or {}
     prev_attempts = check_past.get("prev_attempts") or []
 
     if verbose:
@@ -247,7 +248,7 @@ async def get_initial_thoughts(challenge: GridProblem, with_solution=False, verb
                 f"<PREVIOUS_SUBMISSION>{prev_solution.metadata.get('python_function')}\n\n{prev_solution.metadata.get('py_run_error')}\n\n{prev_solution.metadata.get('py_run_logs')}</PREVIOUS_SUBMISSION>",
             )
     # if related.get("unsolved"):
-    #     impression_q = sb.concat(impression_q, "\n\nOne similar unsolved task:", related["unsolved"]["metadata"]["doc"])
+    #     impression_q = sb.concat(impression_s, "\n\nOne similar unsolved task:", related["unsolved"]["metadata"]["doc"])
     if related.get("solved"):
         impression_q = sb.concat(
             impression_q, "\n\nExample solution from a different problem:", related["solved"]["metadata"]["doc"]
@@ -281,14 +282,14 @@ async def get_initial_thoughts(challenge: GridProblem, with_solution=False, verb
         return res.get(reason).value["text"]
 
 
-async def first_attempt(challenge: GridProblem, initial_thoughts: str) -> str:
+async def first_attempt(challenge: GridProblem, initial_thoughts: str) -> dict:
     print(f"Attempting {challenge.id}")
     prompt = attempt_challenge(challenge, reasoning=initial_thoughts)
     # ct_try = ComputeText(prompt=prompt, model=smart_model, temperature=0.2, max_tokens=2400)
     # return res.get(ct_try).text
     moa_try = moa(prompt, num_layers=2)
     res = await substrate.async_run(moa_try)
-    return res.get(moa_try).value["text"]
+    return res.get(moa_try).value
 
 
 async def parse_attempt(challenge: GridProblem, first_answer: str) -> SolveAttempt:
@@ -323,26 +324,35 @@ def parse_python_fn_str(llm_response: str):
     return parsed_python_fn
 
 
-def correct_count(py_out: RunPythonOut):
+def score_output(py_out: RunPythonOut):
     results = py_out.output
-    examples = results.get("examples") if results else None
-    test_cases = results.get("test_cases") if results else None
-    has_results = examples and test_cases
-    if has_results:
-        return sum([1 for e in examples + test_cases if e])
-    return 0
+    if not results:
+        return -1
+    examples = results.get("examples") or []
+    test_cases = results.get("test_cases") or []
+    agg = examples + test_cases
+    return sum([10 for e in agg if e]) if agg else -1
 
 
 async def run_py_fn(
-    challenge: GridProblem, parsed: SolveAttempt, max_tries: int = 1, verbose=False
+    challenge: GridProblem,
+    parsed: SolveAttempt,
+    functions: List[str],
+    max_tries: int = 1,
+    verbose=False,
 ) -> Optional[RunPythonOut]:
     async def _run(fn: str, run_label: str) -> RunPythonOut:
         print(f"Exec Py[{run_label}]: {challenge.id}\n\n")
-        py_args = {"id": challenge.id, "fn_code": fn, "task_set": task_set}
+        py_args = {"id": challenge.id, "fn_code": fn, "task_set": task_set, "with_solution": with_solution}
         run_py = RunPython(
             function=run_eval,
             kwargs=py_args,
-            pip_install=["pydantic==2.8.2", "substrate", "git+https://github.com/SubstrateLabs/rob-agi.git@da071c0"],
+            pip_install=[
+                "pydantic==2.8.2",
+                "substrate",
+                "git+https://github.com/SubstrateLabs/rob-agi.git@940576f",
+                "numpy",
+            ],
         )
         res = await substrate.async_run(run_py)
         out = res.get(run_py)
@@ -368,16 +378,19 @@ async def run_py_fn(
     def set_results(rpo: RunPythonOut, fn):
         parsed.stdout = rpo.stdout
         parsed.error_message = rpo.stderr
-        if results and results.get("solutions"):
-            parsed.solutions = results.get("solutions")
+        rp_out = rpo.output
+        if rp_out and rp_out.get("solutions"):
+            parsed.solutions = rp_out.get("solutions")
         if fn:
             parsed.python_function = fn
 
     approach_list = "\n".join(parsed.approach)
     curr_best = None
-    to_try = [parsed.python_function]
+    to_try = functions
 
     for i in range(max_tries):
+        if not to_try:
+            break
         try:
             all_opt_results = await _run_all(to_try, i)
             all_results = [r for r in all_opt_results if r]
@@ -393,12 +406,15 @@ async def run_py_fn(
                 s_test_cases = sample_res.get("test_cases") if sample_res else None
                 print(f"Results example, test: {challenge.id}", s_examples, s_test_cases)
                 has_res = s_examples and s_test_cases
-                sample_correct = correct_count(sample_out)
-                best_count = correct_count(curr_best)
                 if has_res and all(s_examples) and all(s_test_cases):
+                    print("---------------------------", "FOUND A WINNER", "---------------------------")
+                    print(sample_out, parsed)
                     set_results(sample_out, to_try[ri])
                     return sample_out
-                elif sample_correct > best_count:
+
+                sample_correct = score_output(sample_out)
+                best_count = score_output(curr_best)
+                if sample_correct > best_count:
                     set_results(sample_out, to_try[ri])
                     curr_best = sample_out
 
@@ -441,19 +457,22 @@ async def run_py_fn(
             reflection += f"{examples_explanation}\n{test_explanation}"
 
             diagnose = ComputeText(
-                prompt="Below is a candidate solution to an ARC challenge problem.\n"
+                prompt="Below is a candidate solution to an ARC challenge problem that tests fundamental reasoning skills.\n"
                 + reflection
-                + "\n\nDiagnose the issue with the attempt, explaining what went wrong and what needs to be fixed. Your diagnosis should be short but comprehensive. Do not include general advice that does not fix the issue.",
+                + "\n\nDiagnose the issue with the attempt, explaining what went wrong and what needs to be fixed. Your diagnosis should be short, specific, and comprehensive.",
                 model=gpt,
                 max_tokens=700,
             )
 
             past_reason = sb.concat(reflection, "\n\nIssue diagnosis:\n\n", diagnose.future.text)
-            prompt = attempt_challenge(challenge, reasoning=past_reason, show_work=False)
+            prompt = attempt_challenge(challenge, reasoning=past_reason)
 
             # new_attempt = ComputeText(prompt=prompt, model=smart_model, max_tokens=1900)
-            new_attempt_moa = await run_moa(prompt, max_tokens=4000, num_layers=2, filename_prefix=challenge.id)
+            new_attempt_moa = await run_moa(prompt, max_tokens=4000, num_layers=3, filename_prefix=challenge.id)
+            if verbose:
+                print(" > NEW_ATTEMPT\n")
             new_fns = find_all_fns(new_attempt_moa)
+            print("New functions:", "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n", new_fns)
             to_try = new_fns
 
         except Exception as e:
@@ -502,20 +521,21 @@ def get_py_test(results: Optional[dict]):
 
 async def log_result(challenge: GridProblem, parsed: SolveAttempt, run_py: Optional[RunPythonOut], extra_meta: dict):
     global attempted, successful
-    solution = ComputedResult(
+    submission = ComputedResult(
         task_id=challenge.id, outputs=[ColoredGrid(values=s) for s in parsed.solutions if s is not None]
     )
-    comparison_report = ""
+    persisted_comparison = ""
     try:
-        comparison_report = solution.comparison_report(solutions[challenge.id])
-        print(comparison_report)
-        did_pass = solution.validate(solutions[challenge.id])
+        _comparison = submission.comparison_report(solutions[challenge.id])
+        persisted_comparison = _comparison if with_solution else ""
+        print(_comparison)
+        did_pass = submission.validate(solutions[challenge.id])
     except Exception as e:
         print(f"Error comparing results: {challenge.id}", e)
         print(
             "=============================\n",
             challenge.id,
-            solution.outputs,
+            submission.outputs,
             solutions[challenge.id].outputs,
             "=============================",
         )
@@ -560,7 +580,7 @@ async def log_result(challenge: GridProblem, parsed: SolveAttempt, run_py: Optio
         EmbedText(
             text=sb.concat(
                 challenge.to_task_description(),
-                f"\n\nComputed:\n{comparison_report}" if comparison_report else "",
+                f"\n\nComputed:\n{persisted_comparison}" if persisted_comparison and with_solution else "",
             ),
             collection_name="arc_attempts",
             metadata={**parsed.model_dump(), **extra_meta},
@@ -584,12 +604,12 @@ async def log_result(challenge: GridProblem, parsed: SolveAttempt, run_py: Optio
     print(f"Solve Rate: {successful} of {attempted} ({successful / attempted:.2%})")
 
 
-async def attempt(challenge: GridProblem, run_remote=False, with_solution=False, verbose=False):
+async def attempt(challenge: GridProblem, run_remote=False, verbose=False):
     global attempted, successful, errored_count
     attempted += 1
 
     print(f"Starting {challenge.id}")
-    initial_thoughts = await get_initial_thoughts(challenge, with_solution=with_solution, verbose=verbose)
+    initial_thoughts = await get_initial_thoughts(challenge, verbose=verbose)
     if verbose:
         print(" > INITIAL_THOUGHTS\n", initial_thoughts)
 
@@ -597,15 +617,25 @@ async def attempt(challenge: GridProblem, run_remote=False, with_solution=False,
     if verbose:
         print(" > FIRST_ATTEMPT\n", first_answer)
 
-    parsed_python_fn = parse_python_fn_str(first_answer)
-    parsed = await parse_attempt(challenge, first_answer)
+    to_try = find_all_fns(first_answer)
+    parsed = await parse_attempt(challenge, first_answer["text"])
     if verbose:
         print(" > PARSED\n", parsed.model_dump())
 
-    if parsed_python_fn:
-        parsed.python_function = parsed_python_fn
+    if parsed.python_function and parsed.python_function not in to_try:
+        to_try.append(parsed.python_function)
 
-    run_py = await run_py_fn(challenge, parsed=parsed, verbose=verbose, max_tries=8) if run_remote else None
+    run_py = (
+        await run_py_fn(
+            challenge,
+            functions=to_try,
+            parsed=parsed,
+            verbose=verbose,
+            max_tries=8,
+        )
+        if run_remote
+        else None
+    )
     extra_meta = {"with_solution": with_solution, "time": int(time.time())}
     await log_result(challenge, parsed, run_py, extra_meta=extra_meta)
 
@@ -739,7 +769,7 @@ Respond with a single new object with keys: current_total_knowledge, ordered_con
 
 async def process_challenge(semaphore, challenge):
     async with semaphore:
-        return await attempt(challenge, with_solution=False, run_remote=True)
+        return await attempt(challenge, run_remote=True)
 
 
 async def solve_loop(max_concurrent=1, to_process=None, max_challenges=None):
@@ -766,14 +796,14 @@ async def main():
     # ensure_db()
     # id = "1f876c06"
     # challenge: GridProblem = challenges[id]
-    # random_challenge = challenges["c3f564a4"]
+    # random_challenge = challenges["e69241bd"]
     verified_so_far = await get_all_verified()
     verified_ids = [v.id for v in verified_so_far]
     print("Skipping previously solved:", len(verified_ids))
 
     to_process = [c for c in all_challenges if c.id not in verified_ids]
     random_challenge = random.choice(to_process)
-    await attempt(random_challenge, with_solution=False, verbose=True, run_remote=True)
+    await attempt(random_challenge, verbose=True, run_remote=True)
 
     # so, rec, su, rel = await get_previous_tries(random_challenge)
     # print("Previous Solution:", so.metadata if so else "None")
