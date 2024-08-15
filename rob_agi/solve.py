@@ -61,7 +61,7 @@ with_solution = task_set == "train"
 remote_pip_deps = [
     "pydantic==2.8.2",
     "substrate",
-    "git+https://github.com/SubstrateLabs/rob-agi.git@d0e2896",
+    "git+https://github.com/SubstrateLabs/rob-agi.git@673d3e5",
     "numpy",
 ]
 
