@@ -362,8 +362,8 @@ def score_output(py_out: RunPythonOut, challenge: GridProblem):
                         if cell == expected[row_idx][col_idx]:
                             score += 1
     except Exception as e:
-        print("Error scoring output", e)
-        traceback.print_exc()
+        print("Error scoring output", e, py_out, challenge, traceback.format_exc())
+        return -1
     return score
 
 
@@ -393,7 +393,7 @@ async def run_py_fn(
         ret = []
         for res in all_res:
             if isinstance(res, Exception):
-                print("Error running python function", res)
+                print("Error running python function:", res)
                 traceback.print_exception(type(res), res, res.__traceback__)
                 ret.append(None)
             else:
