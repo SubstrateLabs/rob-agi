@@ -56,14 +56,14 @@ gpt = "gpt-4o"
 # task_set = "training"
 task_set = "evaluation"
 challenges, solutions = load_task_set(task_set_name=task_set)
-with_solution = task_set == "train"
+with_solution = task_set == "training"
 remote_pip_deps = [
     "pydantic==2.8.2",
     "substrate",
     "git+https://github.com/SubstrateLabs/rob-agi.git@673d3e5",
     "numpy",
 ]
-max_python_tries = 2
+max_python_tries = 4
 
 all_challenges = list(challenges.values())
 random.shuffle(all_challenges)
@@ -853,8 +853,8 @@ async def main():
 
     # distill_research()
 
-    for i in range(2):
-        await solve_loop(max_concurrent=30, to_process=to_process)
+    for i in range(1):
+        await solve_loop(max_concurrent=20, to_process=None)
     # await solve_loop(max_concurrent=4, max_challenges=8)
 
 
