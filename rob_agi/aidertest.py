@@ -7,7 +7,7 @@ fnames = ["greeting.py"]
 model = Model("claude-3-5-sonnet-20240620")
 
 # Create a coder object
-coder: Coder = Coder.create(main_model=model, fnames=fnames)
+coder: Coder = Coder.create(main_model=model, fnames=fnames, auto_commits=False)
 
 # This will execute one instruction on those files and then return
 coder.run("make a script that prints hello world")
