@@ -28,7 +28,6 @@ with open(ignore_template, "r") as tf:
         f.write(f"!data/task_images/{challenge_id}.png\n")
         f.write(f"!rob_agi/attempts/c_{challenge_id}\n")
 
-print(open(adhoc_ignore).read())
 path = project_root / f"rob_agi/attempts/c_{challenge_id}"
 file_entries = {
     "main": path / main_file,
@@ -47,18 +46,19 @@ coder: Coder = Coder.create(
     io=io,
     read_only_fnames=[file_entries["test"]],
     cache_prompts=True,
+    stream=False,
     # max_reflections=3,
     # auto_commits=False, use_git=False
 )
 coder.repo.aider_ignore_file = adhoc_ignore
 # print(coder.repo.aider_ignore_file)
-print(coder.root)
-print(coder.get_all_relative_files())
-print(coder.get_repo_map())
+# print(coder.root)
+# print(coder.get_all_relative_files())
+# print(coder.get_repo_map())
 
 current_result = run_pytest(file_entries["test"])
 success = current_result["success"]
-max_tries = 2
+max_tries = 1
 tries = 0
 
 gp = challenges[challenge_id]
