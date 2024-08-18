@@ -16,9 +16,9 @@ def flip_vertical(grid: List[List[int]]) -> List[List[int]]:
     """Flip the grid vertically."""
     return grid[::-1]
 
-def to_binary(grid: List[List[int]], threshold: int) -> List[List[int]]:
-    """Convert the grid to binary based on a threshold."""
-    return [[1 if cell >= threshold else 0 for cell in row] for row in grid]
+def to_binary(grid: List[List[int]]) -> List[List[int]]:
+    """Convert the grid to binary using a fixed threshold of 5."""
+    return [[1 if cell >= 5 else 0 for cell in row] for row in grid]
 
 def get_edge_cells(grid: List[List[int]]) -> List[List[int]]:
     """Get all cells on the edge of the grid."""
