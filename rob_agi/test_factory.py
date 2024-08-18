@@ -1,5 +1,13 @@
+import json
 import subprocess
 import sys
+from pathlib import Path
+from pprint import pformat
+from typing import Optional
+
+from rob_agi.arc_util import load_task_set
+from rob_agi.computed_result import ComputedResult
+from rob_agi.grid_problem import GridProblem
 
 
 def run_pytest(test_file):
@@ -13,3 +21,88 @@ def run_pytest(test_file):
         }
     except Exception as e:
         return {"success": False, "output": "", "error": str(e), "returncode": -1}
+
+
+def setup_tests(challenge_id: str, task_set: str, path: Path):
+    challenges, solutions = load_task_set(task_set_name=task_set)
+    path.mkdir(parents=True, exist_ok=True)
+
+    gp = challenges[challenge_id]
+    cr = solutions[challenge_id]
+
+    write_test_file(gp, path, cr)
+    write_main_file(gp, path)
+    # write_init_file(path)
+
+
+def write_init_file(path: Path):
+    with open(path / "__init__.py", "w") as f:
+        f.write("")
+
+
+def write_main_file(gp: GridProblem, path: Path):
+    template = f"""
+from rob_agi.colored_grid import ColoredGrid
+
+def solve_{gp.id}(input_grid: ColoredGrid) -> ColoredGrid:
+    pass
+"""
+    with open(path / "main.py", "w") as f:
+        f.write(template)
+
+
+def write_test_file(gp: GridProblem, path: Path, cr: Optional[ComputedResult] = None):
+    examples = gp.examples
+
+    main_import_path = f"rob_agi.attempts.c_{gp.id}.main"
+
+    example_assertions = [
+        f"""
+def test_{gp.id}_example_{i}():
+    input_grid = ColoredGrid(values=
+{json_to_python_string(examples[i].input.values)}
+    )
+    expected = ColoredGrid(values=
+{json_to_python_string(examples[i].output.values)}
+)
+    actual = solve_{gp.id}(input_grid)
+    assert actual == expected
+"""
+        for i, example in enumerate(examples)
+    ]
+    ex_assertion_list = "\n".join(example_assertions)
+
+    test_assertion_list = ""
+    if cr is not None:
+        test_cases = gp.test_cases
+        test_case_solutions = cr.outputs
+        test_case_assertions = [
+            f"""
+def test_{gp.id}_test_case_{i}():
+    input_grid = ColoredGrid(values=
+{json_to_python_string(test_case.values)}
+    )
+    expected = ColoredGrid(values=
+{json_to_python_string(test_case_solutions[i].values)}
+    )
+    actual = solve_{gp.id}(input_grid)
+    assert actual == expected
+"""
+            for i, test_case in enumerate(test_cases)
+        ]
+        test_assertion_list = "\n".join(test_case_assertions)
+    template = f"""
+from rob_agi.colored_grid import ColoredGrid
+from {main_import_path} import solve_{gp.id}
+
+{ex_assertion_list}
+
+{test_assertion_list}
+"""
+    with open(path / "test.py", "w") as f:
+        f.write(template)
+
+
+def json_to_python_string(json_obj):
+    json.dumps(json_obj)
+    return pformat(json_obj, sort_dicts=False)
