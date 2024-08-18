@@ -25,6 +25,7 @@ setup_tests(challenge_id, task_set, path)
 
 model = Model("claude-3-5-sonnet-20240620")
 io = InputOutput(chat_history_file=path / ".aider.chat.history.md")
+print(model)
 coder: Coder = Coder.create(
     main_model=model,
     fnames=files,
@@ -32,6 +33,11 @@ coder: Coder = Coder.create(
     # max_reflections=3,
     # auto_commits=False, use_git=False
 )
+current_file_parent = Path(__file__).parent.parent
+coder.repo.aider_ignore_file = current_file_parent / ".aiderignore"
+# print(coder.repo.aider_ignore_file)
+# print(coder.get_all_relative_files())
+# print(coder.get_repo_map())
 
 current_result = run_pytest(file_entries["test"])
 success = current_result["success"]
