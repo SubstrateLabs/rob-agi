@@ -8,12 +8,21 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     2. Red (2) regions with more than one cell change to Green (3)
     3. Green (3) regions with more than one cell change to Blue (1)
     Single-cell regions and other colors remain unchanged.
+
+    Approach:
+    1. Create a deep copy of the input grid to avoid modifying the original.
+    2. Define the color transformation sequence: Blue -> Red -> Green -> Blue.
+    3. Iterate through the colors in reverse order (Green, Red, Blue) to avoid
+       cascading transformations within a single pass.
+    4. For each color, find all connected regions.
+    5. Transform regions with more than one cell to the next color in the sequence.
+    6. Return the transformed grid.
     """
     output_grid = input_grid.deep_copy()
     
     color_transform = {1: 2, 2: 3, 3: 1}
     
-    for color in [1, 2, 3]:
+    for color in [3, 2, 1]:  # Process in reverse order: Green, Red, Blue
         regions = output_grid.find_connected_regions(color)
         for region in regions:
             if len(region) > 1:
