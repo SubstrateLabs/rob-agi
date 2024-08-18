@@ -5,7 +5,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transform the input grid based on the following rules:
     1. Blue (1) regions that form a single straight line (horizontal, vertical, or diagonal) remain blue.
-    2. Blue (1) regions that do not form a single straight line (including crosses and T-shapes) change to red (2).
+    2. Blue (1) regions that do not form a single straight line (including crosses, T-shapes, and L-shapes) change to red (2).
     3. All other colors remain unchanged.
 
     Approach:
@@ -14,7 +14,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     3. For each blue region:
        a. Check if the entire region forms a single straight line (horizontal, vertical, or diagonal).
        b. If it does, keep it Blue (1).
-       c. If it doesn't (including crosses and T-shapes), change all cells in the region to Red (2).
+       c. If it doesn't (including crosses, T-shapes, and L-shapes), change all cells in the region to Red (2).
     4. Return the transformed grid.
     """
     output_grid = input_grid.deep_copy()
@@ -54,7 +54,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     
         is_diagonal = len(set(r_diffs)) == 1 and len(set(c_diffs)) == 1 and all(abs(diff) == 1 for diff in r_diffs)
     
-        return is_diagonal
+        return is_diagonal and len(line) == max(abs(max(r_coords) - min(r_coords)), abs(max(c_coords) - min(c_coords))) + 1
 
     def process_region(region: List[Tuple[int, int]]) -> None:
         if not is_straight_line(region):
