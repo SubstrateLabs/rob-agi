@@ -16,7 +16,8 @@ def run_pytest(test_file):
         return {
             "success": result.returncode == 0,
             "output": result.stdout,
-            "error": result.stderr,
+            "error": None,
+            # "error": result.stderr,
             "returncode": result.returncode,
         }
     except Exception as e:
