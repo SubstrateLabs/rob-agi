@@ -12,20 +12,27 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     Approach:
     1. Create a deep copy of the input grid to avoid modifying the original.
     2. Define the color transformation sequence: Blue -> Red -> Green -> Blue.
-    3. Find connected regions for each color (1, 2, 3).
-    4. Transform regions with more than one cell according to the rules.
-    5. Return the transformed grid.
+    3. Iterate multiple times to handle cascading effects.
+    4. In each iteration, process all colors (1, 2, 3) in order.
+    5. Find connected regions for each color and transform them if needed.
+    6. Continue iterations until no more changes occur.
+    7. Return the transformed grid.
     """
     output_grid = input_grid.deep_copy()
-    
     color_transform = {1: 2, 2: 3, 3: 1}
+    colors = [1, 2, 3]
     
-    for color in [1, 2, 3]:
-        regions = output_grid.find_connected_regions(color)
-        for region in regions:
-            if len(region) > 1:
-                new_color = color_transform[color]
-                for r, c in region:
-                    output_grid.values[r][c] = new_color
+    changes_made = True
+    while changes_made:
+        changes_made = False
+        for color in colors:
+            regions = output_grid.find_connected_regions(color)
+            for region in regions:
+                if len(region) > 1:
+                    new_color = color_transform[color]
+                    for r, c in region:
+                        if output_grid.values[r][c] != new_color:
+                            output_grid.values[r][c] = new_color
+                            changes_made = True
     
     return output_grid
