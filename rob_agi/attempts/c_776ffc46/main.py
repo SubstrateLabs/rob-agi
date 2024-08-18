@@ -4,10 +4,9 @@ from typing import List, Tuple
 def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transform the input grid based on the following rules:
-    1. Blue (1) regions change to Red (2) if they are not a single straight line (horizontal, vertical, or diagonal)
-    2. Blue (1) regions that form a single straight line remain Blue
-    3. Red (2) regions remain unchanged
-    4. All other colors remain unchanged
+    1. Blue (1) regions that form a single straight line (horizontal, vertical, or diagonal) remain blue.
+    2. Blue (1) regions that do not form a single straight line (including crosses and T-shapes) change to red (2).
+    3. All other colors remain unchanged.
 
     Approach:
     1. Create a deep copy of the input grid to avoid modifying the original.
@@ -17,10 +16,6 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
        b. If it does, keep it Blue (1).
        c. If it doesn't (including crosses and T-shapes), change all cells in the region to Red (2).
     4. Return the transformed grid.
-
-    This implementation ensures that only blue regions that form a single
-    straight line (horizontal, vertical, or diagonal) remain blue, while all other
-    blue regions (including crosses and T-shapes) are changed to red.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -59,11 +54,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     
         is_diagonal = len(set(r_diffs)) == 1 and len(set(c_diffs)) == 1 and all(abs(diff) == 1 for diff in r_diffs)
     
-        # Check for T-shapes and crosses
-        unique_rows = len(set(r_coords))
-        unique_cols = len(set(c_coords))
-    
-        return is_diagonal and unique_rows == unique_cols == len(line)
+        return is_diagonal
 
     def process_region(region: List[Tuple[int, int]]) -> None:
         if not is_straight_line(region):
