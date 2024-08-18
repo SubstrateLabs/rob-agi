@@ -34,7 +34,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
             if (curr_r, curr_c) not in visited and output_grid.values[curr_r][curr_c] == 1:  # Blue
                 visited.add((curr_r, curr_c))
                 region.append((curr_r, curr_c))
-                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]:
+                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                     new_r, new_c = curr_r + dr, curr_c + dc
                     if 0 <= new_r < rows and 0 <= new_c < cols:
                         stack.append((new_r, new_c))
@@ -49,18 +49,18 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         is_horizontal = len(set(r_coords)) == 1
         is_vertical = len(set(c_coords)) == 1
         
-        diffs = [r - c for r, c in line]
-        sums = [r + c for r, c in line]
-        is_diagonal_1 = len(set(diffs)) == 1
-        is_diagonal_2 = len(set(sums)) == 1
+        if is_horizontal or is_vertical:
+            return True
         
-        return is_horizontal or is_vertical or is_diagonal_1 or is_diagonal_2
+        # Check if it's a diagonal line
+        sorted_line = sorted(line)
+        diffs = [sorted_line[i+1][0] - sorted_line[i][0] for i in range(len(sorted_line)-1)]
+        return len(set(diffs)) == 1 and all(abs(diff) == 1 for diff in diffs)
 
     def process_region(region: List[Tuple[int, int]]) -> None:
-        if len(region) <= 2 or is_straight_line(region):
-            return  # Keep the region blue if it's a single straight line
-        for cell_r, cell_c in region:
-            output_grid.set_cell(cell_r, cell_c, 2)  # Change to Red
+        if not is_straight_line(region):
+            for cell_r, cell_c in region:
+                output_grid.set_cell(cell_r, cell_c, 2)  # Change to Red
 
     for r in range(rows):
         for c in range(cols):
