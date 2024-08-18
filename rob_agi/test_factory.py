@@ -95,6 +95,7 @@ def test_{gp.id}_test_case_{i}():
         ]
         test_assertion_list = "\n".join(test_case_assertions)
     template = f"""
+import pytest
 from rob_agi.colored_grid import ColoredGrid
 from {main_import_path} import solve_{gp.id}
 

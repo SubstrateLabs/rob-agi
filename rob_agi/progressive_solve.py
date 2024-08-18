@@ -8,7 +8,7 @@ from rob_agi.arc_util import load_task_set
 from rob_agi.solver_functions import problem_setup
 from rob_agi.test_factory import run_pytest, setup_tests
 
-challenge_id = "776ffc46"
+challenge_id = "c59eb873"
 
 task_set = "training"
 challenges, solutions = load_task_set(task_set_name=task_set)
