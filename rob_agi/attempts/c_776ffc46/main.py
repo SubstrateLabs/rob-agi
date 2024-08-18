@@ -13,14 +13,14 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     1. Create a deep copy of the input grid to avoid modifying the original.
     2. Find all connected blue regions using depth-first search (DFS).
     3. For each blue region:
-       a. Check if the entire region forms a single straight line.
+       a. Check if the entire region forms a single straight line (horizontal, vertical, or diagonal).
        b. If it does, keep it Blue (1).
-       c. If it doesn't, change all cells in the region to Red (2).
+       c. If it doesn't (including crosses and T-shapes), change all cells in the region to Red (2).
     4. Return the transformed grid.
 
     This implementation ensures that only blue regions that form a single
-    straight line remain blue, while all other blue regions (including crosses
-    and T-shapes) are changed to red.
+    straight line (horizontal, vertical, or diagonal) remain blue, while all other
+    blue regions (including crosses and T-shapes) are changed to red.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -43,19 +43,20 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     def is_straight_line(line: List[Tuple[int, int]]) -> bool:
         if len(line) <= 2:
             return True
-        
+    
         r_coords, c_coords = zip(*line)
-        
+    
         is_horizontal = len(set(r_coords)) == 1
         is_vertical = len(set(c_coords)) == 1
-        
+    
         if is_horizontal or is_vertical:
             return True
-        
+    
         # Check if it's a diagonal line
         sorted_line = sorted(line)
-        diffs = [sorted_line[i+1][0] - sorted_line[i][0] for i in range(len(sorted_line)-1)]
-        return len(set(diffs)) == 1 and all(abs(diff) == 1 for diff in diffs)
+        r_diffs = [sorted_line[i+1][0] - sorted_line[i][0] for i in range(len(sorted_line)-1)]
+        c_diffs = [sorted_line[i+1][1] - sorted_line[i][1] for i in range(len(sorted_line)-1)]
+        return len(set(r_diffs)) == 1 and len(set(c_diffs)) == 1 and all(abs(diff) == 1 for diff in r_diffs)
 
     def process_region(region: List[Tuple[int, int]]) -> None:
         if not is_straight_line(region):
