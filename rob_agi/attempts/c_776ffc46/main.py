@@ -11,6 +11,10 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         for c in range(cols):
             current_color = output_grid.values[r][c]
             if current_color in color_transform:
-                output_grid.values[r][c] = color_transform[current_color]
+                # Only transform colors in connected regions
+                region = output_grid.find_connected_regions(current_color)
+                if region:
+                    for region_r, region_c in region[0]:
+                        output_grid.values[region_r][region_c] = color_transform[current_color]
     
     return output_grid
