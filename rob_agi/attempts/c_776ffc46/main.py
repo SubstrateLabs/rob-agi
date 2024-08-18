@@ -10,6 +10,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     for r in range(rows):
         for c in range(cols):
             current_color = output_grid.values[r][c]
-            output_grid.values[r][c] = color_transform.get(current_color, current_color)
+            if current_color in color_transform:
+                output_grid.values[r][c] = color_transform[current_color]
     
     return output_grid
