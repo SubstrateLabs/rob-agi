@@ -17,6 +17,10 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
        b. If it doesn't, change all cells in the region to Red (2).
        c. If it does form a single straight line, leave it as Blue (1).
     4. Return the transformed grid.
+
+    The key improvement in this version is the modification of the is_straight_line function
+    to correctly identify when a region forms a single straight line, even if it's part of a
+    larger non-linear shape (like a cross or T-shape).
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -54,22 +58,39 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         is_diagonal_2 = len(set(sums)) == 1
         
         if is_horizontal or is_vertical or is_diagonal_1 or is_diagonal_2:
-            # Check for gaps
+            # Check for gaps and ensure it's a single line
             if is_horizontal:
                 return max(c_coords) - min(c_coords) + 1 == len(region)
             elif is_vertical:
                 return max(r_coords) - min(r_coords) + 1 == len(region)
             elif is_diagonal_1 or is_diagonal_2:
-                return max(r_coords) - min(r_coords) + 1 == len(region)
+                return max(r_coords) - min(r_coords) + 1 == len(region) and max(c_coords) - min(c_coords) + 1 == len(region)
         
         return False
+
+    def process_region(region: List[Tuple[int, int]]) -> None:
+        # Check if the entire region forms a single straight line
+        if is_straight_line(region):
+            return  # Keep as Blue
+
+        # If not, check for any straight lines within the region
+        for i in range(len(region)):
+            for j in range(i + 1, len(region)):
+                sub_region = region[i:j+1]
+                if is_straight_line(sub_region):
+                    # Mark cells not in the straight line as Red
+                    for cell_r, cell_c in set(region) - set(sub_region):
+                        output_grid.set_cell(cell_r, cell_c, 2)  # Change to Red
+                    return
+
+        # If no straight lines found, change all cells to Red
+        for cell_r, cell_c in region:
+            output_grid.set_cell(cell_r, cell_c, 2)  # Change to Red
 
     for r in range(rows):
         for c in range(cols):
             if (r, c) not in visited and output_grid.values[r][c] == 1:  # Blue
                 region = dfs(r, c)
-                if not is_straight_line(region):
-                    for cell_r, cell_c in region:
-                        output_grid.set_cell(cell_r, cell_c, 2)  # Change to Red
+                process_region(region)
 
     return output_grid
