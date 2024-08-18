@@ -14,12 +14,12 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     2. Iterate through the grid to find connected regions of Blue (1) color.
     3. For each Blue region:
        a. Check if it forms a single straight line (horizontal, vertical, or diagonal).
-       b. If it doesn't (e.g., forms a cross, T-shape, or any non-linear shape), change all cells in the region to Red (2).
+       b. If it doesn't, change all cells in the region to Red (2).
        c. If it does form a single straight line, leave it as Blue (1).
     4. Return the transformed grid.
 
-    Note: This implementation considers a region as a straight line only if all its cells are in a single row, column, or diagonal.
-    Any shape that branches out (like a cross or T-shape) is not considered a straight line and will be changed to red.
+    Note: A region is considered a straight line if all its cells are in a single row, column, or diagonal,
+    and there are no gaps between the cells.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -43,17 +43,21 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         if len(region) < 2:
             return True
         
+        region.sort()  # Sort the region to ensure cells are in order
         r_coords = [r for r, _ in region]
         c_coords = [c for _, c in region]
         
         # Check if all points are on the same row, column, or diagonal
-        is_horizontal = len(set(r_coords)) == 1
-        is_vertical = len(set(c_coords)) == 1
-        is_diagonal_1 = len(set(r - c for r, c in region)) == 1
-        is_diagonal_2 = len(set(r + c for r, c in region)) == 1
+        is_horizontal = len(set(r_coords)) == 1 and max(c_coords) - min(c_coords) + 1 == len(region)
+        is_vertical = len(set(c_coords)) == 1 and max(r_coords) - min(r_coords) + 1 == len(region)
         
-        # Check if the region forms only one line
-        return sum([is_horizontal, is_vertical, is_diagonal_1, is_diagonal_2]) == 1
+        # Check diagonals
+        diffs = [r - c for r, c in region]
+        sums = [r + c for r, c in region]
+        is_diagonal_1 = len(set(diffs)) == 1 and max(r_coords) - min(r_coords) + 1 == len(region)
+        is_diagonal_2 = len(set(sums)) == 1 and max(r_coords) - min(r_coords) + 1 == len(region)
+        
+        return is_horizontal or is_vertical or is_diagonal_1 or is_diagonal_2
 
     for r in range(rows):
         for c in range(cols):
