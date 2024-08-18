@@ -27,10 +27,11 @@ current_result = run_pytest(file_entries["test"])
 success = current_result["success"]
 max_tries = 3
 try_count = 0
-print(current_result)
+
 gp = challenges[challenge_id]
 goal = problem_setup(gp)
 
+print(current_result)
 while not success and try_count < max_tries:
     print(f"TRY {try_count}")
     failure = current_result["error"]
