@@ -11,15 +11,12 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
 
     Approach:
     1. Create a deep copy of the input grid to avoid modifying the original.
-    2. Iterate through the grid to find connected regions of Blue (1) color.
-    3. For each Blue region:
+    2. Find all connected blue regions using depth-first search (DFS).
+    3. For each blue region:
        a. Check if it forms a single straight line (horizontal, vertical, or diagonal).
        b. If it doesn't, change all cells in the region to Red (2).
        c. If it does form a single straight line, leave it as Blue (1).
     4. Return the transformed grid.
-
-    Note: A region is considered a straight line if all its cells are in a single row, column, or diagonal,
-    and there are no gaps between the cells.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -44,8 +41,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
             return True
         
         region.sort()  # Sort the region to ensure cells are in order
-        r_coords = [r for r, _ in region]
-        c_coords = [c for _, c in region]
+        r_coords, c_coords = zip(*region)
         
         # Check if all points are on the same row, column, or diagonal
         is_horizontal = len(set(r_coords)) == 1
@@ -57,7 +53,16 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         is_diagonal_1 = len(set(diffs)) == 1
         is_diagonal_2 = len(set(sums)) == 1
         
-        return is_horizontal or is_vertical or is_diagonal_1 or is_diagonal_2
+        if is_horizontal or is_vertical or is_diagonal_1 or is_diagonal_2:
+            # Check for gaps
+            if is_horizontal:
+                return max(c_coords) - min(c_coords) + 1 == len(region)
+            elif is_vertical:
+                return max(r_coords) - min(r_coords) + 1 == len(region)
+            elif is_diagonal_1 or is_diagonal_2:
+                return max(r_coords) - min(r_coords) + 1 == len(region)
+        
+        return False
 
     for r in range(rows):
         for c in range(cols):
