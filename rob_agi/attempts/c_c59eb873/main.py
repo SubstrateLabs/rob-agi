@@ -3,7 +3,7 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_c59eb873(input_grid: ColoredGrid) -> ColoredGrid:
     input_rows, input_cols = input_grid.get_dimensions()
-    output_rows, output_cols = input_rows * 2, input_cols * 2
+    output_rows, output_cols = input_rows * 2, input_cols * 4
 
     output_values = [[0 for _ in range(output_cols)] for _ in range(output_rows)]
 
