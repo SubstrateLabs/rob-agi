@@ -12,8 +12,8 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     Approach:
     1. Create a deep copy of the input grid to avoid modifying the original.
     2. Define the color transformation sequence: Blue -> Red -> Green -> Blue.
-    3. Iterate through the colors in reverse order (Green, Red, Blue) to avoid
-       cascading transformations within a single pass.
+    3. Iterate through the colors in the correct order (Blue, Red, Green) to
+       ensure proper transformation without cascading effects.
     4. For each color, find all connected regions.
     5. Transform regions with more than one cell to the next color in the sequence.
     6. Return the transformed grid.
@@ -22,7 +22,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     
     color_transform = {1: 2, 2: 3, 3: 1}
     
-    for color in [3, 2, 1]:  # Process in reverse order: Green, Red, Blue
+    for color in [1, 2, 3]:  # Process in correct order: Blue, Red, Green
         regions = output_grid.find_connected_regions(color)
         for region in regions:
             if len(region) > 1:
