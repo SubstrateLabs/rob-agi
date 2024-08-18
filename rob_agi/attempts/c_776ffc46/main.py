@@ -13,7 +13,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     1. Create a deep copy of the input grid to avoid modifying the original.
     2. Define the color transformation sequence: Blue -> Red -> Green -> Blue.
     3. Process all colors in one pass to avoid cascading effects.
-    4. Store regions to be changed in a dictionary, keyed by their new color.
+    4. Store regions to be changed in a dictionary, keyed by their original color.
     5. Apply all changes after identifying all regions to be transformed.
     6. Return the transformed grid.
     """
@@ -26,10 +26,10 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         regions = output_grid.find_connected_regions(color)
         for region in regions:
             if len(region) > 1:
-                new_color = color_transform[color]
-                regions_to_change[new_color].extend(region)
+                regions_to_change[color].extend(region)
     
-    for new_color, cells in regions_to_change.items():
+    for original_color, cells in regions_to_change.items():
+        new_color = color_transform[original_color]
         for r, c in cells:
             output_grid.values[r][c] = new_color
     
