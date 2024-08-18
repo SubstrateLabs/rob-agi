@@ -71,9 +71,10 @@ while not success and tries < max_tries:
     if tries == 0:
         prefix = f"{goal}\n\nCurrently the tests are failing. please fix the implementation. the tests never need to be modified."
     else:
-        prefix = "The tests are still failing. Diagnose the issue, thinking step by step about what is wrong and how to fix it, then come up with the correct solution. the tests are written correctly"
+        prefix = "The tests are still failing."
+    prefix += "\nDiagnose the issue. First think step by step about what is wrong and how to fix it, then come up with the correct solution"
     prompt = f"{prefix}\n\nRESULTS:\n\n{current_result['error']}\n{current_result['output']}"
-    prompt += "Document your theory and approach in the docstring.\n"
+    prompt += "Document your thinking and approach in the docstring.\n"
     prompt += f"An image of the challenge is provided at {challenge_id}.png"
     coder.run(prompt)
     tries += 1
