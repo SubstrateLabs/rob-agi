@@ -26,6 +26,6 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
             if len(region) > 1:
                 new_color = color_transform[color]
                 for r, c in region:
-                    output_grid.values[r][c] = new_color
+                    output_grid.set_cell(r, c, new_color)
 
     return output_grid
