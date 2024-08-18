@@ -11,10 +11,13 @@ from rob_agi.computed_result import ComputedResult
 from rob_agi.grid_problem import GridProblem
 
 
-def run_pytest(test_file):
+def run_pytest(test_file: Path):
     try:
         result = subprocess.run(
-            [sys.executable, "-m", "pytest", "-x", "--no-header", test_file], capture_output=True, text=True
+            [sys.executable, "-m", "pytest", "-x", "--no-header", str(test_file.resolve())],
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         return {
             "success": result.returncode == 0,
@@ -57,8 +60,7 @@ def write_main_file(gp: GridProblem, path: Path):
     target_file = path / "main.py"
     if target_file.exists():
         return
-    template = f"""
-from rob_agi.colored_grid import ColoredGrid
+    template = f"""from rob_agi.colored_grid import ColoredGrid
 
 def solve_{gp.id}(input_grid: ColoredGrid) -> ColoredGrid:
     pass
@@ -107,8 +109,7 @@ def test_{gp.id}_test_case_{i}():
             for i, test_case in enumerate(test_cases)
         ]
         test_assertion_list = "\n".join(test_case_assertions)
-    template = f"""
-import pytest
+    template = f"""import pytest
 from rob_agi.colored_grid import ColoredGrid
 from {main_import_path} import solve_{gp.id}
 

@@ -6,14 +6,14 @@ from aider.models import Model
 
 
 from rob_agi.arc_util import load_task_set
-from rob_agi.solver_functions import problem_setup
+from rob_agi.solver_functions import problem_setup_aider
 from rob_agi.test_factory import run_pytest, setup_tests
 
 project_root = Path(__file__).parent.parent
 ignore_template = project_root / ".aiderignore"
 
-challenge_id = "c59eb873"  # easy
-# challenge_id = "776ffc46"  # hard
+# challenge_id = "c59eb873"  # easy
+challenge_id = "776ffc46"  # hard
 
 task_set = "training"
 challenges, solutions = load_task_set(task_set_name=task_set)
@@ -35,31 +35,34 @@ file_entries = {
     "test": path / test_file,
     "image": project_root / f"data/task_images/{challenge_id}.png",
 }
-files = [f for f in file_entries.values()]
 
+editable = [file_entries["main"]]
 setup_tests(challenge_id, task_set, path)
 
 model = Model("claude-3-5-sonnet-20240620")
-io = InputOutput(chat_history_file=path / ".aider.chat.history.md")
+io = InputOutput(chat_history_file=path / ".aider.chat.history.md", llm_history_file=path / ".aider.llm.history.md")
 coder: Coder = Coder.create(
     main_model=model,
-    fnames=files,
+    fnames=editable,
     io=io,
+    read_only_fnames=[file_entries["test"]],
+    cache_prompts=True,
     # max_reflections=3,
     # auto_commits=False, use_git=False
 )
 coder.repo.aider_ignore_file = adhoc_ignore
 # print(coder.repo.aider_ignore_file)
+print(coder.root)
 print(coder.get_all_relative_files())
-# print(coder.get_repo_map())
+print(coder.get_repo_map())
 
 current_result = run_pytest(file_entries["test"])
 success = current_result["success"]
-max_tries = 3
+max_tries = 2
 tries = 0
 
 gp = challenges[challenge_id]
-goal = problem_setup(gp)
+goal = problem_setup_aider(gp)
 
 print(current_result)
 
@@ -70,10 +73,13 @@ while not success and tries < max_tries:
     else:
         prefix = "The tests are still failing. Diagnose the issue, thinking step by step about what is wrong and how to fix it, then come up with the correct solution. the tests are written correctly"
     prompt = f"{prefix}\n\nRESULTS:\n\n{current_result['error']}\n{current_result['output']}"
-    prompt += "Document your theory and approach in the docstring."
-    # coder.run(prompt)
+    prompt += "Document your theory and approach in the docstring.\n"
+    prompt += f"An image of the challenge is provided at {challenge_id}.png"
+    coder.run(prompt)
     tries += 1
 
+# delete the adhoc ignore file:
+adhoc_ignore.unlink(missing_ok=True)
 
 """
 Process should be:

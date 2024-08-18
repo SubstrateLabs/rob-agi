@@ -103,7 +103,12 @@ def grid_setup() -> str:
     from rob_agi.colored_grid import ColoredGrid
 
     return f"""The grids are represented as a list of lists where each inner list represents a row and each element in the row represents a color.
-Number values correspond to colored squares: {ColoredGrid.color_mapping_str}
+Number values correspond to colored squares: 
+
+{ColoredGrid.color_mapping_str}
+
+Black usually has a semantic meaning, like how when we see a picture it is understood as empty space.
+Colors otherwise are just abstract values.
 
 All grids are rectangular and can be between 1x1 and 30x30 in size.
 """
@@ -152,6 +157,31 @@ def solve_{challenge.id}(input_grid: ColoredGrid) -> ColoredGrid:
     )
 
 
+def problem_setup_aider(challenge: GridProblem) -> str:
+    return (
+        arc_intro()
+        + f"""Below is a challenge. 
+
+You are being tasked to solve it.
+
+The challenge involves transforming one colored 2D grid into another.
+You will be given a few examples of the pattern in the form of input output pairs.
+You will also be given one or more test cases which are unsolved (i.e. only the input is provided).
+The goal is first to identify the pattern that applies to all the example pairs. 
+Do not fixate on any one example, but try to find the idea that works for all of them.
+Next we will implement the python function that works for all the examples. Applying this function to each of the inputs should result in the corresponding outputs.
+Once we have found that function, we apply it to the test case(s) to compute the solution(s) to the challenge.
+Think conceptually; there is usually a description of what is happening in terms of basic knowledge, so try to back in to it with visual intuition. Some are simple but others require you to be creative or imaginative.
+
+{grid_setup()}
+
+The unit tests detail this particular challenge.
+
+The python function that needs to be implemented is named `solve_{challenge.id}`
+"""
+    )
+
+
 def attempt_challenge(challenge: GridProblem, reasoning: str) -> str:
     return sb.concat(
         problem_setup(challenge),
@@ -163,6 +193,11 @@ Here is some of your recent reasoning:
         reasoning,
         f"""
 </REASONING>
+
+The ColoredGrid class is already defined in scope. The method signatures are below. 
+<COLORED_GRID_SUMMARY>
+{get_grid_class_overview()}
+</COLORED_GRID_SUMMARY>
 
 numpy is also available for use if you need it.
 
