@@ -19,7 +19,8 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     4. Return the transformed grid.
 
     This implementation ensures that only blue regions that form a single
-    straight line remain blue, while all other blue regions are changed to red.
+    straight line remain blue, while all other blue regions (including crosses
+    and T-shapes) are changed to red.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -56,9 +57,10 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         return is_horizontal or is_vertical or is_diagonal_1 or is_diagonal_2
 
     def process_region(region: List[Tuple[int, int]]) -> None:
-        if not is_straight_line(region):
-            for cell_r, cell_c in region:
-                output_grid.set_cell(cell_r, cell_c, 2)  # Change to Red
+        if len(region) <= 2 or is_straight_line(region):
+            return  # Keep the region blue if it's a single straight line
+        for cell_r, cell_c in region:
+            output_grid.set_cell(cell_r, cell_c, 2)  # Change to Red
 
     for r in range(rows):
         for c in range(cols):
