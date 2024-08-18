@@ -29,7 +29,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
             if (curr_r, curr_c) not in visited and output_grid.values[curr_r][curr_c] == 1:  # Blue
                 visited.add((curr_r, curr_c))
                 region.append((curr_r, curr_c))
-                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]:
                     new_r, new_c = curr_r + dr, curr_c + dc
                     if 0 <= new_r < rows and 0 <= new_c < cols:
                         stack.append((new_r, new_c))
@@ -54,7 +54,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     
         is_diagonal = len(set(r_diffs)) == 1 and len(set(c_diffs)) == 1 and all(abs(diff) == 1 for diff in r_diffs)
     
-        return is_diagonal and len(line) == max(abs(max(r_coords) - min(r_coords)), abs(max(c_coords) - min(c_coords))) + 1
+        return is_diagonal
 
     def process_region(region: List[Tuple[int, int]]) -> None:
         if not is_straight_line(region):
