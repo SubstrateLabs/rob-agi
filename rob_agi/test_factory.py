@@ -41,13 +41,16 @@ def write_init_file(path: Path):
 
 
 def write_main_file(gp: GridProblem, path: Path):
+    target_file = path / "main.py"
+    if target_file.exists():
+        return
     template = f"""
 from rob_agi.colored_grid import ColoredGrid
 
 def solve_{gp.id}(input_grid: ColoredGrid) -> ColoredGrid:
     pass
 """
-    with open(path / "main.py", "w") as f:
+    with open(target_file, "w") as f:
         f.write(template)
 
 
