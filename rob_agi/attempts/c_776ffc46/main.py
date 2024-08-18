@@ -14,8 +14,8 @@ def solve_776ffc46(input: ColoredGrid) -> ColoredGrid:
     def replace_3x3_squares(grid, from_color, to_color):
         output = grid.deep_copy()
         height, width = grid.get_dimensions()
-        for row in range(height):
-            for col in range(width):
+        for row in range(height - 2):
+            for col in range(width - 2):
                 if is_3x3_square(grid, row, col, from_color):
                     for i in range(3):
                         for j in range(3):
