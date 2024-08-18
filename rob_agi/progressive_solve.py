@@ -23,6 +23,8 @@ setup_tests(challenge_id, task_set, path)
 
 model = Model("claude-3-5-sonnet-20240620")
 coder: Coder = Coder.create(main_model=model, fnames=files)  # , auto_commits=False, use_git=False)
+coder.io.chat_history_file = path / ".aider.chat.history.md"
+
 current_result = run_pytest(file_entries["test"])
 success = current_result["success"]
 max_tries = 3
