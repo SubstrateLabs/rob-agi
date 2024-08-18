@@ -10,9 +10,11 @@ def solve_c59eb873(input_grid: ColoredGrid) -> ColoredGrid:
     for i in range(input_rows):
         for j in range(input_cols):
             color = input_grid.values[i][j]
-            output_values[2 * i][2 * j] = color
-            output_values[2 * i][2 * j + 1] = color
-            output_values[2 * i + 1][2 * j] = color
-            output_values[2 * i + 1][2 * j + 1] = color
+            output_values[2 * i][3 * j] = color
+            output_values[2 * i][3 * j + 1] = color
+            output_values[2 * i][3 * j + 2] = color
+            output_values[2 * i + 1][3 * j] = color
+            output_values[2 * i + 1][3 * j + 1] = color
+            output_values[2 * i + 1][3 * j + 2] = color
 
     return ColoredGrid(values=output_values)
