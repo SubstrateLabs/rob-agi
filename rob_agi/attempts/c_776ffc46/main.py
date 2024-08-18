@@ -3,10 +3,15 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     output_grid = input_grid.deep_copy()
-    blue_regions = output_grid.find_connected_regions(1)  # Find all blue regions
     
-    for region in blue_regions:
-        for r, c in region:
-            output_grid.values[r][c] = 2  # Change blue (1) to red (2)
+    def change_blue_to_red(grid):
+        rows, cols = grid.get_dimensions()
+        for r in range(rows):
+            for c in range(cols):
+                if grid.values[r][c] == 1:  # If the cell is blue
+                    grid.values[r][c] = 2  # Change it to red
+    
+    # Apply the transformation
+    change_blue_to_red(output_grid)
     
     return output_grid
