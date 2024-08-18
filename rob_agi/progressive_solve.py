@@ -1,4 +1,3 @@
-import sys
 from pathlib import Path
 
 from aider.coders import Coder
@@ -8,9 +7,10 @@ from aider.models import Model
 
 from rob_agi.arc_util import load_task_set
 from rob_agi.solver_functions import problem_setup
-from rob_agi.test_factory import run_pytest, setup_tests
+from rob_agi.test_factory import run_pytest, setup_tests, get_pytest_error
 
-challenge_id = "c59eb873"
+# challenge_id = "c59eb873" # easy
+challenge_id = "776ffc46"  # hard
 
 task_set = "training"
 challenges, solutions = load_task_set(task_set_name=task_set)
@@ -30,23 +30,23 @@ coder: Coder = Coder.create(
     fnames=files,
     io=io,
     # max_reflections=3,
-    auto_test=True,
-    test_cmd=lambda: run_pytest(file_entries["test"])["error"],
     # auto_commits=False, use_git=False
 )
 
 current_result = run_pytest(file_entries["test"])
 success = current_result["success"]
+max_tries = 3
+tries = 0
 
 gp = challenges[challenge_id]
 goal = problem_setup(gp)
 
-# print(current_result)
-if not success:
+print(current_result)
+
+while not success and tries < max_tries:
     prompt = (
         goal
         + "\n\nCurrently the tests are failing. please fix the implementation. the tests never need to be modified."
+        + f"\n\n{current_result['error']}\n{current_result['output']}"
     )
     coder.run(prompt)
-    current_result = run_pytest(files[1])
-    print(current_result)

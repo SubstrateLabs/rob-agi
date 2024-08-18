@@ -1,6 +1,7 @@
 import json
 import subprocess
 import sys
+import traceback
 from pathlib import Path
 from pprint import pformat
 from typing import Optional
@@ -16,12 +17,21 @@ def run_pytest(test_file):
         return {
             "success": result.returncode == 0,
             "output": result.stdout,
-            "error": None,
-            # "error": result.stderr,
+            "error": result.stderr,
             "returncode": result.returncode,
         }
     except Exception as e:
-        return {"success": False, "output": "", "error": str(e), "returncode": -1}
+        trace_str = traceback.format_exc()
+        return {"success": False, "output": "", "error": str(e) + trace_str, "returncode": -1}
+
+
+def get_pytest_error(test_file):
+    result = run_pytest(test_file)
+    if not result["success"]:
+        err = result["error"] or ""
+        out = result["output"] or ""
+        return err + out
+    return result["error"]
 
 
 def setup_tests(challenge_id: str, task_set: str, path: Path):
