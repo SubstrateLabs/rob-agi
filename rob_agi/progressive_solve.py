@@ -9,16 +9,32 @@ from rob_agi.arc_util import load_task_set
 from rob_agi.solver_functions import problem_setup
 from rob_agi.test_factory import run_pytest, setup_tests
 
-# challenge_id = "c59eb873" # easy
-challenge_id = "776ffc46"  # hard
+project_root = Path(__file__).parent.parent
+ignore_template = project_root / ".aiderignore"
+
+challenge_id = "c59eb873"  # easy
+# challenge_id = "776ffc46"  # hard
 
 task_set = "training"
 challenges, solutions = load_task_set(task_set_name=task_set)
 main_file = "main.py"
 test_file = "test.py"
 
-path = Path(f"attempts/c_{challenge_id}")
-file_entries = {"main": path / main_file, "test": path / test_file}
+adhoc_ignore = project_root / ".adhoc-aiderignore"
+with open(ignore_template, "r") as tf:
+    with open(adhoc_ignore, "w") as f:
+        f.write(tf.read())
+        f.write("\n")
+        f.write(f"!data/task_images/{challenge_id}.png\n")
+        f.write(f"!rob_agi/attempts/c_{challenge_id}\n")
+
+print(open(adhoc_ignore).read())
+path = project_root / f"rob_agi/attempts/c_{challenge_id}"
+file_entries = {
+    "main": path / main_file,
+    "test": path / test_file,
+    "image": project_root / f"data/task_images/{challenge_id}.png",
+}
 files = [f for f in file_entries.values()]
 
 setup_tests(challenge_id, task_set, path)
@@ -32,10 +48,9 @@ coder: Coder = Coder.create(
     # max_reflections=3,
     # auto_commits=False, use_git=False
 )
-current_file_parent = Path(__file__).parent.parent
-coder.repo.aider_ignore_file = current_file_parent / ".aiderignore"
+coder.repo.aider_ignore_file = adhoc_ignore
 # print(coder.repo.aider_ignore_file)
-# print(coder.get_all_relative_files())
+print(coder.get_all_relative_files())
 # print(coder.get_repo_map())
 
 current_result = run_pytest(file_entries["test"])
@@ -55,5 +70,19 @@ while not success and tries < max_tries:
     else:
         prefix = "The tests are still failing. Diagnose the issue, thinking step by step about what is wrong and how to fix it, then come up with the correct solution. the tests are written correctly"
     prompt = f"{prefix}\n\nRESULTS:\n\n{current_result['error']}\n{current_result['output']}"
-    coder.run(prompt)
+    prompt += "Document your theory and approach in the docstring."
+    # coder.run(prompt)
     tries += 1
+
+
+"""
+Process should be:
+- think about it, make a plan
+- try to implement the plan in code
+- run the tests
+- if the tests fail
+  - diagnose the issue
+  - make a plan to fix it
+  - implement the plan as diff
+  - run the tests
+"""
