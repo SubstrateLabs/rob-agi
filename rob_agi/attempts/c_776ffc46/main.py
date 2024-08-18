@@ -13,14 +13,14 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     1. Create a deep copy of the input grid to avoid modifying the original.
     2. Find all connected blue regions using depth-first search (DFS).
     3. For each blue region:
-       a. Check if it forms a single straight line (horizontal, vertical, or diagonal).
-       b. If it doesn't, change all cells in the region to Red (2).
-       c. If it does form a single straight line, leave it as Blue (1).
+       a. Find all straight lines within the region.
+       b. Keep the longest straight line as Blue (1).
+       c. Change all other cells in the region to Red (2).
     4. Return the transformed grid.
 
-    The key improvement in this version is the modification of the is_straight_line function
-    to correctly identify when a region forms a single straight line, even if it's part of a
-    larger non-linear shape (like a cross or T-shape).
+    The key improvement in this version is the ability to handle complex shapes
+    like crosses and T-shapes by identifying the longest straight line within
+    each blue region and only keeping that line blue.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -40,51 +40,36 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
                         stack.append((new_r, new_c))
         return region
 
-    def is_straight_line(region: List[Tuple[int, int]]) -> bool:
-        if len(region) <= 2:
+    def is_straight_line(line: List[Tuple[int, int]]) -> bool:
+        if len(line) <= 2:
             return True
         
-        region.sort()  # Sort the region to ensure cells are in order
-        r_coords, c_coords = zip(*region)
+        r_coords, c_coords = zip(*line)
         
-        # Check if all points are on the same row, column, or diagonal
         is_horizontal = len(set(r_coords)) == 1
         is_vertical = len(set(c_coords)) == 1
         
-        # Check diagonals
-        diffs = [r - c for r, c in region]
-        sums = [r + c for r, c in region]
+        diffs = [r - c for r, c in line]
+        sums = [r + c for r, c in line]
         is_diagonal_1 = len(set(diffs)) == 1
         is_diagonal_2 = len(set(sums)) == 1
         
-        if is_horizontal or is_vertical or is_diagonal_1 or is_diagonal_2:
-            # Check for gaps and ensure it's a single line
-            if is_horizontal:
-                return max(c_coords) - min(c_coords) + 1 == len(region)
-            elif is_vertical:
-                return max(r_coords) - min(r_coords) + 1 == len(region)
-            elif is_diagonal_1 or is_diagonal_2:
-                return max(r_coords) - min(r_coords) + 1 == len(region) and max(c_coords) - min(c_coords) + 1 == len(region)
-        
-        return False
+        return is_horizontal or is_vertical or is_diagonal_1 or is_diagonal_2
 
-    def process_region(region: List[Tuple[int, int]]) -> None:
-        # Check if the entire region forms a single straight line
-        if is_straight_line(region):
-            return  # Keep as Blue
-
-        # If not, check for any straight lines within the region
+    def find_longest_straight_line(region: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
+        longest_line = []
         for i in range(len(region)):
             for j in range(i + 1, len(region)):
-                sub_region = region[i:j+1]
-                if is_straight_line(sub_region):
-                    # Mark cells not in the straight line as Red
-                    for cell_r, cell_c in set(region) - set(sub_region):
-                        output_grid.set_cell(cell_r, cell_c, 2)  # Change to Red
-                    return
+                line = sorted(region[i:j+1])
+                if is_straight_line(line) and len(line) > len(longest_line):
+                    longest_line = line
+        return longest_line
 
-        # If no straight lines found, change all cells to Red
-        for cell_r, cell_c in region:
+    def process_region(region: List[Tuple[int, int]]) -> None:
+        longest_line = find_longest_straight_line(region)
+        
+        # Change all cells to Red (2) except for the longest straight line
+        for cell_r, cell_c in set(region) - set(longest_line):
             output_grid.set_cell(cell_r, cell_c, 2)  # Change to Red
 
     for r in range(rows):
