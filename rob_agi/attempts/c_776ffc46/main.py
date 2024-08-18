@@ -4,8 +4,8 @@ from typing import List, Tuple
 def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transform the input grid based on the following rules:
-    1. Blue (1) regions change to Red (2) if they are not part of a straight line (horizontal, vertical, or diagonal)
-    2. Blue (1) regions that form straight lines remain Blue
+    1. Blue (1) regions change to Red (2) if they are not part of a single straight line (horizontal, vertical, or diagonal)
+    2. Blue (1) regions that form a single straight line remain Blue
     3. Red (2) regions remain unchanged
     4. All other colors remain unchanged
 
@@ -13,10 +13,13 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     1. Create a deep copy of the input grid to avoid modifying the original.
     2. Iterate through the grid to find connected regions of Blue (1) color.
     3. For each Blue region:
-       a. Check if it forms a straight line (horizontal, vertical, or diagonal).
-       b. If it doesn't, change all cells in the region to Red (2).
-       c. If it does, leave it as Blue (1).
+       a. Check if it forms a single straight line (horizontal, vertical, or diagonal).
+       b. If it doesn't (e.g., forms a cross, T-shape, or any non-linear shape), change all cells in the region to Red (2).
+       c. If it does form a single straight line, leave it as Blue (1).
     4. Return the transformed grid.
+
+    Note: This implementation considers a region as a straight line only if all its cells are in a single row, column, or diagonal.
+    Any shape that branches out (like a cross or T-shape) is not considered a straight line and will be changed to red.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -44,10 +47,13 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         c_coords = [c for _, c in region]
         
         # Check if all points are on the same row, column, or diagonal
-        return (len(set(r_coords)) == 1 or  # Horizontal line
-                len(set(c_coords)) == 1 or  # Vertical line
-                len(set(r - c for r, c in region)) == 1 or  # Diagonal (top-left to bottom-right)
-                len(set(r + c for r, c in region)) == 1)  # Diagonal (top-right to bottom-left)
+        is_horizontal = len(set(r_coords)) == 1
+        is_vertical = len(set(c_coords)) == 1
+        is_diagonal_1 = len(set(r - c for r, c in region)) == 1
+        is_diagonal_2 = len(set(r + c for r, c in region)) == 1
+        
+        # Check if the region forms only one line
+        return sum([is_horizontal, is_vertical, is_diagonal_1, is_diagonal_2]) == 1
 
     for r in range(rows):
         for c in range(cols):
