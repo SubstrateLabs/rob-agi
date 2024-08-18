@@ -17,6 +17,7 @@ msolve.py
 rob_agi/solve.py
 rob_agi/grid_problem.py
 rob_agi/progressive_solve.py
+rob_agi/__init__.py
 
 **/*.html
 **/*.md
