@@ -56,7 +56,14 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         sorted_line = sorted(line)
         r_diffs = [sorted_line[i+1][0] - sorted_line[i][0] for i in range(len(sorted_line)-1)]
         c_diffs = [sorted_line[i+1][1] - sorted_line[i][1] for i in range(len(sorted_line)-1)]
-        return len(set(r_diffs)) == 1 and len(set(c_diffs)) == 1 and all(abs(diff) == 1 for diff in r_diffs)
+    
+        is_diagonal = len(set(r_diffs)) == 1 and len(set(c_diffs)) == 1 and all(abs(diff) == 1 for diff in r_diffs)
+    
+        # Check for T-shapes and crosses
+        unique_rows = len(set(r_coords))
+        unique_cols = len(set(c_coords))
+    
+        return is_diagonal and unique_rows == unique_cols == len(line)
 
     def process_region(region: List[Tuple[int, int]]) -> None:
         if not is_straight_line(region):
