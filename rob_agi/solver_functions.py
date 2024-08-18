@@ -164,11 +164,6 @@ Here is some of your recent reasoning:
         f"""
 </REASONING>
 
-The ColoredGrid class is already defined in scope. The method signatures are below. 
-<COLORED_GRID_SUMMARY>
-{get_grid_class_overview()}
-</COLORED_GRID_SUMMARY>
-
 numpy is also available for use if you need it.
 
 Important:

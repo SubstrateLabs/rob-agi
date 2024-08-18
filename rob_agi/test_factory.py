@@ -13,7 +13,9 @@ from rob_agi.grid_problem import GridProblem
 
 def run_pytest(test_file):
     try:
-        result = subprocess.run([sys.executable, "-m", "pytest", test_file], capture_output=True, text=True)
+        result = subprocess.run(
+            [sys.executable, "-m", "pytest", "-x", "--no-header", test_file], capture_output=True, text=True
+        )
         return {
             "success": result.returncode == 0,
             "output": result.stdout,

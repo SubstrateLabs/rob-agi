@@ -7,7 +7,7 @@ from aider.models import Model
 
 from rob_agi.arc_util import load_task_set
 from rob_agi.solver_functions import problem_setup
-from rob_agi.test_factory import run_pytest, setup_tests, get_pytest_error
+from rob_agi.test_factory import run_pytest, setup_tests
 
 # challenge_id = "c59eb873" # easy
 challenge_id = "776ffc46"  # hard
@@ -25,7 +25,6 @@ setup_tests(challenge_id, task_set, path)
 
 model = Model("claude-3-5-sonnet-20240620")
 io = InputOutput(chat_history_file=path / ".aider.chat.history.md")
-print(model)
 coder: Coder = Coder.create(
     main_model=model,
     fnames=files,
@@ -50,9 +49,11 @@ goal = problem_setup(gp)
 print(current_result)
 
 while not success and tries < max_tries:
-    prompt = (
-        goal
-        + "\n\nCurrently the tests are failing. please fix the implementation. the tests never need to be modified."
-        + f"\n\n{current_result['error']}\n{current_result['output']}"
-    )
+    print(f"Try {tries+1}/{max_tries}")
+    if tries == 0:
+        prefix = f"{goal}\n\nCurrently the tests are failing. please fix the implementation. the tests never need to be modified."
+    else:
+        prefix = "The tests are still failing. Diagnose the issue, thinking step by step about what is wrong and how to fix it, then come up with the correct solution. the tests are written correctly"
+    prompt = f"{prefix}\n\nRESULTS:\n\n{current_result['error']}\n{current_result['output']}"
     coder.run(prompt)
+    tries += 1
