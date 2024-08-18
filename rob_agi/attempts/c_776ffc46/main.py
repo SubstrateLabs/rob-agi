@@ -40,7 +40,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         return region
 
     def is_straight_line(region: List[Tuple[int, int]]) -> bool:
-        if len(region) < 2:
+        if len(region) <= 2:
             return True
         
         region.sort()  # Sort the region to ensure cells are in order
@@ -48,14 +48,14 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         c_coords = [c for _, c in region]
         
         # Check if all points are on the same row, column, or diagonal
-        is_horizontal = len(set(r_coords)) == 1 and max(c_coords) - min(c_coords) + 1 == len(region)
-        is_vertical = len(set(c_coords)) == 1 and max(r_coords) - min(r_coords) + 1 == len(region)
+        is_horizontal = len(set(r_coords)) == 1
+        is_vertical = len(set(c_coords)) == 1
         
         # Check diagonals
         diffs = [r - c for r, c in region]
         sums = [r + c for r, c in region]
-        is_diagonal_1 = len(set(diffs)) == 1 and max(r_coords) - min(r_coords) + 1 == len(region)
-        is_diagonal_2 = len(set(sums)) == 1 and max(r_coords) - min(r_coords) + 1 == len(region)
+        is_diagonal_1 = len(set(diffs)) == 1
+        is_diagonal_2 = len(set(sums)) == 1
         
         return is_horizontal or is_vertical or is_diagonal_1 or is_diagonal_2
 
