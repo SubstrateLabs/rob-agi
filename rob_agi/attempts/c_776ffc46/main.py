@@ -1,5 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List, Tuple, Set
 
 def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -10,32 +10,37 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
 
     Approach:
     1. Create a deep copy of the input grid to avoid modifying the original.
-    2. Find all connected blue regions using depth-first search (DFS).
+    2. Find all connected blue regions using flood-fill algorithm.
     3. For each blue region:
        a. Check if the entire region forms a single straight line (horizontal, vertical, or diagonal).
        b. If it does, keep it Blue (1).
        c. If it doesn't (including crosses, T-shapes, and L-shapes), change all cells in the region to Red (2).
     4. Return the transformed grid.
+
+    The implementation has been improved to correctly identify non-straight lines,
+    including crosses, T-shapes, and L-shapes. The flood-fill algorithm ensures
+    all connected cells in a region are captured. Edge cases for single-cell and
+    two-cell regions are handled separately for efficiency.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
     visited = set()
 
-    def dfs(r: int, c: int) -> List[Tuple[int, int]]:
-        region = []
+    def flood_fill(r: int, c: int) -> Set[Tuple[int, int]]:
+        region = set()
         stack = [(r, c)]
         while stack:
             curr_r, curr_c = stack.pop()
             if (curr_r, curr_c) not in visited and output_grid.values[curr_r][curr_c] == 1:  # Blue
                 visited.add((curr_r, curr_c))
-                region.append((curr_r, curr_c))
-                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]:
+                region.add((curr_r, curr_c))
+                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                     new_r, new_c = curr_r + dr, curr_c + dc
                     if 0 <= new_r < rows and 0 <= new_c < cols:
                         stack.append((new_r, new_c))
         return region
 
-    def is_straight_line(line: List[Tuple[int, int]]) -> bool:
+    def is_straight_line(line: Set[Tuple[int, int]]) -> bool:
         if len(line) <= 2:
             return True
     
@@ -56,15 +61,30 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     
         return is_diagonal
 
-    def process_region(region: List[Tuple[int, int]]) -> None:
-        if not is_straight_line(region):
+    def is_single_path(region: Set[Tuple[int, int]]) -> bool:
+        if len(region) <= 2:
+            return True
+
+        # Count neighbors for each cell
+        neighbor_count = {cell: 0 for cell in region}
+        for r, c in region:
+            for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                if (r + dr, c + dc) in region:
+                    neighbor_count[(r, c)] += 1
+
+        # Check if it's a single path
+        end_points = sum(1 for count in neighbor_count.values() if count == 1)
+        return end_points == 2 and all(count <= 2 for count in neighbor_count.values())
+
+    def process_region(region: Set[Tuple[int, int]]) -> None:
+        if not (is_straight_line(region) and is_single_path(region)):
             for cell_r, cell_c in region:
                 output_grid.set_cell(cell_r, cell_c, 2)  # Change to Red
 
     for r in range(rows):
         for c in range(cols):
             if (r, c) not in visited and output_grid.values[r][c] == 1:  # Blue
-                region = dfs(r, c)
+                region = flood_fill(r, c)
                 process_region(region)
 
     return output_grid
