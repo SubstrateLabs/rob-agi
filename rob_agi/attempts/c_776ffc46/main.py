@@ -17,12 +17,11 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
        c. If it doesn't (including crosses, T-shapes, and L-shapes), change all cells in the region to Red (2).
     4. Return the transformed grid.
 
-    Improvements:
-    - Implemented a new is_single_straight_line function to correctly identify all types of straight lines.
-    - Optimized the flood-fill algorithm to use a set for visited cells, improving performance.
-    - Handled edge cases for single-cell and two-cell regions separately for efficiency.
-    - Modified the process_region function to change non-straight blue regions to red.
-    - Fixed the issue where non-straight blue regions were not being changed to red.
+    Implementation details:
+    - The flood_fill function identifies connected blue regions efficiently using a set for visited cells.
+    - The is_single_straight_line function correctly identifies all types of straight lines (horizontal, vertical, and diagonal).
+    - The process_region function changes non-straight blue regions to red.
+    - Edge cases for single-cell and two-cell regions are handled correctly.
 
     This implementation correctly identifies and transforms all blue regions,
     including complex shapes like L-shapes and T-shapes, while keeping true straight
@@ -54,12 +53,8 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         rows = set(p[0] for p in points)
         cols = set(p[1] for p in points)
         
-        # Check if all points are in the same row
-        if len(rows) == 1:
-            return True
-        
-        # Check if all points are in the same column
-        if len(cols) == 1:
+        # Check if all points are in the same row or column
+        if len(rows) == 1 or len(cols) == 1:
             return True
         
         # Check if it's a diagonal line

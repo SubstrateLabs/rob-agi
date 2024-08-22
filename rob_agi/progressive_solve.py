@@ -72,7 +72,7 @@ class Solver:
         return self.get_coder(edit_format="ask", summarize_from_coder=False, fnames=fnames)
 
     def get_modify_coder(self):
-        fnames = [self.file_entries["main"], self.file_entries["image"]]
+        fnames = [self.file_entries["main"], self.file_entries["image"], project_root / "rob_agi/colored_grid.py"]
         read_only_fnames = [self.file_entries["test"]]
         return self.get_coder(fnames=fnames, read_only_fnames=read_only_fnames)
 
@@ -98,7 +98,10 @@ class Solver:
             prefix += "\nDiagnose the issue. First think step by step about what is wrong and how to fix it, then come up with the correct solution"
             prompt = f"{prefix}\n\nRESULTS:\n\n{current_result['error']}\n{current_result['output']}"
             prompt += "Document your thinking and approach in the docstring.\n"
-            prompt += f"An image of the challenge is provided at {self.challenge.id}.png"
+            # prompt += f"An image of the challenge is provided at {self.challenge.id}.png"
+            prompt += (
+                f"colored_grid.py includes a library of functions that may be useful. modify this file if you need."
+            )
             res = modify_coder.run(prompt)
             print("res==================================", res)
             tries += 1
