@@ -29,7 +29,7 @@ file_entries = {
 adhoc_ignore = project_root / ".adhoc-aiderignore"
 
 
-def get_coder():
+def get_coder(ask=True):
     fnames = [file_entries["main"]]
     read_only_fnames = [file_entries["test"]]
     with open(ignore_template, "r") as tf:
@@ -39,6 +39,7 @@ def get_coder():
             f.write(f"!data/task_images/{challenge_id}.png\n")
             f.write(f"!rob_agi/attempts/c_{challenge_id}\n")
     io = InputOutput(chat_history_file=path / ".aider.chat.history.md", llm_history_file=path / ".aider.llm.history.md")
+    kwargs = {"edit_format": "ask", "summarize_from_coder": False} if ask else {}
     coder: Coder = Coder.create(
         main_model=Model("claude-3-5-sonnet-20240620"),
         fnames=fnames,
@@ -46,9 +47,8 @@ def get_coder():
         read_only_fnames=read_only_fnames,
         cache_prompts=True,
         stream=False,
-        summarize_from_coder=False,
-        edit_format="ask",
         auto_commits=False,
+        **kwargs,
         # max_reflections=3,
         # auto_commits=False, use_git=False
     )
@@ -60,33 +60,34 @@ def get_coder():
     return coder
 
 
-coder = get_coder()
-max_tries = 1
-tries = 0
-
-gp = challenges[challenge_id]
-goal = problem_setup_aider(gp)
-
-setup_tests(challenge_id, task_set, path)
-current_result = run_pytest(file_entries["test"])
-success = current_result["success"]
-print(current_result)
-
-while not success and tries < max_tries:
-    print(f"Try {tries+1}/{max_tries}")
-    if tries == 0:
-        prefix = f"{goal}\n\nCurrently the tests are failing. please fix the implementation. the tests never need to be modified."
-    else:
-        prefix = "The tests are still failing."
-    prefix += "\nDiagnose the issue. First think step by step about what is wrong and how to fix it, then come up with the correct solution"
-    prompt = f"{prefix}\n\nRESULTS:\n\n{current_result['error']}\n{current_result['output']}"
-    prompt += "Document your thinking and approach in the docstring.\n"
-    prompt += f"An image of the challenge is provided at {challenge_id}.png"
-    coder.run(prompt)
-    tries += 1
+def run_solve():
+    coder = get_coder()
+    max_tries = 1
+    tries = 0
+    gp = challenges[challenge_id]
+    goal = problem_setup_aider(gp)
+    setup_tests(challenge_id, task_set, path)
     current_result = run_pytest(file_entries["test"])
     success = current_result["success"]
-    print("SUCCESS: ", success)
+    print(current_result)
+
+    while not success and tries < max_tries:
+        print(f"Try {tries+1}/{max_tries}")
+        if tries == 0:
+            prefix = f"{goal}\n\nCurrently the tests are failing. please fix the implementation. the tests never need to be modified."
+        else:
+            prefix = "The tests are still failing."
+        prefix += "\nDiagnose the issue. First think step by step about what is wrong and how to fix it, then come up with the correct solution"
+        prompt = f"{prefix}\n\nRESULTS:\n\n{current_result['error']}\n{current_result['output']}"
+        prompt += "Document your thinking and approach in the docstring.\n"
+        prompt += f"An image of the challenge is provided at {challenge_id}.png"
+        coder.run(prompt)
+        tries += 1
+        current_result = run_pytest(file_entries["test"])
+        success = current_result["success"]
+        print("SUCCESS: ", success)
+
+    teardown_coder()
 
 
 def teardown_coder():
@@ -94,7 +95,8 @@ def teardown_coder():
     adhoc_ignore.unlink(missing_ok=True)
 
 
-teardown_coder()
+if __name__ == "__main__":
+    run_solve()
 
 """
 Process should be:
