@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 
 from aider.coders import Coder
 from aider.io import InputOutput
@@ -6,98 +7,115 @@ from aider.models import Model
 
 
 from rob_agi.arc_util import load_task_set
+from rob_agi.computed_result import ComputedResult
+from rob_agi.grid_problem import GridProblem
 from rob_agi.solver_functions import problem_setup_aider
 from rob_agi.test_factory import run_pytest, setup_tests
 
-# challenge_id = "c59eb873"  # easy
-challenge_id = "776ffc46"  # hard
 
 project_root = Path(__file__).parent.parent
 ignore_template = project_root / ".aiderignore"
 
-task_set = "training"
-challenges, solutions = load_task_set(task_set_name=task_set)
 main_file = "main.py"
 test_file = "test.py"
 
-path = project_root / f"rob_agi/attempts/c_{challenge_id}"
-file_entries = {
-    "main": path / main_file,
-    "test": path / test_file,
-    "image": project_root / f"data/task_images/{challenge_id}.png",
-}
-adhoc_ignore = project_root / ".adhoc-aiderignore"
 
+class Solver:
+    def __init__(self, challenge: GridProblem, solution: Optional[ComputedResult]):
+        self.challenge_id = challenge.id
+        self.challenge = challenge
+        self.solution = solution
+        self.challenge_root = project_root / f"rob_agi/attempts/c_{challenge.id}"
+        self.file_entries = {
+            "main": self.challenge_root / main_file,
+            "test": self.challenge_root / test_file,
+            "image": project_root / f"data/task_images/{challenge.id}.png",
+        }
+        self.adhoc_ignore = project_root / f".adhoc-aiderignore-{challenge.id}"
+        self.goal = problem_setup_aider(challenge)
+        self.setup()
 
-def get_coder(fnames, read_only_fnames, ask=True):
-    with open(ignore_template, "r") as tf:
-        with open(adhoc_ignore, "w") as f:
-            f.write(tf.read())
-            f.write("\n")
-            f.write(f"!data/task_images/{challenge_id}.png\n")
-            f.write(f"!rob_agi/attempts/c_{challenge_id}\n")
-    io = InputOutput(chat_history_file=path / ".aider.chat.history.md", llm_history_file=path / ".aider.llm.history.md")
-    kwargs = {"edit_format": "ask", "summarize_from_coder": False} if ask else {}
-    coder: Coder = Coder.create(
-        main_model=Model("claude-3-5-sonnet-20240620"),
-        fnames=fnames,
-        io=io,
-        read_only_fnames=read_only_fnames,
-        cache_prompts=True,
-        stream=False,
-        auto_commits=False,
-        **kwargs,
-        # max_reflections=3,
-        # auto_commits=False, use_git=False
-    )
-    coder.repo.aider_ignore_file = adhoc_ignore
-    # print(coder.repo.aider_ignore_file)
-    # print(coder.root)
-    # print(coder.get_all_relative_files())
-    # print(coder.get_repo_map())
-    return coder
+    def setup(self):
+        self.challenge_root.mkdir(parents=True, exist_ok=True)
+        with open(ignore_template, "r") as tf:
+            with open(self.adhoc_ignore, "w") as f:
+                f.write(tf.read())
+                f.write("\n")
+                f.write(f"!data/task_images/{self.challenge.id}.png\n")
+                f.write(f"!rob_agi/attempts/c_{self.challenge.id}\n")
+        setup_tests(self.challenge, self.solution, self.challenge_root)
 
+    def get_coder(self, fnames, read_only_fnames, ask=True):
+        io = InputOutput(
+            chat_history_file=self.challenge_root / ".aider.chat.history.md",
+            llm_history_file=self.challenge_root / ".aider.llm.history.md",
+        )
+        kwargs = {"edit_format": "ask", "summarize_from_coder": False} if ask else {}
+        coder: Coder = Coder.create(
+            main_model=Model("claude-3-5-sonnet-20240620"),
+            fnames=fnames,
+            io=io,
+            read_only_fnames=read_only_fnames,
+            cache_prompts=True,
+            stream=False,
+            auto_commits=False,
+            **kwargs,
+            # max_reflections=3,
+            # auto_commits=False, use_git=False
+        )
+        coder.repo.aider_ignore_file = self.adhoc_ignore
+        # print(coder.repo.aider_ignore_file)
+        # print(coder.root)
+        # print(coder.get_all_relative_files())
+        # print(coder.get_repo_map())
+        return coder
 
-def run_solve():
-    max_tries = 1
-    tries = 0
-    gp = challenges[challenge_id]
-    goal = problem_setup_aider(gp)
-    setup_tests(challenge_id, task_set, path)
-    current_result = run_pytest(file_entries["test"])
-    success = current_result["success"]
-    print(current_result)
+    def run_tests(self):
+        result = run_pytest(self.file_entries["test"])
+        print(result)
+        return result
 
-    fnames = [file_entries["main"]]
-    read_only_fnames = [file_entries["test"]]
-    coder = get_coder(fnames, read_only_fnames)
+    def run_solve(self):
+        max_tries = 1
+        tries = 0
+        current_result = self.run_tests()
 
-    while not success and tries < max_tries:
-        print(f"Try {tries+1}/{max_tries}")
-        if tries == 0:
-            prefix = f"{goal}\n\nCurrently the tests are failing. please fix the implementation. the tests never need to be modified."
-        else:
-            prefix = "The tests are still failing."
-        prefix += "\nDiagnose the issue. First think step by step about what is wrong and how to fix it, then come up with the correct solution"
-        prompt = f"{prefix}\n\nRESULTS:\n\n{current_result['error']}\n{current_result['output']}"
-        prompt += "Document your thinking and approach in the docstring.\n"
-        prompt += f"An image of the challenge is provided at {challenge_id}.png"
-        coder.run(prompt)
-        tries += 1
-        current_result = run_pytest(file_entries["test"])
-        success = current_result["success"]
-        print("SUCCESS: ", success)
+        fnames = [self.file_entries["main"]]
+        read_only_fnames = [self.file_entries["test"]]
+        coder = self.get_coder(fnames, read_only_fnames)
 
-    teardown_coder()
+        while not current_result["success"] and tries < max_tries:
+            print(f"Try {tries+1}/{max_tries}")
+            if tries == 0:
+                prefix = f"{self.goal}\n\nCurrently the tests are failing. please fix the implementation. the tests never need to be modified."
+            else:
+                prefix = "The tests are still failing."
+            prefix += "\nDiagnose the issue. First think step by step about what is wrong and how to fix it, then come up with the correct solution"
+            prompt = f"{prefix}\n\nRESULTS:\n\n{current_result['error']}\n{current_result['output']}"
+            prompt += "Document your thinking and approach in the docstring.\n"
+            prompt += f"An image of the challenge is provided at {self.challenge.id}.png"
+            coder.run(prompt)
+            tries += 1
+            current_result = self.run_tests()
+            print("SUCCESS: ", current_result["success"])
 
+    def __del__(self):
+        self.teardown()
 
-def teardown_coder():
-    # delete the adhoc ignore file:
-    adhoc_ignore.unlink(missing_ok=True)
+    def teardown(self):
+        # delete the adhoc ignore file:
+        self.adhoc_ignore.unlink(missing_ok=True)
 
 
 if __name__ == "__main__":
-    run_solve()
+    # challenge_id = "c59eb873"  # easy
+    challenge_id = "776ffc46"  # hard
+    task_set = "training"
+    challenges, solutions = load_task_set(task_set_name=task_set)
+    challenge = challenges[challenge_id]
+    solution = solutions.get(challenge_id)
+    solver = Solver(challenge, solution)
+    solver.run_solve()
 
 """
 Process should be:

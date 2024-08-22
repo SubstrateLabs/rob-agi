@@ -6,7 +6,6 @@ from pathlib import Path
 from pprint import pformat
 from typing import Optional
 
-from rob_agi.arc_util import load_task_set
 from rob_agi.computed_result import ComputedResult
 from rob_agi.grid_problem import GridProblem
 
@@ -39,13 +38,8 @@ def get_pytest_error(test_file):
     return result["error"]
 
 
-def setup_tests(challenge_id: str, task_set: str, path: Path):
-    challenges, solutions = load_task_set(task_set_name=task_set)
+def setup_tests(gp: GridProblem, cr: Optional[ComputedResult], path: Path):
     path.mkdir(parents=True, exist_ok=True)
-
-    gp = challenges[challenge_id]
-    cr = solutions[challenge_id]
-
     write_test_file(gp, path, cr)
     write_main_file(gp, path)
     # write_init_file(path)
