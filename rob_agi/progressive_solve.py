@@ -45,17 +45,14 @@ class Solver:
                 f.write(f"!rob_agi/attempts/c_{self.challenge.id}\n")
         setup_tests(self.challenge, self.solution, self.challenge_root)
 
-    def get_coder(self, fnames, read_only_fnames, ask=True):
+    def get_coder(self, **kwargs):
         io = InputOutput(
             chat_history_file=self.challenge_root / ".aider.chat.history.md",
             llm_history_file=self.challenge_root / ".aider.llm.history.md",
         )
-        kwargs = {"edit_format": "ask", "summarize_from_coder": False} if ask else {}
         coder: Coder = Coder.create(
             main_model=Model("claude-3-5-sonnet-20240620"),
-            fnames=fnames,
             io=io,
-            read_only_fnames=read_only_fnames,
             cache_prompts=True,
             stream=False,
             auto_commits=False,
@@ -70,6 +67,15 @@ class Solver:
         # print(coder.get_repo_map())
         return coder
 
+    def get_ask_coder(self):
+        fnames = [self.file_entries["main"], self.file_entries["test"], self.file_entries["image"]]
+        return self.get_coder(edit_format="ask", summarize_from_coder=False, fnames=fnames)
+
+    def get_modify_coder(self):
+        fnames = [self.file_entries["main"], self.file_entries["image"]]
+        read_only_fnames = [self.file_entries["test"]]
+        return self.get_coder(fnames=fnames, read_only_fnames=read_only_fnames)
+
     def run_tests(self):
         result = run_pytest(self.file_entries["test"])
         print(result)
@@ -80,9 +86,8 @@ class Solver:
         tries = 0
         current_result = self.run_tests()
 
-        fnames = [self.file_entries["main"]]
-        read_only_fnames = [self.file_entries["test"]]
-        coder = self.get_coder(fnames, read_only_fnames)
+        ask_coder = self.get_ask_coder()
+        modify_coder = self.get_modify_coder()
 
         while not current_result["success"] and tries < max_tries:
             print(f"Try {tries+1}/{max_tries}")
@@ -94,7 +99,7 @@ class Solver:
             prompt = f"{prefix}\n\nRESULTS:\n\n{current_result['error']}\n{current_result['output']}"
             prompt += "Document your thinking and approach in the docstring.\n"
             prompt += f"An image of the challenge is provided at {self.challenge.id}.png"
-            coder.run(prompt)
+            ask_coder.run(prompt)
             tries += 1
             current_result = self.run_tests()
             print("SUCCESS: ", current_result["success"])
