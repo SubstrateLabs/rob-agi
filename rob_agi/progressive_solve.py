@@ -9,28 +9,29 @@ from rob_agi.arc_util import load_task_set
 from rob_agi.solver_functions import problem_setup_aider
 from rob_agi.test_factory import run_pytest, setup_tests
 
-project_root = Path(__file__).parent.parent
-ignore_template = project_root / ".aiderignore"
-path = project_root / f"rob_agi/attempts/c_{challenge_id}"
-file_entries = {
-    "main": path / main_file,
-    "test": path / test_file,
-    "image": project_root / f"data/task_images/{challenge_id}.png",
-}
-
 # challenge_id = "c59eb873"  # easy
 challenge_id = "776ffc46"  # hard
+
+project_root = Path(__file__).parent.parent
+ignore_template = project_root / ".aiderignore"
 
 task_set = "training"
 challenges, solutions = load_task_set(task_set_name=task_set)
 main_file = "main.py"
 test_file = "test.py"
 
+path = project_root / f"rob_agi/attempts/c_{challenge_id}"
+file_entries = {
+    "main": path / main_file,
+    "test": path / test_file,
+    "image": project_root / f"data/task_images/{challenge_id}.png",
+}
+adhoc_ignore = project_root / ".adhoc-aiderignore"
+
 
 def get_coder():
     fnames = [file_entries["main"]]
     read_only_fnames = [file_entries["test"]]
-    adhoc_ignore = project_root / ".adhoc-aiderignore"
     with open(ignore_template, "r") as tf:
         with open(adhoc_ignore, "w") as f:
             f.write(tf.read())
@@ -59,6 +60,7 @@ def get_coder():
     return coder
 
 
+coder = get_coder()
 max_tries = 1
 tries = 0
 
@@ -91,6 +93,8 @@ def teardown_coder():
     # delete the adhoc ignore file:
     adhoc_ignore.unlink(missing_ok=True)
 
+
+teardown_coder()
 
 """
 Process should be:
