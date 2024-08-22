@@ -171,7 +171,8 @@ The goal is first to identify the pattern that applies to all the example pairs.
 Do not fixate on any one example, but try to find the idea that works for all of them.
 Next we will implement the python function that works for all the examples. Applying this function to each of the inputs should result in the corresponding outputs.
 Once we have found that function, we apply it to the test case(s) to compute the solution(s) to the challenge.
-Think conceptually; there is usually a description of what is happening in terms of basic knowledge, so try to back in to it with visual intuition. Some are simple but others require you to be creative or imaginative.
+Think conceptually. You can often see the grid as objects or patterns, and solving the challenge is often about understanding the grid spatially, and learning what concept is being applied to the grid. 
+It's not uncommon to flip, rotate, crop, overlay, finish a pattern, translate objects, isolate colors, draw paths, manipulate empty space, or employ some other spatial operation based on high-level reasoning and pattern recognition. 
 
 {grid_setup()}
 

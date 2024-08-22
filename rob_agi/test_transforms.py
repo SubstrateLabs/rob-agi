@@ -78,8 +78,6 @@ def test_find_connected_regions_complex():
             [2, 1, 1, 2, 2, 1],
         ]
     )
-    for row in grid.values:
-        print(row)
 
     regions = grid.find_connected_regions(2)
 
@@ -219,6 +217,37 @@ def test_flood_fill():
     assert filled.values == [[3, 3, 2], [3, 2, 2], [2, 2, 2]]
 
 
+def test_flood_fill_complex():
+    grid = ColoredGrid(
+        values=[
+            [1, 1, 2, 0, 2, 2],
+            [1, 2, 2, 0, 1, 2],
+            [2, 2, 1, 2, 2, 2],
+            [1, 1, 2, 2, 1, 1],
+            [2, 2, 1, 1, 2, 2],
+            [2, 1, 1, 2, 2, 1],
+        ]
+    )
+    filled = grid.flood_fill(0, 0, 3)
+    assert filled.values == [
+        [3, 3, 2, 0, 2, 2],
+        [3, 2, 2, 0, 1, 2],
+        [2, 2, 1, 2, 2, 2],
+        [1, 1, 2, 2, 1, 1],
+        [2, 2, 1, 1, 2, 2],
+        [2, 1, 1, 2, 2, 1],
+    ]
+    filled = grid.flood_fill(3, 0, 4)
+    assert filled.values == [
+        [1, 1, 2, 0, 2, 2],
+        [1, 2, 2, 0, 1, 2],
+        [2, 2, 1, 2, 2, 2],
+        [4, 4, 2, 2, 1, 1],
+        [2, 2, 1, 1, 2, 2],
+        [2, 1, 1, 2, 2, 1],
+    ]
+
+
 def test_detect_rectangles():
     grid = ColoredGrid(values=[[1, 1, 0], [1, 1, 0], [0, 0, 0]])
     rectangles = grid.detect_rectangles()
@@ -299,21 +328,21 @@ def test_apply_cellular_automaton():
         return 1 if sum(neighbors) >= 2 else 0
 
     result = grid.apply_cellular_automaton(rule)
-    
+
     # Check the resulting grid
     assert result.values == [[0, 1, 0], [1, 1, 1], [0, 1, 0]]
-    
+
     # Check individual cell transitions
     assert result.get_cell(0, 0) == 0  # Should become 0 (less than 2 neighbors)
     assert result.get_cell(0, 1) == 1  # Should become 1 (2 neighbors)
     assert result.get_cell(1, 1) == 1  # Should stay 1 (4 neighbors)
-    
+
     # Test with a different rule
     def alternate_rule(neighbors):
         return 1 if sum(neighbors) % 2 == 0 else 0
 
     alternate_result = grid.apply_cellular_automaton(alternate_rule)
-    
+
     # Check the resulting grid for the alternate rule
     expected_alternate = [[0, 0, 0], [0, 1, 0], [0, 0, 0]]
     assert alternate_result.values == expected_alternate

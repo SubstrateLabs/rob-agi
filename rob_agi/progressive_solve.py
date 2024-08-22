@@ -81,8 +81,17 @@ class Solver:
         print(result)
         return result
 
+    def get_plan(self, ask_coder, current_result):
+        prefix = f"{self.goal}\n\nCurrently the tests are failing. please fix the implementation. the tests never need to be modified."
+        prefix += "\nDiagnose the issue:"
+        prompt = f"{prefix}\n\nRESULTS:\n\n{current_result['error']}\n{current_result['output']}\n\n"
+        prompt += "Pay close attention to the error message and exactly how the expected output differs from the actual output."
+        prompt += "These are general abstract problem solving challenges. Remember to think logically and with high standards for coherence. The solutions can sometimes require a compositional approach where you think step by step. Some involve extrapolation. It's best to visualize the problem as a colored grid so that you can see things spatially."
+        res = ask_coder.run(prompt)
+        return res
+
     def run_solve(self):
-        max_tries = 1
+        max_tries = 2
         tries = 0
         current_result = self.run_tests()
 
@@ -91,19 +100,21 @@ class Solver:
 
         while not current_result["success"] and tries < max_tries:
             print(f"Try {tries+1}/{max_tries}")
+            plan = self.get_plan(ask_coder, current_result)
             if tries == 0:
                 prefix = f"{self.goal}\n\nCurrently the tests are failing. please fix the implementation. the tests never need to be modified."
             else:
                 prefix = "The tests are still failing."
-            prefix += "\nDiagnose the issue. First think step by step about what is wrong and how to fix it, then come up with the correct solution"
+            prefix += "\nDiagnose the issue below:"
             prompt = f"{prefix}\n\nRESULTS:\n\n{current_result['error']}\n{current_result['output']}"
-            prompt += "Document your thinking and approach in the docstring.\n"
+            prompt += f"\n\nYour latest thinking is:\n\n{plan}"
+            prompt += "Use that thinking and solve the challenge by fixing the code.\n"
             # prompt += f"An image of the challenge is provided at {self.challenge.id}.png"
             prompt += (
                 f"colored_grid.py includes a library of functions that may be useful. modify this file if you need."
             )
             res = modify_coder.run(prompt)
-            print("res==================================", res)
+            # print(modify_coder.aider_edited_files)
             tries += 1
             current_result = self.run_tests()
             print("SUCCESS: ", current_result["success"])
