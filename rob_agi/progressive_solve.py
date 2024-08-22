@@ -99,7 +99,8 @@ class Solver:
             prompt = f"{prefix}\n\nRESULTS:\n\n{current_result['error']}\n{current_result['output']}"
             prompt += "Document your thinking and approach in the docstring.\n"
             prompt += f"An image of the challenge is provided at {self.challenge.id}.png"
-            ask_coder.run(prompt)
+            res = modify_coder.run(prompt)
+            print("res==================================", res)
             tries += 1
             current_result = self.run_tests()
             print("SUCCESS: ", current_result["success"])
