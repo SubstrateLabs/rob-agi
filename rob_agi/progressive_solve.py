@@ -82,11 +82,13 @@ class Solver:
         return result
 
     def get_plan(self, ask_coder, current_result):
-        prefix = f"{self.goal}\n\nCurrently the tests are failing. please fix the implementation. the tests never need to be modified."
-        prefix += "\nDiagnose the issue:"
+        prefix = f"{self.goal}\n\nCurrently the tests are failing."
         prompt = f"{prefix}\n\nRESULTS:\n\n{current_result['error']}\n{current_result['output']}\n\n"
-        prompt += "Pay close attention to the error message and exactly how the expected output differs from the actual output."
-        prompt += "These are general abstract problem solving challenges. Remember to think logically and with high standards for coherence. The solutions can sometimes require a compositional approach where you think step by step. Some involve extrapolation. It's best to visualize the problem as a colored grid so that you can see things spatially."
+        prompt += "First state your understanding of the challenge, and describe the solution in words. Remember not to over index on a particular example but find the common pattern across all the examples.\n"
+        prompt += "Then reflect on your idea. Notice if there are any other patterns worth noting. Sometimes it is easy to miss the forest for the trees.\n"
+        prompt += "In this case is it meaningful that certain shapes seem to be 'boxed in'?"
+        prompt += "Then, diagnose this particular test failure, relating to the implementation of that solution.\n"
+        prompt += "Finally describe the plan to fix the implementation.\n"
         res = ask_coder.run(prompt)
         return res
 

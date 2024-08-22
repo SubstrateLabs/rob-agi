@@ -107,7 +107,7 @@ Number values correspond to colored squares:
 
 {ColoredGrid.color_mapping_str}
 
-Black usually has a semantic meaning, like how when we see a picture it is understood as empty space.
+Black (0) can usually be understood as empty space.
 Colors otherwise are just abstract values.
 
 All grids are rectangular and can be between 1x1 and 30x30 in size.
@@ -164,19 +164,22 @@ def problem_setup_aider(challenge: GridProblem) -> str:
 
 You are being tasked to solve it.
 
-The challenge involves transforming one colored 2D grid into another.
+The challenge involves transforming one 2D grid into another.
 You will be given a few examples of the pattern in the form of input output pairs.
 You will also be given one or more test cases which are unsolved (i.e. only the input is provided).
 The goal is first to identify the pattern that applies to all the example pairs. 
 Do not fixate on any one example, but try to find the idea that works for all of them.
 Next we will implement the python function that works for all the examples. Applying this function to each of the inputs should result in the corresponding outputs.
 Once we have found that function, we apply it to the test case(s) to compute the solution(s) to the challenge.
-Think conceptually. You can often see the grid as objects or patterns, and solving the challenge is often about understanding the grid spatially, and learning what concept is being applied to the grid. 
+Think conceptually. You can often see objects or patterns in the grid, and solving the challenge is often about understanding the grid spatially, and learning what concept is being applied to the grid. 
+Think closely about how this would appear if you rendered squares. Note that objects can often have semantic meaning.
 It's not uncommon to flip, rotate, crop, overlay, finish a pattern, translate objects, isolate colors, draw paths, manipulate empty space, or employ some other spatial operation based on high-level reasoning and pattern recognition. 
+Sometimes certain features of the image are emphasized by the content.
+These are general abstract problem solving challenges. Remember to think logically and with high standards for coherence. The solutions can sometimes require a compositional approach where you think step by step. Some involve extrapolation. It's best to visualize the problem as a colored grid so that you can see things spatially.
 
 {grid_setup()}
 
-The unit tests detail this particular challenge.
+Pay close attention to the unit tests because they show each example input and output. From those examples you should be able to deduce the rule or pattern that applies to all of them.
 
 The python function that needs to be implemented is named `solve_{challenge.id}`
 """
