@@ -48,29 +48,29 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     def is_single_straight_line(region: Set[Tuple[int, int]]) -> bool:
         if len(region) <= 2:
             return True
-        
+    
         points = list(region)
-        rows = set(p[0] for p in points)
-        cols = set(p[1] for p in points)
-        
+        rows = [p[0] for p in points]
+        cols = [p[1] for p in points]
+    
         # Check if all points are in the same row or column
-        if len(rows) == 1 or len(cols) == 1:
+        if len(set(rows)) == 1 or len(set(cols)) == 1:
             return True
-        
+    
         # Check if it's a diagonal line
-        if len(rows) == len(cols) == len(region):
+        if len(set(rows)) == len(set(cols)) == len(region):
             sorted_points = sorted(points)
             first, last = sorted_points[0], sorted_points[-1]
             dx, dy = last[0] - first[0], last[1] - first[1]
             if abs(dx) == abs(dy):
-                return all((p[0] - first[0]) * dy == (p[1] - first[1]) * dx for p in sorted_points[1:-1])
-        
+                return all((p[0] - first[0]) * dy == (p[1] - first[1]) * dx for p in sorted_points)
+    
         return False
 
     def process_region(region: Set[Tuple[int, int]]) -> None:
         if not is_single_straight_line(region):
             for cell_r, cell_c in region:
-                output_grid.set_cell(cell_r, cell_c, 2)  # Change to Red
+                output_grid.set_cell(cell_r, cell_c, 2)  # Change to Red (2)
 
     for r in range(rows):
         for c in range(cols):
