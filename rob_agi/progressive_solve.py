@@ -29,9 +29,7 @@ file_entries = {
 adhoc_ignore = project_root / ".adhoc-aiderignore"
 
 
-def get_coder(ask=True):
-    fnames = [file_entries["main"]]
-    read_only_fnames = [file_entries["test"]]
+def get_coder(fnames, read_only_fnames, ask=True):
     with open(ignore_template, "r") as tf:
         with open(adhoc_ignore, "w") as f:
             f.write(tf.read())
@@ -61,7 +59,6 @@ def get_coder(ask=True):
 
 
 def run_solve():
-    coder = get_coder()
     max_tries = 1
     tries = 0
     gp = challenges[challenge_id]
@@ -70,6 +67,10 @@ def run_solve():
     current_result = run_pytest(file_entries["test"])
     success = current_result["success"]
     print(current_result)
+
+    fnames = [file_entries["main"]]
+    read_only_fnames = [file_entries["test"]]
+    coder = get_coder(fnames, read_only_fnames)
 
     while not success and tries < max_tries:
         print(f"Try {tries+1}/{max_tries}")
