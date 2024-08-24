@@ -122,23 +122,29 @@ class Solver:
         # prompt += f"colored_grid.py includes a library of functions that may be useful. modify this file if you need."
         return modify_coder.run(prompt)
 
-    def run_solve(self, max_tries=default_max_tries):
+    def run_solve(self, max_tries=default_max_tries, prev_solution=None) -> bool:
         tries = 0
         current_result = self.run_tests()
         is_failing = not current_result["success"]
 
         while is_failing and tries < max_tries:
             print(f"-------------------- ATTEMPT {tries+1}/{max_tries} --------------------------\n")
-            ask_coder = self.get_ask_coder()
-            modify_coder = self.get_modify_coder()
             is_first = True
-            plan = self.get_plan(ask_coder, current_result, is_first=is_first)
+            if prev_solution:
+                plan = prev_solution
+            else:
+                ask_coder = self.get_ask_coder()
+                plan = self.get_plan(ask_coder, current_result, is_first=is_first)
+
+            modify_coder = self.get_modify_coder()
             self.get_edit(modify_coder, current_result, plan, is_first=is_first)
             print("\n~~~~~~~~~EDITED~~~~~~~~~~~\n", modify_coder.aider_edited_files)
             tries += 1
             current_result = self.run_tests()
             is_failing = not current_result["success"]
             print("SUCCESS: ", current_result["success"])
+
+        return current_result["success"]
 
     def __del__(self):
         self.teardown()

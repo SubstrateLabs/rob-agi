@@ -110,7 +110,7 @@ async def get_all_verified():
         model="jina-v2",
         query_strings=["correct response"],
         top_k=1000,
-        include_metadata=False,
+        include_metadata=True,
         include_values=False,
         filters={"py_test": {"$eq": "pass"}},
     )
@@ -831,17 +831,28 @@ async def solve_loop(max_concurrent=1, to_process=None, max_challenges=None):
 
 
 async def main():
+    global attempted, successful, errored_count
     # ensure_db()
     # id = "1f876c06"
     # challenge: GridProblem = challenges[id]
     # random_challenge = challenges["e69241bd"]
-    # verified_so_far = await get_all_verified()
+    verified_so_far = await get_all_verified()
+    for v in verified_so_far:
+        approach = "Approach:\n\n" + "\n".join([" - " + a for a in v.metadata["approach"]])
+        py_fn = v.metadata["python_function"]
+        previous_solution = approach + "\n\nPython Function:\n" + py_fn
+        attempted += 1
+        sln = solutions[challenge.id]
+        s = Solver(challenge=challenge, solution=sln)
+        s.run_solve(max_tries=1, previous_solution=previous_solution)
+        print(f"Solve Rate: {successful} of {attempted} ({successful / attempted:.2%})")
+        print(previous_solution)
     # verified_ids = [v.id for v in verified_so_far]
     # print("Skipping previously solved:", len(verified_ids))
 
     # to_process = [c for c in all_challenges if c.id not in verified_ids]
-    random_challenge = random.choice(all_challenges)
-    await attempt(random_challenge, verbose=True, run_remote=True)
+    # random_challenge = random.choice(all_challenges)
+    # await attempt(random_challenge, verbose=True, run_remote=True)
 
     # so, rec, su, rel = await get_previous_tries(random_challenge)
     # print("Previous Solution:", so.metadata if so else "None")
