@@ -84,7 +84,7 @@ class Solver:
     def get_modify_coder(self):
         fnames = [self.file_entries["main"]]
         read_only_fnames = [self.file_entries["test"], project_root / "rob_agi/colored_grid.py"]
-        return self.get_coder(fnames=fnames, read_only_fnames=read_only_fnames)
+        return self.get_coder(fnames=fnames, read_only_fnames=read_only_fnames, auto_commits=False)
 
     def run_tests(self):
         result = run_pytest(self.file_entries["test"])
