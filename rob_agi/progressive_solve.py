@@ -96,7 +96,7 @@ class Solver:
 
     def get_plan(self, ask_coder, current_result, is_first=False):
         prefix = self.get_prefix(is_first)
-        prompt = f"{prefix}\n\nRESULTS:\n\n{current_result['error']}\n{current_result['output']}\n\n"
+        prompt = f"{prefix}\n\n<VALIDATION_RESULTS>\n{current_result['error']}\n{current_result['output']}</VALIDATION_RESULTS>\n"
         prompt += "Since the current implementation is incorrect, do not pay too much attention to it. Examine all the information and state your understanding of the challenge, and propose a solution to the challenge in words. Any solution must always apply to every case, not just the failing exception here.\n"
         prompt += "Then reflect on your idea. Look very closely and notice if there are any other patterns or discrepancies worth noting. Remember this is about identifying abstract, intuitive ideas about what is happening.\n"
         prompt += f"Explicitly consider how your idea applies to each of the examples and test cases in attempts/{self.challenge_id}/test.py. To check your thinking, illustrate how your idea either works or doesn't for each case.\n"
@@ -110,9 +110,9 @@ class Solver:
 
     def get_edit(self, modify_coder, current_result, plan, is_first=False):
         prefix = self.get_prefix(is_first)
-        prompt = f"{prefix}\n\nRESULTS:\n\n{current_result['error']}\n{current_result['output']}"
-        prompt += f"\n\nYour latest thinking is:\n\n{plan}"
-        prompt += "Use that thinking and solve the challenge by fixing the code. Make sure the docstring includes a summary of the solution in words.\n"
+        prompt = f"{prefix}\n\n<VALIDATION_RESULTS>\n{current_result['error']}\n{current_result['output']}</VALIDATION_RESULTS>\n"
+        prompt += f"\nYour latest thinking is:\n<LATEST_THINKING>\n{plan}\n</LATEST_THINKING>\n"
+        prompt += f"Use that thinking and solve the challenge by fixing the code. Always ensure that the docstring to solve_{self.challenge_id} includes a correct summary of the solution in words.\n"
         # prompt += f"An image of the challenge is provided at {self.challenge.id}.png"
         # prompt += f"colored_grid.py includes a library of functions that may be useful. modify this file if you need."
         res = modify_coder.run(prompt)
