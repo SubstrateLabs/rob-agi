@@ -3,9 +3,12 @@ from rob_agi.colored_grid import ColoredGrid
 def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid based on the following rules:
-    1. 3x3 solid blue squares are changed to green squares.
+    1. 3x3 solid blue squares remain unchanged.
     2. Blue "plus" shapes are changed to red "plus" shapes.
-    3. Any remaining blue squares are changed to green.
+    3. Any other blue squares remain unchanged.
+    
+    The transformations are applied in the order listed above, and each rule is applied
+    to the entire grid before moving to the next rule.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -24,28 +27,23 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
                 grid.values[row][col-1] == 1 and
                 grid.values[row][col+1] == 1)
 
-    # First pass: Transform 3x3 blue squares to green
+    # First pass: Identify 3x3 blue squares (no change needed)
+    blue_squares = set()
     for row in range(rows - 2):
         for col in range(cols - 2):
             if is_3x3_blue_square(output_grid, row, col):
                 for r in range(row, row + 3):
                     for c in range(col, col + 3):
-                        output_grid.values[r][c] = 3  # Green
+                        blue_squares.add((r, c))
 
-    # Second pass: Transform blue "plus" shapes to red
+    # Second pass: Transform blue "plus" shapes to red, but not if part of a 3x3 blue square
     for row in range(1, rows - 1):
         for col in range(1, cols - 1):
-            if is_blue_plus(output_grid, row, col):
+            if is_blue_plus(output_grid, row, col) and (row, col) not in blue_squares:
                 output_grid.values[row][col] = 2  # Red
                 output_grid.values[row-1][col] = 2
                 output_grid.values[row+1][col] = 2
                 output_grid.values[row][col-1] = 2
                 output_grid.values[row][col+1] = 2
-
-    # Third pass: Change remaining blue to green
-    for row in range(rows):
-        for col in range(cols):
-            if output_grid.values[row][col] == 1:
-                output_grid.values[row][col] = 3  # Green
 
     return output_grid

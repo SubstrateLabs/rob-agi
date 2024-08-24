@@ -18,6 +18,7 @@ ignore_template = project_root / ".aiderignore"
 
 main_file = "main.py"
 test_file = "test.py"
+default_max_tries = 1
 
 
 class Solver:
@@ -41,8 +42,8 @@ class Solver:
             with open(self.adhoc_ignore, "w") as f:
                 f.write(tf.read())
                 f.write("\n")
-                f.write(f"data/task_images/{self.challenge.id}.png\n")
                 f.write(f"!rob_agi/attempts/c_{self.challenge.id}\n")
+                f.write(f"rob_agi/attempts/c_{self.challenge.id}/image.png\n")
         setup_tests(self.challenge, self.solution, self.challenge_root)
         try:
             (self.challenge_root / f"image.png").symlink_to(self.file_entries["image"])
@@ -59,12 +60,13 @@ class Solver:
             llm_history_file=self.challenge_root / f".aider.llm.history{ef}.md",
         )
         io.yes = True
+        auto_commits = kwargs.pop("auto_commits", True)
         coder: Coder = Coder.create(
             main_model=Model("claude-3-5-sonnet-20240620"),
             io=io,
             cache_prompts=True,
             stream=False,
-            auto_commits=False,
+            auto_commits=auto_commits,
             **kwargs,
             # max_reflections=3,
             # auto_commits=False, use_git=False
@@ -120,8 +122,7 @@ class Solver:
         # prompt += f"colored_grid.py includes a library of functions that may be useful. modify this file if you need."
         return modify_coder.run(prompt)
 
-    def run_solve(self):
-        max_tries = 1
+    def run_solve(self, max_tries=default_max_tries):
         tries = 0
         current_result = self.run_tests()
         is_failing = not current_result["success"]
@@ -152,9 +153,9 @@ if __name__ == "__main__":
     challenge_id = "776ffc46"  # hard
     task_set = "training"
     challenges, solutions = load_task_set(task_set_name=task_set)
-    challenge = challenges[challenge_id]
-    solution = solutions.get(challenge_id)
-    solver = Solver(challenge, solution)
+    c = challenges[challenge_id]
+    sln = solutions.get(challenge_id)
+    solver = Solver(c, sln)
     solver.run_solve()
 
 """

@@ -37,6 +37,7 @@ from rob_agi.solver_functions import (
     attempt_challenge,
     run_eval,
 )
+from rob_agi.progressive_solve import Solver
 
 api_key = os.environ.get("SUBSTRATE_API_KEY")
 substrate = Substrate(api_key=api_key, timeout=60 * 4, additional_headers={})
@@ -632,7 +633,7 @@ async def log_result(challenge: GridProblem, parsed: SolveAttempt, run_py: Optio
     print(f"Solve Rate: {successful} of {attempted} ({successful / attempted:.2%})")
 
 
-async def attempt(challenge: GridProblem, run_remote=False, verbose=False):
+async def attempt_old(challenge: GridProblem, run_remote=False, verbose=False):
     global attempted, successful, errored_count
     attempted += 1
 
@@ -666,6 +667,15 @@ async def attempt(challenge: GridProblem, run_remote=False, verbose=False):
     )
     extra_meta = {"with_solution": with_solution, "time": int(time.time())}
     await log_result(challenge, parsed, run_py, extra_meta=extra_meta)
+
+
+async def attempt(challenge: GridProblem, run_remote=False, verbose=False):
+    global attempted, successful, errored_count
+    attempted += 1
+    sln = solutions[challenge.id]
+    s = Solver(challenge=challenge, solution=sln)
+    s.run_solve()
+    print(f"Solve Rate: {successful} of {attempted} ({successful / attempted:.2%})")
 
 
 # def save_research(event: ResearchEvent):
@@ -825,13 +835,13 @@ async def main():
     # id = "1f876c06"
     # challenge: GridProblem = challenges[id]
     # random_challenge = challenges["e69241bd"]
-    verified_so_far = await get_all_verified()
-    verified_ids = [v.id for v in verified_so_far]
-    print("Skipping previously solved:", len(verified_ids))
+    # verified_so_far = await get_all_verified()
+    # verified_ids = [v.id for v in verified_so_far]
+    # print("Skipping previously solved:", len(verified_ids))
 
-    to_process = [c for c in all_challenges if c.id not in verified_ids]
-    # random_challenge = random.choice(to_process)
-    # await attempt(random_challenge, verbose=True, run_remote=True)
+    # to_process = [c for c in all_challenges if c.id not in verified_ids]
+    random_challenge = random.choice(all_challenges)
+    await attempt(random_challenge, verbose=True, run_remote=True)
 
     # so, rec, su, rel = await get_previous_tries(random_challenge)
     # print("Previous Solution:", so.metadata if so else "None")
@@ -853,8 +863,8 @@ async def main():
 
     # distill_research()
 
-    for i in range(1):
-        await solve_loop(max_concurrent=20, to_process=None)
+    # for i in range(1):
+    #     await solve_loop(max_concurrent=20, to_process=None)
     # await solve_loop(max_concurrent=4, max_challenges=8)
 
 
