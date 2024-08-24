@@ -180,6 +180,7 @@ These are general abstract problem solving challenges. Remember to think logical
 {grid_setup()}
 
 Pay close attention to the unit tests because they show each example input and output. From those examples you should be able to deduce the rule or pattern that applies to all of them.
+Always always prefer correctness to efficiency. You almost never need to be concerned about algorithmic efficiency here because the grids are small. Break down problems into easier sub problems if you need to. The function should be able to solve all the examples and test cases.
 
 The python function that needs to be implemented is named `solve_{challenge.id}`
 """
