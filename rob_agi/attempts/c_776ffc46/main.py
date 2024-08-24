@@ -16,12 +16,13 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         return all(grid.values[r][c] == 1 for r in range(row, row + 3) for c in range(col, col + 3))
 
     def is_blue_plus(grid, row, col):
-        if grid.values[row][col] != 1:
+        if row == 0 or row == rows - 1 or col == 0 or col == cols - 1:
             return False
-        for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-            if not (0 <= row + dr < rows and 0 <= col + dc < cols) or grid.values[row + dr][col + dc] != 1:
-                return False
-        return True
+        return (grid.values[row][col] == 1 and
+                grid.values[row-1][col] == 1 and
+                grid.values[row+1][col] == 1 and
+                grid.values[row][col-1] == 1 and
+                grid.values[row][col+1] == 1)
 
     # First pass: Transform 3x3 blue squares to green
     for row in range(rows - 2):
@@ -36,8 +37,10 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         for col in range(1, cols - 1):
             if is_blue_plus(output_grid, row, col):
                 output_grid.values[row][col] = 2  # Red
-                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                    output_grid.values[row + dr][col + dc] = 2  # Red
+                output_grid.values[row-1][col] = 2
+                output_grid.values[row+1][col] = 2
+                output_grid.values[row][col-1] = 2
+                output_grid.values[row][col+1] = 2
 
     # Third pass: Change remaining blue to green
     for row in range(rows):
