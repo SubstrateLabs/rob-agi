@@ -93,9 +93,9 @@ class Solver:
 
     def get_prefix(self, is_first):
         if is_first:
-            prefix = f"{self.goal}\n\nCurrently the tests used to validate the solution are failing."
+            prefix = f"{self.goal}\n\nCurrently the tests used to validate the solution are failing. This means that your previous solution is incorrect."
         else:
-            prefix = "The tests used to validate the solution are still failing."
+            prefix = "The tests used to validate the solution are still failing. This means that your previous solution is incorrect."
         return prefix
 
     def get_plan(self, ask_coder, current_result, is_first=False):
@@ -115,6 +115,7 @@ class Solver:
         prompt = f"{prefix}\n\n<VALIDATION_OUTPUT>\n{current_result['error']}\n{current_result['output']}</VALIDATION_OUTPUT>\n"
         prompt += f"\nYour latest thinking is:\n<LATEST_THINKING>\n{plan}\n</LATEST_THINKING>\n"
         prompt += f"Use that latest thinking and solve the challenge by modifying the implementation file. Always ensure that the docstring to solve_{self.challenge_id} includes a correct summary of the solution in words.\n"
+        prompt += "Make sure your code changes are in the SEARCH/REPLACE format."
         # prompt += f"An image of the challenge is provided at {self.challenge.id}.png"
         # prompt += f"colored_grid.py includes a library of functions that may be useful. modify this file if you need."
         return modify_coder.run(prompt)
