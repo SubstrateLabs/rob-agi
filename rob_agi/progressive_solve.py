@@ -132,7 +132,7 @@ class Solver:
             is_first = True
             plan = self.get_plan(ask_coder, current_result, is_first=is_first)
             self.get_edit(modify_coder, current_result, plan, is_first=is_first)
-            # print(modify_coder.aider_edited_files)
+            print("\n~~~~~~~~~EDITED~~~~~~~~~~~\n", modify_coder.aider_edited_files)
             tries += 1
             current_result = self.run_tests()
             is_failing = not current_result["success"]
