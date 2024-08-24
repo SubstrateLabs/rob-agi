@@ -10,6 +10,9 @@ from rob_agi.computed_result import ComputedResult
 from rob_agi.grid_problem import GridProblem
 
 
+to_replace = "============================= test session starts ==============================\ncollecting ..."
+
+
 def run_pytest(test_file: Path):
     try:
         result = subprocess.run(
@@ -19,9 +22,11 @@ def run_pytest(test_file: Path):
             text=True,
             timeout=10,
         )
+        output = result.stdout.replace(to_replace, "")
+
         return {
             "success": result.returncode == 0,
-            "output": result.stdout,
+            "output": output,
             "error": result.stderr,
             "returncode": result.returncode,
         }

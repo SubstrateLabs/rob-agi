@@ -56,6 +56,7 @@ gpt = "gpt-4o"
 
 # task_set = "training"
 task_set = "evaluation"
+
 challenges, solutions = load_task_set(task_set_name=task_set)
 with_solution = task_set == "training"
 remote_pip_deps = [
@@ -830,29 +831,43 @@ async def solve_loop(max_concurrent=1, to_process=None, max_challenges=None):
     report_results(attempted=attempted, successful=successful, errored=errored_count)
 
 
-async def main():
+async def bootstrap_solved():
     global attempted, successful, errored_count
-    # ensure_db()
-    # id = "1f876c06"
-    # challenge: GridProblem = challenges[id]
-    # random_challenge = challenges["e69241bd"]
+    train_challenges, train_solutions = load_task_set(task_set_name="training")
+    eval_challenges, eval_solutions = load_task_set(task_set_name="evaluation")
+    combined_challenges = {**train_challenges, **eval_challenges}
+    combined_solutions = {**train_solutions, **eval_solutions}
     verified_so_far = await get_all_verified()
     for v in verified_so_far:
         approach = "Approach:\n\n" + "\n".join([" - " + a for a in v.metadata["approach"]])
         py_fn = v.metadata["python_function"]
+        c: GridProblem = combined_challenges.get(v.metadata["task_id"])
+        if not c:
+            print("Challenge not found:", v.metadata["task_id"])
+            continue
         previous_solution = approach + "\n\nPython Function:\n" + py_fn
         attempted += 1
-        sln = solutions[challenge.id]
-        s = Solver(challenge=challenge, solution=sln)
-        s.run_solve(max_tries=1, previous_solution=previous_solution)
+        sln = combined_solutions[c.id]
+        s = Solver(challenge=c, solution=sln)
+        succeeded = s.run_solve(max_tries=1, prev_solution=previous_solution)
+        if succeeded:
+            successful += 1
         print(f"Solve Rate: {successful} of {attempted} ({successful / attempted:.2%})")
-        print(previous_solution)
+
+
+async def main():
+    # ensure_db()
+    # id = "1f876c06"
+    # challenge: GridProblem = challenges[id]
+    # random_challenge = challenges["e69241bd"]
     # verified_ids = [v.id for v in verified_so_far]
     # print("Skipping previously solved:", len(verified_ids))
 
     # to_process = [c for c in all_challenges if c.id not in verified_ids]
     # random_challenge = random.choice(all_challenges)
     # await attempt(random_challenge, verbose=True, run_remote=True)
+
+    await bootstrap_solved()
 
     # so, rec, su, rel = await get_previous_tries(random_challenge)
     # print("Previous Solution:", so.metadata if so else "None")
