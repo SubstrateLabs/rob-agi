@@ -41,7 +41,7 @@ class Solver:
             with open(self.adhoc_ignore, "w") as f:
                 f.write(tf.read())
                 f.write("\n")
-                # f.write(f"!data/task_images/{self.challenge.id}.png\n")
+                f.write(f"data/task_images/{self.challenge.id}.png\n")
                 f.write(f"!rob_agi/attempts/c_{self.challenge.id}\n")
         setup_tests(self.challenge, self.solution, self.challenge_root)
         try:
@@ -58,7 +58,7 @@ class Solver:
             chat_history_file=self.challenge_root / f".aider.chat.history{ef}.md",
             llm_history_file=self.challenge_root / f".aider.llm.history{ef}.md",
         )
-        # io.yes = True
+        io.yes = True
         coder: Coder = Coder.create(
             main_model=Model("claude-3-5-sonnet-20240620"),
             io=io,
