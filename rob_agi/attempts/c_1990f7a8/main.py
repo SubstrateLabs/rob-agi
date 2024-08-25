@@ -13,7 +13,8 @@ def solve_1990f7a8(input_grid: ColoredGrid) -> ColoredGrid:
     2. Extract and simplify the pattern from each quadrant
     3. Create a 3x3 representation for each quadrant
     4. Assemble the 3x3 representations into a 7x7 output grid
-    5. Ensure the middle row (row 3) remains black
+    5. Handle the middle column to connect patterns
+    6. Ensure the middle row (row 3) remains black
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed
@@ -40,8 +41,8 @@ def solve_1990f7a8(input_grid: ColoredGrid) -> ColoredGrid:
         for r in range(min_r, max_r + 1):
             for c in range(min_c, max_c + 1):
                 if subgrid.get_cell(r, c) == 2:
-                    pattern_r = (r - min_r) * 3 // (max_r - min_r + 1)
-                    pattern_c = (c - min_c) * 3 // (max_c - min_c + 1)
+                    pattern_r = min(2, (r - min_r) * 3 // (max_r - min_r + 1))
+                    pattern_c = min(2, (c - min_c) * 3 // (max_c - min_c + 1))
                     pattern[pattern_r][pattern_c] = 2
         
         return pattern
@@ -61,6 +62,14 @@ def solve_1990f7a8(input_grid: ColoredGrid) -> ColoredGrid:
         for r in range(3):
             for c in range(3):
                 output_values[start_row + r][start_col + c] = quad[r][c]
+
+    # Handle middle column
+    for r in range(3):
+        if output_values[r][2] == 2 or output_values[r][4] == 2:
+            output_values[r][3] = 2
+    for r in range(4, 7):
+        if output_values[r][2] == 2 or output_values[r][4] == 2:
+            output_values[r][3] = 2
 
     # Ensure middle row is black
     output_values[3] = [0, 0, 0, 0, 0, 0, 0]
