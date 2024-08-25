@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 20x20 grid with mostly black (empty) space. There are several gray (5) squares scattered throughout the grid. In the center, there's a 3x3 sky blue (8) square. The gray squares appear to be randomly placed, with no clear pattern.
+  output: |
+    The 20x20 grid now has red (2) and yellow (4) squares in addition to the original gray and sky blue squares. The red squares seem to spread diagonally down and to the left from the gray squares, while the yellow squares spread diagonally up and to the right. The spread appears to be limited to about 4 squares in each direction. Yellow overwrites red where they intersect. The sky blue square in the center remains unchanged.
+
+example_1:
+  input: |
+    A 17x18 grid with mostly black (empty) space. Gray (5) squares are scattered throughout, with a slightly higher concentration in the upper half. There's a 3x3 sky blue (8) square in the center, similar to the previous example.
+  output: |
+    The 17x18 grid now includes red (2) and yellow (4) squares spreading from the original gray squares. The pattern is similar to the previous example: red spreads diagonally down-left, yellow spreads diagonally up-right, both limited to about 4 squares. Yellow overwrites red at intersections. The sky blue square remains unchanged.
+
+example_2:
+  input: |
+    A 19x16 grid with a similar pattern to the previous examples. Mostly black (empty) space with scattered gray (5) squares. The 3x3 sky blue (8) square is present in the center. The gray squares seem more evenly distributed compared to the previous examples.
+  output: |
+    The 19x16 grid follows the same transformation pattern as the previous examples. Red (2) squares spread diagonally down-left from gray squares, yellow (4) squares spread diagonally up-right. The spread is limited to about 4 squares, and yellow overwrites red at intersections. The sky blue square in the center remains unchanged.
+
+test_case_0:
+  input: |
+    The input for the test case is not provided in the given test file.
+  output: |
+    The output for the test case is not provided in the given test file, as it is meant to be solved based on the pattern observed in the examples.
