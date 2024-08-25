@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid contains several distinct colored regions. In the top-left, there's a magenta (6) rectangular shape, approximately 7x3 in size. Below and to the right of this is a larger gray (5) region, roughly L-shaped and extending to the right side of the grid. In the bottom-left quadrant, there's a sky blue (8) region that's roughly rectangular. To its right is a red (2) region that's also roughly rectangular. In the bottom-left, there's a small green (3) region that's roughly L-shaped. The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The overall structure is similar to the input, but with some key differences. The magenta (6) region in the top-left has been slightly reshaped, becoming more rectangular and losing its rightmost column. The gray (5) region has expanded leftward, filling the space left by the magenta region's contraction. The sky blue (8) region has moved upward and slightly to the left. The red (2) region remains in roughly the same position but has become more rectangular. The green (3) region has expanded slightly to become a perfect rectangle. All regions now have more defined, rectangular shapes with straighter edges.
+
+example_1:
+  input: |
+    The grid contains several distinct colored regions. In the top-left, there's a small green (3) region that's roughly square. To its right and extending downward is an orange (7) region shaped like an inverted L. In the bottom-left quadrant, there's a magenta (6) region that's roughly rectangular. In the bottom-right quadrant, there's a sky blue (8) region that's also roughly rectangular. To its left is a blue (1) region that's rectangular. The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The overall structure is similar to the input, but with some key differences. The green (3) region in the top-left has expanded downward to become a perfect rectangle. The orange (7) region has contracted upward, becoming a perfect rectangle and no longer touching the bottom of the grid. The magenta (6) region has moved slightly to the right and become a perfect rectangle. The sky blue (8) region has expanded slightly leftward. The blue (1) region has moved upward to touch the top of the grid and has become a perfect rectangle. All regions now have more defined, rectangular shapes with straighter edges.
+
+example_2:
+  input: |
+    The grid contains three distinct colored regions. In the top-left quadrant, there's a large green (3) region that's roughly square. In the top-right quadrant, there's a small sky blue (8) region that's roughly L-shaped. In the bottom-center, there's a red (2) region that's roughly T-shaped. The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The overall structure is similar to the input, but with some key differences. The green (3) region in the top-left has contracted slightly on its right side to become a perfect square. The sky blue (8) region has contracted to become a small perfect square in the center-right of the grid. The red (2) region has contracted upward and inward to become a perfect square in the bottom-center of the grid. All regions now have more defined, square shapes with straight edges.
+
+test_case_0:
+  input: |
+    The grid contains several distinct colored regions. In the top-left quadrant, there's a magenta (6) region that's roughly rectangular. Below it is a gray (5) region that's roughly L-shaped and extends to the right side of the grid. In the bottom-left quadrant, there's a sky blue (8) region that's roughly rectangular. To its right is a red (2) region that's also roughly rectangular. In the bottom-left, there's a small green (3) region that's roughly L-shaped. The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    As this is a test case, no output grid is provided. Based on the pattern observed in the examples, we might expect the output to show all regions becoming more defined rectangles or squares, potentially with some regions moving or resizing to accommodate these changes while maintaining their relative positions.
