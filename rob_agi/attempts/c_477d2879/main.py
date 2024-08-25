@@ -3,16 +3,14 @@ from collections import deque
 
 def solve_477d2879(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transform the input grid by simultaneously expanding colors based on their numeric value.
+    Transform the input grid by expanding colors based on their numeric value and influence.
     
     1. Create a deep copy of the input grid.
-    2. Identify all unique non-zero, non-blue colors.
-    3. Initialize a queue with all initial positions of these colors.
-    4. Perform simultaneous breadth-first expansion of colors:
-       - Expand in all eight directions.
-       - Overwrite lower-numbered colors, including blue (1) and black (0).
-       - Higher-numbered colors take precedence when colors meet.
-    5. Fill remaining black cells with the lowest-numbered non-black neighbor.
+    2. For each non-black cell, calculate its color influence:
+       - Expand in all eight directions until blocked by a higher-numbered color or grid boundary.
+       - Higher-numbered colors take precedence and contain lower-numbered colors.
+    3. Update the grid with the calculated color influences.
+    4. Fill remaining black cells with the highest-numbered non-black neighbor.
     
     Returns the transformed ColoredGrid.
     """
@@ -28,31 +26,31 @@ def solve_477d2879(input_grid: ColoredGrid) -> ColoredGrid:
                 if 0 <= nr < rows and 0 <= nc < cols:
                     yield nr, nc
     
-    colors = set(cell for row in input_grid.values for cell in row if cell > 1)
-    queue = deque()
-    enqueued = set()
+    def calculate_color_influence(r, c, color):
+        queue = deque([(r, c)])
+        visited = set([(r, c)])
+        while queue:
+            cr, cc = queue.popleft()
+            for nr, nc in get_neighbors(cr, cc):
+                if (nr, nc) not in visited:
+                    if result.values[nr][nc] > color:
+                        return result.values[nr][nc]
+                    visited.add((nr, nc))
+                    queue.append((nr, nc))
+        return color
     
-    for color in colors:
-        for r in range(rows):
-            for c in range(cols):
-                if input_grid.values[r][c] == color:
-                    queue.append((r, c, color))
-                    enqueued.add((r, c))
+    # Calculate and update color influences
+    for r in range(rows):
+        for c in range(cols):
+            if result.values[r][c] != 0:
+                result.values[r][c] = calculate_color_influence(r, c, result.values[r][c])
     
-    while queue:
-        r, c, color = queue.popleft()
-        for nr, nc in get_neighbors(r, c):
-            if result.values[nr][nc] < color:
-                result.values[nr][nc] = color
-                if (nr, nc) not in enqueued:
-                    queue.append((nr, nc, color))
-                    enqueued.add((nr, nc))
-    
+    # Fill remaining black cells
     for r in range(rows):
         for c in range(cols):
             if result.values[r][c] == 0:
                 neighbor_colors = [result.values[nr][nc] for nr, nc in get_neighbors(r, c) if result.values[nr][nc] != 0]
                 if neighbor_colors:
-                    result.values[r][c] = min(neighbor_colors)
+                    result.values[r][c] = max(neighbor_colors)
     
     return result
