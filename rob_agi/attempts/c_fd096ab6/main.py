@@ -1,5 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 import random
 import math
 
@@ -9,11 +9,16 @@ def solve_fd096ab6(input_grid: ColoredGrid) -> ColoredGrid:
     
     The solution involves the following steps:
     1. Identify all non-blue color clusters in the grid.
-    2. Analyze each cluster's size and shape.
-    3. Determine the ideal hook shape based on cluster size.
-    4. Expand clusters to form hook or L-shapes, prioritizing growth direction.
-    5. Refine shapes to ensure smooth edges and consistent patterns.
-    6. Perform final validation and adjustments for balance and consistency.
+    2. Sort clusters by size in descending order.
+    3. For each cluster:
+       a. Determine the target shape (L or hook) and size based on the original cluster size.
+       b. Expand the cluster towards the target shape and size, prioritizing certain directions.
+       c. Avoid collisions with other non-blue colors during expansion.
+    4. Perform two phases of expansion to ensure proper shape formation.
+    5. Refine shapes by smoothing edges and removing isolated cells.
+    
+    This approach ensures that larger clusters are handled first and that all clusters
+    are expanded into consistent L or hook shapes while maintaining their relative positions.
     
     Args:
     input_grid (ColoredGrid): The initial grid state.
