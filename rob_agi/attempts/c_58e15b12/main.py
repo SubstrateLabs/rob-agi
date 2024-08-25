@@ -2,63 +2,66 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_58e15b12(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by creating diagonal lines from colored squares.
+    Transforms the input grid by creating diamond patterns from colored squares.
     
     The algorithm works as follows:
-    1. Identifies colored squares in the input grid.
-    2. Determines the outer and inner colors based on square positions.
-    3. Generates diagonal lines for the outer color, extending to grid edges or other colored squares.
-    4. Generates diagonal lines for the inner color, stopping at intersections with outer color lines.
-    5. Handles intersections by coloring them magenta (6).
-    6. Preserves the original colored squares from the input.
-    7. Fills the remaining space with black (0).
+    1. Identifies all non-black squares in the input grid.
+    2. For each color group, determines the maximum extent of its diamond pattern.
+    3. Creates diamond patterns for each original colored square, extending to the determined extent.
+    4. Resolves conflicts between overlapping patterns, using magenta (6) for edge intersections.
+    5. Preserves the original colored squares from the input.
+    6. Fills the remaining space with black (0).
     
-    Returns a new ColoredGrid with the transformed diagonal line pattern.
+    Returns a new ColoredGrid with the transformed diamond pattern.
     """
     rows, cols = input_grid.get_dimensions()
     output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
     
     def find_colored_squares():
-        sky_squares = []
-        green_squares = []
+        colored_squares = {}
         for r in range(rows):
             for c in range(cols):
-                if input_grid.values[r][c] == 8:
-                    sky_squares.append((r, c))
-                elif input_grid.values[r][c] == 3:
-                    green_squares.append((r, c))
-        return sky_squares, green_squares
+                color = input_grid.values[r][c]
+                if color != 0:
+                    if color not in colored_squares:
+                        colored_squares[color] = []
+                    colored_squares[color].append((r, c))
+        return colored_squares
     
-    def is_outer_color(sky_squares, green_squares):
-        sky_dist = min(min(r, c, rows-1-r, cols-1-c) for r, c in sky_squares)
-        green_dist = min(min(r, c, rows-1-r, cols-1-c) for r, c in green_squares)
-        return 8 if sky_dist < green_dist else 3
+    def calculate_max_extent(squares):
+        if not squares:
+            return 0
+        max_r = max(r for r, _ in squares)
+        min_r = min(r for r, _ in squares)
+        max_c = max(c for _, c in squares)
+        min_c = min(c for _, c in squares)
+        return max(max_r - min_r, max_c - min_c)
     
-    def draw_diagonal_lines(squares, color, is_outer):
-        for r, c in squares:
-            for dr, dc in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
-                nr, nc = r + dr, c + dc
-                while 0 <= nr < rows and 0 <= nc < cols:
+    def manhattan_distance(r1, c1, r2, c2):
+        return abs(r1 - r2) + abs(c1 - c2)
+    
+    def draw_diamond(r, c, color, max_extent):
+        for nr in range(rows):
+            for nc in range(cols):
+                distance = manhattan_distance(r, c, nr, nc)
+                if distance <= max_extent:
                     if output_grid.values[nr][nc] == 0:
                         output_grid.values[nr][nc] = color
                     elif output_grid.values[nr][nc] != color:
-                        if not is_outer:
+                        if distance == max_extent:
                             output_grid.values[nr][nc] = 6  # Intersection
-                        break
-                    if not is_outer and output_grid.values[nr][nc] == 6:
-                        break
-                    nr, nc = nr + dr, nc + dc
     
-    sky_squares, green_squares = find_colored_squares()
-    outer_color = is_outer_color(sky_squares, green_squares)
-    inner_color = 3 if outer_color == 8 else 8
+    colored_squares = find_colored_squares()
+    max_extents = {color: calculate_max_extent(squares) for color, squares in colored_squares.items()}
     
-    draw_diagonal_lines(sky_squares if outer_color == 8 else green_squares, outer_color, True)
-    draw_diagonal_lines(green_squares if outer_color == 8 else sky_squares, inner_color, False)
+    # Draw diamonds for each color
+    for color, squares in colored_squares.items():
+        for r, c in squares:
+            draw_diamond(r, c, color, max_extents[color])
     
     # Preserve original squares
-    for squares in [sky_squares, green_squares]:
+    for color, squares in colored_squares.items():
         for r, c in squares:
-            output_grid.values[r][c] = input_grid.values[r][c]
+            output_grid.values[r][c] = color
     
     return output_grid
