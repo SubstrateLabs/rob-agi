@@ -6,9 +6,9 @@ def solve_d5c634a2(input_grid: ColoredGrid) -> ColoredGrid:
     1. Divides the input grid into 3 horizontal thirds.
     2. For each third:
        - Checks the left half for a horizontal line of 3+ red squares. If found, sets output[third][0] to green (3).
-       - Checks the right half for a horizontal line of 3+ red squares. If found, sets output[third][1] to green (3).
-       - Divides the third into 3 vertical sections and checks each (except the leftmost) for any red squares.
-         If found, sets the corresponding output cell to blue (1).
+       - Checks the right half for a horizontal line of 3+ red squares. If found, sets output[third][2] to green (3).
+       - Checks the middle third vertically for any red squares. If found, sets output[third][3] to blue (1).
+       - Checks the right third vertically for any red squares. If found, sets output[third][5] to blue (1).
     3. All other cells in the output remain black (0).
     """
     input_height, input_width = input_grid.get_dimensions()
@@ -26,18 +26,18 @@ def solve_d5c634a2(input_grid: ColoredGrid) -> ColoredGrid:
 
         # Process right half
         if has_horizontal_line(input_grid, start_row, end_row, mid_col, input_width):
-            output[third][1] = 3
+            output[third][2] = 3
 
-        # Process three vertical sections
-        section_width = -(-input_width // 3)  # Ceiling division
-        for section in range(3):
-            start_col = section * section_width
-            end_col = min((section + 1) * section_width, input_width)
-            
-            # Skip the leftmost section (already processed as left half)
-            if section > 0:
-                if has_any_red(input_grid, start_row, end_row, start_col, end_col):
-                    output[third][section + 1] = 1
+        # Process middle third vertically
+        middle_start = input_width // 3
+        middle_end = 2 * input_width // 3
+        if has_any_red(input_grid, start_row, end_row, middle_start, middle_end):
+            output[third][3] = 1
+
+        # Process right third vertically
+        right_start = 2 * input_width // 3
+        if has_any_red(input_grid, start_row, end_row, right_start, input_width):
+            output[third][5] = 1
 
     return ColoredGrid(values=output)
 
