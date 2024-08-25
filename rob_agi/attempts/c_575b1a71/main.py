@@ -5,38 +5,55 @@ from typing import List, Tuple
 def solve_575b1a71(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by replacing black squares with colored squares based on the following rules:
-    1. Identifies connected regions of black squares.
-    2. Assigns colors to regions based on their size and position.
-    3. Ensures all colors (1-4) are present and balanced in the output.
-    4. Maintains consistency by avoiding adjacent same-colored squares where possible.
-    5. Preserves the pattern of vertical alignment for same-colored squares.
+    1. Assigns colors (1-4) to black squares in a left-to-right, top-to-bottom order.
+    2. Maintains vertical alignment of colors within columns where possible.
+    3. Avoids adjacent same-colored squares horizontally and vertically.
+    4. Ensures all colors (1-4) are present in the output.
+    5. Attempts to balance the number of squares for each color.
+    6. Prioritizes vertical alignment over perfect color balance.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
-    
-    # Find all black regions
-    black_regions = output_grid.find_connected_regions(0)
-    
-    # Sort regions by column first, then by row
-    black_regions.sort(key=lambda r: (min(c for _, c in r), min(r for r, _ in r)))
-    
-    # Color assignment
+    color_cycle = [1, 2, 3, 4]  # Blue, Red, Green, Yellow
+    column_colors = {}
     color_count = defaultdict(int)
-    color_sequence = [1, 2, 3, 4]  # Blue, Red, Green, Yellow
-    color_index = 0
-    
-    for region in black_regions:
-        color = color_sequence[color_index]
-        for r, c in region:
-            output_grid.values[r][c] = color
-        color_count[color] += len(region)
-        color_index = (color_index + 1) % 4
-    
-    # Ensure all colors are present and balance colors
+
+    # First pass - Assign colors
+    for c in range(cols):
+        for r in range(rows):
+            if output_grid.values[r][c] == 0:
+                if c not in column_colors:
+                    color = color_cycle[len(column_colors) % 4]
+                    column_colors[c] = color
+                else:
+                    color = column_colors[c]
+                
+                # Check for conflicts and resolve
+                while has_same_color_neighbor(output_grid, r, c, color):
+                    color = color_cycle[(color_cycle.index(color) + 1) % 4]
+                
+                output_grid.values[r][c] = color
+                color_count[color] += 1
+                column_colors[c] = color
+
+    # Second pass - Resolve conflicts and ensure all colors are present
     ensure_all_colors_present(output_grid, color_count)
+
+    # Third pass - Balance colors and maintain vertical alignment
     balance_colors(output_grid, color_count)
-    
+    align_vertically(output_grid, column_colors)
+
     return output_grid
+
+def align_vertically(grid: ColoredGrid, column_colors: Dict[int, int]):
+    rows, cols = grid.get_dimensions()
+    for c in range(cols):
+        if c in column_colors:
+            dominant_color = column_colors[c]
+            for r in range(rows):
+                if grid.values[r][c] != 5 and grid.values[r][c] != dominant_color:
+                    if not has_same_color_neighbor(grid, r, c, dominant_color):
+                        grid.values[r][c] = dominant_color
 
 def ensure_all_colors_present(grid: ColoredGrid, color_count: dict):
     for color in range(1, 5):
@@ -69,17 +86,18 @@ def balance_colors(grid: ColoredGrid, color_count: dict):
         for r in range(grid.num_rows):
             for c in range(grid.num_cols):
                 if grid.values[r][c] == color_to_reduce and not has_same_color_neighbor(grid, r, c, color_to_increase):
-                    grid.values[r][c] = color_to_increase
-                    color_count[color_to_reduce] -= 1
-                    color_count[color_to_increase] += 1
-                    
-                    if color_count[color_to_reduce] == target:
-                        colors_to_reduce.pop(0)
-                    if color_count[color_to_increase] == target:
-                        colors_to_increase.pop(0)
-                    
-                    if not colors_to_reduce or not colors_to_increase:
-                        return
-                    break
+                    if not (r > 0 and grid.values[r-1][c] != 5 and grid.values[r-1][c] != color_to_reduce):
+                        grid.values[r][c] = color_to_increase
+                        color_count[color_to_reduce] -= 1
+                        color_count[color_to_increase] += 1
+                        
+                        if color_count[color_to_reduce] == target:
+                            colors_to_reduce.pop(0)
+                        if color_count[color_to_increase] == target:
+                            colors_to_increase.pop(0)
+                        
+                        if not colors_to_reduce or not colors_to_increase:
+                            return
+                        break
             if not colors_to_reduce or not colors_to_increase:
                 return
