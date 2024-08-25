@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid contains two distinct shapes. In the top-left, there's a rectangular shape outlined in sky blue (8). It's 7x5 in size, with the interior empty (black). In the bottom-right, there's a larger rectangular shape outlined in yellow (4). It's 7x7 in size, also with an empty interior. Scattered throughout the rest of the grid are several magenta (6) dots and a few green (3) dots, seemingly placed randomly.
+  output: |
+    The output grid retains the two shapes from the input, but with significant changes. The sky blue rectangle in the top-left now has a 3x3 checkerboard pattern inside it, alternating between sky blue (8) and black (0). The yellow rectangle in the bottom-right now has a larger 5x5 checkerboard pattern inside it, alternating between magenta (6) and black (0). All other dots and colors outside these two shapes have been removed, leaving the rest of the grid black (0).
+
+example_1:
+  input: |
+    This grid features three distinct shapes. In the top-left, there's a 5x5 square outlined in red (2), with an empty interior. In the bottom-center, there's a larger 9x4 rectangle outlined in green (3), also with an empty interior. In the top-right quadrant, there's a 5x5 square outlined in sky blue (8), again with an empty interior. The rest of the grid contains several yellow (4) dots scattered seemingly randomly.
+  output: |
+    The output grid maintains the three shapes from the input, but with alterations. The red square in the top-left now has a 3x3 checkerboard pattern inside it, alternating between sky blue (8) and black (0). The green rectangle in the bottom-center now has a 7x2 checkerboard pattern inside it, alternating between yellow (4) and black (0). The sky blue square in the top-right remains outlined but empty inside. All other dots and colors outside these three shapes have been removed, leaving the rest of the grid black (0).
+
+example_2:
+  input: |
+    This grid contains three distinct shapes. In the top-left, there's a 3x3 square outlined in blue (1), with an empty interior. In the center-left, there's a 5x3 rectangle outlined in sky blue (8), with an empty interior. In the top-right corner, there's a single red (2) dot. The grid also contains a few scattered yellow (4) dots.
+  output: |
+    The output grid retains the three shapes from the input, with modifications. The blue square in the top-left now has a single yellow (4) dot in its center. The sky blue rectangle in the center-left now has two sky blue (2) dots placed symmetrically inside it. The single red dot in the top-right corner has been removed. All other dots and colors outside these shapes have been removed, leaving the rest of the grid black (0).
+
+test_case_0:
+  input: |
+    This grid contains two distinct shapes and some scattered dots. In the top-left, there's a 3x3 square outlined in blue (1), with an empty interior. In the center-left, there's a 5x3 rectangle outlined in sky blue (8), with an empty interior. The grid also contains several scattered dots: two red (2) dots, one yellow (4) dot, and one sky blue (8) dot in various locations.
+  output: |
+    The output is not provided for the test case.
