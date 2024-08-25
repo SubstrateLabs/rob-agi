@@ -16,32 +16,21 @@ def solve_c92b942c(input_grid: ColoredGrid) -> ColoredGrid:
     output_rows, output_cols = input_rows * 3, input_cols * 3
     output_grid = ColoredGrid(values=[[0 for _ in range(output_cols)] for _ in range(output_rows)])
 
-    def is_within_pattern(row, col, pattern_start_row, pattern_start_col):
-        return (pattern_start_row <= row < pattern_start_row + input_rows and
-                pattern_start_col <= col < pattern_start_col + input_cols)
-
-    def get_pattern_bounds(row, col):
-        pattern_start_row = (row // input_rows) * input_rows
-        pattern_start_col = (col // input_cols) * input_cols
-        return pattern_start_row, pattern_start_col
-
     # Repeat the input pattern
     for r in range(output_rows):
         for c in range(output_cols):
             output_grid.set_cell(r, c, input_grid.get_cell(r % input_rows, c % input_cols))
 
     # Add blue crosses
-    for r in range(output_rows):
-        for c in range(output_cols):
-            if output_grid.get_cell(r, c) not in [0, 1, 3]:
-                pattern_start_row, pattern_start_col = get_pattern_bounds(r, c)
-                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                    nr, nc = r + dr, c + dc
-                    while (0 <= nr < output_rows and 0 <= nc < output_cols and
-                           is_within_pattern(nr, nc, pattern_start_row, pattern_start_col)):
-                        if output_grid.get_cell(nr, nc) == 0:
-                            output_grid.set_cell(nr, nc, 1)
-                        nr, nc = nr + dr, nc + dc
+    for r in range(input_rows):
+        for c in range(input_cols):
+            if input_grid.get_cell(r, c) not in [0, 1, 3]:
+                for i in range(3):
+                    for j in range(3):
+                        output_r, output_c = r * 3 + i, c * 3 + j
+                        if i == 1 or j == 1:
+                            if output_grid.get_cell(output_r, output_c) == 0:
+                                output_grid.set_cell(output_r, output_c, 1)
 
     # Add green corners
     for r in range(0, output_rows, input_rows):
