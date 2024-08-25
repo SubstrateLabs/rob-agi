@@ -3,20 +3,23 @@ from typing import List, Tuple, Dict, Set
 
 def solve_45737921(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the 45737921 challenge by rotating 180 degrees the colors within each connected region of the grid that contains exactly two colors.
+    Solves the 45737921 challenge by reversing the order of colors within each connected region of the grid that contains exactly two colors.
     
     The solution works as follows:
     1. Create a deep copy of the input grid.
     2. Find all non-black connected regions in the grid.
     3. For each region with exactly two colors:
-       - Rotate the colors in the region 180 degrees.
+       - Separate the cells of each color into two lists.
+       - Sort each list based on row-major order.
+       - Reverse both sorted lists.
+       - Reassign colors to the cells based on the reversed lists.
     4. Return the modified grid.
     """
     output_grid = input_grid.deep_copy()
     regions = find_all_regions(output_grid)
     for region in regions:
         if has_two_colors(output_grid, region):
-            rotate_region_180(output_grid, region)
+            reverse_colors_in_region(output_grid, region)
     return output_grid
 
 def find_all_regions(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
@@ -44,11 +47,18 @@ def has_two_colors(grid: ColoredGrid, region: List[Tuple[int, int]]) -> bool:
     colors = set(grid.get_cell(r, c) for r, c in region)
     return len(colors) == 2
 
-def rotate_region_180(grid: ColoredGrid, region: List[Tuple[int, int]]) -> None:
-    n = len(region)
-    for i in range(n // 2):
-        r1, c1 = region[i]
-        r2, c2 = region[n - 1 - i]
+def reverse_colors_in_region(grid: ColoredGrid, region: List[Tuple[int, int]]) -> None:
+    colors = list(set(grid.get_cell(r, c) for r, c in region))
+    color_lists = [[], []]
+    for r, c in region:
+        color_index = colors.index(grid.get_cell(r, c))
+        color_lists[color_index].append((r, c))
+    
+    for color_list in color_lists:
+        color_list.sort(key=lambda x: (x[0], x[1]))  # Sort by row, then column
+        color_list.reverse()
+    
+    for (r1, c1), (r2, c2) in zip(color_lists[0], color_lists[1]):
         color1 = grid.get_cell(r1, c1)
         color2 = grid.get_cell(r2, c2)
         grid.set_cell(r1, c1, color2)
