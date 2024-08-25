@@ -5,15 +5,14 @@ from queue import PriorityQueue
 def solve_e5790162(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by creating a green path that connects the initial green square
-    to all magenta and sky blue squares, and extends to all four edges of the grid if possible.
+    to all magenta and sky blue squares, and extends to an edge of the grid if efficient.
     The path prioritizes horizontal movement, then vertical. It doesn't overwrite magenta or sky blue squares.
     
     1. Finds the starting green square and all target squares (magenta and sky blue).
-    2. Determines edge priorities based on the location of the initial green square.
-    3. Uses a modified A* algorithm to find paths between targets and to edges, prioritizing horizontal movement.
-    4. Connects all targets with a green path, avoiding overwriting existing colored squares.
-    5. Extends the path to reach all four edges of the grid when possible.
-    6. Optimizes the path by removing unnecessary detours.
+    2. Uses a modified A* algorithm to find paths between targets, prioritizing horizontal movement.
+    3. Connects all targets with a green path, avoiding overwriting existing colored squares.
+    4. Extends the path to reach an edge of the grid if it's efficient to do so.
+    5. Optimizes the path by removing unnecessary detours.
     """
     def find_colored_squares() -> List[Tuple[int, int, int]]:
         return [(r, c, val) for r, row in enumerate(input_grid.values) 
@@ -53,44 +52,56 @@ def solve_e5790162(input_grid: ColoredGrid) -> ColoredGrid:
 
         return []  # No path found
 
-    def get_edge_priorities(start: Tuple[int, int], rows: int, cols: int) -> List[List[Tuple[int, int]]]:
-        left = [(r, 0) for r in range(rows)]
-        right = [(r, cols-1) for r in range(rows)]
-        top = [(0, c) for c in range(cols)]
-        bottom = [(rows-1, c) for c in range(cols)]
-        
-        if start[1] == 0:
-            return [right, bottom, top, left]
-        elif start[1] == cols-1:
-            return [left, bottom, top, right]
-        elif start[0] == 0:
-            return [bottom, left, right, top]
-        else:
-            return [top, left, right, bottom]
-
-    def connect_targets_and_edges(colored_squares: List[Tuple[int, int, int]], grid: List[List[int]]) -> None:
+    def connect_targets(colored_squares: List[Tuple[int, int, int]], grid: List[List[int]]) -> None:
         start = next(sq for sq in colored_squares if sq[2] == 3)
         targets = [sq[:2] for sq in colored_squares if sq[2] in (6, 8)]
-        rows, cols = len(grid), len(grid[0])
-        edge_priorities = get_edge_priorities(start[:2], rows, cols)
         
         current = start[:2]
-        all_goals = targets + [edge for priority in edge_priorities for edge in priority]
-
-        while all_goals:
-            path = a_star(current, all_goals, grid)
-            if not path:
-                break
-            for r, c in path[1:]:
+        for target in targets:
+            path = a_star(current, [target], grid)
+            for r, c in path[1:-1]:  # Don't overwrite the target
                 if grid[r][c] == 0:
                     grid[r][c] = 3
-            current = path[-1]
-            if current in targets:
-                targets.remove(current)
-            all_goals = targets + [edge for priority in edge_priorities for edge in priority if grid[edge[0]][edge[1]] == 0]
+            current = target
+
+    def extend_to_edge(grid: List[List[int]]) -> None:
+        rows, cols = len(grid), len(grid[0])
+        green_squares = [(r, c) for r in range(rows) for c in range(cols) if grid[r][c] == 3]
+        
+        edges = ([(0, c) for c in range(cols)] +  # Top edge
+                 [(rows-1, c) for c in range(cols)] +  # Bottom edge
+                 [(r, 0) for r in range(rows)] +  # Left edge
+                 [(r, cols-1) for r in range(rows)])  # Right edge
+        
+        min_dist = float('inf')
+        best_extension = None
+        
+        for green_r, green_c in green_squares:
+            for edge_r, edge_c in edges:
+                dist = abs(green_r - edge_r) + abs(green_c - edge_c)
+                if dist < min_dist and all(grid[r][c] == 0 for r, c in get_line(green_r, green_c, edge_r, edge_c)):
+                    min_dist = dist
+                    best_extension = (green_r, green_c, edge_r, edge_c)
+        
+        if best_extension and min_dist <= 3:
+            start_r, start_c, end_r, end_c = best_extension
+            for r, c in get_line(start_r, start_c, end_r, end_c):
+                if grid[r][c] == 0:
+                    grid[r][c] = 3
+
+    def get_line(r1: int, c1: int, r2: int, c2: int) -> List[Tuple[int, int]]:
+        line = []
+        if r1 == r2:  # Horizontal line
+            for c in range(min(c1, c2), max(c1, c2) + 1):
+                line.append((r1, c))
+        elif c1 == c2:  # Vertical line
+            for r in range(min(r1, r2), max(r1, r2) + 1):
+                line.append((r, c1))
+        return line
 
     output_grid = [row[:] for row in input_grid.values]
     colored_squares = find_colored_squares()
-    connect_targets_and_edges(colored_squares, output_grid)
+    connect_targets(colored_squares, output_grid)
+    extend_to_edge(output_grid)
 
     return ColoredGrid(values=output_grid)
