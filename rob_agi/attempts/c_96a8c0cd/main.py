@@ -4,14 +4,14 @@ from typing import Tuple, Set
 def solve_96a8c0cd(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the grid transformation challenge by creating a minimal tree-like structure
-    of red (2) cells connecting all non-black colored cells. The algorithm starts from
-    the top-left corner and moves only right and down, creating paths to connect
-    colored cells. Any isolated colored cells are then connected to the nearest part
-    of the red network.
+    of red (2) cells connecting all non-black colored cells. The algorithm creates
+    vertical red lines in columns containing colored cells and connects them with
+    horizontal lines where necessary.
 
-    1. Use DFS to create the initial red network.
-    2. Connect any remaining unvisited colored cells to the nearest red cell.
-    3. Add vertical/horizontal red lines at the right/bottom if needed.
+    1. Identify columns with colored cells and create vertical red lines.
+    2. Connect colored cells to the nearest vertical red line with horizontal lines.
+    3. Handle special cases for colored cells in the top row and leftmost column.
+    4. Ensure all colored cells are connected to the red network.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -21,65 +21,53 @@ def solve_96a8c0cd(input_grid: ColoredGrid) -> ColoredGrid:
     """
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
-    visited: Set[Tuple[int, int]] = set()
 
     def is_colored(r: int, c: int) -> bool:
-        return grid.get_cell(r, c) > 0
+        return grid.get_cell(r, c) > 0 and grid.get_cell(r, c) != 2
 
-    def is_valid(r: int, c: int) -> bool:
-        return 0 <= r < rows and 0 <= c < cols
+    # Step 1: Identify columns with colored cells and create vertical red lines
+    columns_with_color = set()
+    for c in range(cols):
+        if any(is_colored(r, c) for r in range(rows)):
+            columns_with_color.add(c)
+            for r in range(rows):
+                if not is_colored(r, c):
+                    grid.set_cell(r, c, 2)
 
-    def connect_right(r: int, c: int) -> None:
-        while c + 1 < cols and not is_colored(r, c + 1):
-            c += 1
-            grid.set_cell(r, c, 2)
+    # Add an extra vertical line to the right if needed
+    if columns_with_color and max(columns_with_color) < cols - 1:
+        rightmost_col = max(columns_with_color) + 1
+        for r in range(rows):
+            grid.set_cell(r, rightmost_col, 2)
+        columns_with_color.add(rightmost_col)
 
-    def connect_down(r: int, c: int) -> None:
-        while r + 1 < rows and not is_colored(r + 1, c):
-            r += 1
-            grid.set_cell(r, c, 2)
-
-    def dfs(r: int, c: int) -> None:
-        if not is_valid(r, c) or (r, c) in visited:
-            return
-        
-        if is_colored(r, c):
-            visited.add((r, c))
-            connect_right(r, c)
-            connect_down(r, c)
-            
-            dfs(r, c + 1)  # Move right
-            dfs(r + 1, c)  # Move down
-
-    # Start DFS from top-left corner
-    dfs(0, 0)
-
-    # Connect any remaining unvisited colored cells
+    # Step 2: Connect colored cells to the nearest vertical red line
     for r in range(rows):
         for c in range(cols):
-            if is_colored(r, c) and (r, c) not in visited:
-                # Find nearest red cell and connect
-                for dr in range(rows):
-                    for dc in range(cols):
-                        if is_valid(r - dr, c - dc) and grid.get_cell(r - dr, c - dc) == 2:
-                            grid.set_cell(r, c - dc, 2)  # Connect horizontally
-                            for rr in range(r - dr, r + 1):
-                                grid.set_cell(rr, c - dc, 2)  # Connect vertically
-                            visited.add((r, c))
-                            break
-                    if (r, c) in visited:
-                        break
+            if is_colored(r, c):
+                left = right = c
+                while left > 0 and left not in columns_with_color:
+                    left -= 1
+                while right < cols - 1 and right not in columns_with_color:
+                    right += 1
+                nearest = left if c - left <= right - c else right
+                for cc in range(min(c, nearest), max(c, nearest) + 1):
+                    if not is_colored(r, cc):
+                        grid.set_cell(r, cc, 2)
 
-    # Add vertical red line at the right if needed
-    if all(grid.get_cell(r, cols - 1) == 0 for r in range(rows)):
+    # Step 3: Handle special cases
+    # Top row
+    for c in range(cols):
+        if is_colored(0, c):
+            nearest = min(columns_with_color, key=lambda x: abs(x - c))
+            for cc in range(min(c, nearest), max(c, nearest) + 1):
+                if not is_colored(0, cc):
+                    grid.set_cell(0, cc, 2)
+
+    # Leftmost column
+    if any(is_colored(r, 0) for r in range(rows)):
         for r in range(rows):
-            if grid.get_cell(r, cols - 2) == 2:
-                grid.set_cell(r, cols - 1, 2)
-
-    # Add horizontal red line at the bottom if needed
-    if all(grid.get_cell(rows - 1, c) == 0 for c in range(cols)):
-        for c in range(cols):
-            if grid.get_cell(rows - 2, c) == 2:
-                grid.set_cell(rows - 1, c, 2)
+            if not is_colored(r, 0):
+                grid.set_cell(r, 0, 2)
 
     return grid
