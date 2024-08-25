@@ -1,0 +1,57 @@
+example_0:
+  input: |
+    A 15x15 grid mostly filled with black (0). There are three colored squares:
+    - A magenta (6) square at position (2, 10)
+    - A red (2) square at position (4, 4)
+    - A sky blue (8) square at position (11, 7)
+    These colored squares appear to be isolated dots in the black grid.
+  output: |
+    A 15x15 grid with three distinct horizontal bands:
+    - Top band: Magenta (6) frame surrounding black interior
+    - Middle band: Red (2) frame surrounding black interior
+    - Bottom band: Sky blue (8) frame surrounding black interior
+    Each band has a full horizontal line of its color and vertical sides extending to the edges of the grid.
+
+example_1:
+  input: |
+    A 15x15 grid mostly filled with black (0). There are four colored squares:
+    - A sky blue (8) square at position (1, 6)
+    - A blue (1) square at position (3, 10)
+    - A red (2) square at position (7, 3)
+    - A green (3) square at position (9, 5)
+    These colored squares appear as isolated dots in different quadrants of the black grid.
+  output: |
+    A 15x15 grid with four distinct horizontal bands, from top to bottom:
+    - Sky blue (8) band: Two full rows at the top, then partial rows on sides
+    - Blue (1) band: One full row, then partial rows on sides
+    - Red (2) band: One full row, then partial rows on sides
+    - Green (3) band: Multiple rows, occupying the bottom third of the grid
+    Each band has at least one full horizontal line of its color and vertical sides extending to the edges of the grid.
+
+example_2:
+  input: |
+    A 15x15 grid mostly filled with black (0). There are three colored squares:
+    - A red (2) square at position (3, 6)
+    - An orange (7) square at position (7, 8)
+    - A sky blue (8) square at position (12, 3)
+    These colored squares appear as isolated dots in different parts of the black grid.
+  output: |
+    A 15x15 grid with three distinct horizontal bands, from top to bottom:
+    - Red (2) band: Occupying roughly the top quarter of the grid
+    - Orange (7) band: Occupying the middle section of the grid
+    - Sky blue (8) band: Occupying roughly the bottom third of the grid
+    Each band has at least one full horizontal line of its color and vertical sides extending to the edges of the grid.
+
+example_3:
+  input: |
+    A 15x15 grid mostly filled with black (0). There are three colored squares:
+    - A green (3) square at position (2, 3)
+    - A red (2) square at position (7, 7)
+    - A brown (9) square at position (9, 4)
+    These colored squares appear as isolated dots in different parts of the black grid.
+  output: |
+    A 15x15 grid with three distinct horizontal bands, from top to bottom:
+    - Green (3) band: Occupying roughly the top fifth of the grid
+    - Red (2) band: Occupying a small section in the middle of the grid
+    - Brown (9) band: Occupying roughly the bottom third of the grid
+    Each band has at least one full horizontal line of its color and vertical sides extending to the edges of the grid.
