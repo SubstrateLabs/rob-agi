@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    An 11x9 grid with a vertical gray (5) line in the middle, dividing the grid into two parts. The left side contains colored elements: a blue (1) vertical line in the second column, red (2) and green (3) horizontal lines, and some yellow (4) dots. The right side is mostly empty (black, 0) with some yellow (4) dots scattered.
+  output: |
+    A 7x9 grid with a blue (1) vertical line in the middle (4th column). There are two horizontal lines: a green (3) line in the 3rd row and a red (2) line in the 6th row. The rest of the grid is empty (black, 0).
+
+example_1:
+  input: |
+    A 13x9 grid with a vertical gray (5) line dividing it slightly off-center. The left side has red (2) and blue (1) vertical lines alternating, with green (3) horizontal lines. The right side is mostly empty with some yellow (4) elements, particularly in the corners.
+  output: |
+    A 7x9 grid with red (2) vertical lines in the 2nd and 6th columns, and a blue (1) vertical line in the middle (4th column). There are two green (3) horizontal lines spanning the entire width in the 2nd and 7th rows. The rest is empty (black, 0).
+
+example_2:
+  input: |
+    A 13x11 grid with a vertical gray (5) line slightly off-center. The left side has alternating vertical lines of blue (1) and other colors (red 2, green 3). The right side is mostly empty with some yellow (4) elements scattered. There are horizontal lines of various colors on the left side.
+  output: |
+    A 7x11 grid with two blue (1) vertical lines in the 3rd and 6th columns. There are two horizontal lines: a red (2) line in the 4th row and a green (3) line in the 8th row. The rest of the grid is empty (black, 0).
+
+example_3:
+  input: |
+    A 13x7 grid with a vertical gray (5) line slightly right of center. The left side is mostly empty with some yellow (4) dots. The right side has vertical lines of red (2), blue (1), and green (3). There's a horizontal line of various colors (1, 2, 3) in the second row on the right side.
+  output: |
+    A 7x7 grid with red (2) and green (3) vertical lines in the 3rd and 5th columns respectively. There's a horizontal blue (1) line in the 5th row. The rest of the grid is empty (black, 0).
