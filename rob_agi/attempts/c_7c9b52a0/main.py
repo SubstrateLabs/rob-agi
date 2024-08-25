@@ -9,7 +9,7 @@ def solve_7c9b52a0(input_grid: ColoredGrid) -> ColoredGrid:
     1. Identifies the background color
     2. Finds rectangular regions of non-background colors
     3. Extracts these regions
-    4. Arranges the regions in a new grid, sorted by size
+    4. Arranges the regions in a new grid, preserving their order and aligning them to the left
     5. Returns the new compact grid containing only the extracted regions
 
     Args:
@@ -45,38 +45,20 @@ def solve_7c9b52a0(input_grid: ColoredGrid) -> ColoredGrid:
                         for j in range(width):
                             visited.add((r + i, c + j))
 
-        return sorted(regions, key=lambda x: (-x[2], -x[3]))  # Sort by height, then width
+        return regions
 
     def arrange_regions(regions: List[Tuple[int, int, int, int]], input_grid: ColoredGrid) -> ColoredGrid:
-        total_area = sum(region[2] * region[3] for region in regions)
-        side = int(total_area ** 0.5) + 1
-        output = [[0 for _ in range(side)] for _ in range(side)]
+        max_width = max(region[3] for region in regions)
+        total_height = sum(region[2] for region in regions)
+        output = [[0 for _ in range(max_width)] for _ in range(total_height)]
 
-        def can_place(r, c, height, width):
-            if r + height > side or c + width > side:
-                return False
-            return all(output[i][j] == 0 for i in range(r, r + height) for j in range(c, c + width))
-
+        current_y = 0
         for top, left, height, width in regions:
-            placed = False
-            for r in range(side):
-                for c in range(side):
-                    if can_place(r, c, height, width):
-                        subgrid = input_grid.extract_subgrid(top, left, height, width)
-                        for i in range(height):
-                            for j in range(width):
-                                output[r + i][c + j] = subgrid.values[i][j]
-                        placed = True
-                        break
-                if placed:
-                    break
-
-        # Trim empty rows and columns
-        while all(cell == 0 for cell in output[-1]):
-            output.pop()
-        while all(row[-1] == 0 for row in output):
-            for row in output:
-                row.pop()
+            subgrid = input_grid.extract_subgrid(top, left, height, width)
+            for i in range(height):
+                for j in range(width):
+                    output[current_y + i][j] = subgrid.values[i][j]
+            current_y += height
 
         return ColoredGrid(values=output)
 
