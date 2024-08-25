@@ -9,10 +9,10 @@ def solve_31adaf00(input_grid: ColoredGrid) -> ColoredGrid:
     The algorithm works as follows:
     1. Creates a deep copy of the input grid and counts gray squares.
     2. Calculates the target number of blue squares.
-    3. Identifies potential locations for blue rectangles (3x3 and 2x2), prioritizing balance.
-    4. Places blue rectangles based on a balance score until reaching the target or running out of suitable spaces.
-    5. Fills remaining individual squares using a spiral pattern from the center outward.
-    6. Performs fine-tuning if needed to match the exact target.
+    3. Identifies key areas for blue square placement using a heatmap.
+    4. Grows blue regions organically from these key areas.
+    5. Fine-tunes the placement to reach the exact target number of blue squares.
+    6. Performs a final balance check and makes minor adjustments if needed.
     
     Returns a new grid with added blue squares while preserving the original gray squares and maintaining visual balance.
     """
@@ -21,26 +21,97 @@ def solve_31adaf00(input_grid: ColoredGrid) -> ColoredGrid:
     gray_count = count_color(input_grid, 5)
     target_blue = (rows * cols - gray_count) // 2
     
-    blue_count = 0
-    potential_areas = get_potential_areas(input_grid)
+    heatmap = create_heatmap(input_grid)
+    blue_count = grow_blue_regions(output_grid, heatmap, target_blue)
     
-    # Place blue rectangles
-    for _, (x, y, width, height) in potential_areas:
-        if blue_count >= target_blue:
-            break
-        if is_valid_blue_area(output_grid, x, y, width, height):
-            fill_area(output_grid, x, y, width, height, 1)
-            blue_count += width * height
-    
-    # Fill remaining squares using spiral pattern
     if blue_count < target_blue:
-        blue_count = fill_spiral(output_grid, blue_count, target_blue)
-    
-    # Fine-tuning
-    if blue_count > target_blue:
+        blue_count = fill_remaining_squares(output_grid, blue_count, target_blue)
+    elif blue_count > target_blue:
         remove_excess_blue(output_grid, blue_count, target_blue)
     
+    final_balance_adjustment(output_grid, target_blue)
+    
     return output_grid
+
+def create_heatmap(grid: ColoredGrid) -> List[List[int]]:
+    rows, cols = grid.get_dimensions()
+    heatmap = [[0 for _ in range(cols)] for _ in range(rows)]
+    
+    for r in range(rows):
+        for c in range(cols):
+            if grid.values[r][c] == 0:
+                for dr in [-1, 0, 1]:
+                    for dc in [-1, 0, 1]:
+                        if 0 <= r+dr < rows and 0 <= c+dc < cols:
+                            heatmap[r+dr][c+dc] += 1
+    
+    return heatmap
+
+def grow_blue_regions(grid: ColoredGrid, heatmap: List[List[int]], target: int) -> int:
+    rows, cols = grid.get_dimensions()
+    blue_count = 0
+    visited = set()
+    
+    while blue_count < target:
+        start_r, start_c = max(((r, c) for r in range(rows) for c in range(cols) if grid.values[r][c] == 0),
+                               key=lambda pos: heatmap[pos[0]][pos[1]])
+        
+        if (start_r, start_c) in visited:
+            break
+        
+        queue = [(start_r, start_c)]
+        region_size = 0
+        
+        while queue and blue_count + region_size < target:
+            r, c = queue.pop(0)
+            if grid.values[r][c] != 0 or (r, c) in visited:
+                continue
+            
+            grid.values[r][c] = 1
+            region_size += 1
+            visited.add((r, c))
+            
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < rows and 0 <= nc < cols and grid.values[nr][nc] == 0:
+                    queue.append((nr, nc))
+        
+        blue_count += region_size
+    
+    return blue_count
+
+def fill_remaining_squares(grid: ColoredGrid, blue_count: int, target: int) -> int:
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        for c in range(cols):
+            if blue_count >= target:
+                return blue_count
+            if grid.values[r][c] == 0:
+                grid.values[r][c] = 1
+                blue_count += 1
+    return blue_count
+
+def final_balance_adjustment(grid: ColoredGrid, target: int) -> None:
+    rows, cols = grid.get_dimensions()
+    blue_count = count_color(grid, 1)
+    
+    if blue_count == target:
+        return
+    
+    center_r, center_c = rows // 2, cols // 2
+    cells = [(r, c) for r in range(rows) for c in range(cols)]
+    cells.sort(key=lambda pos: abs(pos[0] - center_r) + abs(pos[1] - center_c))
+    
+    for r, c in cells:
+        if blue_count < target and grid.values[r][c] == 0:
+            grid.values[r][c] = 1
+            blue_count += 1
+        elif blue_count > target and grid.values[r][c] == 1:
+            grid.values[r][c] = 0
+            blue_count -= 1
+        
+        if blue_count == target:
+            break
 
 def count_color(grid: ColoredGrid, color: int) -> int:
     return sum(row.count(color) for row in grid.values)
