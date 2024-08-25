@@ -9,7 +9,7 @@ def solve_0c786b71(input_grid: ColoredGrid) -> ColoredGrid:
     2. Mirror horizontally for the top-right quadrant.
     3. Mirror vertically for the bottom-left quadrant.
     4. Mirror both horizontally and vertically for the bottom-right quadrant.
-    5. Swap the first and last rows of each quadrant.
+    5. Swap the first and third rows of the entire grid.
     
     This creates a symmetrical expansion of the input grid with specific row swaps.
     """
@@ -38,7 +38,7 @@ def solve_0c786b71(input_grid: ColoredGrid) -> ColoredGrid:
         for j in range(input_cols):
             output_values[i + input_rows][j + input_cols] = input_grid.values[input_rows - 1 - i][input_cols - 1 - j]
     
-    # Swap first and last rows of each quadrant
+    # Swap first and third rows of the entire grid
     output_values[0], output_values[2] = output_values[2], output_values[0]
     output_values[3], output_values[5] = output_values[5], output_values[3]
     
