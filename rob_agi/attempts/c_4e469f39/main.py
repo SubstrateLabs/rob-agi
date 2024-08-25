@@ -8,7 +8,7 @@ def solve_4e469f39(input_grid: ColoredGrid) -> ColoredGrid:
     The function performs the following steps:
     1. Identify all gray shapes in the input grid.
     2. For each shape, determine its orientation based on the grid's midpoint.
-    3. Draw a red horizontal "roof" line across the entire grid width above each shape.
+    3. Draw a red horizontal "roof" line above each shape, extending to the grid edge on one side.
     4. Draw a red vertical "wall" line from the shape to the top of the grid on the appropriate side.
     5. Complete the shape outline by filling gaps between gray cells with red.
     
@@ -30,8 +30,11 @@ def solve_4e469f39(input_grid: ColoredGrid) -> ColoredGrid:
         shape_midpoint = (left + right) // 2
         
         # Draw horizontal "roof" line
-        for col in range(cols):
-            if output_grid.values[top-1][col] == 0:
+        if shape_midpoint < grid_midpoint:
+            for col in range(left):
+                output_grid.values[top-1][col] = 2
+        else:
+            for col in range(right + 1, cols):
                 output_grid.values[top-1][col] = 2
         
         # Determine orientation and draw vertical "wall" line
@@ -40,11 +43,15 @@ def solve_4e469f39(input_grid: ColoredGrid) -> ColoredGrid:
             for row in range(top-1, -1, -1):
                 if output_grid.values[row][wall_col] == 0:
                     output_grid.values[row][wall_col] = 2
+                else:
+                    break
         else:
             wall_col = right
             for row in range(top-1, -1, -1):
                 if output_grid.values[row][wall_col] == 0:
                     output_grid.values[row][wall_col] = 2
+                else:
+                    break
         
         # Complete shape outline
         for col in range(left, right):
