@@ -6,53 +6,42 @@ def solve_a3f84088(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by applying a nested outline pattern.
     
     The function does the following:
-    1. Analyzes the input grid to determine its size and outer boundary.
-    2. Creates nested outlines of alternating colors (gray and red).
-    3. Handles the center area based on the remaining space.
+    1. Preserves the outer gray (5) outline from the input grid.
+    2. Creates nested outlines of alternating colors (red and gray) moving inward.
+    3. Handles the center area based on the remaining space size.
     4. Returns the transformed grid.
 
-    The pattern consists of an outer gray outline, followed by
+    The pattern consists of the original outer gray outline, followed by
     alternating red and gray outlines moving inward. The center
-    pattern varies based on the remaining space size.
+    pattern varies based on the remaining space size, with special
+    handling for different grid dimensions.
     """
     new_grid = input_grid.deep_copy()
     top, left, bottom, right = find_outer_boundary(new_grid)
     
-    current_color = 2  # Start with red
-    while bottom - top > 3 and right - left > 3:
+    current_color = 2  # Start with red for the first inner outline
+    top += 1
+    left += 1
+    bottom -= 1
+    right -= 1
+
+    while bottom - top >= 1 and right - left >= 1:
         draw_outline(new_grid, top, left, bottom, right, current_color)
-        top += 1
-        left += 1
-        bottom -= 1
-        right -= 1
         
-        opposite_color = 5 if current_color == 2 else 2
-        draw_outline(new_grid, top, left, bottom, right, opposite_color)
-        
-        # Fill corners
-        new_grid.values[top][left] = current_color
-        new_grid.values[top][right] = current_color
-        new_grid.values[bottom][left] = current_color
-        new_grid.values[bottom][right] = current_color
+        if bottom - top <= 2 or right - left <= 2:
+            break
         
         top += 1
         left += 1
         bottom -= 1
         right -= 1
-        current_color = opposite_color
+        current_color = 7 - current_color  # Toggle between 2 (red) and 5 (gray)
     
-    # Handle center area
+    # Handle center area for small grids
     center_height = bottom - top + 1
     center_width = right - left + 1
     if center_height <= 2 and center_width <= 2:
         fill_area(new_grid, top, left, bottom, right, 5)
-    else:
-        draw_outline(new_grid, top, left, bottom, right, 5)
-        if center_height > 3 and center_width > 3:
-            new_grid.values[top+1][left+1] = 2
-            new_grid.values[top+1][right-1] = 2
-            new_grid.values[bottom-1][left+1] = 2
-            new_grid.values[bottom-1][right-1] = 2
     
     return new_grid
 
