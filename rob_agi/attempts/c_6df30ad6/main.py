@@ -8,6 +8,7 @@ def solve_6df30ad6(input_grid: ColoredGrid) -> ColoredGrid:
     1. Finds the largest connected region of gray (5) in the input grid.
     2. Identifies the highest-valued color that is not gray (5) or black (0).
     3. Creates a new grid with the largest gray region filled with the highest-valued color.
+    4. If no non-gray, non-black colors are present, uses yellow (4) as the default color.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
