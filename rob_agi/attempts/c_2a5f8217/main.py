@@ -1,15 +1,14 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Dict, FrozenSet
+from typing import List, Tuple, Dict, Set
+from collections import deque
 
 def solve_2a5f8217(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the grid transformation challenge by identifying unique shapes and applying color transformations.
+    Solves the grid transformation challenge by identifying shapes and propagating colors.
 
-    1. Identify and normalize shapes in the input grid.
-    2. Group shapes and their instances.
-    3. Create a color transformation map based on the following rule:
-       For each shape instance, find the first color higher than its current color among instances of the same shape.
-       If no higher color is found, keep the original color.
+    1. Identify shapes in the input grid.
+    2. Build a connection graph between shapes based on adjacency.
+    3. Propagate colors from higher-valued shapes to lower-valued connected shapes.
     4. Apply the color transformations to create a new grid.
 
     Args:
@@ -18,31 +17,62 @@ def solve_2a5f8217(input_grid: ColoredGrid) -> ColoredGrid:
     Returns:
         ColoredGrid: The transformed grid with colors updated according to the rule.
     """
-    def normalize_shape(coords: List[Tuple[int, int]]) -> FrozenSet[Tuple[int, int]]:
-        min_x = min(x for x, y in coords)
-        min_y = min(y for x, y in coords)
-        return frozenset((x - min_x, y - min_y) for x, y in coords)
+    def find_shape(start_x: int, start_y: int, color: int) -> Set[Tuple[int, int]]:
+        shape = set()
+        queue = deque([(start_x, start_y)])
+        while queue:
+            x, y = queue.popleft()
+            if (x, y) not in shape and 0 <= x < rows and 0 <= y < cols and input_grid.values[x][y] == color:
+                shape.add((x, y))
+                for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                    queue.append((x + dx, y + dy))
+        return shape
 
-    shapes: Dict[FrozenSet[Tuple[int, int]], List[Tuple[int, List[Tuple[int, int]]]]] = {}
-    for color in range(1, 10):  # Assuming colors are 1-9
-        regions = input_grid.find_connected_regions(color)
-        for region in regions:
-            shape = normalize_shape(region)
-            if shape not in shapes:
-                shapes[shape] = []
-            shapes[shape].append((color, region))
+    def are_adjacent(shape1: Set[Tuple[int, int]], shape2: Set[Tuple[int, int]]) -> bool:
+        for x1, y1 in shape1:
+            for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]:
+                if (x1 + dx, y1 + dy) in shape2:
+                    return True
+        return False
 
-    color_map: Dict[Tuple[int, int], int] = {}
-    for shape, instances in shapes.items():
-        sorted_instances = sorted(instances, key=lambda x: x[0], reverse=True)
-        for i, (color, region) in enumerate(sorted_instances):
-            new_color = next((c for c, _ in sorted_instances[:i] if c > color), color)
-            for x, y in region:
-                color_map[(x, y)] = new_color
+    rows, cols = input_grid.get_dimensions()
+    shapes: List[Tuple[int, Set[Tuple[int, int]]]] = []
+    visited = set()
 
-    new_grid = ColoredGrid(values=[
-        [color_map.get((x, y), input_grid.values[y][x]) for x in range(input_grid.num_cols)]
-        for y in range(input_grid.num_rows)
-    ])
+    # Identify shapes
+    for x in range(rows):
+        for y in range(cols):
+            if (x, y) not in visited and input_grid.values[x][y] != 0:
+                shape = find_shape(x, y, input_grid.values[x][y])
+                shapes.append((input_grid.values[x][y], shape))
+                visited.update(shape)
 
-    return new_grid
+    # Build connection graph
+    graph: Dict[int, List[int]] = {i: [] for i in range(len(shapes))}
+    for i in range(len(shapes)):
+        for j in range(i + 1, len(shapes)):
+            if are_adjacent(shapes[i][1], shapes[j][1]):
+                graph[i].append(j)
+                graph[j].append(i)
+
+    # Propagate colors
+    shapes.sort(reverse=True)  # Sort by color value, highest first
+    new_colors: Dict[int, int] = {}
+    for i, (color, shape) in enumerate(shapes):
+        if i not in new_colors:
+            new_colors[i] = color
+        queue = deque([i])
+        while queue:
+            node = queue.popleft()
+            for neighbor in graph[node]:
+                if neighbor not in new_colors and shapes[neighbor][0] < new_colors[node]:
+                    new_colors[neighbor] = new_colors[node]
+                    queue.append(neighbor)
+
+    # Apply transformations
+    new_grid = [[0 for _ in range(cols)] for _ in range(rows)]
+    for i, (_, shape) in enumerate(shapes):
+        for x, y in shape:
+            new_grid[x][y] = new_colors[i]
+
+    return ColoredGrid(values=new_grid)
