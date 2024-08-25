@@ -2,26 +2,29 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_b0722778(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by extracting specific columns for each non-black row.
+    Transforms the input grid by extracting the rightmost two non-black columns for the entire grid.
     
     The function creates a new grid with:
     - The same number of rows as the input grid
     - Always 2 columns
-    - For each non-black row:
-      - The first column is taken from the rightmost non-black column of the input
-      - The second column is taken from the second-rightmost non-black column of the input
-    - Black (0) rows in the input are preserved as black rows in the output
+    - For each row:
+      - If the row is entirely black (0), it remains [0, 0] in the output
+      - Otherwise, it takes values from the two rightmost non-black columns of the entire input grid
     
-    This effectively ignores the black separator columns and focuses on the rightmost non-black columns.
+    This effectively ignores the black separator columns and focuses on the rightmost non-black columns
+    of the entire grid, not just each individual row.
     """
     rows, cols = input_grid.get_dimensions()
     
-    # Identify the two rightmost non-black columns
-    col1, col2 = cols - 1, cols - 2
-    while col1 > 0 and all(input_grid.values[r][col1] == 0 for r in range(rows)):
-        col1 -= 1
-    while col2 >= 0 and all(input_grid.values[r][col2] == 0 for r in range(rows)):
-        col2 -= 1
+    # Identify the two rightmost non-black columns for the entire grid
+    col1, col2 = -1, -1
+    for c in range(cols - 1, -1, -1):
+        if any(input_grid.values[r][c] != 0 for r in range(rows)):
+            if col1 == -1:
+                col1 = c
+            elif col2 == -1:
+                col2 = c
+                break
     
     output_rows = []
     
