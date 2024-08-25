@@ -6,10 +6,11 @@ def solve_9def23fe(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by expanding the red (2) rectangle and creating a comb-like pattern.
     
     1. Identifies the original red rectangle and scattered colored dots.
-    2. Creates vertical bars of red starting from the left edge of the original rectangle, including adjacent columns.
-    3. Expands the red area horizontally across the width determined by the vertical bars.
+    2. Determines horizontal and vertical expansion based on the original rectangle's dimensions.
+    3. Creates a new grid with expanded red area, including horizontal bars and vertical columns.
     4. Fills the space between adjacent or nearly adjacent vertical bars.
-    5. Preserves the positions of all scattered colored dots from the original grid.
+    5. Extends the red area within the bounds of the expansion.
+    6. Preserves the positions of all scattered colored dots from the original grid.
     
     Returns a new ColoredGrid with the transformed pattern.
     """
@@ -20,17 +21,19 @@ def solve_9def23fe(input_grid: ColoredGrid) -> ColoredGrid:
     # Step 2: Create new grid
     new_grid = create_empty_grid(input_grid.get_dimensions())
 
-    # Step 3: Determine vertical bar positions
+    # Step 3: Determine horizontal and vertical expansion
+    horizontal_bars = calculate_horizontal_bars(original_rect)
     vertical_columns = calculate_vertical_columns(original_rect)
 
-    # Step 4: Create vertical bars
-    create_vertical_bars(new_grid, vertical_columns)
+    # Step 4: Apply horizontal and vertical expansion
+    apply_horizontal_expansion(new_grid, horizontal_bars)
+    apply_vertical_expansion(new_grid, vertical_columns)
 
-    # Step 5: Determine and perform horizontal expansion
-    expand_horizontally(new_grid, original_rect, vertical_columns)
-
-    # Step 6: Fill between vertical bars
+    # Step 5: Fill between vertical bars
     fill_between_bars(new_grid, vertical_columns, original_rect)
+
+    # Step 6: Extend red area
+    extend_red_area(new_grid, horizontal_bars, vertical_columns)
 
     # Step 7: Preserve scattered dots
     preserve_scattered_dots(new_grid, scattered_dots)
