@@ -1,0 +1,68 @@
+example_0:
+  input: |
+    The input grid is 25x23 in size. It contains two distinct shapes that appear to be stylized flowers or stars. These shapes are primarily composed of yellow (4) and magenta (6) colors, with green (3) and red (2) accents. The shapes are surrounded by black (0) space.
+
+    The first shape is centered in the top-right quadrant of the grid. It has a yellow cross-like center with magenta tips, surrounded by alternating green and red "petals".
+
+    The second shape is similar but larger, occupying the left half of the grid from rows 5 to 19. It has the same color scheme and pattern as the first shape.
+
+    Both shapes are symmetrical and have a clear structure with a central column of magenta (6) surrounded by yellow (4), then alternating green (3) and red (2) outer layers.
+  output: |
+    The output grid is much smaller, only 3x7 in size. It consists of sky blue (8) colored squares arranged in a simple pattern.
+
+    The pattern forms a basic outline or silhouette that could be interpreted as a stylized representation of the input shapes. It has a central column with "arms" extending outwards on the top and bottom rows.
+
+    The layout is:
+    - Top row: 8,0,0,0,0,0,8
+    - Middle row: 8,8,0,0,0,8,8
+    - Bottom row: 8,0,0,0,0,0,8
+
+    This creates a symmetrical shape with a wider center and narrower top and bottom.
+
+example_1:
+  input: |
+    The input grid is 25x25 in size. It contains two distinct shapes that appear to be stylized rockets or missiles. These shapes are composed of various colors including yellow (4), magenta (6), blue (1), green (3), orange (7), and red (2). The shapes are surrounded by black (0) space.
+
+    The first shape is in the upper-left quadrant, spanning from rows 2 to 9. It has a yellow body with a magenta tip, blue fins, and a green base.
+
+    The second shape is larger and located in the bottom-right quadrant, spanning from rows 9 to 20. It has a similar structure to the first shape but with some differences. The body is yellow with a magenta tip, but it has orange fins and a red base. This shape also has additional green elements.
+
+    Both shapes are vertically oriented and have a clear rocket-like structure with a pointed top, a long body, and fin-like protrusions at the base.
+  output: |
+    The output grid is smaller, 4x8 in size. It consists of sky blue (8) colored squares arranged in a more complex pattern than the previous example.
+
+    The pattern forms an abstract shape that could be interpreted as a simplified or stylized version of the input shapes. It has a central column with various protrusions.
+
+    The layout is:
+    - Row 1: 0,8,0,0,0,0,8,8
+    - Row 2: 8,8,8,8,0,8,8,8
+    - Row 3: 0,0,8,0,0,0,0,8
+    - Row 4: 0,0,0,0,0,0,0,8
+
+    This creates an asymmetrical shape with a wider top and a tail-like extension on the right side.
+
+example_2:
+  input: |
+    The input grid is 22x22 in size. It contains two distinct shapes that appear to be stylized hourglasses or vases. These shapes are composed of green (3), yellow (4), orange (7), and red (2) colors. The shapes are surrounded by black (0) space.
+
+    The first shape is in the upper-left quadrant, spanning from rows 3 to 11. It has a symmetrical structure with green outer layers, yellow inner layers, and an orange center. The shape narrows in the middle, giving it an hourglass-like appearance.
+
+    The second shape is in the bottom-right quadrant, spanning from rows 12 to 20. It has a similar structure to the first shape but with some differences. The overall shape is the same, but it's missing some elements in the lower part, creating an asymmetrical or incomplete appearance.
+
+    Both shapes have a clear vertical symmetry and a distinctive narrowing in the middle.
+  output: |
+    The output grid is much smaller, only 2x6 in size. It consists of sky blue (8) colored squares arranged in a simple pattern.
+
+    The pattern forms a basic shape that could be interpreted as a highly simplified version of the input shapes.
+
+    The layout is:
+    - Row 1: 8,8,8,0,8,8
+    - Row 2: 0,0,8,0,0,0
+
+    This creates a shape with a wider top and a single extension in the bottom-center, possibly representing the narrowed middle section of the hourglass shapes in the input.
+
+test_case_0:
+  input: |
+    The input grid is not provided in the test file for the test case. Based on the pattern from the examples, we would expect it to contain one or more complex shapes composed of various colors, likely with some form of symmetry or recognizable structure.
+  output: |
+    The output grid is not provided in the test file for the test case. Based on the pattern from the examples, we would expect it to be a smaller grid containing sky blue (8) squares arranged in a pattern that abstractly represents or simplifies the shapes from the input grid.
