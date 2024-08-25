@@ -5,8 +5,8 @@ def solve_8597cfd7(input_grid: ColoredGrid) -> ColoredGrid:
     Solve the grid transformation challenge by following these steps:
     1. Find the horizontal gray line.
     2. Scan for the leftmost vertical line that:
-       - Starts from the top of the grid
-       - Is continuous until the gray line
+       - Starts from the top of the grid or any row above the gray line
+       - Is continuous from its start until the gray line
        - Extends at least one square below the gray line
     3. Return a 2x2 grid filled with the color of the found line, or black if no line is found.
     """
@@ -18,19 +18,20 @@ def solve_8597cfd7(input_grid: ColoredGrid) -> ColoredGrid:
     # Scan for the target vertical line
     target_color = 0
     for col in range(cols):
-        top_color = input_grid.values[0][col]
-        if top_color == 0:
-            continue
+        top_non_black_index = None
+        for row in range(gray_line_index):
+            if input_grid.values[row][col] != 0:
+                if top_non_black_index is None:
+                    top_non_black_index = row
+                    top_color = input_grid.values[row][col]
+                elif input_grid.values[row][col] != top_color:
+                    top_non_black_index = None
+                    break
         
-        is_continuous = True
-        for row in range(1, gray_line_index):
-            if input_grid.values[row][col] != top_color:
-                is_continuous = False
+        if top_non_black_index is not None:
+            if input_grid.values[gray_line_index + 1][col] == top_color:
+                target_color = top_color
                 break
-        
-        if is_continuous and input_grid.values[gray_line_index + 1][col] == top_color:
-            target_color = top_color
-            break
     
     # Create the output grid
     return ColoredGrid(values=[[target_color] * 2 for _ in range(2)])
