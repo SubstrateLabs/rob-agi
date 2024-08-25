@@ -1,0 +1,54 @@
+example_0:
+  input: |
+    A 13x12 grid mostly filled with black (0). There are two colored squares:
+    - A red square (2) in the top-right corner (row 3, column 11)
+    - A blue square (1) near the bottom-left corner (row 10, column 1)
+  output: |
+    The same 13x12 grid with the original colored squares, plus a new green (3) diagonal line:
+    - Starts from the 4th row, 7th column
+    - Extends diagonally up and to the right for 4 squares
+    - Then continues diagonally down and to the left, reaching the blue square
+    This green line forms a 'V' shape, with its point aimed towards the red square but not quite reaching it
+
+example_1:
+  input: |
+    A 15x12 grid mostly filled with black (0). There are two colored squares:
+    - A red square (2) near the top-left corner (row 1, column 1)
+    - A blue square (1) near the bottom-right corner (row 13, column 8)
+  output: |
+    The same 15x12 grid with the original colored squares, plus a new green (3) line:
+    - Starts from the 2nd row, 3rd column
+    - Extends straight down for 6 squares
+    - Then continues diagonally down and to the right, reaching the blue square
+    This green line forms an 'L' shape, connecting the area near the red square to the blue square
+
+example_2:
+  input: |
+    A 15x16 grid mostly filled with black (0). There are two colored squares:
+    - A red square (2) near the top-middle (row 1, column 6)
+    - A blue square (1) near the bottom-left (row 12, column 3)
+  output: |
+    The same 15x16 grid with the original colored squares, plus a new green (3) line:
+    - Starts from the 2nd row, 5th column (just below and left of the red square)
+    - Extends straight down for 9 squares
+    - Then continues diagonally down and to the left for 2 squares, reaching the blue square
+    This green line forms a slight 'hook' shape, connecting the area near the red square to the blue square
+
+example_3:
+  input: |
+    A 16x16 grid mostly filled with black (0). There are two colored squares:
+    - A blue square (1) near the top-right corner (row 1, column 11)
+    - A red square (2) near the bottom-left corner (row 13, column 3)
+  output: |
+    The same 16x16 grid with the original colored squares, plus a new green (3) line:
+    - Starts from the 2nd row, 11th column (just below the blue square)
+    - Extends diagonally down and to the left, reaching just above the red square
+    This green line forms a diagonal connecting the blue square to the area just above the red square
+
+test_case_0:
+  input: |
+    A 16x16 grid mostly filled with black (0). There are two colored squares:
+    - A blue square (1) near the top-right corner (row 1, column 11)
+    - A red square (2) near the bottom-left corner (row 13, column 3)
+  output: |
+    Not provided in the test case
