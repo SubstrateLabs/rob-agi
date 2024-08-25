@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid is 16x16. The border is a pattern of magenta (6), sky (8), and blue (1) colors, forming a symmetrical frame. Inside this frame, there's a large green (3) cross-shaped area in the center. The green area is surrounded by various patterns of orange (7), gray (5), and yellow (4). The corners of the green cross contain red (2) squares. The overall impression is of a symmetrical, ornate design with a prominent green cross in the center.
+  output: |
+    The 16x16 grid maintains the same border pattern as the input. The key difference is that the green (3) cross-shaped area in the center has been completely removed. The spaces previously occupied by green have been filled with an extension of the surrounding patterns, maintaining symmetry. The orange (7), gray (5), and yellow (4) patterns now occupy the entire interior of the frame, creating a more uniform and interconnected design without the central green cross.
+
+example_1:
+  input: |
+    This 16x16 grid has a symmetrical border pattern of yellow (4), brown (9), orange (7), and magenta (6). The interior features a complex pattern. The center has a cross-shaped area of white (1) squares. Surrounding this are patterns of orange (7) and brown (9). The corners contain sky (8) colored squares. There's a significant green (3) area in the bottom right quadrant, breaking the overall symmetry of the design.
+  output: |
+    The output grid maintains the same 16x16 size and border pattern as the input. The key change is the removal of the green (3) area from the bottom right quadrant. This area has been replaced with a pattern that mirrors the top left quadrant, restoring full symmetry to the design. The central cross-shaped white (1) area remains unchanged, as do the surrounding patterns of orange (7), brown (9), and sky (8) squares. The result is a fully symmetrical design that looks the same when rotated 180 degrees.
+
+example_2:
+  input: |
+    This 16x16 grid has a border of orange (7) and red (2) squares. The interior features a symmetrical design with a cross-shaped pattern in the center made of brown (9) and magenta (6) squares. Surrounding this are patterns of white (1) and sky (8) squares. There are green (3) squares in various locations, most notably forming a small cross in the bottom center of the grid. The overall design is largely symmetrical except for the green squares.
+  output: |
+    The output grid maintains the same 16x16 size and border pattern. The key change is the removal of all green (3) squares. These have been replaced with colors that maintain and extend the existing patterns, resulting in perfect symmetry. The central cross pattern of brown (9) and magenta (6) remains unchanged. The areas previously containing green squares now match their symmetrical counterparts, filled with white (1), sky (8), or brown (9) squares as appropriate. The result is a fully symmetrical design that looks the same when rotated 180 degrees.
+
+example_3:
+  input: |
+    This 16x16 grid has a complex, symmetrical border pattern of blue (1), magenta (6), yellow (4), and orange (7). The interior features a central pattern resembling a flower or star, made primarily of sky (8) and gray (5) squares. Surrounding this are patterns of yellow (4) squares. There's a significant green (3) area on the left side of the grid, breaking the overall symmetry of the design. Some brown (9) squares are also present in the pattern.
+  output: |
+    The output grid maintains the same 16x16 size and border pattern. The key change is the removal of all green (3) squares from the left side. These have been replaced with colors that extend and complete the existing patterns, restoring full symmetry to the design. The central flower/star pattern of sky (8) and gray (5) squares remains largely unchanged, though some gray squares have replaced green ones to maintain symmetry. The surrounding yellow (4) patterns have been extended to fill some of the space previously occupied by green. The result is a fully symmetrical design that looks the same when rotated 180 degrees, with the central flower/star pattern as its focal point.
