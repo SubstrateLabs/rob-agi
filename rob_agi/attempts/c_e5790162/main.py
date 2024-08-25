@@ -6,13 +6,12 @@ def solve_e5790162(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by creating a green path that connects the initial green square
     to all magenta and sky blue squares, and extends to an edge of the grid if efficient.
-    The path prioritizes horizontal movement, then vertical. It doesn't overwrite magenta or sky blue squares.
     
-    1. Finds the starting green square and all target squares (magenta and sky blue).
-    2. Uses a modified A* algorithm to find paths between targets, prioritizing horizontal movement.
-    3. Connects all targets with a green path, avoiding overwriting existing colored squares.
-    4. Extends the path to reach an edge of the grid if it's efficient to do so.
-    5. Optimizes the path by removing unnecessary detours.
+    1. Locates the starting green square and all target squares (magenta and sky blue).
+    2. Connects targets using a pathfinding algorithm, prioritizing magenta squares before sky blue.
+    3. Creates a single, continuous path without branches.
+    4. Extends the path to an edge if it can do so within 3 steps in the last segment's direction.
+    5. Doesn't overwrite existing colored squares.
     """
     def find_colored_squares() -> List[Tuple[int, int, int]]:
         return [(r, c, val) for r, row in enumerate(input_grid.values) 
@@ -53,11 +52,12 @@ def solve_e5790162(input_grid: ColoredGrid) -> ColoredGrid:
         return []  # No path found
 
     def connect_targets(colored_squares: List[Tuple[int, int, int]], grid: List[List[int]]) -> None:
-        start = next(sq for sq in colored_squares if sq[2] == 3)
-        targets = [sq[:2] for sq in colored_squares if sq[2] in (6, 8)]
+        start = next((sq for sq in colored_squares if sq[2] == 3), colored_squares[0])
+        magenta_targets = [sq[:2] for sq in colored_squares if sq[2] == 6]
+        sky_targets = [sq[:2] for sq in colored_squares if sq[2] == 8]
         
         current = start[:2]
-        for target in targets:
+        for target in magenta_targets + sky_targets:
             path = a_star(current, [target], grid)
             for r, c in path[1:-1]:  # Don't overwrite the target
                 if grid[r][c] == 0:
@@ -68,26 +68,25 @@ def solve_e5790162(input_grid: ColoredGrid) -> ColoredGrid:
         rows, cols = len(grid), len(grid[0])
         green_squares = [(r, c) for r in range(rows) for c in range(cols) if grid[r][c] == 3]
         
-        edges = ([(0, c) for c in range(cols)] +  # Top edge
-                 [(rows-1, c) for c in range(cols)] +  # Bottom edge
-                 [(r, 0) for r in range(rows)] +  # Left edge
-                 [(r, cols-1) for r in range(rows)])  # Right edge
-        
-        min_dist = float('inf')
-        best_extension = None
-        
-        for green_r, green_c in green_squares:
-            for edge_r, edge_c in edges:
-                dist = abs(green_r - edge_r) + abs(green_c - edge_c)
-                if dist < min_dist and all(grid[r][c] == 0 for r, c in get_line(green_r, green_c, edge_r, edge_c)):
-                    min_dist = dist
-                    best_extension = (green_r, green_c, edge_r, edge_c)
-        
-        if best_extension and min_dist <= 3:
-            start_r, start_c, end_r, end_c = best_extension
-            for r, c in get_line(start_r, start_c, end_r, end_c):
-                if grid[r][c] == 0:
-                    grid[r][c] = 3
+        if not green_squares:
+            return
+
+        last_green = green_squares[-1]
+        second_last_green = green_squares[-2] if len(green_squares) > 1 else None
+
+        if second_last_green:
+            dr = last_green[0] - second_last_green[0]
+            dc = last_green[1] - second_last_green[1]
+        else:
+            dr, dc = 0, 1  # Default to horizontal if only one green square
+
+        for i in range(1, 4):
+            r, c = last_green[0] + i*dr, last_green[1] + i*dc
+            if r < 0 or r >= rows or c < 0 or c >= cols:
+                break
+            if grid[r][c] != 0:
+                return
+            grid[r][c] = 3
 
     def get_line(r1: int, c1: int, r2: int, c2: int) -> List[Tuple[int, int]]:
         line = []
