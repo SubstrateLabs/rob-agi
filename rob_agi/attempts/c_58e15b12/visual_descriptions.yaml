@@ -1,47 +1,93 @@
 example_0:
   input: |
-    The input grid is 23x17 in size. It contains two distinct groups of colored squares:
-    1. In the upper part (rows 7-10), there are two vertical lines of sky blue (8) squares, each 4 squares tall. These lines are separated by a single column of black squares.
-    2. In the lower part (rows 18-20), there are two vertical lines of green (3) squares, each 3 squares tall. These lines are also separated by a single column of black squares.
-    The rest of the grid is filled with black (0) squares, which can be considered as empty space.
+    The input grid is 23x17. It contains two distinct patterns:
+    1. Upper pattern (rows 7-10): Two vertical lines of sky blue (8) squares, each 4 squares tall, separated by one black square column.
+    2. Lower pattern (rows 18-20): Two vertical lines of green (3) squares, each 3 squares tall, separated by one black square column.
+    All other squares are black (0).
+    Key observations:
+    - The colored squares form compact, vertical groups.
+    - There's significant vertical space between the two colored patterns.
+    - The grid edges are entirely black.
+
   output: |
-    The output grid maintains the same 23x17 size but introduces a complex pattern of diagonal lines:
-    1. The original sky blue squares remain in their positions.
-    2. The original green squares remain in their positions.
-    3. Diagonal lines of sky blue extend from the original sky blue squares, moving both up-left and down-right until they reach the edge of the grid or intersect with other lines.
-    4. Diagonal lines of green extend from the original green squares, moving both up-left and down-right until they reach the edge of the grid or intersect with other lines.
-    5. Where the sky blue and green diagonal lines intersect, the squares are colored magenta (6).
-    6. The pattern creates a series of X-shapes and diamond shapes across the grid.
-    7. The original black space remains in areas not affected by the diagonal lines.
+    The output grid (23x17) shows a transformation based on the input:
+    1. Original colored squares (sky blue and green) remain unchanged.
+    2. Diamond patterns extend from each colored square:
+       - Sky blue diamonds from the upper pattern.
+       - Green diamonds from the lower pattern.
+    3. Diamond characteristics:
+       - Extend diagonally (45-degree angles) from original squares.
+       - Each color's diamonds have the same maximum extent.
+       - Sky blue diamonds are larger than green diamonds.
+    4. Intersections:
+       - Where sky blue and green diamonds overlap, squares are magenta (6).
+       - Several magenta squares appear in the middle of the grid.
+    5. Pattern observations:
+       - Diamonds create symmetrical X-shapes centered on original square groups.
+       - The overall pattern is vertically symmetrical.
+       - Edges of the grid remain mostly black, with some diagonal color intrusions.
 
 example_1:
   input: |
-    The input grid is 22x18 in size. It contains two distinct groups of colored squares:
-    1. In the upper part (rows 2-4), there are two vertical lines of green (3) squares, each 3 squares tall. These lines are separated by a single column of black squares.
-    2. In the middle part (rows 8-9), there are two vertical lines of sky blue (8) squares, each 2 squares tall. These lines are separated by two columns of black squares.
-    The rest of the grid is filled with black (0) squares, which can be considered as empty space.
+    The input grid is 22x18. It contains two distinct patterns:
+    1. Upper pattern (rows 2-4): Two vertical lines of green (3) squares, each 3 squares tall, separated by one black square column.
+    2. Middle pattern (rows 8-9): Two vertical lines of sky blue (8) squares, each 2 squares tall, separated by two black square columns.
+    All other squares are black (0).
+    Key observations:
+    - The colored squares are closer to the top of the grid.
+    - There's less vertical space between the two colored patterns compared to example_0.
+    - The grid's bottom half is entirely black.
+
   output: |
-    The output grid maintains the same 22x18 size but introduces a complex pattern of diagonal lines:
-    1. The original green squares remain in their positions.
-    2. The original sky blue squares remain in their positions.
-    3. Diagonal lines of green extend from the original green squares, moving both up-left and down-right until they reach the edge of the grid or intersect with other lines.
-    4. Diagonal lines of sky blue extend from the original sky blue squares, moving both up-left and down-right until they reach the edge of the grid or intersect with other lines.
-    5. The pattern creates a series of X-shapes and diamond shapes across the grid.
-    6. Unlike the previous example, there are no visible intersections between green and sky blue lines, so no magenta squares are present.
-    7. The original black space remains in areas not affected by the diagonal lines.
+    The output grid (22x18) shows a transformation based on the input:
+    1. Original colored squares (green and sky blue) remain unchanged.
+    2. Diamond patterns extend from each colored square:
+       - Green diamonds from the upper pattern.
+       - Sky blue diamonds from the middle pattern.
+    3. Diamond characteristics:
+       - Extend diagonally (45-degree angles) from original squares.
+       - Each color's diamonds have the same maximum extent.
+       - Green diamonds are slightly larger than sky blue diamonds.
+    4. Intersections:
+       - No visible intersections between green and sky blue diamonds.
+       - No magenta (6) squares present.
+    5. Pattern observations:
+       - Diamonds create symmetrical X-shapes centered on original square groups.
+       - The overall pattern is vertically asymmetrical due to the input's layout.
+       - The bottom edge of the grid remains black, while other edges show diagonal color patterns.
 
 example_2:
   input: |
-    The input grid is 24x19 in size. It contains two distinct groups of colored squares:
-    1. In the upper part (rows 7-10), there are two vertical lines of green (3) squares, each 4 squares tall. These lines are separated by three columns of black squares.
-    2. In the lower part (row 20), there are two single sky blue (8) squares, separated by one column of black squares.
-    The rest of the grid is filled with black (0) squares, which can be considered as empty space.
+    The input grid is 24x19. It contains two distinct patterns:
+    1. Upper pattern (rows 7-10): Two vertical lines of green (3) squares, each 4 squares tall, separated by three black square columns.
+    2. Lower pattern (row 20): Two single sky blue (8) squares, separated by one black square column.
+    All other squares are black (0).
+    Key observations:
+    - The green squares form a compact group, while the sky blue squares are isolated.
+    - There's significant horizontal space between the green vertical lines.
+    - The sky blue squares are very close to the bottom edge.
+
   output: |
-    The output grid maintains the same 24x19 size but introduces a complex pattern of diagonal lines:
-    1. The original green squares remain in their positions.
-    2. The original sky blue squares remain in their positions.
-    3. Diagonal lines of green extend from the original green squares, moving both up-left and down-right until they reach the edge of the grid or intersect with other lines.
-    4. Diagonal lines of sky blue extend from the original sky blue squares, moving both up-left and down-right until they reach the edge of the grid or intersect with other lines.
-    5. Where the sky blue and green diagonal lines intersect, the squares are colored magenta (6). There is one visible magenta square in this grid.
-    6. The pattern creates a series of X-shapes and diamond shapes across the grid, with the sky blue lines forming a more expansive pattern due to their lower starting position.
-    7. The original black space remains in areas not affected by the diagonal lines.
+    The output grid (24x19) shows a transformation based on the input:
+    1. Original colored squares (green and sky blue) remain unchanged.
+    2. Diamond patterns extend from each colored square:
+       - Green diamonds from the upper pattern.
+       - Sky blue diamonds from the lower pattern.
+    3. Diamond characteristics:
+       - Extend diagonally (45-degree angles) from original squares.
+       - Each color's diamonds have different maximum extents.
+       - Sky blue diamonds are significantly larger than green diamonds.
+    4. Intersections:
+       - One visible magenta (6) square where a green and sky blue diamond overlap.
+    5. Pattern observations:
+       - Green diamonds form two distinct X-shapes in the upper half.
+       - Sky blue diamonds create a wide, V-shaped pattern from the bottom.
+       - The overall pattern is vertically asymmetrical.
+       - Top and side edges of the grid show diagonal color intrusions, while the bottom edge is mostly colored.
+
+Key insights across all examples:
+- The transformation creates diamond patterns extending from original colored squares.
+- Diamond size seems related to the spread of same-colored squares in the input.
+- Magenta appears at intersections of different colored diamonds.
+- Original colored squares are always preserved in their input positions.
+- The transformation maintains the input grid's dimensions.
