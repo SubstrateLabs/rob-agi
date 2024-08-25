@@ -1,47 +1,121 @@
 example_0:
   input: |
-    The grid is 19x19 with black borders and two vertical black lines dividing it into three 5x5 sections with 2-unit black borders between them. Each section has a distinct pattern:
-    Left section: A sky blue (8) frame with a blue (1) interior. The frame is 1 unit thick on all sides except the bottom, which is 2 units thick.
-    Middle section: Mostly blue (1) with two sky blue (8) squares in the top-left corner.
-    Right section: Entirely blue (1) except for two sky blue (8) squares in the bottom-right corner.
+    Grid structure: 19x19 with black (0) borders and two vertical black lines creating three 5x5 sections.
+    Color palette: Primary - sky blue (8), Secondary - blue (1), Border - black (0)
+    Left section (1-5, 1-5):
+      - Sky blue (8) frame, 1 unit thick on top, left, and right; 2 units thick on bottom
+      - Blue (1) interior
+    Middle section (1-5, 7-11):
+      - Predominantly blue (1)
+      - Two sky blue (8) squares in top-left corner (1-2, 7-8)
+    Right section (1-5, 13-17):
+      - Predominantly blue (1)
+      - Two sky blue (8) squares in bottom-right corner (4-5, 16-17)
+    Note: Sections repeat vertically in rows 7-11 and 13-17
+
   output: |
-    The grid maintains its 19x19 structure with black borders and dividing lines. The patterns in each section have been modified:
-    Left section: The sky blue (8) frame is now only on the left and top sides, 1 unit thick. The rest is filled with blue (1).
-    Middle section: A symmetrical pattern with sky blue (8) frame on all sides except the bottom. The frame is 1 unit thick on top and sides, 2 units thick on the bottom.
-    Right section: Mirror image of the left section, with the sky blue (8) frame on the right and top sides.
-    The entire grid now has vertical symmetry across its center.
+    Grid structure: Maintained 19x19 with black borders and dividing lines
+    Color palette: Unchanged - Primary (8), Secondary (1), Border (0)
+    Transformation pattern:
+    Left section (1-5, 1-5):
+      - Sky blue (8) frame on left and top only, 1 unit thick
+      - Blue (1) interior and right/bottom edges
+    Middle section (1-5, 7-11):
+      - Symmetrical sky blue (8) frame, 1 unit thick on top/sides, 2 units on bottom
+      - Blue (1) interior
+    Right section (1-5, 13-17):
+      - Mirror of left section: sky blue (8) frame on right and top, 1 unit thick
+      - Blue (1) interior and left/bottom edges
+    Symmetry:
+      - Vertical symmetry across entire grid
+      - Horizontal symmetry between top and bottom thirds (rows 1-5 mirror 13-17)
+    Note: Middle section (rows 7-11) maintains its own internal symmetry
 
 example_1:
   input: |
-    The grid is 19x19 with black borders and two vertical black lines dividing it into three 5x5 sections. Each section has a unique pattern of red (2) and green (3):
-    Left section: Mostly green with a few red squares scattered, more concentrated in the top-left.
-    Middle section: Mostly green with two red squares in the top-left corner.
-    Right section: Mostly green with red squares scattered, more concentrated in the bottom-right.
+    Grid structure: 19x19 with black (0) borders and two vertical black lines creating three 5x5 sections
+    Color palette: Primary - green (3), Secondary - red (2), Border - black (0)
+    Left section (1-5, 1-5):
+      - Predominantly green (3)
+      - Red (2) squares scattered, higher concentration in top-left
+    Middle section (1-5, 7-11):
+      - Predominantly green (3)
+      - Two red (2) squares in top-left corner (1-2, 7-8)
+    Right section (1-5, 13-17):
+      - Predominantly green (3)
+      - Red (2) squares scattered, higher concentration in bottom-right
+    Note: Sections repeat vertically in rows 7-11 and 13-17, with slight variations
+
   output: |
-    The grid maintains its 19x19 structure with black borders and dividing lines. The patterns in each section have been modified:
-    Left section: A red (2) frame on the left and top sides, 1 unit thick. The rest is filled with green (3).
-    Middle section: A symmetrical pattern with a red (2) frame. The frame is 1 unit thick on sides, 2 units thick on top and bottom, with green (3) filling the interior.
-    Right section: Mirror image of the left section, with the red (2) frame on the right and top sides.
-    The entire grid now has both vertical and horizontal symmetry.
+    Grid structure: Maintained 19x19 with black borders and dividing lines
+    Color palette: Unchanged - Primary (3), Secondary (2), Border (0)
+    Transformation pattern:
+    Left section (1-5, 1-5):
+      - Red (2) frame on left and top, 1 unit thick
+      - Green (3) interior and right/bottom edges
+    Middle section (1-5, 7-11):
+      - Symmetrical red (2) frame, 1 unit thick on sides, 2 units on top/bottom
+      - Green (3) interior with red (2) center square
+    Right section (1-5, 13-17):
+      - Mirror of left section: red (2) frame on right and top, 1 unit thick
+      - Green (3) interior and left/bottom edges
+    Symmetry:
+      - Perfect vertical and horizontal symmetry across entire grid
+      - Each third (rows 1-5, 7-11, 13-17) internally symmetrical
+    Note: Consistent pattern application across all three vertical thirds
 
 example_2:
   input: |
-    The grid is 19x19 with black borders and two vertical black lines dividing it into three 5x5 sections. The pattern uses magenta (6) and sky blue (8):
-    Left section: Magenta (6) top row, the rest sky blue (8).
-    Middle section: Mostly sky blue (8) with magenta (6) squares in the bottom corners.
-    Right section: Mostly sky blue (8) with a single magenta (6) square in the top-right corner.
+    Grid structure: 19x19 with black (0) borders and two vertical black lines creating three 5x5 sections
+    Color palette: Primary - sky blue (8), Secondary - magenta (6), Border - black (0)
+    Left section (1-5, 1-5):
+      - Magenta (6) top row
+      - Sky blue (8) in remaining area
+    Middle section (1-5, 7-11):
+      - Predominantly sky blue (8)
+      - Magenta (6) squares in bottom corners (5, 7) and (5, 11)
+    Right section (1-5, 13-17):
+      - Predominantly sky blue (8)
+      - Single magenta (6) square in top-right corner (1, 17)
+    Note: Sections repeat vertically in rows 7-11 and 13-17, with variations
+
   output: |
-    The grid maintains its 19x19 structure with black borders and dividing lines. The patterns in each section have been modified:
-    Left section: Magenta (6) frame on left and top sides, 1 unit thick. The rest is filled with sky blue (8).
-    Middle section: Symmetrical pattern with magenta (6) frame. The frame is 2 units thick on top and bottom, 1 unit thick on sides. Sky blue (8) fills the interior.
-    Right section: Mirror image of the left section, with magenta (6) frame on right and top sides.
-    The entire grid now has both vertical and horizontal symmetry.
+    Grid structure: Maintained 19x19 with black borders and dividing lines
+    Color palette: Unchanged - Primary (8), Secondary (6), Border (0)
+    Transformation pattern:
+    Left section (1-5, 1-5):
+      - Magenta (6) frame on left and top, 1 unit thick
+      - Sky blue (8) interior and right/bottom edges
+    Middle section (1-5, 7-11):
+      - Symmetrical magenta (6) frame, 2 units thick on top/bottom, 1 unit on sides
+      - Sky blue (8) interior
+    Right section (1-5, 13-17):
+      - Mirror of left section: magenta (6) frame on right and top, 1 unit thick
+      - Sky blue (8) interior and left/bottom edges
+    Symmetry:
+      - Perfect vertical and horizontal symmetry across entire grid
+      - Each third (rows 1-5, 7-11, 13-17) internally symmetrical
+    Note: Consistent pattern application with emphasis on frame-like structures
 
 test_case_0:
   input: |
-    The grid is 19x19 with black borders and two vertical black lines dividing it into three 5x5 sections. The pattern uses magenta (6) and sky blue (8):
-    Left section: Mostly sky blue (8) with magenta (6) squares forming an incomplete frame (missing bottom-right corner).
-    Middle section: Mostly sky blue (8) with magenta (6) squares scattered in no clear pattern.
-    Right section: Mix of sky blue (8) and magenta (6), with more magenta concentrated in the top-left area.
+    Grid structure: 19x19 with black (0) borders and two vertical black lines creating three 5x5 sections
+    Color palette: Primary - sky blue (8), Secondary - magenta (6), Border - black (0)
+    Left section (1-5, 1-5):
+      - Predominantly sky blue (8)
+      - Magenta (6) forming incomplete frame (present on top, left, and right; missing bottom-right corner)
+    Middle section (1-5, 7-11):
+      - Predominantly sky blue (8)
+      - Magenta (6) squares scattered without clear pattern
+    Right section (1-5, 13-17):
+      - Mix of sky blue (8) and magenta (6)
+      - Higher concentration of magenta (6) in top-left area
+    Note: Sections repeat vertically in rows 7-11 and 13-17, potentially with variations
+
   output: |
     The output grid is not provided for this test case.
+    Expected transformation based on observed patterns:
+    - Symmetrical arrangement of colors within each 5x5 section
+    - Vertical symmetry across the entire grid
+    - Consistent application of frame-like structures using the secondary color (magenta)
+    - Potential variation in pattern between top, middle, and bottom thirds of the grid
