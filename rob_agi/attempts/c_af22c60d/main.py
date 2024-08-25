@@ -7,11 +7,14 @@ def solve_af22c60d(input_grid: ColoredGrid) -> ColoredGrid:
     extended from surrounding non-black cells.
 
     The solution follows these steps:
-    1. Identify all black areas in the grid.
-    2. Extend horizontal patterns into black areas from left and right.
-    3. Extend vertical patterns into black areas from top and bottom.
-    4. Resolve conflicts at intersections by preferring horizontal extensions.
-    5. Fill any remaining isolated black cells with the most frequent surrounding color.
+    1. Iterate through the grid row by row, from top to bottom.
+    2. For each black cell encountered:
+       a. Look for a sequence of colors to the left.
+       b. If not found, look for a sequence of colors above.
+       c. If still not found, find the nearest non-black color.
+    3. Fill the current black cell and any contiguous black cells to its right
+       with the found color sequence or single color.
+    4. Repeat until no black cells remain.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -22,57 +25,53 @@ def solve_af22c60d(input_grid: ColoredGrid) -> ColoredGrid:
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
 
-    # Helper function to get non-black color in a direction
-    def get_non_black_color(r: int, c: int, dr: int, dc: int) -> int:
-        while 0 <= r < rows and 0 <= c < cols:
-            color = grid.get_cell(r, c)
-            if color != 0:
-                return color
-            r += dr
-            c += dc
-        return -1  # Return -1 if no non-black color found
+    def get_left_sequence(r: int, c: int) -> List[int]:
+        sequence = []
+        c -= 1
+        while c >= 0 and grid.get_cell(r, c) != 0:
+            sequence.append(grid.get_cell(r, c))
+            c -= 1
+        return sequence[::-1]
 
-    # Extend horizontal patterns
+    def get_top_sequence(r: int, c: int) -> List[int]:
+        sequence = []
+        r -= 1
+        while r >= 0 and grid.get_cell(r, c) != 0:
+            sequence.append(grid.get_cell(r, c))
+            r -= 1
+        return sequence
+
+    def get_nearest_color(r: int, c: int) -> int:
+        directions = [(0, 1), (1, 0), (-1, 1), (1, 1), (-1, -1), (1, -1), (-1, 0), (0, -1)]
+        for dr, dc in directions:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols and grid.get_cell(nr, nc) != 0:
+                return grid.get_cell(nr, nc)
+        return 1  # Default to color 1 if no non-black color found
+
+    def fill_sequence(r: int, c: int, sequence: List[int]):
+        if not sequence:
+            return
+        idx = 0
+        while c < cols and grid.get_cell(r, c) == 0:
+            grid.set_cell(r, c, sequence[idx])
+            idx = (idx + 1) % len(sequence)
+            c += 1
+
     for r in range(rows):
-        start = -1
-        for c in range(cols):
+        c = 0
+        while c < cols:
             if grid.get_cell(r, c) == 0:
-                if start == -1:
-                    start = c
-            elif start != -1:
-                left_color = get_non_black_color(r, start - 1, 0, -1)
-                right_color = get_non_black_color(r, c, 0, 1)
-                fill_color = left_color if left_color != -1 else right_color
-                for fill_c in range(start, c):
-                    grid.set_cell(r, fill_c, fill_color)
-                start = -1
-
-    # Extend vertical patterns
-    for c in range(cols):
-        start = -1
-        for r in range(rows):
-            if grid.get_cell(r, c) == 0:
-                if start == -1:
-                    start = r
-            elif start != -1:
-                top_color = get_non_black_color(start - 1, c, -1, 0)
-                bottom_color = get_non_black_color(r, c, 1, 0)
-                fill_color = top_color if top_color != -1 else bottom_color
-                for fill_r in range(start, r):
-                    if grid.get_cell(fill_r, c) == 0:  # Only fill if still black
-                        grid.set_cell(fill_r, c, fill_color)
-                start = -1
-
-    # Fill any remaining black cells with most frequent neighbor
-    for r in range(rows):
-        for c in range(cols):
-            if grid.get_cell(r, c) == 0:
-                neighbors = []
-                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                    nr, nc = r + dr, c + dc
-                    if 0 <= nr < rows and 0 <= nc < cols and grid.get_cell(nr, nc) != 0:
-                        neighbors.append(grid.get_cell(nr, nc))
-                if neighbors:
-                    grid.set_cell(r, c, max(set(neighbors), key=neighbors.count))
+                left_seq = get_left_sequence(r, c)
+                if left_seq:
+                    fill_sequence(r, c, left_seq)
+                else:
+                    top_seq = get_top_sequence(r, c)
+                    if top_seq:
+                        fill_sequence(r, c, top_seq)
+                    else:
+                        nearest_color = get_nearest_color(r, c)
+                        fill_sequence(r, c, [nearest_color])
+            c += 1
 
     return grid
