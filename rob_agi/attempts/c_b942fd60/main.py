@@ -6,21 +6,22 @@ def solve_b942fd60(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by connecting non-black squares with red lines.
     
     The function creates a minimal network of red lines that:
-    1. Creates a "backbone" structure with optimal vertical and horizontal lines
-    2. Connects all non-black squares to the backbone
-    3. Preserves the original positions and colors of non-black squares
-    4. Ensures red lines don't extend beyond the last colored square in any direction
-    5. Cleans up any unnecessary or stray red lines
+    1. Creates vertical lines at the leftmost and rightmost columns with colored squares
+    2. Creates horizontal lines at the topmost and bottommost rows with unconnected colored squares
+    3. Connects any remaining unconnected colored squares to the nearest part of the red line structure
+    4. Preserves the original positions and colors of non-black squares
+    5. Ensures red lines don't extend beyond the last colored square in any direction
+    6. Removes any unnecessary or isolated red squares
     
     Steps:
     1. Create a deep copy of the input grid
     2. Identify all non-black squares
-    3. Find optimal vertical and horizontal lines for the backbone
-    4. Create the backbone structure
-    5. Connect remaining non-black squares to the backbone
+    3. Create vertical red lines at the edges
+    4. Create horizontal red lines to connect unconnected squares
+    5. Connect any remaining unconnected squares
     6. Clean up unnecessary extensions
-    7. Verify connectivity and add necessary connections
-    8. Remove isolated red squares
+    7. Remove isolated red squares
+    8. Perform a final connectivity check
     9. Return the modified grid
     """
     output_grid = input_grid.deep_copy()
