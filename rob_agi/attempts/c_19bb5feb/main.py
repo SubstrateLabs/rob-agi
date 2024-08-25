@@ -9,7 +9,7 @@ def solve_19bb5feb(input_grid: ColoredGrid) -> ColoredGrid:
     2. Creating a 2x2 output grid where:
        - The top-left cell is the color with the lowest value.
        - The top-right cell is the color with the highest value.
-       - The bottom-left cell is the second-lowest color value (if more than two colors are found).
+       - The bottom-left cell is the middle color value (if 3 colors are found) or black (if 2 colors).
        - The bottom-right cell is always black (0).
 
     Args:
@@ -32,12 +32,10 @@ def solve_19bb5feb(input_grid: ColoredGrid) -> ColoredGrid:
 
     output_values = [[0, 0], [0, 0]]
     if found_colors:
-        min_color = min(found_colors)
-        max_color = max(found_colors)
-        output_values[0][0] = min_color  # Top-left: lowest color value
-        output_values[0][1] = max_color  # Top-right: highest color value
-        if len(found_colors) > 2:
-            second_min_color = min(color for color in found_colors if color != min_color)
-            output_values[1][0] = second_min_color  # Bottom-left: second-lowest color value
+        sorted_colors = sorted(found_colors)
+        output_values[0][0] = sorted_colors[0]  # Top-left: lowest color value
+        output_values[0][1] = sorted_colors[-1]  # Top-right: highest color value
+        if len(sorted_colors) == 3:
+            output_values[1][0] = sorted_colors[1]  # Bottom-left: middle color value
 
     return ColoredGrid(values=output_values)
