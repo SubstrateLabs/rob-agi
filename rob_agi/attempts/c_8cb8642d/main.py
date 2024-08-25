@@ -14,6 +14,7 @@ def solve_8cb8642d(input_grid: ColoredGrid) -> ColoredGrid:
        - Fills the rest with black (0).
     4. Ensures symmetry in the transformed patterns.
     5. Applies the transformations back to the original grid.
+    6. Preserves the original border of each rectangle.
     
     Returns the modified grid as the solution.
     """
@@ -58,29 +59,30 @@ def transform_rectangle(grid: ColoredGrid, rect: Tuple[int, int, int, int, int])
     height, width = bottom - top + 1, right - left + 1
     seed_color, _ = find_seed(grid, rect)
     
-    for r in range(top, bottom + 1):
-        for c in range(left, right + 1):
-            if r == top or r == bottom or c == left or c == right:
-                continue  # Keep the border intact
-            
-            rel_r, rel_c = r - top, c - left
-            center_r, center_c = height // 2, width // 2
-            
-            # Set corners and center to seed color
-            if (rel_r, rel_c) in [(0, 0), (0, width-1), (height-1, 0), (height-1, width-1), (center_r, center_c)]:
-                grid.set_cell(r, c, seed_color)
-            # Create X pattern with seed color
-            elif rel_r == rel_c or rel_r == width - 1 - rel_c:
-                grid.set_cell(r, c, seed_color)
-            # Fill the rest with black
-            else:
-                grid.set_cell(r, c, 0)
+    if seed_color == color:
+        return  # No transformation needed if no seed found
+    
+    # Create pattern grid
+    pattern = [[0 for _ in range(width-2)] for _ in range(height-2)]
+    
+    # Set corners and center
+    pattern[0][0] = pattern[0][-1] = pattern[-1][0] = pattern[-1][-1] = seed_color
+    pattern[(height-3)//2][(width-3)//2] = seed_color
+    
+    # Draw diagonals
+    for i in range(height-2):
+        pattern[i][i] = pattern[i][width-3-i] = seed_color
+    
+    # Apply pattern to grid
+    for r in range(top+1, bottom):
+        for c in range(left+1, right):
+            grid.set_cell(r, c, pattern[r-top-1][c-left-1])
 
 def find_seed(grid: ColoredGrid, rect: Tuple[int, int, int, int, int]) -> Tuple[int, Tuple[int, int]]:
     """Finds the seed (different color pixel) within a rectangle."""
     top, left, bottom, right, color = rect
-    for r in range(top, bottom + 1):
-        for c in range(left, right + 1):
+    for r in range(top+1, bottom):
+        for c in range(left+1, right):
             if grid.get_cell(r, c) != color:
                 return grid.get_cell(r, c), (r, c)
     return color, (top, left)  # Fallback if no seed found
