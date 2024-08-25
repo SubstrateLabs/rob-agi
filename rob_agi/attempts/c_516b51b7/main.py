@@ -8,17 +8,16 @@ def solve_516b51b7(input_grid: ColoredGrid) -> ColoredGrid:
     
     The solution follows these steps:
     1. Find all connected blue (1) regions in the input grid.
-    2. For each region, calculate the distance of each cell from the edge.
+    2. For each region:
+       a. Calculate its dimensions and center point(s).
+       b. For each cell, calculate its distance from the center.
     3. Apply a concentric coloring pattern based on the region size:
        - Small regions (3x3 or smaller): Keep edge blue (1), inner cells red (2)
-       - Medium regions (4x4 or 4x3): Keep edge blue (1), inner cells red (2)
-       - Large regions (5x5 or larger):
-         * Edge (distance 0): Blue (1)
-         * First inner layer (distance 1): Red (2)
-         * Second inner layer (distance 2): Green (3)
-         * Center:
-           - For even dimensions: 2x2 red (2) center
-           - For odd dimensions: Green (3) center
+       - Medium and large regions (4x4 or larger):
+         * Center: Red (2) for 2x2 center if even dimensions, Green (3) if odd
+         * Next layer (if exists): Green (3)
+         * Following layer: Red (2)
+         * Edge: Blue (1)
     
     Returns a new ColoredGrid with the transformed pattern.
     """
@@ -28,55 +27,36 @@ def solve_516b51b7(input_grid: ColoredGrid) -> ColoredGrid:
     def find_connected_regions(color: int) -> List[List[Tuple[int, int]]]:
         return input_grid.find_connected_regions(color)
     
-    def get_distance_from_edge(region: List[Tuple[int, int]]) -> dict:
-        distances = {}
-        queue = deque()
-        for r, c in region:
-            if any(0 <= nr < rows and 0 <= nc < cols and input_grid.values[nr][nc] != 1
-                   for nr, nc in [(r-1, c), (r+1, c), (r, c-1), (r, c+1)]):
-                distances[(r, c)] = 0
-                queue.append((r, c, 0))
-        
-        while queue:
-            r, c, d = queue.popleft()
-            for nr, nc in [(r-1, c), (r+1, c), (r, c-1), (r, c+1)]:
-                if (nr, nc) in region and (nr, nc) not in distances:
-                    distances[(nr, nc)] = d + 1
-                    queue.append((nr, nc, d + 1))
-        
-        return distances
-    
-    def get_region_dimensions(region: List[Tuple[int, int]]) -> Tuple[int, int, int, int]:
+    def get_region_info(region: List[Tuple[int, int]]) -> Tuple[int, int, int, int, Tuple[float, float]]:
         min_r = min(r for r, _ in region)
         max_r = max(r for r, _ in region)
         min_c = min(c for _, c in region)
         max_c = max(c for _, c in region)
-        return min_r, min_c, max_r - min_r + 1, max_c - min_c + 1
+        height = max_r - min_r + 1
+        width = max_c - min_c + 1
+        center_r = min_r + (height - 1) / 2
+        center_c = min_c + (width - 1) / 2
+        return min_r, min_c, height, width, (center_r, center_c)
     
     def color_region(region: List[Tuple[int, int]]):
-        distances = get_distance_from_edge(region)
-        min_r, min_c, height, width = get_region_dimensions(region)
-        max_distance = max(distances.values())
+        min_r, min_c, height, width, (center_r, center_c) = get_region_info(region)
+        max_distance = max(height, width) // 2
         
-        if height <= 3 and width <= 3:  # Small region
-            for r, c in region:
-                output_grid.values[r][c] = 1 if distances[(r, c)] == 0 else 2
-        elif (height == 4 and width <= 4) or (width == 4 and height <= 4):  # Medium region
-            for r, c in region:
-                output_grid.values[r][c] = 1 if distances[(r, c)] == 0 else 2
-        else:  # Large region
-            for r, c in region:
-                d = distances[(r, c)]
-                if d == 0:
+        for r, c in region:
+            distance = max(abs(r - center_r), abs(c - center_c))
+            if height <= 3 and width <= 3:  # Small region
+                output_grid.values[r][c] = 1 if distance == max_distance else 2
+            else:  # Medium and large regions
+                if distance == max_distance:
                     output_grid.values[r][c] = 1  # Blue edge
-                elif d == 1:
-                    output_grid.values[r][c] = 2  # Red first inner layer
-                elif d == 2:
-                    output_grid.values[r][c] = 3  # Green second inner layer
+                elif distance == max_distance - 1:
+                    output_grid.values[r][c] = 2  # Red layer
+                elif distance == max_distance - 2 and max_distance > 2:
+                    output_grid.values[r][c] = 3  # Green layer
                 else:
-                    center_r, center_c = min_r + height // 2, min_c + width // 2
+                    # Center coloring
                     if height % 2 == 0 and width % 2 == 0:
-                        output_grid.values[r][c] = 2 if (abs(r - center_r) < 2 and abs(c - center_c) < 2) else 3
+                        output_grid.values[r][c] = 2 if (abs(r - center_r) < 1 and abs(c - center_c) < 1) else 3
                     else:
                         output_grid.values[r][c] = 3
     
