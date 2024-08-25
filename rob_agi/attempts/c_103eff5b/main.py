@@ -39,8 +39,7 @@ def solve_103eff5b(input_grid: ColoredGrid) -> ColoredGrid:
     for region in color_8_regions:
         bounding_box = get_bounding_box(region)
         new_grid = new_grid.apply_function_to_regions(
-            lambda r: color_mapping((r[0], r[1]), bounding_box),
-            [region]
+            lambda r: color_mapping((r[0][0], r[0][1]), bounding_box)
         )
     
     return new_grid
