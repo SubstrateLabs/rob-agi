@@ -1,50 +1,111 @@
 example_0:
   input: |
-    The grid is 13x10. There are three distinct shapes visible:
-    1. In the top-left, a 3x3 square shape made of sky blue (8) and yellow (4) colors. The yellow forms an inverted L-shape within the square.
-    2. In the middle-right, a 3x3 square shape made of green (3) and red (2) colors. The red forms a diagonal line from top-right to bottom-left within the square.
-    3. In the bottom-left, a T-shaped object made of green (3) with two magenta (6) squares in the middle of the top row.
-    The rest of the grid is filled with black (0), which can be considered empty space.
+    Grid size: 13x10
+    Three distinct two-color regions:
+    1. Top-left (3x3): Sky blue (8) and yellow (4)
+       - Yellow forms an inverted L-shape
+       - Sky blue fills the remaining cells
+    2. Middle-right (3x3): Green (3) and red (2)
+       - Red forms a diagonal line from top-right to bottom-left
+       - Green fills the remaining cells
+    3. Bottom-left (T-shape): Green (3) and magenta (6)
+       - Two magenta squares in the middle of the top row
+       - Green forms a T-shape around the magenta squares
+    Background: Black (0)
+
   output: |
-    The grid maintains its 13x10 size. The three shapes are still present but have been transformed:
-    1. The top-left square has been rotated 180 degrees. The yellow inverted L-shape is now in the opposite orientation.
-    2. The middle-right square has been flipped horizontally. The red diagonal now runs from top-left to bottom-right.
-    3. The bottom-left T-shape has been inverted. The two magenta squares are now at the bottom of the T, and the green forms an inverted U-shape above them.
-    The black (empty) spaces remain unchanged.
+    Grid size: 13x10 (unchanged)
+    Three transformed two-color regions:
+    1. Top-left (3x3): Sky blue (8) and yellow (4)
+       - Colors swapped within the region
+       - Yellow now forms an L-shape in the bottom-right
+       - Sky blue fills the remaining cells
+    2. Middle-right (3x3): Green (3) and red (2)
+       - Colors swapped within the region
+       - Red diagonal now runs from top-left to bottom-right
+       - Green fills the remaining cells
+    3. Bottom-left (T-shape): Green (3) and magenta (6)
+       - Colors swapped within the region
+       - Two magenta squares now at the bottom of the T
+       - Green forms an inverted U-shape above the magenta squares
+    Background: Black (0) (unchanged)
 
 example_1:
   input: |
-    The grid is 7x7. There is one distinct shape visible in the top-left corner:
-    A 3x3 square shape made of gray (5) and sky blue (8) colors. The sky blue forms a T-shape within the square, with the stem of the T pointing downwards.
-    The rest of the grid is filled with black (0), which can be considered empty space.
+    Grid size: 7x7
+    One two-color region:
+    Top-left (3x3): Gray (5) and sky blue (8)
+    - Sky blue forms a T-shape with the stem pointing downwards
+    - Gray fills the remaining cells
+    Background: Black (0)
+
   output: |
-    The grid maintains its 7x7 size. The shape in the top-left corner has been transformed:
-    The 3x3 square has been rotated 180 degrees. The sky blue T-shape is now inverted, with the stem pointing upwards.
-    The black (empty) spaces remain unchanged.
+    Grid size: 7x7 (unchanged)
+    One transformed two-color region:
+    Top-left (3x3): Gray (5) and sky blue (8)
+    - Colors swapped within the region
+    - Sky blue now forms an inverted T-shape with the stem pointing upwards
+    - Gray fills the remaining cells
+    Background: Black (0) (unchanged)
 
 example_2:
   input: |
-    The grid is 12x12. There are four distinct shapes visible:
-    1. In the top-left, a 3x3 square shape made of blue (1) and sky blue (8) colors. The sky blue forms a cross shape within the square.
-    2. In the top-right, a 3x3 square shape made of green (3) and red (2) colors. The red forms a plus sign within the square.
-    3. In the middle-left, a 3x3 square shape made of blue (1) and magenta (6) colors. The magenta forms an inverted L-shape in the top-right corner of the square.
-    4. In the bottom-right, a 3x3 square shape made of yellow (4) and gray (5) colors. The yellow forms an L-shape in the top-left corner of the square.
-    The rest of the grid is filled with black (0), which can be considered empty space.
+    Grid size: 12x12
+    Four distinct two-color regions:
+    1. Top-left (3x3): Blue (1) and sky blue (8)
+       - Sky blue forms a cross shape
+       - Blue fills the remaining cells
+    2. Top-right (3x3): Green (3) and red (2)
+       - Red forms a plus sign
+       - Green fills the remaining cells
+    3. Middle-left (3x3): Blue (1) and magenta (6)
+       - Magenta forms an inverted L-shape in the top-right corner
+       - Blue fills the remaining cells
+    4. Bottom-right (3x3): Yellow (4) and gray (5)
+       - Yellow forms an L-shape in the top-left corner
+       - Gray fills the remaining cells
+    Background: Black (0)
+
   output: |
-    The grid maintains its 12x12 size. All four shapes have been transformed:
-    1. The top-left square has been rotated 180 degrees. The sky blue cross is now inverted.
-    2. The top-right square has been rotated 180 degrees. The red plus sign remains unchanged due to its symmetry.
-    3. The middle-left square has been rotated 180 degrees. The magenta inverted L-shape is now in the bottom-left corner of the square.
-    4. The bottom-right square has been rotated 180 degrees. The yellow L-shape is now in the bottom-right corner of the square.
-    The black (empty) spaces remain unchanged.
+    Grid size: 12x12 (unchanged)
+    Four transformed two-color regions:
+    1. Top-left (3x3): Blue (1) and sky blue (8)
+       - Colors swapped within the region
+       - Sky blue cross is now inverted
+       - Blue fills the remaining cells
+    2. Top-right (3x3): Green (3) and red (2)
+       - Colors swapped within the region
+       - Red plus sign remains visually unchanged due to symmetry
+       - Green fills the remaining cells
+    3. Middle-left (3x3): Blue (1) and magenta (6)
+       - Colors swapped within the region
+       - Magenta now forms an L-shape in the bottom-left corner
+       - Blue fills the remaining cells
+    4. Bottom-right (3x3): Yellow (4) and gray (5)
+       - Colors swapped within the region
+       - Yellow now forms an L-shape in the bottom-right corner
+       - Gray fills the remaining cells
+    Background: Black (0) (unchanged)
 
 test_case_0:
   input: |
-    The grid is 12x12. There are four distinct shapes visible:
-    1. In the top-left, a 3x3 square shape made of blue (1) and sky blue (8) colors. The sky blue forms a cross shape within the square.
-    2. In the top-right, a 3x3 square shape made of green (3) and red (2) colors. The red forms a plus sign within the square.
-    3. In the middle-left, a 3x3 square shape made of blue (1) and magenta (6) colors. The magenta forms an inverted L-shape in the top-right corner of the square.
-    4. In the bottom-right, a 3x3 square shape made of yellow (4) and gray (5) colors. The yellow forms an L-shape in the top-left corner of the square.
-    The rest of the grid is filled with black (0), which can be considered empty space.
+    Grid size: 12x12
+    Four distinct two-color regions:
+    1. Top-left (3x3): Blue (1) and sky blue (8)
+       - Sky blue forms a cross shape
+       - Blue fills the remaining cells
+    2. Top-right (3x3): Green (3) and red (2)
+       - Red forms a plus sign
+       - Green fills the remaining cells
+    3. Middle-left (3x3): Blue (1) and magenta (6)
+       - Magenta forms an inverted L-shape in the top-right corner
+       - Blue fills the remaining cells
+    4. Bottom-right (3x3): Yellow (4) and gray (5)
+       - Yellow forms an L-shape in the top-left corner
+       - Gray fills the remaining cells
+    Background: Black (0)
+
   output: |
-    The output grid is not provided for this test case.
+    Output grid not provided for this test case.
+    Expected behavior: Colors within each two-color region should be swapped,
+    maintaining the overall shape of each region.
