@@ -10,7 +10,7 @@ def solve_19bb5feb(input_grid: ColoredGrid) -> ColoredGrid:
        - The top-left cell is the color with the lowest value.
        - The top-right cell is the color with the highest value.
        - The bottom-left cell is the middle color value (if 3 colors are found) or black (if 2 colors).
-       - The bottom-right cell is always black (0).
+       - The bottom-right cell is the second highest color value (if at least 2 colors) or black (if only 1 color).
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -35,6 +35,8 @@ def solve_19bb5feb(input_grid: ColoredGrid) -> ColoredGrid:
         sorted_colors = sorted(found_colors)
         output_values[0][0] = sorted_colors[0]  # Top-left: lowest color value
         output_values[0][1] = sorted_colors[-1]  # Top-right: highest color value
+        if len(sorted_colors) >= 2:
+            output_values[1][1] = sorted_colors[-2]  # Bottom-right: second highest color value
         if len(sorted_colors) == 3:
             output_values[1][0] = sorted_colors[1]  # Bottom-left: middle color value
 
