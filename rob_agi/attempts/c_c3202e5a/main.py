@@ -3,16 +3,15 @@ from typing import Tuple, List
 
 def solve_c3202e5a(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms an input grid by identifying a focus section and color, then creating a new grid
-    based on the pattern of the focus color in that section.
+    Transforms an input grid by identifying dividing lines, focus color, and creating a new grid
+    based on the pattern of the focus color.
 
-    1. Analyzes the input grid to find dividing lines and section size.
-    2. Identifies the focus section with the highest concentration of a single color.
-    3. Determines the focus color within that section.
-    4. Creates a new grid:
-       - If input section is 4x4, expands to 5x5
-       - If input section is 5x5, contracts to 3x3
-    5. Transfers the pattern of the focus color to the new grid.
+    1. Identifies the dividing lines in the input grid.
+    2. Determines the section size (3 or 5).
+    3. Finds the focus color (most frequent non-dividing, non-black color).
+    4. Analyzes the distribution of the focus color in the grid.
+    5. Creates a new grid (5x5 if input sections are 3x3, 3x3 if input sections are 5x5).
+    6. Applies a transformation rule to place the focus color in the output grid.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -22,15 +21,14 @@ def solve_c3202e5a(input_grid: ColoredGrid) -> ColoredGrid:
     """
     dividing_color = find_dividing_lines(input_grid)
     section_size = get_section_size(input_grid, dividing_color)
-    focus_section = find_focus_section(input_grid, dividing_color, section_size)
-    focus_color = get_focus_color(focus_section)
-
-    if section_size == 4:
+    focus_color = get_focus_color(input_grid, dividing_color)
+    
+    if section_size == 3:
         output_size = 5
-        output_values = expand_pattern(focus_section, focus_color)
+        output_values = expand_pattern(input_grid, dividing_color, focus_color)
     elif section_size == 5:
         output_size = 3
-        output_values = contract_pattern(focus_section, focus_color)
+        output_values = contract_pattern(input_grid, dividing_color, focus_color)
     else:
         raise ValueError(f"Unexpected section size: {section_size}")
 
@@ -38,54 +36,78 @@ def solve_c3202e5a(input_grid: ColoredGrid) -> ColoredGrid:
 
 def find_dividing_lines(grid: ColoredGrid) -> int:
     """Identifies the color of the dividing lines."""
-    for color in range(1, 10):  # Skip black (0)
-        if all(cell == color for cell in grid.values[3]):  # Check 4th row
-            return color
+    rows, cols = grid.get_dimensions()
+    for row in range(rows):
+        if all(cell == grid.values[row][0] for cell in grid.values[row]) and grid.values[row][0] != 0:
+            return grid.values[row][0]
     raise ValueError("No dividing lines found")
 
 def get_section_size(grid: ColoredGrid, dividing_color: int) -> int:
     """Calculates the size of individual sections."""
-    for i in range(1, len(grid.values)):
-        if grid.values[i][0] == dividing_color:
-            return i
+    section_size = 0
+    for row in grid.values:
+        if row[0] == dividing_color:
+            return section_size
+        section_size += 1
     raise ValueError("Could not determine section size")
 
-def find_focus_section(grid: ColoredGrid, dividing_color: int, section_size: int) -> List[List[int]]:
-    """Locates the section with the highest color concentration."""
-    max_concentration = 0
-    focus_section = None
-    for i in range(0, len(grid.values), section_size + 1):
-        for j in range(0, len(grid.values[0]), section_size + 1):
-            section = [row[j:j+section_size] for row in grid.values[i:i+section_size]]
-            concentration = max(count_color(section, color) for color in range(10) if color != dividing_color)
-            if concentration > max_concentration:
-                max_concentration = concentration
-                focus_section = section
-    if focus_section is None:
-        raise ValueError("No focus section found")
-    return focus_section
-
-def get_focus_color(section: List[List[int]]) -> int:
-    """Determines the most frequent non-zero color in a section."""
-    color_counts = {color: count_color(section, color) for color in range(1, 10)}
+def get_focus_color(grid: ColoredGrid, dividing_color: int) -> int:
+    """Determines the most frequent non-zero, non-dividing color in the grid."""
+    color_counts = {color: 0 for color in range(1, 10) if color != dividing_color}
+    for row in grid.values:
+        for cell in row:
+            if cell != 0 and cell != dividing_color:
+                color_counts[cell] = color_counts.get(cell, 0) + 1
     return max(color_counts, key=color_counts.get)
 
-def count_color(section: List[List[int]], color: int) -> int:
-    """Counts occurrences of a color in a section."""
-    return sum(row.count(color) for row in section)
-
-def expand_pattern(section: List[List[int]], focus_color: int) -> List[List[int]]:
-    """Expands a 4x4 pattern to 5x5."""
+def expand_pattern(grid: ColoredGrid, dividing_color: int, focus_color: int) -> List[List[int]]:
+    """Expands the pattern from 3x3 sections to a 5x5 grid."""
     output = [[0 for _ in range(5)] for _ in range(5)]
-    for i in range(4):
-        for j in range(4):
-            output[i+1][j+1] = focus_color if section[i][j] == focus_color else 0
-    # Extend pattern to extra row and column
-    for i in range(1, 5):
-        output[0][i] = output[1][i]
-        output[i][0] = output[i][1]
+    sections = [row for row in grid.values if row[0] != dividing_color]
+    focus_positions = []
+    
+    for i, row in enumerate(sections):
+        for j, cell in enumerate(row):
+            if cell == focus_color:
+                focus_positions.append((i % 3, j % 3))
+    
+    # Apply transformation rule (this is a simple example, adjust as needed)
+    for i, j in focus_positions:
+        if i == 0 and j == 0:
+            output[0][0] = focus_color
+        elif i == 0 and j == 2:
+            output[0][4] = focus_color
+        elif i == 2 and j == 0:
+            output[4][0] = focus_color
+        elif i == 2 and j == 2:
+            output[4][4] = focus_color
+        else:
+            output[i+1][j+1] = focus_color
+    
     return output
 
-def contract_pattern(section: List[List[int]], focus_color: int) -> List[List[int]]:
-    """Contracts a 5x5 pattern to 3x3."""
-    return [[focus_color if section[i+1][j+1] == focus_color else 0 for j in range(3)] for i in range(3)]
+def contract_pattern(grid: ColoredGrid, dividing_color: int, focus_color: int) -> List[List[int]]:
+    """Contracts the pattern from 5x5 sections to a 3x3 grid."""
+    output = [[0 for _ in range(3)] for _ in range(3)]
+    sections = [row for row in grid.values if row[0] != dividing_color]
+    focus_positions = []
+    
+    for i, row in enumerate(sections):
+        for j, cell in enumerate(row):
+            if cell == focus_color:
+                focus_positions.append((i % 5, j % 5))
+    
+    # Apply transformation rule (this is a simple example, adjust as needed)
+    for i, j in focus_positions:
+        if i in [0, 4] and j in [0, 4]:
+            output[1][1] = focus_color
+        elif i in [0, 4] and j == 2:
+            output[1][2] = focus_color
+        elif i == 2 and j in [0, 4]:
+            output[2][1] = focus_color
+        elif i == 2 and j == 2:
+            output[2][2] = focus_color
+        else:
+            output[i//2][j//2] = focus_color
+    
+    return output
