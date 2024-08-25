@@ -16,26 +16,23 @@ def solve_7039b2d7(input_grid: ColoredGrid) -> ColoredGrid:
     background_color = Counter([cell for row in input_grid.values for cell in row]).most_common(1)[0][0]
 
     # Step 2: Find horizontal and vertical lines
-    horizontal_lines = [i for i, row in enumerate(input_grid.values) if all(cell != background_color for cell in row)]
-    vertical_lines = [j for j in range(len(input_grid.values[0])) if all(row[j] != background_color for row in input_grid.values)]
+    horizontal_lines = [-1] + [i for i, row in enumerate(input_grid.values) if any(cell != background_color for cell in row)] + [len(input_grid.values)]
+    vertical_lines = [-1] + [j for j in range(len(input_grid.values[0])) if any(row[j] != background_color for row in input_grid.values)] + [len(input_grid.values[0])]
 
     # Step 3: Find largest rectangle
     max_area = 0
     best_rect = (0, 0, 0, 0)  # (top, left, bottom, right)
 
-    for top in [-1] + horizontal_lines:
-        for bottom in horizontal_lines + [len(input_grid.values)]:
-            if bottom <= top + 1:
-                continue
-            for left in [-1] + vertical_lines:
-                for right in vertical_lines + [len(input_grid.values[0])]:
-                    if right <= left + 1:
-                        continue
-                    if is_valid_rectangle(input_grid, top+1, left+1, bottom-1, right-1, background_color):
-                        area = (bottom - top - 1) * (right - left - 1)
-                        if area > max_area:
-                            max_area = area
-                            best_rect = (top+1, left+1, bottom-1, right-1)
+    for i in range(len(horizontal_lines) - 1):
+        for j in range(len(vertical_lines) - 1):
+            top, bottom = horizontal_lines[i] + 1, horizontal_lines[i+1]
+            left, right = vertical_lines[j] + 1, vertical_lines[j+1]
+            
+            if is_valid_rectangle(input_grid, top, left, bottom-1, right-1, background_color):
+                area = (bottom - top) * (right - left)
+                if area > max_area:
+                    max_area = area
+                    best_rect = (top, left, bottom-1, right-1)
 
     # Step 4: Extract and return largest rectangle
     top, left, bottom, right = best_rect
