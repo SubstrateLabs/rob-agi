@@ -39,11 +39,10 @@ def get_other_colors(grid: ColoredGrid) -> Set[int]:
 def swap_regions(grid: ColoredGrid, color1: int, color2: int):
     for r in range(len(grid.values)):
         for c in range(len(grid.values[0])):
-            if r >= 2 or c >= 2:
-                if grid.values[r][c] == color1:
-                    grid.values[r][c] = color2
-                elif grid.values[r][c] == color2:
-                    grid.values[r][c] = color1
+            if grid.values[r][c] == color1:
+                grid.values[r][c] = color2
+            elif grid.values[r][c] == color2:
+                grid.values[r][c] = color1
 
 def is_valid_solution(input_grid: ColoredGrid, new_grid: ColoredGrid) -> bool:
     if not is_top_left_preserved(input_grid, new_grid):
@@ -60,10 +59,10 @@ def is_top_left_preserved(grid1: ColoredGrid, grid2: ColoredGrid) -> bool:
 def are_regions_connected(grid: ColoredGrid) -> bool:
     for color in range(10):
         regions = grid.find_connected_regions(color)
-        if len(regions) > 1:
+        if len(regions) > 1 and color != 0:  # Ignore black (0) regions
             return False
     return True
 
 def calculate_difference(grid1: ColoredGrid, grid2: ColoredGrid) -> int:
     return sum(1 for r in range(len(grid1.values)) for c in range(len(grid1.values[0])) 
-               if (r >= 2 or c >= 2) and grid1.values[r][c] != grid2.values[r][c])
+               if grid1.values[r][c] != grid2.values[r][c])
