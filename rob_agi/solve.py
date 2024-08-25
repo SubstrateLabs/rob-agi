@@ -6,6 +6,7 @@ import random
 import time
 import traceback
 from typing import List, Optional, Union, Tuple
+from concurrent.futures import ThreadPoolExecutor
 
 import cloudpickle
 from openai.lib._pydantic import to_strict_json_schema
@@ -670,15 +671,6 @@ async def attempt_old(challenge: GridProblem, run_remote=False, verbose=False):
     await log_result(challenge, parsed, run_py, extra_meta=extra_meta)
 
 
-async def attempt(challenge: GridProblem, run_remote=False, verbose=False):
-    global attempted, successful, errored_count
-    attempted += 1
-    sln = solutions[challenge.id]
-    s = Solver(challenge=challenge, solution=sln)
-    s.run_solve()
-    print(f"Solve Rate: {successful} of {attempted} ({successful / attempted:.2%})")
-
-
 # def save_research(event: ResearchEvent):
 #     res = substrate.run(event)
 #     print(json.dumps(res.json, indent=2))
@@ -806,18 +798,59 @@ Respond with a single new object with keys: current_total_knowledge, ordered_con
     print(json.dumps(res.json, indent=2))
 
 
-async def process_challenge(semaphore, challenge):
+def attempt(challenge: GridProblem, previous_solution: Optional[str] = None):
+    global attempted, successful, errored_count
+    print(f"Starting {challenge.id}")
+    attempted += 1
+    sln = solutions[challenge.id]
+    s = Solver(challenge=challenge, solution=sln)
+    succeeded = s.run_solve(max_tries=3, prev_solution=previous_solution)
+    if succeeded:
+        successful += 1
+    print(f"Solve Rate: {successful} of {attempted} ({successful / attempted:.2%})")
+
+
+async def aprocess_challenge(semaphore, challenge):
     async with semaphore:
-        return await attempt(challenge, run_remote=True)
+        return await attempt(challenge)
+
+
+async def process_challenge(executor, challenge):
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(executor, attempt, challenge)
 
 
 async def solve_loop(max_concurrent=1, to_process=None, max_challenges=None):
+    global errored_count
+    to_process = all_challenges if not to_process else to_process
+    if max_challenges:
+        to_process = to_process[:max_challenges]
+
+    print(f"Processing {len(to_process)} challenges with {max_concurrent} concurrent threads")
+
+    with ThreadPoolExecutor(max_workers=max_concurrent) as executor:
+        tasks = [process_challenge(executor, challenge) for challenge in to_process]
+        for i, task in enumerate(asyncio.as_completed(tasks), 1):
+            t0 = time.perf_counter()
+            try:
+                await task
+                print(f"Finished {i} of {len(to_process)} [{time.perf_counter() - t0:.2f}s]")
+            except Exception as e:
+                errored_count += 1
+                traceback.print_exc()
+                print(f"Error on task {i}: {e}")
+
+    report_results(attempted=attempted, successful=successful, errored=errored_count)
+
+
+async def asolve_loop(max_concurrent=1, to_process=None, max_challenges=None):
     global errored_count
     semaphore = asyncio.Semaphore(max_concurrent)
     to_process = all_challenges if not to_process else to_process
     if max_challenges:
         to_process = to_process[:max_challenges]
     tasks = [process_challenge(semaphore, challenge) for challenge in to_process]
+    print(f"Processing {len(tasks)} challenges with {max_concurrent} concurrent")
     for i, task in enumerate(asyncio.as_completed(tasks), 1):
         t0 = time.perf_counter()
         try:
@@ -832,14 +865,13 @@ async def solve_loop(max_concurrent=1, to_process=None, max_challenges=None):
 
 
 async def bootstrap_solved():
-    global attempted, successful, errored_count
     train_challenges, train_solutions = load_task_set(task_set_name="training")
     eval_challenges, eval_solutions = load_task_set(task_set_name="evaluation")
     combined_challenges = {**train_challenges, **eval_challenges}
     combined_solutions = {**train_solutions, **eval_solutions}
     verified_so_far = await get_all_verified()
-    verified_by_id = {v.metadata["task_id"]: v for v in verified_so_far}
-    verified_so_far = [verified_by_id["8eb1be9a"]]
+    # verified_by_id = {v.metadata["task_id"]: v for v in verified_so_far}
+    # verified_so_far = [verified_by_id["8eb1be9a"]]
     for v in verified_so_far:
         approach = "Approach:\n\n" + "\n".join([" - " + a for a in v.metadata["approach"]])
         py_fn = v.metadata["python_function"]
@@ -848,13 +880,7 @@ async def bootstrap_solved():
             print("Challenge not found:", v.metadata["task_id"])
             continue
         previous_solution = approach + "\n\nPython Function:\n" + py_fn
-        attempted += 1
-        sln = combined_solutions[c.id]
-        s = Solver(challenge=c, solution=sln)
-        succeeded = s.run_solve(max_tries=2, prev_solution=previous_solution)
-        if succeeded:
-            successful += 1
-        print(f"Solve Rate: {successful} of {attempted} ({successful / attempted:.2%})")
+        attempt(c, prev_solution=previous_solution)
 
 
 async def main():
@@ -869,7 +895,7 @@ async def main():
     # random_challenge = random.choice(all_challenges)
     # await attempt(random_challenge, verbose=True, run_remote=True)
 
-    await bootstrap_solved()
+    # await bootstrap_solved()
 
     # so, rec, su, rel = await get_previous_tries(random_challenge)
     # print("Previous Solution:", so.metadata if so else "None")
@@ -891,8 +917,8 @@ async def main():
 
     # distill_research()
 
-    # for i in range(1):
-    #     await solve_loop(max_concurrent=20, to_process=None)
+    for i in range(1):
+        await solve_loop(max_concurrent=8, to_process=None)
     # await solve_loop(max_concurrent=4, max_challenges=8)
 
 
