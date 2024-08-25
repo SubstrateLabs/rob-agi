@@ -9,12 +9,11 @@ def solve_c6e1b8da(input_grid: ColoredGrid) -> ColoredGrid:
     The transformation follows these steps:
     1. Analyze the input grid to identify distinct colored regions.
     2. Calculate properties for each region (area, bounding box, aspect ratio, center of mass).
-    3. Create a 20x20 grid framework with 5x5 cell subdivisions.
-    4. Place regions on the grid, starting with the largest, aligning with 5-cell boundaries.
-    5. Adjust regions to maintain adjacency and relative positions.
-    6. Ensure consistent 1-cell spacing between regions and a 1-cell black border.
-    7. Regularize shapes to create straight edges and rectangular regions.
-    8. Construct and validate the output grid.
+    3. Create rectangular regions that maintain approximate area and aspect ratio.
+    4. Place regions on the grid, starting with the largest, maintaining relative positions.
+    5. Adjust regions to ensure 1-cell spacing between regions and a 1-cell black border.
+    6. Optimize layout to reduce empty space while maintaining relative positions.
+    7. Construct the output grid based on the optimized layout.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -24,7 +23,8 @@ def solve_c6e1b8da(input_grid: ColoredGrid) -> ColoredGrid:
     """
     regions = analyze_grid(input_grid)
     layout = create_layout(regions, input_grid.get_dimensions())
-    output_grid = construct_output_grid(layout, input_grid.get_dimensions())
+    optimized_layout = optimize_layout(layout, input_grid.get_dimensions())
+    output_grid = construct_output_grid(optimized_layout, input_grid.get_dimensions())
     return output_grid
 
 def analyze_grid(grid: ColoredGrid) -> List[Dict]:
@@ -74,17 +74,28 @@ def create_layout(regions: List[Dict], dimensions: Tuple[int, int]) -> List[Tupl
         area = region['area']
         aspect_ratio = region['aspect_ratio']
         
-        # Calculate ideal dimensions aligned to 5-cell grid
-        ideal_width = math.sqrt(area * aspect_ratio)
-        ideal_height = area / ideal_width
-        width = max(5, 5 * math.ceil(ideal_width / 5))
-        height = max(5, 5 * math.ceil(ideal_height / 5))
+        # Calculate dimensions, preferring multiples of 5
+        width = max(5, 5 * round(math.sqrt(area * aspect_ratio) / 5))
+        height = max(5, 5 * round(area / width / 5))
+        
+        # Adjust dimensions to better fit the original area
+        while abs((width * height) - area) > area * 0.2:
+            if width * height > area:
+                if width > height:
+                    width -= 5
+                else:
+                    height -= 5
+            else:
+                if width > height:
+                    height += 5
+                else:
+                    width += 5
         
         # Find best position
         best_pos = None
         min_distance = float('inf')
-        for r in range(1, rows - height, 5):
-            for c in range(1, cols - width, 5):
+        for r in range(1, rows - height):
+            for c in range(1, cols - width):
                 if all(grid[rr][cc] == 0 for rr in range(r, r+height) for cc in range(c, c+width)):
                     distance = ((r + height/2) - region['center'][0])**2 + ((c + width/2) - region['center'][1])**2
                     if distance < min_distance:
@@ -99,6 +110,21 @@ def create_layout(regions: List[Dict], dimensions: Tuple[int, int]) -> List[Tupl
                     grid[rr][cc] = color
     
     return layout
+
+def optimize_layout(layout: List[Tuple[int, int, int, int, int]], dimensions: Tuple[int, int]) -> List[Tuple[int, int, int, int, int]]:
+    rows, cols = dimensions
+    optimized = layout.copy()
+    
+    # Try to move regions to reduce empty space
+    for i, (color, r, c, h, w) in enumerate(optimized):
+        # Try moving up
+        if r > 1 and all(optimized[j][1] + optimized[j][3] < r - 1 for j in range(i) if optimized[j][2] < c + w and optimized[j][2] + optimized[j][4] > c):
+            optimized[i] = (color, r - 1, c, h, w)
+        # Try moving left
+        if c > 1 and all(optimized[j][2] + optimized[j][4] < c - 1 for j in range(i) if optimized[j][1] < r + h and optimized[j][1] + optimized[j][3] > r):
+            optimized[i] = (color, r, c - 1, h, w)
+    
+    return optimized
 
 def construct_output_grid(layout: List[Tuple[int, int, int, int, int]], dimensions: Tuple[int, int]) -> ColoredGrid:
     rows, cols = dimensions
