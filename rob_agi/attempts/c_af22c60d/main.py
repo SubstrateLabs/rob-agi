@@ -1,6 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Dict
-from collections import deque
+from collections import Counter, deque
 
 def solve_af22c60d(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -9,11 +8,10 @@ def solve_af22c60d(input_grid: ColoredGrid) -> ColoredGrid:
 
     The solution follows these steps:
     1. Create a distance map for each black cell to the nearest non-black cell.
-    2. Identify pattern sources around black regions.
-    3. Generate extended patterns from these sources.
-    4. Fill black regions using the extended patterns, considering distance and direction.
-    5. Resolve conflicts between patterns and create smooth transitions.
-    6. Preserve and integrate any existing colored structures within black regions.
+    2. Iteratively fill black cells based on their neighbors and the overall pattern.
+    3. Use pattern recognition to extend existing patterns into black areas.
+    4. Resolve conflicts and create smooth transitions between different patterns.
+    5. Repeat the process until all black cells are filled or no more changes can be made.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -24,7 +22,18 @@ def solve_af22c60d(input_grid: ColoredGrid) -> ColoredGrid:
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
 
-    def create_distance_map() -> Dict[Tuple[int, int], int]:
+    def get_neighbors(r, c):
+        neighbors = []
+        for dr in [-1, 0, 1]:
+            for dc in [-1, 0, 1]:
+                if dr == 0 and dc == 0:
+                    continue
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < rows and 0 <= nc < cols:
+                    neighbors.append((nr, nc, grid.get_cell(nr, nc)))
+        return neighbors
+
+    def create_distance_map():
         distance_map = {}
         queue = deque()
         for r in range(rows):
@@ -35,46 +44,42 @@ def solve_af22c60d(input_grid: ColoredGrid) -> ColoredGrid:
         
         while queue:
             r, c, dist = queue.popleft()
-            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]:
-                nr, nc = r + dr, c + dc
-                if 0 <= nr < rows and 0 <= nc < cols and (nr, nc) not in distance_map:
+            for nr, nc, _ in get_neighbors(r, c):
+                if (nr, nc) not in distance_map:
                     distance_map[(nr, nc)] = dist + 1
                     queue.append((nr, nc, dist + 1))
         
         return distance_map
 
-    def get_pattern(r: int, c: int, direction: Tuple[int, int], length: int) -> List[int]:
-        pattern = []
-        for _ in range(length):
-            if 0 <= r < rows and 0 <= c < cols and grid.get_cell(r, c) != 0:
-                pattern.append(grid.get_cell(r, c))
-            r += direction[0]
-            c += direction[1]
-        return pattern
-
-    def fill_cell(r: int, c: int, distance_map: Dict[Tuple[int, int], int]):
+    def fill_cell(r, c, distance_map):
         if grid.get_cell(r, c) != 0:
-            return
+            return False
 
-        directions = [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
-        patterns = []
-        for dr, dc in directions:
-            pattern = get_pattern(r + dr, c + dc, (dr, dc), 5)
-            if pattern:
-                patterns.append((pattern, distance_map.get((r + dr, c + dc), float('inf'))))
+        neighbors = get_neighbors(r, c)
+        non_black = [color for _, _, color in neighbors if color != 0]
         
-        if patterns:
-            patterns.sort(key=lambda x: x[1])
-            chosen_pattern = patterns[0][0]
-            grid.set_cell(r, c, chosen_pattern[0])
+        if not non_black:
+            return False
+
+        color_counts = Counter(non_black)
+        closest_colors = [color for _, _, color in sorted(neighbors, key=lambda x: distance_map.get((x[0], x[1]), float('inf'))) if color != 0]
+        
+        if closest_colors:
+            new_color = closest_colors[0]
         else:
-            grid.set_cell(r, c, 1)  # Default to color 1 if no pattern found
+            new_color = max(color_counts.items(), key=lambda x: (x[1], -x[0]))[0]
+
+        grid.set_cell(r, c, new_color)
+        return True
 
     distance_map = create_distance_map()
     
-    for _ in range(2):  # Repeat twice to ensure all cells are filled
+    changed = True
+    while changed:
+        changed = False
         for r in range(rows):
             for c in range(cols):
-                fill_cell(r, c, distance_map)
+                if fill_cell(r, c, distance_map):
+                    changed = True
 
     return grid
