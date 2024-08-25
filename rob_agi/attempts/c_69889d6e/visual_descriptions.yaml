@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 10x10 grid mostly filled with black (0). There's a single red (2) square in the bottom-left corner, specifically at position (9,3).
+  output: |
+    A 10x10 grid with a diagonal line of red (2) squares starting from the bottom-left corner and extending to the top-right corner. The line is two squares thick on the diagonal, creating a staircase-like pattern. The rest of the grid remains black (0).
+
+example_1:
+  input: |
+    A 10x10 grid mostly filled with black (0). There's a single red (2) square in the bottom-left corner, specifically at position (9,1).
+  output: |
+    A 10x10 grid with a diagonal line of red (2) squares starting from the bottom-left corner and extending to the top-right corner. The line is two squares thick on the diagonal, creating a staircase-like pattern. The pattern is shifted one column to the left compared to example_0. The rest of the grid remains black (0).
+
+example_2:
+  input: |
+    A 10x10 grid mostly filled with black (0). There's a single red (2) square in the bottom-left corner at position (9,1), and a single blue (1) square in the middle-left area at position (6,3).
+  output: |
+    A 10x10 grid with a diagonal line of red (2) squares starting from the bottom-left corner and extending to the top-right corner. The line is two squares thick on the diagonal, creating a staircase-like pattern. The pattern is shifted one column to the left compared to example_0. The blue (1) square remains in its original position at (6,3). The red diagonal line passes through the blue square without changing its color. The rest of the grid remains black (0).
+
+example_3:
+  input: |
+    A 10x10 grid mostly filled with black (0). There's a single red (2) square in the bottom-left corner at position (9,0), two blue (1) squares in the middle forming a horizontal line at positions (5,4) and (5,5), and another single blue (1) square near the left edge at position (7,1).
+  output: |
+    A 10x10 grid with a diagonal line of red (2) squares starting from the bottom-left corner and extending to the top-right corner. The line is two squares thick on the diagonal, creating a staircase-like pattern. The pattern starts from the very left edge. The two blue (1) squares in the middle remain in their original positions at (5,4) and (5,5), with the red diagonal line passing through them without changing their color. The single blue square near the left edge at (7,1) is now part of the red diagonal, effectively changing from blue to red. The rest of the grid remains black (0).
