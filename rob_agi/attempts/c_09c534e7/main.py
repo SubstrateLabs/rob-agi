@@ -6,13 +6,16 @@ def solve_09c534e7(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by applying color progression to regions while preserving structure.
     
     The transformation follows these rules:
-    1. Identify main structures (crosses, H-shapes, L-shapes) and isolated higher-value cells.
-    2. Apply color progression to interiors of structures, keeping borders close to original color.
-    3. Expand isolated higher-value cells to fill their containing shapes.
-    4. Preserve corner and edge structures with minimal changes.
-    5. Balance color distribution and introduce highest value colors in appropriate areas.
-    6. Maintain overall shape and connectivity of structures.
-    7. Ensure no value in the output is less than its corresponding value in the input.
+    1. Identify distinct shapes in the grid using flood-fill.
+    2. Analyze each shape for size, border, center, and highest color.
+    3. Determine color progression based on shape size and current colors.
+    4. Apply color transformation to each shape, maintaining borders and structure.
+    5. Handle special cases like high-value color expansion and complex shapes.
+    6. Balance color distribution across the entire grid.
+    7. Maintain structural integrity and connectivity.
+    8. Refine borders for smooth color transitions.
+    9. Ensure no decrease in color values from input to output.
+    10. Handle edge cases like maintaining zero values and small grid/shape sizes.
 
     Args:
         input_grid (ColoredGrid): The input grid to be transformed.
@@ -23,26 +26,15 @@ def solve_09c534e7(input_grid: ColoredGrid) -> ColoredGrid:
     output_grid = input_grid.deep_copy()
     color_sequence = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     
-    # Identify and process main structures
-    central_structure = find_central_structure(input_grid)
-    process_central_structure(output_grid, central_structure, color_sequence)
+    # Identify distinct shapes
+    shapes = identify_shapes(output_grid)
     
-    # Process corner and edge structures
-    corner_structures = find_corner_structures(input_grid)
-    for structure in corner_structures:
-        process_corner_structure(output_grid, structure, color_sequence)
-    
-    # Expand isolated higher-value cells
-    expand_higher_value_cells(output_grid)
-    
-    # Apply general color progression
-    apply_general_progression(output_grid, color_sequence)
+    # Process each shape
+    for shape in shapes:
+        process_shape(output_grid, shape, color_sequence)
     
     # Balance color distribution
     balance_colors(output_grid)
-    
-    # Preserve structure integrity
-    preserve_structure(output_grid, input_grid)
     
     # Refine borders
     refine_borders(output_grid)
@@ -52,39 +44,82 @@ def solve_09c534e7(input_grid: ColoredGrid) -> ColoredGrid:
     
     return output_grid
 
-def find_central_structure(grid: ColoredGrid) -> Set[Tuple[int, int]]:
-    rows, cols = grid.num_rows, grid.num_cols
-    center_r, center_c = rows // 2, cols // 2
-    color = grid.values[center_r][center_c]
-    structure = set()
+def identify_shapes(grid: ColoredGrid) -> List[Set[Tuple[int, int]]]:
+    shapes = []
+    visited = set()
     
-    def dfs(r, c):
-        if 0 <= r < rows and 0 <= c < cols and grid.values[r][c] == color and (r, c) not in structure:
-            structure.add((r, c))
-            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                dfs(r + dr, c + dc)
+    for r in range(grid.num_rows):
+        for c in range(grid.num_cols):
+            if (r, c) not in visited and grid.values[r][c] != 0:
+                shape = flood_fill(grid, r, c, visited)
+                shapes.append(shape)
     
-    dfs(center_r, center_c)
-    return structure
+    return shapes
 
-def process_central_structure(grid: ColoredGrid, structure: Set[Tuple[int, int]], color_sequence: List[int]):
-    if not structure:
-        return
+def flood_fill(grid: ColoredGrid, r: int, c: int, visited: Set[Tuple[int, int]]) -> Set[Tuple[int, int]]:
+    color = grid.values[r][c]
+    shape = set()
+    stack = [(r, c)]
     
-    current_color = grid.values[list(structure)[0][0]][list(structure)[0][1]]
-    next_color = color_sequence[(color_sequence.index(current_color) + 1) % len(color_sequence)]
+    while stack:
+        r, c = stack.pop()
+        if (r, c) not in visited and 0 <= r < grid.num_rows and 0 <= c < grid.num_cols and grid.values[r][c] == color:
+            visited.add((r, c))
+            shape.add((r, c))
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                stack.append((r + dr, c + dc))
     
+    return shape
+
+def process_shape(grid: ColoredGrid, shape: Set[Tuple[int, int]], color_sequence: List[int]):
+    size = len(shape)
+    current_color = grid.values[list(shape)[0][0]][list(shape)[0][1]]
+    highest_color = max(grid.values[r][c] for r, c in shape)
+    
+    if size < 4:
+        target_color = highest_color
+    elif 4 <= size < 9:
+        target_color = next_color_in_sequence(highest_color, color_sequence)
+    else:
+        target_color = next_color_in_sequence(next_color_in_sequence(highest_color, color_sequence), color_sequence)
+    
+    border = find_border(grid, shape)
+    center = find_center(shape)
+    
+    for r, c in shape:
+        if (r, c) in border:
+            grid.values[r][c] = current_color
+        elif is_adjacent_to_border(r, c, border):
+            grid.values[r][c] = next_color_in_sequence(current_color, color_sequence)
+        elif (r, c) == center:
+            grid.values[r][c] = target_color
+        else:
+            grid.values[r][c] = next_color_in_sequence(current_color, color_sequence)
+
+def next_color_in_sequence(color: int, color_sequence: List[int]) -> int:
+    if color not in color_sequence:
+        return color
+    return color_sequence[(color_sequence.index(color) + 1) % len(color_sequence)]
+
+def find_border(grid: ColoredGrid, shape: Set[Tuple[int, int]]) -> Set[Tuple[int, int]]:
     border = set()
-    for r, c in structure:
+    for r, c in shape:
         for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
             nr, nc = r + dr, c + dc
-            if (nr, nc) not in structure:
+            if (nr, nc) not in shape or nr < 0 or nr >= grid.num_rows or nc < 0 or nc >= grid.num_cols:
                 border.add((r, c))
                 break
-    
-    for r, c in structure:
-        if (r, c) not in border:
-            grid.values[r][c] = next_color
+    return border
+
+def find_center(shape: Set[Tuple[int, int]]) -> Tuple[int, int]:
+    min_r = min(r for r, _ in shape)
+    max_r = max(r for r, _ in shape)
+    min_c = min(c for _, c in shape)
+    max_c = max(c for _, c in shape)
+    return ((min_r + max_r) // 2, (min_c + max_c) // 2)
+
+def is_adjacent_to_border(r: int, c: int, border: Set[Tuple[int, int]]) -> bool:
+    return any((r + dr, c + dc) in border for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)])
 
 def find_corner_structures(grid: ColoredGrid) -> List[Set[Tuple[int, int]]]:
     # Implementation to find corner structures (L-shapes)
