@@ -8,14 +8,15 @@ def solve_070dd51e(input_grid: ColoredGrid) -> ColoredGrid:
     draws rectangles to connect them. Vertical lines take precedence over horizontal lines.
     The solution works for all colors (1-9) and grid sizes up to 30x30.
     """
-    color_positions = {color: {'min_row': float('inf'), 'max_row': -1, 
-                               'min_col': float('inf'), 'max_col': -1} 
+    rows, cols = input_grid.get_dimensions()
+    color_positions = {color: {'min_row': rows, 'max_row': -1, 
+                               'min_col': cols, 'max_col': -1} 
                        for color in range(1, 10)}
     
     # Find outermost positions for each color
-    for row in range(len(input_grid.values)):
-        for col in range(len(input_grid.values[0])):
-            color = input_grid.values[row][col]
+    for row in range(rows):
+        for col in range(cols):
+            color = input_grid.get_cell(row, col)
             if color != 0:
                 color_positions[color]['min_row'] = min(color_positions[color]['min_row'], row)
                 color_positions[color]['max_row'] = max(color_positions[color]['max_row'], row)
@@ -26,25 +27,23 @@ def solve_070dd51e(input_grid: ColoredGrid) -> ColoredGrid:
     new_grid = input_grid.deep_copy()
     
     # Draw rectangles for each color
-    for color, positions in color_positions.items():
-        if positions['min_row'] != float('inf'):
+    for color in range(1, 10):
+        positions = color_positions[color]
+        if positions['min_row'] <= positions['max_row']:  # Check if color exists in grid
             min_row, max_row = positions['min_row'], positions['max_row']
             min_col, max_col = positions['min_col'], positions['max_col']
             
             # Draw vertical lines (take precedence)
             for row in range(min_row, max_row + 1):
-                if new_grid.values[row][min_col] == 0 or new_grid.values[row][min_col] > color:
-                    new_grid.values[row][min_col] = color
+                new_grid.set_cell(row, min_col, color)
                 if min_col != max_col:
-                    if new_grid.values[row][max_col] == 0 or new_grid.values[row][max_col] > color:
-                        new_grid.values[row][max_col] = color
+                    new_grid.set_cell(row, max_col, color)
             
             # Draw horizontal lines
-            for col in range(min_col, max_col + 1):
-                if new_grid.values[min_row][col] == 0:
-                    new_grid.values[min_row][col] = color
-                if min_row != max_row:
-                    if new_grid.values[max_row][col] == 0:
-                        new_grid.values[max_row][col] = color
+            for col in range(min_col + 1, max_col):  # Skip corners
+                if new_grid.get_cell(min_row, col) == 0:
+                    new_grid.set_cell(min_row, col, color)
+                if min_row != max_row and new_grid.get_cell(max_row, col) == 0:
+                    new_grid.set_cell(max_row, col, color)
     
     return new_grid
