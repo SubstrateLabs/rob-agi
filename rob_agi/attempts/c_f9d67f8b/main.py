@@ -1,6 +1,7 @@
+from typing import Set, Tuple, List
 from rob_agi.colored_grid import ColoredGrid
 
-def get_adjacent_cells(grid: ColoredGrid, row: int, col: int) -> list[tuple[int, int]]:
+def get_adjacent_cells(grid: ColoredGrid, row: int, col: int) -> List[Tuple[int, int]]:
     """Get orthogonally adjacent cells."""
     rows, cols = grid.get_dimensions()
     adjacent = []
@@ -29,20 +30,22 @@ def solve_f9d67f8b(input_grid: ColoredGrid) -> ColoredGrid:
     """
     new_grid = input_grid.deep_copy()
     rows, cols = new_grid.get_dimensions()
-    brown_cells = [(r, c) for r in range(rows) for c in range(cols) if new_grid.get_cell(r, c) == 9]
+    brown_cells: Set[Tuple[int, int]] = {(r, c) for r in range(rows) for c in range(cols) if new_grid.get_cell(r, c) == 9}
 
     while brown_cells:
-        update_list = []
+        update_list: List[Tuple[int, int, int]] = []
         for r, c in brown_cells:
             adjacent_cells = get_adjacent_cells(new_grid, r, c)
+            new_color = None
             for nr, nc in adjacent_cells:
                 adj_color = new_grid.get_cell(nr, nc)
                 if adj_color == 8:  # Sky blue
-                    update_list.append((r, c, 8))
+                    new_color = 8
                     break
                 elif adj_color != 9:  # First non-brown color
-                    update_list.append((r, c, adj_color))
-                    break
+                    new_color = adj_color
+            if new_color is not None:
+                update_list.append((r, c, new_color))
         
         for r, c, new_color in update_list:
             new_grid.set_cell(r, c, new_color)

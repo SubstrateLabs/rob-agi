@@ -1,8 +1,8 @@
 example_0:
   input: |
-    The grid is 30x30. The overall pattern is complex and appears to have several distinct regions. In the center, there's a large brown (9) square or rectangle, approximately 6x6 in size. This brown area is surrounded by a border of sky blue (8) squares. Outside of this, there's a pattern of various colors forming what looks like a frame or border around the central area. This frame consists of repeating patterns of colors, primarily using red (2), green (3), yellow (4), gray (5), magenta (6), and orange (7). The corners of the grid have distinct patterns, with the top-left and bottom-right corners having a blue (1) square surrounded by magenta (6) squares, while the top-right and bottom-left corners have a reversed pattern with a magenta square surrounded by blue squares. The edges of the grid have alternating patterns of colors, creating a visually complex border.
+    30x30 grid. Center: large brown (9) square ~6x6, surrounded by sky blue (8) border. Outside: complex frame of red (2), green (3), yellow (4), gray (5), magenta (6), orange (7). Corners: blue (1) in magenta (6) (top-left, bottom-right), reversed (top-right, bottom-left). Edges: alternating color patterns.
   output: |
-    The grid remains 30x30, but significant changes have occurred. The most noticeable change is that the large brown (9) square in the center has completely disappeared. The sky blue (8) border that surrounded it has expanded to fill most of the central area where the brown square was. The outer frame or border pattern remains largely intact, with only minor changes in some areas. The corner patterns with blue and magenta squares are unchanged. The overall effect is that the central area of the grid has been "cleared out" or "opened up", while the complex border pattern remains as a frame around this now more open central region.
+    30x30 grid. Center brown (9) square gone, replaced by expanded sky blue (8) area. Outer frame mostly intact. Corner patterns unchanged. Result: open central area surrounded by complex border pattern.
 
 example_1:
   input: |
