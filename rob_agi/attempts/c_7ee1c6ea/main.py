@@ -5,36 +5,72 @@ import random
 
 def solve_7ee1c6ea(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by balancing colors within connected regions.
+    Transforms the input grid by redistributing colors within connected regions.
     
-    1. Identifies connected regions (excluding gray and black).
-    2. For each region, calculates ideal color frequencies.
-    3. Iteratively balances colors within regions by changing squares' colors.
-    4. Preserves black (0) and gray (5) squares.
-    5. Avoids creating 2x2 squares of the same color.
-    6. Repeats the process until stability is reached or max iterations hit.
+    1. Identifies key structures (frames, crosses) to preserve.
+    2. Segments the grid into regions based on these structures.
+    3. For each region, identifies connected color areas.
+    4. Redistributes colors to create larger continuous areas while maintaining balance.
+    5. Preserves black (0) and gray (5) squares.
+    6. Avoids creating 2x2 squares of the same color.
+    7. Performs local refinements to merge small isolated color areas.
+    8. Iterates the process until stability or max iterations.
     
-    Returns the transformed grid.
+    Returns the transformed grid with improved color distribution and pattern coherence.
     """
     new_grid = input_grid.deep_copy()
-    max_iterations = 10
+    key_structures = identify_key_structures(new_grid)
+    regions = segment_grid(new_grid, key_structures)
+    
+    max_iterations = 5
     for _ in range(max_iterations):
-        regions = find_all_regions(new_grid)
-        if not balance_colors_in_regions(new_grid, regions):
+        changed = False
+        for region in regions:
+            if redistribute_colors_in_region(new_grid, region):
+                changed = True
+        if not changed:
             break
+    
+    refine_small_areas(new_grid)
     return new_grid
 
-def find_all_regions(grid: ColoredGrid) -> List[Set[Tuple[int, int]]]:
+def identify_key_structures(grid: ColoredGrid) -> List[Set[Tuple[int, int]]]:
+    structures = []
     rows, cols = grid.get_dimensions()
-    visited = set()
-    regions = []
+    
+    # Identify frame
+    frame = set()
     for r in range(rows):
         for c in range(cols):
-            if (r, c) not in visited and grid.values[r][c] not in [0, 5]:
-                region = find_connected_region(grid, r, c, grid.values[r][c])
-                regions.append(region)
-                visited.update(region)
-    return regions
+            if r in (0, rows-1) or c in (0, cols-1):
+                if grid.values[r][c] == 5:  # Gray
+                    frame.add((r, c))
+    if frame:
+        structures.append(frame)
+    
+    # Identify cross
+    horizontal = set((r, c) for r in range(rows) for c in range(cols) if grid.values[r][c] == 5)
+    vertical = set((r, c) for r in range(rows) for c in range(cols) if grid.values[r][c] == 5)
+    cross = horizontal.intersection(vertical)
+    if len(cross) > 0:
+        structures.append(cross)
+    
+    return structures
+
+def segment_grid(grid: ColoredGrid, key_structures: List[Set[Tuple[int, int]]]) -> List[Set[Tuple[int, int]]]:
+    rows, cols = grid.get_dimensions()
+    all_cells = set((r, c) for r in range(rows) for c in range(cols))
+    structure_cells = set.union(*key_structures) if key_structures else set()
+    remaining_cells = all_cells - structure_cells
+    
+    regions = []
+    while remaining_cells:
+        start = remaining_cells.pop()
+        region = find_connected_region(grid, start[0], start[1], grid.values[start[0]][start[1]])
+        regions.append(region)
+        remaining_cells -= region
+    
+    return regions + key_structures
 
 def find_connected_region(grid: ColoredGrid, r: int, c: int, color: int) -> Set[Tuple[int, int]]:
     region = set()
@@ -50,37 +86,53 @@ def find_connected_region(grid: ColoredGrid, r: int, c: int, color: int) -> Set[
                 stack.append((curr_r + dr, curr_c + dc))
     return region
 
-def balance_colors_in_regions(grid: ColoredGrid, regions: List[Set[Tuple[int, int]]]) -> bool:
+def redistribute_colors_in_region(grid: ColoredGrid, region: Set[Tuple[int, int]]) -> bool:
+    color_areas = defaultdict(set)
+    for r, c in region:
+        color = grid.values[r][c]
+        if color not in [0, 5]:  # Exclude black and gray
+            color_areas[color].add((r, c))
+    
+    if len(color_areas) < 2:
+        return False
+    
     changed = False
-    for region in regions:
-        color_freq = defaultdict(int)
-        for r, c in region:
-            color_freq[grid.values[r][c]] += 1
-        
-        ideal_freq = len(region) / len(color_freq)
-        donors = [color for color, freq in color_freq.items() if freq > ideal_freq]
-        receivers = [color for color, freq in color_freq.items() if freq < ideal_freq]
-        
-        while donors and receivers:
-            donor = donors[0]
-            receiver = receivers[0]
-            donor_squares = [sq for sq in region if grid.values[sq[0]][sq[1]] == donor]
-            random.shuffle(donor_squares)
-            
-            for sq in donor_squares:
-                if is_valid_change(grid, sq, receiver):
-                    grid.values[sq[0]][sq[1]] = receiver
-                    color_freq[donor] -= 1
-                    color_freq[receiver] += 1
+    for color, area in sorted(color_areas.items(), key=lambda x: len(x[1]), reverse=True):
+        adjacent_colors = find_adjacent_colors(grid, area)
+        for adj_color in adjacent_colors:
+            if len(color_areas[adj_color]) < len(area):
+                expansion = expand_color_area(grid, area, adj_color)
+                if expansion:
                     changed = True
-                    break
-            
-            if color_freq[donor] <= ideal_freq:
-                donors.pop(0)
-            if color_freq[receiver] >= ideal_freq:
-                receivers.pop(0)
+                    color_areas[color] -= expansion
+                    color_areas[adj_color] |= expansion
+                    for r, c in expansion:
+                        grid.values[r][c] = adj_color
     
     return changed
+
+def find_adjacent_colors(grid: ColoredGrid, area: Set[Tuple[int, int]]) -> Set[int]:
+    adjacent_colors = set()
+    rows, cols = grid.get_dimensions()
+    for r, c in area:
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols and (nr, nc) not in area:
+                adj_color = grid.values[nr][nc]
+                if adj_color not in [0, 5]:  # Exclude black and gray
+                    adjacent_colors.add(adj_color)
+    return adjacent_colors
+
+def expand_color_area(grid: ColoredGrid, area: Set[Tuple[int, int]], target_color: int) -> Set[Tuple[int, int]]:
+    expansion = set()
+    rows, cols = grid.get_dimensions()
+    for r, c in area:
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols and grid.values[nr][nc] == target_color:
+                if is_valid_change(grid, (nr, nc), grid.values[r][c]):
+                    expansion.add((nr, nc))
+    return expansion
 
 def is_valid_change(grid: ColoredGrid, sq: Tuple[int, int], new_color: int) -> bool:
     r, c = sq
@@ -95,3 +147,20 @@ def is_valid_change(grid: ColoredGrid, sq: Tuple[int, int], new_color: int) -> b
                 return False
     
     return True
+
+def refine_small_areas(grid: ColoredGrid):
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        for c in range(cols):
+            if grid.values[r][c] not in [0, 5]:
+                area = find_connected_region(grid, r, c, grid.values[r][c])
+                if 1 < len(area) <= 3:
+                    merge_small_area(grid, area)
+
+def merge_small_area(grid: ColoredGrid, area: Set[Tuple[int, int]]):
+    adjacent_colors = find_adjacent_colors(grid, area)
+    if adjacent_colors:
+        new_color = random.choice(list(adjacent_colors))
+        for r, c in area:
+            if is_valid_change(grid, (r, c), new_color):
+                grid.values[r][c] = new_color
