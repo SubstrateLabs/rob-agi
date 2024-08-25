@@ -5,27 +5,26 @@ import math
 
 def solve_fd096ab6(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the fd096ab6 challenge by expanding color clusters asymmetrically.
+    Solve the fd096ab6 challenge by expanding color clusters into hook or L-shapes.
     
     The solution involves the following steps:
     1. Identify all non-blue color clusters in the grid.
-    2. Analyze each cluster's size, shape, and surrounding space.
-    3. Determine expansion strategy based on cluster characteristics.
-    4. Expand clusters iteratively, with size-based growth limits.
-    5. Resolve conflicts between expanding clusters.
-    6. Refine shapes and maintain consistency across similar clusters.
-    7. Perform final validation and adjustments.
+    2. Analyze each cluster's size and shape.
+    3. Determine the ideal hook shape based on cluster size.
+    4. Expand clusters to form hook or L-shapes, prioritizing growth direction.
+    5. Refine shapes to ensure smooth edges and consistent patterns.
+    6. Perform final validation and adjustments for balance and consistency.
     
     Args:
     input_grid (ColoredGrid): The initial grid state.
     
     Returns:
-    ColoredGrid: The transformed grid with expanded color clusters.
+    ColoredGrid: The transformed grid with expanded color clusters in hook or L-shapes.
     """
     grid = input_grid.deep_copy()
     colors = set(range(2, 10))  # All colors except blue (1)
     
-    for _ in range(3):  # Perform expansion in 3 phases
+    for _ in range(2):  # Perform expansion in 2 phases
         clusters = []
         for color in colors:
             regions = grid.find_connected_regions(color)
@@ -34,34 +33,33 @@ def solve_fd096ab6(input_grid: ColoredGrid) -> ColoredGrid:
         clusters.sort(key=lambda x: len(x[1]), reverse=True)  # Sort by cluster size
         
         for color, cluster in clusters:
-            expand_cluster(grid, color, cluster)
+            expand_cluster_to_hook(grid, color, cluster)
     
     refine_shapes(grid)
     return grid
 
-def expand_cluster(grid: ColoredGrid, color: int, cluster: List[Tuple[int, int]]):
+def expand_cluster_to_hook(grid: ColoredGrid, color: int, cluster: List[Tuple[int, int]]):
     cluster_size = len(cluster)
-    growth_limit = calculate_growth_limit(cluster_size)
+    target_size = calculate_target_size(cluster_size)
     expansion_cells = get_expansion_cells(grid, cluster)
     
-    center = calculate_center(cluster)
-    primary_direction = determine_primary_direction(cluster, center)
-    
-    expansion_cells = sorted(expansion_cells, key=lambda cell: expansion_priority(cell, center, primary_direction))
-    
-    for i, (r, c) in enumerate(expansion_cells):
-        if i >= growth_limit:
-            break
-        if random.random() < expansion_probability(i, growth_limit):
+    while len(cluster) < target_size and expansion_cells:
+        best_cell = choose_best_expansion_cell(cluster, expansion_cells)
+        if best_cell:
+            r, c = best_cell
             grid.set_cell(r, c, color)
+            cluster.append(best_cell)
+            expansion_cells = get_expansion_cells(grid, cluster)
+        else:
+            break
 
-def calculate_growth_limit(cluster_size: int) -> int:
+def calculate_target_size(cluster_size: int) -> int:
     if cluster_size <= 3:
-        return cluster_size * 2
+        return min(cluster_size * 2, 5)
     elif cluster_size <= 8:
-        return int(cluster_size * 1.5)
+        return min(int(cluster_size * 1.5), 12)
     else:
-        return cluster_size
+        return min(cluster_size + 4, 16)
 
 def get_expansion_cells(grid: ColoredGrid, cluster: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
     directions = [(-1, 0), (0, -1), (1, 0), (0, 1)]
@@ -76,30 +74,52 @@ def get_expansion_cells(grid: ColoredGrid, cluster: List[Tuple[int, int]]) -> Li
     
     return list(expansion_cells)
 
-def calculate_center(cluster: List[Tuple[int, int]]) -> Tuple[float, float]:
-    return (sum(r for r, _ in cluster) / len(cluster),
-            sum(c for _, c in cluster) / len(cluster))
-
-def determine_primary_direction(cluster: List[Tuple[int, int]], center: Tuple[float, float]) -> Tuple[float, float]:
-    max_distance = 0
-    primary_direction = (0, 0)
+def choose_best_expansion_cell(cluster: List[Tuple[int, int]], expansion_cells: List[Tuple[int, int]]) -> Optional[Tuple[int, int]]:
+    if not expansion_cells:
+        return None
     
-    for r, c in cluster:
-        distance = math.sqrt((r - center[0])**2 + (c - center[1])**2)
-        if distance > max_distance:
-            max_distance = distance
-            primary_direction = (center[0] - r, center[1] - c)
+    cluster_shape = analyze_cluster_shape(cluster)
     
-    magnitude = math.sqrt(primary_direction[0]**2 + primary_direction[1]**2)
-    return (primary_direction[0] / magnitude, primary_direction[1] / magnitude)
+    if cluster_shape == "single":
+        return expansion_cells[0]
+    elif cluster_shape == "linear":
+        return choose_perpendicular_cell(cluster, expansion_cells)
+    elif cluster_shape == "L":
+        return choose_corner_cell(cluster, expansion_cells)
+    else:
+        return choose_edge_extension_cell(cluster, expansion_cells)
 
-def expansion_priority(cell: Tuple[int, int], center: Tuple[float, float], primary_direction: Tuple[float, float]) -> float:
-    cell_direction = (center[0] - cell[0], center[1] - cell[1])
-    dot_product = cell_direction[0] * primary_direction[0] + cell_direction[1] * primary_direction[1]
-    return -dot_product  # Negative to prioritize cells in the primary direction
+def analyze_cluster_shape(cluster: List[Tuple[int, int]]) -> str:
+    if len(cluster) == 1:
+        return "single"
+    elif len(cluster) == 2:
+        return "linear"
+    elif len(cluster) == 3:
+        return "L" if not is_linear(cluster) else "linear"
+    else:
+        return "complex"
 
-def expansion_probability(index: int, growth_limit: int) -> float:
-    return 1 - (index / growth_limit)**0.5
+def is_linear(cluster: List[Tuple[int, int]]) -> bool:
+    if len(cluster) <= 2:
+        return True
+    points = sorted(cluster)
+    return (points[0][0] == points[-1][0]) or (points[0][1] == points[-1][1])
+
+def choose_perpendicular_cell(cluster: List[Tuple[int, int]], expansion_cells: List[Tuple[int, int]]) -> Optional[Tuple[int, int]]:
+    if is_linear(cluster):
+        main_axis = 0 if cluster[0][0] == cluster[-1][0] else 1
+        for cell in expansion_cells:
+            if cell[main_axis] != cluster[0][main_axis]:
+                return cell
+    return expansion_cells[0] if expansion_cells else None
+
+def choose_corner_cell(cluster: List[Tuple[int, int]], expansion_cells: List[Tuple[int, int]]) -> Optional[Tuple[int, int]]:
+    corners = [c for c in expansion_cells if sum(abs(c[i] - cluster[0][i]) for i in range(2)) == 2]
+    return corners[0] if corners else (expansion_cells[0] if expansion_cells else None)
+
+def choose_edge_extension_cell(cluster: List[Tuple[int, int]], expansion_cells: List[Tuple[int, int]]) -> Optional[Tuple[int, int]]:
+    edges = [c for c in expansion_cells if sum(abs(c[i] - cluster[0][i]) for i in range(2)) == 1]
+    return edges[0] if edges else (expansion_cells[0] if expansion_cells else None)
 
 def refine_shapes(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
