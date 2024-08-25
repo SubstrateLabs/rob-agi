@@ -4,17 +4,16 @@ from typing import List, Tuple, Dict
 def solve_e41c6fd3(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by identifying shapes, grouping them by color family,
-    sorting within each family, and arranging them efficiently in the upper part of the grid.
+    and arranging them efficiently in the upper part of the grid.
     
     1. Identifies all shapes in the input grid using connected regions.
     2. Groups shapes into color families: Cool (1, 8), Warm (2, 4), Other (3, 5, 6, 7, 9).
-    3. Sorts shapes within each family by color number.
-    4. Alternates between color families when arranging shapes.
-    5. Calculates total shape area to determine vertical positioning.
-    6. Places shapes efficiently, preserving their internal structure and spacing.
-    7. Adjusts vertical positioning based on total shape area.
-    8. Maintains two rows of black space at the top when vertical centering is not possible.
-    9. Returns a new ColoredGrid with the arranged shapes.
+    3. Calculates total shape area to determine vertical positioning.
+    4. Places shapes efficiently, preserving their internal structure and spacing.
+    5. Balances the arrangement by considering shape size and color family.
+    6. Adjusts vertical positioning based on total shape area.
+    7. Maintains two rows of black space at the top when vertical centering is not possible.
+    8. Returns a new ColoredGrid with the arranged shapes.
     """
     # Find all shapes in the grid
     shapes = []
@@ -27,22 +26,14 @@ def solve_e41c6fd3(input_grid: ColoredGrid) -> ColoredGrid:
             max_x = max(x for _, x in region)
             shapes.append((color, (min_y, min_x, max_y, max_x), region))
     
-    # Group shapes by color family and sort
+    # Group shapes by color family
     color_families: Dict[str, List[int]] = {
         "Cool": [1, 8],
         "Warm": [2, 4],
         "Other": [3, 5, 6, 7, 9]
     }
-    family_shapes = {family: sorted([shape for shape in shapes if shape[0] in colors], key=lambda x: x[0])
+    family_shapes = {family: [shape for shape in shapes if shape[0] in colors]
                      for family, colors in color_families.items()}
-    
-    # Interleave shapes from different families
-    grouped_shapes = []
-    max_shapes = max(len(shapes) for shapes in family_shapes.values())
-    for i in range(max_shapes):
-        for family in ["Cool", "Warm", "Other"]:
-            if i < len(family_shapes[family]):
-                grouped_shapes.append(family_shapes[family][i])
     
     # Calculate total shape area
     total_area = sum((max_y - min_y + 1) * (max_x - min_x + 1) for _, (min_y, min_x, max_y, max_x), _ in shapes)
@@ -59,12 +50,28 @@ def solve_e41c6fd3(input_grid: ColoredGrid) -> ColoredGrid:
     current_col = 0
     current_row = start_row
     row_height = 0
-    for color, (min_y, min_x, max_y, max_x), region in grouped_shapes:
+    placed_families = set()
+    
+    while shapes:
+        # Choose the next shape to place
+        chosen_shape = None
+        for family in ["Cool", "Warm", "Other"]:
+            if family not in placed_families and family_shapes[family]:
+                chosen_shape = max(family_shapes[family], key=lambda s: (s[1][2]-s[1][0]+1)*(s[1][3]-s[1][1]+1))
+                family_shapes[family].remove(chosen_shape)
+                placed_families.add(family)
+                break
+        
+        if not chosen_shape:
+            placed_families.clear()
+            continue
+        
+        color, (min_y, min_x, max_y, max_x), region = chosen_shape
         shape_height = max_y - min_y + 1
         shape_width = max_x - min_x + 1
         
         # Check if shape fits in current row
-        if current_col + shape_width + 1 > cols:
+        if current_col + shape_width > cols:
             current_row += row_height + 1
             current_col = 0
             row_height = 0
@@ -81,12 +88,13 @@ def solve_e41c6fd3(input_grid: ColoredGrid) -> ColoredGrid:
         
         current_col += shape_width + 1
         row_height = max(row_height, shape_height)
+        shapes.remove(chosen_shape)
     
     # Adjust vertical position if needed
     if vertical_centering:
         used_rows = max(y for row in new_grid for y, cell in enumerate(row) if cell != 0) + 1
         shift = (rows - used_rows) // 2 - start_row
         if shift > 0:
-            new_grid = [[0] * cols] * shift + new_grid[:-shift]
+            new_grid = [[0] * cols for _ in range(shift)] + new_grid[:-shift]
     
     return ColoredGrid(values=new_grid)
