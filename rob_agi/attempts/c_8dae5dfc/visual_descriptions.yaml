@@ -1,0 +1,56 @@
+example_0:
+  input: |
+    The grid contains three distinct regions:
+    1. A large sky blue (8) rectangular frame with an orange (7) interior.
+    2. A smaller red (2) rectangular region in the bottom right, containing a blue (1) interior with a green (3) center.
+    3. The rest is black (0), representing empty space.
+    The sky blue frame has a thick border and occupies most of the left side of the grid. Inside this frame is a solid orange area, except for a yellow (4) square ring in the center, which surrounds a 3x3 green square.
+    The red region in the bottom right is smaller, with a blue interior and a 2x2 green square at its center.
+  output: |
+    The overall structure remains similar, but colors have shifted:
+    1. The large frame is now green (3), with a yellow (4) interior.
+    2. The smaller region in the bottom right is now blue (1), with a red (2) interior and a sky blue (8) center.
+    3. The black (0) empty space remains unchanged.
+    The green frame now contains a solid yellow area, with an orange (7) square ring in the center, surrounding a 3x3 sky blue square.
+    The blue region in the bottom right has a red interior with a 2x2 sky blue square at its center.
+
+example_1:
+  input: |
+    The grid shows a large sky blue (8) square frame with a thick border. Inside this frame is:
+    1. An outer ring of orange (7)
+    2. An inner ring of sky blue (8)
+    3. A 2x2 red (2) square at the very center
+    The rest of the grid is black (0), representing empty space.
+    The entire colored structure is centered within the grid, surrounded by black on all sides.
+  output: |
+    The overall structure remains, but colors have shifted:
+    1. The large square frame is now brown (9)
+    2. The outer ring is now green (3)
+    3. The inner ring is now orange (7)
+    4. The 2x2 center square is now blue (1)
+    The black (0) empty space surrounding the structure remains unchanged.
+    The colored structure maintains its centered position within the grid.
+
+example_2:
+  input: |
+    The grid contains two distinct colored regions separated by black (0) space:
+    1. Upper left: A sky blue (8) square containing a red (2) square, which in turn contains a blue (1) square.
+    2. Lower right: A larger, more complex structure with a magenta (6) outer frame, green (3) inner frame, yellow (4) middle layer, and red (2) inner layer with a blue (1) core.
+    Both structures are positioned at the corners of the grid, with black space between and around them.
+  output: |
+    The overall layout remains the same, but colors have shifted in both structures:
+    1. Upper left: The outer square is now blue (1), the middle square is red (2), and the innermost square is sky blue (8).
+    2. Lower right: The outer frame is now blue (1), the next layer is yellow (4), followed by orange (7), then green (3), with a magenta (6) core.
+    The black (0) space separating and surrounding the structures remains unchanged.
+
+example_3:
+  input: |
+    The grid contains two distinct structures separated by black (0) space:
+    1. Upper structure: A blue (1) rectangular frame with a magenta (6) interior. Inside the magenta area is a smaller sky blue (8) rectangle.
+    2. Lower structure: A red (2) square frame with a yellow (4) interior. Inside the yellow area is a blue (1) square frame, which contains a sky blue (8) interior.
+    Both structures are positioned near the top and bottom of the grid respectively, with black space between and around them.
+  output: |
+    The overall layout remains similar, but colors have shifted in both structures:
+    1. Upper structure: The outer rectangular frame is now sky blue (8), the middle area is magenta (6), and the inner rectangle is blue (1).
+    2. Lower structure: The outer square frame is now sky blue (8), followed by a blue (1) layer, then a yellow (4) layer, and finally a red (2) core.
+    The black (0) space separating and surrounding the structures remains unchanged.
