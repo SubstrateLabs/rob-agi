@@ -1,23 +1,23 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Set
 import heapq
-
-from typing import List, Tuple
-import heapq
+import itertools
 
 def solve_55059096(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the grid transformation challenge by connecting green crosses with a minimal red path.
+    Solve the grid transformation challenge by connecting green crosses with an optimal red path.
     
     1. Identify all green crosses in the grid.
-    2. Generate subsets of crosses, from smaller to larger.
-    3. For each subset, create a minimal spanning tree using a modified Prim's algorithm.
-    4. Use A* pathfinding with diagonal preference to connect crosses.
-    5. Score each tree based on crosses connected and new red cells added.
-    6. Choose the best tree and apply it to the grid.
-    7. Optimize the final path by removing unnecessary bends or detours.
+    2. Generate all possible subsets of crosses, from pairs to all crosses.
+    3. For each subset:
+       a. Create a minimal spanning tree using Prim's algorithm.
+       b. Convert the tree to a path using A* pathfinding with diagonal preference.
+       c. Calculate a score based on connected crosses and path length.
+    4. Choose the best-scoring solution.
+    5. Apply the best solution to the grid by drawing the red path.
+    6. Optimize the path by removing unnecessary bends or detours.
     
-    This approach ensures a minimal continuous shape connecting the optimal number of crosses,
+    This approach balances connecting the maximum number of crosses with minimizing the length of the red path,
     allowing for some crosses to remain unconnected if it results in a more optimal overall solution.
     """
     crosses = find_crosses(input_grid)
