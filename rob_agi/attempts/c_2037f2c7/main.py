@@ -1,92 +1,114 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple
 
+import random
+from typing import List, Tuple
+
 def solve_2037f2c7(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid into a simplified representation based on density analysis and shape detection.
+    Transforms the input grid into a simplified, abstract representation.
     
-    1. Analyzes the input grid by dividing it into quadrants and calculating densities.
-    2. Determines the output grid size based on input complexity and width.
-    3. Generates a top row with sky blue (8) squares, potentially adding black (0) squares based on overall density.
-    4. Generates bottom row(s) based on quadrant densities and detected shapes.
-    5. Balances the pattern and ensures appropriate symmetry.
-    6. Handles edge cases for empty, sparse, or dense inputs.
+    1. Analyzes the input grid for density, shape distribution, and emphasis.
+    2. Determines the output grid size based on input complexity.
+    3. Generates a base pattern with sky blue (8) and black (0) squares.
+    4. Adjusts the pattern based on input characteristics (vertical/horizontal emphasis, multiple shapes).
+    5. Ensures a pixelated look with appropriate asymmetry.
+    6. Simplifies the output for less complex inputs.
     """
     # Step 1: Analyze input grid
-    quadrant_densities, overall_density = analyze_grid(input_grid)
+    overall_density, vertical_emphasis, num_shapes = analyze_grid(input_grid)
     
     # Step 2: Determine output grid size
-    input_width = input_grid.get_dimensions()[1]
-    output_width = 6 if input_width < 24 else 8
-    output_height = 2 if overall_density < 0.1 else 3 if overall_density < 0.2 else 4
+    output_height, output_width = determine_output_size(overall_density, num_shapes)
     
-    # Step 3 & 4: Generate output grid
-    output_grid = generate_output_grid(input_grid, quadrant_densities, overall_density, output_height, output_width)
+    # Step 3 & 4: Generate and adjust output grid
+    output_grid = generate_output_grid(overall_density, vertical_emphasis, num_shapes, output_height, output_width)
     
-    return output_grid
+    # Step 5 & 6: Ensure pixelated look and simplify if necessary
+    output_grid = post_process_grid(output_grid, overall_density)
+    
+    return ColoredGrid(values=output_grid)
 
-def analyze_grid(grid: ColoredGrid) -> Tuple[List[float], float]:
+def analyze_grid(grid: ColoredGrid) -> Tuple[float, bool, int]:
     rows, cols = grid.get_dimensions()
-    mid_row, mid_col = rows // 2, cols // 2
-    quadrants = [
-        (0, 0, mid_row, mid_col),
-        (0, mid_col, mid_row, cols),
-        (mid_row, 0, rows, mid_col),
-        (mid_row, mid_col, rows, cols)
-    ]
+    non_zero_cells = sum(1 for r in range(rows) for c in range(cols) if grid.get_cell(r, c) != 0)
+    overall_density = non_zero_cells / (rows * cols)
     
-    quadrant_densities = []
-    total_non_zero = 0
-    for top, left, bottom, right in quadrants:
-        non_zero = sum(1 for r in range(top, bottom) for c in range(left, right) if grid.get_cell(r, c) != 0)
-        total_non_zero += non_zero
-        quadrant_densities.append(non_zero / ((bottom - top) * (right - left)))
+    vertical_density = sum(1 for c in range(cols) if any(grid.get_cell(r, c) != 0 for r in range(rows))) / cols
+    horizontal_density = sum(1 for r in range(rows) if any(grid.get_cell(r, c) != 0 for c in range(cols))) / rows
+    vertical_emphasis = vertical_density > horizontal_density
     
-    overall_density = total_non_zero / (rows * cols)
-    return quadrant_densities, overall_density
+    non_zero_regions = grid.find_connected_regions(lambda x: x != 0)
+    num_shapes = len([region for region in non_zero_regions if len(region) > 5])
+    
+    return overall_density, vertical_emphasis, num_shapes
 
-def generate_output_grid(input_grid: ColoredGrid, quadrant_densities: List[float], overall_density: float, height: int, width: int) -> ColoredGrid:
+def determine_output_size(density: float, num_shapes: int) -> Tuple[int, int]:
+    if density < 0.1 or num_shapes == 1:
+        return 3, 7
+    elif density < 0.15:
+        return 3, 8
+    else:
+        return 4, 8
+
+def generate_output_grid(density: float, vertical_emphasis: bool, num_shapes: int, height: int, width: int) -> List[List[int]]:
     output = [[0 for _ in range(width)] for _ in range(height)]
     
     # Generate top row
-    top_row = [8] * width
-    if overall_density < 0.15:
+    output[0] = [8] * width
+    num_gaps = random.randint(1, 3)
+    for _ in range(num_gaps):
+        gap_pos = random.randint(1, width-2)
+        output[0][gap_pos] = 0
+    
+    # Generate middle rows
+    for r in range(1, height-1):
+        output[r] = [8, 8] + [0] * (width-4) + [8, 8]
+        num_fills = int((width-4) * density * 0.7)
+        for _ in range(num_fills):
+            fill_pos = random.randint(2, width-3)
+            output[r][fill_pos] = 8
+    
+    # Generate bottom row
+    output[-1] = [8] + [0] * (width-2) + [8]
+    if density > 0.2:
+        num_fills = random.randint(1, 2)
+        for _ in range(num_fills):
+            fill_pos = random.randint(1, width-2)
+            output[-1][fill_pos] = 8
+    
+    # Adjust for vertical emphasis
+    if vertical_emphasis:
+        for r in range(height):
+            output[r][0] = 8
+            output[r][-1] = 8
+    
+    # Adjust for multiple shapes
+    if num_shapes > 1:
         mid = width // 2
-        top_row[mid-1:mid+1] = [0, 0]
-    output[0] = top_row
-    
-    # Generate bottom row(s)
-    for r in range(1, height):
-        left_density = (quadrant_densities[0] + quadrant_densities[2]) / 2
-        right_density = (quadrant_densities[1] + quadrant_densities[3]) / 2
-        
-        row = [8] + [0] * (width - 2) + [8]
-        
-        if left_density > 0.1:
-            row[1] = 8
-        if right_density > 0.1:
-            row[-2] = 8
-        
-        if left_density > 0.15:
-            row[2] = 8
-        if right_density > 0.15:
-            row[-3] = 8
-        
-        output[r] = row
-    
-    # Adjust for distinct shapes
-    if has_distinct_shapes(input_grid):
         for r in range(1, height):
-            mid = width // 2
             output[r][mid-1:mid+1] = [0, 0]
     
-    # Ensure at least one 8 per row
-    for r in range(height):
-        if 8 not in output[r]:
-            output[r][0] = 8
-    
-    return ColoredGrid(values=output)
+    return output
 
-def has_distinct_shapes(grid: ColoredGrid) -> bool:
-    non_zero_regions = grid.find_connected_regions(lambda x: x != 0)
-    return len(non_zero_regions) > 1 and max(len(region) for region in non_zero_regions) > 20
+def post_process_grid(grid: List[List[int]], density: float) -> List[List[int]]:
+    height, width = len(grid), len(grid[0])
+    
+    # Ensure pixelated look
+    for r in range(height):
+        if 0 not in grid[r]:
+            grid[r][random.randint(0, width-1)] = 0
+    for c in range(width):
+        if all(grid[r][c] != 0 for r in range(height)):
+            grid[random.randint(0, height-1)][c] = 0
+    
+    # Add asymmetry
+    if random.random() < 0.5:
+        change_pos = random.randint(1, width-2)
+        grid[0][change_pos] = 8 if grid[0][change_pos] == 0 else 0
+    
+    # Simplify for low density inputs
+    if density < 0.1 and height > 2:
+        grid = grid[:-1]
+    
+    return grid
