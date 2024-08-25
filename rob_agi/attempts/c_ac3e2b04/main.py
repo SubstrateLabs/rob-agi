@@ -109,21 +109,17 @@ def balance_structure(grid: ColoredGrid):
 
 def extend_blue_lines(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
-    for r in range(rows):
-        for c in range(cols):
-            if grid.get_cell(r, c) == 1:
-                # Extend horizontally
-                for dc in [-1, 1]:
-                    nc = c + dc
-                    while 0 <= nc < cols and grid.get_cell(r, nc) == 0:
-                        grid.set_cell(r, nc, 1)
-                        nc += dc
-                # Extend vertically
-                for dr in [-1, 1]:
-                    nr = r + dr
-                    while 0 <= nr < rows and grid.get_cell(nr, c) == 0:
-                        grid.set_cell(nr, c, 1)
-                        nr += dr
+    changed = True
+    while changed:
+        changed = False
+        for r in range(rows):
+            for c in range(cols):
+                if grid.get_cell(r, c) == 1:
+                    for dr, dc in [(0,1),(1,0),(0,-1),(-1,0)]:
+                        nr, nc = r + dr, c + dc
+                        if 0 <= nr < rows and 0 <= nc < cols and grid.get_cell(nr, nc) == 0:
+                            grid.set_cell(nr, nc, 1)
+                            changed = True
 
 def ensure_symmetry(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
