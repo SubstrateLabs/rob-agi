@@ -8,12 +8,12 @@ def solve_ce8d95cc(input_grid: ColoredGrid) -> ColoredGrid:
     The solution:
     1. Identifies vertical and horizontal lines in the input grid.
     2. Creates a new grid with dimensions based on the number of lines.
-    3. Places vertical lines in odd-numbered columns and horizontal lines in odd-numbered rows.
-    4. Handles thick lines on the edges by filling adjacent columns/rows.
-    5. Preserves line intersections, prioritizing horizontal line colors.
+    3. Places vertical lines in odd-numbered columns.
+    4. Places horizontal lines in odd-numbered rows, preserving intersections with vertical lines.
+    5. Handles thick lines on the edges by filling adjacent columns/rows.
     
     This approach maintains the relative positioning and colors of all lines while
-    compressing the grid to its essential features.
+    compressing the grid to its essential features, correctly handling intersections.
     """
     vertical_lines = find_vertical_lines(input_grid)
     horizontal_lines = find_horizontal_lines(input_grid)
@@ -40,12 +40,19 @@ def solve_ce8d95cc(input_grid: ColoredGrid) -> ColoredGrid:
     for i, (row, color, is_thick) in enumerate(horizontal_lines):
         output_row = 2 * i + 1
         for col in range(new_width):
-            output_grid.values[output_row][col] = color
+            if col % 2 == 1:  # Odd-numbered columns (vertical lines)
+                vertical_color = output_grid.values[output_row][col]
+                if vertical_color != 0:
+                    output_grid.values[output_row][col] = vertical_color
+                else:
+                    output_grid.values[output_row][col] = color
+            else:
+                output_grid.values[output_row][col] = color
         if is_thick:
             if i == 0:  # Top edge
-                output_grid.values[0] = [color] * new_width
+                output_grid.values[0] = [color if c % 2 == 0 else output_grid.values[0][c] for c in range(new_width)]
             elif i == len(horizontal_lines) - 1:  # Bottom edge
-                output_grid.values[-1] = [color] * new_width
+                output_grid.values[-1] = [color if c % 2 == 0 else output_grid.values[-1][c] for c in range(new_width)]
     
     return output_grid
 
