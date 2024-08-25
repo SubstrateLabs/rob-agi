@@ -17,62 +17,49 @@ def solve_1d398264(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by expanding non-black cells according to color-specific rules.
     Each color has a unique expansion pattern:
-    - Blue (1): Expands diagonally up-right (limited)
+    - Blue (1): Expands diagonally up-right (unlimited)
     - Red (2): Expands horizontally to fill the row, then vertically from the ends
-    - Green (3): Expands diagonally up-left and down-right (limited)
+    - Green (3): Expands diagonally up-left and down-right (unlimited)
     - Yellow (4): Expands horizontally to fill the entire row
     - Gray (5): Does not expand
-    - Magenta (6): Expands diagonally up-left (limited or full if on edge)
-    - Orange (7): Expands diagonally down-right (limited or full if on edge)
+    - Magenta (6): Expands diagonally up-left (unlimited)
+    - Orange (7): Expands diagonally down-right (unlimited)
     - Sky Blue (8): Expands vertically down to fill the column, then horizontally at the bottom
     The expansion continues until it hits an edge or a non-black cell.
-    Original non-black cells are preserved, and expansions are applied in a specific order.
+    Original non-black cells are preserved, and expansions are applied in order of appearance.
     """
     grid = input_grid.deep_copy().values
     rows, cols = len(grid), len(grid[0])
 
+    def is_valid(r, c):
+        return 0 <= r < rows and 0 <= c < cols
+
     def expand_color(r, c, color):
         if color == 1:  # Blue
-            expand_diagonal_limited(r, c, -1, 1, color)
+            expand_diagonal(r, c, -1, 1, color)
         elif color == 2:  # Red
-            expand_horizontal_full(r, color)
+            expand_horizontal(r, color)
             expand_vertical_from_ends(r, color)
         elif color == 3:  # Green
-            expand_diagonal_limited(r, c, -1, -1, color)
-            expand_diagonal_limited(r, c, 1, 1, color)
+            expand_diagonal(r, c, -1, -1, color)
+            expand_diagonal(r, c, 1, 1, color)
         elif color == 4:  # Yellow
-            expand_horizontal_full(r, color)
+            expand_horizontal(r, color)
         elif color == 6:  # Magenta
-            if r == 0 or c == 0:
-                expand_diagonal_full(r, c, -1, -1, color)
-            else:
-                expand_diagonal_limited(r, c, -1, -1, color)
+            expand_diagonal(r, c, -1, -1, color)
         elif color == 7:  # Orange
-            if r == rows - 1 or c == cols - 1:
-                expand_diagonal_full(r, c, 1, 1, color)
-            else:
-                expand_diagonal_limited(r, c, 1, 1, color)
+            expand_diagonal(r, c, 1, 1, color)
         elif color == 8:  # Sky Blue
-            expand_vertical_down(r, c, color)
-            expand_horizontal_full(rows - 1, color)
+            expand_vertical(r, c, color)
+            expand_horizontal(rows - 1, color)
 
-    def expand_diagonal_limited(r, c, dr, dc, color):
-        limit = min(rows, cols)
-        for i in range(limit):
-            nr, nc = r + i * dr, c + i * dc
-            if 0 <= nr < rows and 0 <= nc < cols and grid[nr][nc] == 0:
-                grid[nr][nc] = color
-            else:
-                break
+    def expand_diagonal(r, c, dr, dc, color):
+        nr, nc = r + dr, c + dc
+        while is_valid(nr, nc) and grid[nr][nc] == 0:
+            grid[nr][nc] = color
+            nr, nc = nr + dr, nc + dc
 
-    def expand_diagonal_full(r, c, dr, dc, color):
-        while 0 <= r < rows and 0 <= c < cols:
-            if grid[r][c] == 0:
-                grid[r][c] = color
-            r += dr
-            c += dc
-
-    def expand_horizontal_full(r, color):
+    def expand_horizontal(r, color):
         for c in range(cols):
             if grid[r][c] == 0:
                 grid[r][c] = color
@@ -88,17 +75,14 @@ def solve_1d398264(input_grid: ColoredGrid) -> ColoredGrid:
                 if grid[nr][c] == 0:
                     grid[nr][c] = color
 
-    def expand_vertical_down(r, c, color):
+    def expand_vertical(r, c, color):
         for nr in range(r, rows):
             if grid[nr][c] == 0:
                 grid[nr][c] = color
 
-    non_black_cells = [(r, c, grid[r][c]) for r in range(rows) for c in range(cols) if grid[r][c] != 0]
-    expansion_order = [1, 3, 6, 7, 2, 4, 8]
-
-    for color in expansion_order:
-        for r, c, cell_color in non_black_cells:
-            if cell_color == color:
-                expand_color(r, c, color)
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] != 0:
+                expand_color(r, c, grid[r][c])
 
     return ColoredGrid(values=grid)
