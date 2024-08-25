@@ -4,16 +4,16 @@ def solve_1990f7a8(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms an input grid into a 7x7 output grid by analyzing patterns in each quadrant.
     
-    The function divides the input into four quadrants, creates a 3x3 representation for each,
+    The function divides the input into four quadrants, extracts the key pattern from each,
     and assembles these into a 7x7 grid. It preserves the essence of red (2) patterns
     while maintaining a black (0) separator row in the middle.
     
     Steps:
     1. Divide input into quadrants
-    2. Analyze each quadrant and create a 3x3 representation
-    3. Assemble the 3x3 representations into a 7x7 output grid
-    4. Ensure the middle row (row 3) remains black
-    5. Adjust the representation to maintain balance and symmetry
+    2. Extract and simplify the pattern from each quadrant
+    3. Create a 3x3 representation for each quadrant
+    4. Assemble the 3x3 representations into a 7x7 output grid
+    5. Ensure the middle row (row 3) remains black
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed
@@ -24,34 +24,33 @@ def solve_1990f7a8(input_grid: ColoredGrid) -> ColoredGrid:
     rows, cols = input_grid.get_dimensions()
     mid_row, mid_col = rows // 2, cols // 2
 
-    def analyze_quadrant(top, left, bottom, right):
+    def extract_pattern(top, left, bottom, right):
         subgrid = input_grid.extract_subgrid(top, left, bottom - top + 1, right - left + 1)
-        red_count = subgrid.count_color(2)
-        total_cells = (bottom - top + 1) * (right - left + 1)
-        density = red_count / total_cells
-
-        representation = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+        pattern = [[0 for _ in range(3)] for _ in range(3)]
         
-        if density > 0.5:  # High density, fill most of the 3x3
-            for r in range(3):
-                for c in range(3):
-                    representation[r][c] = 2
-        elif density > 0.3:  # Medium density, create a cross or plus shape
-            representation[0][1] = representation[1][0] = representation[1][1] = representation[1][2] = representation[2][1] = 2
-        elif density > 0:  # Low density, create an L shape or corner
-            representation[0][0] = representation[1][0] = representation[2][0] = representation[2][1] = representation[2][2] = 2
+        # Find the bounding box of the red cells
+        red_cells = [(r, c) for r in range(bottom - top + 1) for c in range(right - left + 1) if subgrid.get_cell(r, c) == 2]
+        if not red_cells:
+            return pattern
         
-        # Adjust based on specific patterns
-        if subgrid.get_cell(1, 1) == 0 and density > 0.3:  # Hollow center
-            representation[1][1] = 0
+        min_r, min_c = min(red_cells)
+        max_r, max_c = max(red_cells)
         
-        return representation
+        # Map the pattern to 3x3
+        for r in range(min_r, max_r + 1):
+            for c in range(min_c, max_c + 1):
+                if subgrid.get_cell(r, c) == 2:
+                    pattern_r = (r - min_r) * 3 // (max_r - min_r + 1)
+                    pattern_c = (c - min_c) * 3 // (max_c - min_c + 1)
+                    pattern[pattern_r][pattern_c] = 2
+        
+        return pattern
 
     quadrants = [
-        analyze_quadrant(0, 0, mid_row - 1, mid_col - 1),
-        analyze_quadrant(0, mid_col, mid_row - 1, cols - 1),
-        analyze_quadrant(mid_row, 0, rows - 1, mid_col - 1),
-        analyze_quadrant(mid_row, mid_col, rows - 1, cols - 1)
+        extract_pattern(0, 0, mid_row - 1, mid_col - 1),
+        extract_pattern(0, mid_col, mid_row - 1, cols - 1),
+        extract_pattern(mid_row, 0, rows - 1, mid_col - 1),
+        extract_pattern(mid_row, mid_col, rows - 1, cols - 1)
     ]
 
     output_values = [[0 for _ in range(7)] for _ in range(7)]
