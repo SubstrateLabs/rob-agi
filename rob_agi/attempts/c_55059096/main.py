@@ -10,35 +10,100 @@ def solve_55059096(input_grid: ColoredGrid) -> ColoredGrid:
     Solve the grid transformation challenge by connecting green crosses with a minimal red path.
     
     1. Identify all green crosses in the grid.
-    2. Generate all possible connections between crosses.
-    3. Implement a modified Steiner Tree algorithm to find an optimal set of connections.
-    4. Use A* pathfinding to determine the actual paths between connected crosses.
-    5. Apply the paths to the original grid, changing black cells to red along the path.
+    2. Generate subsets of crosses, from smaller to larger.
+    3. For each subset, create a minimal spanning tree using a modified Prim's algorithm.
+    4. Use A* pathfinding with diagonal preference to connect crosses.
+    5. Score each tree based on crosses connected and new red cells added.
+    6. Choose the best tree and apply it to the grid.
+    7. Optimize the final path by removing unnecessary bends or detours.
     
     This approach ensures a minimal continuous shape connecting the optimal number of crosses,
     allowing for some crosses to remain unconnected if it results in a more optimal overall solution.
     """
     crosses = find_crosses(input_grid)
-    shape = create_minimal_shape(input_grid, crosses)
-    output_grid = apply_shape_to_grid(input_grid, shape)
+    if len(crosses) <= 1:
+        return input_grid  # No changes needed if 0 or 1 cross
+
+    best_shape = set()
+    best_score = float('-inf')
+
+    for i in range(2, len(crosses) + 1):
+        for subset in itertools.combinations(crosses, i):
+            shape = create_minimal_shape(input_grid, subset)
+            score = score_shape(shape, subset, input_grid)
+            if score > best_score:
+                best_score = score
+                best_shape = shape
+
+    output_grid = apply_shape_to_grid(input_grid, best_shape)
     return output_grid
 
 def create_minimal_shape(grid: ColoredGrid, crosses: List[Tuple[int, int]]) -> Set[Tuple[int, int]]:
-    shape = set(crosses[0])
-    unconnected = set(crosses[1:])
-    queue = [(manhattan_distance(crosses[0], cross), crosses[0], cross) for cross in unconnected]
-    heapq.heapify(queue)
+    shape = set()
+    connected = set()
+    unconnected = set(crosses)
+    
+    start = crosses[0]
+    connected.add(start)
+    unconnected.remove(start)
 
     while unconnected:
-        _, current, target = heapq.heappop(queue)
-        path = find_path(current, target, shape, grid)
-        shape.update(path)
-        if target in shape:
-            unconnected.remove(target)
-            for cross in unconnected:
-                heapq.heappush(queue, (manhattan_distance(target, cross), target, cross))
+        best_path = None
+        best_cost = float('inf')
+        best_target = None
+
+        for target in unconnected:
+            for source in connected:
+                path = find_path(source, target, shape, grid)
+                if path:
+                    cost = len(path)
+                    if cost < best_cost:
+                        best_cost = cost
+                        best_path = path
+                        best_target = target
+
+        if best_path:
+            shape.update(best_path)
+            connected.add(best_target)
+            unconnected.remove(best_target)
+        else:
+            break  # No more reachable crosses
 
     return optimize_shape(shape, crosses, grid)
+
+def score_shape(shape: Set[Tuple[int, int]], crosses: List[Tuple[int, int]], grid: ColoredGrid) -> int:
+    connected_crosses = sum(1 for cross in crosses if cross in shape)
+    new_red_cells = len(shape) - len(crosses)
+    return connected_crosses * 10 - new_red_cells
+
+def find_path(start: Tuple[int, int], end: Tuple[int, int], shape: Set[Tuple[int, int]], grid: ColoredGrid) -> List[Tuple[int, int]]:
+    queue = [(0, 0, [start])]
+    visited = set()
+
+    while queue:
+        f, g, path = heapq.heappop(queue)
+        current = path[-1]
+
+        if current == end:
+            return path
+
+        if current in visited:
+            continue
+
+        visited.add(current)
+
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]:
+            nr, nc = current[0] + dr, current[1] + dc
+            if 0 <= nr < grid.num_rows and 0 <= nc < grid.num_cols and (nr, nc) not in visited:
+                new_g = g + (0.5 if dr != 0 and dc != 0 else 1)  # Prefer diagonal moves
+                if (nr, nc) in shape or grid.get_cell(nr, nc) in [2, 3]:
+                    new_g = g  # No additional cost for existing path or crosses
+                h = manhattan_distance((nr, nc), end)
+                f = new_g + h
+                new_path = path + [(nr, nc)]
+                heapq.heappush(queue, (f, new_g, new_path))
+
+    return []  # No path found
 
 def find_path(start: Tuple[int, int], end: Tuple[int, int], shape: Set[Tuple[int, int]], grid: ColoredGrid) -> List[Tuple[int, int]]:
     queue = [(manhattan_distance(start, end), [start])]
