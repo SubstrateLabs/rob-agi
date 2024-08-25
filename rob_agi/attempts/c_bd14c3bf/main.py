@@ -3,23 +3,23 @@ from typing import List, Tuple
 
 def solve_bd14c3bf(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the grid transformation challenge by changing complex blue shapes to red
-    while preserving simpler blue shapes. The function identifies connected regions
-    of blue cells, calculates their complexity, and changes the color of complex
-    shapes to red based on a threshold.
+    Solves the grid transformation challenge by changing irregular blue shapes to red
+    while preserving regular blue shapes. The function identifies connected regions
+    of blue cells, assesses their regularity based on symmetry and shape characteristics,
+    and changes the color of irregular shapes to red based on a regularity score threshold.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
     
     Returns:
-    ColoredGrid: The transformed grid with complex blue shapes changed to red.
+    ColoredGrid: The transformed grid with irregular blue shapes changed to red.
     """
     output_grid = input_grid.deep_copy()
     blue_regions = find_connected_regions(output_grid, 1)  # 1 represents blue
     
     for region in blue_regions:
-        complexity = calculate_complexity(region)
-        if complexity > 10:  # Threshold determined by analyzing examples
+        regularity_score = calculate_regularity(region)
+        if regularity_score < 0.6:  # Threshold determined by analyzing examples
             for r, c in region:
                 output_grid.set_cell(r, c, 2)  # 2 represents red
     
@@ -49,8 +49,8 @@ def find_connected_regions(grid: ColoredGrid, color: int) -> List[List[Tuple[int
     
     return regions
 
-def calculate_complexity(region: List[Tuple[int, int]]) -> float:
-    """Calculate the complexity of a shape based on its size and perimeter."""
+def calculate_regularity(region: List[Tuple[int, int]]) -> float:
+    """Calculate the regularity of a shape based on symmetry and shape characteristics."""
     if not region:
         return 0
     
@@ -60,15 +60,52 @@ def calculate_complexity(region: List[Tuple[int, int]]) -> float:
     min_c = min(c for _, c in region)
     max_c = max(c for _, c in region)
     
-    # Calculate area and perimeter
-    area = len(region)
-    perimeter = sum(1 for r, c in region if (r+1, c) not in region or
-                                           (r-1, c) not in region or
-                                           (r, c+1) not in region or
-                                           (r, c-1) not in region)
+    # Create a binary representation of the shape
+    shape = [[0 for _ in range(max_c - min_c + 1)] for _ in range(max_r - min_r + 1)]
+    for r, c in region:
+        shape[r - min_r][c - min_c] = 1
     
-    # Calculate complexity score
-    bounding_box_area = (max_r - min_r + 1) * (max_c - min_c + 1)
-    complexity = (perimeter * bounding_box_area) / (area * area)
+    # Check for symmetry
+    vertical_symmetry = check_vertical_symmetry(shape)
+    horizontal_symmetry = check_horizontal_symmetry(shape)
     
-    return complexity
+    # Count straight edges and corners
+    straight_edges, corners = count_edges_and_corners(shape)
+    
+    # Calculate regularity score
+    regularity = (vertical_symmetry + horizontal_symmetry + straight_edges / len(region) + corners / len(region)) / 4
+    
+    return regularity
+
+def check_vertical_symmetry(shape: List[List[int]]) -> float:
+    rows, cols = len(shape), len(shape[0])
+    symmetry_score = 0
+    for r in range(rows):
+        for c in range(cols // 2):
+            if shape[r][c] == shape[r][cols - 1 - c]:
+                symmetry_score += 1
+    return symmetry_score / (rows * cols // 2)
+
+def check_horizontal_symmetry(shape: List[List[int]]) -> float:
+    rows, cols = len(shape), len(shape[0])
+    symmetry_score = 0
+    for r in range(rows // 2):
+        for c in range(cols):
+            if shape[r][c] == shape[rows - 1 - r][c]:
+                symmetry_score += 1
+    return symmetry_score / (rows // 2 * cols)
+
+def count_edges_and_corners(shape: List[List[int]]) -> Tuple[int, int]:
+    rows, cols = len(shape), len(shape[0])
+    straight_edges = 0
+    corners = 0
+    for r in range(rows):
+        for c in range(cols):
+            if shape[r][c] == 1:
+                neighbors = sum(shape[r+dr][c+dc] for dr, dc in [(0,1),(1,0),(0,-1),(-1,0)] 
+                                if 0 <= r+dr < rows and 0 <= c+dc < cols)
+                if neighbors == 2:
+                    straight_edges += 1
+                elif neighbors == 1:
+                    corners += 1
+    return straight_edges, corners
