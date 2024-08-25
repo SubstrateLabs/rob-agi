@@ -3,19 +3,20 @@ from typing import Tuple, List
 
 def solve_4e45f183(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by applying pattern-based transformations to 5x5 sections.
+    Transforms the input grid by applying symmetrical pattern-based transformations to 5x5 sections.
     
     The transformation involves:
-    1. Creating frames in left and right sections with the less frequent color.
-    2. Generating a symmetrical pattern in the middle section.
-    3. Ensuring symmetry between top/bottom and left/right sections.
-    4. Preserving color balance and adapting patterns to maintain symmetry.
+    1. Analyzing each 5x5 section to determine the two most frequent colors.
+    2. Creating frames in left and right sections with the less frequent color.
+    3. Generating a symmetrical pattern in the middle sections.
+    4. Ensuring both horizontal and vertical symmetry across the entire grid.
+    5. Preserving the original grid structure with black borders and separators.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
     
     Returns:
-    ColoredGrid: The transformed grid.
+    ColoredGrid: The transformed grid with symmetrical patterns.
     """
     def get_section_colors(section: List[List[int]]) -> Tuple[int, int]:
         colors = [color for row in section for color in row if color != 0]
@@ -30,17 +31,16 @@ def solve_4e45f183(input_grid: ColoredGrid) -> ColoredGrid:
         return section
 
     def create_middle_section(frame_color: int, interior_color: int) -> List[List[int]]:
-        section = create_framed_section(frame_color, interior_color)
+        section = create_framed_section(interior_color, frame_color)
         section[2][2] = frame_color
         return section
 
     def transform_section(section: List[List[int]], position: str) -> List[List[int]]:
-        dominant, secondary = get_section_colors(section)
-        
+        interior, frame = get_section_colors(section)
         if position in ['left', 'right']:
-            return create_framed_section(secondary, dominant)
+            return create_framed_section(frame, interior)
         elif position == 'middle':
-            return create_middle_section(secondary, dominant)
+            return create_middle_section(frame, interior)
         else:
             return section
 
@@ -52,10 +52,18 @@ def solve_4e45f183(input_grid: ColoredGrid) -> ColoredGrid:
         section = input_grid.extract_subgrid(1, j*6+1, 5, 5).values
         position = ['left', 'middle', 'right'][j]
         transformed = transform_section(section, position)
-        
         for r in range(5):
             for c in range(5):
                 output_values[r+1][j*6+c+1] = transformed[r][c]
+
+    # Transform the middle row of sections
+    for j in range(3):
+        section = input_grid.extract_subgrid(7, j*6+1, 5, 5).values
+        position = ['left', 'middle', 'right'][j]
+        transformed = transform_section(section, position)
+        for r in range(5):
+            for c in range(5):
+                output_values[r+7][j*6+c+1] = transformed[r][c]
 
     # Mirror the top row to the bottom row
     for j in range(3):
@@ -63,14 +71,7 @@ def solve_4e45f183(input_grid: ColoredGrid) -> ColoredGrid:
             for c in range(5):
                 output_values[13+r][j*6+c+1] = output_values[5-r][j*6+c+1]
 
-    # Transform the middle row of sections
-    middle_section = input_grid.extract_subgrid(7, 7, 5, 5).values
-    transformed_middle = transform_section(middle_section, 'middle')
-    for r in range(5):
-        for c in range(5):
-            output_values[r+7][c+7] = transformed_middle[r][c]
-
-    # Mirror the left section to the right section in the middle row
+    # Ensure vertical symmetry in the middle row
     for r in range(5):
         for c in range(5):
             output_values[r+7][13+c] = output_values[r+7][5-c]
