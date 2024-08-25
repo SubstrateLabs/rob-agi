@@ -13,12 +13,18 @@ def solve_20818e16(input_grid: ColoredGrid) -> ColoredGrid:
     4. Remove the background color and optimize the grid size.
     5. Ensure all original colors (except background) are represented in the output.
     
+    The algorithm uses a backtracking approach to find the most compact arrangement,
+    trying different rotations and positions for each shape. It starts with a minimum
+    grid size and expands if necessary. The final arrangement is optimized by removing
+    empty rows and columns.
+    
     Returns a new ColoredGrid with the transformed and compact arrangement.
     """
     background_color = identify_background_color(input_grid)
     shapes = extract_shapes(input_grid, background_color)
     arranged_grid = find_optimal_arrangement(shapes)
-    return ColoredGrid(values=arranged_grid)
+    optimized_grid = optimize_grid(arranged_grid)
+    return ColoredGrid(values=optimized_grid)
 
 def identify_background_color(grid: ColoredGrid) -> int:
     color_count = defaultdict(int)
@@ -65,7 +71,7 @@ def rotate_shape(shape: List[List[int]]) -> List[List[int]]:
 
 def find_optimal_arrangement(shapes: List[Tuple[int, List[List[int]]]]) -> List[List[int]]:
     total_area = sum(len(shape) * len(shape[0]) for _, shape in shapes)
-    min_size = int(total_area ** 0.5)
+    min_size = max(int(total_area ** 0.5), max(max(len(shape), len(shape[0])) for _, shape in shapes))
     max_size = sum(max(len(shape), len(shape[0])) for _, shape in shapes)
 
     def can_place(grid, shape, r, c):
@@ -93,27 +99,32 @@ def find_optimal_arrangement(shapes: List[Tuple[int, List[List[int]]]]) -> List[
             return True
 
         color, shape = shapes[index]
-        for rotation in range(4):
+        rotations = [shape, rotate_shape(shape), rotate_shape(rotate_shape(shape)), rotate_shape(rotate_shape(rotate_shape(shape)))]
+        for rotated_shape in rotations:
             for r in range(len(grid)):
                 for c in range(len(grid[0])):
-                    if can_place(grid, shape, r, c):
-                        place_shape(grid, shape, r, c)
+                    if can_place(grid, rotated_shape, r, c):
+                        place_shape(grid, rotated_shape, r, c)
                         if arrange_shapes(grid, shapes, index + 1):
                             return True
-                        remove_shape(grid, shape, r, c)
-            shape = rotate_shape(shape)
+                        remove_shape(grid, rotated_shape, r, c)
         return False
 
     start_time = time.time()
     for size in range(min_size, max_size + 1):
         grid = [[0 for _ in range(size)] for _ in range(size)]
         if arrange_shapes(grid, shapes):
-            # Trim empty rows and columns
-            grid = [row for row in grid if any(cell != 0 for cell in row)]
-            grid = [list(col) for col in zip(*grid) if any(cell != 0 for cell in col)]
             return grid
         if time.time() - start_time > 5:  # 5 seconds timeout
             break
 
     # If no solution found, return the best effort arrangement
+    return grid
+def optimize_grid(grid: List[List[int]]) -> List[List[int]]:
+    # Remove empty rows
+    grid = [row for row in grid if any(cell != 0 for cell in row)]
+    
+    # Remove empty columns
+    grid = [list(col) for col in zip(*grid) if any(cell != 0 for cell in col)]
+    
     return grid
