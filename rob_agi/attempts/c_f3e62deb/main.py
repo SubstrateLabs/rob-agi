@@ -7,50 +7,42 @@ def solve_f3e62deb(input_grid: ColoredGrid) -> ColoredGrid:
     
     The function identifies the 3x3 hollow square in the input grid and moves it
     to the nearest available edge in the following priority order:
-    1. Right edge
-    2. Top edge
-    3. Left edge
-    4. Bottom edge
+    1. Right edge (if not already there)
+    2. Top edge (if not at right edge)
+    3. Left edge (if not at top edge)
+    4. Bottom edge (if not at left edge)
     
-    The shape maintains its vertical or horizontal position when moving to an edge.
-    If the shape is already at all edges, it remains in its current position.
+    The shape maintains its vertical position when moving horizontally and
+    its horizontal position when moving vertically.
     """
-    def find_square(grid: ColoredGrid) -> Tuple[int, int, int]:
-        for r in range(len(grid.values)):
-            for c in range(len(grid.values[0])):
-                if grid.values[r][c] != 0:
-                    if r + 2 < len(grid.values) and c + 2 < len(grid.values[0]):
-                        color = grid.values[r][c]
-                        if all(grid.values[r+i][c+j] == color for i, j in [(0,0), (0,1), (0,2), (1,0), (1,2), (2,0), (2,1), (2,2)]) and grid.values[r+1][c+1] == 0:
-                            return r, c, color
+    def find_hollow_square(grid: ColoredGrid) -> Tuple[int, int, int]:
+        for color in range(1, 10):  # Check all non-black colors
+            regions = grid.find_connected_regions(color)
+            for region in regions:
+                if len(region) == 8:  # A hollow square has 8 colored cells
+                    top = min(r for r, _ in region)
+                    left = min(c for _, c in region)
+                    if grid.extract_subgrid(top, left, 3, 3).values == [
+                        [color, color, color],
+                        [color, 0, color],
+                        [color, color, color]
+                    ]:
+                        return top, left, color
         return -1, -1, -1
 
-    top, left, color = find_square(input_grid)
+    top, left, color = find_hollow_square(input_grid)
     if top == -1:
         return input_grid  # No valid square found, return input grid unchanged
 
-    # Calculate distances to edges
-    dist_right = 9 - (left + 2)
-    dist_top = top
-    dist_left = left
-    dist_bottom = 9 - (top + 2)
-
-    # Determine target edge
-    edges = [(dist_right, 'right'), (dist_top, 'top'), (dist_left, 'left'), (dist_bottom, 'bottom')]
-    edges.sort(key=lambda x: x[0])  # Sort by distance
-    target_edge = next((edge for dist, edge in edges if dist > 0), 'stay')
-
-    # Calculate new position
-    if target_edge == 'right':
-        new_left, new_top = 7, top
-    elif target_edge == 'top':
-        new_left, new_top = left, 0
-    elif target_edge == 'left':
-        new_left, new_top = 0, top
-    elif target_edge == 'bottom':
-        new_left, new_top = left, 7
-    else:  # 'stay'
-        new_left, new_top = left, top
+    # Determine new position
+    if left < 7:
+        new_left, new_top = 7, top  # Move to right edge
+    elif top > 0:
+        new_left, new_top = left, 0  # Move to top edge
+    elif left > 0:
+        new_left, new_top = 0, top  # Move to left edge
+    else:
+        new_left, new_top = left, 7  # Move to bottom edge
 
     # Create new grid with moved square
     new_grid = ColoredGrid(values=[[0 for _ in range(10)] for _ in range(10)])
