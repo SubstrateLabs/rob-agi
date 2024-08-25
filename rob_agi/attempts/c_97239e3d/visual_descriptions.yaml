@@ -1,23 +1,58 @@
 example_0:
   input: |
-    A 17x17 grid with a predominantly black background. There are sky-colored (8) squares forming a pattern of 3x3 blocks separated by black spaces. These blocks are arranged in a 4x4 grid, with black spaces between them. There are two red (2) squares: one in the top-left corner and one in the middle of the 9th row, 13th column.
+    A 17x17 grid divided into four 8x8 quadrants, with the 17th row and column as borders.
+    Background: Predominantly black (0).
+    Pattern: 4x4 arrangement of 3x3 sky-colored (8) blocks, separated by black spaces.
+    Special squares: Two red (2) squares - one at (0,0) in the top-left quadrant, another at (8,12) in the bottom-right quadrant.
+    Note: The 17th row and column are entirely black.
   output: |
-    The grid maintains its 17x17 size. The top-left quadrant (8x8) is now filled with red (2), except for the rightmost column and bottom row which remain unchanged. The sky-colored (8) pattern within this quadrant is preserved but now has red squares where black ones were. The rest of the grid remains unchanged from the input.
+    Grid structure: Maintains 17x17 size with four 8x8 quadrants and black 17th row/column border.
+    Changed area: Top-left 8x8 quadrant filled with red (2), preserving sky-colored (8) pattern.
+    Unchanged areas: Other three quadrants and the 17th row/column remain as in the input.
+    Key observation: Only the quadrant containing the top-left red square was affected.
 
 example_1:
   input: |
-    A 17x17 grid with a similar sky-colored (8) pattern as in example_0. There are two magenta (6) squares: one in the 1st row, 5th column, and another in the 5th row, last column. There's also a blue (1) square in the bottom-left corner.
+    17x17 grid with four 8x8 quadrants and black 17th row/column border.
+    Background and pattern: Same as example_0.
+    Special squares: 
+      - Magenta (6): at (0,4) in top-left quadrant and (4,16) in top-right quadrant.
+      - Blue (1): at (16,0) in bottom-left corner.
+    Note: The special blue square is in the 17th row, outside the main quadrants.
   output: |
-    The grid maintains its 17x17 size. The top-right quadrant (8x8) is now filled with magenta (6), preserving the sky-colored pattern within but replacing black squares with magenta. The bottom-left quadrant (8x8) is filled with blue (1), again preserving the sky pattern but replacing black with blue. The rest of the grid, including the 17th row and column, remains unchanged from the input.
+    Grid structure: Maintains 17x17 size with four 8x8 quadrants and black 17th row/column border.
+    Changed areas:
+      - Top-right 8x8 quadrant filled with magenta (6), preserving sky pattern.
+      - Bottom-left 8x8 quadrant filled with blue (1), preserving sky pattern.
+    Unchanged areas: Top-left quadrant, bottom-right quadrant, and 17th row/column.
+    Key observation: Quadrant expansion prioritizes top-right over bottom-left.
 
 example_2:
   input: |
-    A 17x17 grid with the familiar sky-colored (8) pattern. There's an orange (7) square in the 1st row, 13th column, and another in the 4th row, last column. There are two green (3) squares: one in the 9th row, 2nd column, and another in the 12th row, 12th column.
+    17x17 grid with four 8x8 quadrants and black 17th row/column border.
+    Background and pattern: Same as previous examples.
+    Special squares:
+      - Orange (7): at (0,12) in top-right quadrant and (3,16) in the 17th column.
+      - Green (3): at (8,1) in bottom-left quadrant and (11,11) in bottom-right quadrant.
+    Note: One orange square is in the 17th column, outside the main quadrants.
   output: |
-    The grid maintains its 17x17 size. The top-right quadrant (8x8) is filled with orange (7), preserving the sky pattern but replacing black with orange. The bottom-left quadrant (8x8) is filled with green (3), again preserving the sky pattern but replacing black with green. The rest of the grid, including the 17th row and column, remains unchanged from the input.
+    Grid structure: Maintains 17x17 size with four 8x8 quadrants and black 17th row/column border.
+    Changed areas:
+      - Top-right 8x8 quadrant filled with orange (7), preserving sky pattern.
+      - Bottom-left 8x8 quadrant filled with green (3), preserving sky pattern.
+    Unchanged areas: Top-left quadrant, bottom-right quadrant, and 17th row/column.
+    Key observations: 
+      - Expansion priority: top-right, then bottom-left.
+      - Special squares in 17th row/column don't trigger expansion.
 
 test_case_0:
   input: |
-    A 17x17 grid with the familiar sky-colored (8) pattern. There's an orange (7) square in the 1st row, 13th column, and another in the 4th row, last column. There are two green (3) squares: one in the 9th row, 2nd column, and another in the 12th row, 12th column.
+    17x17 grid with four 8x8 quadrants and black 17th row/column border.
+    Background and pattern: Same as previous examples.
+    Special squares:
+      - Orange (7): at (0,12) in top-right quadrant and (3,16) in the 17th column.
+      - Green (3): at (8,1) in bottom-left quadrant and (11,11) in bottom-right quadrant.
+    Note: Identical to the input of example_2.
   output: |
     The output is not provided for this test case.
+    Expected behavior: Should match the output of example_2.
