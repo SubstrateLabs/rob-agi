@@ -6,18 +6,17 @@ def solve_b942fd60(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by connecting non-black squares with red lines.
     
     The function creates a minimal network of red lines that:
-    1. Creates vertical lines at the leftmost and rightmost columns with colored squares
-    2. Creates horizontal lines at the topmost and bottommost rows with unconnected colored squares
-    3. Connects any remaining unconnected colored squares to the nearest part of the red line structure
-    4. Preserves the original positions and colors of non-black squares
-    5. Ensures red lines don't extend beyond the last colored square in any direction
-    6. Removes any unnecessary or isolated red squares
+    1. Creates one or two vertical lines based on the distribution of colored squares
+    2. Creates horizontal lines to connect colored squares to the vertical line(s)
+    3. Preserves the original positions and colors of non-black squares
+    4. Ensures red lines don't extend beyond the last colored square in any direction
+    5. Removes any unnecessary or isolated red squares
     
     Steps:
     1. Create a deep copy of the input grid
     2. Identify all non-black squares
-    3. Create vertical red lines at the edges
-    4. Create horizontal red lines to connect unconnected squares
+    3. Determine the optimal vertical line position(s)
+    4. Create the basic structure with vertical and horizontal lines
     5. Connect any remaining unconnected squares
     6. Clean up unnecessary extensions
     7. Remove isolated red squares
@@ -33,35 +32,39 @@ def solve_b942fd60(input_grid: ColoredGrid) -> ColoredGrid:
     if not non_black:
         return output_grid  # Return original grid if no non-black squares
     
-    # Find optimal vertical line
+    # Find optimal vertical line(s)
     col_counts = [sum(1 for r in range(rows) if output_grid.get_cell(r, c) != 0) for c in range(cols)]
-    optimal_col = col_counts.index(max(col_counts))
+    left_col = min(c for c, count in enumerate(col_counts) if count > 0)
+    right_col = max(c for c, count in enumerate(col_counts) if count > 0)
     
-    # Find optimal horizontal line
-    row_counts = [sum(1 for c in range(cols) if output_grid.get_cell(r, c) != 0) for r in range(rows)]
-    optimal_row = row_counts.index(max(row_counts))
+    if left_col == right_col or max(col_counts) > 1:
+        # Use a single vertical line
+        optimal_cols = [col_counts.index(max(col_counts))]
+    else:
+        # Use two vertical lines
+        left_optimal = max(range(left_col, (left_col + right_col) // 2 + 1), key=lambda c: col_counts[c])
+        right_optimal = max(range((left_col + right_col) // 2 + 1, right_col + 1), key=lambda c: col_counts[c])
+        optimal_cols = [left_optimal, right_optimal]
     
-    # Adjust optimal_row if it doesn't intersect with any non-black square
-    if all(output_grid.get_cell(optimal_row, c) == 0 for c in range(cols)):
-        optimal_row = min(non_black, key=lambda x: abs(x[0] - optimal_row))[0]
+    # Find top and bottom rows with colored squares
+    top_row = min(r for r, c in non_black)
+    bottom_row = max(r for r, c in non_black)
     
-    # Create backbone structure
-    for r in range(rows):
-        output_grid.set_cell(r, optimal_col, 2)
-    for c in range(cols):
-        output_grid.set_cell(optimal_row, c, 2)
+    # Create basic structure
+    for col in optimal_cols:
+        for r in range(top_row, bottom_row + 1):
+            output_grid.set_cell(r, col, 2)
     
-    # Connect remaining non-black squares to backbone
+    for r in [top_row, bottom_row]:
+        for c in range(min(optimal_cols), max(optimal_cols) + 1):
+            output_grid.set_cell(r, c, 2)
+    
+    # Connect remaining non-black squares
     for r, c in non_black:
         if output_grid.get_cell(r, c) != 2:
-            if abs(r - optimal_row) <= abs(c - optimal_col):
-                for rr in range(min(r, optimal_row), max(r, optimal_row) + 1):
-                    if output_grid.get_cell(rr, c) == 0:
-                        output_grid.set_cell(rr, c, 2)
-            else:
-                for cc in range(min(c, optimal_col), max(c, optimal_col) + 1):
-                    if output_grid.get_cell(r, cc) == 0:
-                        output_grid.set_cell(r, cc, 2)
+            nearest_col = min(optimal_cols, key=lambda col: abs(col - c))
+            for cc in range(min(c, nearest_col), max(c, nearest_col) + 1):
+                output_grid.set_cell(r, cc, 2)
     
     # Clean up unnecessary extensions
     for r in range(rows):
@@ -78,7 +81,16 @@ def solve_b942fd60(input_grid: ColoredGrid) -> ColoredGrid:
             if r < top or r > bottom:
                 output_grid.set_cell(r, c, 0)
     
-    # Verify connectivity and add necessary connections
+    # Remove isolated red squares
+    for r in range(rows):
+        for c in range(cols):
+            if output_grid.get_cell(r, c) == 2:
+                neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                                if 0 <= r + dr < rows and 0 <= c + dc < cols and output_grid.get_cell(r + dr, c + dc) != 0)
+                if neighbors < 2:
+                    output_grid.set_cell(r, c, 0)
+    
+    # Final connectivity check
     def dfs(start_r, start_c):
         stack = [(start_r, start_c)]
         visited = set()
@@ -104,14 +116,5 @@ def solve_b942fd60(input_grid: ColoredGrid) -> ColoredGrid:
                         c += 1 if nearest[1] > c else -1
                     if output_grid.get_cell(r, c) == 0:
                         output_grid.set_cell(r, c, 2)
-    
-    # Remove isolated red squares
-    for r in range(rows):
-        for c in range(cols):
-            if output_grid.get_cell(r, c) == 2:
-                neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
-                                if 0 <= r + dr < rows and 0 <= c + dc < cols and output_grid.get_cell(r + dr, c + dc) != 0)
-                if neighbors < 2:
-                    output_grid.set_cell(r, c, 0)
     
     return output_grid
