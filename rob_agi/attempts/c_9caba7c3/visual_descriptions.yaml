@@ -1,42 +1,51 @@
 example_0:
   input: |
-    A 19x19 grid predominantly filled with gray (5) and black (0) squares. There are several red (2) squares scattered throughout the grid, mostly in the lower half. The red squares appear in small clusters or individually. The gray squares form irregular patterns and regions across the grid.
+    A 19x19 grid with gray (5) as the dominant color. Black (0) squares are scattered throughout, creating barriers. Red (2) squares appear in small clusters or individually, mostly in the lower half. The upper-left quadrant contains fewer red squares compared to other areas. Gray squares form the background and connect most of the grid.
   output: |
-    The grid maintains its 19x19 size and overall structure. Most black (0) and gray (5) squares remain unchanged. Key differences:
-    1. Some red (2) squares in the upper-left quadrant remain red.
-    2. Other red (2) squares outside this quadrant have changed to yellow (4).
-    3. Orange (7) color has appeared, forming paths or regions extending right and downward from yellow squares.
-    4. Orange seems to replace other colors (except black) in its path, sometimes "jumping" over intervening colors.
+    The 19x19 structure and all black (0) squares remain unchanged. Key transformations:
+    1. Red (2) squares in the upper-left quadrant (roughly 9x9 area) stay red.
+    2. Red squares outside the upper-left quadrant change to yellow (4).
+    3. Orange (7) color propagates from yellow squares, moving right and down.
+    4. Orange replaces gray and other colors, but stops at black squares.
+    5. Orange forms continuous paths or regions, sometimes "jumping" over black squares.
+    6. Gray areas unaffected by orange propagation remain unchanged.
 
 example_1:
   input: |
-    A 19x19 grid with a mix of gray (5), black (0), and red (2) squares. Red squares are more concentrated in the center and lower-right quadrant. There's a notable cluster of red squares in the center-left area. The grid has an irregular pattern of gray and black squares throughout.
+    A 19x19 grid with gray (5) as the primary color. Black (0) squares create irregular barriers. Red (2) squares are concentrated in the center and lower-right quadrant, with a notable cluster in the center-left area. The upper-left quadrant has fewer red squares. Gray forms the background and connects most areas.
   output: |
-    The 19x19 grid structure is maintained. Black (0) squares remain unchanged. Key transformations:
-    1. Some red (2) squares in the upper-left quadrant stay red.
-    2. Other red squares change to yellow (4).
-    3. Orange (7) color appears, spreading right and down from yellow squares.
-    4. Orange replaces other colors (except black) in its path, sometimes "jumping" over squares.
-    5. The center-left red cluster is particularly affected, with a mix of red, yellow, and orange squares.
+    The 19x19 structure and all black (0) squares are preserved. Key changes:
+    1. Red (2) squares in the upper-left quadrant (roughly 9x9 area) remain red.
+    2. Red squares outside the upper-left quadrant transform to yellow (4).
+    3. Orange (7) color emerges from yellow squares, propagating right and down.
+    4. Orange replaces gray and other colors but stops at black squares.
+    5. The center-left red cluster shows a mix of yellow and orange, with orange spreading right and down.
+    6. Lower-right quadrant shows significant orange areas due to the initial concentration of red squares.
+    7. Gray areas untouched by orange propagation stay the same.
 
 example_2:
   input: |
-    A 19x19 grid dominated by gray (5) squares with scattered black (0) areas. Red (2) squares are present, mainly in the upper-left quadrant and a few in the center-right area. The grid has an irregular pattern with no clear geometric shapes.
+    A 19x19 grid dominated by gray (5) with scattered black (0) creating barriers. Red (2) squares are mainly in the upper-left quadrant, with a few in the center-right area. The lower half has very few red squares. Gray forms the background and connects most of the grid.
   output: |
-    The 19x19 structure is preserved. Black (0) squares remain unchanged. Notable changes:
-    1. Red (2) squares in the upper-left quadrant mostly stay red.
-    2. Other red squares change to yellow (4).
-    3. Orange (7) color emerges, spreading right and down from yellow squares.
-    4. Orange replaces other colors (except black) in its path, sometimes "jumping" over squares.
-    5. The transformation is most noticeable in the upper-left quadrant and center-right areas where red squares were originally located.
+    The 19x19 structure and all black (0) squares remain unchanged. Notable transformations:
+    1. Most red (2) squares in the upper-left quadrant (roughly 9x9 area) stay red.
+    2. Red squares outside the upper-left quadrant, including those in the center-right, change to yellow (4).
+    3. Orange (7) color propagates from yellow squares, moving right and down.
+    4. Orange replaces gray and other colors but is blocked by black squares.
+    5. The center-right area shows yellow squares with orange spreading from them.
+    6. The lower half of the grid shows minimal changes due to the initial lack of red squares.
+    7. Gray areas unaffected by orange propagation remain the same.
 
 test_case_0:
   input: |
-    A 19x19 grid with a mix of gray (5), black (0), and red (2) squares. Red squares are scattered throughout, with notable concentrations in the upper-left and lower-right quadrants. The grid has an irregular pattern of gray and black squares, with no clear geometric shapes or patterns.
+    A 19x19 grid with a mix of gray (5), black (0), and red (2). Red squares are scattered throughout, with concentrations in the upper-left and lower-right quadrants. Black squares create irregular barriers across the grid. Gray forms the background and connects most areas.
   output: |
-    The output grid is not provided for the test case. Based on the pattern observed in the examples, we would expect:
-    1. Red squares in the upper-left quadrant to mostly remain red.
-    2. Other red squares to change to yellow.
-    3. Orange color to appear, spreading right and down from yellow squares.
-    4. Orange to replace other colors (except black) in its path.
-    5. The overall structure and black squares to remain unchanged.
+    While the actual output is not provided, based on the observed pattern, we can predict:
+    1. The 19x19 structure and all black (0) squares will remain unchanged.
+    2. Red (2) squares in the upper-left quadrant (roughly 9x9 area) will likely stay red.
+    3. Red squares outside the upper-left quadrant, especially in the lower-right, will change to yellow (4).
+    4. Orange (7) will propagate from yellow squares, moving right and down, replacing other colors except black.
+    5. The lower-right quadrant will likely show significant orange areas due to the initial concentration of red squares.
+    6. Orange propagation will stop at black squares, potentially creating intricate patterns.
+    7. Gray areas unaffected by orange propagation will remain unchanged.
+    8. The final grid will likely show a complex interplay of red, yellow, and orange, with black barriers and unchanged gray areas.
