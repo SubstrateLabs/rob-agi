@@ -9,7 +9,8 @@ def solve_551d5bf1(input_grid: ColoredGrid) -> ColoredGrid:
 
     The function creates a minimal spanning tree connecting all blue structures,
     extends the network to the right and bottom edges, fills enclosed areas with
-    sky blue, and ensures the original blue structures are preserved.
+    sky blue, ensures the original blue structures are preserved, and optimizes
+    the sky blue network to use the minimum necessary cells.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -47,15 +48,15 @@ def solve_551d5bf1(input_grid: ColoredGrid) -> ColoredGrid:
         path.append((end_r, end_c))
         return path
 
-    def flood_fill(r, c):
-        if not is_valid(r, c) or output_grid.values[r][c] != 0:
+    def flood_fill(r, c, target_color, replacement_color):
+        if not is_valid(r, c) or output_grid.values[r][c] != target_color:
             return
         queue = deque([(r, c)])
         while queue:
             curr_r, curr_c = queue.popleft()
-            if output_grid.values[curr_r][curr_c] != 0:
+            if output_grid.values[curr_r][curr_c] != target_color:
                 continue
-            output_grid.values[curr_r][curr_c] = 8
+            output_grid.values[curr_r][curr_c] = replacement_color
             for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                 nr, nc = curr_r + dr, curr_c + dc
                 if is_valid(nr, nc):
@@ -74,27 +75,42 @@ def solve_551d5bf1(input_grid: ColoredGrid) -> ColoredGrid:
             output_grid.values[r][c] = 8
             tree.add((r, c))
 
-    # Extend to right edge
-    rightmost = max(c for _, c in tree)
+    # Extend to right edge and bottom row
     for r in range(rows):
-        for c in range(rightmost, cols):
-            output_grid.values[r][c] = 8
+        output_grid.values[r][cols-1] = 8
+    for c in range(cols):
+        output_grid.values[rows-1][c] = 8
 
-    # Extend to bottom edge
-    bottommost = max(r for r, _ in tree)
-    for r in range(bottommost, rows):
-        for c in range(cols):
-            output_grid.values[r][c] = 8
+    # Connect blue structures to edges
+    for r, c in blue_cells:
+        if r == rows - 1 or c == cols - 1:
+            nearest_edge = find_nearest_tree_point(r, c, tree)
+            path = create_path(r, c, nearest_edge[0], nearest_edge[1])
+            for pr, pc in path:
+                output_grid.values[pr][pc] = 8
 
     # Fill enclosed areas
     for r in range(rows):
         for c in range(cols):
-            if output_grid.values[r][c] == 1:
-                for dr, dc in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
-                    flood_fill(r + dr, c + dc)
+            if output_grid.values[r][c] == 0:
+                flood_fill(r, c, 0, 8)
+
+    # Fill blue structure interiors
+    for r, c in blue_cells:
+        if r > 0 and c > 0 and r < rows - 1 and c < cols - 1:
+            flood_fill(r, c, 0, 8)
 
     # Restore original blue cells
     for r, c in blue_cells:
         output_grid.values[r][c] = 1
+
+    # Optimize sky blue network
+    for r in range(rows - 1):
+        for c in range(cols - 1):
+            if output_grid.values[r][c] == 8:
+                neighbors = sum(1 for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]
+                                if is_valid(r+dr, c+dc) and output_grid.values[r+dr][c+dc] in [1, 8])
+                if neighbors <= 1:
+                    output_grid.values[r][c] = 0
 
     return output_grid
