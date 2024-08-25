@@ -8,7 +8,8 @@ def solve_3a301edc(input_grid: ColoredGrid) -> ColoredGrid:
     2. Finds the innermost color of the shape.
     3. Determines the border thickness based on the size of the inner color region.
     4. Creates a new grid with the original shape and adds a border of the inner color.
-    5. The border thickness is 1 for small inner regions (1-3 cells) and 3 for larger regions.
+    5. The border thickness is 1 for small inner regions (1-3 cells) and 2 for larger regions.
+    6. Preserves the original black space around the shape.
     
     Returns a new ColoredGrid with the transformed pattern.
     """
@@ -26,34 +27,23 @@ def solve_3a301edc(input_grid: ColoredGrid) -> ColoredGrid:
                 max_col = max(max_col, c)
     
     # Find the innermost color
-    outer_color = input_grid.values[min_row][min_col]
-    inner_color = outer_color
+    inner_color = None
     for r in range(min_row, max_row + 1):
         for c in range(min_col, max_col + 1):
-            if input_grid.values[r][c] != 0 and input_grid.values[r][c] != outer_color:
-                inner_color = input_grid.values[r][c]
-                break
-        if inner_color != outer_color:
-            break
+            if input_grid.values[r][c] != 0:
+                if inner_color is None or input_grid.values[r][c] != inner_color:
+                    inner_color = input_grid.values[r][c]
     
-    # Determine the size of the inner color region
-    inner_region = input_grid.find_connected_regions(inner_color)[0]
-    border_thickness = 3 if len(inner_region) > 3 else 1
+    # Determine the border thickness
+    shape_area = (max_row - min_row + 1) * (max_col - min_col + 1)
+    border_thickness = 1 if shape_area <= 9 else 2
     
-    # Copy the original shape
-    for r in range(min_row, max_row + 1):
-        for c in range(min_col, max_col + 1):
-            output_grid.values[r][c] = input_grid.values[r][c]
-    
-    # Add the border
-    new_min_row = max(0, min_row - border_thickness)
-    new_min_col = max(0, min_col - border_thickness)
-    new_max_row = min(rows - 1, max_row + border_thickness)
-    new_max_col = min(cols - 1, max_col + border_thickness)
-    
-    for r in range(new_min_row, new_max_row + 1):
-        for c in range(new_min_col, new_max_col + 1):
-            if output_grid.values[r][c] == 0:
+    # Copy the original shape and add the border
+    for r in range(max(0, min_row - border_thickness), min(rows, max_row + border_thickness + 1)):
+        for c in range(max(0, min_col - border_thickness), min(cols, max_col + border_thickness + 1)):
+            if min_row <= r <= max_row and min_col <= c <= max_col:
+                output_grid.values[r][c] = input_grid.values[r][c]
+            elif output_grid.values[r][c] == 0:
                 output_grid.values[r][c] = inner_color
     
     return output_grid
