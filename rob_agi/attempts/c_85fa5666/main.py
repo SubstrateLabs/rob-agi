@@ -4,88 +4,114 @@ from collections import deque
 
 def solve_85fa5666(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by extending colored squares diagonally with bouncing behavior.
+    Transforms the input grid by flowing colors to their target regions with specific rules:
     
-    The function processes colors in priority order: Sky Blue (8), Green (3), Orange (7), Magenta (6).
-    Each color extends diagonally:
-    - Sky Blue (8) and Green (3): start from top-right to bottom-left
-    - Orange (7) and Magenta (6): start from top-left to bottom-right
-    Colors bounce off grid boundaries, red blocks, and higher/equal priority colors.
-    Red (2) 2x2 blocks remain unchanged and block extensions.
-    Higher priority colors overwrite lower priority ones.
-    Extensions continue until forming a loop or being blocked in all directions.
+    1. Colors flow towards their target corners: Sky Blue (8) to top-left, Green (3) to top-right,
+       Orange (7) to bottom-left, Magenta (6) to bottom-right.
+    2. Colors transform when they interact: Green can become Magenta, Orange can become Green,
+       Magenta can become Sky Blue.
+    3. Red (2) 2x2 blocks remain unchanged and block color flow.
+    4. Colors flow around obstacles and can coexist in adjacent cells.
+    5. The final grid aims for balance and often symmetry.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
-    colored_squares = []
-    red_blocks = set()
-
-    # Identify colored squares and red blocks
-    for r in range(rows):
-        for c in range(cols):
-            color = output_grid.get_cell(r, c)
-            if color != 0:
-                if color == 2 and is_red_block(output_grid, r, c):
-                    red_blocks.update([(r+dr, c+dc) for dr in range(2) for dc in range(2)])
-                elif (r, c) not in red_blocks:
-                    colored_squares.append((r, c, color))
-
-    # Sort colored squares by priority
-    colored_squares.sort(key=lambda x: get_color_priority(x[2]))
-
-    # Extend colors
-    for r, c, color in colored_squares:
-        extend_color_with_bounce(output_grid, r, c, color, red_blocks)
-
+    red_blocks = identify_red_blocks(output_grid)
+    colored_cells = identify_colored_cells(output_grid, red_blocks)
+    
+    for color in [8, 3, 7, 6]:
+        flow_color(output_grid, colored_cells, color, red_blocks)
+    
+    balance_grid(output_grid, red_blocks)
     return output_grid
 
-def is_red_block(grid: ColoredGrid, row: int, col: int) -> bool:
-    """Check if a given square is part of a red 2x2 block."""
-    if grid.get_cell(row, col) != 2:
-        return False
-    for dr, dc in [(0, 1), (1, 0), (1, 1)]:
-        if not is_valid_cell(row + dr, col + dc, grid) or grid.get_cell(row + dr, col + dc) != 2:
-            return False
-    return True
-
-def is_valid_cell(row: int, col: int, grid: ColoredGrid) -> bool:
-    """Check if a given coordinate is within the grid boundaries."""
+def identify_red_blocks(grid: ColoredGrid) -> Set[Tuple[int, int]]:
+    red_blocks = set()
     rows, cols = grid.get_dimensions()
-    return 0 <= row < rows and 0 <= col < cols
+    for r in range(rows - 1):
+        for c in range(cols - 1):
+            if all(grid.get_cell(r+dr, c+dc) == 2 for dr in range(2) for dc in range(2)):
+                red_blocks.update((r+dr, c+dc) for dr in range(2) for dc in range(2))
+    return red_blocks
 
-def get_color_priority(color: int) -> int:
-    """Return the priority of a given color."""
-    return {8: 0, 3: 1, 7: 2, 6: 3}.get(color, 4)
+def identify_colored_cells(grid: ColoredGrid, red_blocks: Set[Tuple[int, int]]) -> Dict[int, List[Tuple[int, int]]]:
+    colored_cells = {8: [], 3: [], 7: [], 6: []}
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        for c in range(cols):
+            color = grid.get_cell(r, c)
+            if color in colored_cells and (r, c) not in red_blocks:
+                colored_cells[color].append((r, c))
+    return colored_cells
 
-def extend_color_with_bounce(grid: ColoredGrid, start_row: int, start_col: int, color: int, red_blocks: Set[Tuple[int, int]]):
-    """Extend a color diagonally from its starting point with bouncing behavior."""
-    initial_direction = (-1, 1) if color in [8, 3] else (-1, -1)
+def flow_color(grid: ColoredGrid, colored_cells: Dict[int, List[Tuple[int, int]]], color: int, red_blocks: Set[Tuple[int, int]]):
+    target = get_target_corner(color, grid.get_dimensions())
+    for r, c in colored_cells[color]:
+        flow_from_cell(grid, r, c, color, target, red_blocks)
+
+def get_target_corner(color: int, dimensions: Tuple[int, int]) -> Tuple[int, int]:
+    rows, cols = dimensions
+    return {
+        8: (0, 0),           # Sky Blue to top-left
+        3: (0, cols - 1),    # Green to top-right
+        7: (rows - 1, 0),    # Orange to bottom-left
+        6: (rows - 1, cols - 1)  # Magenta to bottom-right
+    }[color]
+
+def flow_from_cell(grid: ColoredGrid, r: int, c: int, color: int, target: Tuple[int, int], red_blocks: Set[Tuple[int, int]]):
+    queue = deque([(r, c)])
     visited = set()
-    queue = deque([(start_row, start_col, initial_direction)])
-
     while queue:
-        r, c, (dx, dy) = queue.popleft()
+        r, c = queue.popleft()
         if (r, c) in visited:
             continue
         visited.add((r, c))
+        
+        for dr, dc in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
+            nr, nc = r + dr, c + dc
+            if is_valid_cell(nr, nc, grid) and (nr, nc) not in red_blocks:
+                cell_color = grid.get_cell(nr, nc)
+                if cell_color == 0 or should_transform(color, cell_color):
+                    new_color = transform_color(color, cell_color)
+                    grid.set_cell(nr, nc, new_color)
+                    queue.append((nr, nc))
+                elif cell_color == color:
+                    queue.append((nr, nc))
 
-        nr, nc = r + dx, c + dy
-        if not is_valid_cell(nr, nc, grid) or (nr, nc) in red_blocks:
-            # Bounce
-            dx, dy = -dy, -dx
-            nr, nc = r + dx, c + dy
+def is_valid_cell(row: int, col: int, grid: ColoredGrid) -> bool:
+    rows, cols = grid.get_dimensions()
+    return 0 <= row < rows and 0 <= col < cols
 
-        if is_valid_cell(nr, nc, grid) and (nr, nc) not in red_blocks:
-            cell_color = grid.get_cell(nr, nc)
-            if cell_color == 0 or get_color_priority(color) < get_color_priority(cell_color):
-                grid.set_cell(nr, nc, color)
-                queue.append((nr, nc, (dx, dy)))
-            else:
-                # Try bouncing in the other direction
-                dx, dy = -dx, -dy
-                nr, nc = r + dx, c + dy
-                if is_valid_cell(nr, nc, grid) and (nr, nc) not in red_blocks:
-                    cell_color = grid.get_cell(nr, nc)
-                    if cell_color == 0 or get_color_priority(color) < get_color_priority(cell_color):
-                        grid.set_cell(nr, nc, color)
-                        queue.append((nr, nc, (dx, dy)))
+def should_transform(color1: int, color2: int) -> bool:
+    transformations = {(3, 6), (7, 3), (6, 8)}
+    return (color1, color2) in transformations
+
+def transform_color(color1: int, color2: int) -> int:
+    if (color1, color2) == (3, 6) or color2 == 6:
+        return 6
+    elif (color1, color2) == (7, 3) or color2 == 3:
+        return 3
+    elif (color1, color2) == (6, 8) or color2 == 8:
+        return 8
+    return color1
+
+def balance_grid(grid: ColoredGrid, red_blocks: Set[Tuple[int, int]]):
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        for c in range(cols):
+            if (r, c) not in red_blocks:
+                balance_cell(grid, r, c, red_blocks)
+
+def balance_cell(grid: ColoredGrid, r: int, c: int, red_blocks: Set[Tuple[int, int]]):
+    color_counts = {}
+    for dr in [-1, 0, 1]:
+        for dc in [-1, 0, 1]:
+            nr, nc = r + dr, c + dc
+            if is_valid_cell(nr, nc, grid) and (nr, nc) not in red_blocks:
+                color = grid.get_cell(nr, nc)
+                if color != 0:
+                    color_counts[color] = color_counts.get(color, 0) + 1
+    
+    if color_counts:
+        most_common_color = max(color_counts, key=color_counts.get)
+        grid.set_cell(r, c, most_common_color)
