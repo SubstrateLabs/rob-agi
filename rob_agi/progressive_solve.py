@@ -1,3 +1,4 @@
+import time
 from pathlib import Path
 from typing import Optional
 
@@ -123,6 +124,7 @@ class Solver:
         return modify_coder.run(prompt)
 
     def run_solve(self, max_tries=default_max_tries, prev_solution=None) -> bool:
+        t0 = time.perf_counter()
         tries = 0
         current_result = self.run_tests()
         is_failing = not current_result["success"]
@@ -144,6 +146,7 @@ class Solver:
             is_failing = not current_result["success"]
             print("SUCCESS: ", current_result["success"])
 
+        print(f"Total time: {time.perf_counter() - t0:.2f}s")
         return current_result["success"]
 
     def __del__(self):
