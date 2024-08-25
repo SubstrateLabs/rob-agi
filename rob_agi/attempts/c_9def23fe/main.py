@@ -12,6 +12,13 @@ def solve_9def23fe(input_grid: ColoredGrid) -> ColoredGrid:
     5. Extends the red area within the bounds of the expansion.
     6. Preserves the positions of all scattered colored dots from the original grid.
     
+    The transformation includes:
+    - Expanding the red area horizontally across the full width at the top, bottom, and (if tall enough) middle of the original rectangle.
+    - Creating vertical red bars based on the width of the original rectangle.
+    - Filling spaces between vertical bars if they are close enough.
+    - Extending the red area from the top of the original rectangle to the bottom of the grid, between the outermost vertical bars.
+    - Maintaining all non-red, non-black dots from the original grid in their original positions.
+    
     Returns a new ColoredGrid with the transformed pattern.
     """
     # Step 1: Analyze input grid
@@ -33,7 +40,7 @@ def solve_9def23fe(input_grid: ColoredGrid) -> ColoredGrid:
     fill_between_bars(new_grid, vertical_columns, original_rect)
 
     # Step 6: Extend red area
-    extend_red_area(new_grid, horizontal_bars, vertical_columns)
+    extend_red_area(new_grid, original_rect, vertical_columns)
 
     # Step 7: Preserve scattered dots
     preserve_scattered_dots(new_grid, scattered_dots)
@@ -90,8 +97,10 @@ def calculate_horizontal_bars(rect: Tuple[int, int, int, int]) -> List[int]:
 def calculate_vertical_columns(rect: Tuple[int, int, int, int]) -> List[int]:
     _, left, _, right = rect
     width = right - left + 1
-    columns = [left + i * (width // (width + 1)) for i in range(width + 2)]
-    return [c for c in columns if c < len(rect[0])]
+    if width <= 6:
+        return [left, left + width // 3, right]
+    else:
+        return [left, left + width // 3, left + 2 * width // 3, right]
 
 def apply_horizontal_expansion(grid: List[List[int]], bars: List[int]):
     for r in bars:
@@ -102,17 +111,24 @@ def apply_vertical_expansion(grid: List[List[int]], columns: List[int]):
         for r in range(len(grid)):
             grid[r][c] = 2
 
-def extend_red_area(grid: List[List[int]], horizontal_bars: List[int], vertical_columns: List[int]):
-    top, bottom = min(horizontal_bars), max(horizontal_bars)
+def extend_red_area(grid: List[List[int]], rect: Tuple[int, int, int, int], vertical_columns: List[int]):
+    top, _, _, _ = rect
+    rows, cols = len(grid), len(grid[0])
     left, right = min(vertical_columns), max(vertical_columns)
-    for r in range(top, bottom + 1):
+    for r in range(top, rows):
         for c in range(left, right + 1):
             grid[r][c] = 2
 
 def fill_between_bars(grid: List[List[int]], columns: List[int], rect: Tuple[int, int, int, int]):
     rows = len(grid)
+    _, left, _, right = rect
+    width = right - left + 1
     for i in range(len(columns) - 1):
-        if columns[i+1] - columns[i] <= 2:
+        if width <= 6 and columns[i+1] - columns[i] <= 1:
+            for r in range(rows):
+                for c in range(columns[i], columns[i+1] + 1):
+                    grid[r][c] = 2
+        elif width > 6 and columns[i+1] - columns[i] <= 2:
             for r in range(rows):
                 for c in range(columns[i], columns[i+1] + 1):
                     grid[r][c] = 2
