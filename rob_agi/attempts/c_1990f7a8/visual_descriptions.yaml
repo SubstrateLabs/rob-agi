@@ -1,50 +1,56 @@
 example_0:
   input: |
-    A 23x23 grid with mostly black (empty) space. There are four distinct red (2) patterns:
-    1. Top-left quadrant: A 3x3 square with the center cell empty (black).
-    2. Top-right quadrant: A solid 3x3 square.
-    3. Bottom-left quadrant: An inverted T-shape or cross.
-    4. Bottom-right quadrant: An L-shape with an additional red cell above the shorter arm.
-    Each pattern is surrounded by empty space and positioned roughly in the center of its respective quadrant.
+    A 23x23 grid divided into four quadrants, each containing a distinct red (2) pattern:
+    1. Top-left (NW): A 3x3 square with the center cell empty (black), resembling a hollow square or "O" shape.
+    2. Top-right (NE): A solid 3x3 square, completely filled with red cells.
+    3. Bottom-left (SW): An inverted T-shape or cross, 3 cells wide and 3 cells tall.
+    4. Bottom-right (SE): An L-shape with an additional red cell above the shorter arm, forming a small 2x2 square with an extra cell.
+    Each pattern is centered within its quadrant, surrounded by black (0) cells. The grid has a clear separation between quadrants.
+
   output: |
-    A 7x7 grid with a clear structure:
-    1. Top-left quadrant: The 3x3 square with empty center from the input.
-    2. Top-right quadrant: The solid 3x3 square from the input.
-    3. A middle row of all black (empty) cells separating the top and bottom.
-    4. Bottom-left quadrant: The inverted T-shape from the input.
-    5. Bottom-right quadrant: The L-shape with extra cell from the input.
-    The patterns from the input are preserved but condensed into a smaller grid.
+    A condensed 7x7 grid that preserves the essence of the input patterns:
+    1. Top-left (NW): The 3x3 hollow square is directly transferred.
+    2. Top-right (NE): The 3x3 solid square is directly transferred.
+    3. Center: A horizontal black line (row 4) divides the grid into upper and lower halves.
+    4. Bottom-left (SW): The inverted T-shape is directly transferred.
+    5. Bottom-right (SE): The L-shape with extra cell is directly transferred.
+    6. Middle column (column 4) may contain red cells to maintain pattern connectivity between left and right halves.
+    The 7x7 grid efficiently captures all key features from the 23x23 input while maintaining spatial relationships.
 
 example_1:
   input: |
-    A 19x17 grid with mostly black (empty) space. There are four distinct red (2) patterns:
-    1. Top-left quadrant: An inverted L-shape.
-    2. Top-right quadrant: A 3x2 rectangle with the bottom-right corner missing.
-    3. Bottom-left quadrant: A solid 3x3 square.
-    4. Bottom-right quadrant: A 3x3 square frame (outer edge only, center empty).
-    Each pattern is surrounded by empty space and positioned roughly in the center of its respective quadrant.
+    A 19x17 grid divided into four quadrants, each containing a distinct red (2) pattern:
+    1. Top-left (NW): An inverted L-shape, 3 cells tall and 2 cells wide.
+    2. Top-right (NE): A 3x2 rectangle with the bottom-right corner missing, resembling a backwards "C" shape.
+    3. Bottom-left (SW): A solid 3x3 square, completely filled with red cells.
+    4. Bottom-right (SE): A 3x3 square frame (outer edge only, center empty), resembling a larger hollow square.
+    Each pattern is centered within its quadrant, surrounded by black (0) cells. The grid has a clear separation between quadrants.
+
   output: |
-    A 7x7 grid with a clear structure:
-    1. Top-left quadrant: The inverted L-shape from the input.
-    2. Top-right quadrant: The 3x2 rectangle with missing corner from the input.
-    3. A middle row of all black (empty) cells separating the top and bottom.
-    4. Bottom-left quadrant: The solid 3x3 square from the input.
-    5. Bottom-right quadrant: The 3x3 square frame from the input.
-    The patterns from the input are preserved but condensed into a smaller grid.
+    A condensed 7x7 grid that preserves the essence of the input patterns:
+    1. Top-left (NW): The inverted L-shape is directly transferred.
+    2. Top-right (NE): The backwards "C" shape is directly transferred.
+    3. Center: A horizontal black line (row 4) divides the grid into upper and lower halves.
+    4. Bottom-left (SW): The 3x3 solid square is directly transferred.
+    5. Bottom-right (SE): The 3x3 square frame is directly transferred.
+    6. Middle column (column 4) may contain red cells to maintain pattern connectivity between left and right halves.
+    The 7x7 grid efficiently captures all key features from the 19x17 input while maintaining spatial relationships.
 
 example_2:
   input: |
-    A 16x17 grid with mostly black (empty) space. There are four distinct red (2) patterns:
-    1. Top-left quadrant: A diagonal line of 3 red cells from top-left to bottom-right.
-    2. Top-right quadrant: An inverted V-shape or chevron.
-    3. Bottom-left quadrant: A 3x2 rectangle with the top-right corner missing.
-    4. Bottom-right quadrant: A single red cell.
-    Each pattern is surrounded by empty space and positioned roughly in the center of its respective quadrant.
+    A 16x17 grid divided into four quadrants, each containing a distinct red (2) pattern:
+    1. Top-left (NW): A diagonal line of 3 red cells from top-left to bottom-right.
+    2. Top-right (NE): An inverted V-shape or chevron, 3 cells wide and 2 cells tall.
+    3. Bottom-left (SW): A 3x2 rectangle with the top-right corner missing, resembling an "L" shape rotated 90 degrees clockwise.
+    4. Bottom-right (SE): A single red cell, centered in its quadrant.
+    Each pattern is centered within its quadrant, surrounded by black (0) cells. The grid has a clear separation between quadrants.
+
   output: |
-    A 7x7 grid with a clear structure:
-    1. Top-left quadrant: The diagonal line of 3 red cells from the input.
-    2. Top-right quadrant: The inverted V-shape or chevron from the input.
-    3. A middle row of all black (empty) cells separating the top and bottom.
-    4. Bottom-left quadrant: The 3x2 rectangle with missing corner from the input.
-    5. Bottom-right quadrant: The single red cell from the input, positioned in the center of its 3x3 area.
-    The patterns from the input are preserved but condensed into a smaller grid.
+    A condensed 7x7 grid that preserves the essence of the input patterns:
+    1. Top-left (NW): The diagonal line of 3 red cells is directly transferred.
+    2. Top-right (NE): The inverted V-shape or chevron is directly transferred.
+    3. Center: A horizontal black line (row 4) divides the grid into upper and lower halves.
+    4. Bottom-left (SW): The rotated "L" shape is directly transferred.
+    5. Bottom-right (SE): The single red cell is placed in the center of its 3x3 area.
+    6. Middle column (column 4) may contain red cells to maintain pattern connectivity between left and right halves.
+    The 7x7 grid efficiently captures all key features from the 16x17 input while maintaining spatial relationships.
