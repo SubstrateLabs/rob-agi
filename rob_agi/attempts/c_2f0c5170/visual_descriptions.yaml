@@ -1,54 +1,66 @@
 example_0:
   input: |
-    The input grid is 23x20 in size. It consists mostly of sky blue (8) background with two distinct black (0) regions:
-    1. A larger black region in the top-left quadrant, roughly rectangular in shape (9x10).
-    2. A smaller black region in the bottom-right quadrant, roughly rectangular in shape (6x7).
-    Within the larger black region, there is a single green (3) cell near the center-left.
-    Within the smaller black region, there is a more complex pattern:
-    - A yellow (4) cell in the center
-    - Four yellow (4) cells surrounding it in a cross pattern
-    - A green (3) cell below the central yellow cell
+    The input grid is 23x20. The majority is sky blue (8), with two distinct black (0) regions:
+    1. Top-left: Larger black region (9x10)
+      - Contains a single green (3) cell near the center-left
+      - This pattern is simpler and less spread out
+    2. Bottom-right: Smaller black region (6x7)
+      - Contains a more complex pattern:
+        - Central yellow (4) cell
+        - Four yellow (4) cells in a cross pattern around the center
+        - Green (3) cell below the central yellow cell
+      - This pattern has more non-black cells, color variety, and is more spread out
+    Key observation: The bottom-right pattern is more complex despite being in a smaller region.
+
   output: |
-    The output grid is 9x9 in size, significantly smaller than the input. It contains:
-    - A black (0) background
-    - A pattern in the center that matches the more complex pattern from the smaller black region in the input:
-      - A yellow (4) cell in the center
-      - Four yellow (4) cells surrounding it in a cross pattern
-      - A green (3) cell below the central yellow cell
-    The pattern is centered within the black background.
+    Output grid is 9x9, centered, with black (0) background.
+    The pattern from the bottom-right region of the input is preserved:
+    - Central yellow (4) cell
+    - Four yellow (4) cells in a cross pattern
+    - Green (3) cell below the center
+    The pattern maintains its original shape and color distribution.
+    There's a minimal black border around the pattern, making the grid size odd for perfect centering.
 
 example_1:
   input: |
-    The input grid is 22x21 in size. It consists mostly of sky blue (8) background with two distinct black (0) regions:
-    1. A smaller black region in the top-right quadrant, roughly rectangular in shape (5x5).
-    2. A larger black region in the bottom-left quadrant, roughly rectangular in shape (6x8).
-    Within the smaller black region, there is a single red (2) cell near the center.
-    Within the larger black region, there is a more complex pattern:
-    - A 3x3 yellow (4) square
-    - A red (2) cell in the center of this yellow square
+    The input grid is 22x21, predominantly sky blue (8) with two black (0) regions:
+    1. Top-right: Smaller black region (5x5)
+      - Single red (2) cell near the center
+      - This pattern is simpler with less color variety and spread
+    2. Bottom-left: Larger black region (6x8)
+      - More complex pattern:
+        - 3x3 yellow (4) square
+        - Red (2) cell in the center of the yellow square
+      - This pattern has more non-black cells, equal color variety, but more spread
+    Key observation: The bottom-left pattern is more complex due to more non-black cells and greater spread.
+
   output: |
-    The output grid is 5x5 in size, significantly smaller than the input. It contains:
-    - A black (0) background
-    - A pattern that matches the more complex pattern from the larger black region in the input:
-      - A 3x3 yellow (4) square
-      - A red (2) cell in the center of this yellow square
-    The pattern is centered within the black background, with one row of black cells above and below it.
+    Output grid is 5x5, centered, with black (0) background.
+    The pattern from the bottom-left region of the input is preserved:
+    - 3x3 yellow (4) square
+    - Red (2) cell in the center
+    The pattern maintains its original shape and color distribution.
+    There's a minimal black border (1 cell) above and below the pattern, making the grid size odd for perfect centering.
 
 example_2:
   input: |
-    The input grid is 18x19 in size. It consists mostly of sky blue (8) background with two distinct black (0) regions:
-    1. A black region in the top-left quadrant, roughly rectangular in shape (7x9).
-    2. A black region in the bottom-right quadrant, roughly rectangular in shape (7x7).
-    Within the top-left black region, there is a complex pattern:
-    - A yellow (4) cell at the top center
-    - Below it, a 3x3 yellow (4) square
-    - A blue (1) cell in the center of this yellow square
-    Within the bottom-right black region, there is a single blue (1) cell near the center.
+    The input grid is 18x19, mostly sky blue (8) with two black (0) regions:
+    1. Top-left: Black region (7x9)
+      - Complex pattern:
+        - Yellow (4) cell at the top center
+        - 3x3 yellow (4) square below
+        - Blue (1) cell in the center of the yellow square
+      - This pattern has more non-black cells, color variety, and is more spread out
+    2. Bottom-right: Black region (7x7)
+      - Single blue (1) cell near the center
+      - This pattern is simpler with less color variety and spread
+    Key observation: The top-left pattern is more complex due to more non-black cells, color variety, and greater spread.
+
   output: |
-    The output grid is 8x7 in size, smaller than the input. It contains:
-    - A black (0) background
-    - A pattern that matches the more complex pattern from the top-left black region in the input:
-      - A yellow (4) cell at the top center
-      - Below it, a 3x3 yellow (4) square
-      - A blue (1) cell in the center of this yellow square
-    The pattern is centered within the black background, with one row of black cells above and below it, and one column of black cells on each side.
+    Output grid is 8x7, centered, with black (0) background.
+    The pattern from the top-left region of the input is preserved:
+    - Yellow (4) cell at the top center
+    - 3x3 yellow (4) square below
+    - Blue (1) cell in the center of the yellow square
+    The pattern maintains its original shape and color distribution.
+    There's a minimal black border (1 cell) on all sides, with the grid size adjusted to be odd in both dimensions for better centering.
