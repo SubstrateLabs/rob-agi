@@ -3,12 +3,13 @@ from rob_agi.colored_grid import ColoredGrid
 def solve_69889d6e(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by drawing a diagonal red line from bottom-left to top-right,
-    starting from the position of the first red square found. The line is 2 cells wide at
-    the bottom and tapers to 1 cell at the top-right. Non-black cells from the input are preserved.
+    starting from the position of the first red square found. The line is 2 cells wide and
+    maintains this width until it reaches the top or right edge. Non-black cells from the
+    input are preserved.
 
     1. Find the starting column of the red square.
     2. Initialize a new grid filled with black.
-    3. Draw the diagonal red line.
+    3. Draw the diagonal red line, maintaining 2-cell width.
     4. Preserve non-black cells from the input.
     5. Return the transformed grid.
     """
@@ -33,12 +34,12 @@ def solve_69889d6e(input_grid: ColoredGrid) -> ColoredGrid:
     # Draw the diagonal red line
     current_col = start_col
     for row in range(rows - 1, -1, -1):
-        if current_col < cols - 1:
-            output_grid.set_cell(row, current_col, 2)
+        output_grid.set_cell(row, current_col, 2)
+        if current_col + 1 < cols:
             output_grid.set_cell(row, current_col + 1, 2)
-        else:
-            output_grid.set_cell(row, cols - 1, 2)
-        current_col = min(current_col + 1, cols - 1)
+        
+        if current_col < cols - 1:
+            current_col += 1
 
     # Preserve non-black cells from the input
     for row in range(rows):
