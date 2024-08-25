@@ -6,9 +6,10 @@ def solve_fe9372f3(input_grid: ColoredGrid) -> ColoredGrid:
     1. Locate the red (2) cross in the input grid.
     2. Create a 5x5 central pattern around the red cross with blue (1) diagonals and sky blue (8) diamond.
     3. Extend the pattern vertically for the full height of the grid.
-    4. Extend the pattern horizontally to 7 cells wide.
-    5. Add a repeating horizontal pattern with yellow (4) squares every 4 cells, connected by sky blue (8) lines.
-    6. Ensure all other cells remain black (0).
+    4. Create a horizontal pattern with sky blue (8) line and yellow (4) squares every 4 cells.
+    5. Ensure the pattern is centered on the red cross and extends to the grid edges.
+    6. Preserve the original red cross.
+    7. Fill remaining cells with black (0).
     """
     rows, cols = input_grid.get_dimensions()
     output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
@@ -51,23 +52,24 @@ def create_central_pattern(grid: ColoredGrid, center_row: int, center_col: int):
 def extend_vertical_pattern(grid: ColoredGrid, center_row: int, center_col: int):
     rows, _ = grid.get_dimensions()
     for r in range(rows):
-        if abs(r - center_row) % 4 == 0:
+        if r == center_row:
+            continue  # Skip the center row (handled by horizontal pattern)
+        dist = abs(r - center_row)
+        if dist % 4 == 0:
             grid.set_cell(r, center_col, 8)  # Sky blue vertical line
-        if abs(r - center_row) % 2 == 1:
+        if dist % 2 == 1:
             grid.set_cell(r, center_col - 1, 1)  # Left blue diagonal
             grid.set_cell(r, center_col + 1, 1)  # Right blue diagonal
 
 def extend_horizontal_pattern(grid: ColoredGrid, center_row: int, center_col: int):
     _, cols = grid.get_dimensions()
     for c in range(cols):
-        if abs(c - center_col) <= 3:
-            if c == center_col or abs(c - center_col) == 3:
-                grid.set_cell(center_row, c, 8)  # Sky blue horizontal line
+        if c == center_col:
+            continue  # Skip the center cell (part of the red cross)
+        if (c - center_col) % 4 == 0:
+            grid.set_cell(center_row, c, 4)  # Yellow squares
         else:
-            if (c - center_col) % 4 == 0:
-                grid.set_cell(center_row, c, 4)  # Yellow squares
-            else:
-                grid.set_cell(center_row, c, 8)  # Sky blue connecting lines
+            grid.set_cell(center_row, c, 8)  # Sky blue line
 
 def copy_red_cross(input_grid: ColoredGrid, output_grid: ColoredGrid):
     rows, cols = input_grid.get_dimensions()
