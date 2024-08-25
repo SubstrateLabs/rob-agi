@@ -1,0 +1,83 @@
+example_0:
+  input: |
+    A 17x13 grid with several distinct shapes and patterns:
+    1. In the top-left, there's a red (2) L-shaped pattern.
+    2. Below that, a yellow (4) diamond or cross shape.
+    3. In the middle-right, a green (3) diagonal line or slash.
+    4. The bottom half is dominated by a large blue (1) rectangle, 7x7 in size.
+    5. Inside the blue rectangle, there are two different-colored squares:
+       - A gray (5) square in the top-left corner
+       - A red (2) square in the bottom-right corner
+    6. In the bottom-right corner of the grid, there's a sky blue (8) cross or plus sign.
+    The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    A 7x7 grid that appears to be a condensed version of the input:
+    1. The red (2) L-shape is now in the top-right corner.
+    2. The yellow (4) diamond/cross is in the top-left corner.
+    3. The green (3) diagonal line is now in the bottom-right corner.
+    4. The sky blue (8) cross is in the bottom-right corner, but smaller.
+    The shapes are more compact and closer together, with black (0) space between them.
+
+example_1:
+  input: |
+    A 17x17 grid with several distinct shapes and patterns:
+    1. In the top-left quadrant, there's a red (2) shape that looks like a backwards 'L' or a hook.
+    2. In the bottom-left, there's a magenta (6) shape that resembles a plus sign or cross.
+    3. To the right of the magenta shape, there's a green (3) diagonal line or slash.
+    4. In the bottom-right, there's a yellow (4) shape that looks like an upside-down 'T'.
+    5. Above the yellow shape, there's a sky blue (8) triangle or arrow pointing right.
+    6. The entire right side of the grid is occupied by a large blue (1) rectangle, 7x17 in size.
+    7. Inside the blue rectangle, there are three different-colored squares:
+       - A red (2) square near the top
+       - A magenta (6) square in the middle
+       - A green (3) square near the bottom
+    The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    A 7x7 grid that appears to be a condensed version of the input:
+    1. The red (2) hook shape is now in the top-left corner.
+    2. The magenta (6) plus sign is in the bottom-left corner.
+    3. The green (3) diagonal line is now in the bottom-right corner.
+    4. The yellow (4) upside-down 'T' is in the top-right corner.
+    The shapes are more compact and closer together, with black (0) space between them.
+
+example_2:
+  input: |
+    An 18x17 grid with several distinct shapes and patterns:
+    1. In the top-left, there's a large blue (1) rectangle, 7x7 in size.
+    2. Inside the blue rectangle, there are three different-colored squares:
+       - A gray (5) square in the top-left corner
+       - A red (2) square in the middle-left
+       - A green (3) square in the bottom-right corner
+    3. To the right of the blue rectangle, there's a yellow (4) shape that looks like an arrow pointing left.
+    4. In the middle-right, there's a magenta (6) shape that resembles an upside-down 'T'.
+    5. Below that, there's a red (2) shape that looks like a sideways 'T'.
+    6. In the bottom-left, there's a green (3) shape that looks like a backwards 'L'.
+    7. To the right of the green shape, there's a sky blue (8) square or diamond.
+    8. In the bottom-left corner, there's a gray (5) shape that looks like stairs or a zigzag.
+    The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    A 7x7 grid that appears to be a condensed version of the input:
+    1. The gray (5) zigzag shape is now in the top-left corner.
+    2. The yellow (4) left-pointing arrow is in the top-right corner.
+    3. The red (2) sideways 'T' is in the middle-left.
+    4. The green (3) backwards 'L' is in the bottom-right corner.
+    5. The magenta (6) upside-down 'T' is not clearly visible in this output.
+    The shapes are more compact and closer together, with black (0) space between them.
+
+test_case_0:
+  input: |
+    An 18x17 grid with several distinct shapes and patterns:
+    1. In the top-left, there's a large blue (1) rectangle, 7x7 in size.
+    2. Inside the blue rectangle, there are three different-colored squares:
+       - A gray (5) square in the top-left corner
+       - A red (2) square in the middle-left
+       - A green (3) square in the bottom-right corner
+    3. To the right of the blue rectangle, there's a yellow (4) shape that looks like an arrow pointing left.
+    4. In the middle-right, there's a magenta (6) shape that resembles an upside-down 'T'.
+    5. Below that, there's a red (2) shape that looks like a sideways 'T'.
+    6. In the bottom-left, there's a green (3) shape that looks like a backwards 'L'.
+    7. To the right of the green shape, there's a sky blue (8) square or diamond.
+    8. In the bottom-left corner, there's a gray (5) shape that looks like stairs or a zigzag.
+    The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The output grid is not provided for this test case.
