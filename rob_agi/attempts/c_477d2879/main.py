@@ -3,54 +3,69 @@ from collections import deque
 
 def solve_477d2879(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transform the input grid by expanding colors based on their numeric value and influence.
+    Transform the input grid by expanding colors based on their numeric value and global influence.
     
     1. Create a deep copy of the input grid.
-    2. For each non-black cell, calculate its color influence:
-       - Expand in all eight directions until blocked by a higher-numbered color or grid boundary.
-       - Higher-numbered colors take precedence and contain lower-numbered colors.
-    3. Update the grid with the calculated color influences.
+    2. For each non-black cell, calculate its color influence across the entire grid:
+       - Use a modified flood fill algorithm to spread influence in all eight directions.
+       - Decrease influence with distance, stop at higher-valued colors or grid boundaries.
+    3. Apply the color with the highest influence to each cell.
     4. Fill remaining black cells with the highest-numbered non-black neighbor.
     
     Returns the transformed ColoredGrid.
     """
-    result = input_grid.deep_copy()
-    rows, cols = result.get_dimensions()
+    rows, cols = input_grid.get_dimensions()
     
-    def get_neighbors(r, c):
-        for dr in [-1, 0, 1]:
-            for dc in [-1, 0, 1]:
-                if dr == 0 and dc == 0:
-                    continue
+    def calculate_influence(start_row, start_col, color):
+        influence = [[0 for _ in range(cols)] for _ in range(rows)]
+        queue = deque([(start_row, start_col, color)])
+        visited = set()
+
+        while queue:
+            r, c, strength = queue.popleft()
+            if (r, c) in visited or strength <= 0:
+                continue
+            visited.add((r, c))
+            influence[r][c] = max(influence[r][c], strength)
+
+            for dr, dc in [(-1,0), (1,0), (0,-1), (0,1), (-1,-1), (-1,1), (1,-1), (1,1)]:
                 nr, nc = r + dr, c + dc
                 if 0 <= nr < rows and 0 <= nc < cols:
-                    yield nr, nc
+                    if input_grid.values[nr][nc] > color:
+                        continue
+                    queue.append((nr, nc, strength - 1))
+
+        return influence
+
+    # Calculate global influence for each non-black cell
+    sorted_cells = [(input_grid.values[r][c], r, c) for r in range(rows) for c in range(cols) if input_grid.values[r][c] != 0]
+    sorted_cells.sort(reverse=True)
     
-    def calculate_color_influence(r, c, color):
-        queue = deque([(r, c)])
-        visited = set([(r, c)])
-        while queue:
-            cr, cc = queue.popleft()
-            for nr, nc in get_neighbors(cr, cc):
-                if (nr, nc) not in visited:
-                    if result.values[nr][nc] > color:
-                        return result.values[nr][nc]
-                    visited.add((nr, nc))
-                    queue.append((nr, nc))
-        return color
-    
-    # Calculate and update color influences
-    for r in range(rows):
-        for c in range(cols):
-            if result.values[r][c] != 0:
-                result.values[r][c] = calculate_color_influence(r, c, result.values[r][c])
-    
+    max_influence = [[[0, 0] for _ in range(cols)] for _ in range(rows)]  # [influence, color]
+    for color, r, c in sorted_cells:
+        influence = calculate_influence(r, c, color)
+        for i in range(rows):
+            for j in range(cols):
+                if influence[i][j] > max_influence[i][j][0]:
+                    max_influence[i][j] = [influence[i][j], color]
+                elif influence[i][j] == max_influence[i][j][0]:
+                    max_influence[i][j][1] = max(max_influence[i][j][1], color)
+
+    # Apply color influence
+    result = ColoredGrid(values=[[max_influence[i][j][1] for j in range(cols)] for i in range(rows)])
+
     # Fill remaining black cells
-    for r in range(rows):
-        for c in range(cols):
-            if result.values[r][c] == 0:
-                neighbor_colors = [result.values[nr][nc] for nr, nc in get_neighbors(r, c) if result.values[nr][nc] != 0]
-                if neighbor_colors:
-                    result.values[r][c] = max(neighbor_colors)
-    
+    def get_highest_neighbor(grid, r, c):
+        highest = 0
+        for dr, dc in [(-1,0), (1,0), (0,-1), (0,1), (-1,-1), (-1,1), (1,-1), (1,1)]:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols:
+                highest = max(highest, grid[nr][nc])
+        return highest
+
+    for i in range(rows):
+        for j in range(cols):
+            if result.values[i][j] == 0:
+                result.values[i][j] = get_highest_neighbor(result.values, i, j)
+
     return result
