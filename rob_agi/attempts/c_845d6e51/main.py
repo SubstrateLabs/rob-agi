@@ -7,38 +7,26 @@ def solve_845d6e51(input_grid: ColoredGrid) -> ColoredGrid:
     1. Identifies the horizontal gray (5) line dividing the grid.
     2. Collects unique colors (excluding 0, 3, and 5) from cells up to and including the gray line.
     3. Creates a descending sequence of these collected colors.
-    4. Replaces green (3) cells with colors from the sequence, cycling through it.
-    5. Processes the entire grid up to and including the gray line.
-    6. Returns the transformed grid.
+    4. Replaces all green (3) cells in the entire grid with colors from the sequence, cycling through it.
+    5. Returns the transformed grid.
     """
     # Step 1: Find the gray line
-    gray_line_row = find_gray_line(input_grid)
+    gray_line_row = next(i for i, row in enumerate(input_grid.values) if all(cell == 5 for cell in row))
 
     # Step 2: Collect replacement colors
-    replacement_sequence = collect_replacement_colors(input_grid, gray_line_row)
+    replacement_colors = sorted(set(cell for row in input_grid.values[:gray_line_row+1] for cell in row 
+                                if cell not in {0, 3, 5}), reverse=True)
 
-    # Step 3 & 4: Process the grid
+    # Step 3: Create a new grid
     new_grid = input_grid.deep_copy()
+
+    # Step 4: Replace green cells
     color_index = 0
-    for row in range(gray_line_row + 1):  # Include the gray line
+    for row in range(len(new_grid.values)):
         for col in range(len(new_grid.values[row])):
-            if new_grid.values[row][col] == 3:  # Green
-                new_grid.values[row][col] = replacement_sequence[color_index]
-                color_index = (color_index + 1) % len(replacement_sequence)
+            if new_grid.values[row][col] == 3:  # If the cell is green
+                new_grid.values[row][col] = replacement_colors[color_index]
+                color_index = (color_index + 1) % len(replacement_colors)
 
     # Step 5: Return the modified grid
     return new_grid
-
-def find_gray_line(grid: ColoredGrid) -> int:
-    for i, row in enumerate(grid.values):
-        if all(cell == 5 for cell in row):
-            return i
-    return -1  # If no gray line is found
-
-def collect_replacement_colors(grid: ColoredGrid, gray_line_row: int) -> List[int]:
-    colors = set()
-    for row in grid.values[:gray_line_row + 1]:
-        for cell in row:
-            if cell not in {0, 3, 5}:
-                colors.add(cell)
-    return sorted(list(colors), reverse=True)
