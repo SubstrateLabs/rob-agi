@@ -1,17 +1,17 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Dict
-from collections import defaultdict
+from typing import Dict, Tuple
 
 def solve_3194b014(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the 3194b014 challenge by finding the most significant color in the input grid
-    and creating a 3x3 grid filled with that color.
+    Solves the 3194b014 challenge by finding the most significant square-like region in the input grid
+    and creating a 3x3 grid filled with the color of that region.
 
     The solution follows these steps:
-    1. Analyze the input grid to count occurrences of each color and find connected regions.
-    2. Calculate a significance score for each color based on total count, largest connected region, and centrality.
-    3. Identify the most significant color.
-    4. Create and return a 3x3 grid filled with the most significant color.
+    1. Scan the input grid and perform a flood fill for each unvisited cell.
+    2. For each flood fill, analyze the region to find the largest possible square-like area.
+    3. Keep track of the best square-like region for each color.
+    4. Select the color with the largest square-like region as the most significant.
+    5. Create and return a 3x3 grid filled with the most significant color.
 
     Args:
     input_grid (ColoredGrid): The input grid to be processed.
@@ -19,44 +19,56 @@ def solve_3194b014(input_grid: ColoredGrid) -> ColoredGrid:
     Returns:
     ColoredGrid: A 3x3 grid filled with the most significant color.
     """
-    color_analysis = analyze_colors(input_grid)
-    most_significant_color = max(color_analysis, key=lambda c: color_analysis[c]['score'])
+    best_squares = find_best_squares(input_grid)
+    most_significant_color = max(best_squares, key=lambda c: best_squares[c]['side_length'])
     return ColoredGrid(values=[[most_significant_color for _ in range(3)] for _ in range(3)])
 
-def analyze_colors(grid: ColoredGrid) -> Dict[int, Dict]:
+def find_best_squares(grid: ColoredGrid) -> Dict[int, Dict]:
     rows, cols = grid.get_dimensions()
-    color_data = defaultdict(lambda: {'count': 0, 'largest_region': 0, 'centrality': 0})
     visited = set()
+    best_squares = {}
 
     for r in range(rows):
         for c in range(cols):
             if (r, c) not in visited:
                 color = grid.get_cell(r, c)
-                region_size = dfs(grid, r, c, color, visited)
-                color_data[color]['count'] += region_size
-                color_data[color]['largest_region'] = max(color_data[color]['largest_region'], region_size)
-                color_data[color]['centrality'] += region_size * calculate_centrality(r, c, rows, cols)
+                region_info = flood_fill(grid, r, c, color, visited)
+                update_best_square(best_squares, color, region_info)
 
-    for color in color_data:
-        color_data[color]['score'] = (
-            color_data[color]['count'] * 0.5 +
-            color_data[color]['largest_region'] * 0.3 +
-            color_data[color]['centrality'] * 0.2
-        )
+    return best_squares
 
-    return color_data
+def flood_fill(grid: ColoredGrid, r: int, c: int, color: int, visited: set) -> Dict:
+    stack = [(r, c)]
+    region = set()
+    min_x, min_y, max_x, max_y = c, r, c, r
 
-def dfs(grid: ColoredGrid, r: int, c: int, color: int, visited: set) -> int:
-    if (r, c) in visited or not (0 <= r < grid.num_rows and 0 <= c < grid.num_cols) or grid.get_cell(r, c) != color:
-        return 0
-    visited.add((r, c))
-    size = 1
-    for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-        size += dfs(grid, r + dr, c + dc, color, visited)
-    return size
+    while stack:
+        curr_r, curr_c = stack.pop()
+        if (curr_r, curr_c) in visited or grid.get_cell(curr_r, curr_c) != color:
+            continue
 
-def calculate_centrality(r: int, c: int, rows: int, cols: int) -> float:
-    center_r, center_c = rows / 2, cols / 2
-    distance = ((r - center_r) ** 2 + (c - center_c) ** 2) ** 0.5
-    max_distance = ((rows / 2) ** 2 + (cols / 2) ** 2) ** 0.5
-    return 1 - (distance / max_distance)
+        visited.add((curr_r, curr_c))
+        region.add((curr_r, curr_c))
+        min_x, max_x = min(min_x, curr_c), max(max_x, curr_c)
+        min_y, max_y = min(min_y, curr_r), max(max_y, curr_r)
+
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nr, nc = curr_r + dr, curr_c + dc
+            if 0 <= nr < grid.num_rows and 0 <= nc < grid.num_cols:
+                stack.append((nr, nc))
+
+    return {
+        'total_cells': len(region),
+        'width': max_x - min_x + 1,
+        'height': max_y - min_y + 1
+    }
+
+def update_best_square(best_squares: Dict[int, Dict], color: int, region_info: Dict):
+    side_length = min(region_info['width'], region_info['height'])
+    squareness = region_info['total_cells'] / (side_length ** 2)
+
+    if squareness >= 0.8 and (color not in best_squares or side_length > best_squares[color]['side_length']):
+        best_squares[color] = {
+            'side_length': side_length,
+            'squareness': squareness
+        }
