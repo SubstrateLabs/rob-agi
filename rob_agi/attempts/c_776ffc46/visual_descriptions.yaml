@@ -1,0 +1,92 @@
+example_0:
+  input: |
+    A 20x20 grid with mostly black (empty) space. There are several distinct features:
+    1. A gray L-shaped border in the top-left corner, 7 units wide and 7 units tall.
+    2. A 3x3 red square inside this gray border, positioned at (2,2) to (4,4).
+    3. A 3x3 blue square in the top-right corner, from (1,13) to (3,15).
+    4. Four separate blue shapes:
+       a. A vertical line of 4 blue squares at (12,3) to (15,3).
+       b. A 3x3 blue square at (9,10) to (11,12).
+       c. A blue plus sign (+) shape centered at (8,11).
+       d. Another blue plus sign (+) shape centered at (16,15).
+  output: |
+    The grid is mostly identical to the input, with two key changes:
+    1. The 3x3 blue square in the top-right corner remains unchanged.
+    2. Both blue plus sign shapes have been transformed into red plus sign shapes.
+    All other blue shapes (the vertical line and the 3x3 square) remain blue.
+    The gray border and the red square inside it are unchanged.
+
+example_1:
+  input: |
+    A 20x20 grid with several distinct features:
+    1. A large gray border forming a 13x13 square in the top-left quadrant, from (1,5) to (13,17).
+    2. Inside this gray border, a 3x3 green square at (3,7) to (5,9).
+    3. Four blue shapes:
+       a. A 3x3 blue square at (9,15) to (11,17).
+       b. A vertical line of 4 blue squares at (11,11) to (14,11).
+       c. A blue plus sign (+) shape centered at (12,8).
+       d. Another blue plus sign (+) shape centered at (16,15).
+  output: |
+    The grid is mostly identical to the input, with two key changes:
+    1. The 3x3 blue square inside the gray border remains unchanged.
+    2. Both blue plus sign shapes have been transformed into green plus sign shapes.
+    The vertical line of blue squares remains blue.
+    The gray border and the green square inside it are unchanged.
+
+example_2:
+  input: |
+    A 20x20 grid with several distinct features:
+    1. Two gray borders:
+       a. An L-shaped border in the top-left corner, 6 units wide and 7 units tall.
+       b. A rectangular border in the bottom-right quadrant, from (13,13) to (19,19).
+    2. Inside the top-left gray border, a 3x3 red square at (2,15) to (4,17).
+    3. Inside the bottom-right gray border, a red shape resembling the letter "T" or a hammer.
+    4. Multiple blue shapes:
+       a. A 3x3 blue square at (9,10) to (11,12).
+       b. A blue plus sign (+) shape centered at (11,4).
+       c. A vertical line of 4 blue squares at (12,13) to (15,13).
+       d. A blue plus sign (+) shape centered at (16,17).
+  output: |
+    The grid is mostly identical to the input, with one key change:
+    Both blue plus sign shapes have been transformed into red plus sign shapes.
+    All other blue shapes (the 3x3 square and the vertical line) remain blue.
+    The gray borders and the red shapes inside them are unchanged.
+
+example_3:
+  input: |
+    A 20x20 grid with several distinct features:
+    1. Two gray borders:
+       a. An L-shaped border in the top-right corner, 7 units wide and 6 units tall.
+       b. A square border in the bottom-left quadrant, from (3,0) to (9,6).
+    2. Inside the top-right gray border, a 3x3 green square at (3,14) to (5,16).
+    3. Inside the bottom-left gray border, a green shape resembling the letter "T" or a hammer.
+    4. Multiple blue shapes:
+       a. Two 3x3 blue squares: one at (9,9) to (11,11), another at (1,15) to (3,17).
+       b. A blue plus sign (+) shape centered at (10,11).
+       c. A vertical line of 5 blue squares at (12,5) to (16,5).
+  output: |
+    The grid is mostly identical to the input, with one key change:
+    The blue plus sign shape has been transformed into a green plus sign shape.
+    All other blue shapes (the two 3x3 squares and the vertical line) remain blue.
+    The gray borders and the green shapes inside them are unchanged.
+
+test_case_0:
+  input: |
+    A 20x20 grid with several distinct features:
+    1. Three gray borders:
+       a. An L-shaped border in the top-right corner, 8 units wide and 6 units tall.
+       b. A rectangular border in the bottom-left quadrant, from (13,0) to (19,6).
+       c. Another rectangular border in the bottom-right quadrant, from (13,12) to (19,18).
+    2. Inside the top-right gray border, a 3x3 red square at (1,14) to (3,16).
+    3. Inside the bottom-left gray border, a red shape resembling a thick plus sign or a cross.
+    4. Inside the bottom-right gray border, another red shape resembling a thick plus sign or a cross.
+    5. Multiple blue shapes:
+       a. A 3x3 blue square at (2,7) to (4,9).
+       b. A blue plus sign (+) shape centered at (3,8).
+       c. A larger blue plus sign (+) shape centered at (6,3).
+       d. Two more blue plus sign (+) shapes: one centered at (10,15), another at (10,10).
+  output: |
+    The grid is mostly identical to the input, with one key change:
+    All four blue plus sign shapes have been transformed into red plus sign shapes.
+    The 3x3 blue square remains blue.
+    The gray borders and the red shapes inside them are unchanged.

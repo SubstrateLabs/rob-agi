@@ -141,6 +141,10 @@ def test_{gp.id}_test_case_{i}():
 from rob_agi.colored_grid import ColoredGrid
 from {main_import_path} import solve_{gp.id}
 
+# This file is important because it contains assertions that represent the example and test cases.
+# These assertions are used both to verify the correctness of the implementation
+# and to illustrate the problem itself.
+
 {ex_assertion_list}
 
 {test_assertion_list}

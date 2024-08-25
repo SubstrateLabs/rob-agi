@@ -171,10 +171,9 @@ The goal is first to identify the pattern that applies to all the example pairs.
 Do not fixate on any one example, but try to find the idea that works for all of them.
 Next we will implement the python function that works for all the examples. Applying this function to each of the inputs should result in the corresponding outputs.
 Once we have found that function, we apply it to the test case(s) to compute the solution(s) to the challenge.
-Think conceptually. You can often see objects or patterns in the grid, and solving the challenge is often about understanding the grid spatially, and learning what concept is being applied to the grid. 
+Think conceptually using core knowledge like pattern recognition, spatial reasoning, and rule application, geometry, causality, object-ness. 
 Think closely about how this would appear if you rendered squares. Note that objects can often have semantic meaning.
 It's not uncommon to flip, rotate, crop, overlay, finish a pattern, translate objects, isolate colors, draw paths, manipulate empty space, or employ some other spatial operation based on high-level reasoning and pattern recognition. 
-Sometimes certain features of the image are emphasized by the content.
 These are general abstract problem solving challenges. Remember to think logically and with high standards for coherence. The solutions can sometimes require a compositional approach where you think step by step. Some involve extrapolation. It's best to visualize the problem as a colored grid so that you can see things spatially.
 
 {grid_setup()}
@@ -183,6 +182,50 @@ Pay close attention to the unit tests because they show each example input and o
 Always always prefer correctness to efficiency. You almost never need to be concerned about algorithmic efficiency here because the grids are small. Break down problems into easier sub problems if you need to. The function should be able to solve all the examples and test cases.
 
 The python function that needs to be implemented is named `solve_{challenge.id}`
+"""
+    )
+
+
+def get_test_case_descriptions() -> str:
+    return (
+        arc_intro()
+        + f"""Below is a challenge. 
+
+The challenge involves transforming one 2D grid into another.
+You will be given a few examples of the pattern in the form of input output pairs.
+You will also be given one or more test cases which are unsolved (i.e. only the input is provided).
+The goal in the end is to identify the pattern that applies to all the example pairs. 
+Think conceptually. You can often see objects or patterns in the grid, and solving the challenge is often about understanding the grid spatially, and learning what concept is being applied to the grid. 
+Think closely about how this would appear if you rendered squares. 
+
+{grid_setup()}
+
+For now do not worry about solving the challenge.
+
+Your first task is to describe each example and test case visually. For *each* assertion in this test file, describe what you "see" in *both* the input grid and the expected output grid.
+
+Some potentially relevant questions to consider (not ehaustive or relevant in all cases), e.g.: 
+Are there objects? If so, what shape or color, and where are they? Is it a pattern? is it complex or simple? If so, what does it look like? Are there pieces missing or blacked out? Are there lines connecting things? Are there "dots"? Is something boxed in or otherwise highlighted? Is there a visual heiarachy?
+Be very detailed in these descriptions. Point out anything that seems important.
+
+The format for your response is valid yaml and it should look like:
+
+```yaml
+example_0:
+  input: |
+    <description>
+  output: |
+    <description>
+example_1:
+  ...etc
+test_case_0:
+  input: |
+    <description>
+  output: |
+    <description>
+```
+ 
+Respond only with the yaml file contents and no other words or commentary. Do not include the markdown codefence (```).
 """
     )
 

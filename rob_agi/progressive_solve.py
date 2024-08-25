@@ -2,6 +2,7 @@ import time
 from pathlib import Path
 from typing import Optional
 import logging
+import yaml
 
 from aider.coders import Coder
 from aider.io import InputOutput
@@ -18,7 +19,7 @@ logger.propagate = False
 from rob_agi.arc_util import load_task_set
 from rob_agi.computed_result import ComputedResult
 from rob_agi.grid_problem import GridProblem
-from rob_agi.solver_functions import problem_setup_aider
+from rob_agi.solver_functions import problem_setup_aider, get_test_case_descriptions
 from rob_agi.test_factory import run_pytest, setup_files, read_meta_file, write_meta_file
 
 project_root = Path(__file__).parent.parent
@@ -35,9 +36,10 @@ class Solver:
         self.challenge = challenge
         self.solution = solution
         self.challenge_root = project_root / f"rob_agi/attempts/c_{challenge.id}"
-        self.file_entries = {
+        self.file_paths = {
             "main": self.challenge_root / main_file,
             "test": self.challenge_root / test_file,
+            "visual_descriptions": self.challenge_root / "visual_descriptions.yaml",
             "image": project_root / f"data/task_images/{challenge.id}.png",
         }
         self.adhoc_ignore = project_root / f".adhoc-aiderignore-{challenge.id}"
@@ -56,7 +58,7 @@ class Solver:
                 f.write(f"!.adhoc-aiderignore-{self.challenge.id}\n")
         setup_files(self.challenge, self.solution, self.challenge_root)
         try:
-            (self.challenge_root / f"image.png").symlink_to(self.file_entries["image"])
+            (self.challenge_root / f"image.png").symlink_to(self.file_paths["image"])
         except FileExistsError:
             pass
 
@@ -78,8 +80,6 @@ class Solver:
             stream=False,
             auto_commits=auto_commits,
             **kwargs,
-            # max_reflections=3,
-            # auto_commits=False, use_git=False
         )
         coder.repo.aider_ignore_file = self.adhoc_ignore
         # logger.info(coder.repo.aider_ignore_file)
@@ -88,18 +88,18 @@ class Solver:
         # logger.info(coder.get_repo_map())
         return coder
 
-    def get_ask_coder(self):
-        fnames = [self.file_entries["main"], self.file_entries["test"]]
-        # fnames = [self.file_entries["main"], self.file_entries["test"]]
+    def get_ask_coder(self, fnames=None):
+        if fnames is None:
+            fnames = [self.file_paths["main"], self.file_paths["test"]]
         return self.get_coder(edit_format="ask", fnames=fnames)
 
     def get_modify_coder(self):
-        fnames = [self.file_entries["main"]]
-        read_only_fnames = [self.file_entries["test"], project_root / "rob_agi/colored_grid.py"]
+        fnames = [self.file_paths["main"], self.file_paths["visual_descriptions"]]
+        read_only_fnames = [self.file_paths["test"], project_root / "rob_agi/colored_grid.py"]
         return self.get_coder(fnames=fnames, read_only_fnames=read_only_fnames, auto_commits=False)
 
     def run_tests(self):
-        result = run_pytest(self.file_entries["test"])
+        result = run_pytest(self.file_paths["test"])
         logger.info(result)
         return result
 
@@ -110,9 +110,12 @@ class Solver:
             prefix = "The tests used to validate the solution are still failing. This means that your previous solution is incorrect."
         return prefix
 
-    def get_plan(self, ask_coder, current_result, is_first=False):
+    def get_plan(self, current_result, is_first=False):
+        desc = self.get_visual_descriptions()
+        ask_coder = self.get_ask_coder()
         prefix = self.get_prefix(is_first)
         prompt = f"{prefix}\n\n<VALIDATION_OUTPUT>\n{current_result['error']}\n{current_result['output']}</VALIDATION_OUTPUT>\n"
+        prompt += f"\n<VISUAL_DESCRIPTIONS>{desc}</VISUAL_DESCRIPTIONS>\n"
         prompt += "Examine all the information you have, state your understanding of the challenge, and propose a detailed solution to the challenge in words. Any solution must always apply to every case, not just the failing exception here.\n"
         prompt += "Then reflect on your idea. Look very closely and notice if there are any other patterns or discrepancies worth noting. Remember this is about identifying abstract, intuitive ideas about what is happening.\n"
         prompt += f"Explicitly consider how your idea applies to each of the examples and test cases in attempts/{self.challenge_id}/test.py. To check your thinking, illustrate how your idea either works or doesn't for each case.\n"
@@ -122,15 +125,53 @@ class Solver:
         res = ask_coder.run("Based on that reflection detail a step by step plan for how to solve the challenge\n")
         return res
 
-    def get_edit(self, modify_coder, current_result, plan, is_first=False):
+    def get_edit(self, current_result, plan, is_first=True, update_visual_descriptions=False):
+        modify_coder = self.get_modify_coder()
         prefix = self.get_prefix(is_first)
         prompt = f"{prefix}\n\n<VALIDATION_OUTPUT>\n{current_result['error']}\n{current_result['output']}</VALIDATION_OUTPUT>\n"
         prompt += f"\nYour latest thinking is:\n<LATEST_THINKING>\n{plan}\n</LATEST_THINKING>\n"
         prompt += f"Use that latest thinking and solve the challenge by modifying the implementation file. Always ensure that the docstring to solve_{self.challenge_id} includes a correct summary of the solution in words.\n"
         prompt += "Make sure your code changes are in the SEARCH/REPLACE format."
+        if update_visual_descriptions:
+            prompt += "If the visual_descriptions.yaml can be improved (more detail, better abstractions, cutting irrelevant info), include those changes too"
         # prompt += f"An image of the challenge is provided at {self.challenge.id}.png"
         # prompt += f"colored_grid.py includes a library of functions that may be useful. modify this file if you need."
+        logger.info(f"\n~~~~~~~~~EDITED~~~~~~~~~~~\n{modify_coder.aider_edited_files}")
         return modify_coder.run(prompt)
+
+    def get_visual_descriptions(self, overwrite: bool = True) -> str:
+        target_file = self.file_paths["visual_descriptions"]
+        if not overwrite and target_file.exists():
+            return self.parse_descriptions()
+        fnames = [self.file_paths["test"]]
+        descriptions_coder = self.get_ask_coder(fnames=fnames)
+        prompt = get_test_case_descriptions()
+        yaml_content = descriptions_coder.run(prompt)
+        target_file.write_text(yaml_content)
+        return self.parse_descriptions()
+
+    def parse_descriptions(self) -> str:
+        target = self.file_paths["visual_descriptions"]
+        if not target.exists():
+            return ""
+
+        parsed = Solver.parse_yaml_file(target)
+        result = ""
+        if parsed:
+            for key, value in parsed.items():
+                result += f"{key}_input:\n{value['input']}\n"
+                result += f"{key}_output:\n{value['output']}\n"
+        return result
+
+    @staticmethod
+    def parse_yaml_file(file_path):
+        with open(file_path, "r") as file:
+            try:
+                data = yaml.safe_load(file)
+                return data
+            except yaml.YAMLError as e:
+                print(f"Error parsing YAML file: {e}")
+                return None
 
     def run_solve(self, max_tries=default_max_tries, prev_solution=None) -> bool:
         t0 = time.perf_counter()
@@ -140,16 +181,12 @@ class Solver:
 
         while is_failing and local_tries < max_tries:
             logger.info(f"-------------------- ATTEMPT {local_tries+1}/{max_tries} --------------------------\n")
-            is_first = True
             if prev_solution:
                 plan = prev_solution
             else:
-                ask_coder = self.get_ask_coder()
-                plan = self.get_plan(ask_coder, current_result, is_first=is_first)
+                plan = self.get_plan(current_result)
 
-            modify_coder = self.get_modify_coder()
-            self.get_edit(modify_coder, current_result, plan, is_first=is_first)
-            logger.info(f"\n~~~~~~~~~EDITED~~~~~~~~~~~\n{modify_coder.aider_edited_files}")
+            self.get_edit(current_result, plan)
             local_tries += 1
             self.total_attempts += 1
             current_result = self.run_tests()
