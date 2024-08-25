@@ -4,11 +4,8 @@ def solve_27f8ce4f(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transform a 3x3 input grid into a 9x9 output grid by replicating the input.
     
-    The input is placed in three positions of the output grid:
-    1. Top-middle (rows 0-2, columns 3-5)
-    2. Middle-right (rows 3-5, columns 6-8)
-    3. Bottom-left (rows 6-8, columns 0-2)
-    
+    The input is placed in three positions of the output grid, forming an "L" shape.
+    The orientation of the "L" can vary, and is determined by analyzing the input grid.
     The remaining spaces are filled with zeros (black/empty).
     """
     # Initialize new 9x9 grid
@@ -17,26 +14,27 @@ def solve_27f8ce4f(input_grid: ColoredGrid) -> ColoredGrid:
     # Extract input 3x3 grid values
     input_values = input_grid.values
     
-    # Define placement functions
-    def place_top_middle():
-        for i in range(3):
-            for j in range(3):
-                new_grid[i][j+3] = input_values[i][j]
+    def determine_orientation(input_values):
+        """Determine the orientation of the "L" shape based on the input grid."""
+        # Check if the input grid has any zeros
+        has_zeros = any(0 in row for row in input_values)
+        
+        if has_zeros:
+            return [(3, 0), (3, 3), (6, 3)]  # Middle-left, Middle-middle, Bottom-middle
+        else:
+            return [(0, 3), (3, 6), (6, 0)]  # Top-middle, Middle-right, Bottom-left
     
-    def place_middle_right():
+    def place_grid(start_row, start_col):
         for i in range(3):
             for j in range(3):
-                new_grid[i+3][j+6] = input_values[i][j]
+                new_grid[start_row + i][start_col + j] = input_values[i][j]
     
-    def place_bottom_left():
-        for i in range(3):
-            for j in range(3):
-                new_grid[i+6][j] = input_values[i][j]
+    # Determine the correct placement positions
+    positions = determine_orientation(input_values)
     
     # Place input in all required positions
-    place_top_middle()
-    place_middle_right()
-    place_bottom_left()
+    for start_row, start_col in positions:
+        place_grid(start_row, start_col)
     
     # Return new ColoredGrid
     return ColoredGrid(values=new_grid)
