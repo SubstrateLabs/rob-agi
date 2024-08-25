@@ -1,41 +1,41 @@
 example_0:
   input: |
-    A 10x10 grid with scattered colored squares. The top-left corner is empty (black). There's a sky blue square in the top-right quadrant, a green square below it, and a red square in the top-left quadrant. The middle row has an orange square on the left, a yellow square in the center, and a sky blue and magenta square on the right. The bottom half has an orange square on the left, a magenta square next to it, a sky blue square in the center, and an orange square on the bottom-right.
+    10x10 grid. Non-black squares: sky blue (4,0), green (2,2), red (2,0), orange (4,4), yellow (4,6), sky blue (4,7), magenta (4,9), orange (6,1), magenta (7,2), sky blue (8,4), orange (9,9). Rest is black.
   output: |
-    The same 10x10 grid, but with red lines connecting the colored squares. A vertical red line runs from the top sky blue square down to the bottom orange square, passing through the yellow square in the center. Horizontal red lines connect the colored squares in rows 2, 3, 5, and 7. The original colored squares remain in their positions, and the black (empty) spaces that aren't part of the connecting lines are unchanged.
+    Original grid with red lines (value 2) connecting non-black squares. Vertical line from (0,4) to (9,4). Horizontal lines in rows 2, 3, 5, and 7. No diagonal connections. Red lines don't extend past outermost colored squares.
 
 example_1:
   input: |
-    A 12x12 grid with scattered colored squares. The top row has a green and orange square. The second row has a sky blue square on the left and an orange square on the right, with a green square at the far right. There are magenta squares in the middle rows, and the bottom half has several orange, sky blue, and green squares scattered around.
+    12x12 grid. Non-black squares: green (0,4), orange (0,5), sky blue (1,2), orange (1,8), green (1,11), magenta (2,6), magenta (3,7), red (4,0), sky blue (4,3), orange (5,5), magenta (6,9), orange (7,6), sky blue (8,7), orange (10,7), green (10,8). Rest is black.
   output: |
-    The same 12x12 grid, but with red lines connecting the colored squares. A vertical red line runs from the top green square down to the bottom orange square, branching horizontally to connect other colored squares. The original colored squares remain in their positions. The red lines form a tree-like structure, connecting all non-black squares without creating any loops.
+    Original grid with red lines (value 2) forming a minimal tree-like network. Connects all non-black squares vertically and horizontally. No loops or diagonal connections. Red lines don't extend past outermost colored squares.
 
 example_2:
   input: |
-    A 6x6 grid with a few colored squares. There's a green square in the top-left corner, an orange square in the top-right corner, a red square in the middle-left, another green square in the middle-right, and a sky blue square in the bottom-right corner. The rest is black (empty).
+    6x6 grid. Non-black squares: green (0,2), orange (0,5), red (2,0), green (2,4), sky blue (5,5). Rest is black.
   output: |
-    The same 6x6 grid, but with a red line connecting the colored squares. The line starts from the top-left green square, goes down to the red square, then across and up to the top-right orange square. It then goes down to the middle-right green square and finally to the bottom-right sky blue square. The original colored squares remain in their positions.
+    Original grid with red lines (value 2) connecting all non-black squares. Forms a minimal path: (0,2) - (2,0) - (2,4) - (0,5) - (5,5). No diagonal connections. Red lines don't extend past outermost colored squares.
 
 example_3:
   input: |
-    An 8x8 grid with scattered colored squares. There's an orange square in the top-left corner, a green square in the top-right corner, a red square and a sky blue square in the middle-left, and an orange square in the bottom-left quadrant.
+    8x8 grid. Non-black squares: orange (0,1), green (0,7), red (3,0), sky blue (3,2), orange (6,1). Rest is black.
   output: |
-    The same 8x8 grid, but with red lines connecting the colored squares. A vertical red line runs from the top orange square to the bottom orange square on the left side. Horizontal red lines connect this vertical line to the sky blue square and the green square in the top-right corner. The original colored squares remain in their positions.
+    Original grid with red lines (value 2) connecting all non-black squares. Vertical line from (0,1) to (6,1). Horizontal connections to (3,2) and (0,7). No diagonal connections. Red lines don't extend past outermost colored squares.
 
 example_4:
   input: |
-    A 4x6 grid with only two colored squares: a red square in the top-left corner and a sky blue square in the second row on the right side. The rest is black (empty).
+    4x6 grid. Non-black squares: red (0,0), sky blue (1,4). Rest is black.
   output: |
-    The same 4x6 grid, but with a red line connecting the two colored squares. The line goes from the red square in the top-left, across to the middle of the grid, then up and right to the sky blue square. The original colored squares remain in their positions.
+    Original grid with red line (value 2) connecting the two non-black squares. Path: (0,0) - (0,2) - (1,2) - (1,4). No diagonal connections. Red line doesn't extend past outermost colored squares.
 
 example_5:
   input: |
-    An 8x6 grid with scattered colored squares. There's an orange square in the top-right corner, a magenta square in the top-left corner, a red square and a sky blue square in the middle rows on the right side, another orange square in the bottom-left corner, and a sky blue square in the bottom-right corner.
+    8x6 grid. Non-black squares: magenta (0,0), orange (0,5), red (3,0), sky blue (3,5), orange (7,0), sky blue (7,5). Rest is black.
   output: |
-    The same 8x6 grid, but with red lines connecting the colored squares. A vertical red line runs from the top magenta square to the bottom orange square on the left side. Horizontal red lines connect this vertical line to the colored squares on the right side. The original colored squares remain in their positions.
+    Original grid with red lines (value 2) connecting all non-black squares. Vertical lines at columns 0 and 5. Horizontal connections at rows 0, 3, and 7. No diagonal connections. Red lines don't extend past outermost colored squares.
 
 test_case_0:
   input: |
-    A 10x12 grid with scattered colored squares. The top row has a sky blue square and an orange square, with a green square at the far right. There are magenta squares in the middle rows, a green square in the middle, and several orange, sky blue, and magenta squares scattered in the bottom half. There's also a red square in the left column.
+    10x12 grid. Non-black squares: sky blue (0,3), orange (0,8), green (0,11), magenta (2,2), magenta (2,7), red (3,0), magenta (3,6), sky blue (3,11), orange (4,4), sky blue (4,7), green (5,3), orange (5,7), orange (7,1), sky blue (7,7), magenta (8,2), orange (8,9). Rest is black.
   output: |
-    The same 10x12 grid, but with red lines connecting all the colored squares. The lines form a minimal network that connects all non-black squares horizontally and vertically, without creating any loops. The original colored squares remain in their positions, and the black (empty) spaces that aren't part of the connecting lines are unchanged.
+    Original grid with red lines (value 2) forming a minimal network. Connects all non-black squares vertically and horizontally. No loops or diagonal connections. Red lines don't extend past outermost colored squares. Preserves original positions and colors of non-black squares.
