@@ -1,23 +1,49 @@
 example_0:
   input: |
-    A large gray (5) square outline on a black (0) background. The square is 9x9 in size, with its top-left corner at (1,1) and bottom-right corner at (9,9). The interior of the square is filled with black (0).
+    A 13x13 grid with a gray (5) square outline. The outline is 9x9, positioned from (1,1) to (9,9). The interior and exterior of the outline are black (0).
   output: |
-    The same large gray (5) square outline as in the input. Inside this, there's a red (2) square outline, one cell thick, with its top-left at (2,2) and bottom-right at (8,8). Within the red square, there's another gray (5) square outline, with its top-left at (3,3) and bottom-right at (7,7). The innermost area (4x4) remains black (0).
+    The original gray (5) outline is preserved. Inside, concentric square outlines alternate between red (2) and gray (5). Each outline is separated by a one-cell black (0) gap. The pattern is:
+    - Gray (5) outline at (1,1) to (9,9)
+    - Black (0) gap
+    - Red (2) outline at (2,2) to (8,8)
+    - Black (0) gap
+    - Gray (5) outline at (3,3) to (7,7)
+    - Black (0) 4x4 square in the center
 
 example_1:
   input: |
-    A gray (5) square outline on a black (0) background. The square is 6x6, occupying the entire grid.
+    A 6x6 grid entirely filled with a gray (5) square outline. There is no black (0) exterior.
   output: |
-    The same gray (5) square outline as in the input. Inside this, there's a red (2) square outline, one cell thick, with its top-left at (1,1) and bottom-right at (4,4). The very center (2x2) is filled with gray (5).
+    The original gray (5) outline is preserved. Inside, the pattern is:
+    - Gray (5) outline covering the entire 6x6 grid
+    - Red (2) outline at (1,1) to (4,4)
+    - Gray (5) 2x2 square filling the center
 
 example_2:
   input: |
-    A large gray (5) rectangular outline on a black (0) background. The rectangle is 11x13 in size, with its top-left corner at (2,3) and bottom-right corner at (12,15). The interior of the rectangle is filled with black (0).
+    A 16x16 grid with a gray (5) rectangular outline. The outline is 11x13, positioned from (2,3) to (12,15). The interior and exterior of the outline are black (0).
   output: |
-    The same large gray (5) rectangular outline as in the input. Inside this, there's a red (2) rectangular outline, one cell thick, with its top-left at (3,4) and bottom-right at (11,14). Within the red rectangle, there's another gray (5) rectangular outline, with its top-left at (4,5) and bottom-right at (10,13). Inside this innermost gray rectangle, there's a smaller gray (5) rectangle outline from (6,7) to (8,11), with its interior filled with red (2).
+    The original gray (5) outline is preserved. Inside, concentric rectangular outlines alternate between red (2) and gray (5), each separated by a one-cell black (0) gap. The pattern is:
+    - Gray (5) outline at (2,3) to (12,15)
+    - Black (0) gap
+    - Red (2) outline at (3,4) to (11,14)
+    - Black (0) gap
+    - Gray (5) outline at (4,5) to (10,13)
+    - Black (0) gap
+    - Gray (5) outline at (6,7) to (8,11)
+    - Red (2) 3x5 rectangle filling the center
 
 example_3:
   input: |
-    A large gray (5) square outline on a black (0) background. The square is 17x17 in size, occupying almost the entire 19x19 grid, with its top-left corner at (1,1) and bottom-right corner at (17,17). The interior of the square is filled with black (0).
+    A 19x19 grid with a gray (5) square outline. The outline is 17x17, positioned from (1,1) to (17,17). The interior and exterior of the outline are black (0).
   output: |
-    The same large gray (5) square outline as in the input. Inside this, there's a red (2) square outline, one cell thick, with its top-left at (2,2) and bottom-right at (16,16). Within the red square, there's another gray (5) square outline, with its top-left at (3,3) and bottom-right at (15,15). Inside this, there's yet another red (2) square outline from (4,4) to (14,14). The pattern continues inward, alternating between gray and red outlines, each one cell smaller on each side. The innermost shape is a gray (5) 3x3 square with a red (2) center cell.
+    The original gray (5) outline is preserved. Inside, concentric square outlines alternate between red (2) and gray (5), each separated by a one-cell black (0) gap. The pattern continues inward until reaching the center. The sequence is:
+    - Gray (5) outline at (1,1) to (17,17)
+    - Black (0) gap
+    - Red (2) outline
+    - Black (0) gap
+    - Gray (5) outline
+    - (Pattern repeats)
+    ...
+    - Gray (5) 3x3 square
+    - Red (2) single cell at the very center
