@@ -5,11 +5,12 @@ def solve_9caba7c3(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by applying the following rules:
     1. Preserves red (2) squares in the upper-left quadrant.
-    2. Changes other red (2) squares to yellow (4).
-    3. Propagates orange (7) color from yellow squares to the right and below,
-       replacing any non-black squares, potentially jumping over other colors.
-    4. Preserves the original state of black (0) squares.
-    5. Applies transformations based on the original grid state.
+    2. Identifies connected red regions outside the upper-left quadrant.
+    3. Changes these identified red regions to yellow (4).
+    4. Propagates orange (7) color within the boundaries of the originally red regions,
+       moving right and down, but not crossing black (0) squares.
+    5. Preserves the original state of black (0) squares and all other colors outside the red regions.
+    6. Applies transformations based on the original grid state.
     """
     original_grid = input_grid.deep_copy()
     new_grid = input_grid.deep_copy()
@@ -19,41 +20,41 @@ def solve_9caba7c3(input_grid: ColoredGrid) -> ColoredGrid:
     def is_upper_left_quadrant(row, col):
         return row < mid_row and col < mid_col
 
-    def propagate_orange(start_row, start_col):
-        right_queue = deque([(start_row, start_col)])
-        down_queue = deque([(start_row, start_col)])
+    def flood_fill(row, col, color, target_color, visited):
+        if (row < 0 or row >= height or col < 0 or col >= width or
+            original_grid.values[row][col] != target_color or (row, col) in visited):
+            return
 
-        while right_queue or down_queue:
-            if right_queue:
-                row, col = right_queue.popleft()
-                new_col = col
-                while new_col < width and original_grid.values[row][new_col] != 0:
-                    if not is_upper_left_quadrant(row, new_col) or original_grid.values[row][new_col] != 2:
-                        new_grid.values[row][new_col] = 7
-                    if row >= mid_row:
-                        down_queue.append((row, new_col))
-                    new_col += 1
+        visited.add((row, col))
+        new_grid.values[row][col] = color
 
-            if down_queue:
-                row, col = down_queue.popleft()
-                new_row = row
-                while new_row < height and original_grid.values[new_row][col] != 0:
-                    if not is_upper_left_quadrant(new_row, col) or original_grid.values[new_row][col] != 2:
-                        new_grid.values[new_row][col] = 7
-                    if col >= mid_col:
-                        right_queue.append((new_row, col))
-                    new_row += 1
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            flood_fill(row + dr, col + dc, color, target_color, visited)
 
-    yellow_squares = []
+    def propagate_orange(start_row, start_col, visited):
+        queue = deque([(start_row, start_col)])
+        while queue:
+            row, col = queue.popleft()
+            if (row, col) not in visited:
+                continue
+            new_grid.values[row][col] = 7
+            for dr, dc in [(0, 1), (1, 0)]:  # Only right and down
+                new_row, new_col = row + dr, col + dc
+                if (0 <= new_row < height and 0 <= new_col < width and
+                    original_grid.values[new_row][new_col] != 0 and
+                    (new_row, new_col) in visited):
+                    queue.append((new_row, new_col))
+
+    visited = set()
     for row in range(height):
         for col in range(width):
-            if original_grid.values[row][col] == 2:
-                if not is_upper_left_quadrant(row, col):
-                    new_grid.values[row][col] = 4
-                    yellow_squares.append((row, col))
+            if original_grid.values[row][col] == 2 and not is_upper_left_quadrant(row, col):
+                flood_fill(row, col, 4, 2, visited)
 
-    for row, col in yellow_squares:
-        propagate_orange(row, col)
+    for row in range(height):
+        for col in range(width):
+            if new_grid.values[row][col] == 4:
+                propagate_orange(row, col, visited)
 
     # Final check for upper-left quadrant red squares
     for row in range(mid_row):
