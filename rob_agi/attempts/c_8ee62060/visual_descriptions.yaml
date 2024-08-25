@@ -1,17 +1,41 @@
 example_0:
   input: |
-    The input grid is a 12x12 square. It contains a diagonal pattern of sky blue (8) squares, each followed by two red (2) squares. This pattern starts at the top-left corner and moves diagonally down and to the right. Each sky blue square is positioned two rows below and two columns to the right of the previous one. The rest of the grid is filled with black (0) squares, which can be interpreted as empty space.
+    12x12 grid with a diagonal pattern from top-left to bottom-right.
+    Pattern: sky blue (8) square followed by two red (2) squares.
+    Each set (8,2,2) is offset by 2 rows down and 2 columns right from the previous.
+    First set starts at (0,0). Last set ends at (10,10).
+    All other cells are black (0).
   output: |
-    The output grid is also a 12x12 square. It contains the same pattern of sky blue (8) squares followed by two red (2) squares, but the pattern has been reversed. It now starts from the bottom-left corner and moves diagonally up and to the right. Each sky blue square is positioned two rows above and two columns to the right of the previous one. The rest of the grid is filled with black (0) squares.
+    12x12 grid with the same diagonal pattern, but from bottom-left to top-right.
+    Pattern: sky blue (8) square followed by two red (2) squares.
+    Each set (8,2,2) is offset by 2 rows up and 2 columns right from the previous.
+    First set starts at (11,0). Last set ends at (1,10).
+    All other cells are black (0).
 
 example_1:
   input: |
-    The input grid is a 12x12 square. It contains a diagonal pattern of pairs of red (2) squares, each pair followed by a green (3) square. This pattern starts at the top-right corner and moves diagonally down and to the left. Each set of three squares (two red, one green) is positioned two rows below and two columns to the left of the previous set. The rest of the grid is filled with black (0) squares, which can be interpreted as empty space.
+    12x12 grid with a diagonal pattern from top-right to bottom-left.
+    Pattern: two red (2) squares followed by one green (3) square.
+    Each set (2,2,3) is offset by 2 rows down and 2 columns left from the previous.
+    First set starts at (0,9). Last set ends at (10,1).
+    All other cells are black (0).
   output: |
-    The output grid is also a 12x12 square. It contains the same pattern of pairs of red (2) squares followed by a green (3) square, but the pattern has been reversed. It now starts from the bottom-left corner and moves diagonally up and to the right. Each set of three squares (two red, one green) is positioned two rows above and two columns to the right of the previous set. The rest of the grid is filled with black (0) squares.
+    12x12 grid with the same diagonal pattern, but from bottom-left to top-right.
+    Pattern: two red (2) squares followed by one green (3) square.
+    Each set (2,2,3) is offset by 2 rows up and 2 columns right from the previous.
+    First set starts at (11,0). Last set ends at (1,10).
+    All other cells are black (0).
 
 example_2:
   input: |
-    The input grid is a 10x10 square. It contains a diagonal pattern of red (2) squares, each followed by a blue (1) square. This pattern starts at the top-left corner and moves diagonally down and to the right. Each pair of squares (one red, one blue) is positioned two rows below and two columns to the right of the previous pair. The rest of the grid is filled with black (0) squares, which can be interpreted as empty space.
+    10x10 grid with a diagonal pattern from top-left to bottom-right.
+    Pattern: one red (2) square followed by one blue (1) square.
+    Each pair (2,1) is offset by 2 rows down and 2 columns right from the previous.
+    First pair starts at (0,0). Last pair ends at (8,8).
+    All other cells are black (0).
   output: |
-    The output grid is also a 10x10 square. It contains the same pattern of red (2) squares followed by blue (1) squares, but the pattern has been reversed. It now starts from the bottom-left corner and moves diagonally up and to the right. Each pair of squares (one red, one blue) is positioned two rows above and two columns to the right of the previous pair. The rest of the grid is filled with black (0) squares.
+    10x10 grid with the same diagonal pattern, but from bottom-left to top-right.
+    Pattern: one red (2) square followed by one blue (1) square.
+    Each pair (2,1) is offset by 2 rows up and 2 columns right from the previous.
+    First pair starts at (9,0). Last pair ends at (1,8).
+    All other cells are black (0).
