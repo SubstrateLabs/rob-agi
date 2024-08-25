@@ -6,9 +6,9 @@ def solve_506d28a5(input_grid: ColoredGrid) -> ColoredGrid:
     1. Extracts the top 4 rows of the input grid.
     2. Creates a new 4x5 grid.
     3. For each column:
-       - If there's any red cell in the column, all cells become green except:
-         - If the top cell is black, it remains black.
-         - If the bottom cell is black, it remains black.
+       - If there's any red cell in the column:
+         - Fill the column with green.
+         - Preserve contiguous black regions from the top and bottom.
        - If there's no red cell, the column remains unchanged.
     4. Returns the transformed grid as a new ColoredGrid object.
     """
@@ -26,16 +26,24 @@ def solve_506d28a5(input_grid: ColoredGrid) -> ColoredGrid:
         has_red = 2 in input_column
         
         if has_red:
-            # Set column to green
+            # Start with a green column
             output_column = [3, 3, 3, 3]
             
-            # Check first and last cells
-            if input_column[0] == 0:
-                output_column[0] = 0
-            if input_column[3] == 0:
-                output_column[3] = 0
+            # Preserve black from the top
+            for row in range(4):
+                if input_column[row] == 0:
+                    output_column[row] = 0
+                else:
+                    break
+            
+            # Preserve black from the bottom
+            for row in range(3, -1, -1):
+                if input_column[row] == 0:
+                    output_column[row] = 0
+                else:
+                    break
         else:
-            # Copy input column
+            # Copy input column if no red
             output_column = input_column
         
         # Add column to output
