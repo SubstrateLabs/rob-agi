@@ -5,95 +5,80 @@ from collections import deque
 def solve_d94c3b52(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the grid transformation challenge by applying the following steps:
-    1. Identifies connected regions of non-black colors.
-    2. Analyzes the global structure and color distribution.
-    3. Applies color transformations based on region size, position, and adjacent colors.
-    4. Maintains overall balance and visual distinctiveness.
-    5. Preserves small sky blue "anchor" regions and key patterns.
-    6. Ensures no large adjacent regions have the same non-blue color.
-    7. Handles all possible input colors and transforms them according to a defined color cycle.
+    1. Analyzes the input grid to identify non-black shapes and their positions.
+    2. Creates a pattern template dividing the grid into alternating zones.
+    3. Applies color transformations based on the template and existing sky blue shapes.
+    4. Balances color distribution and maintains structure integrity.
+    5. Ensures contrast between adjacent shapes and consistency across similar patterns.
+    6. Handles edge cases and makes final adjustments for visual appeal.
     """
-    regions = find_connected_regions(input_grid)
-    region_graph = create_region_graph(regions)
-    color_distribution = analyze_color_distribution(input_grid)
-    new_colors = apply_color_transformations(regions, region_graph, color_distribution)
-    return create_new_grid(input_grid, regions, new_colors)
+    pattern_template = create_pattern_template(input_grid)
+    new_grid = apply_transformations(input_grid, pattern_template)
+    new_grid = balance_colors(new_grid)
+    new_grid = ensure_contrast(new_grid)
+    return new_grid
 
-def find_connected_regions(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
+def create_pattern_template(grid: ColoredGrid) -> List[List[int]]:
     rows, cols = grid.get_dimensions()
-    visited = set()
-    regions = []
-    
+    template = [[0 for _ in range(cols)] for _ in range(rows)]
     for r in range(rows):
         for c in range(cols):
-            if (r, c) not in visited and grid.values[r][c] != 0:
-                region = []
-                color = grid.values[r][c]
-                queue = deque([(r, c)])
-                while queue:
-                    curr_r, curr_c = queue.popleft()
-                    if (curr_r, curr_c) not in visited and grid.values[curr_r][curr_c] == color:
-                        visited.add((curr_r, curr_c))
-                        region.append((curr_r, curr_c))
-                        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                            new_r, new_c = curr_r + dr, curr_c + dc
-                            if 0 <= new_r < rows and 0 <= new_c < cols:
-                                queue.append((new_r, new_c))
-                regions.append(region)
-    return regions
+            if grid.values[r][c] == 8:  # Sky blue
+                template[r][c] = 2  # Fixed zone
+            else:
+                template[r][c] = (r + c) % 2  # Alternating zones
+    return template
 
-def create_region_graph(regions: List[List[Tuple[int, int]]]) -> Dict[int, List[int]]:
-    graph = {i: [] for i in range(len(regions))}
-    for i, region1 in enumerate(regions):
-        for j, region2 in enumerate(regions[i+1:], i+1):
-            if are_adjacent(region1, region2):
-                graph[i].append(j)
-                graph[j].append(i)
-    return graph
+def apply_transformations(grid: ColoredGrid, template: List[List[int]]) -> ColoredGrid:
+    new_grid = grid.deep_copy()
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        for c in range(cols):
+            if grid.values[r][c] != 0:  # Non-black cell
+                if grid.values[r][c] == 8:  # Sky blue
+                    new_grid.values[r][c] = 8
+                elif template[r][c] == 2:  # Fixed zone
+                    new_grid.values[r][c] = 7  # Orange
+                elif template[r][c] == 0:
+                    new_grid.values[r][c] = 1  # Blue
+                else:
+                    new_grid.values[r][c] = 7  # Orange
+    return new_grid
 
-def are_adjacent(region1: List[Tuple[int, int]], region2: List[Tuple[int, int]]) -> bool:
-    set1 = set(region1)
-    for r, c in region2:
-        if any((r+dr, c+dc) in set1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]):
-            return True
-    return False
-
-def analyze_color_distribution(grid: ColoredGrid) -> Dict[int, int]:
-    distribution = {}
+def balance_colors(grid: ColoredGrid) -> ColoredGrid:
+    color_count = {1: 0, 7: 0, 8: 0}
     for row in grid.values:
         for cell in row:
-            if cell != 0:  # Exclude black cells
-                distribution[cell] = distribution.get(cell, 0) + 1
-    return distribution
-
-def apply_color_transformations(regions: List[List[Tuple[int, int]]], graph: Dict[int, List[int]], color_distribution: Dict[int, int]) -> List[int]:
-    new_colors = []
-    color_cycle = {1: 8, 8: 7, 7: 1}  # Blue -> Sky Blue -> Orange -> Blue
+            if cell in color_count:
+                color_count[cell] += 1
     
-    for i, region in enumerate(regions):
-        color = region[0][1]  # Get color of the region
-        size = len(region)
+    if abs(color_count[1] - color_count[7]) > 5:  # Arbitrary threshold
+        majority_color = 1 if color_count[1] > color_count[7] else 7
+        minority_color = 7 if majority_color == 1 else 1
+        diff = abs(color_count[1] - color_count[7]) // 2
         
-        if size <= 4 and color == 8:  # Small sky blue "anchor" regions
-            new_color = 8
-        elif color in color_cycle:
-            new_color = color_cycle[color]
-        else:
-            # For colors not in the cycle, choose the least common color
-            least_common = min(color_cycle.values(), key=lambda c: color_distribution.get(c, 0))
-            new_color = least_common
-        
-        new_colors.append(new_color)
-        
-        # Update color distribution
-        color_distribution[color] = color_distribution.get(color, 0) - size
-        color_distribution[new_color] = color_distribution.get(new_color, 0) + size
-    
-    return new_colors
+        for r in range(len(grid.values)):
+            for c in range(len(grid.values[0])):
+                if grid.values[r][c] == majority_color and diff > 0:
+                    grid.values[r][c] = minority_color
+                    diff -= 1
+    return grid
 
-def create_new_grid(input_grid: ColoredGrid, regions: List[List[Tuple[int, int]]], new_colors: List[int]) -> ColoredGrid:
-    new_grid = input_grid.deep_copy()
-    for region, color in zip(regions, new_colors):
-        for r, c in region:
-            new_grid.values[r][c] = color
-    return new_grid
+def ensure_contrast(grid: ColoredGrid) -> ColoredGrid:
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        for c in range(cols):
+            if grid.values[r][c] != 0:
+                neighbors = get_neighbors(grid, r, c)
+                if all(neighbor == grid.values[r][c] for neighbor in neighbors if neighbor != 0):
+                    grid.values[r][c] = 1 if grid.values[r][c] == 7 else 7
+    return grid
+
+def get_neighbors(grid: ColoredGrid, r: int, c: int) -> List[int]:
+    rows, cols = grid.get_dimensions()
+    neighbors = []
+    for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+        nr, nc = r + dr, c + dc
+        if 0 <= nr < rows and 0 <= nc < cols:
+            neighbors.append(grid.values[nr][nc])
+    return neighbors
