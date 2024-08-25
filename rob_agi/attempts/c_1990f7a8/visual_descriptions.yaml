@@ -1,0 +1,50 @@
+example_0:
+  input: |
+    A 23x23 grid with mostly black (empty) space. There are four distinct red (2) patterns:
+    1. Top-left quadrant: A 3x3 square with the center cell empty (black).
+    2. Top-right quadrant: A solid 3x3 square.
+    3. Bottom-left quadrant: An inverted T-shape or cross.
+    4. Bottom-right quadrant: An L-shape with an additional red cell above the shorter arm.
+    Each pattern is surrounded by empty space and positioned roughly in the center of its respective quadrant.
+  output: |
+    A 7x7 grid with a clear structure:
+    1. Top-left quadrant: The 3x3 square with empty center from the input.
+    2. Top-right quadrant: The solid 3x3 square from the input.
+    3. A middle row of all black (empty) cells separating the top and bottom.
+    4. Bottom-left quadrant: The inverted T-shape from the input.
+    5. Bottom-right quadrant: The L-shape with extra cell from the input.
+    The patterns from the input are preserved but condensed into a smaller grid.
+
+example_1:
+  input: |
+    A 19x17 grid with mostly black (empty) space. There are four distinct red (2) patterns:
+    1. Top-left quadrant: An inverted L-shape.
+    2. Top-right quadrant: A 3x2 rectangle with the bottom-right corner missing.
+    3. Bottom-left quadrant: A solid 3x3 square.
+    4. Bottom-right quadrant: A 3x3 square frame (outer edge only, center empty).
+    Each pattern is surrounded by empty space and positioned roughly in the center of its respective quadrant.
+  output: |
+    A 7x7 grid with a clear structure:
+    1. Top-left quadrant: The inverted L-shape from the input.
+    2. Top-right quadrant: The 3x2 rectangle with missing corner from the input.
+    3. A middle row of all black (empty) cells separating the top and bottom.
+    4. Bottom-left quadrant: The solid 3x3 square from the input.
+    5. Bottom-right quadrant: The 3x3 square frame from the input.
+    The patterns from the input are preserved but condensed into a smaller grid.
+
+example_2:
+  input: |
+    A 16x17 grid with mostly black (empty) space. There are four distinct red (2) patterns:
+    1. Top-left quadrant: A diagonal line of 3 red cells from top-left to bottom-right.
+    2. Top-right quadrant: An inverted V-shape or chevron.
+    3. Bottom-left quadrant: A 3x2 rectangle with the top-right corner missing.
+    4. Bottom-right quadrant: A single red cell.
+    Each pattern is surrounded by empty space and positioned roughly in the center of its respective quadrant.
+  output: |
+    A 7x7 grid with a clear structure:
+    1. Top-left quadrant: The diagonal line of 3 red cells from the input.
+    2. Top-right quadrant: The inverted V-shape or chevron from the input.
+    3. A middle row of all black (empty) cells separating the top and bottom.
+    4. Bottom-left quadrant: The 3x2 rectangle with missing corner from the input.
+    5. Bottom-right quadrant: The single red cell from the input, positioned in the center of its 3x3 area.
+    The patterns from the input are preserved but condensed into a smaller grid.
