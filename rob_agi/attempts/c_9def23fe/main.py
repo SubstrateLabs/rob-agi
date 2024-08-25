@@ -78,28 +78,35 @@ def expand_horizontally(grid: List[List[int]], rect: Tuple[int, int, int, int], 
         if top <= r <= bottom:
             grid[r][c] = value
 
+def calculate_horizontal_bars(rect: Tuple[int, int, int, int]) -> List[int]:
+    top, _, bottom, _ = rect
+    height = bottom - top + 1
+    if height <= 5:
+        return [top, bottom]
+    else:
+        middle = (top + bottom) // 2
+        return [top, middle, bottom]
+
 def calculate_vertical_columns(rect: Tuple[int, int, int, int]) -> List[int]:
     _, left, _, right = rect
-    columns = [left]
-    for c in range(left + 1, right + 1):
-        if c == right or c - columns[-1] >= 2:
-            columns.append(c)
-    return columns
+    width = right - left + 1
+    columns = [left + i * (width // (width + 1)) for i in range(width + 2)]
+    return [c for c in columns if c < len(rect[0])]
 
-def create_vertical_bars(grid: List[List[int]], columns: List[int]):
-    rows = len(grid)
+def apply_horizontal_expansion(grid: List[List[int]], bars: List[int]):
+    for r in bars:
+        grid[r] = [2] * len(grid[0])
+
+def apply_vertical_expansion(grid: List[List[int]], columns: List[int]):
     for c in columns:
-        for r in range(rows):
+        for r in range(len(grid)):
             grid[r][c] = 2
 
-def expand_horizontally(grid: List[List[int]], rect: Tuple[int, int, int, int], columns: List[int]):
-    top, _, bottom, _ = rect
-    left_expand = columns[0]
-    right_expand = columns[-1]
-    if right_expand == rect[3]:  # If the rightmost bar is at the right edge of the original rectangle
-        right_expand = min(right_expand + 1, len(grid[0]) - 1)
+def extend_red_area(grid: List[List[int]], horizontal_bars: List[int], vertical_columns: List[int]):
+    top, bottom = min(horizontal_bars), max(horizontal_bars)
+    left, right = min(vertical_columns), max(vertical_columns)
     for r in range(top, bottom + 1):
-        for c in range(left_expand, right_expand + 1):
+        for c in range(left, right + 1):
             grid[r][c] = 2
 
 def fill_between_bars(grid: List[List[int]], columns: List[int], rect: Tuple[int, int, int, int]):
