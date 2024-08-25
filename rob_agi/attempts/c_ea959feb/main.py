@@ -3,39 +3,48 @@ from typing import List, Tuple
 
 def solve_ea959feb(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the grid pattern challenge by identifying horizontal and vertical color sequences
+    Solves the grid pattern challenge by identifying row and column color sequences
     and applying them to create a consistent pattern across the entire grid.
     
     The solution works as follows:
-    1. Identifies the horizontal color sequence from the rows of the input grid.
-    2. Identifies the vertical color sequence from the columns of the input grid.
-    3. Creates a function to determine the correct color for any cell based on these sequences.
-    4. Generates a new grid by applying this function to each cell.
+    1. Extracts the row pattern by finding the most common repeating sequence across all rows.
+    2. Extracts the column pattern by finding the most common repeating sequence across all columns.
+    3. Validates and extends the patterns to cover the entire grid dimensions.
+    4. Generates a new grid by combining the row and column patterns.
     5. Returns a new ColoredGrid with the corrected pattern.
     
-    This approach works for all cases by identifying the underlying pattern in each input
-    and extending it consistently across the entire grid.
+    This approach works for all cases by identifying the underlying patterns in each input
+    and extending them consistently across the entire grid.
     """
-    horizontal_sequence = identify_sequence(input_grid.values)
-    vertical_sequence = identify_sequence(list(zip(*input_grid.values)))
-    corrected_values = correct_grid(input_grid, horizontal_sequence, vertical_sequence)
+    rows, cols = input_grid.get_dimensions()
+    row_pattern = extract_pattern(input_grid.values)
+    col_pattern = extract_pattern(list(zip(*input_grid.values)))
+    
+    # Extend patterns if necessary
+    row_pattern = row_pattern * (cols // len(row_pattern) + 1)
+    col_pattern = col_pattern * (rows // len(col_pattern) + 1)
+    
+    corrected_values = [[((row_pattern[j] + col_pattern[i]) % 10) for j in range(cols)] for i in range(rows)]
     return ColoredGrid(values=corrected_values)
 
-def identify_sequence(lines: List[List[int]]) -> List[int]:
-    """Identifies the repeating color sequence in a list of lines."""
-    for line in lines:
-        for i in range(1, len(line) // 2 + 1):
-            if line[:i] * (len(line) // i) == line[:len(line) - (len(line) % i)]:
-                return line[:i]
-    return lines[0]  # Fallback to the first line if no clear repetition is found
+def extract_pattern(lines: List[List[int]]) -> List[int]:
+    """Extracts the most common repeating pattern from a list of lines."""
+    patterns = [find_shortest_repeating_sequence(line) for line in lines]
+    return find_common_sequence(patterns)
 
-def get_correct_color(row: int, col: int, horizontal_seq: List[int], vertical_seq: List[int]) -> int:
-    """Determines the correct color for a given cell based on the horizontal and vertical sequences."""
-    horizontal_color = horizontal_seq[col % len(horizontal_seq)]
-    vertical_color = vertical_seq[row % len(vertical_seq)]
-    return (horizontal_color + vertical_color) % 10
+def find_shortest_repeating_sequence(line: List[int]) -> List[int]:
+    """Finds the shortest repeating sequence in a line."""
+    for i in range(1, len(line) // 2 + 1):
+        if line[:i] * (len(line) // i) == line[:len(line) - (len(line) % i)]:
+            return line[:i]
+    return line  # If no repetition found, return the entire line
 
-def correct_grid(input_grid: ColoredGrid, horizontal_seq: List[int], vertical_seq: List[int]) -> List[List[int]]:
-    """Generates a new grid by applying the identified pattern."""
-    rows, cols = input_grid.get_dimensions()
-    return [[get_correct_color(i, j, horizontal_seq, vertical_seq) for j in range(cols)] for i in range(rows)]
+def find_common_sequence(sequences: List[List[int]]) -> List[int]:
+    """Finds the most common sequence from a list of sequences."""
+    sequence_counts = {}
+    for seq in sequences:
+        seq_tuple = tuple(seq)
+        sequence_counts[seq_tuple] = sequence_counts.get(seq_tuple, 0) + 1
+    
+    most_common = max(sequence_counts, key=sequence_counts.get)
+    return list(most_common)
