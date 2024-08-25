@@ -8,9 +8,11 @@ def solve_08573cc6(input_grid: ColoredGrid) -> ColoredGrid:
     1. Analyze the input grid to determine dimensions and colors.
     2. Create an outer rectangle using the main color (top-left of input).
     3. Create an inner rectangle offset from the outer one.
-    4. Use the side color (top-right of input) for the right sides of both rectangles.
-    5. Add small extensions to the inner rectangle.
-    6. Preserve the position of the single colored square from the input.
+    4. Use the side color (adjacent to main color) for the right sides of both rectangles.
+    5. Add extensions to the inner rectangle.
+    6. Fill the space between rectangles.
+    7. Preserve the position of the single colored square from the input.
+    8. Adjust the pattern based on grid size.
     
     This pattern adapts to different grid sizes while maintaining consistent proportions.
     """
@@ -21,30 +23,49 @@ def solve_08573cc6(input_grid: ColoredGrid) -> ColoredGrid:
     # Create a new grid filled with zeros (black)
     new_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
     
+    # Determine pattern size and position
+    if rows <= 11:
+        start_row, start_col = 2, 1
+    elif rows == 12:
+        start_row, start_col = 2, 2
+    else:
+        start_row, start_col = 1, 1
+    
     # Draw outer rectangle
-    for c in range(1, cols - 2):
-        new_grid.values[2][c] = main_color  # Top
-        new_grid.values[rows - 1][c] = main_color  # Bottom
-    for r in range(2, rows):
-        new_grid.values[r][1] = main_color  # Left side
+    for r in range(start_row, rows - 1):
+        new_grid.values[r][start_col] = main_color  # Left side
         new_grid.values[r][cols - 2] = side_color  # Right side
+    for c in range(start_col, cols - 1):
+        new_grid.values[start_row][c] = main_color  # Top
+        new_grid.values[rows - 2][c] = main_color  # Bottom
     
     # Draw inner rectangle
-    inner_top, inner_left = 4, 2
-    inner_bottom, inner_right = rows - 2, cols - 3
+    inner_top = start_row + 2
+    inner_left = start_col + 1
+    inner_bottom = rows - 3
+    inner_right = cols - 3
     
-    for c in range(inner_left, inner_right):
-        new_grid.values[inner_top][c] = main_color  # Top
-        new_grid.values[inner_bottom][c] = main_color  # Bottom
-    for r in range(inner_top, inner_bottom + 1):
+    for r in range(inner_top, inner_bottom):
         new_grid.values[r][inner_left] = main_color  # Left side
         new_grid.values[r][inner_right] = side_color  # Right side
+    for c in range(inner_left, inner_right + 1):
+        new_grid.values[inner_top][c] = main_color  # Top
+        new_grid.values[inner_bottom][c] = main_color  # Bottom
     
     # Add extensions
-    new_grid.values[inner_top][inner_right] = main_color  # Top-right
-    new_grid.values[inner_bottom][inner_left - 1] = main_color  # Bottom-left
+    new_grid.values[inner_top - 1][inner_right] = main_color  # Top-right
+    new_grid.values[inner_bottom + 1][inner_left - 1] = main_color  # Bottom-left
     
-    # Copy the single colored square from input
+    # Fill space between rectangles
+    for r in range(start_row + 1, rows - 2):
+        for c in range(start_col + 1, cols - 2):
+            if new_grid.values[r][c] == 0:
+                if c < inner_right:
+                    new_grid.values[r][c] = main_color
+                else:
+                    new_grid.values[r][c] = side_color
+    
+    # Preserve the original colored square
     for r in range(rows):
         for c in range(cols):
             if input_grid.values[r][c] not in [0, main_color, side_color]:
