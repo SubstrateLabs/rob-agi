@@ -11,7 +11,7 @@ def solve_e74e1818(input_grid: ColoredGrid) -> ColoredGrid:
     3. Flip shapes vertically if they are not in their natural orientation
     4. Reconstruct the grid with transformed shapes
     
-    This function focuses on orienting shapes intuitively (e.g., arrows pointing up, letters readable)
+    This function focuses on orienting shapes intuitively (e.g., arrows pointing up, letters readable, objects in stable positions)
     while maintaining their horizontal position and the overall structure of the image.
     """
     # Step 1: Identify distinct shapes
@@ -66,7 +66,7 @@ def flip_shapes_if_needed(shapes: Dict[int, List[Tuple[int, int]]], num_rows: in
         else:
             natural_orientation = determine_natural_orientation(shape, min_r, max_r, min_c, max_c)
             if not natural_orientation:
-                flipped_shape = [(max_r - (r - min_r), c) for r, c in shape]
+                flipped_shape = [(2 * min_r + max_r - r, c) for r, c in shape]
                 flipped_shapes[color] = flipped_shape
             else:
                 flipped_shapes[color] = shape
@@ -96,6 +96,12 @@ def determine_natural_orientation(shape: List[Tuple[int, int]], min_r: int, max_
     
     # Check for letter-like shapes (T, U, V)
     if shape_grid[0].count(1) > 1 and all(row.count(1) <= 2 for row in shape_grid[1:]):
+        return True
+    
+    # Check for object-like shapes (e.g., wine glass)
+    top_half = shape_grid[:len(shape_grid)//2]
+    bottom_half = shape_grid[len(shape_grid)//2:]
+    if sum(row.count(1) for row in top_half) < sum(row.count(1) for row in bottom_half):
         return True
     
     # Compare complexity of top and bottom halves
