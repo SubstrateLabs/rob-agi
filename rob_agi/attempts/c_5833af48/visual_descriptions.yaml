@@ -1,0 +1,47 @@
+example_0:
+  input: |
+    The input grid is 18x17. It has a black (0) border around the entire grid. Inside this border, there are two distinct regions:
+    1. The top-left quadrant (5x5) contains a pattern of red (2), sky (8), and blue (1) squares.
+    2. The rest of the non-border area is filled with blue (1) squares, forming a large blue rectangle (16x8).
+    The top-left pattern appears to be two 4x4 squares side by side, separated by a black column. The left square has red and sky colors, while the right square has blue and sky colors.
+  output: |
+    The output grid is 16x8. It appears to be a transformed version of the input, focusing on the pattern from the top-left quadrant.
+    The pattern is repeated and mirrored both horizontally and vertically.
+    The background color is blue (1), and the pattern elements are sky (8).
+    There are four instances of the pattern, one in each corner of the grid.
+    The pattern in each corner is a 4x4 square with sky-colored elements forming an L-shape or its mirror.
+
+example_1:
+  input: |
+    The input grid is 18x16. It has a black (0) border around the entire grid. Inside this border, there are two distinct regions:
+    1. The top-left quadrant (5x5) contains a pattern of red (2), sky (8), and green (3) squares.
+    2. The rest of the non-border area is filled with green (3) squares, forming a large green rectangle (16x9).
+    The top-left pattern appears to be two 4x4 squares side by side, separated by a black column. The left square has red and sky colors, while the right square has green and sky colors.
+  output: |
+    The output grid is 15x9. It appears to be a transformed version of the input, focusing on the pattern from the top-left quadrant.
+    The pattern is repeated and mirrored both horizontally and vertically.
+    The background color is green (3), and the pattern elements are sky (8).
+    There are four instances of the pattern, one in each corner of the grid.
+    The pattern in each corner is a 3x3 square with sky-colored elements forming an L-shape or its mirror.
+
+example_2:
+  input: |
+    The input grid is 15x15. It has a black (0) border around most of the grid, except for the top-left corner. Inside this border, there are two distinct regions:
+    1. The top-left quadrant (4x4) contains a pattern of red (2), sky (8), and yellow (4) squares.
+    2. The rest of the non-border area is filled with yellow (4) squares, forming a yellow rectangle (10x6).
+    The top-left pattern appears to be two 3x3 squares side by side, separated by a black column. The left square has red and sky colors, while the right square has yellow and sky colors.
+  output: |
+    The output grid is 9x6. It appears to be a transformed version of the input, focusing on the pattern from the top-left quadrant.
+    The pattern is repeated and mirrored both horizontally and vertically.
+    The background color is yellow (4), and the pattern elements are sky (8).
+    There are four instances of the pattern, one in each corner of the grid.
+    The pattern in each corner is a 3x3 square with sky-colored elements forming an L-shape or its mirror.
+
+test_case_0:
+  input: |
+    The input grid is 15x15. It has a black (0) border around most of the grid, except for the top-left corner. Inside this border, there are two distinct regions:
+    1. The top-left quadrant (4x4) contains a pattern of red (2), sky (8), and yellow (4) squares.
+    2. The rest of the non-border area is filled with yellow (4) squares, forming a yellow rectangle (10x6).
+    The top-left pattern appears to be two 3x3 squares side by side, separated by a black column. The left square has red and sky colors, while the right square has yellow and sky colors.
+  output: |
+    The output is not provided for this test case.
