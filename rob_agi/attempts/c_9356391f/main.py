@@ -7,8 +7,8 @@ def solve_9356391f(input_grid: ColoredGrid) -> ColoredGrid:
     
     1. Extracts unique colors from the top row, preserving their order.
     2. Modifies the top row by replacing the rightmost occurrence of the last unique color with 5.
-    3. Creates a large rectangular pattern using these colors in reverse order.
-    4. Centers the pattern in the grid, preserving the second row of 5s.
+    3. Creates a square pattern using these colors in reverse order.
+    4. Centers the pattern in the grid, preserving the top two rows.
     5. Fills the remaining space with 0s.
     """
     def find_unique_colors(row: List[int]) -> List[int]:
@@ -26,19 +26,29 @@ def solve_9356391f(input_grid: ColoredGrid) -> ColoredGrid:
             break
     
     # Create pattern
-    pattern_height = rows - 2
-    pattern_width = cols - 2
+    pattern_size = min(rows - 2, cols - 2, 2 * len(unique_colors) - 1)
+    if pattern_size % 2 == 0:
+        pattern_size -= 1
+    
+    pattern = [[0 for _ in range(pattern_size)] for _ in range(pattern_size)]
     reversed_colors = list(reversed(unique_colors))
     
-    for r in range(2, rows):
-        for c in range(1, cols-1):
-            color_index = min(
-                r - 2,
-                c - 1,
-                rows - r - 1,
-                cols - c - 2,
-                len(reversed_colors) - 1
-            )
-            output_grid.values[r][c] = reversed_colors[color_index]
+    for i in range(len(reversed_colors)):
+        color = reversed_colors[i]
+        start = i
+        end = pattern_size - 1 - i
+        for j in range(start, end + 1):
+            pattern[start][j] = color
+            pattern[end][j] = color
+            pattern[j][start] = color
+            pattern[j][end] = color
+    
+    # Position pattern in output grid
+    start_row = 2
+    start_col = (cols - pattern_size) // 2
+    
+    for r in range(pattern_size):
+        for c in range(pattern_size):
+            output_grid.values[start_row + r][start_col + c] = pattern[r][c]
     
     return output_grid
