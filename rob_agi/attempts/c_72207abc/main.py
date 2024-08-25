@@ -7,8 +7,9 @@ def solve_72207abc(input_grid: ColoredGrid) -> ColoredGrid:
     The pattern:
     1. Extracts the initial sequence of non-zero colors from the middle row.
     2. Repeats this sequence across the row with increasing spacing between repetitions.
-    3. The spacing starts at 1 and increases by 1 after each complete sequence.
-    4. The top and bottom rows remain unchanged (all zeros).
+    3. The spacing starts at 1 and increases by 1 after each color in the sequence.
+    4. The spacing resets to 1 when the sequence restarts.
+    5. The top and bottom rows remain unchanged (all zeros).
     
     Args:
     input_grid (ColoredGrid): The input grid to transform.
@@ -29,26 +30,30 @@ def solve_72207abc(input_grid: ColoredGrid) -> ColoredGrid:
     
     # Fill the middle row
     current_position = 0
-    spacing = 1
     width = len(input_grid.values[1])
+    counter = 0
+    index = 0
     
     while current_position < width:
-        # Add the initial sequence
-        for color in initial_sequence:
-            if current_position < width:
-                new_grid.values[1][current_position] = color
-                current_position += 1
-            else:
-                break
+        # Add the next color from the sequence
+        if current_position < width:
+            new_grid.values[1][current_position] = initial_sequence[index]
+            current_position += 1
         
-        # Add spacing
-        for _ in range(spacing):
+        # Add zeros
+        for _ in range(counter):
             if current_position < width:
                 new_grid.values[1][current_position] = 0
                 current_position += 1
             else:
                 break
         
-        spacing += 1
+        counter += 1
+        index += 1
+        
+        # Reset if we've used all colors in the sequence
+        if index == len(initial_sequence):
+            index = 0
+            counter = 0
     
     return new_grid
