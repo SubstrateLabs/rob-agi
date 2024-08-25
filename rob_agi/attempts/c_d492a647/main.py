@@ -43,26 +43,37 @@ def find_enclosed_regions(grid):
 def solve_d492a647(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the grid transformation challenge by applying the following steps:
-    1. Identifies the color to be added (green or blue) based on the input grid.
-    2. Finds all enclosed black regions in the grid.
-    3. For each enclosed region, applies a checkerboard pattern of the identified color,
-       starting from the top-left corner of the region.
-    4. Preserves all non-black squares and the overall structure of the grid.
+    1. Determines the fill color (blue or green) based on the first non-black, non-gray color found in the input grid.
+    2. Creates a deep copy of the input grid.
+    3. Applies a global checkerboard pattern to the copied grid:
+       - Fills black squares with the determined color where the sum of row and column indices is odd.
+       - Preserves all non-black colors from the input.
+    4. Returns the modified grid.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
 
     Returns:
-    ColoredGrid: The transformed grid with the pattern applied.
+    ColoredGrid: The transformed grid with the checkerboard pattern applied.
     """
-    color_to_add = find_color_to_add(input_grid)
+    # Step 1: Determine the fill color
+    fill_color = 3  # Default to green
+    for row in input_grid.values:
+        for cell in row:
+            if cell not in [0, 5]:  # If not black or gray
+                fill_color = cell
+                break
+        if fill_color != 3:
+            break
+
+    # Step 2: Create a copy of the input grid
     output_grid = input_grid.deep_copy()
-    enclosed_regions = find_enclosed_regions(input_grid)
 
-    for region in enclosed_regions:
-        top_left = min(region)
-        for r, c in region:
-            if (r - top_left[0] + 1) % 2 == 1 and (c - top_left[1] + 1) % 2 == 1:
-                output_grid.values[r][c] = color_to_add
+    # Step 3: Apply the global checkerboard pattern
+    for r in range(len(output_grid.values)):
+        for c in range(len(output_grid.values[r])):
+            if output_grid.values[r][c] == 0 and (r + c) % 2 == 1:
+                output_grid.values[r][c] = fill_color
 
+    # Step 4: Return the modified grid
     return output_grid
