@@ -3,19 +3,20 @@ from typing import List, Tuple
 
 def solve_2f0c5170(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Extracts the most complex pattern from black regions in the input grid,
+    Extracts the most complex pattern from two black regions in the input grid,
     centers it in a reasonably sized output grid, and returns it as a new ColoredGrid.
     
-    1. Identifies all black regions in the input grid
-    2. Analyzes each region for complexity based on non-black cells and unique colors
-    3. Selects the most complex region
-    4. Extracts and trims the chosen region
-    5. Determines an appropriate output grid size
-    6. Centers the pattern in the new grid
-    7. Returns the result as a ColoredGrid
+    1. Identifies the two black regions in the input grid
+    2. Extracts patterns from both black regions
+    3. Compares the complexity of the two patterns based on non-black cells and color variety
+    4. Selects the most complex pattern
+    5. Trims the chosen pattern and ensures a minimal black border
+    6. Determines an appropriate output grid size
+    7. Centers the pattern in the new grid
+    8. Returns the result as a ColoredGrid
     """
     
-    def find_black_regions(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
+    def find_two_black_regions(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
         rows, cols = grid.get_dimensions()
         visited = set()
         regions = []
@@ -35,44 +36,61 @@ def solve_2f0c5170(input_grid: ColoredGrid) -> ColoredGrid:
             for c in range(cols):
                 if grid.get_cell(r, c) == 0 and (r, c) not in visited:
                     regions.append(dfs(r, c))
+                    if len(regions) == 2:
+                        return regions
         
         return regions
 
-    def calculate_complexity(grid: ColoredGrid, region: List[Tuple[int, int]]) -> int:
-        non_black = set()
-        unique_colors = set()
-        for r, c in region:
-            color = grid.get_cell(r, c)
-            if color != 0:
-                non_black.add((r, c))
-                unique_colors.add(color)
-        return len(non_black) * 2 + len(unique_colors) * 3
-
-    def extract_and_trim_region(grid: ColoredGrid, region: List[Tuple[int, int]]) -> ColoredGrid:
+    def extract_pattern(grid: ColoredGrid, region: List[Tuple[int, int]]) -> ColoredGrid:
         min_r = min(r for r, _ in region)
         max_r = max(r for r, _ in region)
         min_c = min(c for _, c in region)
         max_c = max(c for _, c in region)
-        subgrid = grid.extract_subgrid(min_r, min_c, max_r - min_r + 1, max_c - min_c + 1)
         
-        # Trim black edges
-        rows, cols = subgrid.get_dimensions()
-        top = next(r for r in range(rows) if any(subgrid.get_cell(r, c) != 0 for c in range(cols)))
-        bottom = next(r for r in range(rows - 1, -1, -1) if any(subgrid.get_cell(r, c) != 0 for c in range(cols)))
-        left = next(c for c in range(cols) if any(subgrid.get_cell(r, c) != 0 for r in range(rows)))
-        right = next(c for c in range(cols - 1, -1, -1) if any(subgrid.get_cell(r, c) != 0 for r in range(rows)))
+        pattern = ColoredGrid(values=[[0 for _ in range(max_c - min_c + 3)] for _ in range(max_r - min_r + 3)])
+        non_black_cells = 0
+        unique_colors = set()
         
-        return subgrid.extract_subgrid(top, left, bottom - top + 1, right - left + 1)
+        for r in range(min_r - 1, max_r + 2):
+            for c in range(min_c - 1, max_c + 2):
+                if 0 <= r < grid.num_rows and 0 <= c < grid.num_cols:
+                    color = grid.get_cell(r, c)
+                    pattern.set_cell(r - min_r + 1, c - min_c + 1, color)
+                    if color != 0:
+                        non_black_cells += 1
+                        unique_colors.add(color)
+        
+        return pattern, non_black_cells, len(unique_colors)
+
+    def trim_pattern(pattern: ColoredGrid) -> ColoredGrid:
+        rows, cols = pattern.get_dimensions()
+        top = next(r for r in range(rows) if any(pattern.get_cell(r, c) != 0 for c in range(cols)))
+        bottom = next(r for r in range(rows - 1, -1, -1) if any(pattern.get_cell(r, c) != 0 for c in range(cols)))
+        left = next(c for c in range(cols) if any(pattern.get_cell(r, c) != 0 for r in range(rows)))
+        right = next(c for c in range(cols - 1, -1, -1) if any(pattern.get_cell(r, c) != 0 for r in range(rows)))
+        
+        return pattern.extract_subgrid(top, left, bottom - top + 1, right - left + 1)
 
     def determine_output_size(pattern: ColoredGrid) -> Tuple[int, int]:
         rows, cols = pattern.get_dimensions()
         max_dim = max(rows, cols)
         min_dim = min(rows, cols)
-        target_max = min(max_dim + 2, int(min_dim * 1.5) + 2)  # Add padding and limit aspect ratio
-        if rows > cols:
-            return target_max, max(cols + 2, (target_max * cols) // rows)
-        else:
-            return max(rows + 2, (target_max * rows) // cols), target_max
+        
+        # Ensure odd dimensions for perfect centering
+        rows = rows + 1 if rows % 2 == 0 else rows
+        cols = cols + 1 if cols % 2 == 0 else cols
+        
+        # Ensure minimum size of 5x5
+        rows = max(rows, 5)
+        cols = max(cols, 5)
+        
+        # Adjust aspect ratio if necessary
+        if rows > cols * 1.5:
+            cols = max(cols, rows * 2 // 3)
+        elif cols > rows * 1.5:
+            rows = max(rows, cols * 2 // 3)
+        
+        return rows, cols
 
     def center_pattern(pattern: ColoredGrid, output_size: Tuple[int, int]) -> ColoredGrid:
         output_rows, output_cols = output_size
@@ -88,13 +106,20 @@ def solve_2f0c5170(input_grid: ColoredGrid) -> ColoredGrid:
         return centered
 
     # Main logic
-    black_regions = find_black_regions(input_grid)
-    if not black_regions:
-        return ColoredGrid(values=[[0]])  # Return a 1x1 black grid if no regions found
+    black_regions = find_two_black_regions(input_grid)
+    if len(black_regions) < 2:
+        return ColoredGrid(values=[[0]])  # Return a 1x1 black grid if fewer than 2 regions found
     
-    most_complex_region = max(black_regions, key=lambda region: calculate_complexity(input_grid, region))
-    extracted_pattern = extract_and_trim_region(input_grid, most_complex_region)
-    output_size = determine_output_size(extracted_pattern)
-    centered_pattern = center_pattern(extracted_pattern, output_size)
+    patterns = []
+    for region in black_regions[:2]:
+        pattern, non_black_cells, unique_colors = extract_pattern(input_grid, region)
+        patterns.append((pattern, non_black_cells, unique_colors))
+    
+    # Choose the most complex pattern
+    chosen_pattern = max(patterns, key=lambda x: (x[1], x[2]))[0]
+    
+    trimmed_pattern = trim_pattern(chosen_pattern)
+    output_size = determine_output_size(trimmed_pattern)
+    centered_pattern = center_pattern(trimmed_pattern, output_size)
     
     return centered_pattern
