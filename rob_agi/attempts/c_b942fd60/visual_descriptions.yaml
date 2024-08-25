@@ -1,156 +1,136 @@
 example_0:
   input: |
-    A 10x10 grid with mostly black (empty) spaces. There are scattered colored squares:
-    - An orange (7) square in the top right corner
-    - A sky blue (8) square in the top left corner
-    - A green (3) square in the second row, third column
-    - A red (2) square in the third row, first column
-    - An orange (7) square in the middle of the grid
-    - A sky blue (8) square next to the orange one
-    - A magenta (6) square at the right edge of the middle row
-    - An orange (7) square in the bottom left corner
-    - A magenta (6) square in the third-to-last row
-    - Two sky blue (8) squares in the bottom half
+    10x10 grid, predominantly black (0). Colored squares:
+    - Top row: sky blue (8) at (0,4)
+    - 2nd row: green (3) at (1,2), orange (7) at (1,8)
+    - 3rd row: red (2) at (2,0)
+    - 5th row: orange (7) at (4,4), sky blue (8) at (4,6), magenta (6) at (4,9)
+    - 7th row: orange (7) at (6,1), magenta (6) at (6,8)
+    - 8th row: sky blue (8) at (7,4)
+    - 9th row: sky blue (8) at (8,4)
   output: |
-    The grid maintains most of its original structure, but with two significant changes:
-    1. A horizontal red (2) line has been added across the middle of the grid.
-    2. A vertical red (2) line has been added, starting from the top edge, going down to meet the horizontal line.
-    These red lines connect some of the colored squares:
-    - The vertical line starts at the sky blue (8) square in the top left
-    - It passes through the green (3) square
-    - It connects to the horizontal line, which passes through the orange (7) and sky blue (8) squares in the middle
-    - The horizontal line extends to both edges of the grid
-    All other colored squares remain in their original positions.
+    Original structure preserved with two key additions:
+    1. Horizontal red (2) line across row 5, spanning full width.
+    2. Vertical red (2) line in column 5, from top to horizontal line.
+    Red lines connect:
+    - Vertical: sky blue (8) at (0,4) to green (3) at (1,2)
+    - Horizontal: orange (7) at (4,4) to sky blue (8) at (4,6)
+    All other colored squares unchanged. Black spaces fill the rest.
 
 example_1:
   input: |
-    A 12x12 grid with mostly black (empty) spaces. Colored squares are scattered throughout:
-    - Green (3) and orange (7) squares in the top row
-    - Sky blue (8) and orange (7) squares in the second row
-    - A magenta (6) square in the third row
-    - Two sky blue (8) squares in the fourth row
-    - A red (2) square in the fifth row, first column
-    - An orange (7) square in the middle
-    - A magenta (6) square in the bottom right quadrant
-    - Two orange (7) squares and a sky blue (8) square in the bottom three rows
-    - A green (3) square in the bottom right corner
+    12x12 grid, predominantly black (0). Colored squares:
+    - Row 0: green (3) at (0,4), orange (7) at (0,5)
+    - Row 1: sky blue (8) at (1,2), orange (7) at (1,8), green (3) at (1,11)
+    - Row 2: magenta (6) at (2,6)
+    - Row 3: sky blue (8) at (3,3) and (3,9)
+    - Row 4: red (2) at (4,0), sky blue (8) at (4,3)
+    - Row 5: orange (7) at (5,5)
+    - Row 6: magenta (6) at (6,9)
+    - Row 7: orange (7) at (7,2)
+    - Row 9: orange (7) at (9,6)
+    - Row 10: sky blue (8) at (10,7), green (3) at (10,8)
+    - Row 11: orange (7) at (11,4)
   output: |
-    The grid maintains its original colored squares, but adds red (2) lines forming a partial frame or boundary:
-    1. A horizontal red line spans the entire second row from left to right.
-    2. A vertical red line starts from the top, intersects the horizontal line, and continues downward, stopping at the sixth row.
-    3. Another horizontal red line appears in the seventh row, spanning from the left edge to the vertical line.
-    4. A second vertical red line starts from the top right corner, goes down to meet the first horizontal line.
-    These red lines connect or border several of the colored squares:
-    - The top horizontal line passes through the sky blue (8) and orange (7) squares in the second row
-    - The left vertical line starts at the green (3) square in the top row
-    - The right vertical line ends at the orange (7) square in the second row
-    - The bottom horizontal line ends at the magenta (6) square
-    All other colored squares remain in their original positions, some now enclosed by the red lines.
+    Original colored squares preserved. Red (2) lines added:
+    1. Horizontal: full width of row 1
+    2. Vertical: column 1 from top to row 6
+    3. Horizontal: row 6 from left edge to column 1
+    4. Vertical: column 7 from top to row 1
+    Red lines connect:
+    - Horizontal (row 1): sky blue (8) at (1,2) to orange (7) at (1,8)
+    - Vertical (column 1): green (3) at (0,4) to red (2) at (4,0)
+    - Vertical (column 7): ends at orange (7) at (1,8)
+    - Horizontal (row 6): ends at magenta (6) at (6,9)
+    Other colored squares unchanged, some now within red frame.
 
 example_2:
   input: |
-    A 6x6 grid with mostly black (empty) spaces. There are a few colored squares:
-    - A green (3) square in the top row, third column
-    - An orange (7) square in the top right corner
-    - A red (2) square in the third row, first column
-    - A green (3) square in the third row, fifth column
-    - A green (3) square in the bottom row, third column
-    - A sky blue (8) square in the bottom right corner
+    6x6 grid, predominantly black (0). Colored squares:
+    - Row 0: green (3) at (0,2), orange (7) at (0,5)
+    - Row 2: red (2) at (2,0), green (3) at (2,4)
+    - Row 5: green (3) at (5,2), sky blue (8) at (5,5)
   output: |
-    The grid maintains its original colored squares, but adds a red (2) vertical line:
-    1. A red vertical line is added in the fourth column, spanning the entire height of the grid.
-    This red line connects or borders some of the colored squares:
-    - It's adjacent to the green (3) square in the top row
-    - It's adjacent to the green (3) square in the third row
-    - It's adjacent to the green (3) square in the bottom row
-    All other colored squares remain in their original positions.
+    Original colored squares preserved. Added:
+    1. Vertical red (2) line in column 3, full height.
+    Red line adjacent to:
+    - Green (3) squares at (0,2), (2,4), and (5,2)
+    Other colored squares unchanged.
 
 example_3:
   input: |
-    An 8x8 grid with mostly black (empty) spaces. There are a few colored squares:
-    - An orange (7) square in the top row, second column
-    - A green (3) square in the top right corner
-    - A red (2) square in the fourth row, first column
-    - A sky blue (8) square in the fourth row, third column
-    - An orange (7) square in the seventh row, fifth column
+    8x8 grid, predominantly black (0). Colored squares:
+    - Row 0: orange (7) at (0,1), green (3) at (0,7)
+    - Row 3: red (2) at (3,0), sky blue (8) at (3,2)
+    - Row 6: orange (7) at (6,4)
   output: |
-    The grid maintains its original colored squares, but adds red (2) lines forming a partial frame:
-    1. A vertical red line is added in the second column, spanning the entire height of the grid.
-    2. A horizontal red line is added in the second row, spanning from the left edge to the right edge.
-    3. Another vertical red line is added in the seventh column, also spanning the entire height.
-    These red lines connect or border some of the colored squares:
-    - The left vertical line passes through the orange (7) square in the top row
-    - The horizontal line is adjacent to the green (3) square in the top right corner
-    - The left vertical line is adjacent to the red (2) square in the fourth row
-    - The right vertical line is near the orange (7) square in the seventh row
-    All other colored squares remain in their original positions, now partially enclosed by the red lines.
+    Original colored squares preserved. Red (2) lines added:
+    1. Vertical: full height in column 1
+    2. Horizontal: full width in row 1
+    3. Vertical: full height in column 6
+    Red lines interact:
+    - Column 1 line passes through orange (7) at (0,1)
+    - Row 1 line adjacent to green (3) at (0,7)
+    - Column 1 line adjacent to red (2) at (3,0)
+    - Column 6 line near orange (7) at (6,4)
+    Other colored squares unchanged, now within partial red frame.
 
 example_4:
   input: |
-    A 4x6 grid with mostly black (empty) spaces. There are two colored squares:
-    - A red (2) square in the second row, first column
-    - A sky blue (8) square in the second row, fifth column
+    4x6 grid, predominantly black (0). Colored squares:
+    - Row 1: red (2) at (1,0), sky blue (8) at (1,4)
   output: |
-    The grid maintains its original colored squares, but adds a red (2) partial frame:
-    1. A vertical red line is added in the fourth column, spanning the entire height of the grid.
-    2. A horizontal red line is added in the second row, spanning from the left edge to the vertical line.
-    These red lines connect the two colored squares:
-    - The horizontal line starts at the red (2) square and extends rightward
-    - The vertical line is adjacent to the sky blue (8) square
-    The rest of the grid remains black (empty).
+    Original colored squares preserved. Red (2) lines added:
+    1. Vertical: full height in column 3
+    2. Horizontal: row 1 from left edge to column 3
+    Red lines connect:
+    - Horizontal line starts at red (2) at (1,0)
+    - Vertical line adjacent to sky blue (8) at (1,4)
+    Rest of grid remains black (0).
 
 example_5:
   input: |
-    An 8x6 grid with mostly black (empty) spaces. There are several colored squares:
-    - An orange (7) square in the top row, fourth column
-    - A magenta (6) square in the second row, first column
-    - A red (2) square in the fourth row, first column
-    - A sky blue (8) square in the fourth row, fifth column
-    - A sky blue (8) square in the bottom right corner
-    - An orange (7) square in the bottom row, first column
+    8x6 grid, predominantly black (0). Colored squares:
+    - Row 0: orange (7) at (0,3)
+    - Row 1: magenta (6) at (1,0)
+    - Row 3: red (2) at (3,0), sky blue (8) at (3,4)
+    - Row 5: sky blue (8) at (5,5)
+    - Row 7: orange (7) at (7,0)
   output: |
-    The grid maintains its original colored squares, but adds red (2) lines forming a partial frame:
-    1. A vertical red line is added in the second column, spanning the entire height of the grid.
-    2. A horizontal red line is added in the second row, spanning from the left edge to the right edge.
-    3. Another vertical red line is added in the fourth column, also spanning the entire height.
-    These red lines connect or border some of the colored squares:
-    - The right vertical line passes through the orange (7) square in the top row
-    - The horizontal line is adjacent to the magenta (6) square in the second row
-    - The left vertical line is adjacent to the red (2) square in the fourth row
-    - The right vertical line is adjacent to the sky blue (8) square in the fourth row
-    - The left vertical line is adjacent to the orange (7) square in the bottom row
-    All other colored squares remain in their original positions, now partially enclosed by the red lines.
+    Original colored squares preserved. Red (2) lines added:
+    1. Vertical: full height in column 1
+    2. Horizontal: full width in row 1
+    3. Vertical: full height in column 3
+    Red lines interact:
+    - Column 3 line passes through orange (7) at (0,3)
+    - Row 1 line adjacent to magenta (6) at (1,0)
+    - Column 1 line adjacent to red (2) at (3,0) and orange (7) at (7,0)
+    - Column 3 line adjacent to sky blue (8) at (3,4)
+    Sky blue (8) at (5,5) unchanged, within partial red frame.
 
 test_case_0:
   input: |
-    A 10x12 grid with mostly black (empty) spaces. There are several colored squares scattered throughout:
-    - A sky blue (8) square in the top row, fourth column
-    - An orange (7) square in the top row, ninth column
-    - A green (3) square in the top right corner
-    - Two magenta (6) squares in the third row
-    - A red (2) square in the fourth row, first column
-    - A magenta (6) square in the fourth row, seventh column
-    - An orange (7) square in the fourth row, eleventh column
-    - A magenta (6) square in the fifth row, last column
-    - A green (3) square in the sixth row, fourth column
-    - A sky blue (8) square in the sixth row, eighth column
-    - A magenta (6) square in the seventh row, tenth column
-    - An orange (7) square in the eighth row, third column
-    - A green (3) square in the eighth row, last column
-    - A sky blue (8) square in the ninth row, third column
-    - A magenta (6) square in the ninth row, tenth column
-    - A green (3) square in the last row, sixth column
+    10x12 grid, predominantly black (0). Colored squares:
+    - Row 0: sky blue (8) at (0,3), orange (7) at (0,8), green (3) at (0,11)
+    - Row 2: magenta (6) at (2,2) and (2,7)
+    - Row 3: red (2) at (3,0), magenta (6) at (3,6), orange (7) at (3,10)
+    - Row 4: magenta (6) at (4,11)
+    - Row 5: green (3) at (5,3), sky blue (8) at (5,7)
+    - Row 6: magenta (6) at (6,9)
+    - Row 7: orange (7) at (7,2), green (3) at (7,11)
+    - Row 8: sky blue (8) at (8,2), magenta (6) at (8,9)
+    - Row 9: green (3) at (9,5)
   output: |
-    The grid maintains its original colored squares, but adds red (2) lines forming a complex partial frame:
-    1. A horizontal red line spans the entire second row.
-    2. A vertical red line starts from the top, intersects the horizontal line in the second column, and continues down to the seventh row.
-    3. Another vertical red line starts from the top in the sixth column, intersects the horizontal line, and continues all the way to the bottom.
-    4. A second horizontal red line appears in the seventh row, spanning from the left edge to the vertical line in the sixth column.
-    5. Short horizontal red segments appear in the fourth and ninth rows, connecting the two vertical lines.
-    These red lines connect or border several of the colored squares:
-    - The top horizontal line is adjacent to the sky blue (8) and orange (7) squares in the first row
-    - The left vertical line passes through the red (2) square in the fourth row
-    - The right vertical line is adjacent to the green (3) square in the sixth row
-    - The bottom horizontal line ends near the magenta (6) square in the seventh row
-    - The short horizontal segment in the ninth row connects the sky blue (8) and magenta (6) squares
-    All other colored squares remain in their original positions, some now enclosed by the red lines.
+    Original colored squares preserved. Red (2) lines added:
+    1. Horizontal: full width in row 1
+    2. Vertical: column 1 from top to row 6
+    3. Vertical: column 5 from top to bottom
+    4. Horizontal: row 6 from left edge to column 5
+    5. Short horizontals: row 3 and row 8, connecting vertical lines
+    Red lines interact:
+    - Row 1 line adjacent to sky blue (8) at (0,3) and orange (7) at (0,8)
+    - Column 1 line passes through red (2) at (3,0)
+    - Column 5 line adjacent to green (3) at (5,3)
+    - Row 6 line ends near magenta (6) at (6,9)
+    - Row 8 short line connects sky blue (8) at (8,2) and magenta (6) at (8,9)
+    Other colored squares unchanged, some within red frame.
