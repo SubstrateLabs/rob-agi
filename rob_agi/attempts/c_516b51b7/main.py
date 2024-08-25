@@ -9,13 +9,16 @@ def solve_516b51b7(input_grid: ColoredGrid) -> ColoredGrid:
     The solution follows these steps:
     1. Find all connected blue (1) regions in the input grid.
     2. For each region, calculate the distance of each cell from the edge.
-    3. Apply a concentric coloring pattern based on the distance from the edge:
-       - Edge (distance 0): Blue (1)
-       - First inner layer (distance 1): Red (2)
-       - Second inner layer and beyond: Alternating Green (3) and Red (2)
-    4. For larger regions, apply a special center treatment:
-       - For regions with even dimensions, create a 2x2 green center
-       - For regions with odd dimensions, keep the center as determined by the concentric pattern
+    3. Apply a concentric coloring pattern based on the region size:
+       - Small regions (3x3 or smaller): Keep edge blue (1), inner cells red (2)
+       - Medium regions (4x4 or 4x3): Keep edge blue (1), inner cells red (2)
+       - Large regions (5x5 or larger):
+         * Edge (distance 0): Blue (1)
+         * First inner layer (distance 1): Red (2)
+         * Second inner layer (distance 2): Green (3)
+         * Center:
+           - For even dimensions: 2x2 red (2) center
+           - For odd dimensions: Green (3) center
     
     Returns a new ColoredGrid with the transformed pattern.
     """
@@ -55,23 +58,27 @@ def solve_516b51b7(input_grid: ColoredGrid) -> ColoredGrid:
         min_r, min_c, height, width = get_region_dimensions(region)
         max_distance = max(distances.values())
         
-        for r, c in region:
-            d = distances[(r, c)]
-            if d == 0:
-                output_grid.values[r][c] = 1  # Blue edge
-            elif d == 1:
-                output_grid.values[r][c] = 2  # Red first inner layer
-            else:
-                output_grid.values[r][c] = 3 if d % 2 == 0 else 2  # Alternating Green and Red
-        
-        # Special center treatment for larger regions
-        if max_distance >= 2 and (height >= 4 or width >= 4):
-            center_r = min_r + height // 2
-            center_c = min_c + width // 2
-            if height % 2 == 0 and width % 2 == 0:
-                for dr in range(2):
-                    for dc in range(2):
-                        output_grid.values[center_r - 1 + dr][center_c - 1 + dc] = 3  # Green 2x2 center
+        if height <= 3 and width <= 3:  # Small region
+            for r, c in region:
+                output_grid.values[r][c] = 1 if distances[(r, c)] == 0 else 2
+        elif (height == 4 and width <= 4) or (width == 4 and height <= 4):  # Medium region
+            for r, c in region:
+                output_grid.values[r][c] = 1 if distances[(r, c)] == 0 else 2
+        else:  # Large region
+            for r, c in region:
+                d = distances[(r, c)]
+                if d == 0:
+                    output_grid.values[r][c] = 1  # Blue edge
+                elif d == 1:
+                    output_grid.values[r][c] = 2  # Red first inner layer
+                elif d == 2:
+                    output_grid.values[r][c] = 3  # Green second inner layer
+                else:
+                    center_r, center_c = min_r + height // 2, min_c + width // 2
+                    if height % 2 == 0 and width % 2 == 0:
+                        output_grid.values[r][c] = 2 if (abs(r - center_r) < 2 and abs(c - center_c) < 2) else 3
+                    else:
+                        output_grid.values[r][c] = 3
     
     blue_regions = find_connected_regions(1)
     for region in blue_regions:
