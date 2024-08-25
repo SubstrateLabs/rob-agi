@@ -4,15 +4,14 @@ from typing import List, Tuple
 
 def solve_4364c1c4(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by moving shapes based on their vertical position:
+    Transforms the input grid by moving shapes with alternating left-right movements:
     1. Identifies the background color as the most frequent color.
     2. Finds all distinct shapes (connected regions of non-background colors).
     3. Sorts shapes from top to bottom.
     4. Moves shapes:
-       - First half of shapes: 1 cell left
-       - Second half of shapes: 1 cell right and 1 cell down (or 3 right, 1 down if only 2 shapes)
-       - If odd number of shapes, middle shape doesn't move
-    5. Applies movements while keeping shapes within grid bounds.
+       - Odd-numbered shapes: Move left with increasing amounts (1, 2, 3, ...)
+       - Even-numbered shapes: Move right and down with increasing amounts (1, 2, 3, ...)
+    5. Applies movements while keeping shapes within grid bounds and preventing overlaps.
     """
     background_color = Counter([cell for row in input_grid.values for cell in row]).most_common(1)[0][0]
     shapes = find_shapes(input_grid, background_color)
@@ -20,25 +19,19 @@ def solve_4364c1c4(input_grid: ColoredGrid) -> ColoredGrid:
 
     new_grid = ColoredGrid(values=[[background_color for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
 
-    num_shapes = len(shapes)
-    num_move = num_shapes // 2
-
+    movement_counter = 1
     for i, shape in enumerate(shapes):
-        if i < num_move:  # First half of shapes
-            dx, dy = -1, 0
-        elif i >= num_shapes - num_move:  # Second half of shapes
-            if num_shapes == 2:
-                dx, dy = 3, 1
-            elif num_shapes == 4:
-                dx, dy = 2, 1
-            else:
-                dx, dy = 1, 1
-        else:  # Middle shape(s) if odd number of shapes
-            dx, dy = 0, 0
+        if i % 2 == 0:  # Odd-numbered shapes (0-indexed)
+            dx, dy = -movement_counter, 0
+        else:  # Even-numbered shapes
+            dx, dy = movement_counter, movement_counter
 
         new_shape = move_shape(shape, dx, dy, new_grid.num_rows, new_grid.num_cols)
         color = input_grid.values[shape[0][0]][shape[0][1]]
         place_shape(new_grid, new_shape, color)
+
+        if i % 2 == 1:  # Increment counter after each pair
+            movement_counter += 1
 
     return new_grid
 
