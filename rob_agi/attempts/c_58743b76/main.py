@@ -9,7 +9,8 @@ def solve_58743b76(input_grid: ColoredGrid) -> ColoredGrid:
     For target color 1 (blue), the sequence is [4, 2, 3] (yellow, red, green).
     For target color 2 (red), the sequence is [4, 6, 1, 2] (yellow, magenta, blue, red).
     The border (first/last row and column) remains unchanged.
-    The transformation continues until all target colors are replaced or the sequence is exhausted.
+    The transformation continues until all target colors are replaced,
+    with the sequence wrapping around if necessary.
     """
     rows, cols = input_grid.get_dimensions()
     
