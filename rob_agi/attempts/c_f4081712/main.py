@@ -5,30 +5,53 @@ import numpy as np
 
 def solve_f4081712(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the f4081712 challenge by identifying and extracting significant sub-patterns from the input grid.
+    Solve the f4081712 challenge by analyzing the central area of the input grid
+    and generating a condensed representation that captures key color relationships.
     
     The solution involves the following steps:
-    1. Analyze the input grid for color frequencies and patterns.
-    2. Identify the most significant sub-pattern using a sliding window approach, focusing on the center.
-    3. Extract and adjust the chosen sub-pattern, preserving color relationships.
-    4. Resize the pattern to match the expected output size (between 5x5 and 8x8).
-    5. Ensure the output maintains key features, color diversity, and central patterns from the input.
+    1. Analyze the central area of the input grid for color frequencies and transitions.
+    2. Determine the core color palette based on frequency and significance.
+    3. Identify key color relationships and transitions.
+    4. Generate an output grid that reflects these relationships.
+    5. Refine the output to better match the input's central color distribution.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
     
     Returns:
-    ColoredGrid: A condensed representation of the input grid, focusing on central significant sub-patterns.
+    ColoredGrid: A condensed representation of the input grid, focusing on central color relationships.
     """
-    color_freq = count_colors(input_grid)
-    sub_pattern = find_significant_subpattern(input_grid)
+    central_area = extract_central_area(input_grid)
+    color_freq = count_colors(central_area)
+    core_palette = determine_core_palette(color_freq)
+    color_relationships = identify_color_relationships(central_area)
     output_size = determine_output_size(input_grid, color_freq)
-    output_values = resize_pattern(sub_pattern, output_size)
-    output_values = fine_tune_output(output_values, color_freq, input_grid)
+    output_values = generate_output_grid(core_palette, color_relationships, output_size)
+    output_values = refine_output(output_values, color_freq, central_area)
     return ColoredGrid(values=output_values)
 
-def count_colors(grid: ColoredGrid) -> Counter:
-    return Counter(cell for row in grid.values for cell in row)
+def extract_central_area(grid: ColoredGrid) -> List[List[int]]:
+    rows, cols = len(grid.values), len(grid.values[0])
+    start_row, start_col = rows // 4, cols // 4
+    end_row, end_col = 3 * rows // 4, 3 * cols // 4
+    return [row[start_col:end_col] for row in grid.values[start_row:end_row]]
+
+def count_colors(grid: List[List[int]]) -> Counter:
+    return Counter(cell for row in grid for cell in row)
+
+def determine_core_palette(color_freq: Counter) -> List[int]:
+    return [color for color, _ in color_freq.most_common(6)]
+
+def identify_color_relationships(grid: List[List[int]]) -> List[Tuple[int, int]]:
+    relationships = Counter()
+    rows, cols = len(grid), len(grid[0])
+    for i in range(rows):
+        for j in range(cols):
+            if j < cols - 1:
+                relationships[(grid[i][j], grid[i][j+1])] += 1
+            if i < rows - 1:
+                relationships[(grid[i][j], grid[i+1][j])] += 1
+    return [pair for pair, _ in relationships.most_common(10)]
 
 def determine_output_size(grid: ColoredGrid, color_freq: Counter) -> Tuple[int, int]:
     unique_colors = len(color_freq)
@@ -36,46 +59,29 @@ def determine_output_size(grid: ColoredGrid, color_freq: Counter) -> Tuple[int, 
     size = max(5, min(8, unique_colors + input_size // 12))
     return (size, size)
 
-def find_significant_subpattern(grid: ColoredGrid) -> List[List[int]]:
-    rows, cols = len(grid.values), len(grid.values[0])
-    center_row, center_col = rows // 2, cols // 2
-    max_score = float('-inf')
-    best_pattern = None
+def generate_output_grid(core_palette: List[int], color_relationships: List[Tuple[int, int]], output_size: Tuple[int, int]) -> List[List[int]]:
+    rows, cols = output_size
+    output = [[core_palette[0]] * cols for _ in range(rows)]
     
-    for window_size in range(5, min(rows, cols) + 1):
-        half_window = window_size // 2
-        start_row = max(0, center_row - half_window)
-        start_col = max(0, center_col - half_window)
-        end_row = min(rows, center_row + half_window + 1)
-        end_col = min(cols, center_col + half_window + 1)
-        
-        window = [row[start_col:end_col] for row in grid.values[start_row:end_row]]
-        score = calculate_significance(window, grid)
-        if score > max_score:
-            max_score = score
-            best_pattern = window
+    for i in range(rows):
+        for j in range(cols):
+            if i == 0 or j == 0 or i == rows-1 or j == cols-1:
+                output[i][j] = core_palette[1]
     
-    return best_pattern
+    for color1, color2 in color_relationships:
+        placed = False
+        for i in range(1, rows-1):
+            for j in range(1, cols-1):
+                if output[i][j] == color1 and output[i][j+1] == core_palette[0]:
+                    output[i][j+1] = color2
+                    placed = True
+                    break
+            if placed:
+                break
+    
+    return output
 
-def calculate_significance(window: List[List[int]], grid: ColoredGrid) -> float:
-    color_variety = len(set(cell for row in window for cell in row))
-    color_transitions = sum(window[i][j] != window[i][j+1] for i in range(len(window)) for j in range(len(window[0])-1))
-    color_transitions += sum(window[i][j] != window[i+1][j] for i in range(len(window)-1) for j in range(len(window[0])))
-    center_weight = 1 + (len(grid.values) // 2 - abs(len(window) // 2 - len(grid.values) // 2)) / len(grid.values)
-    return (color_variety * 2 + color_transitions * 0.5) * center_weight
-
-def resize_pattern(pattern: List[List[int]], output_size: Tuple[int, int]) -> List[List[int]]:
-    pattern_array = np.array(pattern)
-    target_rows, target_cols = output_size
-    row_scale = target_rows / len(pattern)
-    col_scale = target_cols / len(pattern[0])
-    resized = np.zeros(output_size, dtype=int)
-    for i in range(target_rows):
-        for j in range(target_cols):
-            resized[i, j] = pattern[int(i / row_scale)][int(j / col_scale)]
-    return resized.tolist()
-
-def fine_tune_output(output: List[List[int]], color_freq: Counter, input_grid: ColoredGrid) -> List[List[int]]:
+def refine_output(output: List[List[int]], color_freq: Counter, central_area: List[List[int]]) -> List[List[int]]:
     output_freq = Counter(cell for row in output for cell in row)
     input_colors = set(color_freq.keys())
     output_colors = set(output_freq.keys())
@@ -97,8 +103,9 @@ def fine_tune_output(output: List[List[int]], color_freq: Counter, input_grid: C
     
     # Adjust color frequencies to better match input
     total_cells = len(output) * len(output[0])
+    central_total = sum(color_freq.values())
     for color in input_colors:
-        target_count = int((color_freq[color] / sum(color_freq.values())) * total_cells)
+        target_count = int((color_freq[color] / central_total) * total_cells)
         current_count = output_freq[color]
         while current_count < target_count:
             for i in range(len(output)):
