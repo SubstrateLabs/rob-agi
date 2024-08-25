@@ -8,23 +8,28 @@ def solve_0becf7df(input_grid: ColoredGrid) -> ColoredGrid:
     while maintaining the connectedness of regions. The solution involves:
     1. Preserving the top-left 2x2 square
     2. Identifying all color regions in the input grid, excluding the top-left 2x2 square
-    3. Finding the best pair of color pairs to swap
-    4. Swapping the selected color pairs
-    5. Ensuring the connectedness of the swapped regions
-    6. Minimizing the difference between input and output grids
+    3. Finding all possible combinations of two color pairs to swap
+    4. Trying each combination and checking if it produces the desired result
+    5. Applying the successful swap combination to the input grid
+    6. Ensuring the connectedness of the swapped regions
     7. Returning the transformed grid
     """
     color_regions = find_color_regions(input_grid)
     colors = list(set(color_regions.keys()) - set(get_top_left_colors(input_grid)))
-    best_swap = find_best_color_swap(input_grid, colors)
     
-    new_grid = input_grid.deep_copy()
-    for color1, color2 in best_swap:
+    for (color1, color2), (color3, color4) in combinations(combinations(colors, 2), 2):
+        new_grid = input_grid.deep_copy()
         swap_regions(new_grid, color1, color2)
+        swap_regions(new_grid, color3, color4)
         ensure_connectedness(new_grid, color1)
         ensure_connectedness(new_grid, color2)
+        ensure_connectedness(new_grid, color3)
+        ensure_connectedness(new_grid, color4)
+        
+        if calculate_difference(input_grid, new_grid) > 0:
+            return new_grid
     
-    return new_grid
+    return input_grid
 
 def get_top_left_colors(grid: ColoredGrid) -> Set[int]:
     return {grid.values[i][j] for i in range(2) for j in range(2)}
@@ -70,25 +75,8 @@ def ensure_connectedness(grid: ColoredGrid, color: int):
             if r >= 2 or c >= 2:
                 grid.values[r][c] = color
 
-def find_best_color_swap(grid: ColoredGrid, colors: List[int]) -> List[Tuple[int, int]]:
+from itertools import combinations
+
+def get_color_swap_combinations(colors: List[int]) -> List[Tuple[Tuple[int, int], Tuple[int, int]]]:
     color_pairs = list(combinations(colors, 2))
-    pair_combinations = list(combinations(color_pairs, 2))
-    
-    best_swap = None
-    min_difference = float('inf')
-    
-    for (color1, color2), (color3, color4) in pair_combinations:
-        test_grid = grid.deep_copy()
-        swap_regions(test_grid, color1, color2)
-        swap_regions(test_grid, color3, color4)
-        ensure_connectedness(test_grid, color1)
-        ensure_connectedness(test_grid, color2)
-        ensure_connectedness(test_grid, color3)
-        ensure_connectedness(test_grid, color4)
-        
-        difference = calculate_difference(grid, test_grid)
-        if difference < min_difference:
-            min_difference = difference
-            best_swap = [(color1, color2), (color3, color4)]
-    
-    return best_swap
+    return list(combinations(color_pairs, 2))
