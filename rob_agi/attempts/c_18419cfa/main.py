@@ -5,13 +5,13 @@ def solve_18419cfa(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the 18419cfa challenge by expanding red (2) patterns within sky blue (8) regions.
     
-    The function identifies connected sky blue regions, finds red pixels within them,
-    and expands the red patterns into 3x3 structures. It handles various patterns including
-    single pixels, L-shapes, crosses, and other complex shapes. The expansion creates
-    filled 3x3 squares for single pixels and L-shapes, and 3x3 square rings (hollow centers)
-    for crosses and more complex shapes. The expanded pattern is then repeated vertically
-    to fill the sky blue region, maintaining vertical symmetry. The expansion is contained
-    within the bounds of each sky blue region, and non-sky blue areas are preserved.
+    The function identifies connected sky blue regions, analyzes red patterns within them,
+    and expands these patterns based on their shape and available space. It handles various
+    patterns including single pixels, L-shapes, crosses, and complex shapes. The expansion
+    creates filled shapes for simple patterns and maintains the overall structure for complex
+    ones, filling gaps where possible. The expanded pattern is then repeated vertically to
+    fill the sky blue region, maintaining symmetry. The expansion is contained within the
+    bounds of each sky blue region, and non-sky blue areas are preserved.
     """
     grid = input_grid.deep_copy()
     sky_blue_regions = find_connected_regions(grid, 8)
@@ -52,12 +52,10 @@ def expand_region(grid: ColoredGrid, region: Set[Tuple[int, int]]):
     height = max_r - min_r + 1
     width = max_c - min_c + 1
     
-    if height < 3 or width < 3:
-        for r, c in region:
-            grid.set_cell(r, c, 2)
+    red_pixels = set((r, c) for r, c in region if grid.get_cell(r, c) == 2)
+    if not red_pixels:
         return
 
-    red_pixels = set((r, c) for r, c in region if grid.get_cell(r, c) == 2)
     template = create_expansion_template(red_pixels, min_r, min_c, max_r, max_c)
     
     template_height = len(template)
@@ -69,7 +67,7 @@ def expand_region(grid: ColoredGrid, region: Set[Tuple[int, int]]):
     for i in range(repetitions):
         for r in range(template_height):
             for c in range(width):
-                if template[r][c] == 2:
+                if template[r][c] == 2 and (start_r + i * template_height + r, min_c + c) in region:
                     grid.set_cell(start_r + i * template_height + r, min_c + c, 2)
 
 def get_region_bounds(region: Set[Tuple[int, int]]) -> Tuple[int, int, int, int]:
@@ -84,14 +82,19 @@ def create_expansion_template(red_pixels: Set[Tuple[int, int]], min_r: int, min_
     width = max_c - min_c + 1
     template = [[0 for _ in range(width)] for _ in range(height)]
     
+    # Determine if it's a complex shape
+    is_complex = len(red_pixels) > 4 or (max(r for r, _ in red_pixels) - min(r for r, _ in red_pixels) > 2) or (max(c for _, c in red_pixels) - min(c for _, c in red_pixels) > 2)
+    
     for r, c in red_pixels:
         r, c = r - min_r, c - min_c
         for dr in range(-1, 2):
             for dc in range(-1, 2):
                 nr, nc = r + dr, c + dc
                 if 0 <= nr < height and 0 <= nc < width:
-                    if dr == 0 and dc == 0 and len(red_pixels) > 1:
-                        template[nr][nc] = 0  # Hollow center for complex shapes
+                    if is_complex and (dr == 0 and dc == 0):
+                        template[nr][nc] = 2  # Fill center for complex shapes
+                    elif not is_complex and (dr == 0 and dc == 0) and len(red_pixels) > 1:
+                        template[nr][nc] = 0  # Hollow center for simple shapes with multiple pixels
                     else:
                         template[nr][nc] = 2
     
