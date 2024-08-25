@@ -42,7 +42,8 @@ def solve_a680ac02(input_grid: ColoredGrid) -> ColoredGrid:
     Solve the challenge by identifying square outlines in the input grid,
     standardizing them to 4x4 size, and arranging them in a new grid.
     The function ignores solid squares and focuses only on outlines.
-    Outlines are sorted by color and arranged vertically if there are two, horizontally otherwise.
+    Outlines are sorted by their position in the input grid (top-to-bottom, left-to-right)
+    and arranged horizontally if there are three or more, vertically if there are two.
     """
     outlines: List[Tuple[int, int, int, int]] = []  # (color, row, col, size)
     standard_size = 4
@@ -58,11 +59,14 @@ def solve_a680ac02(input_grid: ColoredGrid) -> ColoredGrid:
     if not outlines:
         return ColoredGrid(values=[[0]])
 
-    # Sort outlines by color
-    outlines.sort(key=lambda x: x[0])
+    # Sort outlines by position (top-to-bottom, left-to-right)
+    outlines.sort(key=lambda x: (x[1], x[2]))
 
     # Determine arrangement
-    if len(outlines) == 2:
+    if len(outlines) == 1:
+        output_height = 4
+        output_width = 4
+    elif len(outlines) == 2:
         output_height = 8
         output_width = 4
     else:
