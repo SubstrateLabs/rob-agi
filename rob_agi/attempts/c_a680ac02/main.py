@@ -40,8 +40,9 @@ def copy_outline(source: ColoredGrid, target: ColoredGrid, src_row: int, src_col
 def solve_a680ac02(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the challenge by identifying square outlines in the input grid,
-    standardizing them to 4x4 size, and arranging them compactly in a new grid.
+    standardizing them to 4x4 size, and arranging them in a new grid.
     The function ignores solid squares and focuses only on outlines.
+    Outlines are arranged vertically if there are two, horizontally otherwise.
     """
     outlines: List[Tuple[int, int, int, int]] = []  # (color, row, col, size)
     standard_size = 4
@@ -57,28 +58,25 @@ def solve_a680ac02(input_grid: ColoredGrid) -> ColoredGrid:
     if not outlines:
         return ColoredGrid(values=[[0]])
 
-    if len(outlines) == 1:
-        return standardize_outline(input_grid, outlines[0], standard_size)
-
-    # Determine optimal arrangement
-    num_outlines = len(outlines)
-    sqrt_outlines = math.isqrt(num_outlines)
-    if sqrt_outlines * sqrt_outlines == num_outlines:
-        rows = cols = sqrt_outlines
-    elif sqrt_outlines * (sqrt_outlines + 1) >= num_outlines:
-        rows, cols = sqrt_outlines, sqrt_outlines + 1
+    # Determine arrangement
+    if len(outlines) == 2:
+        output_height = 8
+        output_width = 4
     else:
-        rows, cols = sqrt_outlines + 1, sqrt_outlines + 1
+        output_height = 4
+        output_width = 4 * len(outlines)
 
     # Create output grid
-    output_height = rows * standard_size
-    output_width = cols * standard_size
     result = ColoredGrid(values=[[0 for _ in range(output_width)] for _ in range(output_height)])
 
     # Place standardized outlines in the output grid
     for i, (color, src_row, src_col, _) in enumerate(outlines):
-        tgt_row = (i // cols) * standard_size
-        tgt_col = (i % cols) * standard_size
+        if len(outlines) == 2:
+            tgt_row = i * 4
+            tgt_col = 0
+        else:
+            tgt_row = 0
+            tgt_col = i * 4
         standardized = standardize_outline(input_grid, (color, src_row, src_col, standard_size), standard_size)
         copy_subgrid(standardized, result, 0, 0, tgt_row, tgt_col, standard_size, standard_size)
 
