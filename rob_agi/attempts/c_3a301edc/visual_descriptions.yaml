@@ -1,0 +1,35 @@
+example_0:
+  input: |
+    A 19x13 grid with a yellow (4) rectangular shape in the center. The shape is 7x8 squares and has a smaller 4x4 gray (5) rectangle inside it. The yellow rectangle is surrounded by black (0) space.
+  output: |
+    The yellow rectangle has been expanded by adding a 2-square thick gray border around it. This new gray border extends into the previously black space, creating an 11x12 gray rectangle. The inner yellow and gray pattern remains unchanged. The rest of the grid remains black.
+
+example_1:
+  input: |
+    A 14x13 grid with a green (3) cross-like shape in the center. The shape is 5x5 squares with a single blue (1) square in the very center. The green shape is surrounded by black (0) space.
+  output: |
+    The green cross shape has been enclosed in a blue border. This blue border is one square thick and forms a complete 7x7 square around the original green shape. The inner green cross and blue center remain unchanged. The rest of the grid remains black.
+
+example_2:
+  input: |
+    A 14x15 grid with a magenta (6) square shape in the center. The shape is 4x4 squares with a 2x2 yellow (4) square inside it at the top-left corner. The magenta shape is surrounded by black (0) space.
+  output: |
+    The magenta square has been enclosed in a yellow border. This yellow border is two squares thick and forms a complete 8x8 square around the original magenta shape. The inner magenta square and yellow corner remain unchanged. The rest of the grid remains black.
+
+example_3:
+  input: |
+    A 17x16 grid with a gray (5) rectangular shape in the center. The shape is 7x7 squares and has a smaller 3x3 red (2) square inside it at the center. The gray rectangle is surrounded by black (0) space.
+  output: |
+    The gray rectangle has been enclosed in a red border. This red border is three squares thick and forms a complete 13x13 square around the original gray shape. The inner gray square and red center remain unchanged. The rest of the grid remains black.
+
+example_4:
+  input: |
+    An 11x12 grid with a blue (1) cross-like shape in the center. The shape is 3x3 squares with a single red (2) square in the very center. The blue shape is surrounded by black (0) space.
+  output: |
+    The blue cross shape has been enclosed in a red border. This red border is one square thick and forms a complete 5x5 square around the original blue shape. The inner blue cross and red center remain unchanged. The rest of the grid remains black.
+
+test_case_0:
+  input: |
+    An 11x12 grid with a blue (1) cross-like shape in the center. The shape is 3x3 squares with a single red (2) square in the very center. The blue shape is surrounded by black (0) space.
+  output: |
+    The output is not provided for this test case.
