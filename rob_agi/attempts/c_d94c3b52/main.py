@@ -4,22 +4,18 @@ from collections import deque
 
 def solve_d94c3b52(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the grid transformation challenge by applying the following rules:
-    1. Identifies connected regions of the same color.
-    2. Applies color cycling: Blue (1) -> Sky Blue (8) -> Orange (7) -> Blue (1)
-    3. Ensures no two adjacent regions end up with the same color (except blue).
-    4. Preserves the overall structure and patterns of the input grid.
+    Solves the grid transformation challenge by applying the following steps:
+    1. Identifies connected regions of non-black colors.
+    2. Analyzes the global structure and color distribution.
+    3. Applies color transformations based on region size, position, and adjacent colors.
+    4. Maintains overall balance and visual distinctiveness.
+    5. Preserves small sky blue "anchor" regions and key patterns.
+    6. Ensures no large adjacent regions have the same non-blue color.
     """
-    # Step 1: Identify connected regions
     regions = find_connected_regions(input_grid)
-    
-    # Step 2: Create a graph representation of adjacent regions
     region_graph = create_region_graph(regions)
-    
-    # Step 3: Apply color cycling logic
-    new_colors = apply_color_cycling(regions, region_graph)
-    
-    # Step 4: Create and return the new grid
+    color_distribution = analyze_color_distribution(input_grid)
+    new_colors = apply_color_transformations(regions, region_graph, color_distribution)
     return create_new_grid(input_grid, regions, new_colors)
 
 def find_connected_regions(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
@@ -61,20 +57,37 @@ def are_adjacent(region1: List[Tuple[int, int]], region2: List[Tuple[int, int]])
             return True
     return False
 
-def apply_color_cycling(regions: List[List[Tuple[int, int]]], graph: Dict[int, List[int]]) -> List[int]:
+def analyze_color_distribution(grid: ColoredGrid) -> Dict[int, int]:
+    distribution = {1: 0, 7: 0, 8: 0}  # Blue, Orange, Sky Blue
+    for row in grid.values:
+        for cell in row:
+            if cell in distribution:
+                distribution[cell] += 1
+    return distribution
+
+def apply_color_transformations(regions: List[List[Tuple[int, int]]], graph: Dict[int, List[int]], color_distribution: Dict[int, int]) -> List[int]:
     new_colors = []
     for i, region in enumerate(regions):
         color = region[0][1]  # Get color of the region
-        if color == 8:  # Sky blue always changes to orange
+        size = len(region)
+        
+        if size <= 4 and color == 8:  # Small sky blue "anchor" regions
+            new_colors.append(8)
+        elif color == 8 and size > 4:  # Large sky blue regions change to orange
             new_colors.append(7)
         elif color == 7:  # Orange always changes to blue
             new_colors.append(1)
-        else:  # Blue can stay blue or change to sky blue
+        else:  # Blue regions
             adjacent_colors = [new_colors[j] for j in graph[i] if j < i]
-            if 8 in adjacent_colors or 7 in adjacent_colors:
+            if 8 not in adjacent_colors and color_distribution[8] < color_distribution[1]:
                 new_colors.append(8)
             else:
                 new_colors.append(1)
+        
+        # Update color distribution
+        color_distribution[color] -= size
+        color_distribution[new_colors[-1]] += size
+    
     return new_colors
 
 def create_new_grid(input_grid: ColoredGrid, regions: List[List[Tuple[int, int]]], new_colors: List[int]) -> ColoredGrid:
