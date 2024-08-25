@@ -6,63 +6,15 @@ def solve_50f325b5(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Expand yellow (8) regions in the grid based on the following rules:
     1. Identify all yellow regions in the input grid.
-    2. For each region, calculate an expansion factor based on its size and grid dimensions.
-    3. Create an expansion boundary around each region, larger on the right and bottom.
-    4. Implement a probabilistic expansion within the boundary, favoring right and down directions.
-    5. Resolve conflicts between expanding regions.
-    6. Ensure connectivity in the final expanded regions.
+    2. Calculate expansion energy for each region based on its size and grid dimensions.
+    3. Implement a probabilistic expansion process, favoring cells adjacent to yellow regions.
+    4. Expand regions based on their energy and surrounding space.
+    5. Perform final smoothing to ensure connectivity and remove isolated cells.
     """
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
     processed = set()
     random.seed(42)  # For reproducibility
-
-    def is_valid_position(r, c):
-        return 0 <= r < rows and 0 <= c < cols
-
-    def get_expansion_factor(region_size):
-        grid_area = rows * cols
-        return min(int(region_size * 0.5), int(grid_area * 0.1))
-
-    def get_expansion_boundary(region):
-        min_r = min(r for r, _ in region)
-        max_r = max(r for r, _ in region)
-        min_c = min(c for _, c in region)
-        max_c = max(c for _, c in region)
-        height = max_r - min_r + 1
-        width = max_c - min_c + 1
-        return (
-            max(0, min_r - height // 2),
-            max(0, min_c - width // 2),
-            min(rows - 1, max_r + height),
-            min(cols - 1, max_c + width * 2)
-        )
-
-    def expand_region(region):
-        expansion_factor = get_expansion_factor(len(region))
-        boundary = get_expansion_boundary(region)
-        expansion_queue = deque(sorted(region, key=lambda x: (x[1], x[0])))  # Prioritize right and down
-        expanded = 0
-
-        while expansion_queue and expanded < expansion_factor:
-            r, c = expansion_queue.popleft()
-            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                nr, nc = r + dr, c + dc
-                if (is_valid_position(nr, nc) and
-                    boundary[0] <= nr <= boundary[2] and
-                    boundary[1] <= nc <= boundary[3] and
-                    (nr, nc) not in processed and
-                    grid.get_cell(nr, nc) != 8):
-                    
-                    # Probabilistic expansion
-                    prob = 0.8 if dr >= 0 and dc >= 0 else 0.2
-                    if random.random() < prob:
-                        grid.set_cell(nr, nc, 8)
-                        processed.add((nr, nc))
-                        expansion_queue.append((nr, nc))
-                        expanded += 1
-                        if expanded >= expansion_factor:
-                            break
 
     def get_region(start_r, start_c):
         region = []
@@ -74,24 +26,62 @@ def solve_50f325b5(input_grid: ColoredGrid) -> ColoredGrid:
                 region.append((r, c))
                 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
                     nr, nc = r + dr, c + dc
-                    if is_valid_position(nr, nc) and (nr, nc) not in processed:
+                    if 0 <= nr < rows and 0 <= nc < cols and (nr, nc) not in processed:
                         queue.append((nr, nc))
         return region
 
-    # Identify and expand all yellow regions
+    # Identify yellow regions
+    yellow_regions = []
     for r in range(rows):
         for c in range(cols):
             if grid.get_cell(r, c) == 8 and (r, c) not in processed:
-                region = get_region(r, c)
-                expand_region(region)
+                yellow_regions.append(get_region(r, c))
 
-    # Final pass to ensure connectivity
+    # Calculate expansion energy
+    grid_area = rows * cols
+    energies = [min(len(region) * 0.5, grid_area * 0.1) for region in yellow_regions]
+
+    # Expansion process
+    candidates = set()
+    for region in yellow_regions:
+        for r, c in region:
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < rows and 0 <= nc < cols and grid.get_cell(nr, nc) != 8:
+                    candidates.add((nr, nc))
+
+    while candidates and any(energy > 0 for energy in energies):
+        r, c = candidates.pop()
+        if grid.get_cell(r, c) == 8:
+            continue
+
+        # Calculate expansion probability
+        yellow_neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                               if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.get_cell(r+dr, c+dc) == 8)
+        nearest_region_index = min(range(len(yellow_regions)), 
+                                   key=lambda i: min((r-yr)**2 + (c-yc)**2 for yr, yc in yellow_regions[i]))
+        prob = min(1.0, energies[nearest_region_index] / 100 + yellow_neighbors * 0.2)
+
+        if random.random() < prob:
+            grid.set_cell(r, c, 8)
+            energies[nearest_region_index] -= 1
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < rows and 0 <= nc < cols and grid.get_cell(nr, nc) != 8:
+                    candidates.add((nr, nc))
+
+    # Connectivity and smoothing
     for r in range(rows):
         for c in range(cols):
-            if grid.get_cell(r, c) != 8:
-                neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
-                                if is_valid_position(r+dr, c+dc) and grid.get_cell(r+dr, c+dc) == 8)
-                if neighbors >= 3:
-                    grid.set_cell(r, c, 8)
+            if grid.get_cell(r, c) == 8:
+                yellow_neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                                       if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.get_cell(r+dr, c+dc) == 8)
+                if yellow_neighbors == 0:
+                    grid.set_cell(r, c, 0)  # Remove isolated yellow cells
+            else:
+                yellow_neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                                       if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.get_cell(r+dr, c+dc) == 8)
+                if yellow_neighbors >= 3:
+                    grid.set_cell(r, c, 8)  # Convert to yellow if surrounded
 
     return grid
