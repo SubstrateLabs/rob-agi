@@ -8,9 +8,9 @@ def solve_baf41dbf(input_grid: ColoredGrid) -> ColoredGrid:
 
     1. Analyzes the input grid to find green cells and magenta dots.
     2. Determines the bounding box of the original green shape.
-    3. Calculates the aspect ratio of the original shape.
-    4. Expands the shape while maintaining the aspect ratio, stopping at grid edges or before magenta dots.
-    5. Scales and preserves the interior structure of the original green shape.
+    3. Finds the maximum possible expansion in all directions.
+    4. Creates a new grid with the expanded dimensions.
+    5. Scales and recreates the shape in the new grid, preserving internal structure.
     6. Adds the original magenta dots to the new grid.
     7. Returns the transformed grid.
     """
@@ -32,14 +32,9 @@ def solve_baf41dbf(input_grid: ColoredGrid) -> ColoredGrid:
     min_c = min(c for _, c in green_cells)
     max_c = max(c for _, c in green_cells)
 
-    # 3. Calculate aspect ratio
-    original_width = max_c - min_c + 1
-    original_height = max_r - min_r + 1
-    aspect_ratio = original_width / original_height
-
-    # 4. Expand the shape
+    # 3. Find maximum possible expansion
     def find_boundary(coord, step, limit):
-        while coord + step >= 0 and coord + step < limit:
+        while 0 <= coord + step < limit:
             if any((coord + step == r and step != 0) or (coord + step == c and step == 0) for r, c in magenta_dots):
                 break
             coord += step
@@ -50,31 +45,24 @@ def solve_baf41dbf(input_grid: ColoredGrid) -> ColoredGrid:
     top = find_boundary(min_r, -1, rows)
     bottom = find_boundary(max_r, 1, rows)
 
+    # 4. Create new grid with expanded dimensions
+    new_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
+
+    # 5. Scale and recreate the shape
     new_width = right - left + 1
     new_height = bottom - top + 1
+    x_scale = new_width / (max_c - min_c + 1)
+    y_scale = new_height / (max_r - min_r + 1)
 
-    # Adjust to maintain aspect ratio
-    if new_width / new_height > aspect_ratio:
-        new_width = int(new_height * aspect_ratio)
-        right = left + new_width - 1
-    else:
-        new_height = int(new_width / aspect_ratio)
-        bottom = top + new_height - 1
-
-    # 5. Create new grid and scale internal structure
-    new_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
-    scale_x = new_width / original_width
-    scale_y = new_height / original_height
-
-    for r in range(top, bottom + 1):
-        for c in range(left, right + 1):
-            new_grid.set_cell(r, c, 3)
-
-    for r, c in green_cells:
-        if input_grid.get_cell(r, c) == 0:
-            new_r = int((r - min_r) * scale_y) + top
-            new_c = int((c - min_c) * scale_x) + left
-            new_grid.set_cell(new_r, new_c, 0)
+    for new_r in range(top, bottom + 1):
+        for new_c in range(left, right + 1):
+            orig_r = min_r + (new_r - top) / y_scale
+            orig_c = min_c + (new_c - left) / x_scale
+            orig_r_int, orig_c_int = int(orig_r), int(orig_c)
+            if (orig_r_int, orig_c_int) in green_cells:
+                new_grid.set_cell(new_r, new_c, 3)
+            elif input_grid.get_cell(orig_r_int, orig_c_int) == 0:
+                new_grid.set_cell(new_r, new_c, 0)
 
     # 6. Add magenta dots
     for r, c in magenta_dots:
