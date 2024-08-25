@@ -1,37 +1,45 @@
 from rob_agi.colored_grid import ColoredGrid
+from collections import deque
 
 def solve_9caba7c3(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by applying the following rules:
-    1. Changes each red (2) square to yellow (4).
-    2. Changes adjacent gray (5) or red (2) squares to orange (7).
-    3. Preserves the original state of other colors.
-    4. Applies transformations simultaneously by referring to the original grid state.
+    1. Preserves red (2) squares in the upper-left quadrant.
+    2. Changes other red (2) squares to yellow (4).
+    3. Propagates orange (7) color from yellow squares to the right and below,
+       replacing gray (5) or red (2) squares.
+    4. Preserves the original state of other colors.
+    5. Applies transformations based on the original grid state.
     """
-    # Create a deep copy of the input grid
     original_grid = input_grid.deep_copy()
-    
-    # Find all red squares
-    red_squares = []
-    for row in range(len(original_grid.values)):
-        for col in range(len(original_grid.values[0])):
+    new_grid = input_grid.deep_copy()
+    height, width = len(original_grid.values), len(original_grid.values[0])
+    mid_row, mid_col = height // 2, width // 2
+
+    def is_upper_left_quadrant(row, col):
+        return row < mid_row and col < mid_col
+
+    def propagate_orange(start_row, start_col):
+        queue = deque([(start_row, start_col)])
+        while queue:
+            row, col = queue.popleft()
+            for dr, dc in [(0, 1), (1, 0)]:  # Right and below
+                new_row, new_col = row + dr, col + dc
+                if (0 <= new_row < height and 0 <= new_col < width and
+                    original_grid.values[new_row][new_col] in [2, 5] and
+                    new_grid.values[new_row][new_col] != 7):
+                    new_grid.values[new_row][new_col] = 7
+                    queue.append((new_row, new_col))
+
+    yellow_squares = []
+    for row in range(height):
+        for col in range(width):
             if original_grid.values[row][col] == 2:
-                red_squares.append((row, col))
-    
-    # Create a second copy for transformations
-    transformed_grid = original_grid.deep_copy()
-    
-    # Apply transformations
-    for row, col in red_squares:
-        # Change red to yellow
-        transformed_grid.values[row][col] = 4
-        
-        # Check and transform adjacent squares
-        adjacent = [(row-1, col), (row+1, col), (row, col-1), (row, col+1)]
-        for adj_row, adj_col in adjacent:
-            if 0 <= adj_row < len(original_grid.values) and 0 <= adj_col < len(original_grid.values[0]):
-                if original_grid.values[adj_row][adj_col] in [2, 5]:
-                    transformed_grid.values[adj_row][adj_col] = 7
-    
-    # Return the transformed grid
-    return transformed_grid
+                if not is_upper_left_quadrant(row, col):
+                    new_grid.values[row][col] = 4
+                    yellow_squares.append((row, col))
+
+    for row, col in yellow_squares:
+        propagate_orange(row, col)
+
+    return new_grid
