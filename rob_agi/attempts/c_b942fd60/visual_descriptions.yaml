@@ -1,115 +1,112 @@
 example_0:
   input: |
-    A 10x10 grid with scattered colored squares. The grid is mostly empty (black), with a few colored squares:
-    - An sky blue (8) square in the top right corner
-    - A green (3) square in the second row, third column
-    - A red (2) square in the third row, first column
-    - An orange (7) square in the middle of the grid
-    - A sky blue (8) square and a magenta (6) square in the fifth row
-    - An orange (7) square, a magenta (6) square, and a sky blue (8) square scattered in the bottom half
+    A 10x10 grid with scattered colored squares on a black background:
+    - Sky blue (8): top-right corner (0,9), fifth row fifth column (4,4)
+    - Green (3): second row third column (1,2)
+    - Red (2): third row first column (2,0)
+    - Orange (7): fifth row fifth column (4,4), seventh row second column (6,1)
+    - Magenta (6): fifth row tenth column (4,9), eighth row third column (7,2)
+    - Additional sky blue (8): ninth row fifth column (8,4)
   output: |
-    The same 10x10 grid, but with two significant changes:
-    1. A red (2) line has been drawn from the original red square in the top-left, extending right and then down, forming an "L" shape.
-    2. Another red (2) line has been drawn horizontally across the middle of the grid.
-    All other colored squares remain in their original positions.
+    The 10x10 grid with added red (2) lines connecting non-black squares:
+    1. Horizontal line: from (2,0) to (2,9)
+    2. Vertical line: from (0,4) to (9,4)
+    3. Short horizontal segment: from (4,4) to (4,9)
+    All original colored squares maintain their positions. The red lines form a T-shape, efficiently connecting all non-black squares.
 
 example_1:
   input: |
-    A 12x12 grid with various colored squares scattered throughout:
-    - Green (3) and orange (7) squares in the top row
-    - Sky blue (8) and orange (7) squares in the second row
-    - A magenta (6) square in the third row
-    - Two sky blue (8) squares in the fourth row
-    - A red (2) square and a sky blue (8) square in the fifth row
-    - An orange (7) square in the sixth row
-    - A magenta (6) square in the seventh row
-    - An orange (7) square in the eighth row
-    - Two orange (7) squares in the ninth row
-    - A magenta (6) square in the tenth row
-    - Green (3) and sky blue (8) squares in the eleventh row
-    - An orange (7) square in the last row
+    A 12x12 grid with colored squares on a black background:
+    - Row 0: Green (3) at (0,4), Orange (7) at (0,5)
+    - Row 1: Sky blue (8) at (1,2), Orange (7) at (1,8), Green (3) at (1,11)
+    - Row 2: Magenta (6) at (2,6)
+    - Row 3: Sky blue (8) at (3,3) and (3,9)
+    - Row 4: Red (2) at (4,0), Sky blue (8) at (4,4)
+    - Row 5: Orange (7) at (5,5)
+    - Row 6: Magenta (6) at (6,9)
+    - Row 7: Orange (7) at (7,2)
+    - Row 8: Orange (7) at (8,4) and (8,9)
+    - Row 9: Magenta (6) at (9,3)
+    - Row 10: Green (3) at (10,1), Sky blue (8) at (10,7)
+    - Row 11: Orange (7) at (11,4)
   output: |
-    The same 12x12 grid, but with red (2) lines added:
-    1. A horizontal red line in the second row, connecting the sky blue and orange squares
-    2. A vertical red line from the top, passing through the magenta square in the third row, and extending to the bottom
-    3. An "L" shaped red line starting from the red square in the fifth row, extending right and then down to the bottom
-    The red lines form a kind of irregular grid pattern. All original colored squares remain in their positions.
+    The 12x12 grid with added red (2) lines connecting non-black squares:
+    1. Horizontal lines:
+       - Row 1: from (1,1) to (1,11)
+       - Row 5: from (5,0) to (5,11)
+    2. Vertical lines:
+       - Column 2: from (0,2) to (11,2)
+       - Column 5: from (0,5) to (11,5)
+       - Column 9: from (0,9) to (11,9)
+    The red lines form a grid-like pattern, efficiently connecting all non-black squares. All original colored squares maintain their positions.
 
 example_2:
   input: |
-    A 6x6 grid with a few colored squares:
-    - A green (3) square in the top row, third column
-    - An orange (7) square in the top right corner
-    - A red (2) square in the third row, first column
-    - A green (3) square in the third row, fifth column
-    - A green (3) square in the bottom row, third column
-    - A sky blue (8) square in the bottom right corner
+    A 6x6 grid with colored squares on a black background:
+    - Green (3): (0,2), (2,4), (5,2)
+    - Orange (7): (0,5)
+    - Red (2): (2,0)
+    - Sky blue (8): (5,5)
   output: |
-    The same 6x6 grid, but with a red (2) line added:
-    The line starts from the original red square in the third row, first column, extends up to the second row, then right to the fourth column, and finally down to the bottom of the grid.
-    This forms a rectangular shape encompassing the central area of the grid.
-    All original colored squares remain in their positions.
+    The 6x6 grid with added red (2) lines connecting non-black squares:
+    1. Vertical line: from (0,2) to (5,2)
+    2. Horizontal line: from (2,0) to (2,5)
+    3. Short vertical segment: from (2,4) to (5,4)
+    The red lines form a T-shape with an additional vertical segment, efficiently connecting all non-black squares. All original colored squares maintain their positions.
 
 example_3:
   input: |
-    An 8x8 grid with scattered colored squares:
-    - An orange (7) square in the top left corner
-    - A green (3) square in the top right corner
-    - A red (2) square and a sky blue (8) square in the fourth row
-    - An orange (7) square near the bottom right
+    An 8x8 grid with colored squares on a black background:
+    - Orange (7): (0,0), (6,4)
+    - Green (3): (0,7)
+    - Red (2): (3,0)
+    - Sky blue (8): (3,3)
   output: |
-    The same 8x8 grid, but with red (2) lines added:
-    1. A horizontal red line in the second row, extending from left to right
-    2. A vertical red line from the top to bottom, two columns from the right edge
-    These lines form an "L" shape, with the corner in the top-right area of the grid.
-    All original colored squares remain in their positions.
+    The 8x8 grid with added red (2) lines connecting non-black squares:
+    1. Horizontal line: from (1,0) to (1,7)
+    2. Vertical line: from (0,6) to (7,6)
+    3. Short horizontal segment: from (3,0) to (3,3)
+    4. Short vertical segment: from (3,3) to (6,3)
+    The red lines form an inverted L-shape with additional segments, efficiently connecting all non-black squares. All original colored squares maintain their positions.
 
 example_4:
   input: |
-    A 4x6 grid with only two colored squares:
-    - A red (2) square in the second row, first column
-    - A sky blue (8) square in the second row, fifth column
+    A 4x6 grid with colored squares on a black background:
+    - Red (2): (1,0)
+    - Sky blue (8): (1,4)
   output: |
-    The same 4x6 grid, but with a red (2) line added:
-    The line starts from the original red square, extends up to the top row, then right to the fourth column, and finally down to the bottom of the grid.
-    This forms a rectangular shape encompassing the central area of the grid.
-    The original sky blue square remains in its position.
+    The 4x6 grid with added red (2) lines connecting non-black squares:
+    1. Horizontal line: from (1,0) to (1,4)
+    2. Vertical line: from (0,3) to (3,3)
+    The red lines form an L-shape, efficiently connecting the two non-black squares. All original colored squares maintain their positions.
 
 example_5:
   input: |
-    An 8x6 grid with scattered colored squares:
-    - An orange (7) square in the top right corner
-    - A magenta (6) square in the second row, first column
-    - A red (2) square in the fourth row, first column
-    - A sky blue (8) square in the fourth row, fifth column
-    - A sky blue (8) square in the bottom right corner
-    - An orange (7) square in the bottom left corner
+    An 8x6 grid with colored squares on a black background:
+    - Orange (7): (0,3), (7,0)
+    - Magenta (6): (1,0)
+    - Red (2): (3,0)
+    - Sky blue (8): (3,4), (5,5)
   output: |
-    The same 8x6 grid, but with red (2) lines added:
-    1. A vertical red line from top to bottom in the second column
-    2. A horizontal red line in the fourth row, extending from the original red square to the right edge of the grid
-    These lines form an "L" shape, with the corner in the top-left area of the grid.
-    All original colored squares remain in their positions.
+    The 8x6 grid with added red (2) lines connecting non-black squares:
+    1. Vertical line: from (0,1) to (7,1)
+    2. Horizontal lines: from (1,0) to (1,5), from (3,0) to (3,5)
+    The red lines form a double-T shape, efficiently connecting all non-black squares. All original colored squares maintain their positions.
 
 test_case_0:
   input: |
-    A 10x12 grid with various colored squares scattered throughout:
-    - A sky blue (8) square in the top row, fourth column
-    - An orange (7) square in the top row, ninth column
-    - A green (3) square in the top right corner
-    - Two magenta (6) squares in the third row
-    - A red (2) square and a magenta (6) square in the fourth row
-    - A magenta (6) square in the fifth row, last column
-    - A green (3) square and a sky blue (8) square in the sixth row
-    - A magenta (6) square in the seventh row, tenth column
-    - An orange (7) square and a green (3) square in the eighth row
-    - A sky blue (8) square and a magenta (6) square in the ninth row
-    - A green (3) square in the bottom row, sixth column
+    A 10x12 grid with colored squares on a black background:
+    - Sky blue (8): (0,3), (5,7), (8,2)
+    - Orange (7): (0,8), (7,2)
+    - Green (3): (0,11), (5,3), (7,11), (9,5)
+    - Magenta (6): (2,2), (2,7), (3,6), (4,11), (6,9), (8,9)
+    - Red (2): (3,0)
   output: |
-    The same 10x12 grid, but with red (2) lines added:
-    1. A horizontal red line in the second row, extending across the entire grid
-    2. A vertical red line from top to bottom, in the sixth column
-    3. Another vertical red line from top to bottom, in the ninth column
-    4. A horizontal red line in the seventh row, extending across the entire grid
-    These red lines form a grid-like pattern, creating rectangular sections within the original grid.
-    All original colored squares remain in their positions.
+    The 10x12 grid with added red (2) lines connecting non-black squares:
+    1. Horizontal lines:
+       - Row 1: from (1,0) to (1,11)
+       - Row 6: from (6,0) to (6,11)
+    2. Vertical lines:
+       - Column 5: from (0,5) to (9,5)
+       - Column 8: from (0,8) to (9,8)
+    The red lines form a grid-like pattern with four rectangular sections, efficiently connecting all non-black squares. All original colored squares maintain their positions.
