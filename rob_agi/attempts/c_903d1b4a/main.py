@@ -1,14 +1,14 @@
 from rob_agi.colored_grid import ColoredGrid
 from collections import Counter
-from typing import List, Tuple
+from typing import List, Tuple, Set
 
 def solve_903d1b4a(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Simplify the pattern in the input grid by removing infrequent or isolated colors
+    Simplify the pattern in the input grid by removing green (3) color and extending adjacent patterns
     while preserving the main structure and symmetry. The solution involves:
-    1. Analyzing the grid to identify main colors, structures, and symmetry.
-    2. Processing the central area to simplify its pattern.
-    3. Extending simplification outwards while maintaining symmetry.
+    1. Analyzing the grid to identify green cells, border pattern, and central structures.
+    2. Removing green cells and replacing them with colors that extend adjacent patterns.
+    3. Applying changes symmetrically to maintain the overall structure.
     4. Preserving border patterns and essential structures.
     5. Performing final passes to ensure consistency and symmetry.
     """
@@ -31,17 +31,14 @@ def solve_903d1b4a(input_grid: ColoredGrid) -> ColoredGrid:
     
     def get_neighborhood(grid: ColoredGrid, row: int, col: int) -> List[int]:
         neighbors = []
-        for dr in [-1, 0, 1]:
-            for dc in [-1, 0, 1]:
-                if dr == 0 and dc == 0:
-                    continue
-                r, c = row + dr, col + dc
-                if 0 <= r < rows and 0 <= c < cols:
-                    neighbors.append(grid.values[r][c])
+        for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+            r, c = row + dr, col + dc
+            if 0 <= r < rows and 0 <= c < cols:
+                neighbors.append(grid.values[r][c])
         return neighbors
     
-    def get_most_frequent_color(colors: List[int], essential_colors: Set[int]) -> int:
-        return Counter([c for c in colors if c in essential_colors]).most_common(1)[0][0]
+    def get_replacement_color(neighbors: List[int], essential_colors: Set[int]) -> int:
+        return Counter([c for c in neighbors if c in essential_colors]).most_common(1)[0][0]
     
     def is_border(row: int, col: int) -> bool:
         return row == 0 or row == rows - 1 or col == 0 or col == cols - 1
@@ -53,37 +50,20 @@ def solve_903d1b4a(input_grid: ColoredGrid) -> ColoredGrid:
         grid.values[rows - 1 - row][cols - 1 - col] = color
     
     # Analyze the grid
-    color_freq = get_color_frequency(output_grid)
     border_pattern = get_border_pattern(output_grid)
     central_area = get_central_area(output_grid)
     
-    # Identify essential colors
-    total_squares = rows * cols
-    essential_colors = set(color for color, freq in color_freq.items() if freq >= total_squares * 0.05)
-    essential_colors.update(set(border_pattern))
+    # Identify green cells and essential colors
+    green_cells = [(r, c) for r in range(rows) for c in range(cols) if output_grid.values[r][c] == 3]
+    essential_colors = set(border_pattern + [color for row in central_area for color in row])
+    essential_colors.discard(3)  # Remove green from essential colors
     
-    # Process central area
-    for r in range(len(central_area)):
-        for c in range(len(central_area[0])):
-            if central_area[r][c] not in essential_colors:
-                neighbors = get_neighborhood(ColoredGrid(values=central_area), r, c)
-                new_color = get_most_frequent_color(neighbors, essential_colors)
-                central_area[r][c] = new_color
-    
-    # Apply central area changes to the output grid
-    center_start_row = (rows - len(central_area)) // 2
-    center_start_col = (cols - len(central_area[0])) // 2
-    for r in range(len(central_area)):
-        for c in range(len(central_area[0])):
-            apply_symmetrical(output_grid, center_start_row + r, center_start_col + c, central_area[r][c])
-    
-    # Extend simplification outwards
-    for r in range(rows):
-        for c in range(cols):
-            if not is_border(r, c) and output_grid.values[r][c] not in essential_colors:
-                neighbors = get_neighborhood(output_grid, r, c)
-                new_color = get_most_frequent_color(neighbors, essential_colors)
-                apply_symmetrical(output_grid, r, c, new_color)
+    # Remove green cells and extend patterns
+    for r, c in green_cells:
+        if not is_border(r, c):
+            neighbors = get_neighborhood(output_grid, r, c)
+            new_color = get_replacement_color(neighbors, essential_colors)
+            apply_symmetrical(output_grid, r, c, new_color)
     
     # Preserve border pattern
     for i, color in enumerate(border_pattern):
@@ -100,10 +80,9 @@ def solve_903d1b4a(input_grid: ColoredGrid) -> ColoredGrid:
     # Final consistency pass
     for r in range(rows):
         for c in range(cols):
-            if not is_border(r, c):
+            if not is_border(r, c) and output_grid.values[r][c] == 3:
                 neighbors = get_neighborhood(output_grid, r, c)
-                if output_grid.values[r][c] not in neighbors:
-                    new_color = get_most_frequent_color(neighbors, essential_colors)
-                    apply_symmetrical(output_grid, r, c, new_color)
+                new_color = get_replacement_color(neighbors, essential_colors)
+                apply_symmetrical(output_grid, r, c, new_color)
     
     return output_grid
