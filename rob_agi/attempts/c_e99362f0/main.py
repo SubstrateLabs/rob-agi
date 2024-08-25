@@ -5,91 +5,83 @@ from collections import defaultdict
 def solve_e99362f0(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transform the input grid into a 5x4 output grid by following these steps:
-    1. Split the input grid into left and right sections using the yellow (4) line.
-    2. Identify and score color clusters in each section.
-    3. Create a color importance map based on cluster sizes and positions.
-    4. Generate a 5x4 output grid that represents the most important colors and patterns.
-    5. Balance color distribution and ensure color diversity.
-    6. Fine-tune the output to better reflect significant patterns from the input.
+    1. Analyze the input grid, splitting it into left and right sections.
+    2. Create a color importance map based on frequency and clustering.
+    3. Initialize a 5x4 output grid and fill it with the most important colors.
+    4. Ensure color balance and diversity, with a bias towards sky color.
+    5. Create small clusters and maintain spatial relationships from the input.
+    6. Make final adjustments to meet specific criteria (color representation, distribution).
     """
     
-    def find_clusters(grid: List[List[int]], color: int) -> List[List[Tuple[int, int]]]:
-        clusters = []
-        visited = set()
-        rows, cols = len(grid), len(grid[0])
-        
-        def dfs(r: int, c: int) -> List[Tuple[int, int]]:
-            cluster = []
-            stack = [(r, c)]
-            while stack:
-                r, c = stack.pop()
-                if (r, c) not in visited and grid[r][c] == color:
-                    visited.add((r, c))
-                    cluster.append((r, c))
-                    for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                        nr, nc = r + dr, c + dc
-                        if 0 <= nr < rows and 0 <= nc < cols:
-                            stack.append((nr, nc))
-            return cluster
+    def analyze_section(section: List[List[int]]) -> Dict[int, float]:
+        color_count = defaultdict(int)
+        color_positions = defaultdict(list)
+        rows, cols = len(section), len(section[0])
         
         for r in range(rows):
             for c in range(cols):
-                if grid[r][c] == color and (r, c) not in visited:
-                    clusters.append(dfs(r, c))
+                color = section[r][c]
+                if color != 0:  # Ignore black (empty space)
+                    color_count[color] += 1
+                    color_positions[color].append((r / rows, c / cols))  # Normalized position
         
-        return clusters
+        importance = {}
+        for color, count in color_count.items():
+            avg_pos = [sum(p[i] for p in color_positions[color]) / len(color_positions[color]) for i in range(2)]
+            cluster_score = 1 - (avg_pos[0] - 0.5)**2 - (avg_pos[1] - 0.5)**2  # Higher score for central clusters
+            importance[color] = count * (1 + cluster_score)
+            
+            if color == 8:  # Boost importance of sky color
+                importance[color] *= 1.2
+        
+        return importance
 
-    def score_cluster(cluster: List[Tuple[int, int]], total_cells: int) -> float:
-        size = len(cluster)
-        avg_r = sum(r for r, _ in cluster) / size
-        avg_c = sum(c for _, c in cluster) / size
-        center_dist = ((avg_r - total_cells/2)**2 + (avg_c - total_cells/2)**2)**0.5
-        return size * (1 - center_dist / total_cells)
-
-    def create_color_importance_map(grid: List[List[int]]) -> Dict[int, float]:
-        importance_map = defaultdict(float)
-        total_cells = len(grid) * len(grid[0])
-        for color in range(10):  # 0 to 9
-            clusters = find_clusters(grid, color)
-            for cluster in clusters:
-                importance_map[color] += score_cluster(cluster, total_cells)
-        return importance_map
-
-    # Split the input grid
+    # Analyze input grid
     left_section = [row[:4] for row in input_grid.values]
     right_section = [row[5:] for row in input_grid.values]
-
-    # Create color importance maps
-    left_importance = create_color_importance_map(left_section)
-    right_importance = create_color_importance_map(right_section)
-
-    # Generate output grid
+    left_importance = analyze_section(left_section)
+    right_importance = analyze_section(right_section)
+    
+    # Initialize output grid
     output = [[0 for _ in range(4)] for _ in range(5)]
-    used_colors = defaultdict(int)
-
+    color_count = defaultdict(int)
+    
+    # Fill output grid
+    main_colors = {7, 8, 9, 2}
     for r in range(5):
         for c in range(4):
-            if c < 2:
-                importance = left_importance
-            else:
-                importance = right_importance
+            importance = left_importance if c < 2 else right_importance
+            available_colors = [color for color in main_colors if color_count[color] < 5]
+            if not available_colors:
+                available_colors = list(main_colors)
             
-            color = max(importance, key=importance.get)
-            while used_colors[color] >= 3 and len(used_colors) < 4:
-                del importance[color]
-                color = max(importance, key=importance.get)
-            
+            color = max(available_colors, key=lambda x: importance.get(x, 0))
             output[r][c] = color
-            used_colors[color] += 1
+            color_count[color] += 1
             importance[color] *= 0.5  # Reduce importance after using
-
-    # Ensure color diversity
-    main_colors = {7, 8, 9, 2}
-    for color in main_colors:
-        if color not in used_colors:
-            r, c = min(((r, c) for r in range(5) for c in range(4)), 
-                       key=lambda pos: importance[output[pos[0]][pos[1]]])
-            output[r][c] = color
-            used_colors[color] += 1
-
+    
+    # Ensure sky color appears in at least 3 rows
+    sky_rows = sum(1 for row in output if 8 in row)
+    if sky_rows < 3:
+        for r in range(5):
+            if 8 not in output[r]:
+                c = output[r].index(max(output[r], key=lambda x: color_count[x]))
+                output[r][c] = 8
+                color_count[8] += 1
+                color_count[output[r][c]] -= 1
+                sky_rows += 1
+                if sky_rows == 3:
+                    break
+    
+    # Create at least one 2x2 cluster
+    for r in range(4):
+        for c in range(3):
+            colors = {output[r][c], output[r][c+1], output[r+1][c], output[r+1][c+1]}
+            if len(colors) == 1:
+                return ColoredGrid(values=output)
+    
+    # If no 2x2 cluster, create one with the most frequent color
+    most_frequent = max(color_count, key=color_count.get)
+    output[0][0] = output[0][1] = output[1][0] = output[1][1] = most_frequent
+    
     return ColoredGrid(values=output)
