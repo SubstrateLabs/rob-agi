@@ -1,22 +1,20 @@
 from rob_agi.colored_grid import ColoredGrid
 from collections import Counter
-
-from collections import Counter
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 def solve_3d31c5b3(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transform a 12x6 input grid into a 3x6 output grid by analyzing color patterns, flows, and structures.
+    Transform a 12x6 input grid into a 3x6 output grid by analyzing color patterns, frequencies, and structures.
     
-    The function analyzes the entire input grid for color frequency, continuity, edge patterns, and diagonal flows.
+    The function analyzes the entire input grid for color frequency, continuity, edge patterns, and structural roles.
     It divides the input into three 4x6 sections and creates a condensed representation in the output.
     The algorithm preserves dominant colors, significant patterns, structural elements, and overall color distribution
     while reducing the vertical dimension.
     
     Steps:
-    1. Analyze the entire input grid for color frequency, patterns, and flows
+    1. Analyze the entire input grid for color frequency, patterns, and structures
     2. Divide the input grid into three sections and analyze each
-    3. Create a color scoring system based on frequency, continuity, edge patterns, and diagonal flows
+    3. Create a color scoring system based on frequency, continuity, edge patterns, and structural importance
     4. Generate the output grid based on color scores, section relevance, and structural importance
     5. Post-process to ensure balanced representation, pattern preservation, and structural integrity
     
@@ -32,10 +30,10 @@ def solve_3d31c5b3(input_grid: ColoredGrid) -> ColoredGrid:
     def analyze_grid(grid: List[List[int]]) -> Counter:
         return Counter(cell for row in grid for cell in row if cell != 0)
 
-    def analyze_continuity(grid: List[List[int]]) -> dict:
+    def analyze_continuity(grid: List[List[int]]) -> Dict[int, int]:
         continuity_scores = {}
         for direction in ['vertical', 'horizontal', 'diagonal']:
-            for i in range(rows if direction != 'horizontal' else cols):
+            for i in range(cols if direction == 'vertical' else rows):
                 if direction == 'vertical':
                     line = [grid[row][i] for row in range(rows)]
                 elif direction == 'horizontal':
@@ -55,13 +53,13 @@ def solve_3d31c5b3(input_grid: ColoredGrid) -> ColoredGrid:
                     continuity_scores[line[-1]] = max(continuity_scores.get(line[-1], 0), streak)
         return continuity_scores
 
-    def analyze_edge_patterns(grid: List[List[int]]) -> dict:
+    def analyze_edge_patterns(grid: List[List[int]]) -> Dict[int, int]:
         edges = Counter(row[0] for row in grid if row[0] != 0) + \
                 Counter(row[-1] for row in grid if row[-1] != 0) + \
                 Counter(grid[0]) + Counter(grid[-1])
         return dict(edges)
 
-    def analyze_structural_role(grid: List[List[int]]) -> dict:
+    def analyze_structural_role(grid: List[List[int]]) -> Dict[int, int]:
         structural_scores = {}
         for color in set(cell for row in grid for cell in row):
             if color == 0:  # Skip black (empty space)
@@ -114,9 +112,9 @@ def solve_3d31c5b3(input_grid: ColoredGrid) -> ColoredGrid:
                 output_values[i][least_significant_index] = color
 
     # Preserve diagonal patterns
-    for i in range(3):
-        for j in range(cols):
-            if i > 0 and j > 0 and input_grid.values[i*section_height-1][j-1] == input_grid.values[i*section_height][j]:
+    for i in range(1, 3):
+        for j in range(1, cols):
+            if input_grid.values[i*section_height-1][j-1] == input_grid.values[i*section_height][j]:
                 output_values[i][j] = input_grid.values[i*section_height][j]
 
     return ColoredGrid(values=output_values)
