@@ -5,86 +5,83 @@ from typing import List, Tuple, Dict
 def solve_a096bf4d(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by applying the following rules:
-    1. Analyze the grid to identify special colors and their positions in each 5x5 section.
-    2. Propagate special colors within their respective rows and columns.
-    3. Fill remaining spaces with the most common interior color.
-    4. Handle color replacements (6 with 1, 4 with other special colors if present).
-    5. Ensure consistency across all sections while preserving the border structure.
+    1. Analyze the grid to identify section size, border color, and main interior color.
+    2. Process the grid row by row, propagating special colors within each row.
+    3. Handle the bottom row separately, applying specific rules for color propagation.
+    4. Perform post-processing steps including color replacements and consistency checks.
+    5. Preserve the border structure and colors from the input grid.
     """
     rows, cols = input_grid.get_dimensions()
-    output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
-    
-    # Step 1: Analyze the grid
-    section_info = analyze_grid(input_grid)
-    
-    # Step 2 & 3: Propagate special colors and fill remaining spaces
-    for r in range(0, rows, 5):
-        for c in range(0, cols, 5):
-            if r + 5 <= rows and c + 5 <= cols:
-                transform_section(input_grid, output_grid, r, c, section_info)
-    
-    # Step 4: Handle color replacements
-    handle_color_replacements(output_grid)
-    
+    output_grid = input_grid.deep_copy()
+    section_size = 5 if rows % 5 == 0 else 4
+    border_color = identify_border_color(input_grid)
+    main_interior_color = identify_main_interior_color(input_grid)
+
+    # Process each row of sections
+    for row in range(0, rows - section_size, section_size):
+        process_row(input_grid, output_grid, row, section_size, border_color, main_interior_color)
+
+    # Handle the bottom row separately
+    process_bottom_row(input_grid, output_grid, rows - section_size, section_size, border_color, main_interior_color)
+
+    # Post-processing
+    post_process(output_grid)
+
     return output_grid
 
-def analyze_grid(grid: ColoredGrid) -> Dict[Tuple[int, int], Dict[str, any]]:
-    rows, cols = grid.get_dimensions()
-    section_info = {}
-    
-    for r in range(0, rows, 5):
-        for c in range(0, cols, 5):
-            if r + 5 <= rows and c + 5 <= cols:
-                section = grid.extract_subgrid(r, c, 5, 5)
-                interior = section.extract_subgrid(1, 1, 3, 3)
-                colors = [cell for row in interior.values for cell in row]
-                color_counts = Counter(colors)
-                main_color = max(color_counts, key=color_counts.get)
-                special_colors = {color: (i, j) for i, row in enumerate(interior.values) 
-                                  for j, color in enumerate(row) if color in [1, 2, 3, 4, 6, 7, 8]}
-                
-                section_info[(r//5, c//5)] = {
-                    'main_color': main_color,
-                    'special_colors': special_colors
-                }
-    
-    return section_info
+def identify_border_color(grid: ColoredGrid) -> int:
+    return grid.values[1][1]
 
-def transform_section(input_grid: ColoredGrid, output_grid: ColoredGrid, r: int, c: int, section_info: Dict[Tuple[int, int], Dict[str, any]]):
-    section = input_grid.extract_subgrid(r, c, 5, 5)
-    new_section = section.deep_copy()
-    
-    # Get info for this section
-    info = section_info[(r//5, c//5)]
-    main_color = info['main_color']
-    
-    # Apply special colors
-    for color, (i, j) in info['special_colors'].items():
-        new_section.values[i+1][j+1] = color
-    
-    # Fill remaining spaces with main color
-    for i in range(1, 4):
-        for j in range(1, 4):
-            if new_section.values[i][j] == 0:
-                new_section.values[i][j] = main_color
-    
-    # Copy to output grid
-    for i in range(5):
-        for j in range(5):
-            output_grid.values[r+i][c+j] = new_section.values[i][j]
+def identify_main_interior_color(grid: ColoredGrid) -> int:
+    interior_colors = [grid.values[i][j] for i in range(2, len(grid.values)-2) for j in range(2, len(grid.values[0])-2)]
+    return max(set(interior_colors), key=interior_colors.count)
 
-def handle_color_replacements(grid: ColoredGrid):
+def process_row(input_grid: ColoredGrid, output_grid: ColoredGrid, row: int, section_size: int, border_color: int, main_color: int):
+    special_colors = identify_special_colors(input_grid, row, section_size)
+    for color, position in special_colors:
+        propagate_color(output_grid, row, section_size, color, position)
+    fill_remaining(output_grid, row, section_size, main_color)
+
+def identify_special_colors(grid: ColoredGrid, row: int, section_size: int) -> List[Tuple[int, Tuple[int, int]]]:
+    special_colors = []
+    for col in range(1, len(grid.values[0]) - 1, section_size):
+        for i in range(1, section_size - 1):
+            for j in range(1, section_size - 1):
+                color = grid.values[row + i][col + j]
+                if color not in [0, grid.values[1][1]] and color not in [c for c, _ in special_colors]:
+                    special_colors.append((color, (i, j)))
+    return sorted(special_colors, key=lambda x: x[0], reverse=True)
+
+def propagate_color(grid: ColoredGrid, row: int, section_size: int, color: int, position: Tuple[int, int]):
+    for col in range(1, len(grid.values[0]) - 1, section_size):
+        grid.values[row + position[0]][col + position[1]] = color
+
+def fill_remaining(grid: ColoredGrid, row: int, section_size: int, main_color: int):
+    for col in range(1, len(grid.values[0]) - 1, section_size):
+        for i in range(1, section_size - 1):
+            for j in range(1, section_size - 1):
+                if grid.values[row + i][col + j] == 0:
+                    grid.values[row + i][col + j] = main_color
+
+def process_bottom_row(input_grid: ColoredGrid, output_grid: ColoredGrid, row: int, section_size: int, border_color: int, main_color: int):
+    special_colors = identify_special_colors(input_grid, row, section_size)
+    for color, position in special_colors:
+        propagate_color(output_grid, row, section_size, color, position)
+    fill_remaining(output_grid, row, section_size, main_color)
+
+def post_process(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
     for r in range(rows):
         for c in range(cols):
             if grid.values[r][c] == 6:
                 grid.values[r][c] = 1
             elif grid.values[r][c] == 4:
-                # Check if there's another special color in the 3x3 section
-                for i in range(max(0, r-1), min(rows, r+2)):
-                    for j in range(max(0, c-1), min(cols, c+2)):
-                        if grid.values[i][j] in [2, 3, 7, 8]:
-                            grid.values[r][c] = grid.values[i][j]
-                            break
-                    if grid.values[r][c] != 4:
-                        break
+                replace_color_4(grid, r, c)
+
+def replace_color_4(grid: ColoredGrid, r: int, c: int):
+    rows, cols = grid.get_dimensions()
+    for i in range(max(0, r-1), min(rows, r+2)):
+        for j in range(max(0, c-1), min(cols, c+2)):
+            if grid.values[i][j] in [2, 3, 7, 8]:
+                grid.values[r][c] = grid.values[i][j]
+                return
