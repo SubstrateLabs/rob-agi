@@ -1,0 +1,43 @@
+example_0:
+  input: |
+    A 9x9 grid with mostly black (empty) space. There are three distinct vertical lines:
+    - A red (2) line in the third column, consisting of two squares at the top and two at the bottom.
+    - A yellow (4) line in the seventh column, consisting of two squares at the top and four at the bottom.
+    - A horizontal gray (5) line spanning the entire width of the grid in the fifth row.
+  output: |
+    A small 2x2 grid entirely filled with yellow (4) squares.
+
+example_1:
+  input: |
+    A 9x9 grid similar to example_0, but with a slight difference:
+    - The red (2) line in the third column now extends to four squares at the bottom.
+    - The yellow (4) line in the seventh column and the horizontal gray (5) line remain the same as in example_0.
+  output: |
+    A small 2x2 grid entirely filled with red (2) squares.
+
+example_2:
+  input: |
+    An 11x9 grid, slightly taller than the previous examples:
+    - The red (2) line in the third column has one square at the top and four at the bottom.
+    - The yellow (4) line in the seventh column has three squares at the top and four at the bottom.
+    - The horizontal gray (5) line is now in the sixth row.
+  output: |
+    A small 2x2 grid entirely filled with red (2) squares.
+
+example_3:
+  input: |
+    An 11x9 grid, similar to example_2 but with some changes:
+    - The red (2) line in the third column has two squares at the top and four at the bottom, but the bottom part is disconnected (one black square in between).
+    - The yellow (4) line in the seventh column has two squares at the top and three at the bottom.
+    - The horizontal gray (5) line remains in the sixth row.
+  output: |
+    A small 2x2 grid entirely filled with red (2) squares.
+
+test_case_0:
+  input: |
+    An 11x9 grid with a pattern similar to the previous examples:
+    - The red (2) line in the third column has three squares at the top and four at the bottom.
+    - The yellow (4) line in the seventh column has two squares at the top and four at the bottom.
+    - The horizontal gray (5) line is in the sixth row.
+  output: |
+    A small 2x2 grid entirely filled with yellow (4) squares.
