@@ -4,12 +4,10 @@ from typing import List, Tuple
 def solve_e1d2900e(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by applying the following rules:
-    1. Identifies 2x2 red squares and adds exactly two blue dots around each.
+    1. Identifies 2x2 red squares and adds exactly two blue dots adjacent to each.
     2. Removes isolated blue dots not associated with red squares.
-    3. Preserves blue dots near grid edges or part of larger patterns.
-    4. Ensures each red square has exactly two associated blue dots.
-    5. Handles edge cases and maintains balance in dot placement.
-    6. Optimizes placement to minimize larger connected shapes.
+    3. Preserves blue dots on the grid edges.
+    4. Ensures each red square has exactly two adjacent blue dots in a specific pattern.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -25,57 +23,41 @@ def solve_e1d2900e(input_grid: ColoredGrid) -> ColoredGrid:
             return all(output_grid.get_cell(r+i, c+j) == 2 for i in range(2) for j in range(2))
         return False
 
-    def get_valid_blue_positions(r: int, c: int) -> List[Tuple[int, int]]:
-        positions = [(r-1, c-1), (r-1, c+2), (r+2, c-1), (r+2, c+2)]  # Corners
-        if r == 0 or r == rows - 2:
-            positions.extend([(r, c-1), (r, c+2), (r+1, c-1), (r+1, c+2)])  # Sides
-        if c == 0 or c == cols - 2:
-            positions.extend([(r-1, c), (r-1, c+1), (r+2, c), (r+2, c+1)])  # Top/Bottom
-        return [(r, c) for r, c in positions if 0 <= r < rows and 0 <= c < cols]
+    def get_adjacent_cells(r: int, c: int) -> List[Tuple[int, int]]:
+        return [(r+i, c+j) for i in [-1, 0, 1] for j in [-1, 0, 1] 
+                if 0 <= r+i < rows and 0 <= c+j < cols and (i != 0 or j != 0)]
 
     def add_blue_dots(r: int, c: int):
-        valid_positions = get_valid_blue_positions(r, c)
-        existing_blues = [pos for pos in valid_positions if output_grid.get_cell(*pos) == 1]
-        if len(existing_blues) < 2:
-            available_positions = [pos for pos in valid_positions if pos not in existing_blues]
-            for pos in available_positions[:2-len(existing_blues)]:
-                output_grid.set_cell(*pos, 1)
-        elif len(existing_blues) > 2:
-            for pos in existing_blues[2:]:
-                output_grid.set_cell(*pos, 0)
+        adjacent = get_adjacent_cells(r, c)
+        blue_dots = [pos for pos in adjacent if output_grid.get_cell(*pos) == 1]
+        
+        if len(blue_dots) < 2:
+            # Prefer top or left side, then opposite corner
+            preferred = [(r-1, c), (r, c-1), (r+1, c+1), (r-1, c+1), (r+1, c-1)]
+            for pos in preferred:
+                if pos in adjacent and output_grid.get_cell(*pos) != 1:
+                    output_grid.set_cell(*pos, 1)
+                    blue_dots.append(pos)
+                    if len(blue_dots) == 2:
+                        break
+        
+        # Remove extra blue dots
+        for pos in blue_dots[2:]:
+            output_grid.set_cell(*pos, 0)
 
     # Step 1: Process red squares
     red_squares = [(r, c) for r in range(rows-1) for c in range(cols-1) if is_red_square(r, c)]
     for r, c in red_squares:
         add_blue_dots(r, c)
 
-    # Step 2 & 3: Remove isolated blue dots, preserve edge and pattern dots
+    # Step 2 & 3: Remove isolated blue dots, preserve edge dots
     for r in range(rows):
         for c in range(cols):
             if output_grid.get_cell(r, c) == 1:
-                if not any(is_red_square(r+i, c+j) for i in [-1, 0, 1] for j in [-1, 0, 1] if 0 <= r+i < rows-1 and 0 <= c+j < cols-1):
-                    if r < 2 or r >= rows - 2 or c < 2 or c >= cols - 2:
+                if not any(is_red_square(r+i, c+j) for i, j in [(0,0), (-1,0), (0,-1), (-1,-1)] 
+                           if 0 <= r+i < rows-1 and 0 <= c+j < cols-1):
+                    if r == 0 or r == rows-1 or c == 0 or c == cols-1:
                         continue  # Preserve edge dots
                     output_grid.set_cell(r, c, 0)  # Remove isolated dots
-
-    # Step 4: Final verification and optimization
-    for r, c in red_squares:
-        blue_positions = [pos for pos in get_valid_blue_positions(r, c) if output_grid.get_cell(*pos) == 1]
-        while len(blue_positions) > 2:
-            pos = max(blue_positions, key=lambda p: sum(output_grid.get_cell(p[0]+i, p[1]+j) == 1 
-                                                        for i in [-1, 0, 1] for j in [-1, 0, 1] 
-                                                        if 0 <= p[0]+i < rows and 0 <= p[1]+j < cols))
-            output_grid.set_cell(*pos, 0)
-            blue_positions.remove(pos)
-        while len(blue_positions) < 2:
-            available = [pos for pos in get_valid_blue_positions(r, c) if pos not in blue_positions]
-            if available:
-                pos = min(available, key=lambda p: sum(output_grid.get_cell(p[0]+i, p[1]+j) == 1 
-                                                       for i in [-1, 0, 1] for j in [-1, 0, 1] 
-                                                       if 0 <= p[0]+i < rows and 0 <= p[1]+j < cols))
-                output_grid.set_cell(*pos, 1)
-                blue_positions.append(pos)
-            else:
-                break  # No more valid positions available
 
     return output_grid
