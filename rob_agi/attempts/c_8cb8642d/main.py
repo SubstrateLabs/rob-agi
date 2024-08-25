@@ -4,7 +4,7 @@ from typing import List, Tuple
 def solve_8cb8642d(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by identifying rectangles, finding their seeds,
-    and applying a pattern based on the rectangle's size.
+    and applying an X-pattern based on the rectangle's size.
     
     1. Identifies rectangles of uniform color in the grid.
     2. Finds the seed (different color pixel) within each rectangle.
@@ -19,7 +19,7 @@ def solve_8cb8642d(input_grid: ColoredGrid) -> ColoredGrid:
     Returns the modified grid as the solution.
     """
     output_grid = input_grid.deep_copy()
-    rectangles = find_rectangles(input_grid)
+    rectangles = find_rectangles(output_grid)
     
     for rect in rectangles:
         transform_rectangle(output_grid, rect)
@@ -59,24 +59,18 @@ def transform_rectangle(grid: ColoredGrid, rect: Tuple[int, int, int, int, int])
     height, width = bottom - top + 1, right - left + 1
     seed_color, _ = find_seed(grid, rect)
     
-    if seed_color == color:
-        return  # No transformation needed if no seed found
-    
-    # Create pattern grid
-    pattern = [[0 for _ in range(width-2)] for _ in range(height-2)]
-    
-    # Set corners and center
-    pattern[0][0] = pattern[0][-1] = pattern[-1][0] = pattern[-1][-1] = seed_color
-    pattern[(height-3)//2][(width-3)//2] = seed_color
-    
-    # Draw diagonals
-    for i in range(height-2):
-        pattern[i][i] = pattern[i][width-3-i] = seed_color
+    if seed_color == color or height <= 2 or width <= 2:
+        return  # No transformation needed if no seed found or rectangle is too small
     
     # Apply pattern to grid
     for r in range(top+1, bottom):
         for c in range(left+1, right):
-            grid.set_cell(r, c, pattern[r-top-1][c-left-1])
+            x = (c - left - 1) / (width - 3)
+            y = (r - top - 1) / (height - 3)
+            if abs(x - y) < 0.1 or abs(x - (1-y)) < 0.1 or abs(x - 0.5) < 0.1 or abs(y - 0.5) < 0.1:
+                grid.set_cell(r, c, seed_color)
+            else:
+                grid.set_cell(r, c, 0)
 
 def find_seed(grid: ColoredGrid, rect: Tuple[int, int, int, int, int]) -> Tuple[int, Tuple[int, int]]:
     """Finds the seed (different color pixel) within a rectangle."""
