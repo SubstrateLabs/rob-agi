@@ -1,0 +1,41 @@
+example_0:
+  input: |
+    The input grid shows a 10x10 grid. At the top left, there's a small sky blue (8) square of 3x1. In the 7th row from the top, there's a full gray (5) line spanning the entire width. In the 9th row, there's a colorful line with various colors (8, 6, 4, 3, 4, 7, 3, 8, 3, 7). The rest of the grid is filled with black (0), which can be considered as empty space.
+  output: |
+    The output grid maintains most features from the input. The sky blue square and gray line remain unchanged. The colorful line at the bottom also stays the same. The main difference is the addition of three green (3) vertical lines. These lines start from the 4th row and extend down to the gray line, positioned at columns 4, 7, and 9.
+
+example_1:
+  input: |
+    This 10x10 grid has a single sky blue (8) square in the top-left corner. The 7th row is entirely gray (5), spanning the full width. The 9th row contains a colorful sequence (6, 6, 4, 6, 2, 1, 9, 2, 9, 4). All other cells are black (0), representing empty space.
+  output: |
+    The output grid is nearly identical to the input. The sky blue square, gray line, and colorful bottom row remain unchanged. The only addition is a single blue (1) square in the 6th row, 6th column, directly above the gray line.
+
+example_2:
+  input: |
+    The input shows a 10x10 grid with a 3x1 sky blue (8) rectangle in the top-left corner. The 7th row is filled with gray (5). The 9th row has a colorful sequence (4, 1, 4, 4, 6, 3, 1, 6, 3, 6). All other cells are black (0).
+  output: |
+    The output maintains the sky blue rectangle and gray line. The colorful bottom row is unchanged. The main difference is the addition of three vertical lines extending from row 4 to the gray line. These lines are yellow (4) in columns 1-3, magenta (6) in columns 5, 8, and 10.
+
+example_3:
+  input: |
+    This 10x10 grid has a 2x1 sky blue (8) rectangle in the top-left. The 7th row is entirely gray (5). The 9th row contains a sequence of colors (2, 3, 3, 2, 3, 1, 1, 3, 1, 1). All other cells are black (0).
+  output: |
+    The output keeps the sky blue rectangle, gray line, and colorful bottom row intact. The change is the addition of two red (2) vertical lines, each 2 cells tall, in columns 1 and 4, starting from row 5 and ending at the gray line.
+
+example_4:
+  input: |
+    The input grid is 10x10 with a 4x1 sky blue (8) rectangle at the top-left. The 7th row is filled with gray (5). The 9th row has a pattern of red and blue (2, 1, 2, 1, 2, 1, 1, 2, 2, 2). All other cells are black (0).
+  output: |
+    The output maintains the sky blue rectangle and gray line. The colorful bottom row is unchanged. The main addition is a pattern of blue (1) vertical lines extending from row 3 to the gray line. These blue lines appear in columns 2, 4, 6, and 7, mirroring the positions of blue squares in the bottom row.
+
+example_5:
+  input: |
+    This 10x10 grid has a single sky blue (8) square in the top-left corner. The 7th row is entirely gray (5). The 9th row has a mostly blue sequence with two exceptions (1, 3, 1, 1, 1, 1, 4, 1, 1, 1). All other cells are black (0).
+  output: |
+    The output grid keeps the sky blue square, gray line, and colorful bottom row the same. The only changes are two single squares added in the 6th row: a green (3) square in the 2nd column and a yellow (4) square in the 7th column. These correspond to the non-blue colors in the bottom row.
+
+test_case_0:
+  input: |
+    The input is a 10x10 grid with a 2x1 sky blue (8) rectangle in the top-left corner. The 7th row is filled with gray (5). The 9th row contains a sequence of colors (1, 1, 1, 1, 1, 1, 2, 2, 2, 2). All other cells are black (0).
+  output: |
+    The output is not provided for this test case.
