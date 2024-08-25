@@ -4,13 +4,13 @@ def solve_69889d6e(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by drawing a diagonal red line from bottom to top-right,
     starting from the position of the first red square found in the bottom row.
-    The line is 2 cells thick, except for the top row, and stops at the top or right edge.
-    Non-black cells from the input are preserved.
+    The line is 2 cells thick, except for the top row and right edge, and stops at the top or right edge.
+    Non-black cells from the input are preserved, even when intersecting with the red line.
 
     1. Find the starting column of the red square in the bottom row.
     2. Initialize a new grid filled with black.
-    3. Draw the diagonal red line, maintaining 2-cell thickness.
-    4. Preserve non-black cells from the input.
+    3. Draw the diagonal red line, maintaining 2-cell thickness except for top row and right edge.
+    4. Preserve all non-black cells from the input.
     5. Return the transformed grid.
     """
     rows, cols = input_grid.get_dimensions()
@@ -33,8 +33,8 @@ def solve_69889d6e(input_grid: ColoredGrid) -> ColoredGrid:
     current_col = start_col
     while current_row >= 0 and current_col < cols:
         output_grid.set_cell(current_row, current_col, 2)
-        if current_row < rows - 1:
-            output_grid.set_cell(current_row + 1, current_col, 2)
+        if current_row < rows - 1 and current_col < cols - 1:
+            output_grid.set_cell(current_row, current_col + 1, 2)
         current_row -= 1
         current_col += 1
 
