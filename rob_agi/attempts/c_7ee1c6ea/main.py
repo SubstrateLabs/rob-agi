@@ -1,61 +1,62 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List, Tuple, Optional, Set
 
 def solve_7ee1c6ea(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by swapping the two most frequent colors within each region
-    separated by gray (5) structures. Black (0) and gray (5) squares remain unchanged.
+    Transforms the input grid by changing the color of connected regions to their most frequent adjacent color.
     
-    1. Identifies regions separated by gray structures.
-    2. For each region, determines the two most frequent colors.
-    3. Swaps these colors within the region.
-    4. Preserves black and gray squares.
+    1. Identifies connected regions of the same color.
+    2. For each region, determines the most frequent adjacent color (excluding gray and black).
+    3. Changes the color of the entire region to the most frequent adjacent color.
+    4. Preserves black (0) and gray (5) squares.
     
     Returns the transformed grid.
     """
     new_grid = input_grid.deep_copy()
-    regions = find_regions(new_grid)
-    
-    for region in regions:
-        color1, color2 = get_swap_colors(region, input_grid)
-        swap_map = {color1: color2, color2: color1}
-        
-        for row, col in region:
-            current_color = new_grid.values[row][col]
-            if current_color in [color1, color2]:
-                new_grid.values[row][col] = swap_map[current_color]
-    
-    return new_grid
+    processed = set()
+    return process_grid(new_grid, processed)
 
-def find_regions(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
-    regions = []
-    visited = set()
+def process_grid(grid: ColoredGrid, processed: Set[Tuple[int, int]]) -> ColoredGrid:
     rows, cols = grid.get_dimensions()
-
-    def dfs(r, c, region):
-        if (r, c) in visited or grid.values[r][c] == 5:
-            return
-        visited.add((r, c))
-        region.append((r, c))
-        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            nr, nc = r + dr, c + dc
-            if 0 <= nr < rows and 0 <= nc < cols:
-                dfs(nr, nc, region)
-
     for r in range(rows):
         for c in range(cols):
-            if (r, c) not in visited and grid.values[r][c] != 5:
-                region = []
-                dfs(r, c, region)
-                regions.append(region)
+            if (r, c) in processed or grid.values[r][c] in [0, 5]:
+                continue
+            region = find_connected_region(grid, r, c, grid.values[r][c])
+            processed.update(region)
+            if len(region) > 1:
+                swap_color = find_most_frequent_adjacent_color(grid, region)
+                if swap_color is not None:
+                    apply_color_swap(grid, region, swap_color)
+    return grid
 
-    return regions
+def find_connected_region(grid: ColoredGrid, r: int, c: int, color: int) -> Set[Tuple[int, int]]:
+    region = set()
+    stack = [(r, c)]
+    rows, cols = grid.get_dimensions()
+    while stack:
+        curr_r, curr_c = stack.pop()
+        if (curr_r, curr_c) in region:
+            continue
+        if 0 <= curr_r < rows and 0 <= curr_c < cols and grid.values[curr_r][curr_c] == color:
+            region.add((curr_r, curr_c))
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                stack.append((curr_r + dr, curr_c + dc))
+    return region
 
-def get_swap_colors(region: List[Tuple[int, int]], grid: ColoredGrid) -> Tuple[int, int]:
-    color_count = {}
+def find_most_frequent_adjacent_color(grid: ColoredGrid, region: Set[Tuple[int, int]]) -> Optional[int]:
+    color_freq = {}
+    region_color = grid.values[list(region)[0][0]][list(region)[0][1]]
+    rows, cols = grid.get_dimensions()
     for r, c in region:
-        color = grid.values[r][c]
-        if color not in [0, 5]:
-            color_count[color] = color_count.get(color, 0) + 1
-    sorted_colors = sorted(color_count.items(), key=lambda x: x[1], reverse=True)
-    return sorted_colors[0][0], sorted_colors[1][0] if len(sorted_colors) > 1 else (sorted_colors[0][0], -1)
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nr, nc = r + dr, c + dc
+            if (nr, nc) not in region and 0 <= nr < rows and 0 <= nc < cols:
+                adj_color = grid.values[nr][nc]
+                if adj_color not in [0, 5, region_color]:
+                    color_freq[adj_color] = color_freq.get(adj_color, 0) + 1
+    return max(color_freq, key=color_freq.get) if color_freq else None
+
+def apply_color_swap(grid: ColoredGrid, region: Set[Tuple[int, int]], new_color: int):
+    for r, c in region:
+        grid.values[r][c] = new_color
