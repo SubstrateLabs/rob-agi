@@ -6,111 +6,111 @@ def solve_b942fd60(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by connecting non-black squares with red lines.
     
     The function creates a minimal network of red lines that:
-    1. Connects all non-black squares horizontally and vertically
-    2. Preserves the original positions and colors of non-black squares
-    3. Ensures red lines don't extend beyond the last colored square in any direction
-    4. Handles both simple and complex grid configurations
+    1. Creates a "backbone" structure with optimal vertical and horizontal lines
+    2. Connects all non-black squares to the backbone
+    3. Preserves the original positions and colors of non-black squares
+    4. Ensures red lines don't extend beyond the last colored square in any direction
     5. Cleans up any unnecessary or stray red lines
     
     Steps:
-    1. Initialize by creating a deep copy and identifying non-black squares
-    2. Connect non-black squares horizontally and vertically
-    3. Connect isolated squares to the nearest part of the network
-    4. Clean up unnecessary red lines
-    5. Verify and fix connectivity
-    6. Return the modified grid
+    1. Create a deep copy of the input grid
+    2. Identify all non-black squares
+    3. Find optimal vertical and horizontal lines for the backbone
+    4. Create the backbone structure
+    5. Connect remaining non-black squares to the backbone
+    6. Clean up unnecessary extensions
+    7. Verify connectivity and add necessary connections
+    8. Remove isolated red squares
+    9. Return the modified grid
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
     
+    # Identify non-black squares
     non_black = [(r, c) for r in range(rows) for c in range(cols) if output_grid.get_cell(r, c) != 0]
     
-    # Process rows
+    if not non_black:
+        return output_grid  # Return original grid if no non-black squares
+    
+    # Find optimal vertical line
+    col_counts = [sum(1 for r in range(rows) if output_grid.get_cell(r, c) != 0) for c in range(cols)]
+    optimal_col = col_counts.index(max(col_counts))
+    
+    # Find optimal horizontal line
+    row_counts = [sum(1 for c in range(cols) if output_grid.get_cell(r, c) != 0) for r in range(rows)]
+    optimal_row = row_counts.index(max(row_counts))
+    
+    # Adjust optimal_row if it doesn't intersect with any non-black square
+    if all(output_grid.get_cell(optimal_row, c) == 0 for c in range(cols)):
+        optimal_row = min(non_black, key=lambda x: abs(x[0] - optimal_row))[0]
+    
+    # Create backbone structure
     for r in range(rows):
-        row_squares = [c for c in range(cols) if (r, c) in non_black]
-        if len(row_squares) >= 2:
-            for c in range(row_squares[0], row_squares[-1] + 1):
-                if output_grid.get_cell(r, c) == 0:
-                    output_grid.set_cell(r, c, 2)
-    
-    # Process columns
+        output_grid.set_cell(r, optimal_col, 2)
     for c in range(cols):
-        col_squares = [r for r in range(rows) if (r, c) in non_black]
-        if len(col_squares) >= 2:
-            for r in range(col_squares[0], col_squares[-1] + 1):
-                if output_grid.get_cell(r, c) == 0:
-                    output_grid.set_cell(r, c, 2)
+        output_grid.set_cell(optimal_row, c, 2)
     
-    # Connect isolated squares
+    # Connect remaining non-black squares to backbone
     for r, c in non_black:
-        if all(output_grid.get_cell(r + dr, c + dc) == 0 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)] if 0 <= r + dr < rows and 0 <= c + dc < cols):
-            # Find nearest red line or non-black square
-            directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-            for dr, dc in directions:
-                nr, nc = r + dr, c + dc
-                while 0 <= nr < rows and 0 <= nc < cols:
-                    if output_grid.get_cell(nr, nc) != 0:
-                        break
-                    output_grid.set_cell(nr, nc, 2)
-                    nr, nc = nr + dr, nc + dc
+        if output_grid.get_cell(r, c) != 2:
+            if abs(r - optimal_row) <= abs(c - optimal_col):
+                for rr in range(min(r, optimal_row), max(r, optimal_row) + 1):
+                    if output_grid.get_cell(rr, c) == 0:
+                        output_grid.set_cell(rr, c, 2)
+            else:
+                for cc in range(min(c, optimal_col), max(c, optimal_col) + 1):
+                    if output_grid.get_cell(r, cc) == 0:
+                        output_grid.set_cell(r, cc, 2)
     
-    # Clean up unnecessary red lines
-    def count_non_black_neighbors(r, c):
-        return sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
-                   if 0 <= r + dr < rows and 0 <= c + dc < cols and output_grid.get_cell(r + dr, c + dc) != 0)
-    
-    changes = True
-    while changes:
-        changes = False
-        for r in range(rows):
-            for c in range(cols):
-                if output_grid.get_cell(r, c) == 2 and count_non_black_neighbors(r, c) < 2:
-                    output_grid.set_cell(r, c, 0)
-                    changes = True
-    
-    # Trim extending red lines
+    # Clean up unnecessary extensions
     for r in range(rows):
-        left = min((c for c in range(cols) if output_grid.get_cell(r, c) != 0 and output_grid.get_cell(r, c) != 2), default=-1)
-        right = max((c for c in range(cols) if output_grid.get_cell(r, c) != 0 and output_grid.get_cell(r, c) != 2), default=-1)
-        if left != -1 and right != -1:
-            for c in range(cols):
-                if c < left or c > right:
-                    output_grid.set_cell(r, c, 0)
+        left = min((c for c in range(cols) if output_grid.get_cell(r, c) != 0), default=cols)
+        right = max((c for c in range(cols) if output_grid.get_cell(r, c) != 0), default=-1)
+        for c in range(cols):
+            if c < left or c > right:
+                output_grid.set_cell(r, c, 0)
     
     for c in range(cols):
-        top = min((r for r in range(rows) if output_grid.get_cell(r, c) != 0 and output_grid.get_cell(r, c) != 2), default=-1)
-        bottom = max((r for r in range(rows) if output_grid.get_cell(r, c) != 0 and output_grid.get_cell(r, c) != 2), default=-1)
-        if top != -1 and bottom != -1:
-            for r in range(rows):
-                if r < top or r > bottom:
-                    output_grid.set_cell(r, c, 0)
+        top = min((r for r in range(rows) if output_grid.get_cell(r, c) != 0), default=rows)
+        bottom = max((r for r in range(rows) if output_grid.get_cell(r, c) != 0), default=-1)
+        for r in range(rows):
+            if r < top or r > bottom:
+                output_grid.set_cell(r, c, 0)
     
-    # Final check to ensure all non-black squares are connected
-    def dfs(r, c):
-        stack = [(r, c)]
+    # Verify connectivity and add necessary connections
+    def dfs(start_r, start_c):
+        stack = [(start_r, start_c)]
         visited = set()
         while stack:
-            curr_r, curr_c = stack.pop()
-            if (curr_r, curr_c) not in visited:
-                visited.add((curr_r, curr_c))
+            r, c = stack.pop()
+            if (r, c) not in visited and output_grid.get_cell(r, c) != 0:
+                visited.add((r, c))
                 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                    nr, nc = curr_r + dr, curr_c + dc
-                    if 0 <= nr < rows and 0 <= nc < cols and output_grid.get_cell(nr, nc) != 0:
+                    nr, nc = r + dr, c + dc
+                    if 0 <= nr < rows and 0 <= nc < cols:
                         stack.append((nr, nc))
         return visited
     
     connected = dfs(*non_black[0])
     if len(connected) != len(non_black):
-        # If not all non-black squares are connected, add necessary connections
         for r, c in non_black:
             if (r, c) not in connected:
                 nearest = min(connected, key=lambda x: abs(x[0] - r) + abs(x[1] - c))
-                r_step = 1 if nearest[0] > r else -1 if nearest[0] < r else 0
-                c_step = 1 if nearest[1] > c else -1 if nearest[1] < c else 0
                 while (r, c) != nearest:
+                    if r != nearest[0]:
+                        r += 1 if nearest[0] > r else -1
+                    elif c != nearest[1]:
+                        c += 1 if nearest[1] > c else -1
                     if output_grid.get_cell(r, c) == 0:
                         output_grid.set_cell(r, c, 2)
-                    r += r_step
-                    c += c_step
+    
+    # Remove isolated red squares
+    for r in range(rows):
+        for c in range(cols):
+            if output_grid.get_cell(r, c) == 2:
+                neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                                if 0 <= r + dr < rows and 0 <= c + dc < cols and output_grid.get_cell(r + dr, c + dc) != 0)
+                if neighbors < 2:
+                    output_grid.set_cell(r, c, 0)
     
     return output_grid
