@@ -927,7 +927,7 @@ async def main():
     # distill_research()
 
     for i in range(1):
-        await solve_loop(max_concurrent=8, to_process=None, max_challenges=8)
+        await solve_loop(max_concurrent=1, to_process=None, max_challenges=1)
     # await solve_loop(max_concurrent=4, max_challenges=8)
 
 
