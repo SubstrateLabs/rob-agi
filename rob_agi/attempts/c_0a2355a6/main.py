@@ -1,16 +1,23 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 def solve_0a2355a6(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the grid transformation challenge by identifying distinct shapes,
     classifying them, and assigning colors based on their complexity and position.
     
-    1. Identify distinct contiguous shapes of 8s in the input grid.
-    2. Classify shapes based on size, complexity, hollowness, and regularity.
-    3. Group similar shapes and determine the color palette.
-    4. Assign colors (1: blue, 2: red, 3: green, 4: yellow) to shapes based on complexity and position.
-    5. Create and return a new grid with transformed colors.
+    1. Identify distinct contiguous shapes of sky blue (8) in the input grid using flood-fill.
+    2. Classify shapes based on size, bounding box, perimeter, holes, and complexity.
+    3. Group similar shapes and determine the color palette based on the number of distinct groups.
+    4. Assign colors (1: blue, 2: red, 3: green, 4: yellow) to shapes based on complexity and position:
+       - Simplest shapes: blue (1)
+       - Medium complexity: red (2)
+       - High complexity or unique large shapes: green (3)
+       - Most complex (if 4 colors used): yellow (4)
+    5. Create and return a new grid with transformed colors, maintaining black (0) as empty space.
+    
+    The function ensures consistent color assignment within similar shape groups and
+    handles various grid sizes and shape configurations.
     """
     # Step 1: Identify distinct shapes
     shapes = find_contiguous_shapes(input_grid)
