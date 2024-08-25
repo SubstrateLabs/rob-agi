@@ -1,0 +1,43 @@
+example_0:
+  input: |
+    A 15x12 grid with a large red (2) rectangular shape in the center, surrounded by black (0). The red rectangle is 8x7 cells, occupying rows 1-7 and columns 1-8. There's a single blue (1) cell at position (2,2) within the red rectangle.
+  output: |
+    The same 15x12 grid, but the interior of the red rectangle has been transformed. The outline of the red rectangle remains intact. Inside, a symmetrical pattern has formed:
+    - The corners and center of the interior are blue (1)
+    - There are diagonal lines of blue (1) connecting these points
+    - The spaces between these blue lines are filled with black (0)
+    This creates an X-shape or diamond pattern within the red rectangle.
+
+example_1:
+  input: |
+    A 14x13 grid with a large green (3) rectangular shape in the center, surrounded by black (0). The green rectangle is 10x9 cells, occupying rows 1-10 and columns 2-11. There's a single magenta (6) cell at position (2,9) within the green rectangle.
+  output: |
+    The same 14x13 grid, but the interior of the green rectangle has been transformed. The outline of the green rectangle remains intact. Inside, a symmetrical pattern has formed:
+    - The corners and center of the interior are magenta (6)
+    - There are diagonal lines of magenta (6) connecting these points
+    - The spaces between these magenta lines are filled with black (0)
+    This creates an X-shape or diamond pattern within the green rectangle, similar to the previous example but larger and with a different color.
+
+example_2:
+  input: |
+    An 18x17 grid containing three distinct rectangular shapes:
+    1. A blue (1) 7x7 rectangle in the top-left, with a red (2) cell at (6,7)
+    2. A green (3) 6x5 rectangle in the top-right, with a red (2) cell at (2,15)
+    3. A yellow (4) 7x11 rectangle in the bottom-right, with a green (3) cell at (14,7)
+    The rest of the grid is filled with black (0).
+  output: |
+    The same 18x17 grid, but each rectangle has been internally transformed:
+    1. The blue rectangle now contains an X-shape or diamond pattern in red (2) and black (0)
+    2. The green rectangle now contains an X-shape or diamond pattern in red (2) and black (0)
+    3. The yellow rectangle now contains an X-shape or diamond pattern in green (3) and black (0)
+    Each pattern is centered within its respective rectangle and scaled appropriately to fit. The outlines of all rectangles remain intact.
+
+test_case_0:
+  input: |
+    An 18x17 grid containing three distinct rectangular shapes:
+    1. A blue (1) 7x7 rectangle in the top-left, with a red (2) cell at (6,7)
+    2. A green (3) 6x5 rectangle in the top-right, with a red (2) cell at (2,15)
+    3. A yellow (4) 7x11 rectangle in the bottom-right, with a green (3) cell at (14,7)
+    The rest of the grid is filled with black (0).
+  output: |
+    The output is not provided for this test case.
