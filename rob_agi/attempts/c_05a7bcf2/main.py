@@ -4,10 +4,9 @@ from typing import List, Tuple
 def solve_05a7bcf2(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid according to the following rules:
-    1. Vertically expands colors 1-7 upward and 8-9 downward until hitting another color or edge.
-    2. Fills empty space below horizontal sky blue (8) lines.
-    3. Horizontally expands colors between instances of the same color in each row.
-    4. Fills remaining empty cells with sky blue.
+    1. Vertically expands all non-sky blue colors upward until hitting a sky blue barrier or the edge.
+    2. Horizontally expands colors between instances of the same color within sections bounded by sky blue.
+    3. Fills remaining empty cells with sky blue.
 
     Args:
     input_grid (ColoredGrid): The input grid to transform.
@@ -18,68 +17,59 @@ def solve_05a7bcf2(input_grid: ColoredGrid) -> ColoredGrid:
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
 
-    def is_valid(r: int, c: int) -> bool:
-        return 0 <= r < rows and 0 <= c < cols
+    def is_sky_blue(cell: int) -> bool:
+        return cell == 8
 
     def vertical_expand():
-        for color in range(9, 0, -1):
+        for c in range(cols):
             for r in range(rows):
-                for c in range(cols):
-                    if grid.values[r][c] == color:
-                        if color < 8:
-                            # Expand upward
-                            for i in range(r-1, -1, -1):
-                                if grid.values[i][c] == 0:
-                                    grid.values[i][c] = color
-                                else:
-                                    break
+                if not is_sky_blue(grid.values[r][c]) and grid.values[r][c] != 0:
+                    color = grid.values[r][c]
+                    for i in range(r-1, -1, -1):
+                        if grid.values[i][c] == 0:
+                            grid.values[i][c] = color
+                        elif is_sky_blue(grid.values[i][c]):
+                            break
                         else:
-                            # Expand downward
-                            for i in range(r+1, rows):
-                                if grid.values[i][c] == 0:
-                                    grid.values[i][c] = color
-                                else:
-                                    break
+                            break
+
+    def find_sections():
+        sections = []
+        for r in range(rows):
+            start = 0
+            for c in range(cols):
+                if is_sky_blue(grid.values[r][c]):
+                    if start != c:
+                        sections.append((r, start, c-1))
+                    start = c + 1
+            if start != cols:
+                sections.append((r, start, cols-1))
+        return sections
+
+    def horizontal_expand(sections):
+        for r, start, end in sections:
+            colors = set(grid.values[r][start:end+1]) - {0, 8}
+            for color in colors:
+                left = right = -1
+                for c in range(start, end+1):
+                    if grid.values[r][c] == color:
+                        if left == -1:
+                            left = c
+                        right = c
+                if left != -1 and right != -1:
+                    for c in range(left, right+1):
+                        if grid.values[r][c] == 0:
+                            grid.values[r][c] = color
 
     def sky_blue_fill():
-        for r in range(rows):
-            if 8 in grid.values[r]:
-                for c in range(cols):
-                    if grid.values[r][c] == 8:
-                        for i in range(r+1, rows):
-                            if grid.values[i][c] == 0:
-                                grid.values[i][c] = 8
-                            else:
-                                break
-
-    def horizontal_expand():
-        for r in range(rows):
-            original_colors = set(grid.values[r]) - {0, 8}
-            start = 0
-            while start < cols:
-                if grid.values[r][start] == 8:
-                    start += 1
-                    continue
-                end = start + 1
-                while end < cols and grid.values[r][end] != 8:
-                    end += 1
-                for color in original_colors:
-                    indices = [i for i in range(start, end) if grid.values[r][i] == color]
-                    if len(indices) > 1:
-                        for i in range(indices[0], indices[-1]+1):
-                            if grid.values[r][i] == 0:
-                                grid.values[r][i] = color
-                start = end + 1
-
-    def final_sky_blue_fill():
         for r in range(rows):
             for c in range(cols):
                 if grid.values[r][c] == 0:
                     grid.values[r][c] = 8
 
     vertical_expand()
+    sections = find_sections()
+    horizontal_expand(sections)
     sky_blue_fill()
-    horizontal_expand()
-    final_sky_blue_fill()
 
     return grid
