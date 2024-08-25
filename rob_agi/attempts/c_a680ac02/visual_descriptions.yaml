@@ -1,0 +1,44 @@
+example_0:
+  input: |
+    The input grid is 18x17 in size. It contains four distinct shapes:
+    1. A red (2) square outline in the top-left corner, 5x5 in size.
+    2. A yellow (4) square outline in the top-right corner, 5x5 in size.
+    3. A green (3) solid square in the middle-left, 4x4 in size.
+    4. A sky blue (8) solid square in the bottom-right, 4x4 in size.
+    The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The output grid is 4x8 in size. It contains two square outlines side by side:
+    1. A red (2) square outline on the left, 4x4 in size.
+    2. A yellow (4) square outline on the right, 4x4 in size.
+    The interiors of both squares are filled with black (0).
+
+example_1:
+  input: |
+    The input grid is 21x16 in size. It contains four distinct shapes:
+    1. A sky blue (8) solid square in the top-right corner, 4x4 in size.
+    2. A blue (1) square outline in the middle-left, 5x5 in size.
+    3. A red (2) square outline in the bottom-left, 5x5 in size.
+    4. A yellow (4) solid square in the bottom-right corner, 4x4 in size.
+    The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The output grid is 8x4 in size. It contains two square outlines stacked vertically:
+    1. A blue (1) square outline on top, 4x4 in size.
+    2. A red (2) square outline on bottom, 4x4 in size.
+    The interiors of both squares are filled with black (0).
+
+example_2:
+  input: |
+    The input grid is 24x22 in size. It contains six distinct shapes:
+    1. A blue (1) solid square in the top-left, 4x4 in size.
+    2. A sky blue (8) solid square in the top-right, 4x4 in size.
+    3. A green (3) square outline in the middle-left, 5x5 in size.
+    4. A magenta (6) solid square in the bottom-middle, 4x4 in size.
+    5. A yellow (4) square outline in the bottom-left, 5x5 in size.
+    6. A red (2) square outline in the bottom-right, 5x5 in size.
+    The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The output grid is 4x12 in size. It contains three square outlines side by side:
+    1. A yellow (4) square outline on the left, 4x4 in size.
+    2. A green (3) square outline in the middle, 4x4 in size.
+    3. A red (2) square outline on the right, 4x4 in size.
+    The interiors of all squares are filled with black (0).
