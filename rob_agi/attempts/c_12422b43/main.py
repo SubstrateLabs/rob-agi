@@ -5,10 +5,11 @@ def solve_12422b43(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by extending vertical patterns downwards.
     
-    1. Identifies vertical patterns in the input grid, excluding the leftmost column.
-    2. Extends these patterns downwards to fill the grid.
-    3. Preserves the original content of the first two rows.
-    4. If a pattern is blocked by an existing color, it stops at that point.
+    1. Identifies vertical patterns in each column, starting from the top.
+    2. Extends these patterns downwards, filling all zero (empty) cells.
+    3. Preserves existing non-zero values in the grid.
+    4. Repeats the pattern as needed to fill the entire column.
+    5. Stops filling when encountering a non-zero cell.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -19,25 +20,21 @@ def solve_12422b43(input_grid: ColoredGrid) -> ColoredGrid:
     output_grid = input_grid.deep_copy()
     rows, cols = input_grid.get_dimensions()
     
-    # Identify and extend vertical patterns
     for c in range(1, cols):  # Start from the second column
         pattern = []
-        for r in range(2, rows):  # Start from the third row
+        for r in range(rows):
             if input_grid.get_cell(r, c) != 0:
                 pattern.append(input_grid.get_cell(r, c))
-            elif pattern:
-                break
         
         if pattern:
-            r = 2  # Start filling from the third row
+            r = 0
+            p = 0
             while r < rows:
-                for color in pattern:
-                    if r < rows and output_grid.get_cell(r, c) == 0:
-                        output_grid.set_cell(r, c, color)
-                        r += 1
-                    else:
-                        break
-                if r >= rows or output_grid.get_cell(r, c) != 0:
+                if output_grid.get_cell(r, c) == 0:
+                    output_grid.set_cell(r, c, pattern[p])
+                    p = (p + 1) % len(pattern)
+                else:
                     break
+                r += 1
     
     return output_grid
