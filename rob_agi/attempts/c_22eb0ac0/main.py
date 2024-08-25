@@ -2,19 +2,25 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_22eb0ac0(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by filling rows 3 and 7 (0-indexed) with their first non-zero number
-    if the first and last numbers in the row match and are non-zero.
-    All other rows remain unchanged.
+    Transforms the input grid by filling rows with their first non-zero number
+    if the first and last non-zero numbers in the row match.
+    Rows without matching non-zero numbers at the ends remain unchanged.
     """
     output = input_grid.deep_copy()
-    rows_to_check = [3, 7]
     
-    for row in rows_to_check:
-        first = output.get_cell(row, 0)
-        last = output.get_cell(row, output.num_cols - 1)
+    for row in range(output.num_rows):
+        first_non_zero = None
+        last_non_zero = None
         
-        if first == last and first != 0:
+        for col in range(output.num_cols):
+            cell = output.get_cell(row, col)
+            if cell != 0:
+                if first_non_zero is None:
+                    first_non_zero = cell
+                last_non_zero = cell
+        
+        if first_non_zero is not None and first_non_zero == last_non_zero:
             for col in range(output.num_cols):
-                output.set_cell(row, col, first)
+                output.set_cell(row, col, first_non_zero)
     
     return output

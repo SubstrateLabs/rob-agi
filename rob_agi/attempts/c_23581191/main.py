@@ -3,8 +3,8 @@ from rob_agi.colored_grid import ColoredGrid
 def solve_23581191(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by extending the colors 8 and 7 in specific patterns:
-    - For 8: Fills its entire column and row to the right
-    - For 7: Fills its entire column and row to the left
+    - For 8: Fills its entire column and the entire row it's in
+    - For 7: Fills its entire column and the entire row it's in
     - Places 2 at the intersections of these extensions
     - Preserves the original positions of 8 and 7
 
@@ -30,13 +30,13 @@ def solve_23581191(input_grid: ColoredGrid) -> ColoredGrid:
     if r8 is not None and c8 is not None:
         for r in range(rows):
             output.set_cell(r, c8, 8)
-        for c in range(c8, cols):
+        for c in range(cols):
             output.set_cell(r8, c, 8)
 
     if r7 is not None and c7 is not None:
         for r in range(rows):
             output.set_cell(r, c7, 7)
-        for c in range(c7 + 1):
+        for c in range(cols):
             output.set_cell(r7, c, 7)
 
     if r8 is not None and c8 is not None and r7 is not None and c7 is not None:

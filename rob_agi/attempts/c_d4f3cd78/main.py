@@ -8,15 +8,15 @@ def solve_d4f3cd78(input_grid: ColoredGrid) -> ColoredGrid:
     
     The solution follows these steps:
     1. Find the bounding box of the gray shape.
-    2. Locate an opening in the shape.
-    3. Flood fill the interior with sky blue.
-    4. Extend the fill through the opening if it exists.
+    2. Locate an opening in the shape on any side.
+    3. Flood fill the interior with sky blue, starting from inside the shape.
+    4. Extend the fill through the opening if one exists.
     
     Args:
         input_grid (ColoredGrid): The input grid containing the shape to be filled.
     
     Returns:
-        ColoredGrid: The solved grid with the interior filled and extended if applicable.
+        ColoredGrid: The solved grid with the interior filled and extended through the opening.
     """
     def find_bounding_box(grid: List[List[int]], color: int) -> Optional[Tuple[int, int, int, int]]:
         rows, cols = len(grid), len(grid[0])
@@ -31,9 +31,13 @@ def solve_d4f3cd78(input_grid: ColoredGrid) -> ColoredGrid:
     def find_opening(grid: List[List[int]], bbox: Tuple[int, int, int, int]) -> Optional[Tuple[int, int]]:
         top, left, bottom, right = bbox
         for r in range(top, bottom + 1):
+            if grid[r][left] == 0:
+                return r, left
             if grid[r][right] == 0:
                 return r, right
         for c in range(left, right + 1):
+            if grid[top][c] == 0:
+                return top, c
             if grid[bottom][c] == 0:
                 return bottom, c
         return None
@@ -55,16 +59,24 @@ def solve_d4f3cd78(input_grid: ColoredGrid) -> ColoredGrid:
 
     def extend_fill(grid: List[List[int]], start_r: int, start_c: int, color: int):
         rows, cols = len(grid), len(grid[0])
-        # Extend horizontally
-        for c in range(start_c, cols):
-            if grid[start_r][c] == 5:
-                break
-            grid[start_r][c] = color
         # Extend vertically
+        for r in range(start_r, -1, -1):
+            if grid[r][start_c] == 5:
+                break
+            grid[r][start_c] = color
         for r in range(start_r + 1, rows):
             if grid[r][start_c] == 5:
                 break
             grid[r][start_c] = color
+        # Extend horizontally
+        for c in range(start_c, -1, -1):
+            if grid[start_r][c] == 5:
+                break
+            grid[start_r][c] = color
+        for c in range(start_c + 1, cols):
+            if grid[start_r][c] == 5:
+                break
+            grid[start_r][c] = color
 
     result = input_grid.deep_copy()
     grid = result.values
@@ -77,10 +89,14 @@ def solve_d4f3cd78(input_grid: ColoredGrid) -> ColoredGrid:
     if not opening:
         return result
 
-    # Flood fill from inside the shape
-    flood_fill(grid, bbox[0] + 1, bbox[1] + 1, 8, bbox)
+    # Find a point inside the shape to start the flood fill
+    top, left, bottom, right = bbox
+    inside_r, inside_c = (top + bottom) // 2, (left + right) // 2
 
-    # Extend the fill if there's an opening
+    # Flood fill from inside the shape
+    flood_fill(grid, inside_r, inside_c, 8, bbox)
+
+    # Extend the fill through the opening
     if opening:
         extend_fill(grid, opening[0], opening[1], 8)
 

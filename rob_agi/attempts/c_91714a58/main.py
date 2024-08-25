@@ -9,6 +9,14 @@ def solve_91714a58(input_grid: ColoredGrid) -> ColoredGrid:
     It keeps track of the overall largest valid rectangle (at least 2x3 or 3x2) across all colors.
     Finally, it creates an output grid with the largest found rectangle filled with its color.
 
+    The algorithm works as follows:
+    1. Iterate through all non-zero colors in the input grid.
+    2. For each color, scan the grid row by row, building a histogram of consecutive color heights.
+    3. Use a stack-based algorithm to find the largest rectangle in each histogram.
+    4. Keep track of the overall largest valid rectangle across all colors.
+    5. Create an output grid of the same size as the input, filled with zeros.
+    6. Fill the largest found rectangle in the output grid with its color.
+
     Args:
     input_grid (ColoredGrid): The input grid to be processed.
 
@@ -28,7 +36,7 @@ def solve_91714a58(input_grid: ColoredGrid) -> ColoredGrid:
                 area = width * height
                 if area > max_area and ((width >= 3 and height >= 2) or (width >= 2 and height >= 3)):
                     max_area = area
-                    max_rect = (index, start, height)
+                    max_rect = (index, i, height)
                 start = index
             stack.append((start, h))
         heights.pop()

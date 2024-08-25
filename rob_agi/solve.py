@@ -849,7 +849,7 @@ async def bootstrap_solved():
         attempted += 1
         sln = combined_solutions[c.id]
         s = Solver(challenge=c, solution=sln)
-        succeeded = s.run_solve(max_tries=1, prev_solution=previous_solution)
+        succeeded = s.run_solve(max_tries=2, prev_solution=previous_solution)
         if succeeded:
             successful += 1
         print(f"Solve Rate: {successful} of {attempted} ({successful / attempted:.2%})")

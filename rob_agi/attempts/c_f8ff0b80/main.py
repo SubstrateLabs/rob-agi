@@ -14,6 +14,11 @@ def solve_f8ff0b80(input_grid: ColoredGrid) -> ColoredGrid:
     4. Sort the colors based on largest block size (descending), then row (descending), then column (descending).
     5. Format the sorted colors as a list of single-element lists.
 
+    The sorting prioritizes:
+    - Larger block sizes first
+    - If block sizes are equal, lower rows (closer to bottom) first
+    - If block sizes and rows are equal, rightmost columns first
+
     Args:
     input_grid (ColoredGrid): The input grid containing colored blocks.
 

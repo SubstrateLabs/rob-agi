@@ -10,7 +10,7 @@ def solve_272f95fa(input_grid: ColoredGrid) -> ColoredGrid:
       - Left of first vertical divider: Fill with 4s
       - Between vertical dividers: Fill with 6s
       - Right of last vertical divider: Fill with 3s
-    Preserves all 8s and boundary 0s.
+    Preserves all 8s and outer boundary 0s.
     """
     def find_dividers(grid):
         horizontal = [i for i, row in enumerate(grid.values) if all(cell == 8 for cell in row)]
@@ -50,7 +50,8 @@ def solve_272f95fa(input_grid: ColoredGrid) -> ColoredGrid:
             else:
                 left_div = right_div = -1
             
-            if (j == 0 or j == cols - 1 or i == 0 or i == rows - 1) and grid.get_cell(i, j) == 0:
+            # Preserve all 0s
+            if grid.get_cell(i, j) == 0:
                 continue
             
             new_value = transform_section(i, j, section, left_div, right_div)

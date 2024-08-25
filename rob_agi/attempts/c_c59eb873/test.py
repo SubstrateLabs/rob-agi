@@ -1,4 +1,3 @@
-
 import pytest
 from rob_agi.colored_grid import ColoredGrid
 from rob_agi.attempts.c_c59eb873.main import solve_c59eb873

@@ -18,7 +18,7 @@ def solve_a85d4709(input_grid: ColoredGrid) -> ColoredGrid:
     def transform_row(row):
         if 5 in row:
             index = row.index(5)
-            return [2, 4, 3][index] * 3
+            return [2, 4, 3][index], [2, 4, 3][index], [2, 4, 3][index]
         return row  # This case should not occur based on the given examples
 
     transformed_values = [transform_row(row) for row in input_grid.values]

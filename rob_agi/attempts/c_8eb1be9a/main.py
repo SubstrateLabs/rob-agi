@@ -6,8 +6,14 @@ def solve_8eb1be9a(input_grid: ColoredGrid) -> ColoredGrid:
     
     This function identifies the first non-zero row in the input grid,
     extracts a 3-row pattern starting from that row, and then replicates
-    this pattern vertically to fill the entire output grid. If the input
-    grid is all zeros, it returns the original grid unchanged.
+    this pattern vertically to fill the entire output grid. The pattern
+    starts from the top of the output grid, regardless of where it was found
+    in the input grid. If the input grid is all zeros, it returns the original
+    grid unchanged.
+    
+    The solution ensures that the pattern is correctly aligned from the top
+    of the output grid, and handles cases where the input pattern might be
+    incomplete or shorter than 3 rows.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -23,7 +29,7 @@ def solve_8eb1be9a(input_grid: ColoredGrid) -> ColoredGrid:
         for i in range(start_row, min(start_row + 3, len(grid))):
             pattern.append(grid[i][:])
         while len(pattern) < 3:
-            pattern.append(pattern[-1][:])
+            pattern.append([0] * len(grid[0]))  # Fill with zeros if pattern is incomplete
         return pattern
 
     start_row = find_first_non_zero_row(input_grid.values)
@@ -33,6 +39,6 @@ def solve_8eb1be9a(input_grid: ColoredGrid) -> ColoredGrid:
     pattern = extract_pattern(input_grid.values, start_row)
     output_values = []
     for i in range(len(input_grid.values)):
-        output_values.append(pattern[i % len(pattern)][:])
+        output_values.append(pattern[i % 3][:])
 
     return ColoredGrid(values=output_values)

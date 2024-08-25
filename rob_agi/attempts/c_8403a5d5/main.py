@@ -7,7 +7,7 @@ def solve_8403a5d5(input_grid: ColoredGrid) -> ColoredGrid:
     2. Creates a new grid with the same dimensions, filled with zeros.
     3. Starting from the anchor column, fills every other column with the anchor value.
     4. Adds special pattern (5's) to the top and bottom rows:
-       - Top row: Second filled column after anchor, then every third filled column.
+       - Top row: First filled column after anchor, then every third filled column.
        - Bottom row: Third filled column after anchor, then every third filled column.
     5. Preserves all columns to the left of the anchor as zeros.
     6. Keeps the original anchor value in its position in the last row.
@@ -29,11 +29,14 @@ def solve_8403a5d5(input_grid: ColoredGrid) -> ColoredGrid:
                 new_grid[row][col] = anchor_value
         
         # Add special pattern (5's) to top and bottom rows
-        for i, row in enumerate([0, -1]):  # Top and bottom rows
-            start = anchor_col + (3 if i == 0 else 4)
-            for col in range(start, cols, 6):
-                if col < cols:
-                    new_grid[row][col] = 5
+        top_start = anchor_col + 2
+        bottom_start = anchor_col + 4
+        for col in range(top_start, cols, 6):
+            if col < cols:
+                new_grid[0][col] = 5
+        for col in range(bottom_start, cols, 6):
+            if col < cols:
+                new_grid[-1][col] = 5
         
         # Ensure the anchor value is preserved in the last row
         new_grid[-1][anchor_col] = anchor_value

@@ -9,9 +9,9 @@ def solve_f5b8619d(input_grid: ColoredGrid) -> ColoredGrid:
     1. Initialize an output grid with dimensions twice that of the input.
     2. Process each column of the input grid:
        a. Replicate non-zero values in 2x2 blocks in the output.
-       b. Fill surrounding cells with 8 (sky) until reaching another non-zero value or grid edge.
+       b. Fill surrounding areas with sky color (8) until reaching another non-zero value or grid edge.
     3. Mirror the left and right edges of the output grid.
-    4. Copy the top half of the output to the bottom half for vertical symmetry.
+    4. Create vertical symmetry by mirroring the top half to the bottom half.
     """
     def process_column(col):
         result = [0] * (height * 2)

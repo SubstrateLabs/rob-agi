@@ -13,9 +13,6 @@ def solve_3c9b0459(input_grid: ColoredGrid) -> ColoredGrid:
     rotated = input_grid.flip_vertical().flip_horizontal()
     
     # Step 2: Swap the largest and smallest non-9 values in the first and last rows
-    first_row = rotated.values[0]
-    last_row = rotated.values[-1]
-    
     def swap_min_max(row):
         non_nine = [x for x in row if x != 9]
         if len(non_nine) >= 2:
@@ -24,7 +21,7 @@ def solve_3c9b0459(input_grid: ColoredGrid) -> ColoredGrid:
             max_index = row.index(max_val)
             row[min_index], row[max_index] = max_val, min_val
     
-    swap_min_max(first_row)
-    swap_min_max(last_row)
+    swap_min_max(rotated.values[0])
+    swap_min_max(rotated.values[-1])
     
     return ColoredGrid(values=rotated.values)

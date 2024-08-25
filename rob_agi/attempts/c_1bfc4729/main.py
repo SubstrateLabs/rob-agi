@@ -7,7 +7,7 @@ def solve_1bfc4729(input_grid: ColoredGrid) -> ColoredGrid:
     The function identifies two key colors in the input grid and applies a specific pattern:
     - The top color fills the top three rows and side columns of the top half.
     - The bottom color fills the bottom three rows and side columns of the bottom half.
-    - The middle section (rows 4-6) has only the side columns filled with the bottom color.
+    - The middle section (rows 5-7) has only the side columns filled with the bottom color.
     - The rows corresponding to the original positions of the key colors are fully filled.
     
     Args:
@@ -19,17 +19,21 @@ def solve_1bfc4729(input_grid: ColoredGrid) -> ColoredGrid:
     def find_key_colors(grid):
         colors = []
         for i, row in enumerate(grid.values):
-            for j, cell in enumerate(row):
+            for cell in row:
                 if cell != 0 and len(colors) < 2:
                     colors.append((cell, i))
+                    break
             if len(colors) == 2:
                 break
         return colors
 
-    def apply_pattern(grid, color, start_row, end_row):
+    def apply_pattern(grid, color, start_row, end_row, is_bottom=False):
         for i in range(start_row, end_row):
             grid[i][0] = grid[i][-1] = color
-        grid[start_row] = grid[start_row + 2] = [color] * 10
+        if not is_bottom:
+            grid[start_row] = grid[start_row + 2] = [color] * 10
+        else:
+            grid[end_row - 1] = grid[end_row - 3] = [color] * 10
 
     colors = find_key_colors(input_grid)
     output = [[0 for _ in range(10)] for _ in range(10)]
@@ -41,7 +45,7 @@ def solve_1bfc4729(input_grid: ColoredGrid) -> ColoredGrid:
 
     if len(colors) == 2:
         bottom_color, bottom_row = colors[1]
-        apply_pattern(output, bottom_color, 5, 10)
+        apply_pattern(output, bottom_color, 5, 10, is_bottom=True)
         output[bottom_row] = [bottom_color] * 10
 
     return ColoredGrid(values=output)
