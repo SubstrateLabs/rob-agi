@@ -3,13 +3,14 @@ from typing import List, Tuple, Dict, FrozenSet
 
 def solve_2a5f8217(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the grid transformation challenge by identifying unique shapes,
-    finding the highest color for each shape, and applying these colors
-    consistently across the grid.
+    Solves the grid transformation challenge by identifying unique shapes and applying color transformations.
 
-    1. Identify unique shapes in the input grid.
-    2. Find the highest color value for each unique shape.
-    3. Create a new grid and apply the highest color to all instances of each shape.
+    1. Identify and normalize shapes in the input grid.
+    2. Group shapes and their instances.
+    3. Create a color transformation map based on the following rule:
+       For each shape instance, find the first color higher than its current color among instances of the same shape.
+       If no higher color is found, keep the original color.
+    4. Apply the color transformations to create a new grid.
 
     Args:
         input_grid (ColoredGrid): The input grid to be transformed.
@@ -31,20 +32,17 @@ def solve_2a5f8217(input_grid: ColoredGrid) -> ColoredGrid:
                 shapes[shape] = []
             shapes[shape].append((color, region))
 
-    shape_highest_color = {
-        shape: max(color for color, _ in instances)
-        for shape, instances in shapes.items()
-    }
+    color_map: Dict[Tuple[int, int], int] = {}
+    for shape, instances in shapes.items():
+        sorted_instances = sorted(instances, key=lambda x: x[0], reverse=True)
+        for i, (color, region) in enumerate(sorted_instances):
+            new_color = next((c for c, _ in sorted_instances[:i] if c > color), color)
+            for x, y in region:
+                color_map[(x, y)] = new_color
 
     new_grid = ColoredGrid(values=[
-        [0 for _ in range(input_grid.num_cols)]
-        for _ in range(input_grid.num_rows)
+        [color_map.get((x, y), input_grid.values[y][x]) for x in range(input_grid.num_cols)]
+        for y in range(input_grid.num_rows)
     ])
-
-    for shape, instances in shapes.items():
-        new_color = shape_highest_color[shape]
-        for _, region in instances:
-            for x, y in region:
-                new_grid.values[y][x] = new_color
 
     return new_grid
