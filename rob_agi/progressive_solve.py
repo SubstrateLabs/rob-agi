@@ -11,7 +11,7 @@ from rob_agi.arc_util import load_task_set
 from rob_agi.computed_result import ComputedResult
 from rob_agi.grid_problem import GridProblem
 from rob_agi.solver_functions import problem_setup_aider
-from rob_agi.test_factory import run_pytest, setup_tests
+from rob_agi.test_factory import run_pytest, setup_files
 
 
 project_root = Path(__file__).parent.parent
@@ -45,7 +45,7 @@ class Solver:
                 f.write("\n")
                 f.write(f"!rob_agi/attempts/c_{self.challenge.id}\n")
                 f.write(f"rob_agi/attempts/c_{self.challenge.id}/image.png\n")
-        setup_tests(self.challenge, self.solution, self.challenge_root)
+        setup_files(self.challenge, self.solution, self.challenge_root)
         try:
             (self.challenge_root / f"image.png").symlink_to(self.file_entries["image"])
         except FileExistsError:

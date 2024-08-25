@@ -59,7 +59,9 @@ def solve_91714a58(input_grid: ColoredGrid) -> ColoredGrid:
             if rect:
                 left, right, height = rect
                 area = (right - left) * height
-                if area > (max_rect[2] - max_rect[1]) * max_rect[3] if max_rect else 0:
+                if (not max_rect) or (area > (max_rect[2] - max_rect[1]) * max_rect[3]) or \
+                   (area == (max_rect[2] - max_rect[1]) * max_rect[3] and 
+                    (r - height + 1, left) < (max_rect[0], max_rect[1])):
                     max_rect = (r - height + 1, left, right, height)
                     max_color = color
 

@@ -7,7 +7,8 @@ def solve_5614dbcf(input_grid: ColoredGrid) -> ColoredGrid:
     
     The input grid is divided into nine 3x3 subgrids. The function extracts the center element
     from each subgrid and places it in the corresponding position in the output grid.
-    If the center element is 5 (gray), it is replaced with the most frequent non-zero color in that subgrid.
+    If the center element is 5 (gray), it is replaced with the most frequent non-zero, non-gray color in that subgrid.
+    If there are no other colors, it is replaced with 0 (black).
     
     Args:
     input_grid (ColoredGrid): A 9x9 input grid
@@ -33,10 +34,10 @@ def solve_5614dbcf(input_grid: ColoredGrid) -> ColoredGrid:
                     for r in range(i*3, (i+1)*3)
                     for c in range(j*3, (j+1)*3)
                 ]
-                # Count non-zero values
-                color_counts = Counter(v for v in subgrid_values if v != 0)
-                # Replace with most frequent non-zero color, or keep 5 if no other colors
-                center_value = color_counts.most_common(1)[0][0] if color_counts else 5
+                # Count non-zero, non-gray values
+                color_counts = Counter(v for v in subgrid_values if v not in [0, 5])
+                # Replace with most frequent non-zero, non-gray color, or 0 if no other colors
+                center_value = color_counts.most_common(1)[0][0] if color_counts else 0
             
             # Place the processed center element in the output grid
             output[i][j] = center_value

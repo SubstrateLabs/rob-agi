@@ -10,6 +10,8 @@ def solve_d13f3404(input_grid: ColoredGrid) -> ColoredGrid:
     3. Non-zero elements from the input grid propagate diagonally down-right in the output grid.
     4. When a diagonal reaches the right edge, it wraps around to the left side of the next row.
     5. This pattern continues until the entire 6x6 grid is filled.
+    6. The propagation only fills empty (0) cells, preserving existing non-zero values.
+    7. The propagation starts from the top-left corner and proceeds row by row, column by column.
     
     Args:
     input_grid (ColoredGrid): The input 3x3 grid to be transformed.
@@ -32,7 +34,7 @@ def solve_d13f3404(input_grid: ColoredGrid) -> ColoredGrid:
             if output_values[row][col] == 0:  # Only fill if the cell is empty
                 output_values[row][col] = value
     
-    # Propagate non-zero elements
+    # Propagate non-zero elements starting from the top-left corner
     for i in range(3):
         for j in range(3):
             if input_values[i][j] != 0:

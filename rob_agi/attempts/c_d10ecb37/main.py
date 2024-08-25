@@ -4,12 +4,15 @@ def solve_d10ecb37(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the d10ecb37 challenge by finding the repeating 2x2 pattern in the input grid.
     
-    The function identifies the smallest 2x2 subgrid that, when repeated, can generate
+    The function identifies the 2x2 subgrid that, when repeated, can generate
     the entire input grid. This subgrid is then returned as the solution.
+    
+    The function searches for the pattern by checking all possible 2x2 subgrids in the input,
+    starting from the top-left corner and moving through the first two rows and columns.
     """
     rows, cols = input_grid.get_dimensions()
     
-    # Check all possible 2x2 subgrids
+    # Check all possible 2x2 subgrids in the first two rows and columns
     for r in range(2):
         for c in range(2):
             subgrid = input_grid.extract_subgrid(r, c, 2, 2)

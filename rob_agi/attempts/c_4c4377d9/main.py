@@ -6,14 +6,15 @@ def solve_4c4377d9(input_grid: ColoredGrid) -> ColoredGrid:
     
     The function creates a new grid that is twice the height of the input grid.
     The first half of the new grid is an exact copy of the input grid.
-    The second half is a vertically reflected copy of the input grid.
+    The second half is a vertically reflected copy of the input grid, where the rows are in reverse order
+    but the elements within each row maintain their original order.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
     
     Returns:
     ColoredGrid: A new grid with twice the height of the input, containing the original
-                 grid and its vertical reflection.
+                 grid and its vertical reflection with rows reversed but elements in original order.
     """
     # Get the dimensions of the input grid
     rows, cols = input_grid.get_dimensions()
@@ -27,8 +28,9 @@ def solve_4c4377d9(input_grid: ColoredGrid) -> ColoredGrid:
         new_grid.append(new_row)
     
     # Create a vertically reflected copy of the input grid for the second half
-    for row in range(rows):
-        new_row = [input_grid.get_cell(rows - 1 - row, col) for col in range(cols)]
+    # Note: We reverse the row order but keep the elements within each row in their original order
+    for row in range(rows - 1, -1, -1):
+        new_row = [input_grid.get_cell(row, col) for col in range(cols)]
         new_grid.append(new_row)
     
     # Create and return a new ColoredGrid with the result

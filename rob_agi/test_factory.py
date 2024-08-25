@@ -44,16 +44,28 @@ def get_pytest_error(test_file):
     return result["error"]
 
 
-def setup_tests(gp: GridProblem, cr: Optional[ComputedResult], path: Path):
+def setup_files(gp: GridProblem, cr: Optional[ComputedResult], path: Path):
     path.mkdir(parents=True, exist_ok=True)
     write_test_file(gp, path, cr)
     write_main_file(gp, path)
+    write_meta_file(path)
     # write_init_file(path)
 
 
 def write_init_file(path: Path):
     with open(path / "__init__.py", "w") as f:
         f.write("")
+
+
+def write_meta_file(path: Path, solved: bool = False, latest_plan: str = None):
+    target_file = path / "meta.py"
+
+    content = f"""solved = {solved}
+latest_plan = {repr(latest_plan)}
+"""
+
+    with open(target_file, "w") as f:
+        f.write(content)
 
 
 def write_main_file(gp: GridProblem, path: Path):

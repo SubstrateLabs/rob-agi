@@ -2,12 +2,12 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_8eb1be9a(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the 8eb1be9a challenge by replicating a 3-row pattern vertically.
+    Solve the 8eb1be9a challenge by replicating a 3-row pattern vertically from the top.
     
     This function identifies the first non-zero row in the input grid,
     extracts a 3-row pattern starting from that row, and then replicates
     this pattern vertically to fill the entire output grid. The pattern
-    starts from the top of the output grid, regardless of where it was found
+    always starts from the top of the output grid, regardless of where it was found
     in the input grid. If the input grid is all zeros, it returns the original
     grid unchanged.
     
@@ -19,7 +19,7 @@ def solve_8eb1be9a(input_grid: ColoredGrid) -> ColoredGrid:
     input_grid (ColoredGrid): The input grid to be transformed.
     
     Returns:
-    ColoredGrid: The transformed grid with the replicated pattern.
+    ColoredGrid: The transformed grid with the replicated pattern starting from the top.
     """
     def find_first_non_zero_row(grid):
         return next((i for i, row in enumerate(grid) if any(row)), -1)
@@ -29,7 +29,7 @@ def solve_8eb1be9a(input_grid: ColoredGrid) -> ColoredGrid:
         for i in range(start_row, min(start_row + 3, len(grid))):
             pattern.append(grid[i][:])
         while len(pattern) < 3:
-            pattern.append([0] * len(grid[0]))  # Fill with zeros if pattern is incomplete
+            pattern.append(pattern[-1][:] if pattern else [0] * len(grid[0]))
         return pattern
 
     start_row = find_first_non_zero_row(input_grid.values)

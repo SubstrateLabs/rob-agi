@@ -5,6 +5,8 @@ def solve_62c24649(input_grid: ColoredGrid) -> ColoredGrid:
     Transform a 3x3 input grid into a 6x6 output grid by:
     1. Replicating the input grid in all four corners of the output grid
     2. Mirroring the edges inwards to fill the center
+    3. Preserving the original values in the center of each edge
+    4. Filling the center 2x2 area with zeros (black)
     """
     # Create a 6x6 output grid initialized with zeros
     output = ColoredGrid(values=[[0 for _ in range(6)] for _ in range(6)])
@@ -19,14 +21,17 @@ def solve_62c24649(input_grid: ColoredGrid) -> ColoredGrid:
             output.set_cell(5-i, 5-j, value)
     
     # Mirror the edges inwards to fill the center
-    for i in range(3):
+    for i in range(6):
         output.set_cell(i, 2, output.get_cell(i, 1))
         output.set_cell(i, 3, output.get_cell(i, 4))
-        output.set_cell(5-i, 2, output.get_cell(5-i, 1))
-        output.set_cell(5-i, 3, output.get_cell(5-i, 4))
     
     for j in range(6):
         output.set_cell(2, j, output.get_cell(1, j))
         output.set_cell(3, j, output.get_cell(4, j))
+    
+    # Fill the center 2x2 area with zeros (black)
+    for i in range(2, 4):
+        for j in range(2, 4):
+            output.set_cell(i, j, 0)
     
     return output
