@@ -10,12 +10,13 @@ def solve_0a1d4ef5(input_grid: ColoredGrid) -> ColoredGrid:
 
     The solution follows these steps:
     1. Analyze the input grid to calculate visual significance of colors based on region size,
-       position, contrast, and connectivity.
-    2. Determine the output grid size (2x2, 2x3, or 3x3) based on the complexity of the input.
+       position, contrast, connectivity, and other factors.
+    2. Determine the output grid size (2x2, 2x3, or 3x3) based on the number of significant colors.
     3. Select the most visually significant colors for the output grid.
-    4. Create a color relationship map to understand the relative positions of colors.
+    4. Create a color relationship map to understand the relative positions and adjacencies of colors.
     5. Arrange the colors in the output grid to best represent their relationships and significance.
     6. Fine-tune the arrangement to maximize the representation of the input grid's essence.
+    7. Handle edge cases and ensure the output is always valid.
 
     Args:
         input_grid (ColoredGrid): The input grid to be transformed.
@@ -40,6 +41,9 @@ def solve_0a1d4ef5(input_grid: ColoredGrid) -> ColoredGrid:
     
     # Step 6: Fine-tune the arrangement
     output_values = fine_tune_arrangement(output_values, color_relationships)
+
+    # Step 7: Handle edge cases
+    output_values = handle_edge_cases(output_values, selected_colors)
 
     return ColoredGrid(values=output_values)
 
@@ -140,10 +144,10 @@ def arrange_colors(selected_colors: List[int], color_relationships: Dict[Tuple[i
         for r in range(rows):
             for c in range(cols):
                 if output_grid[r][c] == 0:
-                    score = sum(abs(color_relationships.get((color, placed_color), 0) - 
+                    score = sum(abs(color_relationships.get((color, output_grid[pr][pc]), 0) - 
                                     math.dist((r, c), (pr, pc)))
                                 for pr in range(rows) for pc in range(cols)
-                                if output_grid[pr][pc] != 0 and output_grid[pr][pc] != color)
+                                if output_grid[pr][pc] != 0)
                     if score < best_score:
                         best_score = score
                         best_position = (r, c)
@@ -184,3 +188,19 @@ def calculate_arrangement_score(grid: List[List[int]], color_relationships: Dict
                         ideal_distance = color_relationships.get((color1, color2), 0)
                         score += abs(actual_distance - ideal_distance)
     return score
+def handle_edge_cases(output_values: List[List[int]], selected_colors: List[int]) -> List[List[int]]:
+    rows, cols = len(output_values), len(output_values[0])
+    total_cells = rows * cols
+    
+    # If there are less colors than cells, fill the remaining cells with the most significant color
+    if len(selected_colors) < total_cells:
+        for r in range(rows):
+            for c in range(cols):
+                if output_values[r][c] == 0:
+                    output_values[r][c] = selected_colors[0]
+    
+    # Ensure at least one cell has the most significant color
+    if selected_colors[0] not in [color for row in output_values for color in row]:
+        output_values[0][0] = selected_colors[0]
+    
+    return output_values
