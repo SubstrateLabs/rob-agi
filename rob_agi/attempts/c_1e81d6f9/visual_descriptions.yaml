@@ -1,0 +1,81 @@
+example_0:
+  input: |
+    A 15x15 grid with a gray (5) T-shaped object in the top-left corner. The T is 4 cells wide at the top and 4 cells tall. The rest of the grid is mostly black (0) with scattered colored cells:
+    - Red (2) in the top-left and bottom-right
+    - Green (3) near the top-right
+    - Blue (1) in the middle-left and middle-right
+    - Yellow (4) in the bottom-left and middle
+    - Orange (7) in the middle-right and bottom
+    - Sky (8) in the middle
+    - Brown (9) in the bottom-left
+    - Magenta (6) in the bottom-left
+  output: |
+    The 15x15 grid maintains the gray (5) T-shaped object in the top-left corner. Many of the scattered colored cells have been removed, leaving only:
+    - Red (2) in the top-left
+    - Green (3) near the top-right
+    - Blue (1) in the middle-left and middle-right
+    - Yellow (4) in the middle
+    - Orange (7) in the middle-right
+    - Sky (8) in the middle
+    - Brown (9) in the bottom-left
+    - Magenta (6) in the bottom-left
+
+example_1:
+  input: |
+    A 15x15 grid with a gray (5) T-shaped object in the top-left corner, identical to example_0. The rest of the grid has more scattered colored cells:
+    - Yellow (4) in the top-left, middle, and forming a small cluster in the middle-right
+    - Blue (1) in the top-right, middle-left, and bottom-right
+    - Brown (9) in the top-middle and bottom-left
+    - Red (2) in the top-middle, middle-right, and forming a cluster in the bottom-right
+    - Green (3) in the middle-left and bottom, forming a small cluster
+    - Magenta (6) in the middle-left
+    - Orange (7) in the bottom-middle
+    - Sky (8) in the top-left and bottom-right
+  output: |
+    The 15x15 grid maintains the gray (5) T-shaped object in the top-left corner. Many of the scattered colored cells have been removed, leaving only:
+    - Yellow (4) in the top-left and middle
+    - Blue (1) in the top-right and middle-left
+    - Brown (9) in the top-middle and bottom-left
+    - Red (2) in the top-middle, middle-right, and bottom-right (reduced cluster)
+    - Green (3) in the middle-left and bottom (reduced cluster)
+    - Magenta (6) in the middle-left
+    - Orange (7) in the bottom-middle
+    - Sky (8) in the top-left and bottom-right
+
+example_2:
+  input: |
+    A 15x15 grid with the same gray (5) T-shaped object in the top-left corner. The rest of the grid has scattered colored cells:
+    - Green (3) in the top-left, forming a small cluster
+    - Magenta (6) in the top-middle and middle-left
+    - Brown (9) scattered in the top-right, middle, and bottom-left
+    - Red (2) in the top-middle, middle-left, and bottom-middle
+    - Yellow (4) forming clusters in the middle-left and middle-right
+    - Blue (1) in the middle-right and bottom-left
+    - Orange (7) in the bottom-right
+    - Sky (8) in the top-middle and bottom-right
+    - An extra gray (5) cell in the middle
+  output: |
+    The 15x15 grid maintains the gray (5) T-shaped object in the top-left corner. Many of the scattered colored cells have been removed, leaving only:
+    - Green (3) in the top-left (reduced cluster)
+    - Magenta (6) in the top-middle and middle-left
+    - Brown (9) in the top-right and bottom-left (reduced occurrences)
+    - Red (2) in the top-middle, middle-left, and bottom-middle
+    - Yellow (4) in the middle-left and middle-right (reduced clusters)
+    - Blue (1) in the middle-right and bottom-left
+    - Orange (7) in the bottom-right
+    - Sky (8) in the top-middle and bottom-right
+    - The extra gray (5) cell in the middle is preserved
+
+test_case_0:
+  input: |
+    A 15x15 grid with the familiar gray (5) T-shaped object in the top-left corner. The rest of the grid has scattered colored cells:
+    - Green (3) forming a cluster in the top-left and one cell in the bottom
+    - Blue (1) in the top-right, middle-right, and bottom-right
+    - Magenta (6) in the top-middle and middle-left
+    - Yellow (4) forming clusters in the top-right, middle-left, and bottom-left
+    - Red (2) scattered in the middle and bottom-right
+    - Brown (9) in the top-middle, middle-right, and bottom-right
+    - Orange (7) in the bottom-middle
+    - Sky (8) in the top-left and bottom-right
+  output: |
+    The output is not provided for the test case.
