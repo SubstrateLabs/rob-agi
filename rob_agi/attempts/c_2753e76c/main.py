@@ -10,7 +10,7 @@ def solve_2753e76c(input_grid: ColoredGrid) -> ColoredGrid:
     2. Select the top 4 most frequent colors (or fewer if there aren't 4).
     3. Determine the width of the output grid based on the most frequent color.
     4. Create an output grid with 4 rows and the determined width.
-    5. Fill the grid from bottom to top, with more frequent colors occupying more cells.
+    5. Fill the grid from top to bottom, with more frequent colors occupying more cells.
     6. Align colors to the right in each row, filling unused cells with black (0).
     
     This approach captures the essence of the input grid by showing the relative
@@ -23,19 +23,19 @@ def solve_2753e76c(input_grid: ColoredGrid) -> ColoredGrid:
     top_colors = sorted(color_counts, key=color_counts.get, reverse=True)[:4]
 
     # Determine output grid width based on the most frequent color
-    grid_width = color_counts[top_colors[0]]
-    grid_height = 4
-
-    # Calculate color proportions
-    total_count = sum(color_counts[color] for color in top_colors)
-    color_proportions = {color: max(1, int((color_counts[color] / total_count) * grid_width)) for color in top_colors}
+    width = max(color_counts[color] for color in top_colors)
 
     # Create the output grid
-    output_grid = [[0 for _ in range(grid_width)] for _ in range(grid_height)]
+    output_grid = [[0 for _ in range(width)] for _ in range(4)]
 
     # Fill the grid
-    for i, color in enumerate(reversed(top_colors)):
-        cells_to_fill = color_proportions[color]
-        output_grid[grid_height - 1 - i][-cells_to_fill:] = [color] * cells_to_fill
+    row = 0
+    for color in top_colors:
+        cells_to_fill = color_counts[color]
+        while cells_to_fill > 0 and row < 4:
+            start = max(0, width - cells_to_fill)
+            output_grid[row][start:] = [color] * min(cells_to_fill, width)
+            cells_to_fill -= (width - start)
+            row += 1
 
     return ColoredGrid(values=output_grid)
