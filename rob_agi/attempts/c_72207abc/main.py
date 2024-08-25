@@ -5,7 +5,7 @@ def solve_72207abc(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by applying a pattern to the middle row.
     
     The pattern:
-    1. Extracts the initial sequence of non-zero colors from the middle row, including the first zero after.
+    1. Extracts the initial sequence of non-zero colors from the middle row.
     2. Repeats this sequence across the row with increasing spacing between repetitions.
     3. The spacing starts at 0 and increases by 1 after each complete sequence.
     4. The top and bottom rows remain unchanged (all zeros).
@@ -19,8 +19,9 @@ def solve_72207abc(input_grid: ColoredGrid) -> ColoredGrid:
     # Extract the initial sequence
     initial_sequence = []
     for color in input_grid.values[1]:  # Middle row
-        initial_sequence.append(color)
-        if color == 0 and len(initial_sequence) > 1:  # Include first zero after non-zero colors
+        if color != 0:
+            initial_sequence.append(color)
+        elif initial_sequence:  # Stop if we've found non-zero colors and hit a zero
             break
     
     # Create a new grid
