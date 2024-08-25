@@ -8,12 +8,11 @@ def solve_58743b76(input_grid: ColoredGrid) -> ColoredGrid:
     and replaces them with a repeating color sequence.
     For target color 1 (blue), the sequence is [4, 2, 3] (yellow, red, green).
     For target color 2 (red), the sequence is [4, 6, 1, 2] (yellow, magenta, blue, red).
-    The border (first/last two rows and columns) and any other colors remain unchanged.
-    The transformation stops when the sequence is exhausted.
+    The border (first/last row and column) remains unchanged.
+    The transformation continues until all target colors are replaced or the sequence is exhausted.
     """
     rows, cols = input_grid.get_dimensions()
-    border_width = 2
-
+    
     # Define transformation sequences
     sequences = {
         1: [4, 2, 3],
@@ -22,8 +21,8 @@ def solve_58743b76(input_grid: ColoredGrid) -> ColoredGrid:
 
     # Identify target color
     target_color = None
-    for r in range(border_width, rows - border_width):
-        for c in range(border_width, cols - border_width):
+    for r in range(1, rows - 1):
+        for c in range(1, cols - 1):
             if input_grid.values[r][c] in [1, 2]:
                 target_color = input_grid.values[r][c]
                 break
@@ -38,12 +37,10 @@ def solve_58743b76(input_grid: ColoredGrid) -> ColoredGrid:
     sequence = sequences[target_color]
     seq_index = 0
 
-    for r in range(border_width, rows - border_width):
-        for c in range(border_width, cols - border_width):
+    for r in range(1, rows - 1):
+        for c in range(1, cols - 1):
             if output_grid.values[r][c] == target_color:
                 output_grid.values[r][c] = sequence[seq_index]
-                seq_index += 1
-                if seq_index == len(sequence):
-                    return output_grid  # Stop when sequence is exhausted
+                seq_index = (seq_index + 1) % len(sequence)
 
     return output_grid
