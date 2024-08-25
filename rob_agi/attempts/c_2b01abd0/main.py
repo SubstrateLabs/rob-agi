@@ -5,10 +5,12 @@ def solve_2b01abd0(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the grid transformation challenge by following these steps:
     1. Identifies the blue line dividing the grid
-    2. Determines the source and target sides
-    3. Identifies the two most common non-black, non-blue colors in the source side
-    4. Creates a mirrored copy of the source side on the target side, swapping the two most common colors
-    
+    2. Determines the pattern side and the mirror side
+    3. Identifies the two most common non-black, non-blue colors in the pattern side
+    4. Swaps the two main colors on the pattern side
+    5. Creates a mirrored copy of the original pattern on the mirror side
+    6. Preserves the blue line in its original position
+
     Args:
     input_grid (ColoredGrid): The input grid to be transformed
 
@@ -16,9 +18,9 @@ def solve_2b01abd0(input_grid: ColoredGrid) -> ColoredGrid:
     ColoredGrid: The transformed grid
     """
     blue_line = find_blue_line(input_grid)
-    source_side, target_side = determine_sides(input_grid, blue_line)
-    color1, color2 = identify_common_colors(input_grid, blue_line, source_side)
-    new_grid = create_mirrored_grid(input_grid, blue_line, source_side, target_side, color1, color2)
+    pattern_side, mirror_side = determine_sides(input_grid, blue_line)
+    color1, color2 = identify_common_colors(input_grid, blue_line, pattern_side)
+    new_grid = transform_and_mirror_grid(input_grid, blue_line, pattern_side, mirror_side, color1, color2)
     return new_grid
 
 def find_blue_line(grid: ColoredGrid) -> Tuple[str, int]:
@@ -92,34 +94,36 @@ def identify_common_colors(grid: ColoredGrid, blue_line: Tuple[str, int], source
     sorted_colors = sorted(color_counts.items(), key=lambda x: x[1], reverse=True)
     return sorted_colors[0][0], sorted_colors[1][0] if len(sorted_colors) > 1 else sorted_colors[0][0]
 
-def create_mirrored_grid(grid: ColoredGrid, blue_line: Tuple[str, int], source_side: str, target_side: str, color1: int, color2: int) -> ColoredGrid:
+def transform_and_mirror_grid(grid: ColoredGrid, blue_line: Tuple[str, int], pattern_side: str, mirror_side: str, color1: int, color2: int) -> ColoredGrid:
     new_grid = grid.deep_copy()
     orientation, position = blue_line
     rows, cols = grid.get_dimensions()
     
     if orientation == 'horizontal':
-        source_range = range(position) if source_side == 'top' else range(position + 1, rows)
-        for r in source_range:
-            mirrored_r = position - (r - position) if source_side == 'top' else position + (position - r)
+        pattern_range = range(position) if pattern_side == 'top' else range(position + 1, rows)
+        for r in pattern_range:
+            mirrored_r = position - (r - position) if pattern_side == 'top' else position + (position - r)
             for c in range(cols):
                 original_color = grid.values[r][c]
+                # Swap colors on the pattern side
                 if original_color == color1:
-                    new_grid.values[mirrored_r][c] = color2
+                    new_grid.values[r][c] = color2
                 elif original_color == color2:
-                    new_grid.values[mirrored_r][c] = color1
-                else:
-                    new_grid.values[mirrored_r][c] = original_color
+                    new_grid.values[r][c] = color1
+                # Mirror the original pattern to the other side
+                new_grid.values[mirrored_r][c] = original_color
     else:
-        source_range = range(position) if source_side == 'left' else range(position + 1, cols)
-        for c in source_range:
-            mirrored_c = position - (c - position) if source_side == 'left' else position + (position - c)
+        pattern_range = range(position) if pattern_side == 'left' else range(position + 1, cols)
+        for c in pattern_range:
+            mirrored_c = position - (c - position) if pattern_side == 'left' else position + (position - c)
             for r in range(rows):
                 original_color = grid.values[r][c]
+                # Swap colors on the pattern side
                 if original_color == color1:
-                    new_grid.values[r][mirrored_c] = color2
+                    new_grid.values[r][c] = color2
                 elif original_color == color2:
-                    new_grid.values[r][mirrored_c] = color1
-                else:
-                    new_grid.values[r][mirrored_c] = original_color
+                    new_grid.values[r][c] = color1
+                # Mirror the original pattern to the other side
+                new_grid.values[r][mirrored_c] = original_color
     
     return new_grid
