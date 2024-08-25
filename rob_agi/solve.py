@@ -9,8 +9,13 @@ import logging
 from typing import List, Optional, Union, Tuple
 from concurrent.futures import ThreadPoolExecutor
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(threadName)s - %(message)s")
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler()
+formatter = logging.Formatter("%(asctime)s - %(threadName)s - %(message)s")
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.propagate = False
 
 import cloudpickle
 from openai.lib._pydantic import to_strict_json_schema
@@ -808,7 +813,7 @@ def attempt(challenge: GridProblem, previous_solution: Optional[str] = None):
     attempted += 1
     sln = solutions[challenge.id]
     s = Solver(challenge=challenge, solution=sln)
-    succeeded = s.run_solve(max_tries=3, prev_solution=previous_solution)
+    succeeded = s.run_solve(max_tries=4, prev_solution=previous_solution)
     if succeeded:
         successful += 1
     logger.info(f"Solve Rate: {successful} of {attempted} ({successful / attempted:.2%})")
@@ -922,7 +927,7 @@ async def main():
     # distill_research()
 
     for i in range(1):
-        await solve_loop(max_concurrent=8, to_process=None)
+        await solve_loop(max_concurrent=8, to_process=None, max_challenges=8)
     # await solve_loop(max_concurrent=4, max_challenges=8)
 
 

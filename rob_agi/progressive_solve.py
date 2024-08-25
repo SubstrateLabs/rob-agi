@@ -7,8 +7,13 @@ from aider.coders import Coder
 from aider.io import InputOutput
 from aider.models import Model
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(threadName)s - %(message)s")
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler()
+formatter = logging.Formatter("%(asctime)s - %(threadName)s - %(message)s")
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.propagate = False
 
 from rob_agi.arc_util import load_task_set
 from rob_agi.computed_result import ComputedResult
