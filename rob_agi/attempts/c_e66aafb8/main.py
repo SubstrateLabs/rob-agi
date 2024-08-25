@@ -1,21 +1,23 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import Tuple, List, Optional
 import numpy as np
+from typing import Tuple
 
 def solve_e66aafb8(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the e66aafb8 challenge by finding the most representative repeating pattern in the input grid.
+    Solve the e66aafb8 challenge by finding the most representative subgrid pattern in the input grid.
     
     The function works as follows:
-    1. Preprocess the input grid to identify non-black areas.
-    2. Iterate through potential pattern sizes and aspect ratios.
-    3. For each size, find patterns that repeat at least twice in the grid.
-    4. Clean and refine the patterns by removing black cells and unnecessary repetitions.
-    5. Select the best pattern based on size and coverage of non-black areas.
-    6. Handle edge cases and validate the final output.
+    1. Preprocess the input grid to create a numpy array and identify non-black areas.
+    2. Define a scoring function for subgrids based on color diversity and representativeness.
+    3. Iterate through potential subgrid sizes from 3x3 up to 8x8.
+    4. For each size, slide a window across the grid and score each subgrid.
+    5. Select the highest-scoring subgrid that doesn't contain black cells.
+    6. If no satisfactory subgrid is found, use a fallback method to extract the largest non-black area.
+    7. Post-process the selected subgrid to remove any all-black rows or columns.
+    8. Return the result as a ColoredGrid object.
     
     Returns:
-        ColoredGrid: A new grid containing the extracted pattern.
+        ColoredGrid: A new grid containing the extracted representative pattern.
     """
     rows, cols = input_grid.get_dimensions()
     grid = np.array([[input_grid.get_cell(r, c) for c in range(cols)] for r in range(rows)])
@@ -24,46 +26,55 @@ def solve_e66aafb8(input_grid: ColoredGrid) -> ColoredGrid:
     if not np.any(non_black_mask):
         return ColoredGrid(values=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
     
-    def check_pattern_repetition(pattern: np.ndarray) -> Tuple[bool, int]:
-        p_rows, p_cols = pattern.shape
-        repetitions = 0
-        for r in range(0, rows - p_rows + 1, p_rows):
-            for c in range(0, cols - p_cols + 1, p_cols):
-                if np.array_equal(grid[r:r+p_rows, c:c+p_cols], pattern):
-                    repetitions += 1
-        return repetitions >= 2, repetitions
+    def score_subgrid(subgrid: np.ndarray) -> float:
+        if np.any(subgrid == 0):
+            return -1  # Reject subgrids with black cells
+        
+        unique_colors, color_counts = np.unique(subgrid, return_counts=True)
+        color_diversity = len(unique_colors)
+        color_distribution = color_counts / np.sum(color_counts)
+        
+        overall_distribution = np.bincount(grid[non_black_mask].flatten(), minlength=10)[1:] / np.sum(non_black_mask)
+        representativeness = 1 - np.sum(np.abs(color_distribution - overall_distribution[:len(color_distribution)]))
+        
+        return color_diversity + representativeness
     
-    def clean_pattern(pattern: np.ndarray) -> np.ndarray:
-        pattern = pattern[~np.all(pattern == 0, axis=1)]
-        pattern = pattern[:, ~np.all(pattern == 0, axis=0)]
-        return pattern
+    best_subgrid = None
+    best_score = -1
     
-    best_pattern = None
-    best_pattern_size = 0
-    
-    for size in range(min(12, rows, cols), 1, -1):
+    for size in range(3, 9):
         for aspect_ratio in range(1, 4):
             for height, width in [(size, size//aspect_ratio), (size//aspect_ratio, size)]:
-                if height * width > 64 or height < 2 or width < 2:  # Max size 8x8, min size 2x2
+                if height * width > 64 or height < 2 or width < 2 or height > rows or width > cols:
                     continue
                 
                 for r in range(rows - height + 1):
                     for c in range(cols - width + 1):
-                        pattern = grid[r:r+height, c:c+width]
-                        repeats, _ = check_pattern_repetition(pattern)
-                        
-                        if repeats:
-                            cleaned_pattern = clean_pattern(pattern)
-                            if cleaned_pattern.size > best_pattern_size:
-                                best_pattern = cleaned_pattern
-                                best_pattern_size = cleaned_pattern.size
+                        subgrid = grid[r:r+height, c:c+width]
+                        score = score_subgrid(subgrid)
+                        if score > best_score:
+                            best_subgrid = subgrid
+                            best_score = score
     
-    if best_pattern is None:
-        # Fallback: return the largest non-black rectangular area up to 8x5
-        non_black_rows = np.any(non_black_mask, axis=1)
-        non_black_cols = np.any(non_black_mask, axis=0)
-        height = min(8, np.sum(non_black_rows))
-        width = min(5, np.sum(non_black_cols))
-        best_pattern = grid[non_black_rows][:height, :][:, non_black_cols][:, :width]
+    if best_subgrid is None:
+        # Fallback: extract the largest contiguous non-black area
+        from scipy.ndimage import label
+        labeled, num_features = label(non_black_mask)
+        largest_area = max([(labeled == i).sum() for i in range(1, num_features + 1)])
+        largest_label = [(labeled == i).sum() for i in range(1, num_features + 1)].index(largest_area) + 1
+        largest_region = labeled == largest_label
+        r_indices, c_indices = np.where(largest_region)
+        r_min, r_max = r_indices.min(), r_indices.max()
+        c_min, c_max = c_indices.min(), c_indices.max()
+        best_subgrid = grid[r_min:r_max+1, c_min:c_max+1]
+        best_subgrid = best_subgrid[:min(8, best_subgrid.shape[0]), :min(8, best_subgrid.shape[1])]
     
-    return ColoredGrid(values=best_pattern.tolist())
+    # Post-process: remove any all-black rows or columns
+    best_subgrid = best_subgrid[~np.all(best_subgrid == 0, axis=1)]
+    best_subgrid = best_subgrid[:, ~np.all(best_subgrid == 0, axis=0)]
+    
+    # Ensure minimum size of 2x2
+    if best_subgrid.shape[0] < 2 or best_subgrid.shape[1] < 2:
+        best_subgrid = np.pad(best_subgrid, ((0, max(0, 2 - best_subgrid.shape[0])), (0, max(0, 2 - best_subgrid.shape[1]))), mode='edge')
+    
+    return ColoredGrid(values=best_subgrid.tolist())
