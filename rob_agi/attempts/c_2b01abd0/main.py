@@ -7,9 +7,8 @@ def solve_2b01abd0(input_grid: ColoredGrid) -> ColoredGrid:
     1. Identifies the blue line dividing the grid
     2. Determines the source and target sides
     3. Creates a mirrored copy of the source side on the target side
-    4. Identifies connected regions in the source side
-    5. For each region, swaps the main color with the inner color (if exists)
-       in both the original and mirrored positions
+    4. Identifies the two most common non-black, non-blue colors
+    5. Swaps these two colors across the entire grid
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed
@@ -20,13 +19,8 @@ def solve_2b01abd0(input_grid: ColoredGrid) -> ColoredGrid:
     blue_line = find_blue_line(input_grid)
     source_side, target_side = determine_sides(input_grid, blue_line)
     new_grid = create_mirrored_grid(input_grid, blue_line, source_side, target_side)
-    regions = find_connected_regions(input_grid, source_side)
-    for region in regions:
-        main_color, inner_color = identify_colors(region)
-        if inner_color:
-            swap_colors(new_grid, region, main_color, inner_color)
-            mirrored_region = mirror_region(region, blue_line)
-            swap_colors(new_grid, mirrored_region, main_color, inner_color)
+    color1, color2 = identify_common_colors(input_grid)
+    swap_colors_globally(new_grid, color1, color2)
     return new_grid
 
 def find_blue_line(grid: ColoredGrid) -> Tuple[str, int]:
@@ -77,11 +71,22 @@ def find_connected_regions(grid: ColoredGrid, side: str) -> List[List[Tuple[int,
         start, end = (0, cols // 2) if side == 'left' else (cols // 2, cols)
         return [region for color in range(10) for region in grid.find_connected_regions(color) if all(start <= c < end for _, c in region)]
 
-def identify_colors(region: List[Tuple[int, int]]) -> Tuple[int, int]:
-    colors = [grid.values[r][c] for r, c in region]
-    main_color = max(set(colors), key=colors.count)
-    inner_colors = set(colors) - {main_color, 0}
-    return main_color, inner_colors.pop() if inner_colors else None
+def identify_common_colors(grid: ColoredGrid) -> Tuple[int, int]:
+    color_counts = {}
+    for row in grid.values:
+        for color in row:
+            if color not in [0, 1]:  # Exclude black and blue
+                color_counts[color] = color_counts.get(color, 0) + 1
+    sorted_colors = sorted(color_counts.items(), key=lambda x: x[1], reverse=True)
+    return sorted_colors[0][0], sorted_colors[1][0]
+
+def swap_colors_globally(grid: ColoredGrid, color1: int, color2: int):
+    for r in range(len(grid.values)):
+        for c in range(len(grid.values[0])):
+            if grid.values[r][c] == color1:
+                grid.values[r][c] = color2
+            elif grid.values[r][c] == color2:
+                grid.values[r][c] = color1
 
 def swap_colors(grid: ColoredGrid, region: List[Tuple[int, int]], color1: int, color2: int):
     for r, c in region:
