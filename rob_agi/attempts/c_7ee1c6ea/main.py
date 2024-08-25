@@ -7,14 +7,15 @@ def solve_7ee1c6ea(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by redistributing colors within connected regions.
     
-    1. Identifies key structures (frames, crosses) to preserve.
+    1. Identifies key structures (frames, crosses, border-like patterns) to preserve.
     2. Segments the grid into regions based on these structures.
-    3. For each region, identifies connected color areas.
-    4. Redistributes colors to create larger continuous areas while maintaining balance.
+    3. For each region, analyzes color distribution and identifies potential cluster areas.
+    4. Iteratively expands color clusters while maintaining overall color ratios.
     5. Preserves black (0) and gray (5) squares.
     6. Avoids creating 2x2 squares of the same color.
     7. Performs local refinements to merge small isolated color areas.
-    8. Iterates the process until stability or max iterations.
+    8. Balances changes across regions to maintain overall grid coherence.
+    9. Iterates the process until stability or max iterations.
     
     Returns the transformed grid with improved color distribution and pattern coherence.
     """
@@ -22,17 +23,104 @@ def solve_7ee1c6ea(input_grid: ColoredGrid) -> ColoredGrid:
     key_structures = identify_key_structures(new_grid)
     regions = segment_grid(new_grid, key_structures)
     
-    max_iterations = 5
+    initial_color_ratios = calculate_color_ratios(new_grid)
+    
+    max_iterations = 10
     for _ in range(max_iterations):
         changed = False
         for region in regions:
-            if redistribute_colors_in_region(new_grid, region):
+            if redistribute_colors_in_region(new_grid, region, initial_color_ratios):
                 changed = True
         if not changed:
             break
     
     refine_small_areas(new_grid)
+    balance_changes(new_grid, initial_color_ratios)
     return new_grid
+
+def calculate_color_ratios(grid: ColoredGrid) -> Dict[int, float]:
+    color_counts = defaultdict(int)
+    total_cells = 0
+    for row in grid.values:
+        for cell in row:
+            if cell not in [0, 5]:  # Exclude black and gray
+                color_counts[cell] += 1
+                total_cells += 1
+    return {color: count / total_cells for color, count in color_counts.items()}
+
+def redistribute_colors_in_region(grid: ColoredGrid, region: Set[Tuple[int, int]], initial_ratios: Dict[int, float]) -> bool:
+    color_areas = defaultdict(set)
+    for r, c in region:
+        color = grid.values[r][c]
+        if color not in [0, 5]:  # Exclude black and gray
+            color_areas[color].add((r, c))
+    
+    if len(color_areas) < 2:
+        return False
+    
+    changed = False
+    for color, area in sorted(color_areas.items(), key=lambda x: len(x[1]), reverse=True):
+        target_size = int(len(region) * initial_ratios.get(color, 0))
+        while len(area) < target_size:
+            expansion = expand_color_area(grid, area, color)
+            if not expansion:
+                break
+            changed = True
+            area |= expansion
+            for r, c in expansion:
+                grid.values[r][c] = color
+                for other_color in color_areas:
+                    if other_color != color:
+                        color_areas[other_color].discard((r, c))
+    
+    return changed
+
+def expand_color_area(grid: ColoredGrid, area: Set[Tuple[int, int]], color: int) -> Set[Tuple[int, int]]:
+    expansion = set()
+    rows, cols = grid.get_dimensions()
+    for r, c in area:
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols and grid.values[nr][nc] not in [0, 5, color]:
+                if is_valid_change(grid, (nr, nc), color):
+                    expansion.add((nr, nc))
+    return expansion
+
+def balance_changes(grid: ColoredGrid, initial_ratios: Dict[int, float]):
+    current_ratios = calculate_color_ratios(grid)
+    rows, cols = grid.get_dimensions()
+    
+    for color, initial_ratio in initial_ratios.items():
+        current_ratio = current_ratios.get(color, 0)
+        if abs(current_ratio - initial_ratio) > 0.05:  # 5% threshold
+            target_count = int(rows * cols * initial_ratio)
+            current_count = int(rows * cols * current_ratio)
+            
+            if current_count < target_count:
+                # Need to increase this color
+                for _ in range(target_count - current_count):
+                    for r in range(rows):
+                        for c in range(cols):
+                            if grid.values[r][c] not in [0, 5] and is_valid_change(grid, (r, c), color):
+                                grid.values[r][c] = color
+                                break
+                        else:
+                            continue
+                        break
+            else:
+                # Need to decrease this color
+                for _ in range(current_count - target_count):
+                    for r in range(rows):
+                        for c in range(cols):
+                            if grid.values[r][c] == color:
+                                for new_color in initial_ratios:
+                                    if new_color != color and is_valid_change(grid, (r, c), new_color):
+                                        grid.values[r][c] = new_color
+                                        break
+                                break
+                        else:
+                            continue
+                        break
 
 def identify_key_structures(grid: ColoredGrid) -> List[Set[Tuple[int, int]]]:
     structures = []
