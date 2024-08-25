@@ -23,9 +23,9 @@ def solve_6f473927(input_grid: ColoredGrid) -> ColoredGrid:
     rows, cols = input_grid.get_dimensions()
     red_bounds = find_red_bounds(input_grid)
     expansion_direction = determine_expansion_direction(red_bounds, cols)
-    new_dimensions = calculate_new_dimensions(red_bounds, rows, cols)
+    new_cols = (cols * 2) - 1
     
-    new_grid = create_expanded_grid(input_grid, new_dimensions, expansion_direction)
+    new_grid = create_expanded_grid(input_grid, (rows, new_cols), expansion_direction)
     add_sky_blue_pattern(new_grid, expansion_direction)
     
     return new_grid
@@ -52,15 +52,6 @@ def determine_expansion_direction(bounds: Tuple[int, int, int, int], cols: int) 
     right_space = cols - right - 1
     
     return "left" if left_space > right_space else "right"
-
-def calculate_new_dimensions(bounds: Tuple[int, int, int, int], rows: int, cols: int) -> Tuple[int, int]:
-    """Calculate the new dimensions for the expanded grid."""
-    left, right, _, _ = bounds
-    left_space = left
-    right_space = cols - right - 1
-    
-    new_cols = cols + (2 * max(left_space, right_space)) + 1
-    return rows, new_cols
 
 def create_expanded_grid(input_grid: ColoredGrid, new_dimensions: Tuple[int, int], direction: str) -> ColoredGrid:
     """Create the expanded grid and copy the original pattern."""
@@ -100,3 +91,13 @@ def add_sky_blue_pattern(grid: ColoredGrid, direction: str):
                 else:
                     front = col
                 break
+        
+        # If no non-black cell was encountered, fill the entire row
+        if direction == "left" and front == cols - 1:
+            for col in range(cols):
+                if grid.get_cell(row, col) == 0:
+                    grid.set_cell(row, col, 8)
+        elif direction == "right" and front == 0:
+            for col in range(cols - 1, -1, -1):
+                if grid.get_cell(row, col) == 0:
+                    grid.set_cell(row, col, 8)
