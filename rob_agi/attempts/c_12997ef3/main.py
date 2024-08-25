@@ -5,15 +5,19 @@ def solve_12997ef3(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by identifying unique colors and creating a pattern for each.
     
-    The function scans the input grid for the most prominent line of unique colors (excluding black and blue),
-    determines the orientation (horizontal or vertical) based on this line, and creates a new grid where each color
-    is represented by a 3x3 pattern. The pattern for each color has the color in the center and four corners,
-    with black in between, except for the bottom row which is filled with the color.
+    The function scans the input grid for all unique colors (excluding black),
+    determines the orientation (horizontal or vertical) based on the number of unique colors,
+    and creates a new grid where each color is represented by a 3x3 pattern.
+    The pattern for each color has the color in the top-right, bottom-left, and center,
+    with black in the other positions.
     
     The 3x3 pattern for each color is as follows:
-    [color, 0, color]
-    [0, color, 0]
-    [color, color, color]
+    [0, color, color]
+    [color, color, 0]
+    [0, color, color]
+    
+    The colors are ordered based on their first appearance in the input grid,
+    scanning from top-left to bottom-right.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -21,24 +25,17 @@ def solve_12997ef3(input_grid: ColoredGrid) -> ColoredGrid:
     Returns:
     ColoredGrid: The transformed output grid.
     """
-    def scan_input_grid(grid: ColoredGrid) -> Tuple[List[int], str]:
-        horizontal_colors = []
-        vertical_colors = []
-        for row in range(grid.num_rows):
-            row_colors = [color for color in set(grid.values[row]) if color > 1]
-            if len(row_colors) > len(horizontal_colors):
-                horizontal_colors = row_colors
-        for col in range(grid.num_cols):
-            col_colors = [color for color in set(grid.values[r][col] for r in range(grid.num_rows)) if color > 1]
-            if len(col_colors) > len(vertical_colors):
-                vertical_colors = col_colors
-        
-        if len(horizontal_colors) >= len(vertical_colors):
-            return horizontal_colors, 'horizontal'
-        else:
-            return vertical_colors, 'vertical'
+    def scan_input_grid(grid: ColoredGrid) -> List[int]:
+        color_positions = {}
+        for r in range(grid.num_rows):
+            for c in range(grid.num_cols):
+                color = grid.values[r][c]
+                if color != 0 and color not in color_positions:
+                    color_positions[color] = (r, c)
+        return sorted(color_positions.keys(), key=lambda x: color_positions[x])
 
-    def create_output_grid(colors: List[int], orientation: str) -> List[List[int]]:
+    def create_output_grid(colors: List[int]) -> List[List[int]]:
+        orientation = 'vertical' if len(colors) >= 3 else 'horizontal'
         if orientation == 'horizontal':
             width, height = len(colors) * 3, 3
         else:
@@ -53,9 +50,9 @@ def solve_12997ef3(input_grid: ColoredGrid) -> ColoredGrid:
                 start_row, start_col = i * 3, 0
         
             pattern = [
-                [color, 0, color],
-                [0, color, 0],
-                [color, color, color]
+                [0, color, color],
+                [color, color, 0],
+                [0, color, color]
             ]
         
             for r in range(3):
@@ -64,6 +61,6 @@ def solve_12997ef3(input_grid: ColoredGrid) -> ColoredGrid:
     
         return output
 
-    colors, orientation = scan_input_grid(input_grid)
-    output_values = create_output_grid(colors, orientation)
+    colors = scan_input_grid(input_grid)
+    output_values = create_output_grid(colors)
     return ColoredGrid(values=output_values)
