@@ -75,7 +75,7 @@ remote_pip_deps = [
     "git+https://github.com/SubstrateLabs/rob-agi.git@673d3e5",
     "numpy",
 ]
-max_tries_per_challenge = 2
+max_tries_per_challenge = 5
 
 all_challenges = list(challenges.values())
 random.shuffle(all_challenges)
@@ -811,7 +811,7 @@ def attempt(challenge: GridProblem, previous_solution: Optional[str] = None):
     global attempted, successful, errored_count
     logger.info(f"Starting {challenge.id}")
     attempted += 1
-    sln = solutions[challenge.id]
+    sln = solutions[challenge.id] if task_set == "training" else None
     s = Solver(challenge=challenge, solution=sln)
     succeeded = s.run_solve(max_tries=max_tries_per_challenge, prev_solution=previous_solution)
     if succeeded:
@@ -928,7 +928,7 @@ async def main():
     # distill_research()
 
     for i in range(1):
-        await solve_loop(max_concurrent=1, to_process=None, max_challenges=1)
+        await solve_loop(max_concurrent=8)
     # await solve_loop(max_concurrent=4, max_challenges=8)
 
 
