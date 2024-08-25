@@ -1,36 +1,73 @@
 example_0:
   input: |
-    The input grid is 23x23. It's mostly black (0) with a small magenta (6) rectangle in the center. The magenta rectangle is 2 cells wide and 4 cells tall, positioned vertically from rows 5 to 8 and columns 6 to 7.
+    Grid size: 23x23
+    Main shape: Magenta (6) rectangle
+    Shape dimensions: 2x4 cells
+    Shape position: Center (rows 5-8, columns 6-7)
+    Background: Black (0)
   output: |
-    The output grid is 23x23. It contains several distinct elements:
-    1. Four magenta (6) squares, each 2x3 in size, positioned in the corners of the grid.
-    2. Four green (3) rectangles, each 4x4 in size, positioned between the magenta squares.
-    3. The original magenta rectangle from the input remains in the center.
-    4. The green rectangles and magenta squares form a symmetrical pattern that resembles a picture frame or a stylized flower.
+    Grid size: 23x23
+    Pattern elements:
+    1. Corner elements: Magenta (6) squares, 3x3 each
+    2. Side elements: Green (3) rectangles, 4x4 each
+    3. Center: Original magenta rectangle preserved
+    Pattern characteristics:
+    - Symmetrical across both axes
+    - Forms a frame-like or flower-like structure
+    - Corner elements and side elements alternate
+    Background: Black (0)
 
 example_1:
   input: |
-    The input grid is 16x16. It's mostly black (0) with a small green (3) rectangle in the center. The green rectangle is 3 cells wide and 1 cell tall, positioned horizontally in row 7, columns 7 to 9.
+    Grid size: 16x16
+    Main shape: Green (3) rectangle
+    Shape dimensions: 3x1 cells
+    Shape position: Center (row 7, columns 7-9)
+    Background: Black (0)
   output: |
-    The output grid is 16x16. It contains several distinct elements:
-    1. Four magenta (6) squares, each 3x3 in size, positioned symmetrically in the grid.
-    2. Four green (3) rectangles, each 3x3 in size, positioned between the magenta squares.
-    3. The original green rectangle from the input remains in the center.
-    4. The green squares and magenta squares form a symmetrical pattern that resembles a stylized cross or plus sign.
+    Grid size: 16x16
+    Pattern elements:
+    1. Corner elements: Magenta (6) squares, 3x3 each
+    2. Side elements: Green (3) squares, 3x3 each
+    3. Center: Original green rectangle preserved
+    Pattern characteristics:
+    - Symmetrical across both axes
+    - Forms a cross-like or plus sign structure
+    - Corner elements and side elements alternate
+    Background: Black (0)
 
 example_2:
   input: |
-    The input grid is 26x26. It's mostly black (0) with a green (3) rectangle in the upper-middle part. The green rectangle is 2 cells wide and 5 cells tall, positioned vertically from rows 5 to 9 and columns 11 to 12.
+    Grid size: 26x26
+    Main shape: Green (3) rectangle
+    Shape dimensions: 2x5 cells
+    Shape position: Upper-middle (rows 5-9, columns 11-12)
+    Background: Black (0)
   output: |
-    The output grid is 26x26. It contains several distinct elements:
-    1. Four green (3) rectangles, each 2x5 in size, positioned symmetrically in the grid.
-    2. Four magenta (6) rectangles, each 5x5 in size, positioned between the green rectangles.
-    3. The original green rectangle from the input remains in its position.
-    4. A single green (3) cell appears in the bottom-right corner of the grid.
-    5. The green and magenta rectangles form a symmetrical pattern that resembles a stylized cross or plus sign, with the magenta rectangles forming the main body and the green rectangles as accents.
+    Grid size: 26x26
+    Pattern elements:
+    1. Corner elements: Green (3) rectangles, 2x5 each
+    2. Side elements: Magenta (6) squares, 5x5 each
+    3. Original position: Green rectangle preserved
+    4. Accent: Single green (3) cell in bottom-right corner
+    Pattern characteristics:
+    - Symmetrical across both axes
+    - Forms a cross-like structure
+    - Corner elements and side elements alternate
+    - Side elements form the main body, corner elements act as accents
+    Background: Black (0)
 
 test_case_0:
   input: |
-    The input grid is 26x26. It's mostly black (0) with a green (3) rectangle in the upper-middle part. The green rectangle is 2 cells wide and 5 cells tall, positioned vertically from rows 5 to 9 and columns 11 to 12.
+    Grid size: 26x26
+    Main shape: Green (3) rectangle
+    Shape dimensions: 2x5 cells
+    Shape position: Upper-middle (rows 5-9, columns 11-12)
+    Background: Black (0)
   output: |
-    The output grid is not provided for the test case.
+    Output grid not provided for test case.
+    Expected pattern should follow principles observed in examples:
+    - Maintain symmetry across both axes
+    - Use complementary colors (green and magenta)
+    - Preserve or incorporate the original shape
+    - Create a balanced, frame-like or cross-like structure
