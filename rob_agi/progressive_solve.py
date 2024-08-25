@@ -96,7 +96,7 @@ class Solver:
     def get_modify_coder(self):
         fnames = [self.file_paths["main"], self.file_paths["visual_descriptions"]]
         read_only_fnames = [self.file_paths["test"], project_root / "rob_agi/colored_grid.py"]
-        return self.get_coder(fnames=fnames, read_only_fnames=read_only_fnames, auto_commits=False)
+        return self.get_coder(fnames=fnames, read_only_fnames=read_only_fnames, auto_commits=True)
 
     def run_tests(self):
         result = run_pytest(self.file_paths["test"])
