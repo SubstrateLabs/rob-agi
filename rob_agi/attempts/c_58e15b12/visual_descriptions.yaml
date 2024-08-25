@@ -1,0 +1,47 @@
+example_0:
+  input: |
+    The input grid is 23x17 in size. It contains two distinct groups of colored squares:
+    1. In the upper part (rows 7-10), there are two vertical lines of sky blue (8) squares, each 4 squares tall. These lines are separated by a single column of black squares.
+    2. In the lower part (rows 18-20), there are two vertical lines of green (3) squares, each 3 squares tall. These lines are also separated by a single column of black squares.
+    The rest of the grid is filled with black (0) squares, which can be considered as empty space.
+  output: |
+    The output grid maintains the same 23x17 size but introduces a complex pattern of diagonal lines:
+    1. The original sky blue squares remain in their positions.
+    2. The original green squares remain in their positions.
+    3. Diagonal lines of sky blue extend from the original sky blue squares, moving both up-left and down-right until they reach the edge of the grid or intersect with other lines.
+    4. Diagonal lines of green extend from the original green squares, moving both up-left and down-right until they reach the edge of the grid or intersect with other lines.
+    5. Where the sky blue and green diagonal lines intersect, the squares are colored magenta (6).
+    6. The pattern creates a series of X-shapes and diamond shapes across the grid.
+    7. The original black space remains in areas not affected by the diagonal lines.
+
+example_1:
+  input: |
+    The input grid is 22x18 in size. It contains two distinct groups of colored squares:
+    1. In the upper part (rows 2-4), there are two vertical lines of green (3) squares, each 3 squares tall. These lines are separated by a single column of black squares.
+    2. In the middle part (rows 8-9), there are two vertical lines of sky blue (8) squares, each 2 squares tall. These lines are separated by two columns of black squares.
+    The rest of the grid is filled with black (0) squares, which can be considered as empty space.
+  output: |
+    The output grid maintains the same 22x18 size but introduces a complex pattern of diagonal lines:
+    1. The original green squares remain in their positions.
+    2. The original sky blue squares remain in their positions.
+    3. Diagonal lines of green extend from the original green squares, moving both up-left and down-right until they reach the edge of the grid or intersect with other lines.
+    4. Diagonal lines of sky blue extend from the original sky blue squares, moving both up-left and down-right until they reach the edge of the grid or intersect with other lines.
+    5. The pattern creates a series of X-shapes and diamond shapes across the grid.
+    6. Unlike the previous example, there are no visible intersections between green and sky blue lines, so no magenta squares are present.
+    7. The original black space remains in areas not affected by the diagonal lines.
+
+example_2:
+  input: |
+    The input grid is 24x19 in size. It contains two distinct groups of colored squares:
+    1. In the upper part (rows 7-10), there are two vertical lines of green (3) squares, each 4 squares tall. These lines are separated by three columns of black squares.
+    2. In the lower part (row 20), there are two single sky blue (8) squares, separated by one column of black squares.
+    The rest of the grid is filled with black (0) squares, which can be considered as empty space.
+  output: |
+    The output grid maintains the same 24x19 size but introduces a complex pattern of diagonal lines:
+    1. The original green squares remain in their positions.
+    2. The original sky blue squares remain in their positions.
+    3. Diagonal lines of green extend from the original green squares, moving both up-left and down-right until they reach the edge of the grid or intersect with other lines.
+    4. Diagonal lines of sky blue extend from the original sky blue squares, moving both up-left and down-right until they reach the edge of the grid or intersect with other lines.
+    5. Where the sky blue and green diagonal lines intersect, the squares are colored magenta (6). There is one visible magenta square in this grid.
+    6. The pattern creates a series of X-shapes and diamond shapes across the grid, with the sky blue lines forming a more expansive pattern due to their lower starting position.
+    7. The original black space remains in areas not affected by the diagonal lines.
