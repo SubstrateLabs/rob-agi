@@ -9,9 +9,9 @@ def solve_0a1d4ef5(input_grid: ColoredGrid) -> ColoredGrid:
     and arranging the most visually significant colors.
 
     The solution follows these steps:
-    1. Analyze the input grid to calculate visual significance of colors based on frequency,
-       region size, contrast, and position.
-    2. Determine the output grid size (2x2 or 3x3) based on the number of significant colors.
+    1. Analyze the input grid to calculate visual significance of colors based on region size,
+       position, and contrast.
+    2. Determine the output grid size (2x2 or 3x3) based on the complexity of the input.
     3. Select the most visually significant colors for the output grid.
     4. Arrange the colors in the output grid to correspond with their positions and significance
        in the input grid while maintaining a balanced representation.
@@ -26,7 +26,7 @@ def solve_0a1d4ef5(input_grid: ColoredGrid) -> ColoredGrid:
     color_significance = calculate_visual_significance(input_grid)
     
     # Step 2: Determine output grid size
-    output_size = 2 if len(color_significance) <= 5 else 3
+    output_size = determine_output_size(input_grid, color_significance)
     
     # Step 3: Select colors for the output grid
     selected_colors = select_colors(color_significance, output_size * output_size)
@@ -37,22 +37,35 @@ def solve_0a1d4ef5(input_grid: ColoredGrid) -> ColoredGrid:
     return ColoredGrid(values=output_values)
 
 def calculate_visual_significance(input_grid: ColoredGrid) -> Dict[int, float]:
-    color_counts = Counter(cell for row in input_grid.values for cell in row if cell != 0)
     color_regions = find_connected_regions(input_grid)
     rows, cols = input_grid.get_dimensions()
     center_row, center_col = rows // 2, cols // 2
     
     significance = {}
-    for color, count in color_counts.items():
-        largest_region = max(len(region) for region in color_regions[color])
-        contrast = sum(abs(color - other_color) for other_color in color_counts if other_color != color)
-        center_distance = min(math.dist((r, c), (center_row, center_col)) 
-                              for region in color_regions[color] 
-                              for r, c in region)
+    for color, regions in color_regions.items():
+        total_area = sum(len(region) for region in regions)
+        largest_region = max(len(region) for region in regions)
+        center_of_mass = calculate_center_of_mass(regions)
+        center_distance = math.dist(center_of_mass, (center_row, center_col))
+        contrast = calculate_contrast(color, input_grid)
         
-        significance[color] = (count * largest_region * contrast) / (center_distance + 1)
+        significance[color] = (total_area * largest_region * contrast) / (center_distance + 1)
     
     return significance
+
+def calculate_center_of_mass(regions: List[List[Tuple[int, int]]]) -> Tuple[float, float]:
+    all_points = [point for region in regions for point in region]
+    return (sum(p[0] for p in all_points) / len(all_points),
+            sum(p[1] for p in all_points) / len(all_points))
+
+def calculate_contrast(color: int, grid: ColoredGrid) -> float:
+    other_colors = set(cell for row in grid.values for cell in row if cell != color and cell != 0)
+    return sum(abs(color - other_color) for other_color in other_colors)
+
+def determine_output_size(input_grid: ColoredGrid, color_significance: Dict[int, float]) -> int:
+    significant_colors = sum(1 for score in color_significance.values() if score > max(color_significance.values()) * 0.1)
+    complexity = len(set(cell for row in input_grid.values for cell in row if cell != 0))
+    return 2 if significant_colors <= 4 or complexity <= 5 else 3
 
 def find_connected_regions(grid: ColoredGrid) -> Dict[int, List[List[Tuple[int, int]]]]:
     rows, cols = grid.get_dimensions()
@@ -84,48 +97,55 @@ def select_colors(color_significance: Dict[int, float], num_colors: int) -> List
 def arrange_colors(input_grid: ColoredGrid, selected_colors: List[int], output_size: int) -> List[List[int]]:
     rows, cols = input_grid.get_dimensions()
     output_grid = [[0 for _ in range(output_size)] for _ in range(output_size)]
-    color_positions = {color: [] for color in selected_colors}
-
-    for r in range(rows):
-        for c in range(cols):
-            color = input_grid.values[r][c]
-            if color in selected_colors:
-                color_positions[color].append((r / rows, c / cols))
-
+    color_regions = find_connected_regions(input_grid)
+    
+    # Calculate the center of mass for each color
+    color_positions = {color: calculate_center_of_mass(regions) for color, regions in color_regions.items() if color in selected_colors}
+    
+    # Normalize positions to output grid size
+    for color, (r, c) in color_positions.items():
+        color_positions[color] = (r / rows * output_size, c / cols * output_size)
+    
+    # Place colors in the output grid
     for color in selected_colors:
-        if color_positions[color]:
-            avg_r = sum(pos[0] for pos in color_positions[color]) / len(color_positions[color])
-            avg_c = sum(pos[1] for pos in color_positions[color]) / len(color_positions[color])
-            output_r = min(int(avg_r * output_size), output_size - 1)
-            output_c = min(int(avg_c * output_size), output_size - 1)
+        if color in color_positions:
+            r, c = color_positions[color]
+            output_r = min(int(r), output_size - 1)
+            output_c = min(int(c), output_size - 1)
             
             if output_grid[output_r][output_c] == 0:
                 output_grid[output_r][output_c] = color
             else:
                 # Find the nearest empty cell
-                for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (-1, -1), (1, -1), (-1, 1)]:
-                    nr, nc = output_r + dr, output_c + dc
-                    if 0 <= nr < output_size and 0 <= nc < output_size and output_grid[nr][nc] == 0:
-                        output_grid[nr][nc] = color
-                        break
+                best_distance = float('inf')
+                best_pos = None
+                for i in range(output_size):
+                    for j in range(output_size):
+                        if output_grid[i][j] == 0:
+                            distance = math.dist((r, c), (i, j))
+                            if distance < best_distance:
+                                best_distance = distance
+                                best_pos = (i, j)
+                
+                if best_pos:
+                    output_grid[best_pos[0]][best_pos[1]] = color
                 else:
-                    # If no empty cell found, replace the least significant color
-                    for r in range(output_size):
-                        for c in range(output_size):
-                            if output_grid[r][c] == 0 or selected_colors.index(output_grid[r][c]) > selected_colors.index(color):
-                                output_grid[r][c] = color
+                    # If no empty cell, replace the least significant color
+                    least_significant = min(selected_colors, key=selected_colors.index)
+                    for i in range(output_size):
+                        for j in range(output_size):
+                            if output_grid[i][j] == least_significant:
+                                output_grid[i][j] = color
                                 break
-                        else:
-                            continue
-                        break
-
+                        if output_grid[i][j] == color:
+                            break
+    
     # Fill any remaining empty cells
     empty_cells = [(r, c) for r in range(output_size) for c in range(output_size) if output_grid[r][c] == 0]
     for r, c in empty_cells:
-        for color in selected_colors:
-            if color not in [output_grid[i][j] for i in range(output_size) for j in range(output_size)]:
-                output_grid[r][c] = color
-                break
+        unused_colors = [color for color in selected_colors if color not in [output_grid[i][j] for i in range(output_size) for j in range(output_size)]]
+        if unused_colors:
+            output_grid[r][c] = unused_colors[0]
         else:
             output_grid[r][c] = selected_colors[0]  # Use the most significant color if all are already used
 
