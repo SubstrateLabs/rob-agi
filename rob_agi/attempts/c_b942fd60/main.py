@@ -10,6 +10,7 @@ def solve_b942fd60(input_grid: ColoredGrid) -> ColoredGrid:
     2. Creates horizontal lines to connect colored squares to the vertical line(s)
     3. Preserves the original positions and colors of non-black squares
     4. Ensures red lines don't extend beyond the last colored square in any direction
+    5. Handles special cases like single row/column of colored squares
     
     Steps:
     1. Create a deep copy of the input grid
@@ -17,8 +18,9 @@ def solve_b942fd60(input_grid: ColoredGrid) -> ColoredGrid:
     3. Determine the optimal vertical line position(s)
     4. Draw vertical red lines
     5. Connect horizontal lines to colored squares
-    6. Clean up unnecessary extensions
-    7. Return the modified grid
+    6. Handle special cases
+    7. Clean up unnecessary extensions
+    8. Return the modified grid
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -29,25 +31,38 @@ def solve_b942fd60(input_grid: ColoredGrid) -> ColoredGrid:
     if not non_black:
         return output_grid  # Return original grid if no non-black squares
     
-    # Identify columns with colored squares
+    # Identify columns and rows with colored squares
     colored_cols = sorted(set(c for _, c in non_black))
+    colored_rows = sorted(set(r for r, _ in non_black))
+    
+    # Handle special cases
+    if len(colored_rows) == 1:  # All colored squares in a single row
+        r = colored_rows[0]
+        for c in range(min(colored_cols), max(colored_cols) + 1):
+            if output_grid.get_cell(r, c) == 0:
+                output_grid.set_cell(r, c, 2)
+        return output_grid
+    
+    if len(colored_cols) == 1:  # All colored squares in a single column
+        c = colored_cols[0]
+        for r in range(min(colored_rows), max(colored_rows) + 1):
+            if output_grid.get_cell(r, c) == 0:
+                output_grid.set_cell(r, c, 2)
+        return output_grid
     
     # Decide on vertical line placement
-    if len(colored_cols) == 1:
-        optimal_cols = colored_cols
-    else:
-        def total_distance(columns):
-            return sum(min(abs(c - col) for col in columns) for _, c in non_black)
-        
-        one_col = min(colored_cols, key=lambda col: total_distance([col]))
-        two_cols = min(((c1, c2) for c1 in colored_cols for c2 in colored_cols if c1 < c2),
-                       key=lambda cols: total_distance(cols))
-        
-        optimal_cols = [one_col] if total_distance([one_col]) <= total_distance(two_cols) else list(two_cols)
+    def total_distance(columns):
+        return sum(min(abs(c - col) for col in columns) for _, c in non_black)
+    
+    one_col = min(range(cols), key=lambda col: total_distance([col]))
+    two_cols = min(((c1, c2) for c1 in range(cols) for c2 in range(c1+1, cols)),
+                   key=lambda cols: total_distance(cols))
+    
+    optimal_cols = [one_col] if total_distance([one_col]) <= total_distance(two_cols) * 1.2 else list(two_cols)
     
     # Draw vertical red lines
-    top_row = min(r for r, _ in non_black)
-    bottom_row = max(r for r, _ in non_black)
+    top_row = min(colored_rows)
+    bottom_row = max(colored_rows)
     for col in optimal_cols:
         for r in range(top_row, bottom_row + 1):
             if output_grid.get_cell(r, col) == 0:
