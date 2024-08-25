@@ -1,0 +1,111 @@
+example_0:
+  input: |
+    The grid contains several distinct patterns formed by blue (1) and sky (8) colored squares on a black (0) background. The patterns are symmetrically arranged and separated by black rows and columns.
+    
+    In the top-left quadrant, there's a 3x3 pattern of blue squares with the center square missing, forming a sort of blue frame.
+    
+    In the top-right quadrant, there's a similar 3x3 pattern, but with the corners missing instead of the center.
+    
+    In the center-top, there's a 3x3 sky-colored square.
+    
+    The bottom half of the grid mirrors the top half, with the patterns repeated in different positions.
+  output: |
+    The output grid maintains the same overall structure as the input, but with some color changes and pattern shifts.
+    
+    The 3x3 blue frame in the top-left is now orange (7).
+    
+    The 3x3 sky square in the center-top has moved to the top-right quadrant.
+    
+    The pattern that was in the top-right (blue squares with missing corners) is now in orange in the center-top.
+    
+    These transformations are mirrored in the bottom half of the grid, creating a symmetrical pattern of color and shape changes.
+
+example_1:
+  input: |
+    This grid also features patterns of blue (1) and sky (8) squares on a black (0) background, but with more complex and varied shapes.
+    
+    In the top-left, there's a 3x3 blue square with the top-middle square missing.
+    
+    The top-center has a 3x3 solid blue square.
+    
+    The top-right has a 3x3 blue frame (outer squares blue, center black).
+    
+    The middle section features three 3x3 solid blue squares in a row.
+    
+    The bottom section has three distinct patterns: a 3x3 blue 'T' shape on the left, a 3x3 blue cross in the center, and a 3x3 blue inverse 'L' shape on the right.
+    
+    There's also a small 3x3 sky-colored square in the second quadrant from the top-left.
+  output: |
+    The output grid maintains the overall structure but with significant color changes and some pattern shifts.
+    
+    The top-left pattern is now sky-colored.
+    
+    The top-center solid square is now orange (7).
+    
+    The top-right frame is unchanged.
+    
+    In the middle section, the leftmost and rightmost squares are now orange, while the center remains blue.
+    
+    The bottom patterns remain in their positions but are now orange.
+    
+    The small sky-colored square has moved to the top-left quadrant.
+
+example_2:
+  input: |
+    This grid presents a more varied and asymmetrical pattern of blue (1) and sky (8) squares on a black (0) background.
+    
+    The top-left quadrant has a complex blue shape resembling an incomplete 'E'.
+    
+    The top-right quadrant has a 3x3 blue square with the bottom-right corner missing.
+    
+    The center-left has a blue pattern that looks like a sideways 'T'.
+    
+    The center-right has a 3x3 blue square with the top-left corner missing.
+    
+    The bottom-left quadrant contains a 3x3 sky-colored square.
+    
+    The bottom-right quadrant has a blue pattern that looks like an inverted 'L'.
+    
+    There are also some isolated blue squares scattered throughout the grid.
+  output: |
+    The output grid maintains the overall structure but with color changes and some pattern shifts.
+    
+    The complex 'E' shape in the top-left remains blue.
+    
+    The pattern in the top-right is now sky-colored.
+    
+    The sideways 'T' in the center-left is now orange (7).
+    
+    The pattern in the center-right is now sky-colored.
+    
+    The sky-colored square in the bottom-left has moved to the top-right quadrant.
+    
+    The inverted 'L' in the bottom-right remains blue.
+    
+    The scattered blue squares remain in their positions.
+
+test_case_0:
+  input: |
+    This grid presents a complex arrangement of blue (1) squares on a black (0) background, with no sky-colored squares present.
+    
+    The top row contains four distinct 3x3 patterns:
+    1. A blue 'L' shape
+    2. A blue square with the top-right corner missing
+    3. A blue 'T' shape
+    4. A blue square with the bottom-left corner missing
+    
+    The second row has three 3x3 patterns:
+    1. A blue square with the bottom-right corner missing
+    2. A blue cross shape
+    3. A blue inverse 'L' shape
+    
+    The third row repeats the patterns from the first row.
+    
+    The bottom row has three more 3x3 patterns:
+    1. A blue 'U' shape
+    2. A solid blue square
+    3. A blue inverted 'T' shape
+    
+    There are black rows separating each row of patterns.
+  output: |
+    The output is not provided for this test case.
