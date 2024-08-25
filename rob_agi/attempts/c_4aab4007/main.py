@@ -37,9 +37,10 @@ def solve_4aab4007(input_grid: ColoredGrid) -> ColoredGrid:
     in the input grid. It then creates a new grid with the same blue border and yellow frame,
     and fills the inner area using a spiral pattern. Black cells are replaced with the next
     number in the pattern sequence, while other cells maintain their original values.
+    The pattern is synchronized with existing non-black cells to maintain consistency.
     """
     pattern_sequence = detect_pattern_sequence(input_grid)
-    output_grid = ColoredGrid(values=[row[:] for row in input_grid.values])
+    output_grid = input_grid.deep_copy()
     sequence_pointer = 0
     
     for row, col in spiral_coordinates(input_grid.num_rows, input_grid.num_cols):
@@ -48,6 +49,6 @@ def solve_4aab4007(input_grid: ColoredGrid) -> ColoredGrid:
             sequence_pointer = (sequence_pointer + 1) % len(pattern_sequence)
         elif input_grid[row][col] not in [1, 4]:
             output_grid.values[row][col] = input_grid[row][col]
-            sequence_pointer = pattern_sequence.index(input_grid[row][col])
+            sequence_pointer = (pattern_sequence.index(input_grid[row][col]) + 1) % len(pattern_sequence)
     
     return output_grid
