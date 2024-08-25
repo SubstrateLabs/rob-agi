@@ -1,43 +1,66 @@
 example_0:
   input: |
-    A 15x12 grid with a large red (2) rectangular shape in the center, surrounded by black (0). The red rectangle is 8x7 cells, occupying rows 1-7 and columns 1-8. There's a single blue (1) cell at position (2,2) within the red rectangle.
+    A 15x12 grid with a prominent red (2) rectangle (8x7) centered, surrounded by black (0).
+    Key features:
+    - Red rectangle: rows 1-7, columns 1-8
+    - Single blue (1) cell at (2,2) within the red area
+    - This blue cell is the 'seed' for the transformation
   output: |
-    The same 15x12 grid, but the interior of the red rectangle has been transformed. The outline of the red rectangle remains intact. Inside, a symmetrical pattern has formed:
-    - The corners and center of the interior are blue (1)
-    - There are diagonal lines of blue (1) connecting these points
-    - The spaces between these blue lines are filled with black (0)
-    This creates an X-shape or diamond pattern within the red rectangle.
+    15x12 grid with the red rectangle's interior transformed:
+    - Red (2) border preserved (1 cell thick)
+    - Interior pattern:
+      * Blue (1) cells: corners, center, and diagonal lines forming an X
+      * Black (0) cells: filling spaces between blue lines
+    - Pattern is symmetrical and scaled to fit the rectangle
+    - The blue 'seed' cell influences the entire pattern
 
 example_1:
   input: |
-    A 14x13 grid with a large green (3) rectangular shape in the center, surrounded by black (0). The green rectangle is 10x9 cells, occupying rows 1-10 and columns 2-11. There's a single magenta (6) cell at position (2,9) within the green rectangle.
+    A 14x13 grid featuring a large green (3) rectangle (10x9), surrounded by black (0).
+    Key features:
+    - Green rectangle: rows 1-10, columns 2-11
+    - Single magenta (6) cell at (2,9) within the green area
+    - This magenta cell is the 'seed' for the transformation
   output: |
-    The same 14x13 grid, but the interior of the green rectangle has been transformed. The outline of the green rectangle remains intact. Inside, a symmetrical pattern has formed:
-    - The corners and center of the interior are magenta (6)
-    - There are diagonal lines of magenta (6) connecting these points
-    - The spaces between these magenta lines are filled with black (0)
-    This creates an X-shape or diamond pattern within the green rectangle, similar to the previous example but larger and with a different color.
+    14x13 grid with the green rectangle's interior transformed:
+    - Green (3) border preserved (1 cell thick)
+    - Interior pattern:
+      * Magenta (6) cells: corners, center, and diagonal lines forming an X
+      * Black (0) cells: filling spaces between magenta lines
+    - Pattern is symmetrical and scaled to fit the larger rectangle
+    - The magenta 'seed' cell influences the entire pattern
 
 example_2:
   input: |
-    An 18x17 grid containing three distinct rectangular shapes:
-    1. A blue (1) 7x7 rectangle in the top-left, with a red (2) cell at (6,7)
-    2. A green (3) 6x5 rectangle in the top-right, with a red (2) cell at (2,15)
-    3. A yellow (4) 7x11 rectangle in the bottom-right, with a green (3) cell at (14,7)
-    The rest of the grid is filled with black (0).
+    An 18x17 grid with three distinct rectangles:
+    1. Blue (1) 7x7 rectangle (top-left): rows 1-7, columns 1-7
+       - Red (2) 'seed' at (6,7)
+    2. Green (3) 6x5 rectangle (top-right): rows 1-6, columns 12-16
+       - Red (2) 'seed' at (2,15)
+    3. Yellow (4) 7x11 rectangle (bottom-right): rows 10-16, columns 6-16
+       - Green (3) 'seed' at (14,7)
+    - Black (0) fills the rest of the grid
   output: |
-    The same 18x17 grid, but each rectangle has been internally transformed:
-    1. The blue rectangle now contains an X-shape or diamond pattern in red (2) and black (0)
-    2. The green rectangle now contains an X-shape or diamond pattern in red (2) and black (0)
-    3. The yellow rectangle now contains an X-shape or diamond pattern in green (3) and black (0)
-    Each pattern is centered within its respective rectangle and scaled appropriately to fit. The outlines of all rectangles remain intact.
+    18x17 grid with all three rectangles internally transformed:
+    1. Blue rectangle:
+       - Blue (1) border preserved
+       - Interior: Red (2) X-pattern on black (0) background
+    2. Green rectangle:
+       - Green (3) border preserved
+       - Interior: Red (2) X-pattern on black (0) background
+    3. Yellow rectangle:
+       - Yellow (4) border preserved
+       - Interior: Green (3) X-pattern on black (0) background
+    - Each pattern is symmetrical and scaled to its rectangle
+    - 'Seed' colors determine the pattern color in each rectangle
+    - Black (0) areas outside rectangles remain unchanged
 
 test_case_0:
   input: |
-    An 18x17 grid containing three distinct rectangular shapes:
-    1. A blue (1) 7x7 rectangle in the top-left, with a red (2) cell at (6,7)
-    2. A green (3) 6x5 rectangle in the top-right, with a red (2) cell at (2,15)
-    3. A yellow (4) 7x11 rectangle in the bottom-right, with a green (3) cell at (14,7)
-    The rest of the grid is filled with black (0).
+    An 18x17 grid with three rectangles:
+    1. Blue (1) 7x7 (top-left): rows 1-7, columns 1-7, red (2) seed at (6,7)
+    2. Green (3) 6x5 (top-right): rows 1-6, columns 12-16, red (2) seed at (2,15)
+    3. Yellow (4) 7x11 (bottom-right): rows 10-16, columns 6-16, green (3) seed at (14,7)
+    - Remaining cells are black (0)
   output: |
-    The output is not provided for this test case.
+    The output grid is not provided. The solution should transform each rectangle's interior based on its size and seed color, preserving the original borders.
