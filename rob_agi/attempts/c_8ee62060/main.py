@@ -2,15 +2,15 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_8ee62060(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the grid transformation challenge by flipping the entire grid vertically.
+    Solves the grid transformation challenge by rotating the entire grid 180 degrees.
     
     This function takes an input ColoredGrid and returns a new ColoredGrid where:
-    1. The rows of the input grid are reversed (bottom row becomes top row, etc.).
-    2. Each row maintains its original horizontal order.
+    1. The grid is rotated 180 degrees (equivalent to flipping both horizontally and vertically).
+    2. Each cell's position is moved to its opposite corner.
     3. The overall dimensions of the grid remain unchanged.
     
     This transformation effectively reverses any diagonal patterns in the grid
-    while preserving the relative positions of colored squares within each row.
+    while maintaining the relative positions of all elements.
     """
     # Get dimensions of the input grid
     rows, cols = input_grid.get_dimensions()
@@ -18,9 +18,11 @@ def solve_8ee62060(input_grid: ColoredGrid) -> ColoredGrid:
     # Create a new grid with the same dimensions, initialized with zeros
     new_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
     
-    # Copy rows from input grid to new grid in reverse order
+    # Perform 180-degree rotation
     for i in range(rows):
-        input_row = input_grid.values[rows - 1 - i]  # Get row from bottom to top
-        new_grid.values[i] = input_row.copy()  # Copy to new grid from top to bottom
+        for j in range(cols):
+            new_i = rows - 1 - i
+            new_j = cols - 1 - j
+            new_grid.values[new_i][new_j] = input_grid.values[i][j]
     
     return new_grid
