@@ -1,54 +1,78 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple
 
+from typing import List, Tuple, Set
+from collections import deque
+
 def solve_896d5239(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by finding non-overlapping rectangular regions around green (3) squares
-    and filling them with sky blue (8), while preserving the original green squares.
+    and filling them with sky blue (8), while preserving the original green squares and blue (1) squares.
     
     The algorithm works as follows:
     1. Identify all green squares in the grid.
-    2. For each green square, find the largest possible rectangle that can be formed
-       around it, containing only black (0) and green (3) squares.
-    3. Sort these rectangles by size (area) in descending order.
-    4. Process each rectangle, filling it with sky blue (8) if it doesn't overlap with already processed areas.
-    5. Restore the original green squares.
+    2. Find connected regions of black (0) and green (3) squares.
+    3. Create potential rectangles for each region, prioritizing those with more green squares.
+    4. Sort rectangles by the number of green squares they contain and their area.
+    5. Apply sky blue rectangles without overlapping, adjusting if necessary.
+    6. Restore the original green squares.
 
-    This approach ensures that larger regions are prioritized, non-overlapping regions are maintained,
-    and the original structure of the grid is preserved where necessary.
+    This approach ensures that regions with multiple green squares are prioritized,
+    maximizes the coverage of black areas between green squares,
+    and preserves the original pattern of blue squares.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
-    processed = [[False for _ in range(cols)] for _ in range(rows)]
+    green_squares = set((r, c) for r in range(rows) for c in range(cols) if output_grid.get_cell(r, c) == 3)
+    processed = set()
 
-    def find_largest_rectangle(start_x: int, start_y: int) -> Tuple[int, int, int, int, int]:
-        max_width = max_height = 0
-        for height in range(start_x, rows):
-            for width in range(start_y, cols):
-                if all(output_grid.get_cell(i, j) in [0, 3] for i in range(start_x, height+1) for j in range(start_y, width+1)):
-                    area = (height - start_x + 1) * (width - start_y + 1)
-                    if area > max_width * max_height:
-                        max_width, max_height = width - start_y + 1, height - start_x + 1
-                else:
-                    break
-        return (start_x, start_y, start_x + max_height - 1, start_y + max_width - 1, max_width * max_height)
+    def find_connected_region(start_r: int, start_c: int) -> Set[Tuple[int, int]]:
+        region = set()
+        queue = deque([(start_r, start_c)])
+        while queue:
+            r, c = queue.popleft()
+            if (r, c) not in region and 0 <= r < rows and 0 <= c < cols and output_grid.get_cell(r, c) in [0, 3]:
+                region.add((r, c))
+                for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                    queue.append((r + dr, c + dc))
+        return region
 
-    def fill_rectangle(rect: Tuple[int, int, int, int, int]) -> None:
-        top_left_x, top_left_y, bottom_right_x, bottom_right_y, _ = rect
-        if any(processed[i][j] for i in range(top_left_x, bottom_right_x+1) for j in range(top_left_y, bottom_right_y+1)):
-            return
-        for i in range(top_left_x, bottom_right_x+1):
-            for j in range(top_left_y, bottom_right_y+1):
-                if output_grid.get_cell(i, j) != 3:
-                    output_grid.set_cell(i, j, 8)
-                processed[i][j] = True
+    def create_rectangle(region: Set[Tuple[int, int]]) -> Tuple[int, int, int, int, int]:
+        green_in_region = region & green_squares
+        min_r = min(r for r, _ in green_in_region)
+        max_r = max(r for r, _ in green_in_region)
+        min_c = min(c for _, c in green_in_region)
+        max_c = max(c for _, c in green_in_region)
+        
+        # Expand rectangle
+        while min_r > 0 and all(output_grid.get_cell(min_r-1, c) in [0, 3] for c in range(min_c, max_c+1)):
+            min_r -= 1
+        while max_r < rows-1 and all(output_grid.get_cell(max_r+1, c) in [0, 3] for c in range(min_c, max_c+1)):
+            max_r += 1
+        while min_c > 0 and all(output_grid.get_cell(r, min_c-1) in [0, 3] for r in range(min_r, max_r+1)):
+            min_c -= 1
+        while max_c < cols-1 and all(output_grid.get_cell(r, max_c+1) in [0, 3] for r in range(min_r, max_r+1)):
+            max_c += 1
+        
+        return (min_r, min_c, max_r, max_c, len(green_in_region))
 
-    green_squares = [(r, c) for r in range(rows) for c in range(cols) if output_grid.get_cell(r, c) == 3]
-    rectangles = [find_largest_rectangle(r, c) for r, c in green_squares]
-    rectangles.sort(key=lambda rect: rect[4], reverse=True)
+    rectangles = []
+    for r, c in green_squares:
+        if (r, c) not in processed:
+            region = find_connected_region(r, c)
+            rectangles.append(create_rectangle(region))
+            processed.update(region)
 
-    for rect in rectangles:
-        fill_rectangle(rect)
+    rectangles.sort(key=lambda x: (x[4], (x[2]-x[0]+1)*(x[3]-x[1]+1)), reverse=True)
+
+    filled = set()
+    for min_r, min_c, max_r, max_c, _ in rectangles:
+        if not any((r, c) in filled for r in range(min_r, max_r+1) for c in range(min_c, max_c+1)):
+            for r in range(min_r, max_r+1):
+                for c in range(min_c, max_c+1):
+                    if output_grid.get_cell(r, c) != 3:
+                        output_grid.set_cell(r, c, 8)
+                    filled.add((r, c))
 
     for r, c in green_squares:
         output_grid.set_cell(r, c, 3)
