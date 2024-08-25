@@ -1,5 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List
+from typing import List, Tuple
 
 def solve_b0f4d537(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -8,9 +8,10 @@ def solve_b0f4d537(input_grid: ColoredGrid) -> ColoredGrid:
     2. Determines the colors for vertical lines in the output from the left side of the input.
     3. Creates a new 7-column wide grid with the same height as the input.
     4. Processes each row:
-       - If it's a horizontal line in the input, fills it in the output across all columns.
-       - Otherwise, places vertical line colors at fixed positions (2 and 5 for 2 colors, 3 for 1 color).
-    5. Fills remaining cells with black (0).
+       - If it's a full horizontal line in the input, fills it in the output across all columns.
+       - If it's a partial horizontal line, fills it in the output at corresponding positions.
+       - Otherwise, places vertical line colors at fixed positions (2 and 5 for 2 colors, 2, 3, and 4 for 3 colors).
+    5. Ensures vertical lines are continuous from top to bottom.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -28,13 +29,15 @@ def solve_b0f4d537(input_grid: ColoredGrid) -> ColoredGrid:
     def get_vertical_line_colors(grid: ColoredGrid, dividing_line: int) -> List[int]:
         colors = []
         rows, _ = grid.get_dimensions()
-        for r in range(rows):
-            for c in range(dividing_line):
+        for c in range(dividing_line):
+            for r in range(rows):
                 color = grid.get_cell(r, c)
                 if color not in [0, 5] and color not in colors:
                     colors.append(color)
                     if len(colors) == 3:
                         return colors
+            if colors:  # If we found a color in this column, move to the next
+                break
         return colors
 
     def get_vertical_line_positions(num_colors: int) -> List[int]:
@@ -45,23 +48,44 @@ def solve_b0f4d537(input_grid: ColoredGrid) -> ColoredGrid:
         else:
             return [2, 3, 4]
 
+    def process_row(input_row: List[int], vertical_colors: List[int], output_positions: List[int]) -> List[int]:
+        output_row = [0] * 7
+        non_zero_colors = [c for c in input_row if c not in [0, 5]]
+        
+        if len(set(non_zero_colors)) == 1 and non_zero_colors:
+            # Full horizontal line
+            return [non_zero_colors[0]] * 7
+        elif len(set(non_zero_colors)) > 1:
+            # Partial horizontal line
+            for i, color in enumerate(input_row):
+                if color not in [0, 5]:
+                    output_pos = int(i * 7 / len(input_row))
+                    output_row[output_pos] = color
+        
+        # Place vertical lines
+        for i, pos in enumerate(output_positions):
+            if i < len(vertical_colors):
+                output_row[pos] = vertical_colors[i]
+        
+        return output_row
+
     rows, _ = input_grid.get_dimensions()
     dividing_line = find_dividing_line(input_grid)
     vertical_line_colors = get_vertical_line_colors(input_grid, dividing_line)
     output_line_positions = get_vertical_line_positions(len(vertical_line_colors))
 
-    output_grid = ColoredGrid(values=[[0 for _ in range(7)] for _ in range(rows)])
+    output_grid = ColoredGrid(values=[])
 
     for r in range(rows):
         input_row = [input_grid.get_cell(r, c) for c in range(dividing_line)]
-        if len(set(input_row)) == 1 and input_row[0] not in [0, 5]:
-            # Horizontal line
-            for c in range(7):
-                output_grid.set_cell(r, c, input_row[0])
-        else:
-            # Draw vertical lines
-            for i, pos in enumerate(output_line_positions):
-                if i < len(vertical_line_colors):
-                    output_grid.set_cell(r, pos, vertical_line_colors[i])
+        output_row = process_row(input_row, vertical_line_colors, output_line_positions)
+        output_grid.values.append(output_row)
+
+    # Ensure vertical lines are continuous
+    for pos in output_line_positions:
+        color = next((row[pos] for row in output_grid.values if row[pos] != 0), 0)
+        for r in range(rows):
+            if output_grid.values[r][pos] == 0:
+                output_grid.values[r][pos] = color
 
     return output_grid
