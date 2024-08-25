@@ -7,11 +7,12 @@ def solve_2685904e(input_grid: ColoredGrid) -> ColoredGrid:
     
     The solution follows these steps:
     1. Analyze the source row (second to last row) of the grid.
-    2. Identify colors to extend:
-       - Colors that appear exactly twice.
-       - If no colors appear twice, use the least frequent color(s).
-    3. Extend these colors vertically from two rows above the gray row up to the row above the source row.
-    4. Leave the top rows, gray row, source row, bottom row, and non-extended columns unchanged.
+    2. Determine the target frequency:
+       - If any color appears exactly twice, target frequency is 2.
+       - Otherwise, target frequency is the minimum frequency in the row.
+    3. Identify colors to extend: all colors that appear at the target frequency.
+    4. Extend these colors vertically from two rows above the gray row up to the row above the source row.
+    5. Leave the top 4 rows, gray row, source row, bottom row, and non-extended columns unchanged.
     
     Args:
     input_grid (ColoredGrid): The input grid to transform.
@@ -22,33 +23,27 @@ def solve_2685904e(input_grid: ColoredGrid) -> ColoredGrid:
     # Create a copy of the input grid
     output_grid = input_grid.deep_copy()
     
-    # Get the dimensions of the grid
-    rows, cols = input_grid.get_dimensions()
-    
     # Analyze the source row (second to last row)
     source_row = input_grid.values[-2]
     color_counts = Counter(source_row)
     
-    # Identify colors to extend
-    colors_appearing_twice = {color for color, count in color_counts.items() if count == 2}
-    
-    if colors_appearing_twice:
-        colors_to_extend = colors_appearing_twice
+    # Determine the target frequency
+    if 2 in color_counts.values():
+        target_frequency = 2
     else:
-        min_count = min(color_counts.values())
-        colors_to_extend = {color for color, count in color_counts.items() if count == min_count}
+        target_frequency = min(color_counts.values())
     
-    # Find the gray row (7th row from the top)
-    gray_row_index = 6
+    # Identify colors to extend
+    colors_to_extend = {color for color, count in color_counts.items() if count == target_frequency}
     
     # Calculate the extension range
-    extension_start = gray_row_index - 2
-    extension_end = rows - 3  # Third to last row
+    extension_start = 4  # Two rows above the gray row
+    extension_end = 7  # Row above the source row
     
     # Extend the identified colors
-    for col in range(cols):
+    for col in range(len(source_row)):
         if source_row[col] in colors_to_extend:
-            for row in range(extension_start, extension_end):
+            for row in range(extension_start, extension_end + 1):
                 output_grid.values[row][col] = source_row[col]
     
     return output_grid
