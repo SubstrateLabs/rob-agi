@@ -4,12 +4,11 @@ def solve_3979b1a8(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transform a 5x5 input grid into a 10x10 output grid by:
     1. Copying the input to the top-left quadrant
-    2. Mirroring the pattern to the right and bottom with specific color changes
-    3. Creating a unique pattern in the bottom-right quadrant
-    4. Using the corner, center, and a special color from the input grid
-
-    The top-right and bottom-left quadrants mirror the input with color substitutions.
-    The bottom-right quadrant has a specific pattern based on the key colors.
+    2. Creating a vertical stripe pattern on the right side
+    3. Creating a horizontal stripe pattern on the bottom
+    4. Filling the bottom-right quadrant with a specific pattern
+    
+    The pattern uses the corner color, center color, and a special color from the input grid.
     """
     # Extract key colors
     corner_color = input_grid.values[0][0]
@@ -24,27 +23,22 @@ def solve_3979b1a8(input_grid: ColoredGrid) -> ColoredGrid:
         for j in range(5):
             new_grid[i][j] = input_grid.values[i][j]
 
-    # Fill the top-right quadrant (rows 0-4, columns 5-9)
-    for i in range(5):
-        new_grid[i][5:] = [corner_color, center_color, input_grid.values[i][1], corner_color, center_color]
+    # Fill the right side with vertical stripes (columns 5-9)
+    for i in range(10):
+        new_grid[i][5:] = [corner_color, center_color, special_color, corner_color, center_color]
 
-    # Fill the bottom-left quadrant (rows 5-9, columns 0-4)
-    for j in range(5):
-        for i in range(5, 10):
-            new_grid[i][j] = [corner_color, center_color, input_grid.values[1][j], corner_color, center_color][i-5]
+    # Fill the bottom with horizontal stripes (rows 5-9)
+    for i in range(5, 10):
+        new_grid[i][:5] = [corner_color, center_color, special_color, corner_color, center_color]
 
     # Fill the bottom-right quadrant (rows 5-9, columns 5-9)
     for i in range(5, 10):
         for j in range(5, 10):
-            if i == 5 or j == 5:
-                new_grid[i][j] = corner_color
-            elif i == 6:
+            if i == j:
+                new_grid[i][j] = special_color
+            elif i > j:
                 new_grid[i][j] = center_color
-            elif i == 7:
-                new_grid[i][j] = input_grid.values[1][j-5]
-            elif i == 8:
-                new_grid[i][j] = corner_color if j < 9 else center_color
-            else:  # i == 9
-                new_grid[i][j] = center_color if j < 9 else special_color
+            else:
+                new_grid[i][j] = corner_color
 
     return ColoredGrid(values=new_grid)
