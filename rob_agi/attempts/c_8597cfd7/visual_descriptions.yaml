@@ -1,43 +1,58 @@
 example_0:
   input: |
-    A 9x9 grid with mostly black (empty) space. There are three distinct vertical lines:
-    - A red (2) line in the third column, consisting of two squares at the top and two at the bottom.
-    - A yellow (4) line in the seventh column, consisting of two squares at the top and four at the bottom.
-    - A horizontal gray (5) line spanning the entire width of the grid in the fifth row.
+    A 9x9 grid with the following key features:
+    - Background: Mostly black (0) squares, representing empty space.
+    - Vertical lines:
+      1. Red (2) line in column 3: Two squares at the top (rows 1-2) and two at the bottom (rows 6-7).
+      2. Yellow (4) line in column 7: Two squares at the top (rows 1-2) and four at the bottom (rows 6-9).
+    - Horizontal line:
+      - Gray (5) line in row 5, spanning all 9 columns.
+    - Note: The gray line divides the grid into upper and lower sections.
   output: |
-    A small 2x2 grid entirely filled with yellow (4) squares.
+    A 2x2 grid filled entirely with yellow (4) squares.
+  explanation: |
+    The yellow line is chosen because it has more squares (4) below the gray line than the red line (2).
 
 example_1:
   input: |
-    A 9x9 grid similar to example_0, but with a slight difference:
-    - The red (2) line in the third column now extends to four squares at the bottom.
-    - The yellow (4) line in the seventh column and the horizontal gray (5) line remain the same as in example_0.
+    A 9x9 grid similar to example_0, with one key difference:
+    - Red (2) line in column 3: Two squares at the top (rows 1-2) and four at the bottom (rows 6-9).
+    - Yellow (4) line in column 7: Unchanged from example_0.
+    - Gray (5) horizontal line: Still in row 5, spanning all columns.
   output: |
-    A small 2x2 grid entirely filled with red (2) squares.
+    A 2x2 grid filled entirely with red (2) squares.
+  explanation: |
+    Both red and yellow lines have 4 squares below the gray line, but the red line has a higher total count (6 vs 5).
 
 example_2:
   input: |
-    An 11x9 grid, slightly taller than the previous examples:
-    - The red (2) line in the third column has one square at the top and four at the bottom.
-    - The yellow (4) line in the seventh column has three squares at the top and four at the bottom.
-    - The horizontal gray (5) line is now in the sixth row.
+    An 11x9 grid (taller than previous examples):
+    - Red (2) line in column 3: One square at the top (row 1) and four at the bottom (rows 7-10).
+    - Yellow (4) line in column 7: Three squares at the top (rows 1-3) and four at the bottom (rows 7-10).
+    - Gray (5) horizontal line: Now in row 6, spanning all columns.
   output: |
-    A small 2x2 grid entirely filled with red (2) squares.
+    A 2x2 grid filled entirely with red (2) squares.
+  explanation: |
+    Both lines have 4 squares below the gray line, but the red line is chosen as it's the leftmost of the tied lines.
 
 example_3:
   input: |
-    An 11x9 grid, similar to example_2 but with some changes:
-    - The red (2) line in the third column has two squares at the top and four at the bottom, but the bottom part is disconnected (one black square in between).
-    - The yellow (4) line in the seventh column has two squares at the top and three at the bottom.
-    - The horizontal gray (5) line remains in the sixth row.
+    An 11x9 grid with a disconnected line:
+    - Red (2) line in column 3: Two squares at the top (rows 1-2), one black square (row 3), then four at the bottom (rows 7-10).
+    - Yellow (4) line in column 7: Two squares at the top (rows 1-2) and three at the bottom (rows 7-9).
+    - Gray (5) horizontal line: In row 6, spanning all columns.
   output: |
-    A small 2x2 grid entirely filled with red (2) squares.
+    A 2x2 grid filled entirely with red (2) squares.
+  explanation: |
+    The red line has more squares below the gray line (4) than the yellow line (3), despite being disconnected.
 
 test_case_0:
   input: |
-    An 11x9 grid with a pattern similar to the previous examples:
-    - The red (2) line in the third column has three squares at the top and four at the bottom.
-    - The yellow (4) line in the seventh column has two squares at the top and four at the bottom.
-    - The horizontal gray (5) line is in the sixth row.
+    An 11x9 grid testing a tie-breaking scenario:
+    - Red (2) line in column 3: Three squares at the top (rows 1-3) and four at the bottom (rows 7-10).
+    - Yellow (4) line in column 7: Two squares at the top (rows 1-2) and four at the bottom (rows 7-10).
+    - Gray (5) horizontal line: In row 6, spanning all columns.
   output: |
-    A small 2x2 grid entirely filled with yellow (4) squares.
+    A 2x2 grid filled entirely with yellow (4) squares.
+  explanation: |
+    Both lines have 4 squares below the gray line and 7 squares total, but the yellow line is chosen as it's the rightmost.
