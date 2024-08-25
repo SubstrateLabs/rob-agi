@@ -9,10 +9,9 @@ def solve_4364c1c4(input_grid: ColoredGrid) -> ColoredGrid:
     2. Finds all distinct shapes (connected regions of non-background colors).
     3. Sorts shapes from top to bottom.
     4. Moves shapes:
-       - Topmost shape: 1 cell left and 1 cell up
-       - Bottommost shape: 3 cells right and 1 cell down
-       - Odd-numbered shapes from top: 1 cell left
-       - Even-numbered shapes from top: 3 cells right
+       - First half of shapes: 1 cell left
+       - Second half of shapes: 1 cell right and 1 cell down (or 3 right, 1 down if only 2 shapes)
+       - If odd number of shapes, middle shape doesn't move
     5. Applies movements while keeping shapes within grid bounds.
     """
     background_color = Counter([cell for row in input_grid.values for cell in row]).most_common(1)[0][0]
@@ -21,15 +20,21 @@ def solve_4364c1c4(input_grid: ColoredGrid) -> ColoredGrid:
 
     new_grid = ColoredGrid(values=[[background_color for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
 
+    num_shapes = len(shapes)
+    num_move = num_shapes // 2
+
     for i, shape in enumerate(shapes):
-        if i == 0:  # Topmost shape
-            dx, dy = -1, -1
-        elif i == len(shapes) - 1:  # Bottommost shape
-            dx, dy = 3, 1
-        elif i % 2 == 1:  # Odd-numbered shapes
+        if i < num_move:  # First half of shapes
             dx, dy = -1, 0
-        else:  # Even-numbered shapes
-            dx, dy = 3, 0
+        elif i >= num_shapes - num_move:  # Second half of shapes
+            if num_shapes == 2:
+                dx, dy = 3, 1
+            elif num_shapes == 4:
+                dx, dy = 2, 1
+            else:
+                dx, dy = 1, 1
+        else:  # Middle shape(s) if odd number of shapes
+            dx, dy = 0, 0
 
         new_shape = move_shape(shape, dx, dy, new_grid.num_rows, new_grid.num_cols)
         color = input_grid.values[shape[0][0]][shape[0][1]]
