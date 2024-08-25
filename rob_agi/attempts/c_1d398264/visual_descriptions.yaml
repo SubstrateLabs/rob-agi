@@ -1,58 +1,67 @@
 example_0:
   input: |
-    A 15x15 grid with most cells black (0). In the center-left area, there's a small cluster of colored cells:
-    - Row 1: A red (2) cell, a gray (5) cell, and an orange (7) cell
-    - Row 2: A red (2) cell, a sky (8) cell, and an orange (7) cell
-    - Row 3: Three green (3) cells in a row
-    The rest of the grid is black (0).
+    A 15x15 grid with most cells black (0). In the top-left quadrant, there's a compact cluster of colored cells:
+    - Row 1 (index 0): Empty
+    - Row 2 (index 1): A red (2) cell, a gray (5) cell, and an orange (7) cell, starting from column 2
+    - Row 3 (index 2): A red (2) cell, a sky blue (8) cell, and an orange (7) cell, aligned with the row above
+    - Row 4 (index 3): Three green (3) cells in a row, aligned with the cells above
+    All other cells are black (0).
   output: |
-    A 15x15 grid with various color expansions:
-    - Red (2) expands horizontally across row 2 and vertically up one cell in column 1
-    - Gray (5) remains in its original position
-    - Orange (7) expands diagonally down-right, filling the entire right side of the grid from its starting point
-    - Sky (8) remains in its original position
-    - Green (3) expands in a diagonal cross pattern, forming a long diagonal line from top-left to bottom-right, and shorter diagonal lines perpendicular to it
-    The rest of the grid remains black (0).
+    A 15x15 grid showcasing distinct expansion patterns for each color:
+    - Red (2) fills row 2 horizontally and expands vertically in the leftmost column (1) up to row 0
+    - Gray (5) remains stationary in its original position
+    - Orange (7) creates a large right-angled triangle, expanding diagonally down-right from both starting positions
+    - Sky blue (8) remains stationary in its original position
+    - Green (3) forms an X-shape centered on the middle cell:
+      * The main diagonal extends from top-left (0,3) to bottom-right (14,14)
+      * Secondary diagonals extend perpendicular to the main one, creating shorter lines
+    Black (0) fills all remaining cells.
 
 example_1:
   input: |
-    A 10x10 grid with most cells black (0). In the center, there's a small cluster of colored cells:
-    - Row 2: A green (3) cell, a blue (1) cell, and a red (2) cell
-    - Row 3: A red (2) cell, a magenta (6) cell, and a red (2) cell
-    - Row 4: A red (2) cell and two orange (7) cells
-    The rest of the grid is black (0).
+    A 10x10 grid with most cells black (0). In the center, there's a compact cluster of colored cells:
+    - Row 3 (index 2): A green (3) cell, a blue (1) cell, and a red (2) cell, starting from column 3
+    - Row 4 (index 3): A red (2) cell, a magenta (6) cell, and a red (2) cell, aligned with the row above
+    - Row 5 (index 4): A red (2) cell and two orange (7) cells, aligned with the cells above
+    All other cells are black (0).
   output: |
-    A 10x10 grid with color expansions:
-    - Green (3) expands diagonally up-left for two cells
-    - Blue (1) expands diagonally up-right for two cells
-    - Red (2) expands horizontally across row 3 and vertically up and down from its ends
-    - Magenta (6) expands diagonally up-left, reaching the top-left corner
-    - Orange (7) expands diagonally down-right, forming a triangular pattern in the bottom-right corner
-    The rest of the grid remains black (0).
+    A 10x10 grid demonstrating various color expansion rules:
+    - Green (3) expands diagonally, forming two lines:
+      * Up-left from (2,3) to (0,1)
+      * Down-right from (2,3) to (4,5), stopping at the red cells
+    - Blue (1) creates a diagonal line up-right from (2,4) to (0,6)
+    - Red (2) fills row 3 horizontally and expands vertically:
+      * Up from the leftmost red cell (3,3) to (0,3)
+      * Down from the rightmost red cell (3,5) to (9,5)
+    - Magenta (6) forms a diagonal line up-left from (3,4) to (0,1)
+    - Orange (7) creates a right-angled triangle in the bottom-right, expanding diagonally down-right from (4,4)
+    Black (0) fills all remaining cells.
 
 example_2:
   input: |
-    A 20x20 grid with most cells black (0). In the bottom-right quadrant, there's a small cluster of colored cells:
-    - Row 6: A magenta (6) cell and two red (2) cells
-    - Row 7: A yellow (4) cell, a gray (5) cell, and a yellow (4) cell
-    - Row 8: A magenta (6) cell and two sky (8) cells
-    The rest of the grid is black (0).
+    A 20x20 grid with most cells black (0). In the center-right area, there's a compact cluster of colored cells:
+    - Row 7 (index 6): A magenta (6) cell and two red (2) cells, starting from column 15
+    - Row 8 (index 7): A yellow (4) cell, a gray (5) cell, and a yellow (4) cell, aligned with the row above
+    - Row 9 (index 8): A magenta (6) cell and two sky blue (8) cells, aligned with the cells above
+    All other cells are black (0).
   output: |
-    A 20x20 grid with color expansions:
-    - Magenta (6) in row 6 expands diagonally up-left, reaching the top-left corner
-    - Red (2) expands horizontally across row 6 and vertically up from its rightmost position
-    - Yellow (4) expands horizontally, filling the entire row 7
-    - Gray (5) remains in its original position
-    - Magenta (6) in row 8 expands diagonally up-left, but stops at the yellow row
-    - Sky (8) expands diagonally down-right, forming a triangular pattern in the bottom-right corner
-    The rest of the grid remains black (0).
+    A 20x20 grid illustrating complex interactions between color expansions:
+    - Magenta (6) in row 7 expands diagonally up-left, creating a line from (6,15) to (0,9)
+    - Red (2) fills row 6 horizontally from column 15 to 19, then expands vertically:
+      * Up from (6,16) to (0,16)
+      * Up from (6,17) to (0,17)
+    - Yellow (4) fills the entire row 7 horizontally
+    - Gray (5) remains stationary in its original position (7,16)
+    - Magenta (6) in row 9 expands diagonally up-left, but stops at the yellow row (7,13)
+    - Sky blue (8) expands vertically down from (8,17) and (8,18) to row 19, then fills row 19 horizontally
+    Black (0) fills all remaining cells.
 
 test_case_0:
   input: |
-    A 20x20 grid with most cells black (0). In the bottom-right quadrant, there's a small cluster of colored cells:
-    - Row 6: A magenta (6) cell and two red (2) cells
-    - Row 7: A yellow (4) cell, a gray (5) cell, and a yellow (4) cell
-    - Row 8: A magenta (6) cell and two sky (8) cells
-    The rest of the grid is black (0).
+    A 20x20 grid with most cells black (0). In the center-right area, there's a compact cluster of colored cells:
+    - Row 7 (index 6): A magenta (6) cell and two red (2) cells, starting from column 15
+    - Row 8 (index 7): A yellow (4) cell, a gray (5) cell, and a yellow (4) cell, aligned with the row above
+    - Row 9 (index 8): A magenta (6) cell and two sky blue (8) cells, aligned with the cells above
+    All other cells are black (0).
   output: |
-    Not provided in the test case.
+    The expected output is not provided, but based on the expansion rules, it should be similar to example_2's output.
