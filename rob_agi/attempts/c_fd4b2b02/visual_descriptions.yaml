@@ -1,0 +1,36 @@
+example_0:
+  input: |
+    The input grid is 23x23. It's mostly black (0) with a small magenta (6) rectangle in the center. The magenta rectangle is 2 cells wide and 4 cells tall, positioned vertically from rows 5 to 8 and columns 6 to 7.
+  output: |
+    The output grid is 23x23. It contains several distinct elements:
+    1. Four magenta (6) squares, each 2x3 in size, positioned in the corners of the grid.
+    2. Four green (3) rectangles, each 4x4 in size, positioned between the magenta squares.
+    3. The original magenta rectangle from the input remains in the center.
+    4. The green rectangles and magenta squares form a symmetrical pattern that resembles a picture frame or a stylized flower.
+
+example_1:
+  input: |
+    The input grid is 16x16. It's mostly black (0) with a small green (3) rectangle in the center. The green rectangle is 3 cells wide and 1 cell tall, positioned horizontally in row 7, columns 7 to 9.
+  output: |
+    The output grid is 16x16. It contains several distinct elements:
+    1. Four magenta (6) squares, each 3x3 in size, positioned symmetrically in the grid.
+    2. Four green (3) rectangles, each 3x3 in size, positioned between the magenta squares.
+    3. The original green rectangle from the input remains in the center.
+    4. The green squares and magenta squares form a symmetrical pattern that resembles a stylized cross or plus sign.
+
+example_2:
+  input: |
+    The input grid is 26x26. It's mostly black (0) with a green (3) rectangle in the upper-middle part. The green rectangle is 2 cells wide and 5 cells tall, positioned vertically from rows 5 to 9 and columns 11 to 12.
+  output: |
+    The output grid is 26x26. It contains several distinct elements:
+    1. Four green (3) rectangles, each 2x5 in size, positioned symmetrically in the grid.
+    2. Four magenta (6) rectangles, each 5x5 in size, positioned between the green rectangles.
+    3. The original green rectangle from the input remains in its position.
+    4. A single green (3) cell appears in the bottom-right corner of the grid.
+    5. The green and magenta rectangles form a symmetrical pattern that resembles a stylized cross or plus sign, with the magenta rectangles forming the main body and the green rectangles as accents.
+
+test_case_0:
+  input: |
+    The input grid is 26x26. It's mostly black (0) with a green (3) rectangle in the upper-middle part. The green rectangle is 2 cells wide and 5 cells tall, positioned vertically from rows 5 to 9 and columns 11 to 12.
+  output: |
+    The output grid is not provided for the test case.
