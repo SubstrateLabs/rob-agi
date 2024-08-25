@@ -12,7 +12,7 @@ from concurrent.futures import ThreadPoolExecutor
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 handler = logging.StreamHandler()
-formatter = logging.Formatter("%(asctime)s [%(threadName)s]\n%(message)s", "%H:%M")
+formatter = logging.Formatter("\n%(asctime)s [%(threadName)s]\n%(message)s", "%H:%M")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.propagate = False
@@ -75,7 +75,7 @@ remote_pip_deps = [
     "git+https://github.com/SubstrateLabs/rob-agi.git@673d3e5",
     "numpy",
 ]
-max_python_tries = 4
+max_tries_per_challenge = 2
 
 all_challenges = list(challenges.values())
 random.shuffle(all_challenges)
@@ -383,7 +383,7 @@ async def run_py_fn(
     challenge: GridProblem,
     parsed: SolveAttempt,
     functions: List[str],
-    max_tries: int = max_python_tries,
+    max_tries: int = max_tries_per_challenge,
     verbose=False,
 ) -> Optional[RunPythonOut]:
     async def _run(fn: str, run_label: str) -> RunPythonOut:
@@ -671,7 +671,7 @@ async def attempt_old(challenge: GridProblem, run_remote=False, verbose=False):
             functions=to_try,
             parsed=parsed,
             verbose=verbose,
-            max_tries=max_python_tries,
+            max_tries=max_tries_per_challenge,
         )
         if run_remote
         else None
@@ -813,7 +813,7 @@ def attempt(challenge: GridProblem, previous_solution: Optional[str] = None):
     attempted += 1
     sln = solutions[challenge.id]
     s = Solver(challenge=challenge, solution=sln)
-    succeeded = s.run_solve(max_tries=4, prev_solution=previous_solution)
+    succeeded = s.run_solve(max_tries=max_tries_per_challenge, prev_solution=previous_solution)
     if succeeded:
         successful += 1
     logger.info(f"Solve Rate: {successful} of {attempted} ({successful / attempted:.2%})")

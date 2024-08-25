@@ -1,77 +1,94 @@
 example_0:
   input: |
-    A 25x25 grid with a black (0) background. Key features:
-    1. Two red (2) L-shaped patterns in the top-left and top-right corners, each 3x3 in size.
-    2. Blue (1) elements:
-       - A cluster of 4 dots in the top-center, forming a 2x2 square.
-       - A vertical line of 3 dots in the middle-right, with 2 adjacent dots.
-       - Scattered dots in the bottom-left quadrant, forming no clear pattern.
-    3. Two yellow (4) 5x5 square outlines in the bottom-right quadrant.
-    4. Several isolated blue (1) dots throughout the grid.
+    A 25x25 grid with mostly black (empty) space. There are several distinct elements:
+    1. Four yellow 2x2 squares in the corners of the grid (top-left, top-right, bottom-left, bottom-right).
+    2. A pattern of blue dots and small blue shapes scattered across the grid:
+       - Two horizontal blue dots in the top-left quadrant
+       - A small L-shaped blue pattern in the top-right quadrant
+       - A single blue dot in the middle-right of the grid
+       - Two vertical blue dots in the bottom-right quadrant
+       - A cluster of blue dots forming a rough diamond shape in the center-left of the grid
+    3. Red elements:
+       - Two 2x2 red squares in the top-center of the grid
+       - Two 2x2 red squares in the bottom-center of the grid
+       - Single red dots adjacent to some of these red squares
   output: |
-    The 25x25 grid retains its structure with these key transformations:
-    1. Red (2) L-shapes remain unchanged.
-    2. Blue (1) elements have been expanded and connected:
-       - Top-center cluster extended into a horizontal line spanning between the red L-shapes.
-       - Middle-right vertical line extended downward, forming a longer vertical line.
-       - Bottom-left scattered dots now form a more structured pattern, resembling a partial square.
-    3. Yellow (4) squares remain unchanged.
-    4. Most isolated blue dots have been incorporated into larger patterns.
-    5. New blue lines respect the boundaries of other colored elements.
+    The 25x25 grid maintains the same overall structure as the input, with some key changes:
+    1. The four yellow 2x2 squares in the corners remain unchanged.
+    2. The blue elements have been significantly modified:
+       - The scattered blue dots and shapes have been connected to form more cohesive patterns
+       - A symmetrical blue pattern has emerged in the top half of the grid, resembling a stylized bird or butterfly
+       - The central cluster has been extended into a more defined shape
+       - New blue connections have been added, creating lines and shapes that weren't present in the input
+    3. The red elements (2x2 squares and adjacent dots) remain unchanged
+    Overall, the output grid shows a more structured and symmetrical arrangement of blue elements, while maintaining the positions of yellow and red elements.
 
 example_1:
   input: |
-    A 23x23 grid with a black (0) background. Key features:
-    1. Four yellow (8) C-shaped patterns in each corner, each 5x5 in size.
-    2. Blue (1) elements:
-       - Small clusters forming partial shapes throughout the grid.
-       - Several isolated dots.
-    3. A red (3) 3x2 rectangle near the center-left edge.
+    A 23x23 grid with mostly black (empty) space. The grid contains:
+    1. Six sky-blue (color 8) 2x2 squares arranged in three pairs:
+       - Top-left and top-right
+       - Middle-left and middle-right
+       - Bottom-left and bottom-right
+    2. Blue dots and small shapes scattered across the grid:
+       - A small L-shape in the top-left quadrant
+       - Two separate dots in the top-right quadrant
+       - A cluster of dots forming a rough T-shape in the center
+       - A single dot in the bottom-left quadrant
+       - Two dots forming a diagonal line in the bottom-right quadrant
+    3. Green elements:
+       - Two 2x2 green squares in the center-top of the grid
+       - Two 2x2 green squares in the center-bottom of the grid
   output: |
-    The 23x23 grid maintains its structure with these significant blue (1) transformations:
-    1. Yellow (8) C-shapes and red (3) rectangle remain unchanged.
-    2. Blue (1) elements now form a cohesive pattern:
-       - A horizontal line spans the top third, connecting the top C-shapes.
-       - Two vertical lines in the left and right thirds, connecting top and bottom C-shapes.
-       - A square shape in the bottom-center, connecting the bottom C-shapes.
-    3. New blue lines carefully avoid intersecting other colored elements.
-    4. The pattern shows clear symmetry and balance across the grid.
+    The 23x23 grid maintains the same overall structure, with significant changes to the blue elements:
+    1. The six sky-blue 2x2 squares remain unchanged in their positions.
+    2. The blue elements have been transformed:
+       - The scattered blue dots and shapes are now connected, forming a more cohesive pattern
+       - A symmetrical blue pattern has emerged, resembling a stylized face or mask
+       - The central T-shape has been extended and connected to other blue elements
+       - New blue connections have been added, creating lines and shapes that weren't present in the input
+    3. The green 2x2 squares remain unchanged in their positions
+    The output grid shows a more structured and symmetrical arrangement of blue elements, while maintaining the positions of sky-blue and green elements.
 
 example_2:
   input: |
-    A 21x21 grid with a black (0) background. Key features:
-    1. Four green (3) C-shaped patterns, two in the top half and two in the bottom half, each 5x5 in size.
-    2. Blue (1) elements:
-       - A cross-like pattern in the center, 5x5 in size.
-       - Short line segments and small clusters scattered throughout.
-       - Several isolated dots.
+    A 21x21 grid with mostly black (empty) space. The grid contains:
+    1. Eight green 2x2 squares arranged in four pairs:
+       - Top-left and top-right
+       - Upper-middle left and right
+       - Lower-middle left and right
+       - Bottom-left and bottom-right
+    2. Blue dots and small shapes scattered across the grid:
+       - A small L-shape in the top-left quadrant
+       - A cluster of dots forming a rough cross shape in the center
+       - A single dot in the bottom-right quadrant
+       - Two separate dots in the middle-right of the grid
+    3. A single red dot near the center-left of the grid
   output: |
-    The 21x21 grid retains its structure with these major blue (1) transformations:
-    1. Green (3) C-shapes remain unchanged.
-    2. Blue (1) elements now form an interconnected pattern:
-       - The central cross expanded into a large square, encompassing the original cross.
-       - Vertical lines connect the top and bottom C-shapes on both sides.
-       - Horizontal lines connect the left and right C-shapes on both top and bottom.
-    3. Most isolated dots and small clusters have been incorporated into the larger pattern.
-    4. The new pattern respects the boundaries of the green C-shapes.
-    5. The resulting blue structure shows clear symmetry and balance.
+    The 21x21 grid maintains the same overall structure, with significant changes to the blue elements:
+    1. The eight green 2x2 squares remain unchanged in their positions.
+    2. The blue elements have been transformed:
+       - The scattered blue dots and shapes are now connected, forming a more cohesive pattern
+       - A symmetrical blue pattern has emerged, resembling a stylized tree or plant
+       - The central cross shape has been extended and connected to other blue elements
+       - New blue connections have been added, creating lines and shapes that weren't present in the input
+    3. The single red dot remains unchanged in its position
+    The output grid shows a more structured and symmetrical arrangement of blue elements, while maintaining the positions of green squares and the red dot.
 
 test_case_0:
   input: |
-    A 28x25 grid with a black (0) background. Key features:
-    1. Multiple yellow (4) C-shaped patterns scattered throughout, varying in size from 3x3 to 5x5.
-    2. Blue (1) elements:
-       - Small clusters and short line segments throughout the grid.
-       - A cross-like pattern near the center-left.
-       - Several isolated dots.
-    3. A few isolated red (2) dots.
+    A 28x25 grid with mostly black (empty) space. The grid contains:
+    1. Twelve yellow 2x2 squares arranged in six pairs:
+       - Top-left and top-right
+       - Upper-middle left and right
+       - Middle-left and middle-right
+       - Lower-middle left and right
+       - Bottom-left and bottom-right
+       - An additional pair in the center-right
+    2. Blue dots and small shapes scattered across the grid:
+       - Various single dots and small clusters throughout the grid
+       - A larger cluster forming a rough X-shape in the center-left
+    3. A single blue dot in the top-left corner
+    4. Two red dots in the top-right quadrant
   output: |
-    The 28x25 grid maintains its overall structure with these significant blue (1) transformations:
-    1. Yellow (4) C-shapes and red (2) dots remain unchanged.
-    2. Blue (1) elements now form a complex, interconnected pattern:
-       - Vertical and horizontal lines connect most yellow C-shapes.
-       - The center-left cross expanded into a larger rectangular shape.
-       - Smaller shapes and lines connect previously isolated dots and clusters.
-    3. The new blue pattern carefully avoids intersecting other colored elements.
-    4. The resulting structure shows improved connectivity and balance across the grid.
-    5. A few isolated blue dots remain, likely due to distance from main structures.
+    The output grid is not provided for the test case, as it is meant to be solved based on the pattern observed in the examples.

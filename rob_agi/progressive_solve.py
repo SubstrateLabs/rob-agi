@@ -11,7 +11,7 @@ from aider.models import Model
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 handler = logging.StreamHandler()
-formatter = logging.Formatter("%(asctime)s [%(threadName)s]\n%(message)s", "%H:%M")
+formatter = logging.Formatter("\n%(asctime)s [%(threadName)s]\n%(message)s", "%H:%M")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.propagate = False
@@ -125,7 +125,7 @@ class Solver:
         res = ask_coder.run("Based on that reflection detail a step by step plan for how to solve the challenge\n")
         return res
 
-    def get_edit(self, current_result, plan, is_first=True, update_visual_descriptions=True) -> str:
+    def get_edit(self, current_result, plan, is_first=True, update_visual_desc=False) -> str:
         modify_coder = self.get_modify_coder()
         prefix = self.get_prefix(is_first)
         prompt = f"{prefix}\n\n<VALIDATION_OUTPUT>\n{current_result['error']}\n{current_result['output']}</VALIDATION_OUTPUT>\n"
@@ -134,10 +134,10 @@ class Solver:
         prompt += "Make sure your code changes are in the SEARCH/REPLACE format."
         # prompt += f"An image of the challenge is provided at {self.challenge.id}.png"
         # prompt += f"colored_grid.py includes a library of functions that may be useful. modify this file if you need."
-        logger.info(f"\n~~~~~~~~~EDITED~~~~~~~~~~~\n{modify_coder.aider_edited_files}")
         modifications = modify_coder.run(prompt)
-        if update_visual_descriptions:
-            update_prompt = "If the visual_descriptions.yaml can be improved (more detail, better abstractions, cutting irrelevant info), include those changes too"
+        logger.info(f"\n~~~~~~~~~EDITED~~~~~~~~~~~\n{modify_coder.aider_edited_files}")
+        if update_visual_desc:
+            update_prompt = "If the visual_descriptions.yaml can be improved (more detail, more accurate, better intuitive abstractions, cutting irrelevant info, clarity, etc), include those changes too. This file is purely for descriptions of the grid images. It should not have any information about the code or the solution. These descriptions should help someone trying to solve this problem though, so it should include language that is relevant for solving the problem.\n"
             modify_coder.run(update_prompt)
         return modifications
 
@@ -188,7 +188,8 @@ class Solver:
             else:
                 plan = self.get_plan(current_result)
 
-            self.get_edit(current_result, plan)
+            update_desc = self.total_attempts > 0 and self.total_attempts % 4 == 0
+            self.get_edit(current_result, plan, update_visual_desc=update_desc)
             local_tries += 1
             self.total_attempts += 1
             current_result = self.run_tests()
