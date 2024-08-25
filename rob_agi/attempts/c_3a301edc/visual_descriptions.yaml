@@ -1,35 +1,35 @@
 example_0:
   input: |
-    A 19x13 grid with a yellow (4) rectangular shape in the center. The shape is 7x8 squares and has a smaller 4x4 gray (5) rectangle inside it. The yellow rectangle is surrounded by black (0) space.
+    A 19x13 grid with a yellow (4) rectangular shape of size 7x8 in the center. The shape contains a smaller 4x4 gray (5) rectangle at its core. The yellow rectangle is surrounded by black (0) space. The largest dimension of the shape is 8.
   output: |
-    The yellow rectangle has been expanded by adding a 2-square thick gray border around it. This new gray border extends into the previously black space, creating an 11x12 gray rectangle. The inner yellow and gray pattern remains unchanged. The rest of the grid remains black.
+    A gray (5) border has been added around the original shape. The border is 2 units thick, determined by the largest dimension (8) of the original shape. The resulting shape is an 11x12 gray rectangle containing the original yellow rectangle with its gray core. The entire shape is centered within the 19x13 grid, maintaining the black (0) space around it.
 
 example_1:
   input: |
-    A 14x13 grid with a green (3) cross-like shape in the center. The shape is 5x5 squares with a single blue (1) square in the very center. The green shape is surrounded by black (0) space.
+    A 14x13 grid featuring a green (3) cross-shaped pattern in the center. The pattern spans 5x5 squares with a single blue (1) square at its center. The cross is surrounded by black (0) space. The largest dimension of the shape is 5.
   output: |
-    The green cross shape has been enclosed in a blue border. This blue border is one square thick and forms a complete 7x7 square around the original green shape. The inner green cross and blue center remain unchanged. The rest of the grid remains black.
+    A blue (1) border has been added around the original cross shape. The border is 1 unit thick, based on the largest dimension (5) of the original shape. The result is a 7x7 blue square enclosing the green cross with its blue center. This new shape is centered within the 14x13 grid, preserving the black (0) space around it.
 
 example_2:
   input: |
-    A 14x15 grid with a magenta (6) square shape in the center. The shape is 4x4 squares with a 2x2 yellow (4) square inside it at the top-left corner. The magenta shape is surrounded by black (0) space.
+    A 14x15 grid containing a magenta (6) square of size 4x4 in the center. The square has a 2x2 yellow (4) square in its top-left corner. The magenta square is surrounded by black (0) space. The largest dimension of the shape is 4.
   output: |
-    The magenta square has been enclosed in a yellow border. This yellow border is two squares thick and forms a complete 8x8 square around the original magenta shape. The inner magenta square and yellow corner remain unchanged. The rest of the grid remains black.
+    A yellow (4) border has been added around the original magenta square. The border is 2 units thick, determined by the largest dimension (4) of the original shape. The result is an 8x8 yellow square containing the original magenta square with its yellow corner. This new shape is centered within the 14x15 grid, maintaining the black (0) space around it.
 
 example_3:
   input: |
-    A 17x16 grid with a gray (5) rectangular shape in the center. The shape is 7x7 squares and has a smaller 3x3 red (2) square inside it at the center. The gray rectangle is surrounded by black (0) space.
+    A 17x16 grid with a gray (5) square of size 7x7 in the center. The square contains a smaller 3x3 red (2) square at its core. The gray square is surrounded by black (0) space. The largest dimension of the shape is 7.
   output: |
-    The gray rectangle has been enclosed in a red border. This red border is three squares thick and forms a complete 13x13 square around the original gray shape. The inner gray square and red center remain unchanged. The rest of the grid remains black.
+    A red (2) border has been added around the original gray square. The border is 3 units thick, based on the largest dimension (7) of the original shape. The result is a 13x13 red square enclosing the original gray square with its red core. This new shape is centered within the 17x16 grid, preserving the black (0) space around it.
 
 example_4:
   input: |
-    An 11x12 grid with a blue (1) cross-like shape in the center. The shape is 3x3 squares with a single red (2) square in the very center. The blue shape is surrounded by black (0) space.
+    An 11x12 grid featuring a blue (1) cross-shaped pattern in the center. The pattern spans 3x3 squares with a single red (2) square at its center. The cross is surrounded by black (0) space. The largest dimension of the shape is 3.
   output: |
-    The blue cross shape has been enclosed in a red border. This red border is one square thick and forms a complete 5x5 square around the original blue shape. The inner blue cross and red center remain unchanged. The rest of the grid remains black.
+    A red (2) border has been added around the original blue cross shape. The border is 1 unit thick, determined by the largest dimension (3) of the original shape. The result is a 5x5 red square containing the blue cross with its red center. This new shape is centered within the 11x12 grid, maintaining the black (0) space around it.
 
 test_case_0:
   input: |
-    An 11x12 grid with a blue (1) cross-like shape in the center. The shape is 3x3 squares with a single red (2) square in the very center. The blue shape is surrounded by black (0) space.
+    An 11x12 grid with a blue (1) cross-shaped pattern spanning 3x3 squares in the center. The cross has a single red (2) square at its core. The pattern is surrounded by black (0) space. The largest dimension of the shape is 3.
   output: |
-    The output is not provided for this test case.
+    The output is not provided for this test case, but based on the pattern observed in previous examples, we would expect a red (2) border to be added around the blue cross. The border should be 1 unit thick due to the largest dimension (3) of the original shape. The result would likely be a 5x5 red square enclosing the original blue cross with its red center, centered within the 11x12 grid.
