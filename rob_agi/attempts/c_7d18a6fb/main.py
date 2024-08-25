@@ -1,24 +1,28 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Optional
 from collections import defaultdict
 
 def solve_7d18a6fb(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid into a 7x7 output grid by identifying and arranging color patterns.
     
-    1. Identifies the largest contiguous rectangle of a single color and excludes it.
-    2. Finds unique color patterns in the remaining grid.
-    3. Selects up to 4 patterns, prioritizing color diversity.
-    4. Creates 3x3 representations of selected patterns.
-    5. Places patterns in quadrants of a 7x7 grid based on their original positions.
-    6. Fills the central cross with black (0) to separate quadrants.
+    1. Preprocesses the input grid by identifying and excluding the largest contiguous rectangle of a single color.
+    2. Divides the remaining grid into four quadrants.
+    3. For each quadrant:
+       a. Identifies distinct color patterns using a flood fill algorithm.
+       b. Selects the most prominent pattern, prioritizing unique colors.
+    4. Compresses each selected pattern into a 3x3 representation.
+    5. Creates a 7x7 output grid:
+       a. Places compressed patterns in the corners corresponding to their original quadrants.
+       b. Fills the central cross with black (0) to separate quadrants.
     
     Returns a 7x7 ColoredGrid with the arranged patterns.
     """
-    patterns = identify_patterns(input_grid)
-    selected_patterns = select_patterns(patterns)
-    compressed_patterns = compress_patterns(selected_patterns)
-    output_grid = create_output_grid(compressed_patterns, input_grid)
+    preprocessed_grid = preprocess_grid(input_grid)
+    quadrants = divide_into_quadrants(preprocessed_grid)
+    patterns = [process_quadrant(quadrant) for quadrant in quadrants]
+    compressed_patterns = [compress_pattern(pattern) for pattern in patterns if pattern]
+    output_grid = create_output_grid(compressed_patterns)
     return output_grid
 
 def identify_patterns(grid: ColoredGrid) -> List[Tuple[int, List[Tuple[int, int]]]]:
@@ -110,15 +114,11 @@ def compress_patterns(patterns: List[Tuple[int, List[Tuple[int, int]]]]) -> List
     
     return compressed
 
-def create_output_grid(compressed_patterns: List[Tuple[int, List[List[int]], Tuple[int, int]]], input_grid: ColoredGrid) -> ColoredGrid:
+def create_output_grid(compressed_patterns: List[List[List[int]]]) -> ColoredGrid:
     output = [[0 for _ in range(7)] for _ in range(7)]
-    input_rows, input_cols = input_grid.get_dimensions()
     quadrants = [(0, 0), (0, 4), (4, 0), (4, 4)]
     
-    # Sort patterns based on their center position
-    compressed_patterns.sort(key=lambda x: x[2])
-    
-    for (color, pattern, _), (qr, qc) in zip(compressed_patterns, quadrants):
+    for pattern, (qr, qc) in zip(compressed_patterns, quadrants):
         for r in range(3):
             for c in range(3):
                 output[qr + r][qc + c] = pattern[r][c]
@@ -129,3 +129,48 @@ def create_output_grid(compressed_patterns: List[Tuple[int, List[List[int]], Tup
         output[i][3] = 0
     
     return ColoredGrid(values=output)
+def preprocess_grid(grid: ColoredGrid) -> ColoredGrid:
+    largest_rect = find_largest_rectangle(grid)
+    if largest_rect:
+        color, rect_cells = largest_rect
+        new_grid = grid.deep_copy()
+        for r, c in rect_cells:
+            new_grid.values[r][c] = 0  # Set to black (excluded)
+        return new_grid
+    return grid
+
+def divide_into_quadrants(grid: ColoredGrid) -> List[ColoredGrid]:
+    rows, cols = grid.get_dimensions()
+    mid_row, mid_col = rows // 2, cols // 2
+    return [
+        grid.extract_subgrid(0, 0, mid_row, mid_col),
+        grid.extract_subgrid(0, mid_col, mid_row, cols - mid_col),
+        grid.extract_subgrid(mid_row, 0, rows - mid_row, mid_col),
+        grid.extract_subgrid(mid_row, mid_col, rows - mid_row, cols - mid_col)
+    ]
+
+def process_quadrant(quadrant: ColoredGrid) -> Optional[Tuple[int, List[Tuple[int, int]]]]:
+    patterns = identify_patterns(quadrant)
+    return select_pattern(patterns) if patterns else None
+
+def select_pattern(patterns: List[Tuple[int, List[Tuple[int, int]]]]) -> Tuple[int, List[Tuple[int, int]]]:
+    return max(patterns, key=lambda x: len(x[1]))
+
+def compress_pattern(pattern: Tuple[int, List[Tuple[int, int]]]) -> List[List[int]]:
+    color, cells = pattern
+    min_r = min(r for r, _ in cells)
+    max_r = max(r for r, _ in cells)
+    min_c = min(c for _, c in cells)
+    max_c = max(c for _, c in cells)
+    
+    compressed = [[0 for _ in range(3)] for _ in range(3)]
+    for r in range(3):
+        for c in range(3):
+            r_start = min_r + (max_r - min_r + 1) * r // 3
+            r_end = min_r + (max_r - min_r + 1) * (r + 1) // 3
+            c_start = min_c + (max_c - min_c + 1) * c // 3
+            c_end = min_c + (max_c - min_c + 1) * (c + 1) // 3
+            cells_in_section = [(rr, cc) for rr, cc in cells if r_start <= rr <= r_end and c_start <= cc <= c_end]
+            compressed[r][c] = color if cells_in_section else 0
+    
+    return compressed
