@@ -10,10 +10,10 @@ def solve_4364c1c4(input_grid: ColoredGrid) -> ColoredGrid:
     3. Sorts shapes from top to bottom.
     4. Moves shapes:
        - Topmost shape: 1 cell left and 1 cell up
-       - Second from top: 3 cells right (if more than 2 shapes exist)
-       - Middle shapes: 1 cell left
        - Bottommost shape: 3 cells right and 1 cell down
-    5. Applies movements while keeping shapes within grid bounds and avoiding overlaps.
+       - Odd-numbered shapes from top: 1 cell left
+       - Even-numbered shapes from top: 3 cells right
+    5. Applies movements while keeping shapes within grid bounds.
     """
     background_color = Counter([cell for row in input_grid.values for cell in row]).most_common(1)[0][0]
     shapes = find_shapes(input_grid, background_color)
@@ -24,12 +24,12 @@ def solve_4364c1c4(input_grid: ColoredGrid) -> ColoredGrid:
     for i, shape in enumerate(shapes):
         if i == 0:  # Topmost shape
             dx, dy = -1, -1
-        elif i == 1 and len(shapes) > 2:  # Second from top (if more than 2 shapes)
-            dx, dy = 3, 0
         elif i == len(shapes) - 1:  # Bottommost shape
             dx, dy = 3, 1
-        else:  # Middle shapes
+        elif i % 2 == 1:  # Odd-numbered shapes
             dx, dy = -1, 0
+        else:  # Even-numbered shapes
+            dx, dy = 3, 0
 
         new_shape = move_shape(shape, dx, dy, new_grid.num_rows, new_grid.num_cols)
         color = input_grid.values[shape[0][0]][shape[0][1]]
