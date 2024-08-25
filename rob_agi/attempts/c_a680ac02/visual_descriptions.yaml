@@ -1,44 +1,50 @@
 example_0:
   input: |
     The input grid is 18x17 in size. It contains four distinct shapes:
-    1. A red (2) square outline in the top-left corner, 5x5 in size.
-    2. A yellow (4) square outline in the top-right corner, 5x5 in size.
-    3. A green (3) solid square in the middle-left, 4x4 in size.
-    4. A sky blue (8) solid square in the bottom-right, 4x4 in size.
-    The rest of the grid is filled with black (0), which can be considered empty space.
+    1. A red (2) square outline in the top-left corner, 5x5 in size. The outline is one cell thick with a black interior.
+    2. A yellow (4) square outline in the top-right corner, 5x5 in size. The outline is one cell thick with a black interior.
+    3. A green (3) solid square in the middle-left, 4x4 in size. This is not an outline.
+    4. A sky blue (8) solid square in the bottom-right, 4x4 in size. This is not an outline.
+    The rest of the grid is filled with black (0).
+    Key observation: Only the red and yellow shapes are square outlines.
   output: |
     The output grid is 4x8 in size. It contains two square outlines side by side:
     1. A red (2) square outline on the left, 4x4 in size.
     2. A yellow (4) square outline on the right, 4x4 in size.
-    The interiors of both squares are filled with black (0).
+    Both outlines are one cell thick with black (0) interiors.
+    Note: The outlines have been standardized to 4x4 size and arranged horizontally.
 
 example_1:
   input: |
     The input grid is 21x16 in size. It contains four distinct shapes:
-    1. A sky blue (8) solid square in the top-right corner, 4x4 in size.
-    2. A blue (1) square outline in the middle-left, 5x5 in size.
-    3. A red (2) square outline in the bottom-left, 5x5 in size.
-    4. A yellow (4) solid square in the bottom-right corner, 4x4 in size.
-    The rest of the grid is filled with black (0), which can be considered empty space.
+    1. A sky blue (8) solid square in the top-right corner, 4x4 in size. This is not an outline.
+    2. A blue (1) square outline in the middle-left, 5x5 in size. The outline is one cell thick with a black interior.
+    3. A red (2) square outline in the bottom-left, 5x5 in size. The outline is one cell thick with a black interior.
+    4. A yellow (4) solid square in the bottom-right corner, 4x4 in size. This is not an outline.
+    The rest of the grid is filled with black (0).
+    Key observation: Only the blue and red shapes are square outlines.
   output: |
     The output grid is 8x4 in size. It contains two square outlines stacked vertically:
     1. A blue (1) square outline on top, 4x4 in size.
     2. A red (2) square outline on bottom, 4x4 in size.
-    The interiors of both squares are filled with black (0).
+    Both outlines are one cell thick with black (0) interiors.
+    Note: The outlines have been standardized to 4x4 size and arranged vertically.
 
 example_2:
   input: |
     The input grid is 24x22 in size. It contains six distinct shapes:
-    1. A blue (1) solid square in the top-left, 4x4 in size.
-    2. A sky blue (8) solid square in the top-right, 4x4 in size.
-    3. A green (3) square outline in the middle-left, 5x5 in size.
-    4. A magenta (6) solid square in the bottom-middle, 4x4 in size.
-    5. A yellow (4) square outline in the bottom-left, 5x5 in size.
-    6. A red (2) square outline in the bottom-right, 5x5 in size.
-    The rest of the grid is filled with black (0), which can be considered empty space.
+    1. A blue (1) solid square in the top-left, 4x4 in size. This is not an outline.
+    2. A sky blue (8) solid square in the top-right, 4x4 in size. This is not an outline.
+    3. A green (3) square outline in the middle-left, 5x5 in size. The outline is one cell thick with a black interior.
+    4. A magenta (6) solid square in the bottom-middle, 4x4 in size. This is not an outline.
+    5. A yellow (4) square outline in the bottom-left, 5x5 in size. The outline is one cell thick with a black interior.
+    6. A red (2) square outline in the bottom-right, 5x5 in size. The outline is one cell thick with a black interior.
+    The rest of the grid is filled with black (0).
+    Key observation: Only the green, yellow, and red shapes are square outlines.
   output: |
     The output grid is 4x12 in size. It contains three square outlines side by side:
     1. A yellow (4) square outline on the left, 4x4 in size.
     2. A green (3) square outline in the middle, 4x4 in size.
     3. A red (2) square outline on the right, 4x4 in size.
-    The interiors of all squares are filled with black (0).
+    All outlines are one cell thick with black (0) interiors.
+    Note: The outlines have been standardized to 4x4 size and arranged horizontally.
