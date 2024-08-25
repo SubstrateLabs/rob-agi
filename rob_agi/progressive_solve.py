@@ -1,11 +1,14 @@
 import time
 from pathlib import Path
 from typing import Optional
+import logging
 
 from aider.coders import Coder
 from aider.io import InputOutput
 from aider.models import Model
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(threadName)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 from rob_agi.arc_util import load_task_set
 from rob_agi.computed_result import ComputedResult
@@ -73,10 +76,10 @@ class Solver:
             # auto_commits=False, use_git=False
         )
         coder.repo.aider_ignore_file = self.adhoc_ignore
-        # print(coder.repo.aider_ignore_file)
-        # print(coder.root)
-        # print(coder.get_all_relative_files())
-        # print(coder.get_repo_map())
+        # logger.info(coder.repo.aider_ignore_file)
+        # logger.info(coder.root)
+        # logger.info(coder.get_all_relative_files())
+        # logger.info(coder.get_repo_map())
         return coder
 
     def get_ask_coder(self):
@@ -91,7 +94,7 @@ class Solver:
 
     def run_tests(self):
         result = run_pytest(self.file_entries["test"])
-        print(result)
+        logger.info(result)
         return result
 
     def get_prefix(self, is_first):
@@ -130,7 +133,7 @@ class Solver:
         is_failing = not current_result["success"]
 
         while is_failing and local_tries < max_tries:
-            print(f"-------------------- ATTEMPT {local_tries+1}/{max_tries} --------------------------\n")
+            logger.info(f"-------------------- ATTEMPT {local_tries+1}/{max_tries} --------------------------\n")
             is_first = True
             if prev_solution:
                 plan = prev_solution
@@ -140,7 +143,7 @@ class Solver:
 
             modify_coder = self.get_modify_coder()
             self.get_edit(modify_coder, current_result, plan, is_first=is_first)
-            print("\n~~~~~~~~~EDITED~~~~~~~~~~~\n", modify_coder.aider_edited_files)
+            logger.info(f"\n~~~~~~~~~EDITED~~~~~~~~~~~\n{modify_coder.aider_edited_files}")
             local_tries += 1
             self.total_attempts += 1
             current_result = self.run_tests()
@@ -148,9 +151,9 @@ class Solver:
             write_meta_file(
                 self.challenge_root, solved=not is_failing, latest_plan=plan, total_attempts=self.total_attempts
             )
-            print("SUCCESS: ", current_result["success"])
+            logger.info(f"SUCCESS: {current_result['success']}")
 
-        print(f"Total time: {time.perf_counter() - t0:.2f}s")
+        logger.info(f"Total time: {time.perf_counter() - t0:.2f}s")
         return current_result["success"]
 
     def __del__(self):
