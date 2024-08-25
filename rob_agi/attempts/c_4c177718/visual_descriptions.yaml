@@ -1,51 +1,67 @@
 example_0:
   input: |
-    A 15x15 grid with three distinct shapes above a horizontal gray line in the middle:
-    1. A blue 3x3 square with a hollow center in the top-left quadrant
-    2. A red L-shape in the top-middle area
-    3. A green T-shape in the top-right quadrant
-    Below the gray line, there's a single blue 3x3 square with a hollow center, centered horizontally and near the bottom of the grid.
+    A 15x15 grid with a horizontal gray line (color 5) in row 5.
+    Above the line:
+    1. Blue shape (color 1): 3x3 square with hollow center at (1,2)
+    2. Red shape (color 2): L-shape at (1,7)
+    3. Green shape (color 3): T-shape at (1,11)
+    Below the line:
+    4. Blue shape (color 1): 3x3 square with hollow center, centered horizontally at (11,6)
+    All other cells are black (color 0).
   output: |
     A 9x15 grid with two shapes:
-    1. The green T-shape from the input, now centered in the top half
-    2. The blue 3x3 square with a hollow center, now centered in the bottom half
-    The red L-shape is not present in the output.
+    1. Green T-shape (color 3) from input, centered in top half (rows 0-4)
+    2. Blue 3x3 square (color 1) with hollow center from below the line in input, centered in bottom half (rows 5-8)
+    All other cells are black (color 0).
+    Note: The red shape is absent, and the blue shape from above the line in the input is not used.
 
 example_1:
   input: |
-    A 15x15 grid with three distinct shapes above a horizontal gray line in the middle:
-    1. A blue X-shape in the top-left quadrant
-    2. A red L-shape in the top-middle area
-    3. A yellow 3x3 square in the top-right quadrant
-    Below the gray line, there's a single blue X-shape, centered horizontally and near the bottom of the grid.
+    A 15x15 grid with a horizontal gray line (color 5) in row 5.
+    Above the line:
+    1. Blue shape (color 1): X-shape at (1,2)
+    2. Red shape (color 2): L-shape at (1,7)
+    3. Yellow shape (color 4): 3x3 solid square at (1,10)
+    Below the line:
+    4. Blue shape (color 1): X-shape, centered horizontally at (10,7)
+    All other cells are black (color 0).
   output: |
     A 9x15 grid with two shapes:
-    1. The yellow 3x3 square from the input, now centered in the top half
-    2. The blue X-shape from below the gray line in the input, now centered in the bottom half
-    The red L-shape is not present in the output.
+    1. Yellow 3x3 square (color 4) from input, centered in top half (rows 0-4)
+    2. Blue X-shape (color 1) from below the line in input, centered in bottom half (rows 5-8)
+    All other cells are black (color 0).
+    Note: The red shape is absent, and the blue shape from above the line in the input is not used.
 
 example_2:
   input: |
-    A 15x15 grid with three distinct shapes above a horizontal gray line in the middle:
-    1. A blue plus sign in the top-left quadrant
-    2. A red L-shape in the top-middle area
-    3. A magenta 3x3 square with a hollow center in the top-right quadrant
-    Below the gray line, there's a single blue plus sign, centered horizontally and in the upper part of the bottom half.
+    A 15x15 grid with a horizontal gray line (color 5) in row 5.
+    Above the line:
+    1. Blue shape (color 1): Plus sign at (1,2)
+    2. Red shape (color 2): L-shape at (1,7)
+    3. Magenta shape (color 6): 3x3 square with hollow center at (1,10)
+    Below the line:
+    4. Blue shape (color 1): Plus sign, centered horizontally at (8,7)
+    All other cells are black (color 0).
   output: |
     A 9x15 grid with two shapes:
-    1. The blue plus sign from below the gray line in the input, now centered in the top half
-    2. The magenta 3x3 square with a hollow center from the input, now centered in the bottom half
-    The red L-shape is not present in the output.
+    1. Blue plus sign (color 1) from below the line in input, centered in top half (rows 0-4)
+    2. Magenta 3x3 square (color 6) with hollow center from input, centered in bottom half (rows 5-8)
+    All other cells are black (color 0).
+    Note: The red shape is absent, and the blue shape from above the line in the input is not used.
 
 example_3:
   input: |
-    A 15x15 grid with three distinct shapes above a horizontal gray line in the middle:
-    1. A blue L-shape in the top-left quadrant
-    2. A red L-shape in the top-middle area
-    3. An orange Y-shape in the top-right quadrant
-    Below the gray line, there's a single blue L-shape, centered horizontally and in the middle of the bottom half.
+    A 15x15 grid with a horizontal gray line (color 5) in row 5.
+    Above the line:
+    1. Blue shape (color 1): L-shape at (1,2)
+    2. Red shape (color 2): L-shape at (1,7)
+    3. Orange shape (color 7): Y-shape at (1,10)
+    Below the line:
+    4. Blue shape (color 1): L-shape, centered horizontally at (10,8)
+    All other cells are black (color 0).
   output: |
     A 9x15 grid with two shapes:
-    1. The blue L-shape from below the gray line in the input, now centered in the top half
-    2. The orange Y-shape from the input, now centered in the bottom half
-    The red L-shape is not present in the output.
+    1. Blue L-shape (color 1) from below the line in input, centered in top half (rows 0-4)
+    2. Orange Y-shape (color 7) from input, centered in bottom half (rows 5-8)
+    All other cells are black (color 0).
+    Note: The red shape is absent, and the blue shape from above the line in the input is not used.
