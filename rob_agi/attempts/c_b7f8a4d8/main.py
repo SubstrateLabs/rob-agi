@@ -4,17 +4,15 @@ def solve_b7f8a4d8(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by expanding colors from the centers of supercells.
     The expansion rules depend on the color of the center and the border of the supercell:
+    - Yellow (4) always expands horizontally within the supercell.
     - In red (2) supercells:
-      * Yellow (4) expands horizontally within the cell.
       * Blue (1) expands vertically beyond the cell, stopping at supercell borders.
       * Green (3) expands vertically only within the cell.
     - In green (3) supercells:
-      * Yellow (4) and Sky (8) expand horizontally within the cell.
+      * Sky (8) expands horizontally within the cell.
       * Blue (1) expands vertically within the supercell.
-      * Red (2) does not expand.
     - In blue (1) supercells:
-      * Green (3) expands horizontally within the cell and vertically beyond it, stopping at other colored cells or grid edges.
-      * Red (2) does not expand.
+      * Green (3) expands horizontally within the cell and vertically beyond it, connecting with other green cells.
     The grid structure (borders and frames) is preserved.
     """
     height, width = input_grid.get_dimensions()
@@ -26,33 +24,26 @@ def solve_b7f8a4d8(input_grid: ColoredGrid) -> ColoredGrid:
     def get_supercell_border(row, col):
         return input_grid.values[row - row % supercell_size][col - col % supercell_size]
     
-    def expand_horizontal(row, col, color, limit):
-        for c in range(col - 1, max(col - limit, col - col % supercell_size), -1):
-            if output_grid.values[row][c] in {0, 2}:
+    def expand_horizontal(row, col, color):
+        left = col - col % supercell_size
+        right = left + supercell_size
+        for c in range(left + 1, right):
+            if c != col and output_grid.values[row][c] == 0:
                 output_grid.values[row][c] = color
-            else:
-                break
-        for c in range(col + 1, min(col + limit, col - col % supercell_size + supercell_size)):
-            if output_grid.values[row][c] in {0, 2}:
-                output_grid.values[row][c] = color
-            else:
-                break
 
-    def expand_vertical(row, col, color, up_limit, down_limit):
-        for r in range(row - 1, max(row - up_limit, -1), -1):
-            if output_grid.values[r][col] in {0, 2}:
+    def expand_vertical(row, col, color, within_supercell=False):
+        top = row - row % supercell_size if within_supercell else 0
+        bottom = top + supercell_size if within_supercell else height
+        for r in range(top, bottom):
+            if r != row and (output_grid.values[r][col] == 0 or 
+                             (not within_supercell and output_grid.values[r][col] == color)):
                 output_grid.values[r][col] = color
-            else:
-                break
-        for r in range(row + 1, min(row + down_limit, height)):
-            if output_grid.values[r][col] in {0, 2}:
-                output_grid.values[r][col] = color
-            else:
+            elif not within_supercell and output_grid.values[r][col] != 0 and output_grid.values[r][col] != color:
                 break
 
     def expand_green_in_blue(row, col):
-        expand_horizontal(row, col, 3, supercell_size // 2)
-        expand_vertical(row, col, 3, height, height)
+        expand_horizontal(row, col, 3)
+        expand_vertical(row, col, 3)
     
     # Process expansions
     for row in range(supercell_size // 2, height, supercell_size):
@@ -60,18 +51,19 @@ def solve_b7f8a4d8(input_grid: ColoredGrid) -> ColoredGrid:
             color = input_grid.values[row][col]
             border = get_supercell_border(row, col)
             
+            if color == 4:  # Yellow
+                expand_horizontal(row, col, color)
+            
             if border == 2:  # Red supercell
-                if color == 4:  # Yellow
-                    expand_horizontal(row, col, color, supercell_size // 2)
-                elif color == 1:  # Blue
-                    expand_vertical(row, col, color, height, height)
+                if color == 1:  # Blue
+                    expand_vertical(row, col, color)
                 elif color == 3:  # Green
-                    expand_vertical(row, col, color, 1, 1)
+                    expand_vertical(row, col, color, within_supercell=True)
             elif border == 3:  # Green supercell
-                if color in {4, 8}:  # Yellow or Sky
-                    expand_horizontal(row, col, color, supercell_size // 2)
+                if color == 8:  # Sky
+                    expand_horizontal(row, col, color)
                 elif color == 1:  # Blue
-                    expand_vertical(row, col, color, supercell_size // 2, supercell_size // 2)
+                    expand_vertical(row, col, color, within_supercell=True)
             elif border == 1:  # Blue supercell
                 if color == 3:  # Green
                     expand_green_in_blue(row, col)
