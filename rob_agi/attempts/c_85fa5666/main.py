@@ -1,17 +1,19 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Set, Dict
+from collections import deque
 
 def solve_85fa5666(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by extending colored squares diagonally.
+    Transforms the input grid by extending colored squares diagonally with bouncing behavior.
     
     The function processes colors in priority order: Sky Blue (8), Green (3), Orange (7), Magenta (6).
     Each color extends diagonally:
-    - Sky Blue (8) and Green (3): extend from top-right to bottom-left
-    - Orange (7) and Magenta (6): extend from top-left to bottom-right
+    - Sky Blue (8) and Green (3): start from top-right to bottom-left
+    - Orange (7) and Magenta (6): start from top-left to bottom-right
+    Colors bounce off grid boundaries, red blocks, and higher/equal priority colors.
     Red (2) 2x2 blocks remain unchanged and block extensions.
     Higher priority colors overwrite lower priority ones.
-    Extensions continue through intersections and stop at grid boundaries or red blocks.
+    Extensions continue until forming a loop or being blocked in all directions.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -33,7 +35,7 @@ def solve_85fa5666(input_grid: ColoredGrid) -> ColoredGrid:
 
     # Extend colors
     for r, c, color in colored_squares:
-        extend_color(output_grid, r, c, color, red_blocks)
+        extend_color_with_bounce(output_grid, r, c, color, red_blocks)
 
     return output_grid
 
@@ -55,18 +57,35 @@ def get_color_priority(color: int) -> int:
     """Return the priority of a given color."""
     return {8: 0, 3: 1, 7: 2, 6: 3}.get(color, 4)
 
-def extend_color(grid: ColoredGrid, start_row: int, start_col: int, color: int, red_blocks: Set[Tuple[int, int]]):
-    """Extend a color diagonally from its starting point."""
-    directions = [(-1, 1), (1, -1)] if color in [8, 3] else [(-1, -1), (1, 1)]
-    
-    for dx, dy in directions:
-        x, y = start_row, start_col
-        while True:
-            x, y = x + dx, y + dy
-            if not is_valid_cell(x, y, grid) or (x, y) in red_blocks:
-                break
-            cell_color = grid.get_cell(x, y)
+def extend_color_with_bounce(grid: ColoredGrid, start_row: int, start_col: int, color: int, red_blocks: Set[Tuple[int, int]]):
+    """Extend a color diagonally from its starting point with bouncing behavior."""
+    initial_direction = (-1, 1) if color in [8, 3] else (-1, -1)
+    visited = set()
+    queue = deque([(start_row, start_col, initial_direction)])
+
+    while queue:
+        r, c, (dx, dy) = queue.popleft()
+        if (r, c) in visited:
+            continue
+        visited.add((r, c))
+
+        nr, nc = r + dx, c + dy
+        if not is_valid_cell(nr, nc, grid) or (nr, nc) in red_blocks:
+            # Bounce
+            dx, dy = -dy, -dx
+            nr, nc = r + dx, c + dy
+
+        if is_valid_cell(nr, nc, grid) and (nr, nc) not in red_blocks:
+            cell_color = grid.get_cell(nr, nc)
             if cell_color == 0 or get_color_priority(color) < get_color_priority(cell_color):
-                grid.set_cell(x, y, color)
+                grid.set_cell(nr, nc, color)
+                queue.append((nr, nc, (dx, dy)))
             else:
-                break
+                # Try bouncing in the other direction
+                dx, dy = -dx, -dy
+                nr, nc = r + dx, c + dy
+                if is_valid_cell(nr, nc, grid) and (nr, nc) not in red_blocks:
+                    cell_color = grid.get_cell(nr, nc)
+                    if cell_color == 0 or get_color_priority(color) < get_color_priority(cell_color):
+                        grid.set_cell(nr, nc, color)
+                        queue.append((nr, nc, (dx, dy)))
