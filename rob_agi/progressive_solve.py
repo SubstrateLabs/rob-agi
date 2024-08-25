@@ -11,8 +11,7 @@ from rob_agi.arc_util import load_task_set
 from rob_agi.computed_result import ComputedResult
 from rob_agi.grid_problem import GridProblem
 from rob_agi.solver_functions import problem_setup_aider
-from rob_agi.test_factory import run_pytest, setup_files
-
+from rob_agi.test_factory import run_pytest, setup_files, read_meta_file, write_meta_file
 
 project_root = Path(__file__).parent.parent
 ignore_template = project_root / ".aiderignore"
@@ -35,6 +34,7 @@ class Solver:
         }
         self.adhoc_ignore = project_root / f".adhoc-aiderignore-{challenge.id}"
         self.setup()
+        self.solved, self.latest_plan, self.total_attempts = read_meta_file(self.challenge_root)
         self.goal = problem_setup_aider(challenge)
 
     def setup(self):
@@ -125,12 +125,12 @@ class Solver:
 
     def run_solve(self, max_tries=default_max_tries, prev_solution=None) -> bool:
         t0 = time.perf_counter()
-        tries = 0
+        local_tries = 0
         current_result = self.run_tests()
         is_failing = not current_result["success"]
 
-        while is_failing and tries < max_tries:
-            print(f"-------------------- ATTEMPT {tries+1}/{max_tries} --------------------------\n")
+        while is_failing and local_tries < max_tries:
+            print(f"-------------------- ATTEMPT {local_tries+1}/{max_tries} --------------------------\n")
             is_first = True
             if prev_solution:
                 plan = prev_solution
@@ -141,9 +141,13 @@ class Solver:
             modify_coder = self.get_modify_coder()
             self.get_edit(modify_coder, current_result, plan, is_first=is_first)
             print("\n~~~~~~~~~EDITED~~~~~~~~~~~\n", modify_coder.aider_edited_files)
-            tries += 1
+            local_tries += 1
+            self.total_attempts += 1
             current_result = self.run_tests()
             is_failing = not current_result["success"]
+            write_meta_file(
+                self.challenge_root, solved=not is_failing, latest_plan=plan, total_attempts=self.total_attempts
+            )
             print("SUCCESS: ", current_result["success"])
 
         print(f"Total time: {time.perf_counter() - t0:.2f}s")

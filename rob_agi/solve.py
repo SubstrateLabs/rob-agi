@@ -838,6 +838,8 @@ async def bootstrap_solved():
     combined_challenges = {**train_challenges, **eval_challenges}
     combined_solutions = {**train_solutions, **eval_solutions}
     verified_so_far = await get_all_verified()
+    verified_by_id = {v.metadata["task_id"]: v for v in verified_so_far}
+    verified_so_far = [verified_by_id["8eb1be9a"]]
     for v in verified_so_far:
         approach = "Approach:\n\n" + "\n".join([" - " + a for a in v.metadata["approach"]])
         py_fn = v.metadata["python_function"]

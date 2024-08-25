@@ -13,7 +13,8 @@ def solve_8eb1be9a(input_grid: ColoredGrid) -> ColoredGrid:
     
     The solution ensures that the pattern is correctly aligned from the top
     of the output grid, and handles cases where the input pattern might be
-    incomplete or shorter than 3 rows.
+    incomplete or shorter than 3 rows. The pattern is replicated in the order:
+    first row, second row, third row, repeating until the grid is filled.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -29,7 +30,7 @@ def solve_8eb1be9a(input_grid: ColoredGrid) -> ColoredGrid:
         for i in range(start_row, min(start_row + 3, len(grid))):
             pattern.append(grid[i][:])
         while len(pattern) < 3:
-            pattern.append(pattern[-1][:] if pattern else [0] * len(grid[0]))
+            pattern.append([0] * len(grid[0]))
         return pattern
 
     start_row = find_first_non_zero_row(input_grid.values)

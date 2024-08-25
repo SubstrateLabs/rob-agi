@@ -57,15 +57,31 @@ def write_init_file(path: Path):
         f.write("")
 
 
-def write_meta_file(path: Path, solved: bool = False, latest_plan: str = None):
+def write_meta_file(path: Path, solved: bool = False, latest_plan: str = None, total_attempts: int = 0):
     target_file = path / "meta.py"
 
     content = f"""solved = {solved}
 latest_plan = {repr(latest_plan)}
+total_attempts = {total_attempts}
 """
 
     with open(target_file, "w") as f:
         f.write(content)
+
+
+def read_meta_file(base_path: Path) -> tuple[bool, Optional[str], int]:
+    target_file = base_path / "meta.py"
+    if not target_file.exists():
+        write_meta_file(base_path)
+
+    with open(target_file, "r") as f:
+        content = f.read()
+    namespace = {}
+    exec(content, namespace)
+    solved = namespace.get("solved", False)
+    latest_plan = namespace.get("latest_plan", None)
+    total_attempts = namespace.get("total_attempts", 0)
+    return solved, latest_plan, total_attempts
 
 
 def write_main_file(gp: GridProblem, path: Path):
