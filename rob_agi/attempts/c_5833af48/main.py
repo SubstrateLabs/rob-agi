@@ -14,40 +14,27 @@ def solve_5833af48(input_grid: ColoredGrid) -> ColoredGrid:
     8. Refine and balance the pattern for visual appeal and perfect symmetry.
 
     The output grid will contain only two colors: the background color and sky blue (8),
-    arranged in a symmetrical pattern that represents a transformed version of the input.
+    arranged in a symmetrical pattern that represents a simplified, transformed version of the input.
     """
-    # Remove border and get non-border dimensions
     non_border = remove_border(input_grid.values)
-    
-    # Determine background color
     background_color = get_background_color(non_border)
-
-    # Analyze pattern and calculate output dimensions
     pattern = analyze_pattern(non_border)
     out_rows, out_cols = calculate_output_size(pattern)
-
-    # Create initial output grid
     output = [[background_color for _ in range(out_cols)] for _ in range(out_rows)]
-
-    # Generate and apply symmetrical pattern
     apply_symmetrical_pattern(output, pattern)
-
-    # Refine and balance the pattern
     refine_pattern(output)
-
     return ColoredGrid(values=output)
 
 def get_background_color(grid: List[List[int]]) -> int:
-    # Assume the background color is the dominant color in the bottom half of the grid
-    bottom_half = grid[len(grid)//2:]
-    return max(set(cell for row in bottom_half for cell in row if cell != 0), key=lambda x: sum(row.count(x) for row in bottom_half))
+    return max(set(cell for row in grid for cell in row if cell != 0 and cell != 8), 
+               key=lambda x: sum(row.count(x) for row in grid))
 
 def remove_border(grid: List[List[int]]) -> List[List[int]]:
     return [row[1:-1] for row in grid[1:-1] if any(cell != 0 for cell in row)]
 
 def analyze_pattern(grid: List[List[int]]) -> List[Tuple[int, int]]:
     pattern = []
-    for r in range(min(4, len(grid))):
+    for r in range(min(5, len(grid))):
         for c in range(min(5, len(grid[0]))):
             if grid[r][c] == 8:
                 pattern.append((r, c))
@@ -55,57 +42,48 @@ def analyze_pattern(grid: List[List[int]]) -> List[Tuple[int, int]]:
 
 def calculate_output_size(pattern: List[Tuple[int, int]]) -> Tuple[int, int]:
     complexity = len(pattern)
-    base_size = max(9, complexity + 6)
-    size = min(15, base_size)
-    return size, size
+    size = max(6, min(9, complexity + 3))
+    return size, size + 3  # Make it slightly wider for better symmetry
 
 def apply_symmetrical_pattern(output: List[List[int]], pattern: List[Tuple[int, int]]):
     rows, cols = len(output), len(output[0])
     center_row, center_col = rows // 2, cols // 2
 
+    # Apply pattern to corners
     for r, c in pattern:
-        dr, dc = r - 1, c - 2  # Adjust for centering
+        dr, dc = r - 2, c - 2  # Adjust for centering
         for sr, sc in [(1, 1), (1, -1), (-1, 1), (-1, -1)]:
             nr, nc = center_row + sr * dr, center_col + sc * dc
             if 0 <= nr < rows and 0 <= nc < cols:
                 output[nr][nc] = 8
 
     # Ensure pattern touches all edges and corners
+    output[0][0] = output[0][-1] = output[-1][0] = output[-1][-1] = 8
     output[0][center_col] = output[-1][center_col] = 8
     output[center_row][0] = output[center_row][-1] = 8
-    output[0][0] = output[0][-1] = output[-1][0] = output[-1][-1] = 8
+
+    # Add central feature
+    output[center_row][center_col] = 8
 
 def refine_pattern(output: List[List[int]]):
     rows, cols = len(output), len(output[0])
-    center_row, center_col = rows // 2, cols // 2
 
-    # Connect edge cells to the pattern
+    # Connect edge patterns
     for r in range(1, rows - 1):
-        if output[r][0] == 8 and output[r][1] != 8:
-            output[r][1] = 8
-        if output[r][-1] == 8 and output[r][-2] != 8:
-            output[r][-2] = 8
+        if output[r][0] == 8 and output[r][-1] == 8:
+            output[r][cols // 4] = output[r][cols // 2] = output[r][3 * cols // 4] = 8
     for c in range(1, cols - 1):
-        if output[0][c] == 8 and output[1][c] != 8:
-            output[1][c] = 8
-        if output[-1][c] == 8 and output[-2][c] != 8:
-            output[-2][c] = 8
+        if output[0][c] == 8 and output[-1][c] == 8:
+            output[rows // 4][c] = output[rows // 2][c] = output[3 * rows // 4][c] = 8
 
-    # Balance the pattern
+    # Ensure symmetry
     for r in range(rows):
         for c in range(cols):
             if output[r][c] == 8:
-                output[rows - r - 1][c] = 8
-                output[r][cols - c - 1] = 8
-                output[rows - r - 1][cols - c - 1] = 8
+                output[rows - r - 1][c] = output[r][cols - c - 1] = output[rows - r - 1][cols - c - 1] = 8
 
-    # Add diagonal elements if space allows
-    if rows >= 7 and cols >= 7:
-        output[1][1] = output[1][-2] = output[-2][1] = output[-2][-2] = 8
-
-    # Ensure no isolated sky blue cells
+    # Remove isolated cells
     for r in range(1, rows - 1):
         for c in range(1, cols - 1):
-            if output[r][c] == 8:
-                if sum(output[r+dr][c+dc] == 8 for dr, dc in [(0,1),(1,0),(0,-1),(-1,0)]) == 0:
-                    output[r][c] = output[0][0]  # Change to background color
+            if output[r][c] == 8 and sum(output[r+dr][c+dc] == 8 for dr, dc in [(0,1),(1,0),(0,-1),(-1,0)]) < 2:
+                output[r][c] = output[0][0]  # Change to background color
