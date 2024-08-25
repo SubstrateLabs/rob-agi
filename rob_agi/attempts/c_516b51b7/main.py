@@ -4,18 +4,18 @@ from collections import deque
 
 def solve_516b51b7(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by applying a pattern to connected blue regions.
+    Transforms the input grid by applying a concentric pattern to connected blue regions.
     
     The solution follows these steps:
     1. Find all connected blue (1) regions in the input grid.
-    2. For each region, determine its complexity level based on size.
-    3. Apply a layering system to color cells based on their distance from the edge.
-    4. Handle the center cells separately based on the region's complexity.
-    
-    The complexity levels and corresponding color patterns are:
-    - Small (area < 16): Blue edge, Red interior
-    - Medium (16 <= area < 36): Blue edge, Red inner layer, Green center
-    - Large (area >= 36): Blue edge, alternating Red and Green layers, with special center handling
+    2. For each region, calculate the distance of each cell from the edge.
+    3. Apply a concentric coloring pattern based on the distance from the edge:
+       - Edge (distance 0): Blue (1)
+       - First inner layer (distance 1): Red (2)
+       - Second inner layer and beyond: Alternating Green (3) and Red (2)
+    4. For larger regions, apply a special center treatment:
+       - For regions with even dimensions, create a 2x2 green center
+       - For regions with odd dimensions, keep the center as determined by the concentric pattern
     
     Returns a new ColoredGrid with the transformed pattern.
     """
@@ -25,20 +25,11 @@ def solve_516b51b7(input_grid: ColoredGrid) -> ColoredGrid:
     def find_connected_regions(color: int) -> List[List[Tuple[int, int]]]:
         return input_grid.find_connected_regions(color)
     
-    def get_complexity_level(region: List[Tuple[int, int]]) -> int:
-        area = len(region)
-        if area < 16:
-            return 1
-        elif area < 36:
-            return 2
-        else:
-            return 3
-    
     def get_distance_from_edge(region: List[Tuple[int, int]]) -> dict:
         distances = {}
         queue = deque()
         for r, c in region:
-            if any(0 <= nr < rows and 0 <= nc < cols and input_grid.values[nr][nc] == 0
+            if any(0 <= nr < rows and 0 <= nc < cols and input_grid.values[nr][nc] != 1
                    for nr, nc in [(r-1, c), (r+1, c), (r, c-1), (r, c+1)]):
                 distances[(r, c)] = 0
                 queue.append((r, c, 0))
@@ -52,25 +43,38 @@ def solve_516b51b7(input_grid: ColoredGrid) -> ColoredGrid:
         
         return distances
     
-    def color_region(region: List[Tuple[int, int]], complexity: int):
+    def get_region_dimensions(region: List[Tuple[int, int]]) -> Tuple[int, int, int, int]:
+        min_r = min(r for r, _ in region)
+        max_r = max(r for r, _ in region)
+        min_c = min(c for _, c in region)
+        max_c = max(c for _, c in region)
+        return min_r, min_c, max_r - min_r + 1, max_c - min_c + 1
+    
+    def color_region(region: List[Tuple[int, int]]):
         distances = get_distance_from_edge(region)
+        min_r, min_c, height, width = get_region_dimensions(region)
         max_distance = max(distances.values())
-        center_distance = max_distance if complexity < 3 else (max_distance // 2) + (max_distance % 2)
         
         for r, c in region:
             d = distances[(r, c)]
-            if d == center_distance:
-                output_grid.values[r][c] = 3 if complexity > 1 else 2
-            elif complexity == 1:
-                output_grid.values[r][c] = 2 if d > 0 else 1
-            elif complexity == 2:
-                output_grid.values[r][c] = 3 if d > 1 else (2 if d > 0 else 1)
+            if d == 0:
+                output_grid.values[r][c] = 1  # Blue edge
+            elif d == 1:
+                output_grid.values[r][c] = 2  # Red first inner layer
             else:
-                output_grid.values[r][c] = [1, 2, 3][(d - 1) % 3] if d > 0 else 1
+                output_grid.values[r][c] = 3 if d % 2 == 0 else 2  # Alternating Green and Red
+        
+        # Special center treatment for larger regions
+        if max_distance >= 2 and (height >= 4 or width >= 4):
+            center_r = min_r + height // 2
+            center_c = min_c + width // 2
+            if height % 2 == 0 and width % 2 == 0:
+                for dr in range(2):
+                    for dc in range(2):
+                        output_grid.values[center_r - 1 + dr][center_c - 1 + dc] = 3  # Green 2x2 center
     
     blue_regions = find_connected_regions(1)
     for region in blue_regions:
-        complexity = get_complexity_level(region)
-        color_region(region, complexity)
+        color_region(region)
     
     return output_grid
