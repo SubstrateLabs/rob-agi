@@ -4,16 +4,16 @@ from typing import List, Tuple
 def solve_ac3e2b04(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by adding blue (1) structures that complement
-    existing red (2) and green (3) patterns. The function identifies symmetry
-    axes, extends blue lines from pattern anchors, and creates a balanced,
-    symmetrical design while preserving the original structures.
+    existing red (2) and green (3) patterns. The function creates a symmetrical
+    design by adding horizontal and vertical blue lines through green squares
+    and the grid center, forming crosses/plus signs.
 
-    1. Analyzes existing red and green structures
-    2. Determines symmetry axes
-    3. Identifies pattern anchors (centers and edges of green crosses, endpoints and midpoints of red lines)
-    4. Generates blue line patterns in empty areas
-    5. Balances the design and connects patterns
-    6. Refines the solution by filling gaps and removing isolated lines
+    1. Identifies green squares and red lines
+    2. Creates horizontal blue lines through green squares and grid center
+    3. Creates vertical blue lines extending from green squares and grid center
+    4. Forms crosses/plus signs at intersections
+    5. Ensures symmetry and connectivity of blue structures
+    6. Preserves all original red and green cells
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed
@@ -24,63 +24,93 @@ def solve_ac3e2b04(input_grid: ColoredGrid) -> ColoredGrid:
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
 
-    # Find symmetry axes
-    vert_axis = cols // 2
-    horz_axis = rows // 2
+    # Find green squares
+    green_squares = find_green_squares(output_grid)
 
-    # Identify pattern anchors
-    anchors = find_pattern_anchors(output_grid)
+    # Create horizontal blue lines
+    create_horizontal_blue_lines(output_grid, green_squares)
 
-    # Generate blue line patterns
-    for r in range(rows):
-        for c in range(cols):
-            if output_grid.get_cell(r, c) == 0:
-                if should_add_blue(r, c, anchors, vert_axis, horz_axis):
-                    output_grid.set_cell(r, c, 1)
+    # Create vertical blue lines
+    create_vertical_blue_lines(output_grid, green_squares)
 
-    # Connect patterns and refine
-    connect_patterns(output_grid)
-    refine_solution(output_grid)
+    # Ensure symmetry and connectivity
+    ensure_symmetry_and_connectivity(output_grid)
 
     return output_grid
 
-def find_pattern_anchors(grid: ColoredGrid) -> List[Tuple[int, int]]:
-    anchors = []
+def find_green_squares(grid: ColoredGrid) -> List[Tuple[int, int]]:
+    green_squares = []
     rows, cols = grid.get_dimensions()
-    for r in range(rows):
-        for c in range(cols):
-            if grid.get_cell(r, c) in [2, 3]:
-                anchors.append((r, c))
-    return anchors
+    for r in range(1, rows - 1):
+        for c in range(1, cols - 1):
+            if (grid.get_cell(r, c) == 3 and
+                grid.get_cell(r-1, c) == 3 and grid.get_cell(r+1, c) == 3 and
+                grid.get_cell(r, c-1) == 3 and grid.get_cell(r, c+1) == 3):
+                green_squares.append((r, c))
+    return green_squares
 
-def should_add_blue(r: int, c: int, anchors: List[Tuple[int, int]], vert_axis: int, horz_axis: int) -> bool:
-    # Check if the cell is on a line from an anchor or on a symmetry axis
-    return any(r == ar or c == ac for ar, ac in anchors) or r == horz_axis or c == vert_axis
-
-def connect_patterns(grid: ColoredGrid):
+def create_horizontal_blue_lines(grid: ColoredGrid, green_squares: List[Tuple[int, int]]):
     rows, cols = grid.get_dimensions()
+    center_row = rows // 2
+
+    # Add horizontal line through green squares
+    for r, c in green_squares:
+        for col in range(cols):
+            if grid.get_cell(r, col) == 0:
+                grid.set_cell(r, col, 1)
+
+    # Add horizontal line through center if no green squares or space in center
+    if not green_squares or all(r != center_row for r, _ in green_squares):
+        for col in range(cols):
+            if grid.get_cell(center_row, col) == 0:
+                grid.set_cell(center_row, col, 1)
+
+def create_vertical_blue_lines(grid: ColoredGrid, green_squares: List[Tuple[int, int]]):
+    rows, cols = grid.get_dimensions()
+    center_col = cols // 2
+
+    # Add vertical lines through green squares
+    for r, c in green_squares:
+        for row in range(rows):
+            if grid.get_cell(row, c) == 0:
+                grid.set_cell(row, c, 1)
+
+    # Add vertical line through center if no green squares or space in center
+    if not green_squares or all(c != center_col for _, c in green_squares):
+        for row in range(rows):
+            if grid.get_cell(row, center_col) == 0:
+                grid.set_cell(row, center_col, 1)
+
+def ensure_symmetry_and_connectivity(grid: ColoredGrid):
+    rows, cols = grid.get_dimensions()
+    center_row, center_col = rows // 2, cols // 2
+
+    # Ensure symmetry
     for r in range(rows):
         for c in range(cols):
             if grid.get_cell(r, c) == 1:
-                for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                    nr, nc = r + dr, c + dc
-                    if 0 <= nr < rows and 0 <= nc < cols and grid.get_cell(nr, nc) == 0:
-                        if count_blue_neighbors(grid, nr, nc) >= 2:
-                            grid.set_cell(nr, nc, 1)
+                grid.set_cell(rows - 1 - r, c, 1)
+                grid.set_cell(r, cols - 1 - c, 1)
+                grid.set_cell(rows - 1 - r, cols - 1 - c, 1)
 
-def count_blue_neighbors(grid: ColoredGrid, r: int, c: int) -> int:
-    count = 0
-    rows, cols = grid.get_dimensions()
-    for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-        nr, nc = r + dr, c + dc
-        if 0 <= nr < rows and 0 <= nc < cols and grid.get_cell(nr, nc) == 1:
-            count += 1
-    return count
-
-def refine_solution(grid: ColoredGrid):
-    rows, cols = grid.get_dimensions()
+    # Ensure connectivity
     for r in range(rows):
         for c in range(cols):
             if grid.get_cell(r, c) == 1:
-                if count_blue_neighbors(grid, r, c) == 0:
+                if r > 0 and grid.get_cell(r-1, c) == 0:
+                    grid.set_cell(r-1, c, 1)
+                if r < rows-1 and grid.get_cell(r+1, c) == 0:
+                    grid.set_cell(r+1, c, 1)
+                if c > 0 and grid.get_cell(r, c-1) == 0:
+                    grid.set_cell(r, c-1, 1)
+                if c < cols-1 and grid.get_cell(r, c+1) == 0:
+                    grid.set_cell(r, c+1, 1)
+
+    # Remove isolated blue cells
+    for r in range(rows):
+        for c in range(cols):
+            if grid.get_cell(r, c) == 1:
+                neighbors = sum(1 for dr, dc in [(0,1),(1,0),(0,-1),(-1,0)]
+                                if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.get_cell(r+dr, c+dc) == 1)
+                if neighbors == 0:
                     grid.set_cell(r, c, 0)
