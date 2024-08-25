@@ -7,7 +7,7 @@ def solve_0692e18c(input_grid: ColoredGrid) -> ColoredGrid:
     The expansion pattern depends on the color of the cell:
     - Orange (7): Expands into a 3x3 cross shape
     - Magenta (6): Expands into a 3x3 L-shape
-    - Yellow (4): Expands into a 3x3 square with top and left sides filled
+    - Yellow (4): Expands into a 3x3 L-shape with top and left sides filled
     - Black (0): Expands into a 3x3 empty space
     - Other colors: Expands into a 3x3 square with all sides filled and an empty center
     
@@ -23,19 +23,13 @@ def solve_0692e18c(input_grid: ColoredGrid) -> ColoredGrid:
     def rotate_180(pattern):
         return [row[::-1] for row in pattern[::-1]]
 
-    def flip_horizontal(pattern):
-        return [row[::-1] for row in pattern]
-
-    def flip_vertical(pattern):
-        return pattern[::-1]
-
     def get_base_pattern(color: int) -> List[List[int]]:
         if color == 7:  # orange
             return [[0, color, 0], [color, 0, color], [0, color, 0]]
         elif color == 6:  # magenta
             return [[color, color, 0], [color, 0, 0], [0, 0, 0]]
         elif color == 4:  # yellow
-            return [[color, color, 0], [color, 0, 0], [0, 0, 0]]
+            return [[color, color, 0], [color, 0, 0], [color, 0, 0]]
         elif color == 0:  # black
             return [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         else:  # other colors
