@@ -4,20 +4,20 @@ from collections import deque
 
 def solve_2a5f8217(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the grid transformation challenge by identifying shapes, propagating colors,
-    and expanding shapes into adjacent empty spaces.
+    Solves the grid transformation challenge by identifying shapes and updating their colors
+    based on the highest adjacent color value, without expanding the shapes.
 
     1. Identify shapes in the input grid.
     2. Create an adjacency map for shapes.
     3. Determine color changes based on adjacent higher-valued shapes.
-    4. Apply color changes and expand shapes into empty spaces.
+    4. Apply color changes to the shapes.
     5. Create and return the transformed grid.
 
     Args:
         input_grid (ColoredGrid): The input grid to be transformed.
 
     Returns:
-        ColoredGrid: The transformed grid with colors updated and shapes expanded.
+        ColoredGrid: The transformed grid with colors updated.
     """
     rows, cols = input_grid.get_dimensions()
     
@@ -64,17 +64,11 @@ def solve_2a5f8217(input_grid: ColoredGrid) -> ColoredGrid:
         adjacent_colors = [other_color for _, other_color in adjacency_map[i]]
         new_colors[i] = max([color] + adjacent_colors)
 
-    # Apply color changes and expand shapes
+    # Apply color changes
     new_grid = [[0 for _ in range(cols)] for _ in range(rows)]
     for i, (_, shape) in enumerate(shapes):
         new_color = new_colors[i]
         for x, y in shape:
             new_grid[x][y] = new_color
-        
-        # Expand into empty spaces
-        adjacent_empty = [cell for cell in get_adjacent_cells(shape) if input_grid.values[cell[0]][cell[1]] == 0]
-        for x, y in adjacent_empty:
-            if all(input_grid.values[nx][ny] in [0, new_color] for nx, ny in get_adjacent_cells({(x, y)})):
-                new_grid[x][y] = new_color
 
     return ColoredGrid(values=new_grid)
