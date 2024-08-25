@@ -40,45 +40,65 @@ def copy_outline(source: ColoredGrid, target: ColoredGrid, src_row: int, src_col
 def solve_a680ac02(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the challenge by identifying square outlines in the input grid,
-    arranging them horizontally or vertically based on the optimal layout,
-    and returning a new grid with the arranged outlines.
+    standardizing them to 4x4 size, and arranging them compactly in a new grid.
+    The function ignores solid squares and focuses only on outlines.
     """
     outlines: List[Tuple[int, int, int, int]] = []  # (color, row, col, size)
-    
+    standard_size = 4
+
+    # Scan the input grid for square outlines
     for row in range(input_grid.num_rows):
         for col in range(input_grid.num_cols):
             if input_grid.get_cell(row, col) != 0:
                 is_outline, size = is_square_outline(input_grid, row, col)
                 if is_outline:
                     outlines.append((input_grid.get_cell(row, col), row, col, size))
-    
+
     if not outlines:
-        return ColoredGrid(values=[[]])
-    
+        return ColoredGrid(values=[[0]])
+
     if len(outlines) == 1:
-        color, row, col, size = outlines[0]
-        return input_grid.extract_subgrid(row, col, size, size)
-    
-    total_area = sum(size * size for _, _, _, size in outlines)
-    ideal_side = math.isqrt(total_area)
-    
-    if len(outlines) <= ideal_side:
-        # Arrange horizontally
-        height = outlines[0][3]
-        width = sum(size for _, _, _, size in outlines)
+        return standardize_outline(input_grid, outlines[0], standard_size)
+
+    # Determine optimal arrangement
+    num_outlines = len(outlines)
+    sqrt_outlines = math.isqrt(num_outlines)
+    if sqrt_outlines * sqrt_outlines == num_outlines:
+        rows = cols = sqrt_outlines
+    elif sqrt_outlines * (sqrt_outlines + 1) >= num_outlines:
+        rows, cols = sqrt_outlines, sqrt_outlines + 1
     else:
-        # Arrange vertically
-        height = sum(size for _, _, _, size in outlines)
-        width = outlines[0][3]
-    
-    result = ColoredGrid(values=[[0 for _ in range(width)] for _ in range(height)])
-    
-    current_row, current_col = 0, 0
-    for color, src_row, src_col, size in outlines:
-        copy_outline(input_grid, result, src_row, src_col, current_row, current_col, size)
-        if len(outlines) <= ideal_side:
-            current_col += size
-        else:
-            current_row += size
-    
+        rows, cols = sqrt_outlines + 1, sqrt_outlines + 1
+
+    # Create output grid
+    output_height = rows * standard_size
+    output_width = cols * standard_size
+    result = ColoredGrid(values=[[0 for _ in range(output_width)] for _ in range(output_height)])
+
+    # Place standardized outlines in the output grid
+    for i, (color, src_row, src_col, _) in enumerate(outlines):
+        tgt_row = (i // cols) * standard_size
+        tgt_col = (i % cols) * standard_size
+        standardized = standardize_outline(input_grid, (color, src_row, src_col, standard_size), standard_size)
+        copy_subgrid(standardized, result, 0, 0, tgt_row, tgt_col, standard_size, standard_size)
+
     return result
+
+def standardize_outline(grid: ColoredGrid, outline: Tuple[int, int, int, int], standard_size: int) -> ColoredGrid:
+    """Create a standardized 4x4 outline from the given outline."""
+    color, row, col, _ = outline
+    result = ColoredGrid(values=[[0 for _ in range(standard_size)] for _ in range(standard_size)])
+    for i in range(standard_size):
+        result.set_cell(0, i, color)
+        result.set_cell(standard_size - 1, i, color)
+        result.set_cell(i, 0, color)
+        result.set_cell(i, standard_size - 1, color)
+    return result
+
+def copy_subgrid(source: ColoredGrid, target: ColoredGrid, src_row: int, src_col: int, 
+                 tgt_row: int, tgt_col: int, height: int, width: int):
+    """Copy a subgrid from the source to the target grid."""
+    for i in range(height):
+        for j in range(width):
+            value = source.get_cell(src_row + i, src_col + j)
+            target.set_cell(tgt_row + i, tgt_col + j, value)
