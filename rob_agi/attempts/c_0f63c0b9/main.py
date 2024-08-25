@@ -7,13 +7,14 @@ def solve_0f63c0b9(input_grid: ColoredGrid) -> ColoredGrid:
     The transformation follows these rules:
     1. Colors are processed from top to bottom based on their first appearance.
     2. Each color creates a frame-like structure:
-       - For the topmost color, the top two rows are filled.
-       - For middle colors, only the top row of its section is filled.
-       - For the bottommost color, the bottom two rows are filled.
-    3. Vertical lines for each color extend from its start to row 12 or the next color's start.
-    4. The bottommost color fills upwards from row 12 to its start row.
-    5. There's always at least one row of black between color sections.
-    6. The interior of each frame remains black.
+       - For a single color, it fills the entire grid.
+       - For multiple colors:
+         - The topmost color fills the top two rows and extends down.
+         - Middle colors (if any) fill their top row and extend down.
+         - The bottommost color fills the bottom three rows and extends up.
+    3. Vertical lines for each color extend from its start to its end boundary.
+    4. There's always at least one row of black between color sections for 3 or more colors.
+    5. The interior of each frame remains black.
     
     Args:
     input_grid (ColoredGrid): The input 15x15 grid with scattered colored squares.
@@ -31,33 +32,33 @@ def solve_0f63c0b9(input_grid: ColoredGrid) -> ColoredGrid:
                 colors.append((input_grid.values[row][col], row))
     colors.sort(key=lambda x: x[1])  # Sort by row
     
+    # Handle single color case
+    if len(colors) == 1:
+        return ColoredGrid(values=[[colors[0][0] for _ in range(15)] for _ in range(15)])
+    
     # Process each color
     for i, (color, start_row) in enumerate(colors):
         is_first = i == 0
         is_last = i == len(colors) - 1
         
+        # Determine boundaries
+        top_boundary = 0 if is_first else start_row
+        bottom_boundary = 14 if is_last else (colors[i+1][1] - 2 if i+1 < len(colors) else 11)
+        
         # Fill horizontal rows
         if is_first:
-            output_grid[start_row] = [color] * 15
-            output_grid[start_row + 1] = [color] * 15
+            output_grid[0] = [color] * 15
+            output_grid[1] = [color] * 15
         elif is_last:
+            output_grid[12] = [color] * 15
             output_grid[13] = [color] * 15
             output_grid[14] = [color] * 15
         else:
-            output_grid[start_row] = [color] * 15
-        
-        # Determine end row for vertical lines
-        end_row = 12 if is_last else min(12, colors[i+1][1] - 2)
+            output_grid[top_boundary] = [color] * 15
         
         # Fill vertical lines
-        for row in range(start_row + (2 if is_first else 1), end_row + 1):
+        for row in range(top_boundary, bottom_boundary + 1):
             output_grid[row][0] = color
             output_grid[row][14] = color
-        
-        # Special handling for bottommost color
-        if is_last:
-            for row in range(start_row + 1, 13):
-                output_grid[row][0] = color
-                output_grid[row][14] = color
     
     return ColoredGrid(values=output_grid)
