@@ -4,70 +4,66 @@ from typing import List, Tuple
 def solve_b4a43f3b(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid into an 18x18 output grid based on the following steps:
-    1. Parses the input grid, separating upper and lower parts.
-    2. Creates a pattern template from the upper part.
-    3. Analyzes the lower part to determine arrangement (horizontal or vertical).
-    4. Creates an arrangement pattern based on the lower part.
-    5. Initializes an 18x18 output grid.
-    6. Places pattern instances according to the arrangement.
-    7. Adds a black border and fills remaining space.
+    1. Extracts the top 6 rows to create a 3x3 template.
+    2. Uses rows 8-13 to determine the arrangement pattern.
+    3. Creates a 3x3 template from the top rows.
+    4. Creates an arrangement map from the bottom rows.
+    5. Calculates the scaling factor based on the arrangement.
+    6. Places scaled templates in the output grid according to the arrangement.
+    7. Ensures a 3-cell black border around the pattern.
 
-    The function identifies color regions in the upper part, creates 3x3 blocks
-    for each region, and arranges them based on the non-black squares in the lower part.
+    The function dynamically adapts to various input patterns and arrangements,
+    scaling the output to fit within the 18x18 grid while maintaining proportions.
     """
-    # Parse input grid
+    # Extract relevant parts of the input grid
     upper_part = input_grid.values[:6]
     lower_part = input_grid.values[8:13]
 
-    # Create pattern template
-    pattern_template = create_pattern_template(upper_part)
+    # Create 3x3 template
+    template = create_template(upper_part)
 
-    # Analyze lower part and create arrangement pattern
-    arrangement = analyze_lower_part(lower_part)
-    arrangement_pattern = create_arrangement_pattern(lower_part)
+    # Create arrangement map
+    arrangement_map = create_arrangement_map(lower_part)
 
-    # Initialize output grid
-    output_grid = [[0 for _ in range(18)] for _ in range(18)]
+    # Calculate scaling factor
+    scaling_factor = calculate_scaling_factor(arrangement_map)
 
-    # Place pattern instances
-    place_pattern_instances(output_grid, pattern_template, arrangement_pattern, arrangement)
-
-    # Add border and fill remaining space
-    add_border_and_fill(output_grid)
+    # Create output grid
+    output_grid = create_output_grid(template, arrangement_map, scaling_factor)
 
     return ColoredGrid(values=output_grid)
 
-def create_pattern_template(upper_part: List[List[int]]) -> List[List[int]]:
-    template = [[0 for _ in range(9)] for _ in range(9)]
-    for i in range(0, 6, 2):
-        for j in range(0, 6, 2):
-            color = upper_part[i][j]
-            if color != 0:
-                template[i//2*3+1][j//2*3+1] = color
+def create_template(upper_part: List[List[int]]) -> List[List[int]]:
+    template = [[0 for _ in range(3)] for _ in range(3)]
+    for i in range(3):
+        for j in range(3):
+            block = [upper_part[2*i][2*j], upper_part[2*i][2*j+1],
+                     upper_part[2*i+1][2*j], upper_part[2*i+1][2*j+1]]
+            non_zero = [x for x in block if x != 0]
+            template[i][j] = non_zero[0] if non_zero else 0
     return template
 
-def analyze_lower_part(lower_part: List[List[int]]) -> str:
-    row_counts = [sum(1 for cell in row if cell != 0) for row in lower_part]
-    col_counts = [sum(1 for row in lower_part if row[j] != 0) for j in range(6)]
-    return "horizontal" if max(row_counts) > max(col_counts) else "vertical"
+def create_arrangement_map(lower_part: List[List[int]]) -> List[List[bool]]:
+    return [[cell != 0 for cell in row] for row in lower_part]
 
-def create_arrangement_pattern(lower_part: List[List[int]]) -> List[Tuple[int, int]]:
-    return [(i, j) for i, row in enumerate(lower_part) for j, cell in enumerate(row) if cell != 0]
+def calculate_scaling_factor(arrangement_map: List[List[bool]]) -> int:
+    height = max(sum(row) for row in arrangement_map)
+    width = max(sum(col) for col in zip(*arrangement_map))
+    return max(1, min(12 // max(height, width), 3))
 
-def place_pattern_instances(output_grid: List[List[int]], pattern_template: List[List[int]], 
-                            arrangement_pattern: List[Tuple[int, int]], arrangement: str):
-    for idx, (i, j) in enumerate(arrangement_pattern):
-        if arrangement == "horizontal":
-            row, col = (idx // 3) * 6, (idx % 3) * 6
-        else:
-            row, col = (idx % 3) * 6, (idx // 3) * 6
-        for r in range(9):
-            for c in range(9):
-                if 3 <= row+r < 15 and 3 <= col+c < 15:
-                    output_grid[row+r][col+c] = pattern_template[r][c]
-
-def add_border_and_fill(output_grid: List[List[int]]):
-    for i in range(18):
-        for j in range(18):
-            if i < 3 or i >= 15 or j < 3 or j >= 15:
-                output_grid[i][j] = 0
+def create_output_grid(template: List[List[int]], arrangement_map: List[List[bool]], scaling_factor: int) -> List[List[int]]:
+    output_grid = [[0 for _ in range(18)] for _ in range(18)]
+    start_row, start_col = 3, 3
+    for i, row in enumerate(arrangement_map):
+        for j, place in enumerate(row):
+            if place:
+                for ti in range(3):
+                    for tj in range(3):
+                        value = template[ti][tj]
+                        for si in range(scaling_factor):
+                            for sj in range(scaling_factor):
+                                r = start_row + i * 3 * scaling_factor + ti * scaling_factor + si
+                                c = start_col + j * 3 * scaling_factor + tj * scaling_factor + sj
+                                if 0 <= r < 18 and 0 <= c < 18:
+                                    output_grid[r][c] = value
+    return output_grid
