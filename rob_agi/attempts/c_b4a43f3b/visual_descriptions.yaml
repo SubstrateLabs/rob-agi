@@ -1,0 +1,82 @@
+example_0:
+  input: |
+    A 13x6 grid with several distinct regions:
+    1. Top-left: A 2x2 green square
+    2. Top-right: A 2x2 black square
+    3. Middle-left: A 2x2 red square
+    4. Middle-right: A 2x2 magenta square
+    5. A gray horizontal line spanning the entire width in the 7th row
+    6. Bottom section: A red shape resembling an upside-down 'T', surrounded by black space
+  output: |
+    An 18x18 grid with a centered pattern:
+    1. Four 3x3 blocks arranged in a 2x2 formation
+    2. Each block consists of:
+       - Top-left: Green
+       - Top-right: Red
+       - Bottom-left: Empty (black)
+       - Bottom-right: Magenta and blue
+    3. The pattern is surrounded by black space
+    4. The overall effect resembles a larger version of the input's top-left quadrant, repeated and arranged symmetrically
+
+example_1:
+  input: |
+    A 13x6 grid with several distinct regions:
+    1. Top-left: A 2x2 blue square
+    2. Top-right: A 2x2 magenta square
+    3. Middle: A 2x2 blue square
+    4. Bottom-left: A 2x2 red square
+    5. A gray horizontal line spanning the entire width in the 7th row
+    6. Bottom section: A red shape resembling a rotated 'L', surrounded by black space
+  output: |
+    An 18x18 grid with a centered pattern:
+    1. Three rows of 2x3 blocks
+    2. Each block consists of:
+       - Top: Blue, magenta, blue (left to right)
+       - Bottom: Empty (black), blue, red (left to right)
+    3. The blocks are arranged in a staggered pattern:
+       - First row: 2 blocks
+       - Second row: 3 blocks
+       - Third row: 2 blocks
+    4. The pattern is surrounded by black space
+
+example_2:
+  input: |
+    A 13x6 grid with several distinct regions:
+    1. Top-left and top-right: 2x2 blue squares
+    2. Middle: A 2x2 red square
+    3. Bottom-left: A 2x2 green square
+    4. A gray horizontal line spanning the entire width in the 7th row
+    5. Bottom section: A red shape resembling a plus sign or cross, surrounded by black space
+  output: |
+    An 18x18 grid with a centered pattern:
+    1. Three rows of blocks, with the middle row being the widest
+    2. Each block is a 3x3 arrangement:
+       - Top: Blue, empty, blue
+       - Middle: Empty, red, empty
+       - Bottom: Green, red, empty
+    3. The blocks are arranged:
+       - First row: 1 block
+       - Second row: 4 blocks side by side
+       - Third row: 1 block
+    4. The pattern is surrounded by black space
+
+example_3:
+  input: |
+    A 13x6 grid with several distinct regions:
+    1. Top-left and top-right: 2x2 blue squares
+    2. Middle: A 2x2 blue square
+    3. Two rows of green spanning the entire width (rows 5 and 6)
+    4. A gray horizontal line spanning the entire width in the 7th row
+    5. Bottom section: A red shape resembling an upside-down 'T' with an extra arm on the right, surrounded by black space
+  output: |
+    An 18x18 grid with a centered pattern:
+    1. Three rows of blocks
+    2. Each block is a 3x3 arrangement:
+       - Top: Blue, empty, blue
+       - Middle: Empty, blue, empty
+       - Bottom: Green, green, green
+    3. The blocks are arranged:
+       - First row: 1 block
+       - Second row: 1 block
+       - Third row: 3 blocks side by side
+    4. The pattern is surrounded by black space
