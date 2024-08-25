@@ -9,58 +9,67 @@ def solve_516b51b7(input_grid: ColoredGrid) -> ColoredGrid:
     The solution follows these steps:
     1. Find all connected blue (1) regions in the input grid.
     2. For each region:
-       a. Calculate its dimensions and center point(s).
-       b. For each cell, calculate its distance from the center.
-    3. Apply a concentric coloring pattern based on the region size:
-       - Small regions (3x3 or smaller): Keep edge blue (1), inner cells red (2)
-       - Medium and large regions (4x4 or larger):
-         * Center: Red (2) for 2x2 center if even dimensions, Green (3) if odd
-         * Next layer (if exists): Green (3)
-         * Following layer: Red (2)
-         * Edge: Blue (1)
+       a. Determine its dimensions and the number of layers based on the smaller dimension.
+       b. Apply concentric layers of colors from outside to inside:
+          - Outermost layer: Blue (1)
+          - Alternating layers: Red (2) and Green (3)
+       c. Handle the center based on remaining space:
+          - Fill with the last layer color if only one cell remains in any dimension
+          - Fill with Red (2) if a 2x2 or larger area remains
+    3. Return the transformed grid.
     
-    Returns a new ColoredGrid with the transformed pattern.
+    This pattern is applied consistently to all blue regions, regardless of their size or position.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = input_grid.get_dimensions()
     
-    def find_connected_regions(color: int) -> List[List[Tuple[int, int]]]:
-        return input_grid.find_connected_regions(color)
-    
-    def get_region_info(region: List[Tuple[int, int]]) -> Tuple[int, int, int, int, Tuple[float, float]]:
+    def get_region_dimensions(region: List[Tuple[int, int]]) -> Tuple[int, int, int, int]:
         min_r = min(r for r, _ in region)
         max_r = max(r for r, _ in region)
         min_c = min(c for _, c in region)
         max_c = max(c for _, c in region)
-        height = max_r - min_r + 1
-        width = max_c - min_c + 1
-        center_r = min_r + (height - 1) / 2
-        center_c = min_c + (width - 1) / 2
-        return min_r, min_c, height, width, (center_r, center_c)
+        return min_r, min_c, max_r - min_r + 1, max_c - min_c + 1
+    
+    def get_layer_count(smaller_dimension: int) -> int:
+        if smaller_dimension <= 3:
+            return 2
+        elif smaller_dimension <= 5:
+            return 3
+        elif smaller_dimension <= 7:
+            return 4
+        else:
+            return 5
+    
+    def get_layer_color(layer_index: int) -> int:
+        if layer_index == 0:
+            return 1  # Blue
+        return 2 if layer_index % 2 == 1 else 3  # Red or Green
     
     def color_region(region: List[Tuple[int, int]]):
-        min_r, min_c, height, width, (center_r, center_c) = get_region_info(region)
-        max_distance = max(height, width) // 2
+        min_r, min_c, height, width = get_region_dimensions(region)
+        smaller_dim = min(height, width)
+        layer_count = get_layer_count(smaller_dim)
         
-        for r, c in region:
-            distance = max(abs(r - center_r), abs(c - center_c))
-            if height <= 3 and width <= 3:  # Small region
-                output_grid.values[r][c] = 1 if distance == max_distance else 2
-            else:  # Medium and large regions
-                if distance == max_distance:
-                    output_grid.values[r][c] = 1  # Blue edge
-                elif distance == max_distance - 1:
-                    output_grid.values[r][c] = 2  # Red layer
-                elif distance == max_distance - 2 and max_distance > 2:
-                    output_grid.values[r][c] = 3  # Green layer
-                else:
-                    # Center coloring
-                    if height % 2 == 0 and width % 2 == 0:
-                        output_grid.values[r][c] = 2 if (abs(r - center_r) < 1 and abs(c - center_c) < 1) else 3
-                    else:
-                        output_grid.values[r][c] = 3
+        for layer in range(layer_count):
+            color = get_layer_color(layer)
+            for r in range(min_r + layer, min_r + height - layer):
+                if layer < width // 2:
+                    output_grid.values[r][min_c + layer] = color
+                    output_grid.values[r][min_c + width - 1 - layer] = color
+            for c in range(min_c + layer, min_c + width - layer):
+                if layer < height // 2:
+                    output_grid.values[min_r + layer][c] = color
+                    output_grid.values[min_r + height - 1 - layer][c] = color
+        
+        # Handle center
+        center_height = height - 2 * (layer_count - 1)
+        center_width = width - 2 * (layer_count - 1)
+        center_color = 2 if center_height > 1 and center_width > 1 else get_layer_color(layer_count - 1)
+        for r in range(min_r + layer_count - 1, min_r + height - layer_count + 1):
+            for c in range(min_c + layer_count - 1, min_c + width - layer_count + 1):
+                output_grid.values[r][c] = center_color
     
-    blue_regions = find_connected_regions(1)
+    blue_regions = input_grid.find_connected_regions(1)
     for region in blue_regions:
         color_region(region)
     
