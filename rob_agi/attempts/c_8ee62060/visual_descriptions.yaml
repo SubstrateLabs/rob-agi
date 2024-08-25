@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The input grid is a 12x12 square. It contains a diagonal pattern of sky blue (8) squares, each followed by two red (2) squares. This pattern starts at the top-left corner and moves diagonally down and to the right. Each sky blue square is positioned two rows below and two columns to the right of the previous one. The rest of the grid is filled with black (0) squares, which can be interpreted as empty space.
+  output: |
+    The output grid is also a 12x12 square. It contains the same pattern of sky blue (8) squares followed by two red (2) squares, but the pattern has been reversed. It now starts from the bottom-left corner and moves diagonally up and to the right. Each sky blue square is positioned two rows above and two columns to the right of the previous one. The rest of the grid is filled with black (0) squares.
+
+example_1:
+  input: |
+    The input grid is a 12x12 square. It contains a diagonal pattern of pairs of red (2) squares, each pair followed by a green (3) square. This pattern starts at the top-right corner and moves diagonally down and to the left. Each set of three squares (two red, one green) is positioned two rows below and two columns to the left of the previous set. The rest of the grid is filled with black (0) squares, which can be interpreted as empty space.
+  output: |
+    The output grid is also a 12x12 square. It contains the same pattern of pairs of red (2) squares followed by a green (3) square, but the pattern has been reversed. It now starts from the bottom-left corner and moves diagonally up and to the right. Each set of three squares (two red, one green) is positioned two rows above and two columns to the right of the previous set. The rest of the grid is filled with black (0) squares.
+
+example_2:
+  input: |
+    The input grid is a 10x10 square. It contains a diagonal pattern of red (2) squares, each followed by a blue (1) square. This pattern starts at the top-left corner and moves diagonally down and to the right. Each pair of squares (one red, one blue) is positioned two rows below and two columns to the right of the previous pair. The rest of the grid is filled with black (0) squares, which can be interpreted as empty space.
+  output: |
+    The output grid is also a 10x10 square. It contains the same pattern of red (2) squares followed by blue (1) squares, but the pattern has been reversed. It now starts from the bottom-left corner and moves diagonally up and to the right. Each pair of squares (one red, one blue) is positioned two rows above and two columns to the right of the previous pair. The rest of the grid is filled with black (0) squares.
