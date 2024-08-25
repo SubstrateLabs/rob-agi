@@ -2,43 +2,43 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_c92b942c(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transform the input grid by repeating it in a 3x3 pattern, adding blue crosses
-    around non-zero cells within each repetition, and green corners to repetitions
-    containing non-zero, non-blue, non-green cells.
-
-    1. Create an output grid that is 3 times larger in each dimension
-    2. Repeat the entire input pattern in a 3x3 grid
-    3. Add blue crosses around non-zero cells, confined to their pattern repetition
-    4. Add green corners to pattern repetitions with non-zero, non-blue, non-green cells
-    5. Return the transformed grid
+    Transform the input grid into a 3x3 expanded pattern with the following rules:
+    1. Create an output grid that is 3 times larger in each dimension.
+    2. For each non-zero input cell:
+       - Place its color in the center of the corresponding 3x3 area.
+       - If it's not blue (1) or green (3), surround it with blue (1) in a cross pattern.
+    3. Apply a global blue (1) grid on every third row and column.
+    4. Add green (3) corners in a checkerboard pattern of 3x3 areas.
+    5. Never overwrite a non-black color with another color.
     """
     input_rows, input_cols = input_grid.get_dimensions()
     output_rows, output_cols = input_rows * 3, input_cols * 3
     output_grid = ColoredGrid(values=[[0 for _ in range(output_cols)] for _ in range(output_rows)])
 
-    # Repeat the input pattern
-    for r in range(output_rows):
-        for c in range(output_cols):
-            output_grid.set_cell(r, c, input_grid.get_cell(r % input_rows, c % input_cols))
-
-    # Add blue crosses
+    # Process each input cell
     for r in range(input_rows):
         for c in range(input_cols):
-            if input_grid.get_cell(r, c) not in [0, 1, 3]:
-                for i in range(3):
-                    for j in range(3):
-                        output_r, output_c = r * 3 + i, c * 3 + j
-                        if i == 1 or j == 1:
-                            if output_grid.get_cell(output_r, output_c) == 0:
-                                output_grid.set_cell(output_r, output_c, 1)
+            color = input_grid.get_cell(r, c)
+            if color != 0:
+                out_r, out_c = r * 3 + 1, c * 3 + 1
+                output_grid.set_cell(out_r, out_c, color)
+                if color not in [1, 3]:
+                    for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                        nr, nc = out_r + dr, out_c + dc
+                        if output_grid.get_cell(nr, nc) == 0:
+                            output_grid.set_cell(nr, nc, 1)
 
-    # Add green corners
-    for r in range(0, output_rows, input_rows):
-        for c in range(0, output_cols, input_cols):
-            if any(output_grid.get_cell(r+dr, c+dc) not in [0, 1, 3]
-                   for dr in range(input_rows) for dc in range(input_cols)):
-                for corner_r, corner_c in [(r, c), (r, c+input_cols-1),
-                                           (r+input_rows-1, c), (r+input_rows-1, c+input_cols-1)]:
+    # Apply global blue grid
+    for r in range(output_rows):
+        for c in range(output_cols):
+            if (r % 3 == 0 or c % 3 == 0) and output_grid.get_cell(r, c) == 0:
+                output_grid.set_cell(r, c, 1)
+
+    # Apply green corners in checkerboard pattern
+    for r in range(0, output_rows, 3):
+        for c in range(0, output_cols, 3):
+            if ((r // 3 + c // 3) % 2 == 0):
+                for corner_r, corner_c in [(r, c), (r, c+2), (r+2, c), (r+2, c+2)]:
                     if output_grid.get_cell(corner_r, corner_c) == 0:
                         output_grid.set_cell(corner_r, corner_c, 3)
 
