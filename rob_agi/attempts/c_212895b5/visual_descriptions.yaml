@@ -1,23 +1,46 @@
 example_0:
   input: |
-    A 20x20 grid with mostly black (empty) space. There are several gray (5) squares scattered throughout the grid. In the center, there's a 3x3 sky blue (8) square. The gray squares appear to be randomly placed, with no clear pattern.
+    A 20x20 grid primarily composed of black (0) squares. Gray (5) squares are scattered throughout, serving as origin points for color propagation. A 3x3 sky blue (8) square is centrally located, acting as a barrier to color spread. The placement of gray squares appears random but is crucial for understanding the propagation pattern.
   output: |
-    The 20x20 grid now has red (2) and yellow (4) squares in addition to the original gray and sky blue squares. The red squares seem to spread diagonally down and to the left from the gray squares, while the yellow squares spread diagonally up and to the right. The spread appears to be limited to about 4 squares in each direction. Yellow overwrites red where they intersect. The sky blue square in the center remains unchanged.
+    The transformed 20x20 grid now features red (2) and yellow (4) squares emanating from the original gray (5) squares. Red propagates diagonally down-left, while yellow spreads diagonally up-right. Key observations:
+    1. Color propagation is limited to a maximum of 4 steps from each gray square.
+    2. When propagation paths intersect, yellow overwrites red.
+    3. The central sky blue (8) square remains unchanged, blocking color propagation.
+    4. Original gray squares and other pre-existing colors are preserved.
+    5. Propagation stops at grid edges or upon encountering non-black colors.
 
 example_1:
   input: |
-    A 17x18 grid with mostly black (empty) space. Gray (5) squares are scattered throughout, with a slightly higher concentration in the upper half. There's a 3x3 sky blue (8) square in the center, similar to the previous example.
+    A 17x18 grid with black (0) background. Gray (5) squares are distributed throughout, with a higher density in the upper half. A 3x3 sky blue (8) square is centrally positioned. The varying concentration of gray squares may influence the final color distribution.
   output: |
-    The 17x18 grid now includes red (2) and yellow (4) squares spreading from the original gray squares. The pattern is similar to the previous example: red spreads diagonally down-left, yellow spreads diagonally up-right, both limited to about 4 squares. Yellow overwrites red at intersections. The sky blue square remains unchanged.
+    The 17x18 grid transformation follows the same rules as example_0. Notable features:
+    1. Red (2) and yellow (4) squares spread from gray origins, with red moving down-left and yellow up-right.
+    2. The denser concentration of gray squares in the upper half results in more extensive color propagation in that area.
+    3. Color spread is consistently limited to 4 steps maximum from each gray square.
+    4. Yellow continues to overwrite red at intersection points.
+    5. The central sky blue square and original gray squares remain unchanged.
 
 example_2:
   input: |
-    A 19x16 grid with a similar pattern to the previous examples. Mostly black (empty) space with scattered gray (5) squares. The 3x3 sky blue (8) square is present in the center. The gray squares seem more evenly distributed compared to the previous examples.
+    A 19x16 grid with black (0) background. Gray (5) squares are more evenly distributed compared to previous examples. The standard 3x3 sky blue (8) square is present in the center. The uniform distribution of gray squares may lead to a more balanced color spread.
   output: |
-    The 19x16 grid follows the same transformation pattern as the previous examples. Red (2) squares spread diagonally down-left from gray squares, yellow (4) squares spread diagonally up-right. The spread is limited to about 4 squares, and yellow overwrites red at intersections. The sky blue square in the center remains unchanged.
+    The 19x16 grid transformation adheres to the established pattern. Key points:
+    1. Red (2) and yellow (4) propagation from gray squares follows the diagonal down-left and up-right directions, respectively.
+    2. The even distribution of gray squares results in a more uniform color spread across the grid.
+    3. The 4-step propagation limit is consistently applied from each gray square.
+    4. Yellow overwrites red at intersections, as in previous examples.
+    5. The central sky blue square and original gray squares are preserved.
+    6. Grid edges and pre-existing colors continue to act as propagation barriers.
 
 test_case_0:
   input: |
-    The input for the test case is not provided in the given test file.
+    The input grid for this test case is not provided. It is expected to follow the pattern of previous examples: a grid with black (0) background, scattered gray (5) squares, and possibly a sky blue (8) square or other color elements.
   output: |
-    The output for the test case is not provided in the given test file, as it is meant to be solved based on the pattern observed in the examples.
+    The expected output should demonstrate the same transformation rules observed in the examples:
+    1. Red (2) propagation diagonally down-left from gray squares.
+    2. Yellow (4) propagation diagonally up-right from gray squares.
+    3. Color spread limited to 4 steps from each gray square.
+    4. Yellow overwriting red at intersections.
+    5. Preservation of original gray squares and any pre-existing colors.
+    6. Propagation stopping at grid edges or upon encountering non-black colors.
+    The specific pattern will depend on the input grid's configuration.
