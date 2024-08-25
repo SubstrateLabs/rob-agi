@@ -7,18 +7,15 @@ def solve_903d1b4a(input_grid: ColoredGrid) -> ColoredGrid:
     Transform the input grid by removing green (3) color and extending adjacent patterns
     while preserving the main structure and symmetry. The solution involves:
     1. Preserving the border pattern exactly.
-    2. Identifying and maintaining (or completing) the central pattern.
-    3. Replacing green cells by extending or completing existing patterns.
-    4. Ensuring symmetry is maintained throughout the process.
-    5. Performing multiple passes to catch and correct any inconsistencies.
+    2. Replacing green cells with colors that maintain symmetry and extend existing patterns.
+    3. Ensuring perfect 180-degree rotational symmetry in the final grid.
+    4. Performing multiple passes to catch and correct any inconsistencies.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
     
-    def get_central_area(grid: ColoredGrid) -> List[List[int]]:
-        center_size = min(rows, cols) // 2
-        start_row, start_col = (rows - center_size) // 2, (cols - center_size) // 2
-        return grid.extract_subgrid(start_row, start_col, center_size, center_size).values
+    def get_symmetrical_cell(row: int, col: int) -> Tuple[int, int]:
+        return rows - 1 - row, cols - 1 - col
     
     def get_neighborhood(grid: ColoredGrid, row: int, col: int, size: int = 1) -> List[int]:
         neighbors = []
@@ -29,16 +26,15 @@ def solve_903d1b4a(input_grid: ColoredGrid) -> ColoredGrid:
         return neighbors
     
     def get_replacement_color(neighbors: List[int]) -> int:
-        return Counter(neighbors).most_common(1)[0][0]
+        return Counter([n for n in neighbors if n != 3]).most_common(1)[0][0]
     
     def is_border(row: int, col: int) -> bool:
         return row == 0 or row == rows - 1 or col == 0 or col == cols - 1
     
     def apply_symmetrical(grid: ColoredGrid, row: int, col: int, color: int):
+        sym_row, sym_col = get_symmetrical_cell(row, col)
         grid.values[row][col] = color
-        grid.values[row][cols - 1 - col] = color
-        grid.values[rows - 1 - row][col] = color
-        grid.values[rows - 1 - row][cols - 1 - col] = color
+        grid.values[sym_row][sym_col] = color
     
     # Preserve border
     for i in range(cols):
@@ -48,30 +44,26 @@ def solve_903d1b4a(input_grid: ColoredGrid) -> ColoredGrid:
         output_grid.values[i][0] = input_grid.values[i][0]
         output_grid.values[i][-1] = input_grid.values[i][-1]
     
-    # Process central area
-    central_area = get_central_area(input_grid)
-    central_pattern = [color for row in central_area for color in row if color != 3]
-    
     # Replace green cells
-    for r in range(rows):
-        for c in range(cols):
-            if output_grid.values[r][c] == 3:
-                if not is_border(r, c):
-                    neighbors = get_neighborhood(output_grid, r, c, size=2)
-                    new_color = get_replacement_color([color for color in neighbors if color != 3])
-                    apply_symmetrical(output_grid, r, c, new_color)
+    green_cells = [(r, c) for r in range(rows) for c in range(cols) if output_grid.values[r][c] == 3]
+    for r, c in green_cells:
+        if not is_border(r, c):
+            sym_r, sym_c = get_symmetrical_cell(r, c)
+            sym_color = output_grid.values[sym_r][sym_c]
+            if sym_color != 3:
+                apply_symmetrical(output_grid, r, c, sym_color)
+            else:
+                neighbors = get_neighborhood(output_grid, r, c, size=2) + get_neighborhood(output_grid, sym_r, sym_c, size=2)
+                new_color = get_replacement_color(neighbors)
+                apply_symmetrical(output_grid, r, c, new_color)
     
-    # Pattern extension and symmetry correction
-    for _ in range(2):  # Two passes for better consistency
-        for r in range(rows):
-            for c in range(cols):
-                if not is_border(r, c):
-                    neighbors = get_neighborhood(output_grid, r, c)
-                    most_common = Counter(neighbors).most_common(2)
-                    if len(most_common) > 1 and most_common[0][1] == most_common[1][1]:
-                        new_color = get_replacement_color(central_pattern)
-                    else:
-                        new_color = most_common[0][0]
-                    apply_symmetrical(output_grid, r, c, new_color)
+    # Symmetry correction
+    for r in range(rows // 2 + 1):
+        for c in range(cols):
+            sym_r, sym_c = get_symmetrical_cell(r, c)
+            if output_grid.values[r][c] != output_grid.values[sym_r][sym_c]:
+                neighbors = get_neighborhood(output_grid, r, c) + get_neighborhood(output_grid, sym_r, sym_c)
+                new_color = get_replacement_color(neighbors)
+                apply_symmetrical(output_grid, r, c, new_color)
     
     return output_grid
