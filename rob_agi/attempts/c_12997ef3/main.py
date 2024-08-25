@@ -11,6 +11,11 @@ def solve_12997ef3(input_grid: ColoredGrid) -> ColoredGrid:
     and four corners, with black in between. The orientation (horizontal or vertical)
     of the output grid is determined by the spatial relationship of colors in the input grid.
     
+    The 3x3 pattern for each color is as follows:
+    [color, 0, color]
+    [0, color, 0]
+    [color, 0, color]
+    
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
     
@@ -46,18 +51,25 @@ def solve_12997ef3(input_grid: ColoredGrid) -> ColoredGrid:
             width, height = len(colors) * 3, 3
         else:
             width, height = 3, len(colors) * 3
-        
+    
         output = [[0 for _ in range(width)] for _ in range(height)]
-        
+    
         for i, color in enumerate(colors):
             if orientation == 'horizontal':
                 start_row, start_col = 0, i * 3
             else:
                 start_row, start_col = i * 3, 0
-            
-            for r, c in [(0,0), (0,2), (1,1), (2,0), (2,2)]:
-                output[start_row + r][start_col + c] = color
         
+            pattern = [
+                [color, 0, color],
+                [0, color, 0],
+                [color, 0, color]
+            ]
+        
+            for r in range(3):
+                for c in range(3):
+                    output[start_row + r][start_col + c] = pattern[r][c]
+    
         return output
 
     colors, color_positions = scan_input_grid(input_grid)
