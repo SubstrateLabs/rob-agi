@@ -7,8 +7,8 @@ def solve_9caba7c3(input_grid: ColoredGrid) -> ColoredGrid:
     1. Preserves red (2) squares in the upper-left quadrant.
     2. Changes other red (2) squares to yellow (4).
     3. Propagates orange (7) color from yellow squares to the right and below,
-       replacing gray (5) or red (2) squares, potentially jumping over other colors.
-    4. Preserves the original state of other colors.
+       replacing any non-black squares, potentially jumping over other colors.
+    4. Preserves the original state of black (0) squares.
     5. Applies transformations based on the original grid state.
     """
     original_grid = input_grid.deep_copy()
@@ -20,21 +20,29 @@ def solve_9caba7c3(input_grid: ColoredGrid) -> ColoredGrid:
         return row < mid_row and col < mid_col
 
     def propagate_orange(start_row, start_col):
-        queue = deque([(start_row, start_col)])
-        while queue:
-            row, col = queue.popleft()
-            for dr, dc in [(0, 1), (1, 0)]:  # Right and below
-                new_row, new_col = row, col
-                while True:
-                    new_row += dr
-                    new_col += dc
-                    if new_row >= height or new_col >= width:
-                        break
-                    if original_grid.values[new_row][new_col] in [2, 5]:
-                        if new_grid.values[new_row][new_col] != 7:
-                            new_grid.values[new_row][new_col] = 7
-                            queue.append((new_row, new_col))
-                        break
+        right_queue = deque([(start_row, start_col)])
+        down_queue = deque([(start_row, start_col)])
+
+        while right_queue or down_queue:
+            if right_queue:
+                row, col = right_queue.popleft()
+                new_col = col
+                while new_col < width and original_grid.values[row][new_col] != 0:
+                    if not is_upper_left_quadrant(row, new_col) or original_grid.values[row][new_col] != 2:
+                        new_grid.values[row][new_col] = 7
+                    if row >= mid_row:
+                        down_queue.append((row, new_col))
+                    new_col += 1
+
+            if down_queue:
+                row, col = down_queue.popleft()
+                new_row = row
+                while new_row < height and original_grid.values[new_row][col] != 0:
+                    if not is_upper_left_quadrant(new_row, col) or original_grid.values[new_row][col] != 2:
+                        new_grid.values[new_row][col] = 7
+                    if col >= mid_col:
+                        right_queue.append((new_row, col))
+                    new_row += 1
 
     yellow_squares = []
     for row in range(height):
@@ -46,5 +54,11 @@ def solve_9caba7c3(input_grid: ColoredGrid) -> ColoredGrid:
 
     for row, col in yellow_squares:
         propagate_orange(row, col)
+
+    # Final check for upper-left quadrant red squares
+    for row in range(mid_row):
+        for col in range(mid_col):
+            if original_grid.values[row][col] == 2:
+                new_grid.values[row][col] = 2
 
     return new_grid
