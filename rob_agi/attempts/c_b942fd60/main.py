@@ -14,13 +14,11 @@ def solve_b942fd60(input_grid: ColoredGrid) -> ColoredGrid:
     
     Steps:
     1. Initialize by creating a deep copy and identifying non-black squares
-    2. Process rows to connect non-black squares horizontally
-    3. Process columns to connect non-black squares vertically
-    4. Connect isolated squares to the nearest red line or non-black square
-    5. Clean up unnecessary red lines
-    6. Trim extending red lines
-    7. Perform a final check to ensure all non-black squares are connected
-    8. Return the modified grid
+    2. Connect non-black squares horizontally and vertically
+    3. Connect isolated squares to the nearest part of the network
+    4. Clean up unnecessary red lines
+    5. Verify and fix connectivity
+    6. Return the modified grid
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
