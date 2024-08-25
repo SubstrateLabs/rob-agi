@@ -31,54 +31,50 @@ def solve_4e45f183(input_grid: ColoredGrid) -> ColoredGrid:
         return section
 
     def create_middle_section(frame_color: int, interior_color: int) -> List[List[int]]:
-        section = create_framed_section(interior_color, frame_color)
+        section = [[interior_color] * 5 for _ in range(5)]
+        section[0][0] = section[0][4] = section[4][0] = section[4][4] = frame_color
         section[2][2] = frame_color
         return section
 
     def transform_section(section: List[List[int]], position: str) -> List[List[int]]:
-        interior, frame = get_section_colors(section)
+        primary, secondary = get_section_colors(section)
         if position in ['left', 'right']:
-            return create_framed_section(frame, interior)
+            return create_framed_section(secondary, primary)
         elif position == 'middle':
-            return create_middle_section(frame, interior)
+            return create_middle_section(secondary, primary)
         else:
             return section
 
     rows, cols = input_grid.get_dimensions()
     output_values = [[0] * cols for _ in range(rows)]
 
-    # Transform the top row of sections
-    for j in range(3):
-        section = input_grid.extract_subgrid(1, j*6+1, 5, 5).values
-        position = ['left', 'middle', 'right'][j]
-        transformed = transform_section(section, position)
-        for r in range(5):
-            for c in range(5):
-                output_values[r+1][j*6+c+1] = transformed[r][c]
+    # Transform and apply symmetry for each third of the grid
+    for i in range(3):
+        start_row = i * 6 + 1
+        for j in range(3):
+            section = input_grid.extract_subgrid(start_row, j*6+1, 5, 5).values
+            position = ['left', 'middle', 'right'][j]
+            transformed = transform_section(section, position)
+            
+            # Apply the transformed section
+            for r in range(5):
+                for c in range(5):
+                    output_values[start_row+r][j*6+c+1] = transformed[r][c]
+            
+            # Apply vertical symmetry within each third
+            if j == 0:  # Left section
+                for r in range(5):
+                    for c in range(5):
+                        output_values[start_row+r][13+c] = transformed[r][4-c]
 
-    # Transform the middle row of sections
-    for j in range(3):
-        section = input_grid.extract_subgrid(7, j*6+1, 5, 5).values
-        position = ['left', 'middle', 'right'][j]
-        transformed = transform_section(section, position)
-        for r in range(5):
-            for c in range(5):
-                output_values[r+7][j*6+c+1] = transformed[r][c]
-
-    # Mirror the top row to the bottom row
-    for j in range(3):
-        for r in range(5):
-            for c in range(5):
-                output_values[13+r][j*6+c+1] = output_values[5-r][j*6+c+1]
-
-    # Ensure vertical symmetry in the middle row
+    # Apply horizontal symmetry
     for r in range(5):
-        for c in range(5):
-            output_values[r+7][13+c] = output_values[r+7][5-c]
+        for c in range(17):
+            output_values[13+r][c+1] = output_values[5-r][c+1]
 
     # Preserve black borders and separators
     for i in range(19):
         output_values[0][i] = output_values[18][i] = output_values[i][0] = output_values[i][18] = 0
-        output_values[i][6] = output_values[i][12] = 0
+        output_values[6][i] = output_values[12][i] = output_values[i][6] = output_values[i][12] = 0
 
     return ColoredGrid(values=output_values)
