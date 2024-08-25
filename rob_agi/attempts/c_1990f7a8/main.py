@@ -13,6 +13,7 @@ def solve_1990f7a8(input_grid: ColoredGrid) -> ColoredGrid:
     2. Analyze each quadrant and create a 3x3 representation
     3. Assemble the 3x3 representations into a 7x7 output grid
     4. Ensure the middle row (row 3) remains black
+    5. Adjust the representation to maintain balance and symmetry
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed
@@ -25,26 +26,24 @@ def solve_1990f7a8(input_grid: ColoredGrid) -> ColoredGrid:
 
     def analyze_quadrant(top, left, bottom, right):
         subgrid = input_grid.extract_subgrid(top, left, bottom - top + 1, right - left + 1)
-        red_regions = subgrid.find_connected_regions(2)
-        if not red_regions:
-            return [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
-        
+        red_count = subgrid.count_color(2)
+        total_cells = (bottom - top + 1) * (right - left + 1)
+        density = red_count / total_cells
+
         representation = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
-        for region in red_regions:
-            min_r = min(r for r, _ in region)
-            max_r = max(r for r, _ in region)
-            min_c = min(c for _, c in region)
-            max_c = max(c for _, c in region)
-            
-            r_scale = 3 / (bottom - top + 1)
-            c_scale = 3 / (right - left + 1)
-            
-            for r in range(min_r, max_r + 1):
-                for c in range(min_c, max_c + 1):
-                    if (r, c) in region:
-                        rep_r = min(2, int((r - top) * r_scale))
-                        rep_c = min(2, int((c - left) * c_scale))
-                        representation[rep_r][rep_c] = 2
+        
+        if density > 0.5:  # High density, fill most of the 3x3
+            for r in range(3):
+                for c in range(3):
+                    representation[r][c] = 2
+        elif density > 0.3:  # Medium density, create a cross or plus shape
+            representation[0][1] = representation[1][0] = representation[1][1] = representation[1][2] = representation[2][1] = 2
+        elif density > 0:  # Low density, create an L shape or corner
+            representation[0][0] = representation[1][0] = representation[2][0] = representation[2][1] = representation[2][2] = 2
+        
+        # Adjust based on specific patterns
+        if subgrid.get_cell(1, 1) == 0 and density > 0.3:  # Hollow center
+            representation[1][1] = 0
         
         return representation
 
@@ -63,5 +62,8 @@ def solve_1990f7a8(input_grid: ColoredGrid) -> ColoredGrid:
         for r in range(3):
             for c in range(3):
                 output_values[start_row + r][start_col + c] = quad[r][c]
+
+    # Ensure middle row is black
+    output_values[3] = [0, 0, 0, 0, 0, 0, 0]
 
     return ColoredGrid(values=output_values)
