@@ -13,7 +13,7 @@ def solve_2f0c5170(input_grid: ColoredGrid) -> ColoredGrid:
     5. Determines optimal output grid size based on the pattern
     6. Centers the pattern in the new grid with a minimal black border
     7. Optimizes the final grid size
-    8. Returns the result as a ColoredGrid
+    8. Returns the result as a ColoredGrid, or a 5x5 black grid if no pattern is found
     """
     
     def find_black_regions(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
@@ -85,10 +85,14 @@ def solve_2f0c5170(input_grid: ColoredGrid) -> ColoredGrid:
 
     def optimize_grid_size(grid: ColoredGrid) -> ColoredGrid:
         rows, cols = grid.get_dimensions()
-        top = next(r for r in range(rows) if any(grid.get_cell(r, c) != 0 for c in range(cols)))
-        bottom = next(r for r in range(rows - 1, -1, -1) if any(grid.get_cell(r, c) != 0 for c in range(cols)))
-        left = next(c for c in range(cols) if any(grid.get_cell(r, c) != 0 for r in range(rows)))
-        right = next(c for c in range(cols - 1, -1, -1) if any(grid.get_cell(r, c) != 0 for r in range(rows)))
+        try:
+            top = next(r for r in range(rows) if any(grid.get_cell(r, c) != 0 for c in range(cols)))
+            bottom = next(r for r in range(rows - 1, -1, -1) if any(grid.get_cell(r, c) != 0 for c in range(cols)))
+            left = next(c for c in range(cols) if any(grid.get_cell(r, c) != 0 for r in range(rows)))
+            right = next(c for c in range(cols - 1, -1, -1) if any(grid.get_cell(r, c) != 0 for r in range(rows)))
+        except StopIteration:
+            # If no non-black cells are found, return a 5x5 black grid
+            return ColoredGrid(values=[[0 for _ in range(5)] for _ in range(5)])
         
         # Ensure at least one cell of black border
         top, left = max(0, top - 1), max(0, left - 1)
@@ -96,24 +100,31 @@ def solve_2f0c5170(input_grid: ColoredGrid) -> ColoredGrid:
         
         optimized = grid.extract_subgrid(top, left, bottom - top + 1, right - left + 1)
         
-        # Ensure odd dimensions
-        if optimized.num_rows % 2 == 0:
-            optimized = optimized.expand(1, 0, 0, 0)
-        if optimized.num_cols % 2 == 0:
-            optimized = optimized.expand(0, 1, 0, 0)
+        # Ensure odd dimensions and minimum size of 5x5
+        new_rows, new_cols = max(5, optimized.num_rows), max(5, optimized.num_cols)
+        if new_rows % 2 == 0:
+            new_rows += 1
+        if new_cols % 2 == 0:
+            new_cols += 1
         
-        return optimized
+        return optimized.expand((new_rows - optimized.num_rows) // 2,
+                                (new_cols - optimized.num_cols) // 2,
+                                (new_rows - optimized.num_rows + 1) // 2,
+                                (new_cols - optimized.num_cols + 1) // 2)
 
     # Main logic
     black_regions = find_black_regions(input_grid)
     if not black_regions:
-        return ColoredGrid(values=[[0]])  # Return a 1x1 black grid if no regions found
+        return ColoredGrid(values=[[0 for _ in range(5)] for _ in range(5)])  # Return a 5x5 black grid if no regions found
     
     patterns = []
     for region in black_regions:
         pattern, non_black_cells, unique_colors, max_distance = extract_pattern(input_grid, region)
         complexity_score = non_black_cells * unique_colors * max_distance
         patterns.append((pattern, complexity_score, max_distance))
+    
+    if not patterns:
+        return ColoredGrid(values=[[0 for _ in range(5)] for _ in range(5)])  # Return a 5x5 black grid if no patterns found
     
     # Choose the most complex pattern
     chosen_pattern, _, max_distance = max(patterns, key=lambda x: x[1])
