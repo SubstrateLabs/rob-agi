@@ -6,21 +6,18 @@ def solve_18419cfa(input_grid: ColoredGrid) -> ColoredGrid:
     Solve the 18419cfa challenge by expanding red (2) patterns within sky blue (8) regions.
     
     The function identifies connected sky blue regions, finds red pixels within them,
-    and expands the red patterns symmetrically. It handles various patterns including
-    single pixels, L-shapes, rectangles, crosses, and other complex shapes. The expansion
-    is done to create rectangular forms with a width of 3 units where possible, and
-    creates hollow centers for larger expansions. The expansion maintains symmetry and
-    balance within the constraints of each sky blue region.
+    and expands the red patterns into 3x3 structures. It handles various patterns including
+    single pixels, L-shapes, crosses, and other complex shapes. The expansion creates
+    filled 3x3 squares for single pixels and L-shapes, and 3x3 square rings (hollow centers)
+    for crosses and more complex shapes. The expanded pattern is then repeated vertically
+    to fill the sky blue region, maintaining vertical symmetry. The expansion is contained
+    within the bounds of each sky blue region, and non-sky blue areas are preserved.
     """
     grid = input_grid.deep_copy()
     sky_blue_regions = find_connected_regions(grid, 8)
     
     for region in sky_blue_regions:
-        red_pixels = set(coord for coord in region if grid.get_cell(coord[0], coord[1]) == 2)
-        if red_pixels:
-            expanded_red_pixels = expand_red_patterns(grid, region, red_pixels)
-            for x, y in expanded_red_pixels:
-                grid.set_cell(x, y, 2)
+        expand_region(grid, region)
     
     return grid
 
@@ -50,18 +47,30 @@ def find_connected_regions(grid: ColoredGrid, color: int) -> List[Set[Tuple[int,
 
     return regions
 
-def expand_red_patterns(grid: ColoredGrid, region: Set[Tuple[int, int]], red_pixels: Set[Tuple[int, int]]) -> Set[Tuple[int, int]]:
+def expand_region(grid: ColoredGrid, region: Set[Tuple[int, int]]):
     min_r, max_r, min_c, max_c = get_region_bounds(region)
-    center_r, center_c = (min_r + max_r) // 2, (min_c + max_c) // 2
+    height = max_r - min_r + 1
+    width = max_c - min_c + 1
     
-    expanded_pixels = set()
-    for r in range(min_r, max_r + 1):
-        for c in range(min_c, max_c + 1):
-            if (r, c) in region:
-                if is_part_of_pattern(r, c, center_r, center_c, red_pixels):
-                    expanded_pixels.add((r, c))
+    if height < 3 or width < 3:
+        for r, c in region:
+            grid.set_cell(r, c, 2)
+        return
+
+    red_pixels = set((r, c) for r, c in region if grid.get_cell(r, c) == 2)
+    template = create_expansion_template(red_pixels, min_r, min_c, max_r, max_c)
     
-    return expanded_pixels
+    template_height = len(template)
+    repetitions = height // template_height
+    extra_space = height % template_height
+    
+    start_r = min_r + extra_space // 2
+    
+    for i in range(repetitions):
+        for r in range(template_height):
+            for c in range(width):
+                if template[r][c] == 2:
+                    grid.set_cell(start_r + i * template_height + r, min_c + c, 2)
 
 def get_region_bounds(region: Set[Tuple[int, int]]) -> Tuple[int, int, int, int]:
     min_r = min(r for r, _ in region)
@@ -70,16 +79,20 @@ def get_region_bounds(region: Set[Tuple[int, int]]) -> Tuple[int, int, int, int]
     max_c = max(c for _, c in region)
     return min_r, max_r, min_c, max_c
 
-def is_part_of_pattern(r: int, c: int, center_r: int, center_c: int, red_pixels: Set[Tuple[int, int]]) -> bool:
-    if (r, c) in red_pixels:
-        return True
+def create_expansion_template(red_pixels: Set[Tuple[int, int]], min_r: int, min_c: int, max_r: int, max_c: int) -> List[List[int]]:
+    height = max_r - min_r + 1
+    width = max_c - min_c + 1
+    template = [[0 for _ in range(width)] for _ in range(height)]
     
-    for red_r, red_c in red_pixels:
-        dr, dc = abs(r - red_r), abs(c - red_c)
-        if (dr <= 1 and dc <= 1) or (dr <= 2 and dc == 0) or (dr == 0 and dc <= 2):
-            return True
+    for r, c in red_pixels:
+        r, c = r - min_r, c - min_c
+        for dr in range(-1, 2):
+            for dc in range(-1, 2):
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < height and 0 <= nc < width:
+                    if dr == 0 and dc == 0 and len(red_pixels) > 1:
+                        template[nr][nc] = 0  # Hollow center for complex shapes
+                    else:
+                        template[nr][nc] = 2
     
-    if abs(r - center_r) <= 1 and abs(c - center_c) <= 1:
-        return True
-    
-    return False
+    return template
