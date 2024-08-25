@@ -1,54 +1,63 @@
 example_0:
   input: |
-    A 13x12 grid mostly filled with black (0). There are two colored squares:
-    - A red square (2) in the top-right corner (row 3, column 11)
-    - A blue square (1) near the bottom-left corner (row 10, column 1)
+    A 13x12 grid mostly filled with black (0). Two key squares:
+    - Red square (2): top-right corner (row 3, column 11)
+    - Blue square (1): near bottom-left (row 10, column 1)
+    Note the vertical distance between squares and their horizontal offset.
   output: |
-    The same 13x12 grid with the original colored squares, plus a new green (3) diagonal line:
-    - Starts from the 4th row, 7th column
-    - Extends diagonally up and to the right for 4 squares
-    - Then continues diagonally down and to the left, reaching the blue square
-    This green line forms a 'V' shape, with its point aimed towards the red square but not quite reaching it
+    Original grid with a new green (3) path connecting the squares:
+    - Starts adjacent to red square (row 4, column 7)
+    - Forms a 'V' shape:
+      * Moves diagonally up-right for 4 squares (prioritizing diagonal movement)
+      * Then diagonally down-left, ending adjacent to blue square
+    The path efficiently navigates the vertical and horizontal distance between squares.
 
 example_1:
   input: |
-    A 15x12 grid mostly filled with black (0). There are two colored squares:
-    - A red square (2) near the top-left corner (row 1, column 1)
-    - A blue square (1) near the bottom-right corner (row 13, column 8)
+    A 15x12 grid mostly black (0). Two key squares:
+    - Red square (2): near top-left (row 1, column 1)
+    - Blue square (1): near bottom-right (row 13, column 8)
+    Note the significant vertical distance and moderate horizontal offset.
   output: |
-    The same 15x12 grid with the original colored squares, plus a new green (3) line:
-    - Starts from the 2nd row, 3rd column
-    - Extends straight down for 6 squares
-    - Then continues diagonally down and to the right, reaching the blue square
-    This green line forms an 'L' shape, connecting the area near the red square to the blue square
+    Original grid with a new green (3) path connecting the squares:
+    - Starts adjacent to red square (row 2, column 2)
+    - Forms an 'L' shape:
+      * Moves straight down for 6 squares (when diagonal movement isn't optimal)
+      * Then diagonally down-right to blue square
+    The path demonstrates vertical movement when the horizontal offset is less than the vertical distance.
 
 example_2:
   input: |
-    A 15x16 grid mostly filled with black (0). There are two colored squares:
-    - A red square (2) near the top-middle (row 1, column 6)
-    - A blue square (1) near the bottom-left (row 12, column 3)
+    A 15x16 grid mostly black (0). Two key squares:
+    - Red square (2): near top-middle (row 1, column 6)
+    - Blue square (1): near bottom-left (row 12, column 3)
+    Note the significant vertical distance and moderate leftward horizontal offset.
   output: |
-    The same 15x16 grid with the original colored squares, plus a new green (3) line:
-    - Starts from the 2nd row, 5th column (just below and left of the red square)
-    - Extends straight down for 9 squares
-    - Then continues diagonally down and to the left for 2 squares, reaching the blue square
-    This green line forms a slight 'hook' shape, connecting the area near the red square to the blue square
+    Original grid with a new green (3) path connecting the squares:
+    - Starts adjacent to red square (row 2, column 5)
+    - Forms a 'hook' shape:
+      * Moves straight down for 9 squares (maximizing vertical coverage)
+      * Then diagonally down-left for 2 squares to blue square
+    The path shows how to handle a leftward horizontal offset efficiently.
 
 example_3:
   input: |
-    A 16x16 grid mostly filled with black (0). There are two colored squares:
-    - A blue square (1) near the top-right corner (row 1, column 11)
-    - A red square (2) near the bottom-left corner (row 13, column 3)
+    A 16x16 grid mostly black (0). Two key squares:
+    - Blue square (1): near top-right (row 1, column 11)
+    - Red square (2): near bottom-left (row 13, column 3)
+    Note the significant diagonal distance between squares.
   output: |
-    The same 16x16 grid with the original colored squares, plus a new green (3) line:
-    - Starts from the 2nd row, 11th column (just below the blue square)
-    - Extends diagonally down and to the left, reaching just above the red square
-    This green line forms a diagonal connecting the blue square to the area just above the red square
+    Original grid with a new green (3) path connecting the squares:
+    - Starts adjacent to blue square (row 2, column 11)
+    - Forms a long diagonal line:
+      * Moves diagonally down-left, ending adjacent to red square
+    This example showcases optimal diagonal movement when squares are diagonally aligned.
 
 test_case_0:
   input: |
-    A 16x16 grid mostly filled with black (0). There are two colored squares:
-    - A blue square (1) near the top-right corner (row 1, column 11)
-    - A red square (2) near the bottom-left corner (row 13, column 3)
+    A 16x16 grid mostly black (0). Two key squares:
+    - Blue square (1): near top-right (row 1, column 11)
+    - Red square (2): near bottom-left (row 13, column 3)
+    Similar to example_3, with significant diagonal distance.
   output: |
-    Not provided in the test case
+    Expected output not provided. Based on previous examples, likely a diagonal green path connecting the squares.
