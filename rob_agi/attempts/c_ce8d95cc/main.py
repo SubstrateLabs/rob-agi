@@ -11,9 +11,11 @@ def solve_ce8d95cc(input_grid: ColoredGrid) -> ColoredGrid:
     3. Places vertical lines in odd-numbered columns.
     4. Places horizontal lines in odd-numbered rows, preserving intersections with vertical lines.
     5. Handles thick lines on the edges by filling adjacent columns/rows.
+    6. Ensures horizontal lines maintain their color across the entire width, except at intersections.
     
     This approach maintains the relative positioning and colors of all lines while
-    compressing the grid to its essential features, correctly handling intersections.
+    compressing the grid to its essential features, correctly handling intersections
+    and preserving the structure of horizontal lines.
     """
     vertical_lines = find_vertical_lines(input_grid)
     horizontal_lines = find_horizontal_lines(input_grid)
@@ -40,19 +42,17 @@ def solve_ce8d95cc(input_grid: ColoredGrid) -> ColoredGrid:
     for i, (row, color, is_thick) in enumerate(horizontal_lines):
         output_row = 2 * i + 1
         for col in range(new_width):
-            if col % 2 == 1:  # Odd-numbered columns (vertical lines)
-                vertical_color = output_grid.values[output_row][col]
-                if vertical_color != 0:
-                    output_grid.values[output_row][col] = vertical_color
-                else:
-                    output_grid.values[output_row][col] = color
-            else:
+            if output_grid.values[output_row][col] == 0:  # Only fill if not a vertical line
                 output_grid.values[output_row][col] = color
         if is_thick:
             if i == 0:  # Top edge
-                output_grid.values[0] = [color if c % 2 == 0 else output_grid.values[0][c] for c in range(new_width)]
+                for col in range(new_width):
+                    if output_grid.values[0][col] == 0:
+                        output_grid.values[0][col] = color
             elif i == len(horizontal_lines) - 1:  # Bottom edge
-                output_grid.values[-1] = [color if c % 2 == 0 else output_grid.values[-1][c] for c in range(new_width)]
+                for col in range(new_width):
+                    if output_grid.values[-1][col] == 0:
+                        output_grid.values[-1][col] = color
     
     return output_grid
 
