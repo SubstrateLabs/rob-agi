@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 21x21 grid predominantly filled with gray (5) squares. There are three vertical green (3) lines running through the grid at regular intervals - at columns 3, 9, and 19. These green lines extend from the top to the bottom of the grid. There are also two horizontal green (3) lines that span the entire width of the grid - one at row 11 and another at row 14. These horizontal and vertical green lines create a grid-like pattern over the gray background.
+  output: |
+    A much smaller 3x4 grid consisting entirely of gray (5) squares. This appears to be a section of the larger input grid, specifically a region that was bounded by the green lines but not including those green lines themselves.
+
+example_1:
+  input: |
+    A 27x27 grid with a pattern similar to the previous example, but using sky blue (8) instead of green for the lines. The background is still predominantly gray (5). There are vertical sky blue lines at columns 7, 17, 20, and 26. Horizontal sky blue lines appear at rows 10, 15, 20, and 25. These lines create a grid-like pattern over the gray background, dividing it into rectangular sections of varying sizes.
+  output: |
+    A 5x5 grid consisting entirely of gray (5) squares. This appears to be one of the larger rectangular sections from the input grid, bounded by the sky blue lines but not including those lines.
+
+example_2:
+  input: |
+    A 10x10 grid with a more complex pattern. The background is predominantly blue (1). There are vertical yellow (4) lines at columns 1, 3, and 9. There is a horizontal yellow line at row 6. These yellow lines create a grid-like pattern over the blue background. Unlike the previous examples, the vertical yellow lines extend the full height of the grid, including through the horizontal yellow line.
+  output: |
+    A small 2x3 grid consisting entirely of blue (1) squares. This appears to be one of the rectangular sections from the input grid that was bounded by the yellow lines, but not including those yellow lines.
