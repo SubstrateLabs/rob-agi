@@ -1,5 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List, Tuple, Set
 import heapq
 
 from typing import List, Tuple
@@ -10,12 +10,13 @@ def solve_55059096(input_grid: ColoredGrid) -> ColoredGrid:
     Solve the grid transformation challenge by connecting green crosses with a minimal red path.
     
     1. Identify all green crosses in the grid.
-    2. Start from one cross and expand, prioritizing cells closer to other crosses.
-    3. Connect all crosses with a continuous shape.
-    4. Optimize the shape by removing unnecessary cells.
-    5. Apply the optimized shape to the original grid.
+    2. Generate all possible connections between crosses.
+    3. Implement a modified Steiner Tree algorithm to find an optimal set of connections.
+    4. Use A* pathfinding to determine the actual paths between connected crosses.
+    5. Apply the paths to the original grid, changing black cells to red along the path.
     
-    This approach ensures a minimal continuous shape connecting all crosses.
+    This approach ensures a minimal continuous shape connecting the optimal number of crosses,
+    allowing for some crosses to remain unconnected if it results in a more optimal overall solution.
     """
     crosses = find_crosses(input_grid)
     shape = create_minimal_shape(input_grid, crosses)
