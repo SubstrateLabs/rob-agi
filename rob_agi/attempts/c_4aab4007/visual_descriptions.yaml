@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid is 28x28. The top two rows and leftmost two columns are solid blue (1). The rest of the grid has a yellow (4) border. Inside this yellow border is a complex pattern of colors (1-7) arranged in a spiral. There are several black (0) regions scattered throughout the spiral pattern, creating "holes" or empty spaces.
+  output: |
+    The grid maintains the same 28x28 size and blue (1) border. The yellow (4) border also remains. The spiral pattern of colors (1-7) is now complete, with all the black (0) regions filled in to continue the spiral pattern seamlessly.
+
+example_1:
+  input: |
+    The grid is 28x28. The top two rows and leftmost two columns are solid blue (1). The rest of the grid has a yellow (4) border. Inside this yellow border is a pattern of colors (1-7) arranged in horizontal stripes. There are several black (0) regions scattered throughout the striped pattern, creating "holes" or empty spaces.
+  output: |
+    The grid maintains the same 28x28 size and blue (1) border. The yellow (4) border also remains. The striped pattern of colors (1-7) is now complete, with all the black (0) regions filled in to continue the horizontal striped pattern seamlessly.
+
+example_2:
+  input: |
+    The grid is 28x28. The top two rows and leftmost two columns are solid blue (1). The rest of the grid has a yellow (4) border. Inside this yellow border is a complex pattern of colors (1-9) arranged in a spiral. There are several black (0) regions scattered throughout the spiral pattern, creating "holes" or empty spaces. This pattern uses more colors than the previous examples.
+  output: |
+    The grid maintains the same 28x28 size and blue (1) border. The yellow (4) border also remains. The spiral pattern of colors (1-9) is now complete, with all the black (0) regions filled in to continue the spiral pattern seamlessly.
+
+test_case_0:
+  input: |
+    The grid is 28x28. The top two rows and leftmost two columns are solid blue (1). The rest of the grid has a yellow (4) border. Inside this yellow border is a complex pattern of colors (1-9) arranged in a spiral. There are several black (0) regions scattered throughout the spiral pattern, creating "holes" or empty spaces. The pattern and distribution of holes is different from the previous examples.
+  output: |
+    The expected output is not provided in the test case. Based on the pattern observed in the examples, we would expect the grid to maintain the same 28x28 size and blue (1) border, keep the yellow (4) border, and have the spiral pattern of colors (1-9) completed by filling in all the black (0) regions to continue the spiral pattern seamlessly.
