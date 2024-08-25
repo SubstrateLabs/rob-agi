@@ -6,12 +6,11 @@ def solve_2685904e(input_grid: ColoredGrid) -> ColoredGrid:
     
     The solution follows these steps:
     1. Analyze the colored sequence row (second to last row) of the grid.
-    2. Identify target colors: colors that appear more than once but are not the most frequent.
-       If no such colors exist, select the second least frequent color(s).
-    3. For each target color, determine the extension height (min of color frequency and 3).
-    4. Extend target colors upwards from the row above the colored sequence row,
+    2. Identify colors to extend: colors with the minimum frequency (excluding the most frequent).
+    3. For each color to extend, determine the extension height (color's frequency, max 3).
+    4. Extend selected colors upwards from the row above the colored sequence row,
        respecting the gray row and top 4 rows.
-    5. Leave the top 4 rows, gray row, colored sequence row, bottom row, and non-extended columns unchanged.
+    5. Preserve the top 4 rows, gray row, colored sequence row, and bottom row.
     
     Args:
     input_grid (ColoredGrid): The input grid to transform.
@@ -29,30 +28,25 @@ def solve_2685904e(input_grid: ColoredGrid) -> ColoredGrid:
         if color != 0:  # Ignore black (empty space)
             color_frequency[color] = color_frequency.get(color, 0) + 1
     
-    # Identify target colors
+    # Identify colors to extend
     max_freq = max(color_frequency.values())
     min_freq = min(color_frequency.values())
-    target_colors = [color for color, freq in color_frequency.items() 
-                     if freq > 1 and freq != max_freq]
     
-    # If no colors meet the criteria, select the second least frequent color(s)
-    if not target_colors:
-        second_min_freq = min(freq for freq in color_frequency.values() if freq > min_freq)
-        target_colors = [color for color, freq in color_frequency.items() 
-                         if freq == second_min_freq]
+    if max_freq == min_freq:
+        # If all colors appear equally, select all except the first one
+        colors_to_extend = list(color_frequency.keys())[1:]
+    else:
+        # Select colors with the minimum frequency
+        colors_to_extend = [color for color, freq in color_frequency.items() if freq == min_freq]
 
-    # Determine extension details for each target color
-    extension_details = {}
-    for color in target_colors:
+    # Extend the selected colors
+    for color in colors_to_extend:
         columns = [i for i, c in enumerate(source_row) if c == color]
         extension_height = min(color_frequency[color], 3)
-        extension_details[color] = (columns, extension_height)
-
-    # Extend the target colors
-    for color, (columns, height) in extension_details.items():
+        
         for col in columns:
-            for row in range(-3, -3-height, -1):
-                if 4 <= row < -2:  # Don't modify top 4 rows, gray row, or colored sequence row
+            for row in range(-3, -3-extension_height, -1):
+                if row >= -6:  # Don't modify top 4 rows or gray row
                     output_grid.values[row][col] = color
 
     return output_grid
