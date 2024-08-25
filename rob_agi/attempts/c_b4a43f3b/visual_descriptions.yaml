@@ -1,82 +1,105 @@
 example_0:
   input: |
-    A 13x6 grid with several distinct regions:
-    1. Top-left: A 2x2 green square
-    2. Top-right: A 2x2 black square
-    3. Middle-left: A 2x2 red square
-    4. Middle-right: A 2x2 magenta square
-    5. A gray horizontal line spanning the entire width in the 7th row
-    6. Bottom section: A red shape resembling an upside-down 'T', surrounded by black space
+    A 13x6 grid with distinct regions:
+    1. Upper 6x6 section:
+       - Top-left: 2x2 green (3)
+       - Top-right: 2x2 black (0)
+       - Middle-left: 2x2 red (2)
+       - Middle-right: 2x2 magenta (6)
+    2. Full-width line: Gray (5) in row 7
+    3. Lower section (rows 9-13):
+       - Red (2) shape resembling an upside-down 'T'
+       - Surrounded by black (0)
+
   output: |
-    An 18x18 grid with a centered pattern:
-    1. Four 3x3 blocks arranged in a 2x2 formation
-    2. Each block consists of:
-       - Top-left: Green
-       - Top-right: Red
-       - Bottom-left: Empty (black)
-       - Bottom-right: Magenta and blue
-    3. The pattern is surrounded by black space
-    4. The overall effect resembles a larger version of the input's top-left quadrant, repeated and arranged symmetrically
+    An 18x18 grid with a centered, scaled, and repeated pattern:
+    1. Core pattern: 3x3 block derived from input's upper-left quadrant
+       - Top-left: Green (3)
+       - Top-right: Red (2)
+       - Bottom-left: Black (0)
+       - Bottom-right: Magenta (6)
+    2. Arrangement: Four 3x3 blocks in a 2x2 formation
+    3. Scaling: Each color in the core pattern is represented by a 3x3 square
+    4. Full-width line: Preserved, positioned below the main pattern
+    5. Bottom shape: Scaled version of the input's red 'T' shape, centered at the bottom
 
 example_1:
   input: |
-    A 13x6 grid with several distinct regions:
-    1. Top-left: A 2x2 blue square
-    2. Top-right: A 2x2 magenta square
-    3. Middle: A 2x2 blue square
-    4. Bottom-left: A 2x2 red square
-    5. A gray horizontal line spanning the entire width in the 7th row
-    6. Bottom section: A red shape resembling a rotated 'L', surrounded by black space
+    A 13x6 grid with distinct regions:
+    1. Upper 6x6 section:
+       - Top-left: 2x2 blue (1)
+       - Top-right: 2x2 magenta (6)
+       - Middle-left: 2x2 black (0)
+       - Middle-right: 2x2 blue (1)
+       - Bottom-left: 2x2 red (2)
+       - Bottom-right: 2x2 black (0)
+    2. Full-width line: Gray (5) in row 7
+    3. Lower section (rows 9-13):
+       - Red (2) shape resembling a rotated 'L'
+       - Surrounded by black (0)
+
   output: |
-    An 18x18 grid with a centered pattern:
-    1. Three rows of 2x3 blocks
-    2. Each block consists of:
-       - Top: Blue, magenta, blue (left to right)
-       - Bottom: Empty (black), blue, red (left to right)
-    3. The blocks are arranged in a staggered pattern:
-       - First row: 2 blocks
-       - Second row: 3 blocks
-       - Third row: 2 blocks
-    4. The pattern is surrounded by black space
+    An 18x18 grid with a centered, scaled, and repeated pattern:
+    1. Core pattern: 3x3 block derived from input's upper 6x6 section
+       - Top: Blue (1), Magenta (6), Blue (1)
+       - Bottom: Black (0), Blue (1), Red (2)
+    2. Arrangement: Six 3x3 blocks in a staggered formation
+       - Top row: 2 blocks
+       - Middle row: 3 blocks
+       - Bottom row: 2 blocks
+    3. Scaling: Each color in the core pattern is represented by a 2x2 square
+    4. Full-width line: Preserved, positioned below the main pattern
+    5. Bottom shape: Scaled version of the input's red 'L' shape, centered at the bottom
 
 example_2:
   input: |
-    A 13x6 grid with several distinct regions:
-    1. Top-left and top-right: 2x2 blue squares
-    2. Middle: A 2x2 red square
-    3. Bottom-left: A 2x2 green square
-    4. A gray horizontal line spanning the entire width in the 7th row
-    5. Bottom section: A red shape resembling a plus sign or cross, surrounded by black space
+    A 13x6 grid with distinct regions:
+    1. Upper 6x6 section:
+       - Top-left and top-right: 2x2 blue (1) squares
+       - Middle: 2x2 red (2) square
+       - Bottom-left: 2x2 green (3) square
+       - Other areas: Black (0)
+    2. Full-width line: Gray (5) in row 7
+    3. Lower section (rows 9-13):
+       - Red (2) shape resembling a plus sign or cross
+       - Surrounded by black (0)
+
   output: |
-    An 18x18 grid with a centered pattern:
-    1. Three rows of blocks, with the middle row being the widest
-    2. Each block is a 3x3 arrangement:
-       - Top: Blue, empty, blue
-       - Middle: Empty, red, empty
-       - Bottom: Green, red, empty
-    3. The blocks are arranged:
-       - First row: 1 block
-       - Second row: 4 blocks side by side
-       - Third row: 1 block
-    4. The pattern is surrounded by black space
+    An 18x18 grid with a centered, scaled, and repeated pattern:
+    1. Core pattern: 3x3 block derived from input's upper 6x6 section
+       - Top: Blue (1), Black (0), Blue (1)
+       - Middle: Black (0), Red (2), Black (0)
+       - Bottom: Green (3), Red (2), Black (0)
+    2. Arrangement: Six 3x3 blocks in a symmetric formation
+       - Top row: 1 centered block
+       - Middle row: 4 blocks side by side
+       - Bottom row: 1 centered block
+    3. Scaling: Each color in the core pattern is represented by a 3x3 square
+    4. Full-width line: Preserved, positioned below the main pattern
+    5. Bottom shape: Scaled version of the input's red cross shape, centered at the bottom
 
 example_3:
   input: |
-    A 13x6 grid with several distinct regions:
-    1. Top-left and top-right: 2x2 blue squares
-    2. Middle: A 2x2 blue square
-    3. Two rows of green spanning the entire width (rows 5 and 6)
-    4. A gray horizontal line spanning the entire width in the 7th row
-    5. Bottom section: A red shape resembling an upside-down 'T' with an extra arm on the right, surrounded by black space
+    A 13x6 grid with distinct regions:
+    1. Upper 6x6 section:
+       - Top-left, top-right, and middle: 2x2 blue (1) squares
+       - Bottom two rows: Full-width green (3) lines
+       - Other areas: Black (0)
+    2. Full-width line: Gray (5) in row 7
+    3. Lower section (rows 9-13):
+       - Red (2) shape resembling an upside-down 'T' with an extra right arm
+       - Surrounded by black (0)
+
   output: |
-    An 18x18 grid with a centered pattern:
-    1. Three rows of blocks
-    2. Each block is a 3x3 arrangement:
-       - Top: Blue, empty, blue
-       - Middle: Empty, blue, empty
-       - Bottom: Green, green, green
-    3. The blocks are arranged:
-       - First row: 1 block
-       - Second row: 1 block
-       - Third row: 3 blocks side by side
-    4. The pattern is surrounded by black space
+    An 18x18 grid with a centered, scaled, and repeated pattern:
+    1. Core pattern: 3x3 block derived from input's upper 6x6 section
+       - Top: Blue (1), Black (0), Blue (1)
+       - Middle: Black (0), Blue (1), Black (0)
+       - Bottom: Green (3), Green (3), Green (3)
+    2. Arrangement: Five 3x3 blocks in a vertical formation
+       - Top row: 1 centered block
+       - Middle row: 1 centered block
+       - Bottom row: 3 blocks side by side
+    3. Scaling: Each color in the core pattern is represented by a 3x3 square
+    4. Full-width lines: Two green lines preserved, positioned within the main pattern
+    5. Bottom shape: Scaled version of the input's red 'T' shape with extra arm, centered at the bottom
