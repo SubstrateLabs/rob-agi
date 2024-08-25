@@ -3,12 +3,12 @@ from rob_agi.colored_grid import ColoredGrid
 def solve_992798f6(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the challenge by connecting two colored squares (blue and red) with a green line.
-    The line starts adjacent to the higher square, moves diagonally when possible,
-    and ends adjacent to the lower square. The path adapts based on the relative
-    positions of the squares, allowing for both diagonal and straight movements.
+    The line starts adjacent to the top square, moves vertically when possible,
+    then diagonally if needed, and ends adjacent to the bottom square.
+    The path adapts based on the relative positions of the squares.
     
     1. Identify colored squares
-    2. Determine start and end points
+    2. Determine top and bottom squares
     3. Generate the adaptive path
     4. Create output grid with the green line
     """
@@ -24,26 +24,27 @@ def solve_992798f6(input_grid: ColoredGrid) -> ColoredGrid:
     if not blue_pos or not red_pos:
         return input_grid  # Return original grid if colored squares are not found
 
-    # Step 2: Determine start and end points
-    start_pos = blue_pos if blue_pos[1] <= red_pos[1] else red_pos
-    end_pos = red_pos if start_pos == blue_pos else blue_pos
+    # Step 2: Determine top and bottom squares
+    top_pos, bottom_pos = (blue_pos, red_pos) if blue_pos[1] < red_pos[1] else (red_pos, blue_pos)
     
     # Step 3: Generate the adaptive path
     path = []
-    current = (start_pos[0], start_pos[1] + (1 if start_pos == blue_pos else -1))
-    path.append(current)
+    current = (top_pos[0], top_pos[1] + 1)  # Start one step below the top square
+    target_col = bottom_pos[0]
 
-    while current != (end_pos[0], end_pos[1] - (1 if end_pos == blue_pos else -1)):
-        dx = 1 if end_pos[0] > current[0] else -1 if end_pos[0] < current[0] else 0
-        dy = 1 if end_pos[1] > current[1] else -1 if end_pos[1] < current[1] else 0
+    while current[1] < bottom_pos[1] - 1:  # Stop one step before the bottom square
+        path.append(current)
+        if current[0] == target_col:
+            current = (current[0], current[1] + 1)  # Move vertically
+        else:
+            dx = 1 if target_col > current[0] else -1
+            current = (current[0] + dx, current[1] + 1)  # Move diagonally
 
-        if dx != 0 and dy != 0:
-            current = (current[0] + dx, current[1] + dy)  # Move diagonally
-        elif dx != 0:
-            current = (current[0] + dx, current[1])  # Move horizontally
-        elif dy != 0:
-            current = (current[0], current[1] + dy)  # Move vertically
-        
+    # Ensure we end adjacent to the bottom square
+    if current[0] != target_col:
+        path.append((current[0], current[1]))
+        path.append((target_col, current[1]))
+    else:
         path.append(current)
 
     # Step 4: Create output grid with the green line
