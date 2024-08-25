@@ -4,11 +4,12 @@ from typing import List, Tuple
 def solve_e1d2900e(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by applying the following rules:
-    1. Identifies 2x2 red squares and adds blue dots around them.
+    1. Identifies 2x2 red squares and adds exactly two blue dots around each.
     2. Removes isolated blue dots not associated with red squares.
     3. Preserves blue dots near grid edges or part of larger patterns.
     4. Ensures each red square has exactly two associated blue dots.
     5. Handles edge cases and maintains balance in dot placement.
+    6. Optimizes placement to minimize larger connected shapes.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -35,20 +36,18 @@ def solve_e1d2900e(input_grid: ColoredGrid) -> ColoredGrid:
     def add_blue_dots(r: int, c: int):
         valid_positions = get_valid_blue_positions(r, c)
         existing_blues = [pos for pos in valid_positions if output_grid.get_cell(*pos) == 1]
-        if not existing_blues:
-            for pos in valid_positions[:2]:
+        if len(existing_blues) < 2:
+            available_positions = [pos for pos in valid_positions if pos not in existing_blues]
+            for pos in available_positions[:2-len(existing_blues)]:
                 output_grid.set_cell(*pos, 1)
-        elif len(existing_blues) == 1:
-            for pos in valid_positions:
-                if pos not in existing_blues:
-                    output_grid.set_cell(*pos, 1)
-                    break
+        elif len(existing_blues) > 2:
+            for pos in existing_blues[2:]:
+                output_grid.set_cell(*pos, 0)
 
     # Step 1: Process red squares
-    for r in range(rows - 1):
-        for c in range(cols - 1):
-            if is_red_square(r, c):
-                add_blue_dots(r, c)
+    red_squares = [(r, c) for r in range(rows-1) for c in range(cols-1) if is_red_square(r, c)]
+    for r, c in red_squares:
+        add_blue_dots(r, c)
 
     # Step 2 & 3: Remove isolated blue dots, preserve edge and pattern dots
     for r in range(rows):
@@ -59,15 +58,24 @@ def solve_e1d2900e(input_grid: ColoredGrid) -> ColoredGrid:
                         continue  # Preserve edge dots
                     output_grid.set_cell(r, c, 0)  # Remove isolated dots
 
-    # Step 4: Balance check
-    for r in range(rows - 1):
-        for c in range(cols - 1):
-            if is_red_square(r, c):
-                blue_count = sum(1 for pos in get_valid_blue_positions(r, c) if output_grid.get_cell(*pos) == 1)
-                if blue_count > 2:
-                    for pos in get_valid_blue_positions(r, c):
-                        if output_grid.get_cell(*pos) == 1 and blue_count > 2:
-                            output_grid.set_cell(*pos, 0)
-                            blue_count -= 1
+    # Step 4: Final verification and optimization
+    for r, c in red_squares:
+        blue_positions = [pos for pos in get_valid_blue_positions(r, c) if output_grid.get_cell(*pos) == 1]
+        while len(blue_positions) > 2:
+            pos = max(blue_positions, key=lambda p: sum(output_grid.get_cell(p[0]+i, p[1]+j) == 1 
+                                                        for i in [-1, 0, 1] for j in [-1, 0, 1] 
+                                                        if 0 <= p[0]+i < rows and 0 <= p[1]+j < cols))
+            output_grid.set_cell(*pos, 0)
+            blue_positions.remove(pos)
+        while len(blue_positions) < 2:
+            available = [pos for pos in get_valid_blue_positions(r, c) if pos not in blue_positions]
+            if available:
+                pos = min(available, key=lambda p: sum(output_grid.get_cell(p[0]+i, p[1]+j) == 1 
+                                                       for i in [-1, 0, 1] for j in [-1, 0, 1] 
+                                                       if 0 <= p[0]+i < rows and 0 <= p[1]+j < cols))
+                output_grid.set_cell(*pos, 1)
+                blue_positions.append(pos)
+            else:
+                break  # No more valid positions available
 
     return output_grid
