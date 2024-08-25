@@ -1,19 +1,16 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Dict
-import math
 
 def solve_c6e1b8da(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by adjusting the position and shape of colored regions.
+    Transforms the input grid by simplifying and regularizing colored regions.
     
     The transformation follows these steps:
-    1. Analyze the input grid to identify distinct colored regions.
-    2. Calculate properties for each region (area, bounding box, aspect ratio, center of mass).
-    3. Create rectangular regions that maintain approximate area and aspect ratio.
-    4. Place regions on the grid, starting with the largest, maintaining relative positions.
-    5. Adjust regions to ensure 1-cell spacing between regions and a 1-cell black border.
-    6. Optimize layout to reduce empty space while maintaining relative positions.
-    7. Construct the output grid based on the optimized layout.
+    1. Identify distinct colored regions in the input grid.
+    2. For each region, create a simplified rectangular shape.
+    3. Place the simplified shapes on a new grid, maintaining relative positions.
+    4. Ensure a 1-cell black border around the grid and between shapes.
+    5. Align shapes to grid edges or other shapes when possible.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -21,13 +18,12 @@ def solve_c6e1b8da(input_grid: ColoredGrid) -> ColoredGrid:
     Returns:
     ColoredGrid: The transformed grid after applying the rules.
     """
-    regions = analyze_grid(input_grid)
-    layout = create_layout(regions, input_grid.get_dimensions())
-    optimized_layout = optimize_layout(layout, input_grid.get_dimensions())
-    output_grid = construct_output_grid(optimized_layout, input_grid.get_dimensions())
+    regions = identify_regions(input_grid)
+    simplified_regions = simplify_regions(regions)
+    output_grid = place_regions(simplified_regions, input_grid.get_dimensions())
     return output_grid
 
-def analyze_grid(grid: ColoredGrid) -> List[Dict]:
+def identify_regions(grid: ColoredGrid) -> List[Dict]:
     regions = []
     visited = set()
     for r in range(grid.num_rows):
@@ -50,88 +46,66 @@ def analyze_grid(grid: ColoredGrid) -> List[Dict]:
                 max_r = max(r for r, _ in region)
                 min_c = min(c for _, c in region)
                 max_c = max(c for _, c in region)
-                area = len(region)
-                center_r = sum(r for r, _ in region) / area
-                center_c = sum(c for _, c in region) / area
                 
                 regions.append({
                     'color': color,
-                    'area': area,
+                    'area': len(region),
                     'bounding_box': (min_r, min_c, max_r - min_r + 1, max_c - min_c + 1),
-                    'aspect_ratio': (max_c - min_c + 1) / (max_r - min_r + 1),
-                    'center': (center_r, center_c)
+                    'center': ((min_r + max_r) / 2, (min_c + max_c) / 2)
                 })
     
     return sorted(regions, key=lambda x: x['area'], reverse=True)
 
-def create_layout(regions: List[Dict], dimensions: Tuple[int, int]) -> List[Tuple[int, int, int, int, int]]:
+def simplify_regions(regions: List[Dict]) -> List[Dict]:
+    simplified = []
+    for region in regions:
+        height, width = region['bounding_box'][2], region['bounding_box'][3]
+        area = region['area']
+        
+        # Simplify to square if possible
+        if abs(height - width) <= 2:
+            new_size = max(3, min(height, width))
+            simplified.append({
+                'color': region['color'],
+                'height': new_size,
+                'width': new_size,
+                'center': region['center']
+            })
+        else:
+            # Simplify to rectangle
+            if height > width:
+                new_height = max(5, min(height, area // 3))
+                new_width = max(3, min(width, area // new_height))
+            else:
+                new_width = max(5, min(width, area // 3))
+                new_height = max(3, min(height, area // new_width))
+            
+            simplified.append({
+                'color': region['color'],
+                'height': new_height,
+                'width': new_width,
+                'center': region['center']
+            })
+    
+    return simplified
+
+def place_regions(regions: List[Dict], dimensions: Tuple[int, int]) -> ColoredGrid:
     rows, cols = dimensions
     grid = [[0 for _ in range(cols)] for _ in range(rows)]
-    layout = []
     
     for region in regions:
         color = region['color']
-        area = region['area']
-        aspect_ratio = region['aspect_ratio']
+        height, width = region['height'], region['width']
+        center_r, center_c = region['center']
         
-        # Calculate dimensions, preferring multiples of 5
-        width = max(5, 5 * round(math.sqrt(area * aspect_ratio) / 5))
-        height = max(5, 5 * round(area / width / 5))
+        # Find the best position for the region
+        best_r = max(1, min(rows - height - 1, int(center_r - height / 2)))
+        best_c = max(1, min(cols - width - 1, int(center_c - width / 2)))
         
-        # Adjust dimensions to better fit the original area
-        while abs((width * height) - area) > area * 0.2:
-            if width * height > area:
-                if width > height:
-                    width -= 5
-                else:
-                    height -= 5
-            else:
-                if width > height:
-                    height += 5
-                else:
-                    width += 5
-        
-        # Find best position
-        best_pos = None
-        min_distance = float('inf')
-        for r in range(1, rows - height):
-            for c in range(1, cols - width):
-                if all(grid[rr][cc] == 0 for rr in range(r, r+height) for cc in range(c, c+width)):
-                    distance = ((r + height/2) - region['center'][0])**2 + ((c + width/2) - region['center'][1])**2
-                    if distance < min_distance:
-                        min_distance = distance
-                        best_pos = (r, c)
-        
-        if best_pos:
-            r, c = best_pos
-            layout.append((color, r, c, height, width))
-            for rr in range(r, r+height):
-                for cc in range(c, c+width):
-                    grid[rr][cc] = color
+        # Place the region
+        for r in range(best_r, best_r + height):
+            for c in range(best_c, best_c + width):
+                if 0 < r < rows - 1 and 0 < c < cols - 1:
+                    grid[r][c] = color
     
-    return layout
-
-def optimize_layout(layout: List[Tuple[int, int, int, int, int]], dimensions: Tuple[int, int]) -> List[Tuple[int, int, int, int, int]]:
-    rows, cols = dimensions
-    optimized = layout.copy()
-    
-    # Try to move regions to reduce empty space
-    for i, (color, r, c, h, w) in enumerate(optimized):
-        # Try moving up
-        if r > 1 and all(optimized[j][1] + optimized[j][3] < r - 1 for j in range(i) if optimized[j][2] < c + w and optimized[j][2] + optimized[j][4] > c):
-            optimized[i] = (color, r - 1, c, h, w)
-        # Try moving left
-        if c > 1 and all(optimized[j][2] + optimized[j][4] < c - 1 for j in range(i) if optimized[j][1] < r + h and optimized[j][1] + optimized[j][3] > r):
-            optimized[i] = (color, r, c - 1, h, w)
-    
-    return optimized
-
-def construct_output_grid(layout: List[Tuple[int, int, int, int, int]], dimensions: Tuple[int, int]) -> ColoredGrid:
-    rows, cols = dimensions
-    grid = [[0 for _ in range(cols)] for _ in range(rows)]
-    for color, r, c, h, w in layout:
-        for rr in range(r, r+h):
-            for cc in range(c, c+w):
-                if 0 < rr < rows-1 and 0 < cc < cols-1:
-                    grid[rr][cc] = color
     return ColoredGrid(values=grid)
