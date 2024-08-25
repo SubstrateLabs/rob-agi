@@ -1,21 +1,21 @@
 from rob_agi.colored_grid import ColoredGrid
 import numpy as np
-from scipy import signal
-from typing import Tuple, List
+from collections import defaultdict
+import heapq
+from typing import Tuple, List, Dict
 
 def solve_e66aafb8(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the e66aafb8 challenge by finding the most representative subgrid pattern in the input grid.
+    Solve the e66aafb8 challenge by analyzing color transitions and creating a representative pattern.
     
     The function works as follows:
-    1. Preprocess the input grid to create a numpy array and calculate overall color distribution.
-    2. Define a scoring function for subgrids based on color diversity, representativeness, and pattern complexity.
-    3. Generate candidate subgrids of various sizes (2x2 up to 8x8 or half the input size).
-    4. Score and rank subgrids, maintaining a list of top candidates.
-    5. Refine top candidates by adjusting boundaries slightly.
-    6. Select the best subgrid after refinement.
-    7. Post-process the selected subgrid to handle edge cases and ensure minimum size.
-    8. Return the result as a ColoredGrid object.
+    1. Preprocess the input grid to create a numpy array and identify non-black cells.
+    2. Analyze color transitions in the input grid, creating a transition graph.
+    3. Identify significant color transitions based on frequency and color contrast.
+    4. Determine the output grid size and orientation based on significant transitions.
+    5. Construct the output grid by placing colors according to significant transitions.
+    6. Post-process the output grid to ensure no black cells and minimum size.
+    7. Return the result as a ColoredGrid object.
     
     Returns:
         ColoredGrid: A new grid containing the extracted representative pattern.
@@ -25,76 +25,104 @@ def solve_e66aafb8(input_grid: ColoredGrid) -> ColoredGrid:
     non_black_mask = grid != 0
     
     if not np.any(non_black_mask):
-        return ColoredGrid(values=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
+        return ColoredGrid(values=[[1, 1], [1, 1]])  # Return a 2x2 blue grid if input is all black
     
-    overall_distribution = np.bincount(grid[non_black_mask].flatten(), minlength=10)[1:] / np.sum(non_black_mask)
+    def analyze_transitions(grid: np.ndarray) -> Dict[Tuple[int, int], int]:
+        transitions = defaultdict(int)
+        rows, cols = grid.shape
+        for r in range(rows):
+            for c in range(cols):
+                if grid[r, c] != 0:
+                    if c < cols - 1 and grid[r, c+1] != 0:
+                        transitions[(grid[r, c], grid[r, c+1])] += 1
+                    if r < rows - 1 and grid[r+1, c] != 0:
+                        transitions[(grid[r, c], grid[r+1, c])] += 1
+        return transitions
     
-    def score_subgrid(subgrid: np.ndarray) -> float:
-        if np.all(subgrid == 0):
-            return -np.inf
-        
-        unique_colors, color_counts = np.unique(subgrid, return_counts=True)
-        color_diversity = len(unique_colors)
-        color_distribution = color_counts / np.sum(color_counts)
-        
-        representativeness = 1 - np.sum(np.abs(color_distribution - overall_distribution[:len(color_distribution)]))
-        
-        edges = np.abs(signal.convolve2d(subgrid, np.array([[1, -1], [-1, 1]]), mode='valid'))
-        pattern_complexity = np.sum(edges) / subgrid.size
-        
-        black_penalty = -0.5 * np.sum(subgrid == 0) / subgrid.size
-        
-        score = (color_diversity + representativeness + pattern_complexity + black_penalty) / np.log(subgrid.size)
-        return score
+    def calculate_significance(color1: int, color2: int, frequency: int, total: int) -> float:
+        return (frequency / total) * (abs(color1 - color2) / 9)
     
-    def generate_candidates() -> List[Tuple[np.ndarray, float]]:
-        candidates = []
-        max_size = min(8, min(rows, cols) // 2)
-        for height in range(2, max_size + 1):
-            for width in range(2, max_size + 1):
-                for r in range(rows - height + 1):
-                    for c in range(cols - width + 1):
-                        subgrid = grid[r:r+height, c:c+width]
-                        score = score_subgrid(subgrid)
-                        candidates.append((subgrid, score))
-        return sorted(candidates, key=lambda x: x[1], reverse=True)[:10]
+    transitions = analyze_transitions(grid)
+    total_transitions = sum(transitions.values())
     
-    def refine_subgrid(subgrid: np.ndarray) -> np.ndarray:
-        height, width = subgrid.shape
-        best_refined = subgrid
-        best_score = score_subgrid(subgrid)
+    significant_transitions = [
+        (-calculate_significance(c1, c2, freq, total_transitions), c1, c2)
+        for (c1, c2), freq in transitions.items()
+    ]
+    heapq.heapify(significant_transitions)
+    
+    horizontal_transitions = sum(transitions[(c1, c2)] for (c1, c2) in transitions if c1 != c2)
+    vertical_transitions = total_transitions - horizontal_transitions
+    is_vertical = vertical_transitions > horizontal_transitions
+    
+    min_size = 2
+    max_size = min(8, min(rows, cols) // 3)
+    size = min(max(min_size, int(len(significant_transitions) ** 0.5)), max_size)
+    
+    output_shape = (size, size) if is_vertical else (size, size)
+    output_grid = np.zeros(output_shape, dtype=int)
+    
+    def place_color(grid: np.ndarray, color: int, position: Tuple[int, int]) -> None:
+        if 0 <= position[0] < grid.shape[0] and 0 <= position[1] < grid.shape[1]:
+            grid[position] = color
+    
+    def get_available_edges(grid: np.ndarray) -> List[Tuple[int, int]]:
+        edges = []
+        for r in range(grid.shape[0]):
+            for c in range(grid.shape[1]):
+                if grid[r, c] != 0:
+                    for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                        nr, nc = r + dr, c + dc
+                        if 0 <= nr < grid.shape[0] and 0 <= nc < grid.shape[1] and grid[nr, nc] == 0:
+                            edges.append((nr, nc))
+        return edges
+    
+    # Place the most significant transition in the center
+    _, c1, c2 = heapq.heappop(significant_transitions)
+    center = (output_shape[0] // 2, output_shape[1] // 2)
+    place_color(output_grid, c1, center)
+    place_color(output_grid, c2, (center[0], center[1] + 1))
+    
+    while significant_transitions and np.any(output_grid == 0):
+        edges = get_available_edges(output_grid)
+        if not edges:
+            break
         
-        for dh in [-1, 0, 1]:
-            for dw in [-1, 0, 1]:
-                if dh == 0 and dw == 0:
-                    continue
-                new_height, new_width = height + dh, width + dw
-                if new_height < 2 or new_width < 2:
-                    continue
-                r, c = np.unravel_index(np.argmax(grid[:rows-new_height+1, :cols-new_width+1]), (rows-new_height+1, cols-new_width+1))
-                refined = grid[r:r+new_height, c:c+new_width]
-                score = score_subgrid(refined)
-                if score > best_score:
-                    best_refined = refined
-                    best_score = score
-        
-        return best_refined
+        _, c1, c2 = heapq.heappop(significant_transitions)
+        for edge in edges:
+            neighbors = [
+                output_grid[r, c]
+                for r in range(max(0, edge[0] - 1), min(output_shape[0], edge[0] + 2))
+                for c in range(max(0, edge[1] - 1), min(output_shape[1], edge[1] + 2))
+                if output_grid[r, c] != 0
+            ]
+            if c1 in neighbors:
+                place_color(output_grid, c2, edge)
+                break
+            elif c2 in neighbors:
+                place_color(output_grid, c1, edge)
+                break
     
-    candidates = generate_candidates()
-    best_subgrid = max((refine_subgrid(subgrid) for subgrid, _ in candidates), key=score_subgrid)
+    # Fill any remaining gaps
+    for r in range(output_shape[0]):
+        for c in range(output_shape[1]):
+            if output_grid[r, c] == 0:
+                neighbors = [
+                    output_grid[nr, nc]
+                    for nr in range(max(0, r - 1), min(output_shape[0], r + 2))
+                    for nc in range(max(0, c - 1), min(output_shape[1], c + 2))
+                    if output_grid[nr, nc] != 0
+                ]
+                if neighbors:
+                    output_grid[r, c] = max(set(neighbors), key=neighbors.count)
+                else:
+                    output_grid[r, c] = 1  # Default to blue if no neighbors
     
-    # Post-process: remove black edges if possible
-    while np.any(best_subgrid[0] == 0) and best_subgrid.shape[0] > 2:
-        best_subgrid = best_subgrid[1:]
-    while np.any(best_subgrid[-1] == 0) and best_subgrid.shape[0] > 2:
-        best_subgrid = best_subgrid[:-1]
-    while np.any(best_subgrid[:, 0] == 0) and best_subgrid.shape[1] > 2:
-        best_subgrid = best_subgrid[:, 1:]
-    while np.any(best_subgrid[:, -1] == 0) and best_subgrid.shape[1] > 2:
-        best_subgrid = best_subgrid[:, :-1]
+    if is_vertical:
+        output_grid = output_grid.T
     
     # Ensure minimum size of 2x2
-    if best_subgrid.shape[0] < 2 or best_subgrid.shape[1] < 2:
-        best_subgrid = np.pad(best_subgrid, ((0, max(0, 2 - best_subgrid.shape[0])), (0, max(0, 2 - best_subgrid.shape[1]))), mode='edge')
+    if output_grid.shape[0] < 2 or output_grid.shape[1] < 2:
+        output_grid = np.pad(output_grid, ((0, max(0, 2 - output_grid.shape[0])), (0, max(0, 2 - output_grid.shape[1]))), mode='edge')
     
-    return ColoredGrid(values=best_subgrid.tolist())
+    return ColoredGrid(values=output_grid.tolist())
