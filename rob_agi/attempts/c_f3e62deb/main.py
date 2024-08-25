@@ -6,14 +6,14 @@ def solve_f3e62deb(input_grid: ColoredGrid) -> ColoredGrid:
     Solve the grid transformation challenge by moving a 3x3 hollow square shape.
     
     The function identifies the 3x3 hollow square in the input grid and moves it
-    according to the following priority order:
-    1. If not on the right edge, move to the right edge.
-    2. If on the right edge but not on the top edge, move to the top edge.
-    3. If on the right and top edges but not on the left edge, move to the left edge.
-    4. If on the right, top, and left edges but not on the bottom edge, move to the bottom edge.
-    5. If on all edges, keep the current position.
+    to the nearest available edge in the following priority order:
+    1. Right edge
+    2. Top edge
+    3. Left edge
+    4. Bottom edge
     
     The shape maintains its vertical or horizontal position when moving to an edge.
+    If the shape is already at all edges, it remains in its current position.
     """
     def find_square(grid: ColoredGrid) -> Tuple[int, int, int]:
         for r in range(len(grid.values)):
@@ -29,25 +29,28 @@ def solve_f3e62deb(input_grid: ColoredGrid) -> ColoredGrid:
     if top == -1:
         return input_grid  # No valid square found, return input grid unchanged
 
-    right = left + 2
-    bottom = top + 2
+    # Calculate distances to edges
+    dist_right = 9 - (left + 2)
+    dist_top = top
+    dist_left = left
+    dist_bottom = 9 - (top + 2)
 
-    # Determine new position
-    if right < 9:  # Not on right edge
-        new_left = 7
-        new_top = top
-    elif top > 0:  # On right edge but not on top
-        new_left = left
-        new_top = 0
-    elif left > 0:  # On right and top edges but not on left
-        new_left = 0
-        new_top = top
-    elif bottom < 9:  # On right, top, and left edges but not on bottom
-        new_left = left
-        new_top = 7
-    else:  # On all edges
-        new_left = left
-        new_top = top
+    # Determine target edge
+    edges = [(dist_right, 'right'), (dist_top, 'top'), (dist_left, 'left'), (dist_bottom, 'bottom')]
+    edges.sort(key=lambda x: x[0])  # Sort by distance
+    target_edge = next((edge for dist, edge in edges if dist > 0), 'stay')
+
+    # Calculate new position
+    if target_edge == 'right':
+        new_left, new_top = 7, top
+    elif target_edge == 'top':
+        new_left, new_top = left, 0
+    elif target_edge == 'left':
+        new_left, new_top = 0, top
+    elif target_edge == 'bottom':
+        new_left, new_top = left, 7
+    else:  # 'stay'
+        new_left, new_top = left, top
 
     # Create new grid with moved square
     new_grid = ColoredGrid(values=[[0 for _ in range(10)] for _ in range(10)])
