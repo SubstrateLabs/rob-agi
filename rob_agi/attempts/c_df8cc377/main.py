@@ -6,12 +6,13 @@ def solve_df8cc377(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by identifying closed shapes, filling their interiors with patterns,
     and clearing the rest of the grid. The process involves:
     1. Identifying closed shapes in the grid.
-    2. For shapes larger than 3x3, filling the interior with a checkerboard pattern using
+    2. For shapes 4x4 or larger, filling the interior with a checkerboard pattern using
        the highest-numbered color found inside the shape and black (0).
     3. For 3x3 shapes, placing a single dot of the highest-numbered color at the center.
-    4. For 2x2 shapes and smaller, preserving them as they are.
-    5. Clearing all cells not part of any shape's boundary or interior.
-    6. Reconstructing the grid with the modified shapes.
+    4. For 5x3 or 3x5 shapes, placing two dots of the highest-numbered color symmetrically.
+    5. For 2x2 shapes and smaller, preserving them as they are.
+    6. Clearing all cells not part of any shape's boundary or interior.
+    7. Reconstructing the grid with the modified shapes.
     """
     def find_shapes(grid: ColoredGrid) -> List[Tuple[int, List[Tuple[int, int]], List[Tuple[int, int]]]]:
         shapes = []
@@ -60,26 +61,35 @@ def solve_df8cc377(input_grid: ColoredGrid) -> ColoredGrid:
 
     def fill_shape(grid: ColoredGrid, boundary: List[Tuple[int, int]], interior: List[Tuple[int, int]], shape_color: int, fill_color: int):
         min_r, min_c, height, width = get_shape_dimensions(boundary + interior)
-        if height > 3 and width > 3:
+        if height >= 4 and width >= 4:
             for r, c in interior:
                 grid.set_cell(r, c, fill_color if (r + c) % 2 == 0 else 0)
         elif height == 3 and width == 3:
             center_r, center_c = min_r + 1, min_c + 1
             grid.set_cell(center_r, center_c, fill_color)
+        elif (height == 5 and width == 3) or (height == 3 and width == 5):
+            if height == 5:
+                grid.set_cell(min_r + 1, min_c + 1, fill_color)
+                grid.set_cell(min_r + 3, min_c + 1, fill_color)
+            else:
+                grid.set_cell(min_r + 1, min_c + 1, fill_color)
+                grid.set_cell(min_r + 1, min_c + 3, fill_color)
         # For 2x2 and smaller shapes, we don't modify them
 
-    new_grid = input_grid.deep_copy()
-    shapes = find_shapes(new_grid)
+    new_grid = ColoredGrid(values=[[0 for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
+    shapes = find_shapes(input_grid)
 
     for shape_color, boundary, interior in shapes:
+        # Add boundary to new_grid
+        for r, c in boundary:
+            new_grid.set_cell(r, c, shape_color)
+        
         if len(boundary) + len(interior) > 4:  # Only process shapes larger than 2x2
-            fill_color = get_highest_color(new_grid, interior)
+            fill_color = get_highest_color(input_grid, interior)
             fill_shape(new_grid, boundary, interior, shape_color, fill_color)
-
-    rows, cols = new_grid.get_dimensions()
-    for r in range(rows):
-        for c in range(cols):
-            if all((r, c) not in (boundary + interior) for _, boundary, interior in shapes):
-                new_grid.set_cell(r, c, 0)
+        else:
+            # For 2x2 and smaller shapes, copy them as they are
+            for r, c in interior:
+                new_grid.set_cell(r, c, input_grid.get_cell(r, c))
 
     return new_grid
