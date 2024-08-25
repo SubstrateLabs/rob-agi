@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 23x19 grid with mostly black (empty) space. There's a small cluster of colored squares in the top-left corner: blue, red, green, and sky blue in a row. The main feature is a large gray triangle or wedge shape starting from the left side of the grid and expanding diagonally downwards to the right. The triangle is made up of gray (5) squares and takes up a significant portion of the grid.
+  output: |
+    The 23x19 grid maintains its overall structure, but the gray triangle has been transformed. The triangle now consists of a pattern of colored squares that seem to follow the sequence blue (1), red (2), green (3), and sky blue (8). This pattern repeats in diagonal stripes, following the shape of the original gray triangle. The colored squares in the top-left corner remain unchanged.
+
+example_1:
+  input: |
+    An 18x17 grid, mostly black (empty). There's a small cluster of colored squares in the top-right: blue, green, and yellow in a row. The main feature is a gray triangle or wedge shape, similar to the previous example but smaller and positioned differently. It starts from the right side of the grid and expands diagonally downwards to the left.
+  output: |
+    The 18x17 grid keeps its structure, but the gray triangle has been transformed. The triangle now consists of a repeating pattern of colored squares: blue (1), green (3), and yellow (4). This pattern forms diagonal stripes following the shape of the original gray triangle. The colored squares in the top-right corner remain unchanged.
+
+example_2:
+  input: |
+    An 18x14 grid with two main features. In the top-left, there's a small cluster of colored squares: red, sky blue, and green in a row. The grid contains two gray shapes: a smaller triangle on the left side expanding diagonally down and right, and a larger, more rectangular shape on the right side of the grid.
+  output: |
+    The 18x14 grid maintains its overall structure. Both gray shapes have been transformed into patterns of colored squares. The left triangle now consists of a repeating pattern of red (2), sky blue (8), and green (3) in diagonal stripes. The right shape has been filled with the same pattern, but it starts with green and follows the sequence green (3), red (2), sky blue (8). The colored squares in the top-left corner remain unchanged.
