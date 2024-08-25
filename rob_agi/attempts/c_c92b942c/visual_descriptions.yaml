@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 3x3 grid with a single magenta (6) square in the center, surrounded by black (0) squares.
+  output: |
+    A 9x9 grid with a repeating pattern. The pattern consists of green (3) squares in the corners of 3x3 sections, blue (1) squares forming a cross shape around magenta (6) squares in the center of each 3x3 section. The remaining squares are black (0).
+
+example_1:
+  input: |
+    A 2x4 grid with a single gray (5) square in the top row, third column. All other squares are black (0).
+  output: |
+    A 6x12 grid with a repeating pattern. The pattern consists of blue (1) squares forming horizontal lines at the top of each 2x4 section, with gray (5) squares interrupting these lines every 4 columns. Green (3) squares form a zigzag pattern between the blue lines. The remaining squares are black (0).
+
+example_2:
+  input: |
+    A 4x6 grid with three yellow (4) squares: one in the second row, third column, and two in the bottom row at the first and fifth columns. All other squares are black (0).
+  output: |
+    A 12x18 grid with a complex repeating pattern. The pattern consists of yellow (4) squares forming a diagonal line from top-left to bottom-right in each 4x6 section. Blue (1) squares form horizontal lines connecting the yellow squares. Green (3) squares appear in alternating positions above and below the blue lines. The remaining squares are black (0).
+
+example_3:
+  input: |
+    A 5x5 grid with a single red (2) square in the center. All other squares are black (0).
+  output: |
+    A 15x15 grid with a repeating pattern. The pattern consists of a red (2) square in the center of each 5x5 section, surrounded by a cross shape of blue (1) squares. Green (3) squares appear in the corners of each 5x5 section, forming a larger zigzag pattern across the entire grid. The remaining squares are black (0).
+
+test_case_0:
+  input: |
+    Not provided in the test file.
+  output: |
+    Not provided in the test file.
