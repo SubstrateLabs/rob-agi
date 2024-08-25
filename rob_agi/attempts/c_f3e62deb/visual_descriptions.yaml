@@ -1,0 +1,35 @@
+example_0:
+  input: |
+    A 10x10 grid with mostly black (empty) squares. In the center-left area, there's a 3x3 hollow square shape made of sky blue (8) squares. The hollow square is positioned at rows 2-4 and columns 2-4.
+  output: |
+    A 10x10 grid with mostly black (empty) squares. The 3x3 hollow square shape made of sky blue (8) squares has moved to the right edge of the grid. It now occupies rows 2-4 and columns 7-9.
+
+example_1:
+  input: |
+    A 10x10 grid with mostly black (empty) squares. In the center area, there's a 3x3 hollow square shape made of yellow (4) squares. The hollow square is positioned at rows 2-4 and columns 3-5.
+  output: |
+    A 10x10 grid with mostly black (empty) squares. The 3x3 hollow square shape made of yellow (4) squares has moved to the bottom edge of the grid. It now occupies rows 7-9 and columns 3-5.
+
+example_2:
+  input: |
+    A 10x10 grid with mostly black (empty) squares. In the center area, there's a 3x3 hollow square shape made of sky blue (8) squares. The hollow square is positioned at rows 3-5 and columns 3-5.
+  output: |
+    A 10x10 grid with mostly black (empty) squares. The 3x3 hollow square shape made of sky blue (8) squares has moved to the right edge of the grid. It now occupies rows 3-5 and columns 7-9.
+
+example_3:
+  input: |
+    A 10x10 grid with mostly black (empty) squares. In the center-right area, there's a 3x3 hollow square shape made of magenta (6) squares. The hollow square is positioned at rows 3-5 and columns 4-6.
+  output: |
+    A 10x10 grid with mostly black (empty) squares. The 3x3 hollow square shape made of magenta (6) squares has moved to the top edge of the grid. It now occupies rows 0-2 and columns 4-6.
+
+example_4:
+  input: |
+    A 10x10 grid with mostly black (empty) squares. In the center-left area, there's a 3x3 hollow square shape made of magenta (6) squares. The hollow square is positioned at rows 4-6 and columns 2-4.
+  output: |
+    A 10x10 grid with mostly black (empty) squares. The 3x3 hollow square shape made of magenta (6) squares has moved to the top edge of the grid. It now occupies rows 0-2 and columns 2-4.
+
+example_5:
+  input: |
+    A 10x10 grid with mostly black (empty) squares. In the center-left area, there's a 3x3 hollow square shape made of sky blue (8) squares. The hollow square is positioned at rows 5-7 and columns 2-4.
+  output: |
+    A 10x10 grid with mostly black (empty) squares. The 3x3 hollow square shape made of sky blue (8) squares has moved to the right edge of the grid. It now occupies rows 5-7 and columns 7-9.
