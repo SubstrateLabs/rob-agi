@@ -4,19 +4,20 @@ from collections import defaultdict
 
 def solve_7d18a6fb(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid into a 7x7 output grid by identifying significant patterns and arranging them.
+    Transforms the input grid into a 7x7 output grid by identifying and arranging color patterns.
     
-    1. Identifies connected regions of the same color in the input grid.
-    2. Ranks patterns based on size, color rarity, and shape complexity.
-    3. Selects top 4 patterns and compresses them into 3x3 representations.
-    4. Places compressed patterns in quadrants of a 7x7 grid, maintaining relative positions.
-    5. Fills the central cross with black (0) to separate quadrants.
+    1. Identifies the largest contiguous rectangle of a single color and excludes it.
+    2. Finds unique color patterns in the remaining grid.
+    3. Selects up to 4 patterns, prioritizing color diversity.
+    4. Creates 3x3 representations of selected patterns.
+    5. Places patterns in quadrants of a 7x7 grid based on their original positions.
+    6. Fills the central cross with black (0) to separate quadrants.
     
     Returns a 7x7 ColoredGrid with the arranged patterns.
     """
     patterns = identify_patterns(input_grid)
-    ranked_patterns = rank_patterns(patterns, input_grid)
-    compressed_patterns = compress_patterns(ranked_patterns[:4])
+    selected_patterns = select_patterns(patterns)
+    compressed_patterns = compress_patterns(selected_patterns)
     output_grid = create_output_grid(compressed_patterns, input_grid)
     return output_grid
 
@@ -24,7 +25,13 @@ def identify_patterns(grid: ColoredGrid) -> List[Tuple[int, List[Tuple[int, int]
     patterns = []
     visited = set()
     rows, cols = grid.get_dimensions()
-
+    
+    # Find the largest rectangle
+    largest_rect = find_largest_rectangle(grid)
+    if largest_rect:
+        color, rect_cells = largest_rect
+        visited.update(rect_cells)
+    
     def dfs(r: int, c: int, color: int) -> List[Tuple[int, int]]:
         if (r, c) in visited or r < 0 or r >= rows or c < 0 or c >= cols or grid.values[r][c] != color:
             return []
@@ -44,27 +51,42 @@ def identify_patterns(grid: ColoredGrid) -> List[Tuple[int, List[Tuple[int, int]
 
     return patterns
 
-def rank_patterns(patterns: List[Tuple[int, List[Tuple[int, int]]]], grid: ColoredGrid) -> List[Tuple[int, List[Tuple[int, int]]]]:
-    color_counts = defaultdict(int)
-    for row in grid.values:
-        for cell in row:
-            if cell != 0:
-                color_counts[cell] += 1
+def find_largest_rectangle(grid: ColoredGrid) -> Optional[Tuple[int, List[Tuple[int, int]]]]:
+    rows, cols = grid.get_dimensions()
+    largest_area = 0
+    largest_rect = None
+    
+    for r in range(rows):
+        for c in range(cols):
+            if grid.values[r][c] != 0:
+                color = grid.values[r][c]
+                max_width = cols - c
+                max_height = rows - r
+                for width in range(1, max_width + 1):
+                    for height in range(1, max_height + 1):
+                        if all(grid.values[r + i][c + j] == color 
+                               for i in range(height) for j in range(width)):
+                            area = width * height
+                            if area > largest_area:
+                                largest_area = area
+                                largest_rect = (color, [(r + i, c + j) 
+                                                        for i in range(height) 
+                                                        for j in range(width)])
+    
+    return largest_rect
 
-    def pattern_score(pattern):
-        color, region = pattern
-        size = len(region)
-        rarity = 1 / color_counts[color]
-        min_r = min(r for r, _ in region)
-        max_r = max(r for r, _ in region)
-        min_c = min(c for _, c in region)
-        max_c = max(c for _, c in region)
-        complexity = len(region) / ((max_r - min_r + 1) * (max_c - min_c + 1))
-        return size * rarity * complexity
+def select_patterns(patterns: List[Tuple[int, List[Tuple[int, int]]]]) -> List[Tuple[int, List[Tuple[int, int]]]]:
+    unique_colors = set()
+    selected = []
+    
+    for color, region in patterns:
+        if color not in unique_colors and len(selected) < 4:
+            unique_colors.add(color)
+            selected.append((color, region))
+    
+    return selected
 
-    return sorted(patterns, key=pattern_score, reverse=True)
-
-def compress_patterns(patterns: List[Tuple[int, List[Tuple[int, int]]]]) -> List[Tuple[int, List[List[int]]]]:
+def compress_patterns(patterns: List[Tuple[int, List[Tuple[int, int]]]]) -> List[Tuple[int, List[List[int]], Tuple[int, int]]]:
     compressed = []
     for color, region in patterns:
         min_r = min(r for r, _ in region)
@@ -83,23 +105,23 @@ def compress_patterns(patterns: List[Tuple[int, List[Tuple[int, int]]]]) -> List
                 if cells:
                     compressed_pattern[r][c] = color
         
-        compressed.append((color, compressed_pattern))
+        center = ((min_r + max_r) // 2, (min_c + max_c) // 2)
+        compressed.append((color, compressed_pattern, center))
     
     return compressed
 
-def create_output_grid(compressed_patterns: List[Tuple[int, List[List[int]]]], input_grid: ColoredGrid) -> ColoredGrid:
+def create_output_grid(compressed_patterns: List[Tuple[int, List[List[int]], Tuple[int, int]]], input_grid: ColoredGrid) -> ColoredGrid:
     output = [[0 for _ in range(7)] for _ in range(7)]
     input_rows, input_cols = input_grid.get_dimensions()
     quadrants = [(0, 0), (0, 4), (4, 0), (4, 4)]
     
-    for (color, pattern), (qr, qc) in zip(compressed_patterns, quadrants):
-        # Determine pattern position within quadrant
-        pattern_r = qr + (3 if 2 * qr > input_rows else 0)
-        pattern_c = qc + (3 if 2 * qc > input_cols else 0)
-        
+    # Sort patterns based on their center position
+    compressed_patterns.sort(key=lambda x: x[2])
+    
+    for (color, pattern, _), (qr, qc) in zip(compressed_patterns, quadrants):
         for r in range(3):
             for c in range(3):
-                output[pattern_r + r][pattern_c + c] = pattern[r][c]
+                output[qr + r][qc + c] = pattern[r][c]
     
     # Fill central cross
     for i in range(7):
