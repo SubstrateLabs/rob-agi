@@ -1,23 +1,75 @@
 example_0:
   input: |
-    The grid is 28x28. The top two rows and leftmost two columns are solid blue (1). The rest of the grid has a yellow (4) border. Inside this yellow border is a complex pattern of colors (1-7) arranged in a spiral. There are several black (0) regions scattered throughout the spiral pattern, creating "holes" or empty spaces.
+    Grid size: 28x28
+    Border: Top two rows and leftmost two columns are blue (1)
+    Frame: Single-cell wide yellow (4) border inside the blue border
+    Pattern type: Clockwise spiral
+    Colors used: 1-7 (excluding blue border and yellow frame)
+    Black regions: Multiple black (0) cells scattered throughout the spiral
+    Pattern start: Near top-left corner of the inner area
+    Notable: The spiral pattern is interrupted by black regions but maintains its sequence when resumed
+
   output: |
-    The grid maintains the same 28x28 size and blue (1) border. The yellow (4) border also remains. The spiral pattern of colors (1-7) is now complete, with all the black (0) regions filled in to continue the spiral pattern seamlessly.
+    Grid size: Unchanged (28x28)
+    Border and frame: Preserved (blue border and yellow frame)
+    Pattern type: Complete clockwise spiral
+    Colors used: 1-7 (same as input, excluding blue border and yellow frame)
+    Black regions: All filled in, continuing the spiral pattern
+    Pattern consistency: Maintains the original sequence throughout the grid
 
 example_1:
   input: |
-    The grid is 28x28. The top two rows and leftmost two columns are solid blue (1). The rest of the grid has a yellow (4) border. Inside this yellow border is a pattern of colors (1-7) arranged in horizontal stripes. There are several black (0) regions scattered throughout the striped pattern, creating "holes" or empty spaces.
+    Grid size: 28x28
+    Border: Top two rows and leftmost two columns are blue (1)
+    Frame: Single-cell wide yellow (4) border inside the blue border
+    Pattern type: Horizontal stripes
+    Colors used: 1-7 (excluding blue border and yellow frame)
+    Black regions: Multiple black (0) cells interrupting the striped pattern
+    Pattern start: Top-left corner of the inner area
+    Notable: Each row follows the same color sequence, interrupted by black cells
+
   output: |
-    The grid maintains the same 28x28 size and blue (1) border. The yellow (4) border also remains. The striped pattern of colors (1-7) is now complete, with all the black (0) regions filled in to continue the horizontal striped pattern seamlessly.
+    Grid size: Unchanged (28x28)
+    Border and frame: Preserved (blue border and yellow frame)
+    Pattern type: Complete horizontal stripes
+    Colors used: 1-7 (same as input, excluding blue border and yellow frame)
+    Black regions: All filled in, continuing the horizontal striped pattern
+    Pattern consistency: Each row maintains the same color sequence without interruptions
 
 example_2:
   input: |
-    The grid is 28x28. The top two rows and leftmost two columns are solid blue (1). The rest of the grid has a yellow (4) border. Inside this yellow border is a complex pattern of colors (1-9) arranged in a spiral. There are several black (0) regions scattered throughout the spiral pattern, creating "holes" or empty spaces. This pattern uses more colors than the previous examples.
+    Grid size: 28x28
+    Border: Top two rows and leftmost two columns are blue (1)
+    Frame: Single-cell wide yellow (4) border inside the blue border
+    Pattern type: Clockwise spiral
+    Colors used: 1-9 (excluding blue border and yellow frame)
+    Black regions: Multiple black (0) cells scattered throughout the spiral
+    Pattern start: Near top-left corner of the inner area
+    Notable: Uses more colors than previous examples, creating a more complex spiral pattern
+
   output: |
-    The grid maintains the same 28x28 size and blue (1) border. The yellow (4) border also remains. The spiral pattern of colors (1-9) is now complete, with all the black (0) regions filled in to continue the spiral pattern seamlessly.
+    Grid size: Unchanged (28x28)
+    Border and frame: Preserved (blue border and yellow frame)
+    Pattern type: Complete clockwise spiral
+    Colors used: 1-9 (same as input, excluding blue border and yellow frame)
+    Black regions: All filled in, continuing the spiral pattern
+    Pattern consistency: Maintains the original sequence throughout the grid, including the expanded color range
 
 test_case_0:
   input: |
-    The grid is 28x28. The top two rows and leftmost two columns are solid blue (1). The rest of the grid has a yellow (4) border. Inside this yellow border is a complex pattern of colors (1-9) arranged in a spiral. There are several black (0) regions scattered throughout the spiral pattern, creating "holes" or empty spaces. The pattern and distribution of holes is different from the previous examples.
+    Grid size: 28x28
+    Border: Top two rows and leftmost two columns are blue (1)
+    Frame: Single-cell wide yellow (4) border inside the blue border
+    Pattern type: Likely clockwise spiral (based on previous examples)
+    Colors used: 1-9 (excluding blue border and yellow frame)
+    Black regions: Multiple black (0) cells with unique distribution
+    Pattern start: To be determined from the grid
+    Notable: Different pattern and hole distribution compared to previous examples
+
   output: |
-    The expected output is not provided in the test case. Based on the pattern observed in the examples, we would expect the grid to maintain the same 28x28 size and blue (1) border, keep the yellow (4) border, and have the spiral pattern of colors (1-9) completed by filling in all the black (0) regions to continue the spiral pattern seamlessly.
+    Expected transformation (based on previous examples):
+    - Grid size should remain 28x28
+    - Blue border and yellow frame should be preserved
+    - Black regions should be filled to complete the clockwise spiral pattern
+    - Color sequence (1-9) should be maintained consistently throughout the grid
+    - The unique distribution of initial black cells may result in a different final pattern compared to previous examples, but the underlying spiral structure should be preserved
