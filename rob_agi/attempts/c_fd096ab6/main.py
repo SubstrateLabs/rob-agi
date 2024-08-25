@@ -1,6 +1,7 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple
 import random
+import math
 
 def solve_fd096ab6(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -8,11 +9,12 @@ def solve_fd096ab6(input_grid: ColoredGrid) -> ColoredGrid:
     
     The solution involves the following steps:
     1. Identify all non-blue color clusters in the grid.
-    2. For each cluster, calculate its growth potential based on size and surrounding space.
-    3. Generate and score possible expansion patterns for each cluster, favoring upward and leftward growth.
-    4. Apply the highest-scoring valid expansion pattern for each cluster.
-    5. Repeat the expansion process multiple times, resolving conflicts between clusters.
-    6. Return the resulting expanded grid.
+    2. Analyze each cluster's size, shape, and surrounding space.
+    3. Determine expansion strategy based on cluster characteristics.
+    4. Expand clusters iteratively, with size-based growth limits.
+    5. Resolve conflicts between expanding clusters.
+    6. Refine shapes and maintain consistency across similar clusters.
+    7. Perform final validation and adjustments.
     
     Args:
     input_grid (ColoredGrid): The initial grid state.
@@ -23,32 +25,105 @@ def solve_fd096ab6(input_grid: ColoredGrid) -> ColoredGrid:
     grid = input_grid.deep_copy()
     colors = set(range(2, 10))  # All colors except blue (1)
     
-    for _ in range(3):  # Perform expansion 3 times
+    for _ in range(3):  # Perform expansion in 3 phases
         clusters = []
         for color in colors:
             regions = grid.find_connected_regions(color)
             clusters.extend((color, region) for region in regions)
         
+        clusters.sort(key=lambda x: len(x[1]), reverse=True)  # Sort by cluster size
+        
         for color, cluster in clusters:
             expand_cluster(grid, color, cluster)
     
+    refine_shapes(grid)
     return grid
 
 def expand_cluster(grid: ColoredGrid, color: int, cluster: List[Tuple[int, int]]):
-    directions = [(-1, 0), (0, -1), (1, 0), (0, 1)]  # Prioritize up and left
-    rows, cols = grid.get_dimensions()
+    cluster_size = len(cluster)
+    growth_limit = calculate_growth_limit(cluster_size)
+    expansion_cells = get_expansion_cells(grid, cluster)
     
+    center = calculate_center(cluster)
+    primary_direction = determine_primary_direction(cluster, center)
+    
+    expansion_cells = sorted(expansion_cells, key=lambda cell: expansion_priority(cell, center, primary_direction))
+    
+    for i, (r, c) in enumerate(expansion_cells):
+        if i >= growth_limit:
+            break
+        if random.random() < expansion_probability(i, growth_limit):
+            grid.set_cell(r, c, color)
+
+def calculate_growth_limit(cluster_size: int) -> int:
+    if cluster_size <= 3:
+        return cluster_size * 2
+    elif cluster_size <= 8:
+        return int(cluster_size * 1.5)
+    else:
+        return cluster_size
+
+def get_expansion_cells(grid: ColoredGrid, cluster: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
+    directions = [(-1, 0), (0, -1), (1, 0), (0, 1)]
+    rows, cols = grid.get_dimensions()
     expansion_cells = set()
+    
     for r, c in cluster:
         for dr, dc in directions:
             nr, nc = r + dr, c + dc
             if 0 <= nr < rows and 0 <= nc < cols and grid.get_cell(nr, nc) == 1:
                 expansion_cells.add((nr, nc))
     
-    # Expand to about 50% of possible cells, prioritizing upward and leftward
-    expansion_cells = sorted(expansion_cells, key=lambda x: (x[0], x[1]))
-    expansion_limit = len(expansion_cells) // 2
-    for i, (r, c) in enumerate(expansion_cells):
-        if i >= expansion_limit and random.random() < 0.5:
-            break
-        grid.set_cell(r, c, color)
+    return list(expansion_cells)
+
+def calculate_center(cluster: List[Tuple[int, int]]) -> Tuple[float, float]:
+    return (sum(r for r, _ in cluster) / len(cluster),
+            sum(c for _, c in cluster) / len(cluster))
+
+def determine_primary_direction(cluster: List[Tuple[int, int]], center: Tuple[float, float]) -> Tuple[float, float]:
+    max_distance = 0
+    primary_direction = (0, 0)
+    
+    for r, c in cluster:
+        distance = math.sqrt((r - center[0])**2 + (c - center[1])**2)
+        if distance > max_distance:
+            max_distance = distance
+            primary_direction = (center[0] - r, center[1] - c)
+    
+    magnitude = math.sqrt(primary_direction[0]**2 + primary_direction[1]**2)
+    return (primary_direction[0] / magnitude, primary_direction[1] / magnitude)
+
+def expansion_priority(cell: Tuple[int, int], center: Tuple[float, float], primary_direction: Tuple[float, float]) -> float:
+    cell_direction = (center[0] - cell[0], center[1] - cell[1])
+    dot_product = cell_direction[0] * primary_direction[0] + cell_direction[1] * primary_direction[1]
+    return -dot_product  # Negative to prioritize cells in the primary direction
+
+def expansion_probability(index: int, growth_limit: int) -> float:
+    return 1 - (index / growth_limit)**0.5
+
+def refine_shapes(grid: ColoredGrid):
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        for c in range(cols):
+            if grid.get_cell(r, c) != 1:
+                smooth_cell(grid, r, c)
+
+def smooth_cell(grid: ColoredGrid, r: int, c: int):
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    rows, cols = grid.get_dimensions()
+    color = grid.get_cell(r, c)
+    blue_neighbors = 0
+    
+    for dr, dc in directions:
+        nr, nc = r + dr, c + dc
+        if 0 <= nr < rows and 0 <= nc < cols and grid.get_cell(nr, nc) == 1:
+            blue_neighbors += 1
+    
+    if blue_neighbors >= 3:
+        grid.set_cell(r, c, 1)
+    elif blue_neighbors == 0:
+        for dr, dc in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols and grid.get_cell(nr, nc) == 1:
+                grid.set_cell(nr, nc, color)
+                break
