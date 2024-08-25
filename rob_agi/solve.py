@@ -5,8 +5,12 @@ import os
 import random
 import time
 import traceback
+import logging
 from typing import List, Optional, Union, Tuple
 from concurrent.futures import ThreadPoolExecutor
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(threadName)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 import cloudpickle
 from openai.lib._pydantic import to_strict_json_schema
@@ -74,7 +78,7 @@ random.shuffle(all_challenges)
 
 def ensure_db():
     res = substrate.run(col_attempts, col_research, col_knowledge)
-    print(json.dumps(res.json, indent=2))
+    logger.info(json.dumps(res.json, indent=2))
 
 
 def local_image_to_base64(image_path: str) -> str:
@@ -98,7 +102,7 @@ def visual_parse(challenge: GridProblem):
         image_uris=[uri],
     )
     res = substrate.run(look_at)
-    print(json.dumps(res.json, indent=2))
+    logger.info(json.dumps(res.json, indent=2))
 
 
 attempted = 0
@@ -220,7 +224,7 @@ async def get_previous_tries(challenge: GridProblem):
 
 
 async def get_initial_thoughts(challenge: GridProblem, verbose=False) -> Tuple[str, List[str]]:
-    print(f"Checking past for {challenge.id}")
+    logger.info(f"Checking past for {challenge.id}")
     check_past = await get_previous_tries(challenge)
 
     prev_solution = check_past.get("prev_solution")
@@ -302,7 +306,7 @@ async def get_initial_thoughts(challenge: GridProblem, verbose=False) -> Tuple[s
 
 
 async def first_attempt(challenge: GridProblem, initial_thoughts: str) -> dict:
-    print(f"Attempting {challenge.id}")
+    logger.info(f"Attempting {challenge.id}")
     prompt = attempt_challenge(challenge, reasoning=initial_thoughts)
     # ct_try = ComputeText(prompt=prompt, model=smart_model, temperature=0.2, max_tokens=2400)
     # return res.get(ct_try).text
@@ -312,7 +316,7 @@ async def first_attempt(challenge: GridProblem, initial_thoughts: str) -> dict:
 
 
 async def parse_attempt(challenge: GridProblem, first_answer: str) -> SolveAttempt:
-    print(f"Parsing {challenge.id}")
+    logger.info(f"Parsing {challenge.id}")
     parse_query = sb.concat(
         "From the following message, extract a result as structured JSON:\n\n<MESSAGE>",
         first_answer,
@@ -379,7 +383,7 @@ async def run_py_fn(
 ) -> Optional[RunPythonOut]:
     async def _run(fn: str, run_label: str) -> RunPythonOut:
         if verbose:
-            print(f"Exec Py[{run_label}]: {challenge.id}")
+            logger.info(f"Exec Py[{run_label}]: {challenge.id}")
         py_args = {"id": challenge.id, "fn_code": fn, "task_set": task_set, "with_solution": with_solution}
         run_py = RunPython(function=run_eval, kwargs=py_args, pip_install=remote_pip_deps)
         res = await substrate.async_run(run_py)
@@ -390,7 +394,7 @@ async def run_py_fn(
 
     async def _run_all(fns: List[str], run_count: int) -> List[Union[RunPythonOut, None]]:
         if verbose:
-            print(f" > BATCH {len(fns)} FNS: {challenge.id}")
+            logger.info(f" > BATCH {len(fns)} FNS: {challenge.id}")
         tasks = [_run(fn, f"{run_count}.{idx}") for idx, fn in enumerate(fns)]
         all_res = await asyncio.gather(*tasks, return_exceptions=True)
         ret = []
@@ -499,7 +503,7 @@ async def run_py_fn(
             # new_attempt = ComputeText(prompt=prompt, model=smart_model, max_tokens=1900)
             new_attempt_moa = await run_moa(prompt, max_tokens=4000, num_layers=3, filename_prefix=challenge.id)
             if verbose:
-                print(" > NEW_ATTEMPT\n")
+                logger.info(" > NEW_ATTEMPT\n")
             new_fns = find_all_fns(new_attempt_moa)
             to_try = new_fns
 
@@ -556,7 +560,7 @@ async def log_result(challenge: GridProblem, parsed: SolveAttempt, run_py: Optio
     try:
         _comparison = submission.comparison_report(solutions[challenge.id])
         persisted_comparison = _comparison if with_solution else ""
-        print(_comparison)
+        logger.info(_comparison)
         did_pass = submission.validate(solutions[challenge.id])
     except Exception as e:
         print(f"Error comparing results: {challenge.id}", e)
@@ -631,15 +635,15 @@ async def log_result(challenge: GridProblem, parsed: SolveAttempt, run_py: Optio
     )
     await substrate.async_run(*write_nodes)
 
-    print(f"\n\nWrote to {'solves' if did_pass else 'attempts'}")
-    print(f"Solve Rate: {successful} of {attempted} ({successful / attempted:.2%})")
+    logger.info(f"\n\nWrote to {'solves' if did_pass else 'attempts'}")
+    logger.info(f"Solve Rate: {successful} of {attempted} ({successful / attempted:.2%})")
 
 
 async def attempt_old(challenge: GridProblem, run_remote=False, verbose=False):
     global attempted, successful, errored_count
     attempted += 1
 
-    print(f"Starting {challenge.id}")
+    logger.info(f"Starting {challenge.id}")
     initial_thoughts, starting_functions = await get_initial_thoughts(challenge, verbose=verbose)
     if verbose:
         print(" > INITIAL_THOUGHTS\n", initial_thoughts)
@@ -738,10 +742,10 @@ def research_loop(prev_event: Optional[ResearchEvent] = None, passes=1):
             _max_retries=2,
         )
         res = substrate.run(evt, embed)
-        print(json.dumps(res.json, indent=2))
+        logger.info(json.dumps(res.json, indent=2))
         print("\nWrote EMB", res.get(embed).embedding.doc_id)
         prev_event = ResearchEvent.model_validate(res.get(evt).json_object)
-        print(prev_event.current_total_knowledge)
+        logger.info(prev_event.current_total_knowledge)
 
 
 def distill_research():
@@ -795,19 +799,19 @@ Respond with a single new object with keys: current_total_knowledge, ordered_con
         _max_retries=2,
     )
     res = substrate.run(embed)
-    print(json.dumps(res.json, indent=2))
+    logger.info(json.dumps(res.json, indent=2))
 
 
 def attempt(challenge: GridProblem, previous_solution: Optional[str] = None):
     global attempted, successful, errored_count
-    print(f"Starting {challenge.id}")
+    logger.info(f"Starting {challenge.id}")
     attempted += 1
     sln = solutions[challenge.id]
     s = Solver(challenge=challenge, solution=sln)
     succeeded = s.run_solve(max_tries=3, prev_solution=previous_solution)
     if succeeded:
         successful += 1
-    print(f"Solve Rate: {successful} of {attempted} ({successful / attempted:.2%})")
+    logger.info(f"Solve Rate: {successful} of {attempted} ({successful / attempted:.2%})")
 
 
 async def aprocess_challenge(semaphore, challenge):
@@ -826,7 +830,7 @@ async def solve_loop(max_concurrent=1, to_process=None, max_challenges=None):
     if max_challenges:
         to_process = to_process[:max_challenges]
 
-    print(f"Processing {len(to_process)} challenges with {max_concurrent} concurrent threads")
+    logger.info(f"Processing {len(to_process)} challenges with {max_concurrent} concurrent threads")
 
     with ThreadPoolExecutor(max_workers=max_concurrent) as executor:
         tasks = [process_challenge(executor, challenge) for challenge in to_process]
@@ -834,11 +838,11 @@ async def solve_loop(max_concurrent=1, to_process=None, max_challenges=None):
             t0 = time.perf_counter()
             try:
                 await task
-                print(f"Finished {i} of {len(to_process)} [{time.perf_counter() - t0:.2f}s]")
+                logger.info(f"Finished {i} of {len(to_process)} [{time.perf_counter() - t0:.2f}s]")
             except Exception as e:
                 errored_count += 1
                 traceback.print_exc()
-                print(f"Error on task {i}: {e}")
+                logger.info(f"Error on task {i}: {e}")
 
     report_results(attempted=attempted, successful=successful, errored=errored_count)
 
@@ -850,16 +854,16 @@ async def asolve_loop(max_concurrent=1, to_process=None, max_challenges=None):
     if max_challenges:
         to_process = to_process[:max_challenges]
     tasks = [process_challenge(semaphore, challenge) for challenge in to_process]
-    print(f"Processing {len(tasks)} challenges with {max_concurrent} concurrent")
+    logger.info(f"Processing {len(tasks)} challenges with {max_concurrent} concurrent")
     for i, task in enumerate(asyncio.as_completed(tasks), 1):
         t0 = time.perf_counter()
         try:
             await task
-            print(f"Finished {i} of {len(to_process)} [{time.perf_counter() - t0:.2f}s]")
+            logger.info(f"Finished {i} of {len(to_process)} [{time.perf_counter() - t0:.2f}s]")
         except Exception as e:
             errored_count += 1
             traceback.print_exc()
-            print(f"Error on task {i}: {e}")
+            logger.info(f"Error on task {i}: {e}")
 
     report_results(attempted=attempted, successful=successful, errored=errored_count)
 
@@ -877,7 +881,7 @@ async def bootstrap_solved():
         py_fn = v.metadata["python_function"]
         c: GridProblem = combined_challenges.get(v.metadata["task_id"])
         if not c:
-            print("Challenge not found:", v.metadata["task_id"])
+            logger.info("Challenge not found:", v.metadata["task_id"])
             continue
         previous_solution = approach + "\n\nPython Function:\n" + py_fn
         attempt(c, prev_solution=previous_solution)
