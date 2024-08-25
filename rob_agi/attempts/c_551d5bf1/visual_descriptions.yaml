@@ -1,0 +1,32 @@
+example_0:
+  input: |
+    The grid is 28x24. There are several blue (1) structures visible:
+    1. Two rectangular structures in the top left and top right, each 7x5 in size.
+    2. A larger rectangular structure in the center, 9x7 in size.
+    3. Two smaller rectangular structures in the bottom left and bottom right, each 6x6 in size.
+    These blue structures are surrounded by black (0) space. The structures are not connected to each other.
+  output: |
+    The grid maintains the same 28x24 size. The blue (1) structures from the input remain intact, but are now connected by a network of sky blue (8) paths:
+    1. The top structures are connected by a horizontal sky blue line.
+    2. This line extends down to connect with the central structure.
+    3. From the central structure, sky blue paths extend to connect with the bottom structures.
+    4. The interior of all blue rectangles is now filled with sky blue, except for their borders which remain blue.
+    5. The sky blue network extends to the right and bottom edges of the grid.
+    6. All previously black areas that are now enclosed by the sky blue network are filled with sky blue.
+
+example_1:
+  input: |
+    The grid is 25x24. There are five distinct blue (1) structures:
+    1. Two rectangular structures in the top left and top right, each 7x6 in size.
+    2. A rectangular structure in the center, 7x6 in size.
+    3. Two structures in the bottom left and bottom right. The bottom left is a 9x6 rectangle with a 3x1 extension on top. The bottom right is a 6x4 rectangle.
+    These blue structures are surrounded by black (0) space and are not connected to each other.
+  output: |
+    The grid maintains the same 25x24 size. The blue (1) structures from the input remain intact, but are now connected by a network of sky blue (8) paths:
+    1. A horizontal sky blue line connects the top structures.
+    2. This line extends down to connect with the central structure.
+    3. From the central structure, sky blue paths extend to connect with the bottom structures.
+    4. The interior of all blue rectangles is now filled with sky blue, except for their borders which remain blue.
+    5. The sky blue network extends to the right and bottom edges of the grid.
+    6. A single sky blue line extends from the bottom of the grid to connect with the bottom left structure.
+    7. All previously black areas that are now enclosed by the sky blue network are filled with sky blue.
