@@ -1,84 +1,80 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Dict
-from collections import deque
+from typing import List, Tuple
 
 def solve_d94c3b52(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the grid transformation challenge by applying the following steps:
-    1. Analyzes the input grid to identify non-black shapes and their positions.
-    2. Creates a pattern template dividing the grid into alternating zones.
-    3. Applies color transformations based on the template and existing sky blue shapes.
-    4. Balances color distribution and maintains structure integrity.
-    5. Ensures contrast between adjacent shapes and consistency across similar patterns.
-    6. Handles edge cases and makes final adjustments for visual appeal.
+    1. Identifies and expands sky blue (8) squares to 3x3 if present.
+    2. Creates an alternation template based on the grid structure.
+    3. Applies color transformations:
+       - Moves sky blue squares to a new position.
+       - Alternates between blue (1) and orange (7) for other colored squares.
+    4. Maintains the overall structure and symmetry of the input patterns.
+    5. Ensures black (0) squares remain unchanged.
     """
-    pattern_template = create_pattern_template(input_grid)
-    new_grid = apply_transformations(input_grid, pattern_template)
-    new_grid = balance_colors(new_grid)
-    new_grid = ensure_contrast(new_grid)
+    new_grid = input_grid.deep_copy()
+    sky_blue_pos = find_sky_blue(new_grid)
+    
+    if sky_blue_pos:
+        new_grid = expand_sky_blue(new_grid, sky_blue_pos)
+        new_sky_blue_pos = move_sky_blue(new_grid, sky_blue_pos)
+    else:
+        new_sky_blue_pos = None
+    
+    template = create_alternation_template(new_grid, new_sky_blue_pos)
+    new_grid = apply_color_transformation(new_grid, template, new_sky_blue_pos)
+    
     return new_grid
 
-def create_pattern_template(grid: ColoredGrid) -> List[List[int]]:
-    rows, cols = grid.get_dimensions()
-    template = [[0 for _ in range(cols)] for _ in range(rows)]
-    for r in range(rows):
-        for c in range(cols):
-            if grid.values[r][c] == 8:  # Sky blue
-                template[r][c] = 2  # Fixed zone
+def find_sky_blue(grid: ColoredGrid) -> Tuple[int, int]:
+    for r in range(grid.num_rows):
+        for c in range(grid.num_cols):
+            if grid.values[r][c] == 8:
+                return r, c
+    return None
+
+def expand_sky_blue(grid: ColoredGrid, pos: Tuple[int, int]) -> ColoredGrid:
+    r, c = pos
+    for dr in range(-1, 2):
+        for dc in range(-1, 2):
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < grid.num_rows and 0 <= nc < grid.num_cols:
+                grid.values[nr][nc] = 8
+    return grid
+
+def move_sky_blue(grid: ColoredGrid, old_pos: Tuple[int, int]) -> Tuple[int, int]:
+    r, c = old_pos
+    new_r = grid.num_rows - 1 - r if r < grid.num_rows // 2 else r - grid.num_rows // 2
+    new_c = grid.num_cols - 1 - c if c < grid.num_cols // 2 else c - grid.num_cols // 2
+    
+    # Move the 3x3 sky blue square
+    for dr in range(-1, 2):
+        for dc in range(-1, 2):
+            grid.values[new_r + dr][new_c + dc] = 8
+            grid.values[r + dr][c + dc] = 0  # Clear the old position
+    
+    return new_r, new_c
+
+def create_alternation_template(grid: ColoredGrid, sky_blue_pos: Tuple[int, int]) -> List[List[int]]:
+    template = [[0 for _ in range(grid.num_cols)] for _ in range(grid.num_rows)]
+    for r in range(grid.num_rows):
+        for c in range(grid.num_cols):
+            if sky_blue_pos and abs(r - sky_blue_pos[0]) <= 1 and abs(c - sky_blue_pos[1]) <= 1:
+                template[r][c] = 2  # Sky blue area
+            elif (r + c) % 2 == 0:
+                template[r][c] = 0  # Blue
             else:
-                template[r][c] = (r + c) % 2  # Alternating zones
+                template[r][c] = 1  # Orange
     return template
 
-def apply_transformations(grid: ColoredGrid, template: List[List[int]]) -> ColoredGrid:
-    new_grid = grid.deep_copy()
-    rows, cols = grid.get_dimensions()
-    for r in range(rows):
-        for c in range(cols):
+def apply_color_transformation(grid: ColoredGrid, template: List[List[int]], sky_blue_pos: Tuple[int, int]) -> ColoredGrid:
+    for r in range(grid.num_rows):
+        for c in range(grid.num_cols):
             if grid.values[r][c] != 0:  # Non-black cell
-                if grid.values[r][c] == 8:  # Sky blue
-                    new_grid.values[r][c] = 8
-                elif template[r][c] == 2:  # Fixed zone
-                    new_grid.values[r][c] = 7  # Orange
+                if template[r][c] == 2:  # Sky blue area
+                    grid.values[r][c] = 8
                 elif template[r][c] == 0:
-                    new_grid.values[r][c] = 1  # Blue
+                    grid.values[r][c] = 1  # Blue
                 else:
-                    new_grid.values[r][c] = 7  # Orange
-    return new_grid
-
-def balance_colors(grid: ColoredGrid) -> ColoredGrid:
-    color_count = {1: 0, 7: 0, 8: 0}
-    for row in grid.values:
-        for cell in row:
-            if cell in color_count:
-                color_count[cell] += 1
-    
-    if abs(color_count[1] - color_count[7]) > 5:  # Arbitrary threshold
-        majority_color = 1 if color_count[1] > color_count[7] else 7
-        minority_color = 7 if majority_color == 1 else 1
-        diff = abs(color_count[1] - color_count[7]) // 2
-        
-        for r in range(len(grid.values)):
-            for c in range(len(grid.values[0])):
-                if grid.values[r][c] == majority_color and diff > 0:
-                    grid.values[r][c] = minority_color
-                    diff -= 1
+                    grid.values[r][c] = 7  # Orange
     return grid
-
-def ensure_contrast(grid: ColoredGrid) -> ColoredGrid:
-    rows, cols = grid.get_dimensions()
-    for r in range(rows):
-        for c in range(cols):
-            if grid.values[r][c] != 0:
-                neighbors = get_neighbors(grid, r, c)
-                if all(neighbor == grid.values[r][c] for neighbor in neighbors if neighbor != 0):
-                    grid.values[r][c] = 1 if grid.values[r][c] == 7 else 7
-    return grid
-
-def get_neighbors(grid: ColoredGrid, r: int, c: int) -> List[int]:
-    rows, cols = grid.get_dimensions()
-    neighbors = []
-    for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-        nr, nc = r + dr, c + dc
-        if 0 <= nr < rows and 0 <= nc < cols:
-            neighbors.append(grid.values[nr][nc])
-    return neighbors
