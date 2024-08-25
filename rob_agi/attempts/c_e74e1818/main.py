@@ -7,22 +7,17 @@ def solve_e74e1818(input_grid: ColoredGrid) -> ColoredGrid:
     
     The solution involves the following steps:
     1. Identify distinct shapes in the grid
-    2. Analyze each shape to determine its natural orientation
+    2. Analyze each shape to determine if it needs flipping
     3. Flip shapes vertically if they are not in their natural orientation
     4. Reconstruct the grid with transformed shapes
     
-    This function focuses on orienting shapes intuitively (e.g., arrows pointing up, letters readable, objects in stable positions)
-    while maintaining their horizontal position and the overall structure of the image.
+    This function focuses on orienting shapes based on their structure and complexity,
+    flipping them to achieve a more stable or natural position while maintaining
+    their horizontal position and the overall structure of the image.
     """
-    # Step 1: Identify distinct shapes
     shapes = identify_shapes(input_grid)
-    
-    # Step 2 & 3: Analyze shapes and flip if necessary
-    flipped_shapes = flip_shapes_if_needed(shapes, input_grid.num_rows)
-    
-    # Step 4: Reconstruct the grid
+    flipped_shapes = analyze_and_flip_shapes(shapes, input_grid.num_rows)
     output_grid = reconstruct_grid(flipped_shapes, input_grid)
-    
     return output_grid
 
 def identify_shapes(grid: ColoredGrid) -> Dict[int, List[Tuple[int, int]]]:
@@ -50,7 +45,7 @@ def identify_shapes(grid: ColoredGrid) -> Dict[int, List[Tuple[int, int]]]:
     
     return shapes
 
-def flip_shapes_if_needed(shapes: Dict[int, List[Tuple[int, int]]], num_rows: int) -> Dict[int, List[Tuple[int, int]]]:
+def analyze_and_flip_shapes(shapes: Dict[int, List[Tuple[int, int]]], num_rows: int) -> Dict[int, List[Tuple[int, int]]]:
     flipped_shapes = {}
     
     for color, shape in shapes.items():
@@ -61,53 +56,27 @@ def flip_shapes_if_needed(shapes: Dict[int, List[Tuple[int, int]]], num_rows: in
         height = max_r - min_r + 1
         width = max_c - min_c + 1
         
-        if height <= 2 or width == 1 or is_horizontally_symmetric(shape, min_r, max_r, min_c, max_c):
+        if height <= 2 or width == 1:
             flipped_shapes[color] = shape
         else:
-            natural_orientation = determine_natural_orientation(shape, min_r, max_r, min_c, max_c)
-            if not natural_orientation:
+            shape_grid = [[0 for _ in range(width)] for _ in range(height)]
+            for r, c in shape:
+                shape_grid[r - min_r][c - min_c] = 1
+            
+            top_half = shape_grid[:height//2]
+            bottom_half = shape_grid[height//2:]
+            top_count = sum(sum(row) for row in top_half)
+            bottom_count = sum(sum(row) for row in bottom_half)
+            top_complexity = sum(1 for row in top_half if sum(row) > 0)
+            bottom_complexity = sum(1 for row in bottom_half if sum(row) > 0)
+            
+            if top_count < bottom_count or (top_count == bottom_count and top_complexity < bottom_complexity):
                 flipped_shape = [(2 * min_r + max_r - r, c) for r, c in shape]
                 flipped_shapes[color] = flipped_shape
             else:
                 flipped_shapes[color] = shape
     
     return flipped_shapes
-
-def is_horizontally_symmetric(shape: List[Tuple[int, int]], min_r: int, max_r: int, min_c: int, max_c: int) -> bool:
-    shape_grid = [[0 for _ in range(max_c - min_c + 1)] for _ in range(max_r - min_r + 1)]
-    for r, c in shape:
-        shape_grid[r - min_r][c - min_c] = 1
-    
-    for row in shape_grid:
-        if row != row[::-1]:
-            return False
-    return True
-
-def determine_natural_orientation(shape: List[Tuple[int, int]], min_r: int, max_r: int, min_c: int, max_c: int) -> bool:
-    shape_grid = [[0 for _ in range(max_c - min_c + 1)] for _ in range(max_r - min_r + 1)]
-    for r, c in shape:
-        shape_grid[r - min_r][c - min_c] = 1
-    
-    # Check for arrow-like shapes
-    if shape_grid[0].count(1) > shape_grid[-1].count(1):
-        return True
-    elif shape_grid[0].count(1) < shape_grid[-1].count(1):
-        return False
-    
-    # Check for letter-like shapes (T, U, V)
-    if shape_grid[0].count(1) > 1 and all(row.count(1) <= 2 for row in shape_grid[1:]):
-        return True
-    
-    # Check for object-like shapes (e.g., wine glass)
-    top_half = shape_grid[:len(shape_grid)//2]
-    bottom_half = shape_grid[len(shape_grid)//2:]
-    if sum(row.count(1) for row in top_half) < sum(row.count(1) for row in bottom_half):
-        return True
-    
-    # Compare complexity of top and bottom halves
-    top_complexity = sum(row.count(1) for row in shape_grid[:len(shape_grid)//2])
-    bottom_complexity = sum(row.count(1) for row in shape_grid[len(shape_grid)//2:])
-    return top_complexity >= bottom_complexity
 
 def reconstruct_grid(shapes: Dict[int, List[Tuple[int, int]]], original_grid: ColoredGrid) -> ColoredGrid:
     new_grid = [[0 for _ in range(original_grid.num_cols)] for _ in range(original_grid.num_rows)]
