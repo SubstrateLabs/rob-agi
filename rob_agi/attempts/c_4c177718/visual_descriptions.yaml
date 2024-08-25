@@ -1,0 +1,51 @@
+example_0:
+  input: |
+    A 15x15 grid with three distinct shapes above a horizontal gray line in the middle:
+    1. A blue 3x3 square with a hollow center in the top-left quadrant
+    2. A red L-shape in the top-middle area
+    3. A green T-shape in the top-right quadrant
+    Below the gray line, there's a single blue 3x3 square with a hollow center, centered horizontally and near the bottom of the grid.
+  output: |
+    A 9x15 grid with two shapes:
+    1. The green T-shape from the input, now centered in the top half
+    2. The blue 3x3 square with a hollow center, now centered in the bottom half
+    The red L-shape is not present in the output.
+
+example_1:
+  input: |
+    A 15x15 grid with three distinct shapes above a horizontal gray line in the middle:
+    1. A blue X-shape in the top-left quadrant
+    2. A red L-shape in the top-middle area
+    3. A yellow 3x3 square in the top-right quadrant
+    Below the gray line, there's a single blue X-shape, centered horizontally and near the bottom of the grid.
+  output: |
+    A 9x15 grid with two shapes:
+    1. The yellow 3x3 square from the input, now centered in the top half
+    2. The blue X-shape from below the gray line in the input, now centered in the bottom half
+    The red L-shape is not present in the output.
+
+example_2:
+  input: |
+    A 15x15 grid with three distinct shapes above a horizontal gray line in the middle:
+    1. A blue plus sign in the top-left quadrant
+    2. A red L-shape in the top-middle area
+    3. A magenta 3x3 square with a hollow center in the top-right quadrant
+    Below the gray line, there's a single blue plus sign, centered horizontally and in the upper part of the bottom half.
+  output: |
+    A 9x15 grid with two shapes:
+    1. The blue plus sign from below the gray line in the input, now centered in the top half
+    2. The magenta 3x3 square with a hollow center from the input, now centered in the bottom half
+    The red L-shape is not present in the output.
+
+example_3:
+  input: |
+    A 15x15 grid with three distinct shapes above a horizontal gray line in the middle:
+    1. A blue L-shape in the top-left quadrant
+    2. A red L-shape in the top-middle area
+    3. An orange Y-shape in the top-right quadrant
+    Below the gray line, there's a single blue L-shape, centered horizontally and in the middle of the bottom half.
+  output: |
+    A 9x15 grid with two shapes:
+    1. The blue L-shape from below the gray line in the input, now centered in the top half
+    2. The orange Y-shape from the input, now centered in the bottom half
+    The red L-shape is not present in the output.
