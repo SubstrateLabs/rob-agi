@@ -7,10 +7,10 @@ def solve_31adaf00(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by adding blue (1) squares to balance the colors.
     
     The algorithm works as follows:
-    1. Creates a deep copy of the input grid and counts gray squares.
-    2. Calculates the target number of blue squares.
-    3. Identifies key areas for blue square placement using a heatmap.
-    4. Grows blue regions organically from these key areas.
+    1. Analyzes the input grid to count gray squares and calculate the target number of blue squares.
+    2. Creates a list of potential rectangular regions for blue square placement.
+    3. Scores each potential region based on proximity to gray squares, position, and contribution to symmetry.
+    4. Iteratively places blue regions, starting with the highest-scoring ones.
     5. Fine-tunes the placement to reach the exact target number of blue squares.
     6. Performs a final balance check and makes minor adjustments if needed.
     
@@ -21,8 +21,8 @@ def solve_31adaf00(input_grid: ColoredGrid) -> ColoredGrid:
     gray_count = count_color(input_grid, 5)
     target_blue = (rows * cols - gray_count) // 2
     
-    heatmap = create_heatmap(input_grid)
-    blue_count = grow_blue_regions(output_grid, heatmap, target_blue)
+    potential_regions = get_potential_regions(input_grid)
+    blue_count = place_blue_regions(output_grid, potential_regions, target_blue)
     
     if blue_count < target_blue:
         blue_count = fill_remaining_squares(output_grid, blue_count, target_blue)
@@ -82,14 +82,25 @@ def grow_blue_regions(grid: ColoredGrid, heatmap: List[List[int]], target: int) 
 
 def fill_remaining_squares(grid: ColoredGrid, blue_count: int, target: int) -> int:
     rows, cols = grid.get_dimensions()
-    for r in range(rows):
-        for c in range(cols):
-            if blue_count >= target:
-                return blue_count
-            if grid.values[r][c] == 0:
-                grid.values[r][c] = 1
-                blue_count += 1
+    center_r, center_c = rows // 2, cols // 2
+    cells = [(r, c) for r in range(rows) for c in range(cols)]
+    cells.sort(key=lambda pos: abs(pos[0] - center_r) + abs(pos[1] - center_c))
+    
+    for r, c in cells:
+        if blue_count >= target:
+            return blue_count
+        if grid.values[r][c] == 0 and not is_isolated(grid, r, c):
+            grid.values[r][c] = 1
+            blue_count += 1
     return blue_count
+
+def is_isolated(grid: ColoredGrid, r: int, c: int) -> bool:
+    rows, cols = grid.get_dimensions()
+    for dr, dc in [(0,1), (1,0), (0,-1), (-1,0)]:
+        nr, nc = r + dr, c + dc
+        if 0 <= nr < rows and 0 <= nc < cols and grid.values[nr][nc] == 1:
+            return False
+    return True
 
 def final_balance_adjustment(grid: ColoredGrid, target: int) -> None:
     rows, cols = grid.get_dimensions()
@@ -197,3 +208,40 @@ def remove_excess_blue(grid: ColoredGrid, blue_count: int, target_blue: int) -> 
             if grid.values[r][c] == 1:
                 grid.values[r][c] = 0
                 blue_count -= 1
+def get_potential_regions(grid: ColoredGrid) -> List[Tuple[float, Tuple[int, int, int, int]]]:
+    rows, cols = grid.get_dimensions()
+    potential_regions = []
+    region_sizes = [(2,2), (3,3), (2,4), (4,2), (3,2), (2,3)]
+    
+    for r in range(rows):
+        for c in range(cols):
+            for width, height in region_sizes:
+                if is_valid_blue_area(grid, r, c, width, height):
+                    score = score_region(grid, r, c, width, height)
+                    potential_regions.append((score, (r, c, width, height)))
+    
+    return sorted(potential_regions, key=lambda x: x[0], reverse=True)
+
+def score_region(grid: ColoredGrid, r: int, c: int, width: int, height: int) -> float:
+    rows, cols = grid.get_dimensions()
+    center_r, center_c = rows // 2, cols // 2
+    distance_from_center = ((r + height/2 - center_r)**2 + (c + width/2 - center_c)**2)**0.5
+    
+    gray_proximity = sum(1 for dr in range(-1, height+1) for dc in range(-1, width+1)
+                         if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 5)
+    
+    edge_score = 1 if r == 0 or r + height == rows or c == 0 or c + width == cols else 0
+    
+    size_score = width * height
+    
+    return (1 / (1 + distance_from_center)) + (0.5 * gray_proximity) + edge_score + (0.1 * size_score)
+
+def place_blue_regions(grid: ColoredGrid, potential_regions: List[Tuple[float, Tuple[int, int, int, int]]], target_blue: int) -> int:
+    blue_count = 0
+    for _, (r, c, width, height) in potential_regions:
+        if blue_count + (width * height) <= target_blue and is_valid_blue_area(grid, r, c, width, height):
+            fill_area(grid, r, c, width, height, 1)
+            blue_count += width * height
+        if blue_count >= target_blue:
+            break
+    return blue_count
