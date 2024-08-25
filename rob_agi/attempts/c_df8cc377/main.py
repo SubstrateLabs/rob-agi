@@ -6,9 +6,9 @@ def solve_df8cc377(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by identifying closed shapes, filling their interiors with patterns,
     and clearing the rest of the grid. The process involves:
-    1. Identifying the highest-numbered color not used for shape outlines.
-    2. Detecting closed shapes in the grid using flood fill.
-    3. For shapes 5x5 or larger, filling the interior with a 3x3 checkerboard pattern using
+    1. Detecting closed shapes in the grid using flood fill.
+    2. Identifying the highest-numbered color present in the grid for filling.
+    3. For shapes 5x5 or larger, filling the interior with a checkerboard pattern using
        the highest-numbered color and black (0).
     4. For 3x3 shapes, placing a single dot of the highest-numbered color at the center.
     5. For 5x3 or 3x5 shapes, placing two dots of the highest-numbered color symmetrically.
@@ -21,8 +21,8 @@ def solve_df8cc377(input_grid: ColoredGrid) -> ColoredGrid:
     def is_outline_color(color: int) -> bool:
         return color != BLACK and any(input_grid.get_cell(r, c) == color for r in range(input_grid.num_rows) for c in range(input_grid.num_cols))
 
-    def get_highest_fill_color() -> int:
-        return max((color for color in range(9, 0, -1) if not is_outline_color(color)), default=0)
+    def get_highest_fill_color(grid: ColoredGrid) -> int:
+        return max((color for color in range(9, 0, -1) if any(color in row for row in grid.values)), default=0)
 
     def find_shapes(grid: ColoredGrid) -> List[Tuple[int, List[Tuple[int, int]], List[Tuple[int, int]]]]:
         shapes = []
@@ -55,11 +55,14 @@ def solve_df8cc377(input_grid: ColoredGrid) -> ColoredGrid:
             for c in range(cols):
                 if (r, c) not in visited and grid.get_cell(r, c) != BLACK:
                     boundary, interior = flood_fill(r, c, grid.get_cell(r, c))
-                    shapes.append((grid.get_cell(r, c), boundary, interior))
+                    if boundary:  # Only add shapes with a boundary
+                        shapes.append((grid.get_cell(r, c), boundary, interior))
 
         return shapes
 
     def get_shape_dimensions(shape: List[Tuple[int, int]]) -> Tuple[int, int, int, int]:
+        if not shape:
+            return 0, 0, 0, 0
         min_r = min(r for r, _ in shape)
         max_r = max(r for r, _ in shape)
         min_c = min(c for _, c in shape)
@@ -67,6 +70,8 @@ def solve_df8cc377(input_grid: ColoredGrid) -> ColoredGrid:
         return min_r, min_c, max_r - min_r + 1, max_c - min_c + 1
 
     def apply_checkerboard(grid: ColoredGrid, shape: List[Tuple[int, int]], fill_color: int):
+        if not shape:
+            return
         min_r, min_c, _, _ = get_shape_dimensions(shape)
         for r, c in shape:
             if (r - min_r + c - min_c) % 2 == 0:
@@ -76,10 +81,10 @@ def solve_df8cc377(input_grid: ColoredGrid) -> ColoredGrid:
         min_r, min_c, height, width = get_shape_dimensions(boundary + interior)
         if height >= 5 and width >= 5:
             apply_checkerboard(grid, interior, fill_color)
-        elif height == 3 and width == 3:
+        elif height == 3 and width == 3 and interior:
             center_r, center_c = min_r + 1, min_c + 1
             grid.set_cell(center_r, center_c, fill_color)
-        elif (height == 5 and width == 3) or (height == 3 and width == 5):
+        elif ((height == 5 and width == 3) or (height == 3 and width == 5)) and interior:
             if height == 5:
                 grid.set_cell(min_r + 1, min_c + 1, fill_color)
                 grid.set_cell(min_r + 3, min_c + 1, fill_color)
@@ -90,7 +95,7 @@ def solve_df8cc377(input_grid: ColoredGrid) -> ColoredGrid:
 
     new_grid = ColoredGrid(values=[[BLACK for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
     shapes = find_shapes(input_grid)
-    fill_color = get_highest_fill_color()
+    fill_color = get_highest_fill_color(input_grid)
 
     for shape_color, boundary, interior in shapes:
         # Add boundary to new_grid
