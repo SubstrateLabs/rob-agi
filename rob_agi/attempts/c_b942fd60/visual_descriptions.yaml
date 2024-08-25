@@ -4,160 +4,112 @@ example_0:
     - An sky blue (8) square in the top right corner
     - A green (3) square in the second row, third column
     - A red (2) square in the third row, first column
-    - An orange (7) square in the second row, second to last column
-    - A yellow (7) square in the middle, slightly to the right
-    - A sky blue (8) square just right of the yellow square
-    - A magenta (6) square at the far right of the same row as the yellow and sky blue
-    - An orange (7) square in the third row from the bottom, second column
-    - A magenta (6) square in the same row, third column
-    - A sky blue (8) square two rows below the orange and magenta, in the middle
-    - An orange (7) square in the bottom row, third from the right
+    - An orange (7) square in the middle of the grid
+    - A sky blue (8) square and a magenta (6) square in the fifth row
+    - An orange (7) square, a magenta (6) square, and a sky blue (8) square scattered in the bottom half
   output: |
-    The 10x10 grid maintains most of the colored squares from the input, but adds two prominent red (2) lines:
-    - A horizontal red line in the middle of the grid, spanning the entire width
-    - A vertical red line starting from the top, going down to the horizontal line, positioned about 1/3 from the left edge
-    These red lines connect some of the existing colored squares and create a T-shape. Some observations:
-    - The sky blue square in the top right is now connected to the red vertical line
-    - The green square is now touching the red vertical line
-    - The red square in the top left is now part of the vertical red line
-    - The yellow and sky blue squares in the middle are now part of the horizontal red line
-    - The magenta square on the right is now connected to the horizontal red line
+    The same 10x10 grid, but with two significant changes:
+    1. A red (2) line has been drawn from the original red square in the top-left, extending right and then down, forming an "L" shape.
+    2. Another red (2) line has been drawn horizontally across the middle of the grid.
     All other colored squares remain in their original positions.
 
 example_1:
   input: |
-    A 12x12 grid with scattered colored squares on a mostly black background:
-    - A green (3) square in the top row, fifth column
-    - An orange (7) square next to the green square
-    - A sky blue (8) square in the second row, third column
-    - An orange (7) square in the same row, near the right edge
-    - A green (3) square at the far right of the second row
-    - A magenta (6) square in the third row, about 1/3 from the left
-    - Two sky blue (8) squares in the fourth row, one near the middle and one near the right
-    - A red (2) square in the fifth row, far left
-    - An orange (7) square in the sixth row, slightly right of center
-    - A magenta (6) square three rows from the bottom, about 1/3 from the right
-    - Two orange (7) squares in the third row from the bottom, one left of center and one right of center
-    - A magenta (6) square in the fourth row from the bottom, left of center
-    - A green (3) square in the second row from the bottom, second column
-    - A sky blue (8) square in the same row, about 2/3 to the right
-    - Another green (3) square next to the sky blue square
-    - An orange (7) square in the bottom row, fifth column
+    A 12x12 grid with various colored squares scattered throughout:
+    - Green (3) and orange (7) squares in the top row
+    - Sky blue (8) and orange (7) squares in the second row
+    - A magenta (6) square in the third row
+    - Two sky blue (8) squares in the fourth row
+    - A red (2) square and a sky blue (8) square in the fifth row
+    - An orange (7) square in the sixth row
+    - A magenta (6) square in the seventh row
+    - An orange (7) square in the eighth row
+    - Two orange (7) squares in the ninth row
+    - A magenta (6) square in the tenth row
+    - Green (3) and sky blue (8) squares in the eleventh row
+    - An orange (7) square in the last row
   output: |
-    The 12x12 grid maintains most of the colored squares from the input, but adds two prominent red (2) lines forming an inverted L-shape:
-    - A horizontal red line in the second row from the top, spanning most of the width
-    - A vertical red line starting from the left edge of the horizontal line, going down about 2/3 of the grid height
-    These red lines connect or interact with some of the existing colored squares:
-    - The green and orange squares in the top row are now connected by the red horizontal line
-    - The sky blue square in the second row is now part of the red horizontal line
-    - The orange and green squares on the right side of the second row are now connected to the red horizontal line
-    - The magenta square in the third row is now connected to the red vertical line
-    - The leftmost sky blue square in the fourth row is now connected to the red vertical line
-    - The red square in the fifth row is now part of the red vertical line
-    - The orange square in the sixth row is now connected to the red vertical line
-    - A new small horizontal red line appears in the third row from the bottom, connecting the two orange squares
-    All other colored squares remain in their original positions.
+    The same 12x12 grid, but with red (2) lines added:
+    1. A horizontal red line in the second row, connecting the sky blue and orange squares
+    2. A vertical red line from the top, passing through the magenta square in the third row, and extending to the bottom
+    3. An "L" shaped red line starting from the red square in the fifth row, extending right and then down to the bottom
+    The red lines form a kind of irregular grid pattern. All original colored squares remain in their positions.
 
 example_2:
   input: |
-    A 6x6 grid with a few scattered colored squares:
+    A 6x6 grid with a few colored squares:
     - A green (3) square in the top row, third column
-    - An orange (7) square in the top row, far right
-    - A red (2) square in the third row, far left
-    - A green (3) square in the third row, second from the right
-    - A sky blue (8) square in the bottom row, far right
+    - An orange (7) square in the top right corner
+    - A red (2) square in the third row, first column
+    - A green (3) square in the third row, fifth column
     - A green (3) square in the bottom row, third column
+    - A sky blue (8) square in the bottom right corner
   output: |
-    The 6x6 grid maintains the colored squares from the input, but adds a prominent red (2) vertical line:
-    - The vertical red line starts from the top row, fourth column
-    - It extends all the way down to the bottom of the grid
-    This red line interacts with some of the existing colored squares:
-    - It's positioned just right of the green square in the top row
-    - It passes through the middle of the grid, between the red square on the left and the green square on the right in the third row
-    - It's positioned just left of the green square in the bottom row
-    All other colored squares remain in their original positions.
+    The same 6x6 grid, but with a red (2) line added:
+    The line starts from the original red square in the third row, first column, extends up to the second row, then right to the fourth column, and finally down to the bottom of the grid.
+    This forms a rectangular shape encompassing the central area of the grid.
+    All original colored squares remain in their positions.
 
 example_3:
   input: |
     An 8x8 grid with scattered colored squares:
-    - An orange (7) square in the top row, second column
-    - A green (3) square in the second row, far right
-    - A red (2) square in the fourth row, far left
-    - A sky blue (8) square in the fourth row, third column
-    - An orange (7) square in the third row from the bottom, fifth column
+    - An orange (7) square in the top left corner
+    - A green (3) square in the top right corner
+    - A red (2) square and a sky blue (8) square in the fourth row
+    - An orange (7) square near the bottom right
   output: |
-    The 8x8 grid maintains the colored squares from the input, but adds two prominent red (2) lines forming an inverted L-shape:
-    - A vertical red line starts from the top, second column from the right
-    - A horizontal red line in the second row from the top, spanning the entire width
-    These red lines interact with some of the existing colored squares:
-    - The orange square in the top row is now connected to the horizontal red line
-    - The green square in the second row is now connected to both the horizontal and vertical red lines
-    - The red square in the fourth row is now part of the horizontal red line
-    - The sky blue square in the fourth row is now connected to the vertical red line
-    - The orange square near the bottom is now connected to the vertical red line
-    All colored squares remain in their original positions.
+    The same 8x8 grid, but with red (2) lines added:
+    1. A horizontal red line in the second row, extending from left to right
+    2. A vertical red line from the top to bottom, two columns from the right edge
+    These lines form an "L" shape, with the corner in the top-right area of the grid.
+    All original colored squares remain in their positions.
 
 example_4:
   input: |
-    A 4x6 grid with a few colored squares:
-    - A red (2) square in the second row, far left
-    - A sky blue (8) square in the second row, second from the right
+    A 4x6 grid with only two colored squares:
+    - A red (2) square in the second row, first column
+    - A sky blue (8) square in the second row, fifth column
   output: |
-    The 4x6 grid maintains the colored squares from the input, but adds a red (2) inverted L-shape:
-    - A vertical red line starts from the top, fourth column
-    - A horizontal red line in the second row, spanning from the left edge to the vertical line
-    These red lines interact with the existing colored squares:
-    - The red square in the second row is now part of the horizontal red line
-    - The sky blue square in the second row is now connected to the vertical red line
-    The overall effect is an inverted L-shape made of red squares.
+    The same 4x6 grid, but with a red (2) line added:
+    The line starts from the original red square, extends up to the top row, then right to the fourth column, and finally down to the bottom of the grid.
+    This forms a rectangular shape encompassing the central area of the grid.
+    The original sky blue square remains in its position.
 
 example_5:
   input: |
     An 8x6 grid with scattered colored squares:
-    - An orange (7) square in the top row, fourth column
-    - A magenta (6) square in the second row, far left
-    - A red (2) square in the fourth row, far left
-    - A sky blue (8) square in the fourth row, second from the right
-    - A sky blue (8) square in the bottom row, far right
-    - An orange (7) square in the bottom row, far left
+    - An orange (7) square in the top right corner
+    - A magenta (6) square in the second row, first column
+    - A red (2) square in the fourth row, first column
+    - A sky blue (8) square in the fourth row, fifth column
+    - A sky blue (8) square in the bottom right corner
+    - An orange (7) square in the bottom left corner
   output: |
-    The 8x6 grid maintains the colored squares from the input, but adds two prominent red (2) lines forming an inverted L-shape:
-    - A vertical red line starts from the top, second column
-    - A horizontal red line in the second row from the top, spanning from the left edge to the vertical line
-    These red lines interact with some of the existing colored squares:
-    - The orange square in the top row is now connected to the vertical red line
-    - The magenta square in the second row is now connected to both the horizontal and vertical red lines
-    - The red square in the fourth row is now connected to the vertical red line
-    - The sky blue square in the fourth row is indirectly connected to the vertical red line (the line stops just short of it)
-    - The orange square in the bottom row is now connected to the vertical red line
-    All colored squares remain in their original positions.
+    The same 8x6 grid, but with red (2) lines added:
+    1. A vertical red line from top to bottom in the second column
+    2. A horizontal red line in the fourth row, extending from the original red square to the right edge of the grid
+    These lines form an "L" shape, with the corner in the top-left area of the grid.
+    All original colored squares remain in their positions.
 
 test_case_0:
   input: |
-    A 10x12 grid with scattered colored squares:
+    A 10x12 grid with various colored squares scattered throughout:
     - A sky blue (8) square in the top row, fourth column
-    - An orange (7) square in the top row, fourth from the right
-    - A green (3) square in the top row, far right
-    - Two magenta (6) squares in the third row, one about 1/4 from the left, another about 2/3 from the left
-    - A red (2) square in the fourth row, far left
-    - A magenta (6) square in the fourth row, slightly right of center
-    - An orange (7) square in the fourth row, second from the right
-    - A green (3) square in the sixth row, fourth column
-    - A sky blue (8) square in the sixth row, slightly right of center
-    - A magenta (6) square in the seventh row, third from the right
-    - An orange (7) square in the eighth row, third column
-    - A sky blue (8) square in the eighth row, third from the right
-    - A magenta (6) square in the eighth row, second from the right
-    - A green (3) square in the bottom row, fourth from the right
+    - An orange (7) square in the top row, ninth column
+    - A green (3) square in the top right corner
+    - Two magenta (6) squares in the third row
+    - A red (2) square and a magenta (6) square in the fourth row
+    - A magenta (6) square in the fifth row, last column
+    - A green (3) square and a sky blue (8) square in the sixth row
+    - A magenta (6) square in the seventh row, tenth column
+    - An orange (7) square and a green (3) square in the eighth row
+    - A sky blue (8) square and a magenta (6) square in the ninth row
+    - A green (3) square in the bottom row, sixth column
   output: |
-    The 10x12 grid maintains most of the colored squares from the input, but adds two prominent red (2) lines forming an inverted L-shape:
-    - A horizontal red line in the second row from the top, spanning the entire width
-    - A vertical red line starting from the left edge of the horizontal line, going down about 2/3 of the grid height
-    These red lines connect or interact with some of the existing colored squares:
-    - The sky blue, orange, and green squares in the top row are now connected by the red horizontal line
-    - The two magenta squares in the third row are now connected to the red vertical line
-    - The red square in the fourth row is now part of the red vertical line
-    - The magenta and orange squares in the fourth row are now connected to the red vertical line
-    - The green and sky blue squares in the sixth row are now connected to the red vertical line
-    - A new small horizontal red line appears in the eighth row, connecting the orange, sky blue, and magenta squares
-    All other colored squares remain in their original positions.
+    The same 10x12 grid, but with red (2) lines added:
+    1. A horizontal red line in the second row, extending across the entire grid
+    2. A vertical red line from top to bottom, in the sixth column
+    3. Another vertical red line from top to bottom, in the ninth column
+    4. A horizontal red line in the seventh row, extending across the entire grid
+    These red lines form a grid-like pattern, creating rectangular sections within the original grid.
+    All original colored squares remain in their positions.
