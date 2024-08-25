@@ -7,7 +7,7 @@ def solve_9caba7c3(input_grid: ColoredGrid) -> ColoredGrid:
     1. Preserves red (2) squares in the upper-left quadrant.
     2. Changes other red (2) squares to yellow (4).
     3. Propagates orange (7) color from yellow squares to the right and below,
-       replacing gray (5) or red (2) squares.
+       replacing gray (5) or red (2) squares, potentially jumping over other colors.
     4. Preserves the original state of other colors.
     5. Applies transformations based on the original grid state.
     """
@@ -24,12 +24,17 @@ def solve_9caba7c3(input_grid: ColoredGrid) -> ColoredGrid:
         while queue:
             row, col = queue.popleft()
             for dr, dc in [(0, 1), (1, 0)]:  # Right and below
-                new_row, new_col = row + dr, col + dc
-                if (0 <= new_row < height and 0 <= new_col < width and
-                    original_grid.values[new_row][new_col] in [2, 5] and
-                    new_grid.values[new_row][new_col] != 7):
-                    new_grid.values[new_row][new_col] = 7
-                    queue.append((new_row, new_col))
+                new_row, new_col = row, col
+                while True:
+                    new_row += dr
+                    new_col += dc
+                    if new_row >= height or new_col >= width:
+                        break
+                    if original_grid.values[new_row][new_col] in [2, 5]:
+                        if new_grid.values[new_row][new_col] != 7:
+                            new_grid.values[new_row][new_col] = 7
+                            queue.append((new_row, new_col))
+                        break
 
     yellow_squares = []
     for row in range(height):
