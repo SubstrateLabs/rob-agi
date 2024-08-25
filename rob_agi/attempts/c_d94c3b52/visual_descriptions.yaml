@@ -1,111 +1,104 @@
 example_0:
   input: |
-    The grid contains several distinct patterns formed by blue (1) and sky (8) colored squares on a black (0) background. The patterns are symmetrically arranged and separated by black rows and columns.
+    The 25x17 grid is divided into a 4x3 arrangement of 5x5 cells, separated by black (0) rows and columns.
+    Each 5x5 cell contains a 3x3 pattern of colored squares surrounded by black.
+    Colors used: black (0), blue (1), sky blue (8).
     
-    In the top-left quadrant, there's a 3x3 pattern of blue squares with the center square missing, forming a sort of blue frame.
+    Pattern distribution:
+    - Top row: blue frame, sky blue square, blue with missing corners
+    - Middle row: All blue patterns (frame, solid, with missing corners)
+    - Bottom row: Mirrors top row, with patterns in different positions
     
-    In the top-right quadrant, there's a similar 3x3 pattern, but with the corners missing instead of the center.
-    
-    In the center-top, there's a 3x3 sky-colored square.
-    
-    The bottom half of the grid mirrors the top half, with the patterns repeated in different positions.
+    Key observations:
+    - Symmetry between top and bottom rows
+    - Central sky blue square
+    - Consistent 3x3 pattern size within 5x5 cells
   output: |
-    The output grid maintains the same overall structure as the input, but with some color changes and pattern shifts.
+    Grid structure and size remain unchanged.
+    Colors used: black (0), blue (1), orange (7), sky blue (8).
     
-    The 3x3 blue frame in the top-left is now orange (7).
-    
-    The 3x3 sky square in the center-top has moved to the top-right quadrant.
-    
-    The pattern that was in the top-right (blue squares with missing corners) is now in orange in the center-top.
-    
-    These transformations are mirrored in the bottom half of the grid, creating a symmetrical pattern of color and shape changes.
+    Key transformations:
+    1. Sky blue square moved diagonally (center-top to top-right)
+    2. Blue patterns alternate with orange:
+       - Top-left blue frame becomes orange
+       - Top-right blue pattern becomes orange
+       - Middle row alternates blue-orange-blue
+       - Bottom row mirrors top row's color changes
+    3. Black squares and overall symmetry preserved
 
 example_1:
   input: |
-    This grid also features patterns of blue (1) and sky (8) squares on a black (0) background, but with more complex and varied shapes.
+    25x17 grid with 4x3 arrangement of 5x5 cells, separated by black (0) rows and columns.
+    Colors used: black (0), blue (1), sky blue (8).
     
-    In the top-left, there's a 3x3 blue square with the top-middle square missing.
+    Pattern distribution (3x3 within 5x5):
+    - Top row: Blue U, solid blue, blue frame
+    - Middle row: Three solid blue squares
+    - Bottom row: Blue T, blue cross, blue inverted L
+    - Sky blue 3x3 square in second quadrant (top-left)
     
-    The top-center has a 3x3 solid blue square.
-    
-    The top-right has a 3x3 blue frame (outer squares blue, center black).
-    
-    The middle section features three 3x3 solid blue squares in a row.
-    
-    The bottom section has three distinct patterns: a 3x3 blue 'T' shape on the left, a 3x3 blue cross in the center, and a 3x3 blue inverse 'L' shape on the right.
-    
-    There's also a small 3x3 sky-colored square in the second quadrant from the top-left.
+    Key observations:
+    - Varied blue patterns
+    - Asymmetrical sky blue placement
+    - Consistent 3x3 pattern size
   output: |
-    The output grid maintains the overall structure but with significant color changes and some pattern shifts.
+    Grid structure and size maintained.
+    Colors used: black (0), blue (1), orange (7), sky blue (8).
     
-    The top-left pattern is now sky-colored.
-    
-    The top-center solid square is now orange (7).
-    
-    The top-right frame is unchanged.
-    
-    In the middle section, the leftmost and rightmost squares are now orange, while the center remains blue.
-    
-    The bottom patterns remain in their positions but are now orange.
-    
-    The small sky-colored square has moved to the top-left quadrant.
+    Key transformations:
+    1. Sky blue square moved to top-left quadrant
+    2. Blue patterns alternate with orange:
+       - Top row: Sky blue, orange, blue
+       - Middle row: Orange, blue, orange
+       - Bottom row: All orange patterns
+    3. Black squares and pattern shapes preserved
 
 example_2:
   input: |
-    This grid presents a more varied and asymmetrical pattern of blue (1) and sky (8) squares on a black (0) background.
+    25x17 grid with less structured pattern arrangement.
+    Colors used: black (0), blue (1), sky blue (8).
     
-    The top-left quadrant has a complex blue shape resembling an incomplete 'E'.
+    Pattern distribution:
+    - Top-left: Complex blue 'E' shape
+    - Top-right: 3x3 blue with missing corner
+    - Center: Sideways blue 'T' and 3x3 blue with missing corner
+    - Bottom-left: 3x3 sky blue square
+    - Bottom-right: Blue inverted 'L'
+    - Scattered single blue squares
     
-    The top-right quadrant has a 3x3 blue square with the bottom-right corner missing.
-    
-    The center-left has a blue pattern that looks like a sideways 'T'.
-    
-    The center-right has a 3x3 blue square with the top-left corner missing.
-    
-    The bottom-left quadrant contains a 3x3 sky-colored square.
-    
-    The bottom-right quadrant has a blue pattern that looks like an inverted 'L'.
-    
-    There are also some isolated blue squares scattered throughout the grid.
+    Key observations:
+    - More complex, asymmetrical patterns
+    - Varied pattern sizes (not all 3x3)
+    - Single sky blue square in bottom-left
   output: |
-    The output grid maintains the overall structure but with color changes and some pattern shifts.
+    Grid structure and overall pattern placement maintained.
+    Colors used: black (0), blue (1), orange (7), sky blue (8).
     
-    The complex 'E' shape in the top-left remains blue.
-    
-    The pattern in the top-right is now sky-colored.
-    
-    The sideways 'T' in the center-left is now orange (7).
-    
-    The pattern in the center-right is now sky-colored.
-    
-    The sky-colored square in the bottom-left has moved to the top-right quadrant.
-    
-    The inverted 'L' in the bottom-right remains blue.
-    
-    The scattered blue squares remain in their positions.
+    Key transformations:
+    1. Sky blue square moved to top-right quadrant
+    2. Some blue patterns change to orange:
+       - Center sideways 'T' becomes orange
+       - Some scattered squares become orange
+    3. Some blue patterns expand to 3x3 sky blue:
+       - Top-right and center-right patterns
+    4. Complex shapes (e.g., 'E' shape, inverted 'L') retain original color
+    5. Black squares preserved
 
 test_case_0:
   input: |
-    This grid presents a complex arrangement of blue (1) squares on a black (0) background, with no sky-colored squares present.
+    25x17 grid with 4x3 arrangement of 5x5 cells, separated by black (0) rows and columns.
+    Colors used: black (0), blue (1). No sky blue present.
     
-    The top row contains four distinct 3x3 patterns:
-    1. A blue 'L' shape
-    2. A blue square with the top-right corner missing
-    3. A blue 'T' shape
-    4. A blue square with the bottom-left corner missing
+    Pattern distribution (all 3x3 within 5x5):
+    - Top row: Blue L, U with top-right missing, T, U with bottom-left missing
+    - Second row: U with bottom-right missing, cross, inverted L
+    - Third row: Repeats top row patterns
+    - Bottom row: U shape, solid square, inverted T
     
-    The second row has three 3x3 patterns:
-    1. A blue square with the bottom-right corner missing
-    2. A blue cross shape
-    3. A blue inverse 'L' shape
-    
-    The third row repeats the patterns from the first row.
-    
-    The bottom row has three more 3x3 patterns:
-    1. A blue 'U' shape
-    2. A solid blue square
-    3. A blue inverted 'T' shape
-    
-    There are black rows separating each row of patterns.
+    Key observations:
+    - Complex variety of blue patterns
+    - Absence of sky blue color
+    - Consistent 3x3 pattern size
+    - Some pattern repetition (top and third rows)
   output: |
     The output is not provided for this test case.
