@@ -9,9 +9,9 @@ def solve_baf41dbf(input_grid: ColoredGrid) -> ColoredGrid:
     1. Analyzes the input grid to find green cells and magenta dots.
     2. Determines the bounding box of the original green shape.
     3. Finds the maximum possible expansion in all directions.
-    4. Creates a new grid with the expanded dimensions.
-    5. Scales and recreates the shape in the new grid, preserving internal structure.
-    6. Adds the original magenta dots to the new grid.
+    4. Creates a new grid with the original dimensions.
+    5. Fills the new rectangle with green, preserving the internal structure.
+    6. Restores the original magenta dots.
     7. Returns the transformed grid.
     """
     rows, cols = input_grid.get_dimensions()
@@ -45,26 +45,21 @@ def solve_baf41dbf(input_grid: ColoredGrid) -> ColoredGrid:
     top = find_boundary(min_r, -1, rows)
     bottom = find_boundary(max_r, 1, rows)
 
-    # 4. Create new grid with expanded dimensions
-    new_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
+    # 4. Create new grid with original dimensions
+    new_grid = input_grid.deep_copy()
 
-    # 5. Scale and recreate the shape
-    new_width = right - left + 1
-    new_height = bottom - top + 1
-    x_scale = new_width / (max_c - min_c + 1)
-    y_scale = new_height / (max_r - min_r + 1)
+    # 5. Fill the new rectangle and preserve internal structure
+    for r in range(top, bottom + 1):
+        for c in range(left, right + 1):
+            if left <= c <= right and top <= r <= bottom:
+                orig_r = min_r + (r - top) * (max_r - min_r) // (bottom - top)
+                orig_c = min_c + (c - left) * (max_c - min_c) // (right - left)
+                if (orig_r, orig_c) in green_cells:
+                    new_grid.set_cell(r, c, 3)
+                else:
+                    new_grid.set_cell(r, c, 0)
 
-    for new_r in range(top, bottom + 1):
-        for new_c in range(left, right + 1):
-            orig_r = min_r + (new_r - top) / y_scale
-            orig_c = min_c + (new_c - left) / x_scale
-            orig_r_int, orig_c_int = int(orig_r), int(orig_c)
-            if (orig_r_int, orig_c_int) in green_cells:
-                new_grid.set_cell(new_r, new_c, 3)
-            elif input_grid.get_cell(orig_r_int, orig_c_int) == 0:
-                new_grid.set_cell(new_r, new_c, 0)
-
-    # 6. Add magenta dots
+    # 6. Restore magenta dots
     for r, c in magenta_dots:
         new_grid.set_cell(r, c, 6)
 
