@@ -125,19 +125,21 @@ class Solver:
         res = ask_coder.run("Based on that reflection detail a step by step plan for how to solve the challenge\n")
         return res
 
-    def get_edit(self, current_result, plan, is_first=True, update_visual_descriptions=False):
+    def get_edit(self, current_result, plan, is_first=True, update_visual_descriptions=True) -> str:
         modify_coder = self.get_modify_coder()
         prefix = self.get_prefix(is_first)
         prompt = f"{prefix}\n\n<VALIDATION_OUTPUT>\n{current_result['error']}\n{current_result['output']}</VALIDATION_OUTPUT>\n"
         prompt += f"\nYour latest thinking is:\n<LATEST_THINKING>\n{plan}\n</LATEST_THINKING>\n"
         prompt += f"Use that latest thinking and solve the challenge by modifying the implementation file. Always ensure that the docstring to solve_{self.challenge_id} includes a correct summary of the solution in words.\n"
         prompt += "Make sure your code changes are in the SEARCH/REPLACE format."
-        if update_visual_descriptions:
-            prompt += "If the visual_descriptions.yaml can be improved (more detail, better abstractions, cutting irrelevant info), include those changes too"
         # prompt += f"An image of the challenge is provided at {self.challenge.id}.png"
         # prompt += f"colored_grid.py includes a library of functions that may be useful. modify this file if you need."
         logger.info(f"\n~~~~~~~~~EDITED~~~~~~~~~~~\n{modify_coder.aider_edited_files}")
-        return modify_coder.run(prompt)
+        modifications = modify_coder.run(prompt)
+        if update_visual_descriptions:
+            update_prompt = "If the visual_descriptions.yaml can be improved (more detail, better abstractions, cutting irrelevant info), include those changes too"
+            modify_coder.run(update_prompt)
+        return modifications
 
     def get_visual_descriptions(self, overwrite: bool = True) -> str:
         target_file = self.file_paths["visual_descriptions"]

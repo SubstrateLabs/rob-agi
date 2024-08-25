@@ -849,7 +849,8 @@ async def solve_loop(max_concurrent=1, to_process=None, max_challenges=None):
                 traceback.print_exc()
                 logger.info(f"Error on task {i}: {e}")
 
-    report_results(attempted=attempted, successful=successful, errored=errored_count)
+    if max_challenges is None and to_process == all_challenges:
+        report_results(attempted=attempted, successful=successful, errored=errored_count)
 
 
 async def asolve_loop(max_concurrent=1, to_process=None, max_challenges=None):
