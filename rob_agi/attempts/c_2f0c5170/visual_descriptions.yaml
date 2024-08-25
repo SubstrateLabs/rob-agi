@@ -1,0 +1,54 @@
+example_0:
+  input: |
+    The input grid is 23x20 in size. It consists mostly of sky blue (8) background with two distinct black (0) regions:
+    1. A larger black region in the top-left quadrant, roughly rectangular in shape (9x10).
+    2. A smaller black region in the bottom-right quadrant, roughly rectangular in shape (6x7).
+    Within the larger black region, there is a single green (3) cell near the center-left.
+    Within the smaller black region, there is a more complex pattern:
+    - A yellow (4) cell in the center
+    - Four yellow (4) cells surrounding it in a cross pattern
+    - A green (3) cell below the central yellow cell
+  output: |
+    The output grid is 9x9 in size, significantly smaller than the input. It contains:
+    - A black (0) background
+    - A pattern in the center that matches the more complex pattern from the smaller black region in the input:
+      - A yellow (4) cell in the center
+      - Four yellow (4) cells surrounding it in a cross pattern
+      - A green (3) cell below the central yellow cell
+    The pattern is centered within the black background.
+
+example_1:
+  input: |
+    The input grid is 22x21 in size. It consists mostly of sky blue (8) background with two distinct black (0) regions:
+    1. A smaller black region in the top-right quadrant, roughly rectangular in shape (5x5).
+    2. A larger black region in the bottom-left quadrant, roughly rectangular in shape (6x8).
+    Within the smaller black region, there is a single red (2) cell near the center.
+    Within the larger black region, there is a more complex pattern:
+    - A 3x3 yellow (4) square
+    - A red (2) cell in the center of this yellow square
+  output: |
+    The output grid is 5x5 in size, significantly smaller than the input. It contains:
+    - A black (0) background
+    - A pattern that matches the more complex pattern from the larger black region in the input:
+      - A 3x3 yellow (4) square
+      - A red (2) cell in the center of this yellow square
+    The pattern is centered within the black background, with one row of black cells above and below it.
+
+example_2:
+  input: |
+    The input grid is 18x19 in size. It consists mostly of sky blue (8) background with two distinct black (0) regions:
+    1. A black region in the top-left quadrant, roughly rectangular in shape (7x9).
+    2. A black region in the bottom-right quadrant, roughly rectangular in shape (7x7).
+    Within the top-left black region, there is a complex pattern:
+    - A yellow (4) cell at the top center
+    - Below it, a 3x3 yellow (4) square
+    - A blue (1) cell in the center of this yellow square
+    Within the bottom-right black region, there is a single blue (1) cell near the center.
+  output: |
+    The output grid is 8x7 in size, smaller than the input. It contains:
+    - A black (0) background
+    - A pattern that matches the more complex pattern from the top-left black region in the input:
+      - A yellow (4) cell at the top center
+      - Below it, a 3x3 yellow (4) square
+      - A blue (1) cell in the center of this yellow square
+    The pattern is centered within the black background, with one row of black cells above and below it, and one column of black cells on each side.
