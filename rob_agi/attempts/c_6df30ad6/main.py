@@ -50,4 +50,4 @@ def find_highest_color(grid: ColoredGrid) -> int:
         for cell in row:
             if cell not in [0, 5] and cell > highest_color:
                 highest_color = cell
-    return highest_color if highest_color > 0 else 1  # Default to blue (1) if no other colors are present
+    return highest_color if highest_color > 0 else 4  # Default to yellow (4) if no other colors are present
