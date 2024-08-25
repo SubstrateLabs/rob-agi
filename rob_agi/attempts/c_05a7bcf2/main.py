@@ -9,6 +9,7 @@ def solve_05a7bcf2(input_grid: ColoredGrid) -> ColoredGrid:
     3. Expands red (2) regions upwards/leftwards until hitting the barrier, yellow, or edge.
     4. Fills the top/left section with green (3) where not yellow or sky blue.
     5. Fills remaining empty cells with sky blue (8).
+    6. Preserves the original sky blue barrier.
 
     Args:
     input_grid (ColoredGrid): The input grid to transform.
@@ -52,47 +53,64 @@ def solve_05a7bcf2(input_grid: ColoredGrid) -> ColoredGrid:
 
     orientation, barrier_pos = find_sky_blue_barrier(grid)
 
+    # Store original yellow and red positions
+    original_yellow = [(r, c) for r in range(rows) for c in range(cols) if grid.values[r][c] == 4]
+    original_red = [(r, c) for r in range(rows) for c in range(cols) if grid.values[r][c] == 2]
+
     if orientation == 'horizontal':
-        # Expand yellow downwards
-        for r in range(barrier_pos):
-            for c in range(cols):
-                if grid.values[r][c] == 4:
-                    expand_color(grid, r, c, 4, 'down')
+        # Expand yellow downwards and rightwards
+        for r, c in original_yellow:
+            if r < barrier_pos:
+                expand_color(grid, r, c, 4, 'down')
+                expand_color(grid, r, c, 4, 'right')
         
-        # Expand red upwards
-        for r in range(rows - 1, barrier_pos, -1):
-            for c in range(cols):
-                if grid.values[r][c] == 2:
-                    expand_color(grid, r, c, 2, 'up')
+        # Expand red upwards and leftwards
+        for r, c in original_red:
+            if r > barrier_pos:
+                expand_color(grid, r, c, 2, 'up')
+                expand_color(grid, r, c, 2, 'left')
         
         # Fill with green in top half
         for r in range(barrier_pos):
             for c in range(cols):
                 if grid.values[r][c] not in [4, 8]:
                     grid.values[r][c] = 3
-    else:  # vertical orientation
-        # Expand yellow rightwards
-        for c in range(barrier_pos):
-            for r in range(rows):
-                if grid.values[r][c] == 4:
-                    expand_color(grid, r, c, 4, 'right')
         
-        # Expand red leftwards
-        for c in range(cols - 1, barrier_pos, -1):
-            for r in range(rows):
-                if grid.values[r][c] == 2:
-                    expand_color(grid, r, c, 2, 'left')
+        # Fill remaining cells with sky blue
+        for r in range(barrier_pos, rows):
+            for c in range(cols):
+                if grid.values[r][c] not in [2, 8]:
+                    grid.values[r][c] = 8
+    else:  # vertical orientation
+        # Expand yellow downwards and rightwards
+        for r, c in original_yellow:
+            if c < barrier_pos:
+                expand_color(grid, r, c, 4, 'down')
+                expand_color(grid, r, c, 4, 'right')
+        
+        # Expand red upwards and leftwards
+        for r, c in original_red:
+            if c > barrier_pos:
+                expand_color(grid, r, c, 2, 'up')
+                expand_color(grid, r, c, 2, 'left')
         
         # Fill with green in left half
         for c in range(barrier_pos):
             for r in range(rows):
                 if grid.values[r][c] not in [4, 8]:
                     grid.values[r][c] = 3
+        
+        # Fill remaining cells with sky blue
+        for c in range(barrier_pos, cols):
+            for r in range(rows):
+                if grid.values[r][c] not in [2, 8]:
+                    grid.values[r][c] = 8
 
-    # Fill remaining cells with sky blue
-    for r in range(rows):
-        for c in range(cols):
-            if grid.values[r][c] == 0:
-                grid.values[r][c] = 8
+    # Ensure the original barrier remains unchanged
+    if orientation == 'horizontal':
+        grid.values[barrier_pos] = [8] * cols
+    else:
+        for r in range(rows):
+            grid.values[r][barrier_pos] = 8
 
     return grid
