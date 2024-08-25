@@ -1,6 +1,9 @@
 from rob_agi.colored_grid import ColoredGrid
 from itertools import cycle
 
+# Global color cycle
+color_cycle = cycle([3, 6, 4, 8])
+
 def solve_604001fa(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by:
@@ -8,6 +11,7 @@ def solve_604001fa(input_grid: ColoredGrid) -> ColoredGrid:
     2. Identifying blue (1) shapes
     3. Sorting blue shapes based on their top-left position
     4. Transforming blue shapes into a sequence of colors: green (3), magenta (6), yellow (4), sky (8)
+    The color sequence is maintained across multiple function calls.
     """
     grid = input_grid.deep_copy()
     
@@ -27,12 +31,9 @@ def solve_604001fa(input_grid: ColoredGrid) -> ColoredGrid:
     
     blue_regions.sort(key=region_sort_key)
     
-    # Prepare color sequence
-    color_sequence = cycle([3, 6, 4, 8])
-    
     # Transform blue shapes
     for region in blue_regions:
-        new_color = next(color_sequence)
+        new_color = next(color_cycle)
         for r, c in region:
             grid.values[r][c] = new_color
     
