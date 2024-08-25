@@ -3,13 +3,14 @@ from typing import List, Tuple
 
 def solve_4e469f39(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the challenge by identifying gray (5) 'P' shapes and adding red (2) outlines.
+    Solve the challenge by identifying gray (5) shapes and adding red (2) outlines.
     
     The function performs the following steps:
     1. Identify all gray shapes in the input grid.
-    2. For each shape, determine its orientation and critical corner.
-    3. Draw a red outline around the top and outer edge of each gray shape.
-    4. The red outline extends to the edge of the grid horizontally and to the top of the grid vertically.
+    2. For each shape, determine its orientation based on the grid's midpoint.
+    3. Draw a red horizontal "roof" line across the entire grid width above each shape.
+    4. Draw a red vertical "wall" line from the shape to the top of the grid on the appropriate side.
+    5. Complete the shape outline by filling gaps between gray cells with red.
     
     Args:
     input_grid (ColoredGrid): The input grid containing gray shapes.
@@ -19,37 +20,44 @@ def solve_4e469f39(input_grid: ColoredGrid) -> ColoredGrid:
     """
     output_grid = input_grid.deep_copy()
     rows, cols = input_grid.get_dimensions()
+    grid_midpoint = cols // 2
     gray_regions = input_grid.find_connected_regions(5)
     
     for region in gray_regions:
-        # Determine orientation and critical corner
-        left_most = min(col for _, col in region)
-        right_most = max(col for _, col in region)
-        top_most = min(row for row, _ in region)
+        top = min(row for row, _ in region)
+        left = min(col for _, col in region)
+        right = max(col for _, col in region)
+        shape_midpoint = (left + right) // 2
         
-        if left_most < cols - right_most:
-            # Shape is closer to left edge
-            critical_corner = (top_most, left_most)
-            direction = -1  # Move left
+        # Draw horizontal "roof" line
+        for col in range(cols):
+            if output_grid.values[top-1][col] == 0:
+                output_grid.values[top-1][col] = 2
+        
+        # Determine orientation and draw vertical "wall" line
+        if shape_midpoint < grid_midpoint:
+            wall_col = left
+            for row in range(top-1, -1, -1):
+                if output_grid.values[row][wall_col] == 0:
+                    output_grid.values[row][wall_col] = 2
         else:
-            # Shape is closer to right edge
-            critical_corner = (top_most, right_most)
-            direction = 1  # Move right
+            wall_col = right
+            for row in range(top-1, -1, -1):
+                if output_grid.values[row][wall_col] == 0:
+                    output_grid.values[row][wall_col] = 2
         
-        # Draw horizontal line
-        row = critical_corner[0] - 1
-        col = critical_corner[1]
-        while 0 <= col < cols:
-            if output_grid.values[row][col] == 0:
-                output_grid.values[row][col] = 2
-            col += direction
+        # Complete shape outline
+        for col in range(left, right):
+            if output_grid.values[top][col] == 0 and output_grid.values[top][col+1] == 5:
+                output_grid.values[top][col] = 2
         
-        # Draw vertical line
-        row = critical_corner[0]
-        col = critical_corner[1] + direction
-        while row >= 0:
-            if output_grid.values[row][col] == 0:
-                output_grid.values[row][col] = 2
-            row -= 1
+        if shape_midpoint < grid_midpoint:
+            for row in range(top, rows):
+                if output_grid.values[row][left] == 0 and row+1 < rows and output_grid.values[row+1][left] == 5:
+                    output_grid.values[row][left] = 2
+        else:
+            for row in range(top, rows):
+                if output_grid.values[row][right] == 0 and row+1 < rows and output_grid.values[row+1][right] == 5:
+                    output_grid.values[row][right] = 2
     
     return output_grid
