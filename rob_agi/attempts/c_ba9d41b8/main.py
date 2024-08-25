@@ -1,4 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
+from typing import List, Tuple
 
 def solve_ba9d41b8(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -6,30 +7,59 @@ def solve_ba9d41b8(input_grid: ColoredGrid) -> ColoredGrid:
     The outer border of each region remains unchanged, while the inner part is filled
     with a checkerboard pattern using the original color and black (0).
     
-    The checkerboard pattern is applied based on the global position of each cell,
+    The checkerboard pattern is applied based on the relative position within each region,
     ensuring consistent patterning for all regions regardless of their position in the grid.
-    Cells where the sum of row and column indices is odd are set to black (0).
+    Interior cells where the sum of (row - top) and (column - left) is odd are set to black (0).
     """
     if not input_grid.is_valid:
         raise ValueError("Invalid input grid")
 
     output_grid = input_grid.deep_copy()
-    rows, cols = output_grid.get_dimensions()
+    regions = find_regions(output_grid)
+    
+    for color, region in regions:
+        process_region(output_grid, color, region)
+    
+    return output_grid
 
-    def is_border(r: int, c: int, color: int) -> bool:
-        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            nr, nc = r + dr, c + dc
-            if 0 <= nr < rows and 0 <= nc < cols:
-                if output_grid.get_cell(nr, nc) != color:
-                    return True
-        return False
-
+def find_regions(grid: ColoredGrid) -> List[Tuple[int, List[Tuple[int, int]]]]:
+    regions = []
+    visited = set()
+    rows, cols = grid.get_dimensions()
+    
     for r in range(rows):
         for c in range(cols):
-            color = output_grid.get_cell(r, c)
-            if color != 0:  # If the cell is not black
-                if not is_border(r, c, color):
-                    if (r + c) % 2 == 1:  # If sum of row and column is odd
-                        output_grid.set_cell(r, c, 0)  # Set to black
+            if (r, c) not in visited and grid.get_cell(r, c) != 0:
+                region = []
+                color = grid.get_cell(r, c)
+                queue = [(r, c)]
+                while queue:
+                    curr_r, curr_c = queue.pop(0)
+                    if (curr_r, curr_c) in visited:
+                        continue
+                    visited.add((curr_r, curr_c))
+                    region.append((curr_r, curr_c))
+                    for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                        new_r, new_c = curr_r + dr, curr_c + dc
+                        if 0 <= new_r < rows and 0 <= new_c < cols and grid.get_cell(new_r, new_c) == color:
+                            queue.append((new_r, new_c))
+                regions.append((color, region))
+    return regions
 
-    return output_grid
+def process_region(grid: ColoredGrid, color: int, region: List[Tuple[int, int]]):
+    top = min(r for r, _ in region)
+    left = min(c for _, c in region)
+    
+    for r, c in region:
+        if is_border(grid, r, c, color):
+            continue
+        if (r - top + c - left) % 2 == 1:
+            grid.set_cell(r, c, 0)
+
+def is_border(grid: ColoredGrid, r: int, c: int, color: int) -> bool:
+    rows, cols = grid.get_dimensions()
+    for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+        new_r, new_c = r + dr, c + dc
+        if not (0 <= new_r < rows and 0 <= new_c < cols) or grid.get_cell(new_r, new_c) != color:
+            return True
+    return False
