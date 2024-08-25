@@ -1,56 +1,97 @@
 example_0:
   input: |
-    The grid contains three distinct regions:
-    1. A large sky blue (8) rectangular frame with an orange (7) interior.
-    2. A smaller red (2) rectangular region in the bottom right, containing a blue (1) interior with a green (3) center.
-    3. The rest is black (0), representing empty space.
-    The sky blue frame has a thick border and occupies most of the left side of the grid. Inside this frame is a solid orange area, except for a yellow (4) square ring in the center, which surrounds a 3x3 green square.
-    The red region in the bottom right is smaller, with a blue interior and a 2x2 green square at its center.
+    The grid contains two distinct colored regions surrounded by black (0) space:
+    1. Left region: A large sky blue (8) rectangular frame occupying most of the left side.
+       - Thick border of sky blue (8)
+       - Interior filled with orange (7)
+       - Center contains a yellow (4) square ring surrounding a 3x3 green (3) square
+    2. Bottom-right region: A smaller red (2) rectangular frame
+       - Outer border of red (2)
+       - Interior filled with blue (1)
+       - Center contains a 2x2 green (3) square
+    Note the nested structure of colors in each region, from outer to inner layers.
+
   output: |
-    The overall structure remains similar, but colors have shifted:
-    1. The large frame is now green (3), with a yellow (4) interior.
-    2. The smaller region in the bottom right is now blue (1), with a red (2) interior and a sky blue (8) center.
-    3. The black (0) empty space remains unchanged.
-    The green frame now contains a solid yellow area, with an orange (7) square ring in the center, surrounding a 3x3 sky blue square.
-    The blue region in the bottom right has a red interior with a 2x2 sky blue square at its center.
+    The overall structure and positions remain unchanged, but colors have shifted within each region:
+    1. Left region:
+       - Outer frame is now green (3)
+       - Interior is filled with yellow (4)
+       - Center contains an orange (7) square ring surrounding a 3x3 sky blue (8) square
+    2. Bottom-right region:
+       - Outer frame is now blue (1)
+       - Interior is filled with red (2)
+       - Center contains a 2x2 sky blue (8) square
+    Observe how the colors have shifted inward, with the innermost color becoming the new outermost color in each region.
 
 example_1:
   input: |
-    The grid shows a large sky blue (8) square frame with a thick border. Inside this frame is:
-    1. An outer ring of orange (7)
-    2. An inner ring of sky blue (8)
-    3. A 2x2 red (2) square at the very center
-    The rest of the grid is black (0), representing empty space.
-    The entire colored structure is centered within the grid, surrounded by black on all sides.
+    The grid shows a single, centered structure surrounded by black (0) space:
+    1. Outermost: Large sky blue (8) square frame with a thick border
+    2. Next layer: Ring of orange (7)
+    3. Inner layer: Ring of sky blue (8)
+    4. Center: 2x2 red (2) square
+    Note the symmetrical, nested structure of colors from the outer edge to the center.
+
   output: |
-    The overall structure remains, but colors have shifted:
-    1. The large square frame is now brown (9)
-    2. The outer ring is now green (3)
-    3. The inner ring is now orange (7)
-    4. The 2x2 center square is now blue (1)
-    The black (0) empty space surrounding the structure remains unchanged.
-    The colored structure maintains its centered position within the grid.
+    The structure's position and shape remain the same, but colors have shifted:
+    1. Outermost: The large square frame is now brown (9)
+    2. Next layer: Ring of green (3)
+    3. Inner layer: Ring of orange (7)
+    4. Center: 2x2 blue (1) square
+    Observe how each color has moved inward by one layer, with the centermost color (red) shifting to become the new outermost color (brown).
 
 example_2:
   input: |
-    The grid contains two distinct colored regions separated by black (0) space:
-    1. Upper left: A sky blue (8) square containing a red (2) square, which in turn contains a blue (1) square.
-    2. Lower right: A larger, more complex structure with a magenta (6) outer frame, green (3) inner frame, yellow (4) middle layer, and red (2) inner layer with a blue (1) core.
-    Both structures are positioned at the corners of the grid, with black space between and around them.
+    The grid contains two separate colored structures in opposite corners, surrounded by black (0) space:
+    1. Upper-left structure: Nested squares
+       - Outer: Sky blue (8)
+       - Middle: Red (2)
+       - Inner: Blue (1)
+    2. Lower-right structure: More complex nested shape
+       - Outermost: Magenta (6) frame
+       - Next layer: Green (3) frame
+       - Middle layer: Yellow (4)
+       - Inner layer: Red (2)
+       - Core: Blue (1)
+    Note the increasing complexity and number of color layers in the lower-right structure.
+
   output: |
-    The overall layout remains the same, but colors have shifted in both structures:
-    1. Upper left: The outer square is now blue (1), the middle square is red (2), and the innermost square is sky blue (8).
-    2. Lower right: The outer frame is now blue (1), the next layer is yellow (4), followed by orange (7), then green (3), with a magenta (6) core.
-    The black (0) space separating and surrounding the structures remains unchanged.
+    The positions and shapes of both structures remain unchanged, but colors have shifted within each:
+    1. Upper-left structure:
+       - Outer: Now Blue (1)
+       - Middle: Still Red (2)
+       - Inner: Now Sky blue (8)
+    2. Lower-right structure:
+       - Outermost: Now Blue (1)
+       - Next layer: Now Yellow (4)
+       - Middle layer: Now Orange (7) (note the new color appearance)
+       - Inner layer: Now Green (3)
+       - Core: Now Magenta (6)
+    Observe how colors shift inward, with the innermost color becoming the new outermost color in each structure.
 
 example_3:
   input: |
-    The grid contains two distinct structures separated by black (0) space:
-    1. Upper structure: A blue (1) rectangular frame with a magenta (6) interior. Inside the magenta area is a smaller sky blue (8) rectangle.
-    2. Lower structure: A red (2) square frame with a yellow (4) interior. Inside the yellow area is a blue (1) square frame, which contains a sky blue (8) interior.
-    Both structures are positioned near the top and bottom of the grid respectively, with black space between and around them.
+    The grid contains two distinct structures separated vertically by black (0) space:
+    1. Upper structure: Rectangular shape
+       - Outer frame: Blue (1)
+       - Middle area: Magenta (6)
+       - Inner rectangle: Sky blue (8)
+    2. Lower structure: Square shape with more layers
+       - Outermost frame: Red (2)
+       - Next layer: Yellow (4)
+       - Inner frame: Blue (1)
+       - Core: Sky blue (8)
+    Note the different number of color layers in each structure and their arrangement.
+
   output: |
-    The overall layout remains similar, but colors have shifted in both structures:
-    1. Upper structure: The outer rectangular frame is now sky blue (8), the middle area is magenta (6), and the inner rectangle is blue (1).
-    2. Lower structure: The outer square frame is now sky blue (8), followed by a blue (1) layer, then a yellow (4) layer, and finally a red (2) core.
-    The black (0) space separating and surrounding the structures remains unchanged.
+    The overall layout and shapes remain the same, but colors have shifted within each structure:
+    1. Upper structure:
+       - Outer frame: Now Sky blue (8)
+       - Middle area: Still Magenta (6)
+       - Inner rectangle: Now Blue (1)
+    2. Lower structure:
+       - Outermost frame: Now Sky blue (8)
+       - Next layer: Now Blue (1)
+       - Inner layer: Now Yellow (4)
+       - Core: Now Red (2)
+    Observe how colors shift inward in each structure, with the innermost color becoming the new outermost color. The number of color layers in each structure remains consistent.
