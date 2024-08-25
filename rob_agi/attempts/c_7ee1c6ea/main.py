@@ -1,34 +1,40 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Optional, Set
+from typing import List, Tuple, Set, Dict
+from collections import defaultdict
+import random
 
 def solve_7ee1c6ea(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by changing the color of connected regions to their most frequent adjacent color.
+    Transforms the input grid by balancing colors within connected regions.
     
-    1. Identifies connected regions of the same color.
-    2. For each region, determines the most frequent adjacent color (excluding gray and black).
-    3. Changes the color of the entire region to the most frequent adjacent color.
+    1. Identifies connected regions (excluding gray and black).
+    2. For each region, calculates ideal color frequencies.
+    3. Iteratively balances colors within regions by changing squares' colors.
     4. Preserves black (0) and gray (5) squares.
+    5. Avoids creating 2x2 squares of the same color.
+    6. Repeats the process until stability is reached or max iterations hit.
     
     Returns the transformed grid.
     """
     new_grid = input_grid.deep_copy()
-    processed = set()
-    return process_grid(new_grid, processed)
+    max_iterations = 10
+    for _ in range(max_iterations):
+        regions = find_all_regions(new_grid)
+        if not balance_colors_in_regions(new_grid, regions):
+            break
+    return new_grid
 
-def process_grid(grid: ColoredGrid, processed: Set[Tuple[int, int]]) -> ColoredGrid:
+def find_all_regions(grid: ColoredGrid) -> List[Set[Tuple[int, int]]]:
     rows, cols = grid.get_dimensions()
+    visited = set()
+    regions = []
     for r in range(rows):
         for c in range(cols):
-            if (r, c) in processed or grid.values[r][c] in [0, 5]:
-                continue
-            region = find_connected_region(grid, r, c, grid.values[r][c])
-            processed.update(region)
-            if len(region) > 1:
-                swap_color = find_most_frequent_adjacent_color(grid, region)
-                if swap_color is not None:
-                    apply_color_swap(grid, region, swap_color)
-    return grid
+            if (r, c) not in visited and grid.values[r][c] not in [0, 5]:
+                region = find_connected_region(grid, r, c, grid.values[r][c])
+                regions.append(region)
+                visited.update(region)
+    return regions
 
 def find_connected_region(grid: ColoredGrid, r: int, c: int, color: int) -> Set[Tuple[int, int]]:
     region = set()
@@ -44,19 +50,48 @@ def find_connected_region(grid: ColoredGrid, r: int, c: int, color: int) -> Set[
                 stack.append((curr_r + dr, curr_c + dc))
     return region
 
-def find_most_frequent_adjacent_color(grid: ColoredGrid, region: Set[Tuple[int, int]]) -> Optional[int]:
-    color_freq = {}
-    region_color = grid.values[list(region)[0][0]][list(region)[0][1]]
-    rows, cols = grid.get_dimensions()
-    for r, c in region:
-        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            nr, nc = r + dr, c + dc
-            if (nr, nc) not in region and 0 <= nr < rows and 0 <= nc < cols:
-                adj_color = grid.values[nr][nc]
-                if adj_color not in [0, 5, region_color]:
-                    color_freq[adj_color] = color_freq.get(adj_color, 0) + 1
-    return max(color_freq, key=color_freq.get) if color_freq else None
+def balance_colors_in_regions(grid: ColoredGrid, regions: List[Set[Tuple[int, int]]]) -> bool:
+    changed = False
+    for region in regions:
+        color_freq = defaultdict(int)
+        for r, c in region:
+            color_freq[grid.values[r][c]] += 1
+        
+        ideal_freq = len(region) / len(color_freq)
+        donors = [color for color, freq in color_freq.items() if freq > ideal_freq]
+        receivers = [color for color, freq in color_freq.items() if freq < ideal_freq]
+        
+        while donors and receivers:
+            donor = donors[0]
+            receiver = receivers[0]
+            donor_squares = [sq for sq in region if grid.values[sq[0]][sq[1]] == donor]
+            random.shuffle(donor_squares)
+            
+            for sq in donor_squares:
+                if is_valid_change(grid, sq, receiver):
+                    grid.values[sq[0]][sq[1]] = receiver
+                    color_freq[donor] -= 1
+                    color_freq[receiver] += 1
+                    changed = True
+                    break
+            
+            if color_freq[donor] <= ideal_freq:
+                donors.pop(0)
+            if color_freq[receiver] >= ideal_freq:
+                receivers.pop(0)
+    
+    return changed
 
-def apply_color_swap(grid: ColoredGrid, region: Set[Tuple[int, int]], new_color: int):
-    for r, c in region:
-        grid.values[r][c] = new_color
+def is_valid_change(grid: ColoredGrid, sq: Tuple[int, int], new_color: int) -> bool:
+    r, c = sq
+    rows, cols = grid.get_dimensions()
+    if grid.values[r][c] in [0, 5]:
+        return False
+    
+    for dr, dc in [(0, 1), (1, 0), (1, 1)]:
+        nr, nc = r + dr, c + dc
+        if 0 <= nr < rows and 0 <= nc < cols:
+            if all(grid.values[r+i][c+j] == new_color for i in range(2) for j in range(2) if 0 <= r+i < rows and 0 <= c+j < cols):
+                return False
+    
+    return True
