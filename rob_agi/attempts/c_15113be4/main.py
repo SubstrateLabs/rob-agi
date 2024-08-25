@@ -4,13 +4,12 @@ from typing import List, Tuple
 def solve_15113be4(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by introducing or modifying a secondary color (sky blue, magenta, or green)
-    in a balanced pattern. The function follows these steps:
+    in a balanced pattern, primarily in the upper half of the grid. The function follows these steps:
     1. Identifies the secondary color to use (8: sky blue, 6: magenta, or 3: green).
-    2. Locates existing sections of the secondary color and 3x3 sections with blue squares.
-    3. Applies transformations by shifting existing secondary color sections and introducing
-       the secondary color in 2-3 additional 3x3 sections.
-    4. Preserves the yellow grid structure and black squares.
-    5. Ensures a visually balanced pattern with 6-8 total changes.
+    2. Analyzes existing patterns and identifies potential transformation areas.
+    3. Plans and applies L-shaped transformations, focusing on the upper sections.
+    4. Balances the design while preserving the yellow grid structure and most of the lower sections.
+    5. Makes final adjustments to ensure a visually appealing and intentional pattern.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -24,15 +23,15 @@ def solve_15113be4(input_grid: ColoredGrid) -> ColoredGrid:
     # Identify the secondary color
     secondary_color = identify_secondary_color(output_grid)
 
-    # Find existing secondary color sections and potential 3x3 sections for transformation
-    existing_sections = find_existing_sections(output_grid, secondary_color)
-    potential_sections = find_potential_sections(output_grid)
+    # Analyze existing patterns and identify potential areas for transformation
+    existing_patterns = find_existing_patterns(output_grid, secondary_color)
+    potential_areas = identify_potential_areas(output_grid)
 
-    # Apply transformations
-    if existing_sections:
-        shift_existing_sections(output_grid, existing_sections, secondary_color)
-    
-    transform_additional_sections(output_grid, potential_sections, secondary_color)
+    # Plan and apply L-shaped transformations
+    apply_l_shape_transformations(output_grid, potential_areas, secondary_color, existing_patterns)
+
+    # Balance the design and make final adjustments
+    balance_design(output_grid, secondary_color)
 
     return output_grid
 
@@ -47,33 +46,40 @@ def identify_secondary_color(grid: ColoredGrid) -> int:
     else:
         return 8  # default to sky blue if no secondary color is present
 
-def find_existing_sections(grid: ColoredGrid, color: int) -> List[Tuple[int, int, int, int]]:
-    return [section for section in grid.detect_rectangles() if section[0] == color]
+def find_existing_patterns(grid: ColoredGrid, color: int) -> List[Tuple[int, int, int, int]]:
+    return [rect for rect in grid.detect_rectangles() if rect[0] == color]
 
-def find_potential_sections(grid: ColoredGrid) -> List[Tuple[int, int]]:
+def identify_potential_areas(grid: ColoredGrid) -> List[Tuple[int, int]]:
     rows, cols = grid.get_dimensions()
-    return [(r, c) for r in range(0, rows, 4) for c in range(0, cols, 4) 
-            if grid.get_cell(r, c) != 4 and any(grid.get_cell(r+i, c+j) == 1 
-            for i in range(3) for j in range(3) if r+i < rows and c+j < cols)]
+    upper_half = rows // 2
+    return [(r, c) for r in range(upper_half) for c in range(cols)
+            if grid.get_cell(r, c) == 1 and is_potential_l_shape(grid, r, c)]
 
-def shift_existing_sections(grid: ColoredGrid, sections: List[Tuple[int, int, int, int]], color: int):
-    for _, top, left, bottom, right in sections:
-        for r in range(top, bottom + 1):
-            for c in range(left, right + 1):
-                if grid.get_cell(r, c) == color:
-                    new_r, new_c = r + 1, c + 1
-                    if new_r <= bottom and new_c <= right and grid.get_cell(new_r, new_c) != 4:
-                        grid.set_cell(new_r, new_c, color)
-                        grid.set_cell(r, c, 0 if grid.get_cell(r-1, c-1) == 4 else 1)
+def is_potential_l_shape(grid: ColoredGrid, r: int, c: int) -> bool:
+    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+    blue_neighbors = sum(1 for dr, dc in directions
+                         if grid.get_cell(r + dr, c + dc) == 1)
+    return blue_neighbors >= 2
 
-def transform_additional_sections(grid: ColoredGrid, sections: List[Tuple[int, int]], color: int):
+def apply_l_shape_transformations(grid: ColoredGrid, areas: List[Tuple[int, int]], color: int, existing_patterns: List[Tuple[int, int, int, int]]):
     changes = 0
-    for top, left in sections:
-        if changes >= 3:
+    for r, c in areas:
+        if changes >= 3 or r >= grid.get_dimensions()[0] // 2:
             break
-        blue_cells = [(r, c) for r in range(top, top+3) for c in range(left, left+3) 
-                      if grid.get_cell(r, c) == 1]
-        if len(blue_cells) >= 2:
-            for r, c in blue_cells[:2]:
-                grid.set_cell(r, c, color)
+        if create_l_shape(grid, r, c, color):
             changes += 1
+
+def create_l_shape(grid: ColoredGrid, r: int, c: int, color: int) -> bool:
+    directions = [(0, 0), (0, 1), (1, 0)]
+    if all(grid.get_cell(r + dr, c + dc) != 4 for dr, dc in directions):
+        for dr, dc in directions:
+            grid.set_cell(r + dr, c + dc, color)
+        return True
+    return False
+
+def balance_design(grid: ColoredGrid, color: int):
+    rows, cols = grid.get_dimensions()
+    for r in range(rows // 2, rows * 3 // 4):
+        for c in range(cols):
+            if grid.get_cell(r, c) == 1 and random.random() < 0.1:
+                grid.set_cell(r, c, color)
