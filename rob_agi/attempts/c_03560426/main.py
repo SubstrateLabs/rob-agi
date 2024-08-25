@@ -8,9 +8,9 @@ def solve_03560426(input_grid: ColoredGrid) -> ColoredGrid:
     
     1. Extracts shapes from bottom to top, preserving their order.
     2. Places shapes in a new grid, starting from the top-left corner.
-    3. Tries various orientations and modifications of each shape for optimal placement.
-    4. Ensures shapes are connected and the arrangement is as compact as possible.
-    5. Uses backtracking if initial placement doesn't yield an optimal solution.
+    3. Stacks shapes vertically, creating new stacks to the right when needed.
+    4. Maintains the original form and orientation of each shape.
+    5. Compacts the arrangement by moving shapes left if possible.
     6. Fills remaining space with black (0).
     
     Returns the transformed grid with shapes arranged compactly in the top-left quadrant.
@@ -18,6 +18,7 @@ def solve_03560426(input_grid: ColoredGrid) -> ColoredGrid:
     shapes = extract_shapes(input_grid)
     output_grid = ColoredGrid(values=[[0 for _ in range(10)] for _ in range(10)])
     place_shapes(shapes, output_grid)
+    compact_arrangement(output_grid)
     return output_grid
 
 def extract_shapes(grid: ColoredGrid) -> List[Dict[str, any]]:
@@ -38,42 +39,37 @@ def bfs(grid: ColoredGrid, start_r: int, start_c: int, visited: set) -> List[Tup
     shape = []
     color = grid.values[start_r][start_c]
     rows, cols = grid.get_dimensions()
+    min_r, min_c = start_r, start_c
     
     while queue:
         r, c = queue.popleft()
         if (r, c) not in visited and grid.values[r][c] == color:
             visited.add((r, c))
-            shape.append((r - start_r, c - start_c))  # Store relative coordinates
+            min_r = min(min_r, r)
+            min_c = min(min_c, c)
+            shape.append((r, c))
             for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
                 nr, nc = r + dr, c + dc
                 if 0 <= nr < rows and 0 <= nc < cols:
                     queue.append((nr, nc))
     
-    return shape
+    return [(r - min_r, c - min_c) for r, c in shape]  # Store relative coordinates
 
 def place_shapes(shapes: List[Dict[str, any]], output_grid: ColoredGrid) -> None:
-    current_position = (0, 0)
+    stacks = [0]  # Keep track of the bottom of each stack
     for shape in shapes:
         placed = False
-        for orientation in get_shape_orientations(shape["coords"]):
-            if can_place_shape(output_grid, orientation, current_position):
-                place_shape(output_grid, orientation, current_position, shape["color"])
-                current_position = get_next_position(output_grid, current_position)
+        for i, bottom in enumerate(stacks):
+            if can_place_shape(output_grid, shape["coords"], (bottom, i)):
+                place_shape(output_grid, shape["coords"], (bottom, i), shape["color"])
+                stacks[i] = bottom + max(y for _, y in shape["coords"]) + 1
                 placed = True
                 break
         if not placed:
-            # If we can't place a shape, we should implement backtracking here
-            # For simplicity, we'll just skip it for now
-            pass
-
-def get_shape_orientations(shape: List[Tuple[int, int]]) -> List[List[Tuple[int, int]]]:
-    orientations = []
-    for i in range(4):  # 4 rotations
-        rotated = [(y, -x) for x, y in shape]
-        orientations.append(rotated)
-        orientations.append([(-x, y) for x, y in rotated])  # flipped
-        shape = rotated
-    return orientations
+            # Start a new stack
+            stacks.append(0)
+            place_shape(output_grid, shape["coords"], (0, len(stacks) - 1), shape["color"])
+            stacks[-1] = max(y for _, y in shape["coords"]) + 1
 
 def can_place_shape(grid: ColoredGrid, shape: List[Tuple[int, int]], position: Tuple[int, int]) -> bool:
     rows, cols = grid.get_dimensions()
@@ -88,23 +84,15 @@ def place_shape(grid: ColoredGrid, shape: List[Tuple[int, int]], position: Tuple
         new_x, new_y = position[0] + x, position[1] + y
         grid.values[new_x][new_y] = color
 
-def get_next_position(grid: ColoredGrid, current_position: Tuple[int, int]) -> Tuple[int, int]:
+def compact_arrangement(grid: ColoredGrid) -> None:
     rows, cols = grid.get_dimensions()
-    x, y = current_position
-    
-    # Try moving right
-    if y + 1 < cols and grid.values[x][y + 1] == 0:
-        return (x, y + 1)
-    
-    # Move to the next row
-    for new_x in range(x + 1, rows):
-        for new_y in range(cols):
-            if grid.values[new_x][new_y] == 0:
-                # Check if it's adjacent to a non-zero cell
-                for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-                    adj_x, adj_y = new_x + dx, new_y + dy
-                    if 0 <= adj_x < rows and 0 <= adj_y < cols and grid.values[adj_x][adj_y] != 0:
-                        return (new_x, new_y)
-    
-    # If no suitable position found, return the current position
-    return current_position
+    for c in range(1, cols):
+        for r in range(rows):
+            if grid.values[r][c] != 0:
+                move_left = 0
+                while c - move_left > 0 and all(grid.values[i][c - move_left - 1] == 0 for i in range(rows)):
+                    move_left += 1
+                if move_left > 0:
+                    for i in range(rows):
+                        grid.values[i][c - move_left] = grid.values[i][c]
+                        grid.values[i][c] = 0
