@@ -8,8 +8,8 @@ def solve_c1990cce(input_grid: ColoredGrid) -> ColoredGrid:
     then fills in an inverted blue triangle below the diamond. The pattern is as follows:
     1. Copy the input row to the first row of the output grid.
     2. Create a red diamond by expanding diagonally from the center red square.
-    3. Fill in blue squares below the red diamond, starting from the 4th row,
-       avoiding placing blue squares directly under red ones.
+    3. Fill in blue squares below the red diamond, starting from the middle row,
+       avoiding placing blue squares directly under red ones or in the same column as the original red square.
     4. The rest of the grid remains black (empty space).
 
     Args:
@@ -34,13 +34,17 @@ def solve_c1990cce(input_grid: ColoredGrid) -> ColoredGrid:
             output_grid.values[row][left] = 2
         if 0 <= right < grid_size:
             output_grid.values[row][right] = 2
+        if left < 0 and right >= grid_size:
+            break  # Stop when diamond is complete
     
     # Step 4: Create the blue inverted triangle
-    for row in range(3, grid_size):
-        left_red = output_grid.values[row].index(2)
-        right_red = grid_size - 1 - output_grid.values[row][::-1].index(2)
+    for row in range(grid_size // 2, grid_size):
+        left_red = next((i for i, val in enumerate(output_grid.values[row]) if val == 2), -1)
+        right_red = next((grid_size - 1 - i for i, val in enumerate(reversed(output_grid.values[row])) if val == 2), grid_size)
         for col in range(left_red + 1, right_red):
-            if output_grid.values[row-1][col] != 2:
+            if (output_grid.values[row-1][col] == 0 and 
+                (row == grid_size // 2 or output_grid.values[row-1][col] != 1) and
+                col != center):
                 output_grid.values[row][col] = 1
     
     # Step 5: Return the completed grid
