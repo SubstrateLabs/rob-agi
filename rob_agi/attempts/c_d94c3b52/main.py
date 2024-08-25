@@ -11,6 +11,7 @@ def solve_d94c3b52(input_grid: ColoredGrid) -> ColoredGrid:
     4. Maintains overall balance and visual distinctiveness.
     5. Preserves small sky blue "anchor" regions and key patterns.
     6. Ensures no large adjacent regions have the same non-blue color.
+    7. Handles all possible input colors and transforms them according to a defined color cycle.
     """
     regions = find_connected_regions(input_grid)
     region_graph = create_region_graph(regions)
@@ -58,35 +59,35 @@ def are_adjacent(region1: List[Tuple[int, int]], region2: List[Tuple[int, int]])
     return False
 
 def analyze_color_distribution(grid: ColoredGrid) -> Dict[int, int]:
-    distribution = {1: 0, 7: 0, 8: 0}  # Blue, Orange, Sky Blue
+    distribution = {}
     for row in grid.values:
         for cell in row:
-            if cell in distribution:
-                distribution[cell] += 1
+            if cell != 0:  # Exclude black cells
+                distribution[cell] = distribution.get(cell, 0) + 1
     return distribution
 
 def apply_color_transformations(regions: List[List[Tuple[int, int]]], graph: Dict[int, List[int]], color_distribution: Dict[int, int]) -> List[int]:
     new_colors = []
+    color_cycle = {1: 8, 8: 7, 7: 1}  # Blue -> Sky Blue -> Orange -> Blue
+    
     for i, region in enumerate(regions):
         color = region[0][1]  # Get color of the region
         size = len(region)
         
         if size <= 4 and color == 8:  # Small sky blue "anchor" regions
-            new_colors.append(8)
-        elif color == 8 and size > 4:  # Large sky blue regions change to orange
-            new_colors.append(7)
-        elif color == 7:  # Orange always changes to blue
-            new_colors.append(1)
-        else:  # Blue regions
-            adjacent_colors = [new_colors[j] for j in graph[i] if j < i]
-            if 8 not in adjacent_colors and color_distribution[8] < color_distribution[1]:
-                new_colors.append(8)
-            else:
-                new_colors.append(1)
+            new_color = 8
+        elif color in color_cycle:
+            new_color = color_cycle[color]
+        else:
+            # For colors not in the cycle, choose the least common color
+            least_common = min(color_cycle.values(), key=lambda c: color_distribution.get(c, 0))
+            new_color = least_common
+        
+        new_colors.append(new_color)
         
         # Update color distribution
-        color_distribution[color] -= size
-        color_distribution[new_colors[-1]] += size
+        color_distribution[color] = color_distribution.get(color, 0) - size
+        color_distribution[new_color] = color_distribution.get(new_color, 0) + size
     
     return new_colors
 
