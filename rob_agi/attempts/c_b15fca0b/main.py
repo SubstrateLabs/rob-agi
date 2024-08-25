@@ -12,38 +12,34 @@ def solve_b15fca0b(input_grid: ColoredGrid) -> ColoredGrid:
     Blue lines and red squares remain unchanged.
     
     Algorithm:
-    1. Perform an initial flood fill from the edges to mark cells with a path to the edge, including diagonal paths.
-    2. Fill unmarked black cells with yellow.
-    3. Ensure blue lines and red squares remain unchanged.
+    1. Create a deep copy of the input grid.
+    2. Initialize a 'reachable' grid to track cells that can be reached from edges or red squares.
+    3. Perform flood fill from red squares and non-blue edge cells, including diagonal movements.
+    4. Fill unreachable black cells with yellow.
+    5. Return the modified grid.
     """
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
-    visited = [[False for _ in range(cols)] for _ in range(rows)]
+    reachable = [[False for _ in range(cols)] for _ in range(rows)]
 
-    def is_valid(row, col):
-        return 0 <= row < rows and 0 <= col < cols
-
-    def is_edge(row, col):
-        return row == 0 or col == 0 or row == rows - 1 or col == cols - 1
-
-    def flood_fill(row, col):
-        if not is_valid(row, col) or visited[row][col] or grid.values[row][col] in [1, 2]:
+    def flood_fill(r, c):
+        if not (0 <= r < rows and 0 <= c < cols) or reachable[r][c] or grid.values[r][c] == BLUE:
             return
-        visited[row][col] = True
+        reachable[r][c] = True
         for dr in [-1, 0, 1]:
             for dc in [-1, 0, 1]:
-                flood_fill(row + dr, col + dc)
+                flood_fill(r + dr, c + dc)
 
-    # Perform edge flood fill
+    # Identify starting points and perform flood fill
     for r in range(rows):
         for c in range(cols):
-            if is_edge(r, c) and grid.values[r][c] == 0:
+            if grid.values[r][c] == RED or (grid.values[r][c] == BLACK and (r in [0, rows-1] or c in [0, cols-1])):
                 flood_fill(r, c)
 
-    # Fill enclosed areas with yellow
+    # Fill enclosed areas
     for r in range(rows):
         for c in range(cols):
-            if grid.values[r][c] == 0 and not visited[r][c]:
-                grid.values[r][c] = 4
+            if grid.values[r][c] == BLACK and not reachable[r][c]:
+                grid.values[r][c] = YELLOW
 
     return grid
