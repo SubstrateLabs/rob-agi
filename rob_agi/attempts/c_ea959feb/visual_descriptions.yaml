@@ -1,41 +1,65 @@
 example_0:
   input: |
-    The input grid is a 22x25 rectangular pattern. It consists of a repeating sequence of colors (1-6) in diagonal stripes. However, there are several irregular areas:
-    1. In the top-left corner, there's a triangular area of color 1 (blue).
-    2. In the middle-left, there's a rectangular area of color 1 (blue).
-    3. In the bottom-right corner, there's a triangular area of color 1 (blue).
-    4. There are a few scattered single-cell irregularities of color 1 (blue) throughout the grid.
-    These irregular areas disrupt the otherwise consistent diagonal stripe pattern.
+    The input grid is 22x25 cells. The underlying pattern consists of diagonal stripes of colors 1-6 repeating in sequence. This pattern is disrupted by:
+    1. A triangular area of color 1 (blue) in the top-left corner, spanning about 7x7 cells.
+    2. A rectangular area of color 1 (blue) in the middle-left, approximately 5x5 cells.
+    3. A triangular area of color 1 (blue) in the bottom-right corner, spanning about 5x5 cells.
+    4. Scattered single cells of color 1 (blue) throughout, breaking the stripe pattern.
+    The diagonal stripes slope down from left to right at approximately a 45-degree angle.
+    Each color typically spans 2-3 cells in width before transitioning to the next color.
   output: |
-    The output grid is the same size as the input (22x25). It shows a perfect diagonal stripe pattern of colors 1-6, repeating consistently across the entire grid. All the irregular areas and single-cell disruptions present in the input have been "corrected" to match the overall diagonal stripe pattern.
+    The output grid maintains the 22x25 size but shows a perfect diagonal stripe pattern.
+    Colors 1-6 repeat in sequence, forming continuous stripes from top-left to bottom-right.
+    Each stripe is consistently 2-3 cells wide.
+    All irregularities from the input (triangles, rectangle, scattered cells) are replaced with the correct colors to maintain the stripe pattern.
+    The pattern appears to repeat every 6 columns horizontally and every 3 rows vertically.
 
 example_1:
   input: |
-    The input is a 22x25 grid with a complex pattern. The base pattern is a repeating sequence of colors 1-7 in diagonal stripes. However, there are several irregular areas:
-    1. In the top-left, there's a triangular area filled with color 5 (gray).
-    2. In the middle-left, there's a rectangular area filled with color 1 (blue).
-    3. In the bottom-right, there's a triangular area filled with color 1 (blue).
-    4. There are scattered single-cell irregularities of color 1 (blue) throughout the grid.
-    These irregular areas interrupt the otherwise consistent diagonal stripe pattern.
+    The input grid is 22x25 cells with a base pattern of diagonal stripes using colors 1-7.
+    The pattern is interrupted by:
+    1. A triangular area of color 5 (gray) in the top-left, covering about 5x5 cells.
+    2. A rectangular region of color 1 (blue) in the middle-left, roughly 5x5 cells.
+    3. A triangular section of color 1 (blue) in the bottom-right, approximately 5x5 cells.
+    4. Random single cells of color 1 (blue) scattered across the grid.
+    The diagonal stripes slope down from left to right at roughly a 45-degree angle.
+    Each color typically spans 1-2 cells in width before transitioning to the next color.
   output: |
-    The output grid is identical in size to the input (22x25). It displays a perfect diagonal stripe pattern of colors 1-7, repeating consistently across the entire grid. All the irregular areas and single-cell disruptions present in the input have been "corrected" to match the overall diagonal stripe pattern.
+    The output maintains the 22x25 grid size but displays a flawless diagonal stripe pattern.
+    Colors 1-7 repeat sequentially, forming uninterrupted stripes from top-left to bottom-right.
+    Each stripe consistently spans 1-2 cells in width.
+    All irregularities from the input are corrected to fit the overall stripe pattern.
+    The pattern seems to repeat every 7 columns horizontally and every 3 rows vertically.
 
 example_2:
   input: |
-    The input is a 22x25 grid with a complex pattern. The base pattern is a repeating sequence of colors 1-8 in diagonal stripes. However, there are several irregular areas:
-    1. In the middle-left, there's a rectangular area filled with color 1 (blue).
-    2. In the bottom-right, there's a triangular area filled with color 1 (blue).
-    3. There are scattered single-cell irregularities of color 1 (blue) throughout the grid.
-    These irregular areas disrupt the otherwise consistent diagonal stripe pattern.
+    The input is a 22x25 cell grid with an underlying pattern of diagonal stripes using colors 1-8.
+    This pattern is disrupted by:
+    1. A rectangular area of color 1 (blue) in the middle-left, about 6x6 cells.
+    2. A triangular region of color 1 (blue) in the bottom-right, spanning roughly 6x6 cells.
+    3. Individual cells of color 1 (blue) randomly distributed across the grid.
+    The diagonal stripes descend from left to right at approximately a 45-degree angle.
+    Each color typically occupies 1 cell in width before transitioning to the next color.
   output: |
-    The output grid is the same size as the input (22x25). It shows a perfect diagonal stripe pattern of colors 1-8, repeating consistently across the entire grid. All the irregular areas and single-cell disruptions present in the input have been "corrected" to match the overall diagonal stripe pattern.
+    The output preserves the 22x25 grid dimensions but exhibits a perfect diagonal stripe pattern.
+    Colors 1-8 repeat in sequence, creating unbroken stripes from top-left to bottom-right.
+    Each stripe is consistently 1 cell wide.
+    All irregularities from the input are replaced to conform to the overall stripe pattern.
+    The pattern appears to repeat every 8 columns horizontally and every 3 rows vertically.
 
 test_case_0:
   input: |
-    The input is a 22x25 grid with a complex pattern. The base pattern is a repeating sequence of colors 1-8 in diagonal stripes. However, there are several irregular areas:
-    1. In the middle-left, there's a rectangular area filled with color 1 (blue).
-    2. In the bottom-right, there's a triangular area filled with color 1 (blue).
-    3. There are scattered single-cell irregularities of color 1 (blue) throughout the grid.
-    These irregular areas interrupt the otherwise consistent diagonal stripe pattern.
+    The input grid is 22x25 cells with a base pattern of diagonal stripes using colors 1-8.
+    The pattern is interrupted by:
+    1. A rectangular area of color 1 (blue) in the middle-left, approximately 6x6 cells.
+    2. A triangular region of color 1 (blue) in the bottom-right, covering about 6x6 cells.
+    3. Sporadic single cells of color 1 (blue) distributed throughout the grid.
+    The diagonal stripes slope down from left to right at roughly a 45-degree angle.
+    Each color typically spans 1 cell in width before transitioning to the next color.
   output: |
-    The expected output is not provided in the test case. Based on the pattern observed in the examples, it's likely that the output would be a 22x25 grid showing a perfect diagonal stripe pattern of colors 1-8, repeating consistently across the entire grid, with all irregular areas and single-cell disruptions "corrected" to match the overall pattern.
+    While the specific output is not provided, based on the pattern in previous examples, 
+    we can expect a 22x25 grid with a perfect diagonal stripe pattern.
+    Colors 1-8 would likely repeat in sequence, forming continuous stripes from top-left to bottom-right.
+    Each stripe would be consistently 1 cell wide.
+    All irregularities from the input would be corrected to match the overall stripe pattern.
+    The pattern would probably repeat every 8 columns horizontally and every 3 rows vertically.
