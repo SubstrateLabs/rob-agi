@@ -9,7 +9,7 @@ def solve_ca8de6ea(input_grid: ColoredGrid) -> ColoredGrid:
     
     The resulting 3x3 grid is structured as follows:
     - Top row: [top-left corner, element at (1,1), top-right corner]
-    - Middle row: [element at (2,1), center, element at (2,3)]
+    - Middle row: [element at (3,3), center, element at (1,3)]
     - Bottom row: [bottom-left corner, element at (3,1), bottom-right corner]
     """
     # Extract corners
@@ -20,9 +20,9 @@ def solve_ca8de6ea(input_grid: ColoredGrid) -> ColoredGrid:
     
     # Extract middle elements
     top_middle = input_grid.values[1][1]
-    right_middle = input_grid.values[2][3]
+    right_middle = input_grid.values[1][3]
     bottom_middle = input_grid.values[3][1]
-    left_middle = input_grid.values[2][1]
+    left_middle = input_grid.values[3][3]
     
     # Extract center
     center = input_grid.values[2][2]
