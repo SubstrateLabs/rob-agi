@@ -7,9 +7,8 @@ def solve_0c786b71(input_grid: ColoredGrid) -> ColoredGrid:
     The function creates a symmetrical expansion of the input grid:
     1. Copy the input grid to the top-left quadrant.
     2. Mirror horizontally for the top-right quadrant.
-    3. Mirror vertically for the bottom-left quadrant.
-    4. Mirror both horizontally and vertically for the bottom-right quadrant.
-    5. Swap the first and third rows of the entire grid.
+    3. Swap the first and third rows of the top half.
+    4. Mirror the entire top half vertically to create the bottom half.
     
     This creates a symmetrical expansion of the input grid with specific row swaps.
     """
@@ -28,18 +27,12 @@ def solve_0c786b71(input_grid: ColoredGrid) -> ColoredGrid:
         for j in range(input_cols):
             output_values[i][j + input_cols] = input_grid.values[i][input_cols - 1 - j]
     
-    # Fill bottom-left quadrant (vertical mirror)
-    for i in range(input_rows):
-        for j in range(input_cols):
-            output_values[i + input_rows][j] = input_grid.values[input_rows - 1 - i][j]
-    
-    # Fill bottom-right quadrant (both horizontal and vertical mirror)
-    for i in range(input_rows):
-        for j in range(input_cols):
-            output_values[i + input_rows][j + input_cols] = input_grid.values[input_rows - 1 - i][input_cols - 1 - j]
-    
-    # Swap first and third rows of the entire grid
+    # Swap first and third rows of the top half
     output_values[0], output_values[2] = output_values[2], output_values[0]
-    output_values[3], output_values[5] = output_values[5], output_values[3]
+    
+    # Mirror the entire top half vertically to create the bottom half
+    for i in range(input_rows):
+        for j in range(output_cols):
+            output_values[i + input_rows][j] = output_values[input_rows - 1 - i][j]
     
     return ColoredGrid(values=output_values)
