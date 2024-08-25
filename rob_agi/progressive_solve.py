@@ -115,9 +115,11 @@ class Solver:
         ask_coder = self.get_ask_coder()
         prefix = self.get_prefix(is_first)
         prompt = f"{prefix}\n\n<VALIDATION_OUTPUT>\n{current_result['error']}\n{current_result['output']}</VALIDATION_OUTPUT>\n"
-        prompt += f"\n<VISUAL_DESCRIPTIONS>{desc}</VISUAL_DESCRIPTIONS>\n"
+        prompt += f"\n<VISUAL_DESCRIPTIONS>\n{desc}\n</VISUAL_DESCRIPTIONS>\n"
         prompt += "Examine all the information you have, state your understanding of the challenge, and propose a detailed solution to the challenge in words. Any solution must always apply to every case, not just the failing exception here.\n"
-        prompt += "Then reflect on your idea. Look very closely and notice if there are any other patterns or discrepancies worth noting. Remember this is about identifying abstract, intuitive ideas about what is happening.\n"
+        ask_coder.run(prompt)
+
+        prompt = "Now reflect on your idea. Look very closely and notice if there are any other patterns or discrepancies worth noting. Remember this is about identifying abstract, intuitive ideas about what is happening.\n"
         prompt += f"Explicitly consider how your idea applies to each of the examples and test cases in attempts/{self.challenge_id}/test.py. To check your thinking, illustrate how your idea either works or doesn't for each case.\n"
         prompt += f"If the rule(s) you came up with does not apply to any specific case, call it out and think about a more general idea that does apply in every case. Be meticulous and careful in your reflection. Sometimes you need to zoom out to see how a single idea can apply to all cases.\n"
         ask_coder.run(prompt)
@@ -197,7 +199,6 @@ class Solver:
             write_meta_file(
                 self.challenge_root, solved=not is_failing, latest_plan=plan, total_attempts=self.total_attempts
             )
-            logger.info(f"SUCCESS: {current_result['success']}")
 
         logger.info(f"Total time: {time.perf_counter() - t0:.2f}s")
         return current_result["success"]

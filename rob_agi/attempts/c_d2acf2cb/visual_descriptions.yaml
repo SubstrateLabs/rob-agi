@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 7x9 grid with mostly magenta (6) and black (0) squares. There are two yellow (4) squares at the bottom row, positioned at the leftmost and rightmost edges. The magenta squares form various patterns and shapes throughout the grid, including solid rows, partial rows, and scattered squares.
+  output: |
+    The grid maintains most of its original structure, but the bottom row has been significantly altered. The space between the two yellow (4) squares is now filled with alternating orange (7) and sky blue (8) squares. The rest of the grid remains unchanged.
+
+example_1:
+  input: |
+    A 9x9 grid with a complex pattern. Three rows (1st, 5th, and 8th) contain yellow (4) squares at both ends, with these rows filled with alternating orange (7) and sky blue (8) squares. The rest of the grid is a mix of black (0) and magenta (6) squares in various patterns.
+  output: |
+    The grid has been transformed significantly. The three rows that previously contained alternating orange and sky blue squares (1st, 5th, and 8th) now contain mostly magenta (6) and black (0) squares, with some patterns preserved. The yellow (4) squares remain in their original positions at the ends of these rows. The rest of the grid maintains its original black and magenta pattern.
+
+example_2:
+  input: |
+    A 6x9 grid with a mix of magenta (6) and black (0) squares. There are four yellow (4) squares: two in the top row (4th and 8th columns) and two in the bottom row (4th and 8th columns). The yellow squares form a rectangle shape when connected.
+  output: |
+    The grid maintains its overall structure, but the space between the yellow squares has been filled. Vertical lines of alternating sky blue (8) and orange (7) squares now connect the top and bottom yellow squares in both the 4th and 8th columns. The rest of the grid remains unchanged.
+
+test_case_0:
+  input: |
+    A 10x9 grid with a complex pattern of magenta (6) and black (0) squares. There are six yellow (4) squares: three in the top row (2nd, 6th, and 8th columns) and three in the bottom row (2nd, 6th, and 8th columns). The yellow squares form three vertical pairs when connected.
+  output: |
+    The grid has been transformed with vertical connections between the yellow squares. Alternating orange (7) and sky blue (8) squares now fill the spaces between the top and bottom yellow squares in the 2nd, 6th, and 8th columns. Some of the original magenta squares remain, while others have been replaced by the new orange and sky blue pattern. The overall structure of the grid is maintained, with the most significant changes occurring in the columns containing yellow squares.
