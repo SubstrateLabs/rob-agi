@@ -6,10 +6,10 @@ def solve_ecaa0ec1(input_grid: ColoredGrid) -> ColoredGrid:
     Solve the ecaa0ec1 challenge by reorganizing the colored cells.
     
     1. Find the bounding box of non-black cells.
-    2. Calculate the center of the bounding box.
-    3. Create a fixed 3x3 structure with sky blue corners and blue center/sides.
-    4. Place the structure centered on the calculated center.
-    5. If yellow exists in the input, place one yellow cell adjacent to the structure.
+    2. Analyze the pattern of blue (1) and sky blue (8) cells.
+    3. Create a 3x3 structure that resembles the input pattern.
+    4. Place the structure near the center of the bounding box.
+    5. If yellow exists in the input, place one yellow cell two spaces away from the structure.
     6. Clear the rest of the grid.
     7. Return the new grid with the reorganized structure.
     """
@@ -19,12 +19,13 @@ def solve_ecaa0ec1(input_grid: ColoredGrid) -> ColoredGrid:
         return input_grid.deep_copy()
 
     center = calculate_center(bounding_box)
-    structure = create_3x3_structure()
+    color_counts = count_colors(input_grid, bounding_box)
+    structure = create_3x3_structure(input_grid, bounding_box)
     
     output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
     place_structure(output_grid, structure, center)
     
-    if has_yellow(input_grid):
+    if color_counts[4] > 0:  # If yellow exists in the input
         place_yellow(output_grid, center)
     
     return output_grid
@@ -60,12 +61,29 @@ def calculate_center(bbox: Tuple[int, int, int, int]) -> Tuple[int, int]:
     center_col = (min_col + max_col) // 2
     return (center_row, center_col)
 
-def create_3x3_structure() -> List[List[int]]:
-    return [
-        [8, 1, 8],
-        [1, 1, 1],
-        [8, 1, 8]
-    ]
+def create_3x3_structure(grid: ColoredGrid, bbox: Tuple[int, int, int, int]) -> List[List[int]]:
+    min_row, min_col, max_row, max_col = bbox
+    blue_count = 0
+    sky_blue_count = 0
+    for r in range(min_row, max_row + 1):
+        for c in range(min_col, max_col + 1):
+            if grid.values[r][c] == 1:
+                blue_count += 1
+            elif grid.values[r][c] == 8:
+                sky_blue_count += 1
+    
+    if sky_blue_count >= 3:
+        return [
+            [8, 1, 8],
+            [1, 1, 1],
+            [1, 8, 1]
+        ]
+    else:
+        return [
+            [1, 8, 1],
+            [1, 1, 1],
+            [1, 8, 1]
+        ]
 
 def place_structure(grid: ColoredGrid, structure: List[List[int]], center: Tuple[int, int]):
     center_row, center_col = center
@@ -76,12 +94,9 @@ def place_structure(grid: ColoredGrid, structure: List[List[int]], center: Tuple
             if 0 <= grid_row < len(grid.values) and 0 <= grid_col < len(grid.values[0]):
                 grid.values[grid_row][grid_col] = structure[r][c]
 
-def has_yellow(grid: ColoredGrid) -> bool:
-    return any(4 in row for row in grid.values)
-
 def place_yellow(grid: ColoredGrid, center: Tuple[int, int]):
     center_row, center_col = center
-    directions = [(-2, 0), (0, -2), (2, 0), (0, 2), (-2, -1), (-2, 1), (2, -1), (2, 1), (-1, -2), (1, -2), (-1, 2), (1, 2)]
+    directions = [(-2, 0), (0, -2), (2, 0), (0, 2), (-2, -2), (-2, 2), (2, -2), (2, 2)]
     for dr, dc in directions:
         r, c = center_row + dr, center_col + dc
         if 0 <= r < len(grid.values) and 0 <= c < len(grid.values[0]) and grid.values[r][c] == 0:
