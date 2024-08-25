@@ -1,0 +1,65 @@
+example_0:
+  input: |
+    A 30x30 grid mostly filled with black (empty) squares. There are several notable features:
+    1. Four 2x2 red squares located at different positions:
+       - Top-left corner at (3,5)
+       - Top-left corner at (4,18)
+       - Top-left corner at (15,10)
+       - Top-left corner at (23,20)
+    2. Several isolated blue dots scattered across the grid:
+       - At (0,18), (4,2), (4,11), (4,14), (4,24), (7,5), (9,18), (10,10), (10,26), (16,6), (16,20), (23,13), (28,21)
+  output: |
+    The 30x30 grid has been transformed. Key changes:
+    1. The four 2x2 red squares remain in their original positions.
+    2. Most isolated blue dots have been removed.
+    3. New blue dots have been added adjacent to the red squares:
+       - For the square at (3,5): blue dots at (3,4) and (5,5)
+       - For the square at (4,18): blue dots at (4,17) and (6,18)
+       - For the square at (15,10): blue dots at (15,9) and (17,10)
+       - For the square at (23,20): blue dots at (23,19) and (25,20)
+    4. Blue dots on the edges of the grid have been preserved: (0,18), (10,26), (28,21)
+
+example_1:
+  input: |
+    A 30x30 grid mostly filled with black (empty) squares. Notable features:
+    1. Three 2x2 red squares:
+       - Top-left corner at (7,5)
+       - Top-left corner at (16,16)
+       - Top-left corner at (23,20)
+    2. Several isolated blue dots:
+      - At (2,26), (3,6), (7,16), (8,17), (10,10), (15,11), (16,6), (19,20), (23,3), (28,24)
+  output: |
+    The 30x30 grid has been transformed:
+    1. The three 2x2 red squares remain in their original positions.
+    2. Most isolated blue dots have been removed.
+    3. New blue dots have been added adjacent to the red squares:
+       - For the square at (7,5): blue dots at (7,4) and (9,5)
+       - For the square at (16,16): blue dots at (16,15) and (18,16)
+       - For the square at (23,20): blue dots at (23,19) and (25,20)
+    4. Blue dots on the edges of the grid have been preserved: (2,26), (23,3), (28,24)
+
+example_2:
+  input: |
+    A 13x10 grid mostly filled with black (empty) squares. Notable features:
+    1. Four 2x2 red squares:
+       - Top-left corners at (3,1), (3,10), (4,1), and (4,10)
+    2. Three isolated blue dots:
+       - At (3,5), (4,7), (8,4)
+  output: |
+    The 13x10 grid has been transformed:
+    1. The four 2x2 red squares remain in their original positions.
+    2. All isolated blue dots have been removed.
+    3. New blue dots have been added adjacent to the red squares:
+       - For the squares at (3,1) and (4,1): a blue dot at (3,3)
+       - For the squares at (3,10) and (4,10): a blue dot at (4,9)
+    4. The blue dot at (8,4) has been preserved as it's on the edge of the grid.
+
+test_case_0:
+  input: |
+    A 13x10 grid mostly filled with black (empty) squares. Notable features:
+    1. Four 2x2 red squares:
+       - Top-left corners at (3,1), (3,10), (4,1), and (4,10)
+    2. Three isolated blue dots:
+       - At (3,5), (4,7), (8,4)
+  output: |
+    The output grid is not provided for the test case.
