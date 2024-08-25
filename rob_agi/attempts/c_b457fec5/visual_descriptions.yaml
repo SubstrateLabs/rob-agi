@@ -1,17 +1,41 @@
 example_0:
   input: |
-    A 23x19 grid with mostly black (empty) space. There's a small cluster of colored squares in the top-left corner: blue, red, green, and sky blue in a row. The main feature is a large gray triangle or wedge shape starting from the left side of the grid and expanding diagonally downwards to the right. The triangle is made up of gray (5) squares and takes up a significant portion of the grid.
+    A 23x19 grid with black (0) background. Key features:
+    1. Color sequence: In the top-left corner, a row of four colors - blue (1), red (2), green (3), and sky blue (8).
+    2. Gray area: A large triangular shape made of gray (5) squares, starting from the left edge and expanding diagonally down-right.
+    3. The gray area's top-left corner aligns with the start of the color sequence.
   output: |
-    The 23x19 grid maintains its overall structure, but the gray triangle has been transformed. The triangle now consists of a pattern of colored squares that seem to follow the sequence blue (1), red (2), green (3), and sky blue (8). This pattern repeats in diagonal stripes, following the shape of the original gray triangle. The colored squares in the top-left corner remain unchanged.
+    Grid structure unchanged. Transformations:
+    1. Color sequence in top-left remains intact.
+    2. Gray area replaced with a repeating diagonal pattern of blue (1), red (2), green (3), sky blue (8).
+    3. Pattern starts from the top-left of the former gray area, matching the color sequence order.
+    4. Diagonal stripes run parallel to the original triangle's hypotenuse, maintaining color order across rows.
 
 example_1:
   input: |
-    An 18x17 grid, mostly black (empty). There's a small cluster of colored squares in the top-right: blue, green, and yellow in a row. The main feature is a gray triangle or wedge shape, similar to the previous example but smaller and positioned differently. It starts from the right side of the grid and expands diagonally downwards to the left.
+    An 18x17 grid with black (0) background. Key features:
+    1. Color sequence: In the top-right corner, a row of three colors - blue (1), green (3), and yellow (4).
+    2. Gray area: A triangular shape of gray (5) squares, starting from the right edge and expanding diagonally down-left.
+    3. The gray area's top-right corner aligns closely with the color sequence.
   output: |
-    The 18x17 grid keeps its structure, but the gray triangle has been transformed. The triangle now consists of a repeating pattern of colored squares: blue (1), green (3), and yellow (4). This pattern forms diagonal stripes following the shape of the original gray triangle. The colored squares in the top-right corner remain unchanged.
+    Grid structure preserved. Transformations:
+    1. Color sequence in top-right unchanged.
+    2. Gray area filled with a repeating diagonal pattern of blue (1), green (3), yellow (4).
+    3. Pattern begins from the top-right of the former gray area, following the color sequence order.
+    4. Diagonal stripes run parallel to the original triangle's hypotenuse, maintaining color order across rows.
 
 example_2:
   input: |
-    An 18x14 grid with two main features. In the top-left, there's a small cluster of colored squares: red, sky blue, and green in a row. The grid contains two gray shapes: a smaller triangle on the left side expanding diagonally down and right, and a larger, more rectangular shape on the right side of the grid.
+    An 18x14 grid with black (0) background. Key features:
+    1. Color sequence: In the top-left corner, a row of three colors - red (2), sky blue (8), green (3).
+    2. Two distinct gray (5) areas:
+       a. Left: A small triangular shape expanding diagonally down-right from the left edge.
+       b. Right: A larger, more rectangular shape occupying the right side of the grid.
+    3. The left gray area's top-left corner aligns with the start of the color sequence.
   output: |
-    The 18x14 grid maintains its overall structure. Both gray shapes have been transformed into patterns of colored squares. The left triangle now consists of a repeating pattern of red (2), sky blue (8), and green (3) in diagonal stripes. The right shape has been filled with the same pattern, but it starts with green and follows the sequence green (3), red (2), sky blue (8). The colored squares in the top-left corner remain unchanged.
+    Grid structure maintained. Transformations:
+    1. Color sequence in top-left remains unchanged.
+    2. Both gray areas filled with the same repeating pattern of red (2), sky blue (8), green (3).
+    3. Pattern in left area starts from its top-left, matching the color sequence order.
+    4. Pattern in right area begins with green (3), suggesting a continuous pattern across both areas.
+    5. Diagonal stripes in both areas run parallel to the left triangle's hypotenuse, preserving color order across rows.
