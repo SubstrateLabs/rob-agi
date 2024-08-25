@@ -3,57 +3,66 @@ from collections import Counter
 
 def solve_67b4a34d(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the challenge by analyzing the input grid and creating a new 4x4 output grid.
+    Solves the challenge by analyzing the 16x16 input grid and creating a new 4x4 output grid.
     
-    The solution divides the 16x16 input grid into 16 non-overlapping 4x4 subgrids.
-    It then analyzes each subgrid for color frequencies and positional information.
-    The output grid is generated based on this analysis, considering color frequencies,
-    corner colors, and maintaining symmetry.
+    The solution analyzes the global structure of the input grid, including corners, edges,
+    and center. It creates a color importance map based on frequency and structural significance.
+    The output grid is generated to reflect key patterns, maintain symmetry, and ensure color diversity.
     
     Args:
     input_grid (ColoredGrid): A 16x16 input grid
     
     Returns:
-    ColoredGrid: A 4x4 grid generated based on the analysis of the input
+    ColoredGrid: A 4x4 grid that captures the essence of the input grid's structure and color distribution
     """
-    def analyze_subgrid(subgrid):
-        flat = [cell for row in subgrid for cell in row]
-        counter = Counter(flat)
-        most_common = counter.most_common(2)
-        return (most_common[0][0], most_common[1][0] if len(most_common) > 1 else most_common[0][0],
-                subgrid[0][0], subgrid[3][3])
+    def analyze_region(region):
+        flat = [cell for row in region for cell in row]
+        return Counter(flat).most_common()
 
-    subgrids = [
-        [input_grid.extract_subgrid(i*4, j*4, 4, 4) for j in range(4)]
-        for i in range(4)
+    # Analyze corners
+    corners = [
+        input_grid.extract_subgrid(0, 0, 4, 4),
+        input_grid.extract_subgrid(0, 12, 4, 4),
+        input_grid.extract_subgrid(12, 0, 4, 4),
+        input_grid.extract_subgrid(12, 12, 4, 4)
     ]
-    
-    analyses = [[analyze_subgrid(sg.values) for sg in row] for row in subgrids]
-    
-    output = [[0 for _ in range(4)] for _ in range(4)]
-    
-    for i in range(4):
-        for j in range(4):
-            if i + j == 0:
-                output[i][j] = analyses[i][j][2]  # top-left corner
-            elif i + j == 3 and i != j:
-                output[i][j] = analyses[i][j][3]  # corners except bottom-right
-            elif i + j % 2 == 0:
-                output[i][j] = analyses[i][j][0]  # most frequent
-            else:
-                output[i][j] = analyses[i][j][1]  # second most frequent
+    corner_colors = [analyze_region(c.values)[0][0] for c in corners]
 
-    # Ensure symmetry
-    output[3][3] = output[0][0]
-    output[3][0] = output[0][3]
-    output[1][2] = output[2][1]
-    
-    # Check for at least 3 colors
+    # Analyze edges
+    edges = [
+        [row[:4] + row[-4:] for row in input_grid.values[:4] + input_grid.values[-4:]],
+        [row[4:12] for row in input_grid.values[:4] + input_grid.values[-4:]]
+    ]
+    edge_colors = [color for edge in edges for color, _ in analyze_region(edge)[:2]]
+
+    # Analyze center
+    center = input_grid.extract_subgrid(4, 4, 8, 8)
+    center_colors = [color for color, _ in analyze_region(center.values)[:3]]
+
+    # Create color importance map
+    color_importance = Counter(corner_colors + edge_colors + center_colors)
+
+    # Generate output grid
+    output = [[0 for _ in range(4)] for _ in range(4)]
+
+    # Set corners
+    output[0][0] = output[3][3] = corner_colors[0]
+    output[0][3] = output[3][0] = corner_colors[1]
+
+    # Set edges
+    output[0][1] = output[0][2] = edge_colors[0]
+    output[1][0] = output[2][0] = edge_colors[1]
+    output[3][1] = output[3][2] = edge_colors[2]
+    output[1][3] = output[2][3] = edge_colors[3]
+
+    # Set center
+    output[1][1] = output[2][2] = center_colors[0]
+    output[1][2] = output[2][1] = center_colors[1]
+
+    # Ensure color diversity
     unique_colors = set(cell for row in output for cell in row)
     if len(unique_colors) < 3:
-        all_colors = [cell for row in input_grid.values for cell in row]
-        third_most_common = Counter(all_colors).most_common(3)[-1][0]
-        least_common = min(unique_colors, key=lambda x: sum(row.count(x) for row in output))
-        output = [[third_most_common if cell == least_common else cell for cell in row] for row in output]
-    
+        additional_color = max(color_importance, key=lambda x: color_importance[x] if x not in unique_colors else 0)
+        output[1][1] = output[2][2] = additional_color
+
     return ColoredGrid(values=output)
