@@ -1,5 +1,7 @@
 from rob_agi.colored_grid import ColoredGrid
 
+BLACK, BLUE, RED, YELLOW = 0, 1, 2, 4
+
 def solve_b15fca0b(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by filling enclosed areas with yellow (4).
@@ -10,36 +12,46 @@ def solve_b15fca0b(input_grid: ColoredGrid) -> ColoredGrid:
     Blue lines and red squares remain unchanged.
     
     Algorithm:
-    1. Use a flood fill algorithm to mark all cells that have a path to the edge.
-    2. Convert unmarked cells (enclosed areas) to yellow (4).
-    3. Restore the original colors of blue lines and red squares.
+    1. Perform an initial flood fill from the edges to mark cells with a path to the edge.
+    2. Fill unmarked black cells with yellow using a flood fill algorithm.
+    3. Ensure blue lines and red squares remain unchanged.
     """
-    new_grid = input_grid.deep_copy()
-    rows, cols = new_grid.get_dimensions()
+    grid = input_grid.deep_copy()
+    rows, cols = grid.get_dimensions()
+    marked = [[False for _ in range(cols)] for _ in range(rows)]
 
-    def flood_fill(r, c):
-        if not (0 <= r < rows and 0 <= c < cols):
-            return True  # Reached the edge
-        if new_grid.values[r][c] in [1, 2, -1]:  # Blue, red, or already visited
-            return False
-        if new_grid.values[r][c] == 0:
-            new_grid.values[r][c] = -1  # Mark as visited
-            # Check all four directions
-            return (flood_fill(r-1, c) or flood_fill(r+1, c) or
-                    flood_fill(r, c-1) or flood_fill(r, c+1))
-        return False
+    def is_valid_cell(row, col):
+        return 0 <= row < rows and 0 <= col < cols
 
+    def is_boundary_cell(row, col):
+        return row == 0 or col == 0 or row == rows - 1 or col == cols - 1
+
+    def edge_flood_fill(row, col):
+        if not is_valid_cell(row, col) or marked[row][col] or grid.values[row][col] in [BLUE, RED]:
+            return
+        
+        marked[row][col] = True
+        for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+            edge_flood_fill(row + dr, col + dc)
+
+    def yellow_flood_fill(row, col):
+        if not is_valid_cell(row, col) or marked[row][col] or grid.values[row][col] in [BLUE, RED, YELLOW]:
+            return
+        
+        grid.values[row][col] = YELLOW
+        for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+            yellow_flood_fill(row + dr, col + dc)
+
+    # Edge flood fill
     for r in range(rows):
         for c in range(cols):
-            if new_grid.values[r][c] == 0:
-                if not flood_fill(r, c):
-                    new_grid.values[r][c] = 0  # Change back to black if no path to edge
+            if is_boundary_cell(r, c) and grid.values[r][c] == BLACK:
+                edge_flood_fill(r, c)
 
+    # Yellow flood fill
     for r in range(rows):
         for c in range(cols):
-            if new_grid.values[r][c] == 0:
-                new_grid.values[r][c] = 4  # Change to yellow
-            elif new_grid.values[r][c] == -1:
-                new_grid.values[r][c] = 0  # Change back to black
+            if grid.values[r][c] == BLACK and not marked[r][c]:
+                yellow_flood_fill(r, c)
 
-    return new_grid
+    return grid
