@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 17x17 grid with a predominantly black background. There are sky-colored (8) squares forming a pattern of 3x3 blocks separated by black spaces. These blocks are arranged in a 4x4 grid, with black spaces between them. There are two red (2) squares: one in the top-left corner and one in the middle of the 9th row, 13th column.
+  output: |
+    The grid maintains its 17x17 size. The top-left quadrant (8x8) is now filled with red (2), except for the rightmost column and bottom row which remain unchanged. The sky-colored (8) pattern within this quadrant is preserved but now has red squares where black ones were. The rest of the grid remains unchanged from the input.
+
+example_1:
+  input: |
+    A 17x17 grid with a similar sky-colored (8) pattern as in example_0. There are two magenta (6) squares: one in the 1st row, 5th column, and another in the 5th row, last column. There's also a blue (1) square in the bottom-left corner.
+  output: |
+    The grid maintains its 17x17 size. The top-right quadrant (8x8) is now filled with magenta (6), preserving the sky-colored pattern within but replacing black squares with magenta. The bottom-left quadrant (8x8) is filled with blue (1), again preserving the sky pattern but replacing black with blue. The rest of the grid, including the 17th row and column, remains unchanged from the input.
+
+example_2:
+  input: |
+    A 17x17 grid with the familiar sky-colored (8) pattern. There's an orange (7) square in the 1st row, 13th column, and another in the 4th row, last column. There are two green (3) squares: one in the 9th row, 2nd column, and another in the 12th row, 12th column.
+  output: |
+    The grid maintains its 17x17 size. The top-right quadrant (8x8) is filled with orange (7), preserving the sky pattern but replacing black with orange. The bottom-left quadrant (8x8) is filled with green (3), again preserving the sky pattern but replacing black with green. The rest of the grid, including the 17th row and column, remains unchanged from the input.
+
+test_case_0:
+  input: |
+    A 17x17 grid with the familiar sky-colored (8) pattern. There's an orange (7) square in the 1st row, 13th column, and another in the 4th row, last column. There are two green (3) squares: one in the 9th row, 2nd column, and another in the 12th row, 12th column.
+  output: |
+    The output is not provided for this test case.
