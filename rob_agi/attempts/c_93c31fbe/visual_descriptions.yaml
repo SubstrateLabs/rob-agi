@@ -1,0 +1,69 @@
+example_0:
+  input: |
+    A 25x25 grid with mostly black (0) background. There are several distinct shapes and patterns:
+    1. Two red (2) L-shaped objects in the top-left and top-right corners.
+    2. Three blue (1) clusters: one in the top-center, one in the middle-right, and one scattered in the bottom-left.
+    3. Two yellow (4) square shapes with hollow centers in the bottom-right quadrant.
+    The rest of the grid is filled with black (0).
+  output: |
+    The 25x25 grid maintains the same overall structure, but with some key changes:
+    1. The red (2) L-shapes remain unchanged.
+    2. The blue (1) clusters have been expanded and connected:
+       - The top-center cluster now forms a horizontal line.
+       - The middle-right cluster extends downward.
+       - The bottom-left scattered dots now form a more cohesive shape.
+    3. The yellow (4) squares in the bottom-right remain unchanged.
+    The black (0) background is still predominant.
+
+example_1:
+  input: |
+    A 23x23 grid with a black (0) background and several distinct patterns:
+    1. Four yellow (8) C-shaped objects in each corner of the grid.
+    2. Blue (1) dots scattered throughout the grid, with some forming small clusters.
+    3. A red (3) rectangular shape in the center-left of the grid.
+    The rest of the grid is filled with black (0).
+  output: |
+    The 23x23 grid maintains the same overall structure, but with significant changes to the blue (1) elements:
+    1. The yellow (8) C-shaped objects in the corners remain unchanged.
+    2. The blue (1) dots have been connected to form continuous lines:
+       - A horizontal line in the top third of the grid.
+       - Two vertical lines in the left and right thirds of the grid.
+       - A square shape in the bottom-center of the grid.
+    3. The red (3) rectangular shape in the center-left remains unchanged.
+    The black (0) background is still predominant.
+
+example_2:
+  input: |
+    A 21x21 grid with a black (0) background and several distinct patterns:
+    1. Four green (3) C-shaped objects, two in the top half and two in the bottom half of the grid.
+    2. Blue (1) dots scattered throughout the grid, with some forming small clusters or short lines.
+    3. A cross-like pattern made of blue (1) dots in the center of the grid.
+    The rest of the grid is filled with black (0).
+  output: |
+    The 21x21 grid maintains the same overall structure, but with significant changes to the blue (1) elements:
+    1. The green (3) C-shaped objects remain unchanged.
+    2. The scattered blue (1) dots have been connected to form continuous lines and shapes:
+       - A large square shape in the center of the grid, encompassing the previous cross-like pattern.
+       - Vertical lines connecting the top and bottom C-shaped objects on both sides.
+       - Horizontal lines connecting the left and right C-shaped objects on both top and bottom.
+    3. Some isolated blue (1) dots remain unchanged.
+    The black (0) background is still predominant.
+
+test_case_0:
+  input: |
+    A 28x25 grid with a black (0) background and several distinct patterns:
+    1. Multiple yellow (4) C-shaped objects scattered throughout the grid.
+    2. Blue (1) dots and small clusters scattered across the grid.
+    3. A few isolated red (2) dots.
+    4. A cross-like pattern of blue (1) dots near the center-left of the grid.
+    The rest of the grid is filled with black (0).
+  output: |
+    The 28x25 grid maintains the same overall structure, but with significant changes to the blue (1) elements:
+    1. The yellow (4) C-shaped objects remain unchanged.
+    2. The blue (1) dots have been connected to form continuous lines and shapes:
+       - Vertical and horizontal lines connecting the yellow C-shaped objects.
+       - A large rectangular shape in the center-left, incorporating the previous cross-like pattern.
+       - Several smaller shapes and lines connecting previously isolated blue dots.
+    3. The red (2) dots remain unchanged.
+    4. Some isolated blue (1) dots remain unchanged.
+    The black (0) background is still predominant.
