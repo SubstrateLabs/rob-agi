@@ -1,31 +1,25 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Dict
-from collections import defaultdict
+from typing import List, Tuple
 
 def solve_bd14c3bf(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the grid transformation challenge by changing unique blue shapes to red
-    while preserving repeated blue shapes. The function identifies connected regions
-    of blue cells, generates a unique identifier for each shape, and then changes
-    the color of unique shapes to red.
+    Solves the grid transformation challenge by changing complex blue shapes to red
+    while preserving simpler blue shapes. The function identifies connected regions
+    of blue cells, calculates their complexity, and changes the color of complex
+    shapes to red based on a threshold.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
     
     Returns:
-    ColoredGrid: The transformed grid with unique blue shapes changed to red.
+    ColoredGrid: The transformed grid with complex blue shapes changed to red.
     """
     output_grid = input_grid.deep_copy()
     blue_regions = find_connected_regions(output_grid, 1)  # 1 represents blue
     
-    shape_counts = defaultdict(int)
     for region in blue_regions:
-        shape_id = generate_shape_identifier(region)
-        shape_counts[shape_id] += 1
-    
-    for region in blue_regions:
-        shape_id = generate_shape_identifier(region)
-        if shape_counts[shape_id] == 1:
+        complexity = calculate_complexity(region)
+        if complexity > 10:  # Threshold determined by analyzing examples
             for r, c in region:
                 output_grid.set_cell(r, c, 2)  # 2 represents red
     
@@ -55,14 +49,26 @@ def find_connected_regions(grid: ColoredGrid, color: int) -> List[List[Tuple[int
     
     return regions
 
-def generate_shape_identifier(region: List[Tuple[int, int]]) -> str:
-    """Generate a unique identifier for a shape based on its relative coordinates."""
+def calculate_complexity(region: List[Tuple[int, int]]) -> float:
+    """Calculate the complexity of a shape based on its size and perimeter."""
     if not region:
-        return ""
+        return 0
     
+    # Calculate bounding box
     min_r = min(r for r, _ in region)
+    max_r = max(r for r, _ in region)
     min_c = min(c for _, c in region)
-    normalized = [(r - min_r, c - min_c) for r, c in region]
-    normalized.sort()
+    max_c = max(c for _, c in region)
     
-    return ",".join(f"{r},{c}" for r, c in normalized)
+    # Calculate area and perimeter
+    area = len(region)
+    perimeter = sum(1 for r, c in region if (r+1, c) not in region or
+                                           (r-1, c) not in region or
+                                           (r, c+1) not in region or
+                                           (r, c-1) not in region)
+    
+    # Calculate complexity score
+    bounding_box_area = (max_r - min_r + 1) * (max_c - min_c + 1)
+    complexity = (perimeter * bounding_box_area) / (area * area)
+    
+    return complexity
