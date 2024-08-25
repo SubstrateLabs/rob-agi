@@ -1,5 +1,6 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import Tuple, List
+from typing import Tuple, List, Optional
+import numpy as np
 
 def solve_e66aafb8(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -7,70 +8,62 @@ def solve_e66aafb8(input_grid: ColoredGrid) -> ColoredGrid:
     
     The function works as follows:
     1. Preprocess the input grid to identify non-black areas.
-    2. Identify potential pattern sizes.
-    3. For each potential size, find the pattern with the highest coverage of the non-black area.
-    4. Select the best pattern based on coverage and size.
-    5. Refine the pattern to ensure it's complete and doesn't include unnecessary black cells.
-    6. Extract the final subgrid from the original input.
-    7. Validate the output and handle edge cases.
+    2. Iterate through potential pattern sizes and aspect ratios.
+    3. For each size, find patterns that repeat at least twice in the grid.
+    4. Clean and refine the patterns by removing black cells and unnecessary repetitions.
+    5. Select the best pattern based on size and coverage of non-black areas.
+    6. Handle edge cases and validate the final output.
     
     Returns:
         ColoredGrid: A new grid containing the extracted pattern.
     """
     rows, cols = input_grid.get_dimensions()
-    non_black_cells = [(r, c) for r in range(rows) for c in range(cols) if input_grid.get_cell(r, c) != 0]
+    grid = np.array([[input_grid.get_cell(r, c) for c in range(cols)] for r in range(rows)])
+    non_black_mask = grid != 0
     
-    if not non_black_cells:
-        return ColoredGrid(values=[[0, 0], [0, 0], [0, 0]])
+    if not np.any(non_black_mask):
+        return ColoredGrid(values=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
     
-    def get_pattern_coverage(pattern: List[List[int]]) -> float:
-        pattern_rows, pattern_cols = len(pattern), len(pattern[0])
-        covered_cells = 0
-        total_cells = len(non_black_cells)
-        
-        for r, c in non_black_cells:
-            if input_grid.get_cell(r, c) == pattern[r % pattern_rows][c % pattern_cols]:
-                covered_cells += 1
-        
-        return covered_cells / total_cells
+    def check_pattern_repetition(pattern: np.ndarray) -> Tuple[bool, int]:
+        p_rows, p_cols = pattern.shape
+        repetitions = 0
+        for r in range(0, rows - p_rows + 1, p_rows):
+            for c in range(0, cols - p_cols + 1, p_cols):
+                if np.array_equal(grid[r:r+p_rows, c:c+p_cols], pattern):
+                    repetitions += 1
+        return repetitions >= 2, repetitions
+    
+    def clean_pattern(pattern: np.ndarray) -> np.ndarray:
+        pattern = pattern[~np.all(pattern == 0, axis=1)]
+        pattern = pattern[:, ~np.all(pattern == 0, axis=0)]
+        return pattern
     
     best_pattern = None
-    best_coverage = 0
+    best_pattern_size = 0
     
-    for height in range(2, min(9, rows + 1)):
-        for width in range(2, min(9, cols + 1)):
-            if height * width > 40:  # Max size based on examples
-                continue
-            
-            for r in range(rows - height + 1):
-                for c in range(cols - width + 1):
-                    pattern = [
-                        [input_grid.get_cell(r + i, c + j) for j in range(width)]
-                        for i in range(height)
-                    ]
-                    coverage = get_pattern_coverage(pattern)
-                    
-                    if coverage > best_coverage or (coverage == best_coverage and height * width < len(best_pattern) * len(best_pattern[0])):
-                        best_pattern = pattern
-                        best_coverage = coverage
+    for size in range(min(12, rows, cols), 1, -1):
+        for aspect_ratio in range(1, 4):
+            for height, width in [(size, size//aspect_ratio), (size//aspect_ratio, size)]:
+                if height * width > 64 or height < 2 or width < 2:  # Max size 8x8, min size 2x2
+                    continue
+                
+                for r in range(rows - height + 1):
+                    for c in range(cols - width + 1):
+                        pattern = grid[r:r+height, c:c+width]
+                        repeats, _ = check_pattern_repetition(pattern)
+                        
+                        if repeats:
+                            cleaned_pattern = clean_pattern(pattern)
+                            if cleaned_pattern.size > best_pattern_size:
+                                best_pattern = cleaned_pattern
+                                best_pattern_size = cleaned_pattern.size
     
     if best_pattern is None:
         # Fallback: return the largest non-black rectangular area up to 8x5
-        non_black_rows = [r for r in range(rows) if any(input_grid.get_cell(r, c) != 0 for c in range(cols))]
-        non_black_cols = [c for c in range(cols) if any(input_grid.get_cell(r, c) != 0 for r in range(rows))]
-        
-        height = min(8, len(non_black_rows))
-        width = min(5, len(non_black_cols))
-        
-        return ColoredGrid(values=[
-            [input_grid.get_cell(non_black_rows[r], non_black_cols[c]) for c in range(width)]
-            for r in range(height)
-        ])
+        non_black_rows = np.any(non_black_mask, axis=1)
+        non_black_cols = np.any(non_black_mask, axis=0)
+        height = min(8, np.sum(non_black_rows))
+        width = min(5, np.sum(non_black_cols))
+        best_pattern = grid[non_black_rows][:height, :][:, non_black_cols][:, :width]
     
-    # Refine the pattern by removing unnecessary black cells
-    while any(all(cell == 0 for cell in row) for row in best_pattern):
-        best_pattern = [row for row in best_pattern if any(cell != 0 for cell in row)]
-    while any(all(best_pattern[r][c] == 0 for r in range(len(best_pattern))) for c in range(len(best_pattern[0]))):
-        best_pattern = [[row[c] for c in range(len(best_pattern[0])) if any(best_pattern[r][c] != 0 for r in range(len(best_pattern)))] for row in best_pattern]
-    
-    return ColoredGrid(values=best_pattern)
+    return ColoredGrid(values=best_pattern.tolist())
