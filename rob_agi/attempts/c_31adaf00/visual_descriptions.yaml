@@ -1,37 +1,70 @@
 example_0:
   input: |
-    A 10x10 grid with gray (5) and black (0) squares. The gray squares form an irregular pattern across the grid. There are clusters of gray squares in the corners and along the edges, with some scattered in the center. The black squares create gaps and spaces between the gray areas.
+    A 10x10 grid with gray (5) and black (0) squares. The gray squares form an irregular pattern across the grid. Notable features:
+    - Clusters of gray squares in the corners (top-left, top-right, bottom-left, bottom-right)
+    - Gray squares along the edges, creating a partial frame
+    - Scattered gray squares in the center, leaving some open black areas
+    - Approximately 40% of the grid is gray, with the remaining 60% black
+    - The largest contiguous black area is roughly 3x3 in size
   output: |
-    The same 10x10 grid structure, but with blue (1) squares added. The blue squares form three distinct regions:
-    1. A 3x3 square in the top-center (rows 0-2, columns 4-6)
-    2. A 2x2 square in the middle-right (rows 5-6, columns 6-7)
-    3. A 3x3 square in the bottom-left (rows 7-9, columns 2-4)
-    These blue regions are placed in areas that were previously black. The gray and black squares remain unchanged in their positions.
+    The same 10x10 grid structure, with blue (1) squares strategically added:
+    1. A 3x3 blue square in the top-center (rows 0-2, columns 4-6), balancing the gray corners
+    2. A 2x2 blue square in the middle-right (rows 5-6, columns 6-7), filling a gap between gray areas
+    3. A 3x3 blue square in the bottom-left (rows 7-9, columns 2-4), creating symmetry with the top-center blue square
+    Key observations:
+    - Blue squares occupy about 30% of the grid, balancing with gray (40%) and remaining black (30%)
+    - Blue regions are placed in previously black areas, avoiding overlap with gray
+    - The placement creates a visual balance, with blue regions distributed across the grid
 
 example_1:
   input: |
-    Another 10x10 grid with gray (5) and black (0) squares. The gray squares are more evenly distributed across the grid compared to the previous example. There are several small clusters of gray squares and some isolated gray squares. The pattern appears more random and less concentrated in specific areas.
+    A 10x10 grid with gray (5) and black (0) squares. The gray squares are more evenly distributed compared to example_0. Key features:
+    - Several small clusters (2x2 or 2x3) of gray squares scattered across the grid
+    - Some isolated gray squares, creating a more fragmented pattern
+    - No large contiguous areas of either gray or black
+    - Approximately 35% of the grid is gray, with 65% black
+    - The largest open black area is roughly 3x3 in size
   output: |
-    The same 10x10 grid structure, with blue (1) squares added in four distinct regions:
-    1. A 2x2 square in the top-left corner (rows 0-1, columns 2-3)
-    2. A 2x2 square in the top-right (rows 2-3, columns 6-7)
-    3. A 2x2 square in the middle-left (rows 6-7, columns 0-1)
-    4. A 3x3 square in the center (rows 3-5, columns 3-5)
-    As in the previous example, the blue squares are placed in areas that were previously black. The gray and black squares maintain their original positions.
+    The 10x10 grid with blue (1) squares added strategically:
+    1. A 2x2 blue square in the top-left corner (rows 0-1, columns 2-3)
+    2. A 2x2 blue square in the top-right (rows 2-3, columns 6-7)
+    3. A 2x2 blue square in the middle-left (rows 6-7, columns 0-1)
+    4. A 3x3 blue square in the center (rows 3-5, columns 3-5)
+    Key observations:
+    - Blue squares now occupy about 32% of the grid, creating a near-equal distribution of colors
+    - Blue regions are placed to create a balanced triangular pattern across the grid
+    - The central 3x3 blue square anchors the composition, filling the largest open area
 
 example_2:
   input: |
-    A 10x10 grid with gray (5) and black (0) squares. The gray squares form a more structured pattern compared to the previous examples. There's a concentration of gray squares in the bottom-right quadrant, forming almost a solid block. The rest of the grid has scattered gray squares, with more in the left and top edges than in the center.
+    A 10x10 grid with gray (5) and black (0) squares. The gray squares form a more structured pattern:
+    - A dense concentration of gray squares in the bottom-right quadrant, almost forming a solid 5x5 block
+    - Scattered gray squares along the left and top edges, creating a partial L-shape
+    - The center and top-right areas have fewer gray squares, leaving larger black spaces
+    - Approximately 45% of the grid is gray, with 55% black
+    - The largest contiguous black area is roughly 4x4 in the center-right
   output: |
-    The same 10x10 grid structure, with blue (1) squares added in three main regions:
-    1. A 2x4 rectangle in the top-center (rows 0-1, columns 3-6)
-    2. A 3x3 square in the middle-left (rows 2-4, columns 0-2)
-    3. A 3x3 square in the bottom-left corner (rows 7-9, columns 0-2)
-    Additionally, there's a single blue square at position (5,8).
-    As in previous examples, the blue squares are placed in areas that were previously black, and the gray and black squares remain in their original positions.
+    The 10x10 grid with blue (1) squares added to balance the composition:
+    1. A 2x4 blue rectangle in the top-center (rows 0-1, columns 3-6), balancing the top edge
+    2. A 3x3 blue square in the middle-left (rows 2-4, columns 0-2), filling the left side
+    3. A 3x3 blue square in the bottom-left corner (rows 7-9, columns 0-2), creating symmetry with the gray block
+    4. A single blue square at (5,8), providing a visual link between blue regions
+    Key observations:
+    - Blue squares now occupy about 27% of the grid, balancing with the dense gray area
+    - The placement of blue creates a counter-balance to the gray concentration in the bottom-right
+    - The blue regions form an inverted L-shape, complementing the gray L-shape
 
 test_case_0:
   input: |
-    A 10x10 grid with gray (5) and black (0) squares. The gray squares form an irregular pattern across the grid. There are more gray squares in the top-left and bottom-right corners, creating partial diagonal patterns. The center of the grid has fewer gray squares, creating a more open space.
+    A 10x10 grid with gray (5) and black (0) squares. Key features to consider:
+    - Higher concentration of gray squares in the top-left and bottom-right corners, suggesting a diagonal pattern
+    - The center has fewer gray squares, creating a more open black space
+    - Scattered gray squares create potential for various blue square placements
+    - Approximately 35-40% of the grid is gray, leaving 60-65% black to work with
+    - The largest contiguous black areas are likely in the center and opposite corners to the gray concentrations
   output: |
-    This is a test case, so no output grid is provided for description.
+    This is a test case, so no output grid is provided. When solving, consider:
+    - Balancing the diagonal gray pattern with strategic blue square placements
+    - Utilizing the open center area for a larger blue region
+    - Creating symmetry or complementary patterns to the existing gray structure
+    - Aiming for an approximately equal distribution of gray, blue, and remaining black squares
