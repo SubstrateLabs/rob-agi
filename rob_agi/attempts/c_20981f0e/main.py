@@ -7,11 +7,13 @@ def solve_20981f0e(input_grid: ColoredGrid) -> ColoredGrid:
     Rearrange blue cells (1) in each section between red dot (2) rows to form two vertically aligned columns.
     The solution maintains the same number of blue cells in each section and preserves the positions of red dots.
     Steps:
-    1. Identify sections between red dot rows
-    2. For each section, count blue cells and distribute them into two columns
-    3. Align columns vertically across all sections
-    4. Ensure at least one empty row between blue cells and red dots
-    5. Construct the output grid with the new arrangements
+    1. Analyze the input grid and identify sections between red dot rows
+    2. Calculate the column positions for blue cells based on grid width
+    3. For each section, count blue cells and distribute them into two columns
+    4. Determine the maximum height of blue cells across all sections
+    5. Rearrange blue cells in each section, aligning them vertically and starting from the bottom
+    6. Ensure at least one empty row between blue cells and red dots
+    7. Construct the output grid with the new arrangements
     """
     rows, cols = input_grid.get_dimensions()
     output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
@@ -53,17 +55,17 @@ def rearrange_section(input_grid: ColoredGrid, output_grid: ColoredGrid, start: 
 def align_columns_vertically(grid: ColoredGrid, sections: List[Tuple[int, int]]):
     rows, cols = grid.get_dimensions()
     center = cols // 2
-    left_col, right_col = center - 1, center
+    left_col, right_col = (center - 1, center) if cols % 2 == 0 else (center, center + 1)
     
-    max_height = max(sum(grid.values[start+1:end].count(1) for start, end in sections if end - start > 2))
+    max_height = max(sum(row.count(1) for row in grid.values[start+1:end]) for start, end in sections if end - start > 2)
     
     for start, end in sections:
         if end - start > 2:
-            section_height = sum(grid.values[start+1:end].count(1))
+            section_height = sum(row.count(1) for row in grid.values[start+1:end])
             offset = max_height - section_height
             
             # Move blue cells up
-            for row in range(start + 1, end):
+            for row in range(end - 1, start, -1):
                 if grid.values[row][left_col] == 1:
                     grid.values[row - offset][left_col] = 1
                     grid.values[row][left_col] = 0
