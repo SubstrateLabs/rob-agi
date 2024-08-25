@@ -2,27 +2,101 @@ from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple
 import heapq
 
+from typing import List, Tuple
+import heapq
+
 def solve_55059096(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the grid transformation challenge by connecting green crosses with minimal red paths.
+    Solve the grid transformation challenge by connecting green crosses with a minimal red path.
     
     1. Identify all green crosses in the grid.
-    2. Create a graph where nodes are crosses and edges are potential connections.
-    3. Find the Minimum Spanning Tree (MST) of this graph.
-    4. Apply the MST to the grid by drawing red paths between connected crosses.
+    2. Start from one cross and expand, prioritizing cells closer to other crosses.
+    3. Connect all crosses with a continuous shape.
+    4. Optimize the shape by removing unnecessary cells.
+    5. Apply the optimized shape to the original grid.
     
-    This approach ensures a minimal continuous shape connecting the crosses.
+    This approach ensures a minimal continuous shape connecting all crosses.
     """
-    # Step 1: Identify green crosses
     crosses = find_crosses(input_grid)
-    
-    # Step 2 & 3: Create graph and find MST
-    mst = find_minimum_spanning_tree(crosses, input_grid)
-    
-    # Step 4: Apply MST to the grid
-    output_grid = apply_mst_to_grid(input_grid, mst)
-    
+    shape = create_minimal_shape(input_grid, crosses)
+    output_grid = apply_shape_to_grid(input_grid, shape)
     return output_grid
+
+def create_minimal_shape(grid: ColoredGrid, crosses: List[Tuple[int, int]]) -> Set[Tuple[int, int]]:
+    shape = set(crosses[0])
+    unconnected = set(crosses[1:])
+    queue = [(manhattan_distance(crosses[0], cross), crosses[0], cross) for cross in unconnected]
+    heapq.heapify(queue)
+
+    while unconnected:
+        _, current, target = heapq.heappop(queue)
+        path = find_path(current, target, shape, grid)
+        shape.update(path)
+        if target in shape:
+            unconnected.remove(target)
+            for cross in unconnected:
+                heapq.heappush(queue, (manhattan_distance(target, cross), target, cross))
+
+    return optimize_shape(shape, crosses, grid)
+
+def find_path(start: Tuple[int, int], end: Tuple[int, int], shape: Set[Tuple[int, int]], grid: ColoredGrid) -> List[Tuple[int, int]]:
+    queue = [(manhattan_distance(start, end), [start])]
+    visited = set()
+
+    while queue:
+        _, path = heapq.heappop(queue)
+        current = path[-1]
+
+        if current == end:
+            return path
+
+        if current in visited:
+            continue
+
+        visited.add(current)
+
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]:
+            nr, nc = current[0] + dr, current[1] + dc
+            if 0 <= nr < grid.num_rows and 0 <= nc < grid.num_cols and (nr, nc) not in visited:
+                new_path = path + [(nr, nc)]
+                heapq.heappush(queue, (len(new_path) + manhattan_distance((nr, nc), end), new_path))
+
+    return []
+
+def optimize_shape(shape: Set[Tuple[int, int]], crosses: List[Tuple[int, int]], grid: ColoredGrid) -> Set[Tuple[int, int]]:
+    optimized = shape.copy()
+    for cell in shape:
+        if cell not in crosses and not is_disconnecting(optimized - {cell}, crosses):
+            optimized.remove(cell)
+    return optimized
+
+def is_disconnecting(shape: Set[Tuple[int, int]], crosses: List[Tuple[int, int]]) -> bool:
+    if not shape:
+        return True
+    start = next(iter(shape))
+    connected = set(flood_fill(shape, start))
+    return any(cross not in connected for cross in crosses)
+
+def flood_fill(shape: Set[Tuple[int, int]], start: Tuple[int, int]) -> Set[Tuple[int, int]]:
+    filled = set()
+    stack = [start]
+    while stack:
+        cell = stack.pop()
+        if cell in shape and cell not in filled:
+            filled.add(cell)
+            r, c = cell
+            stack.extend([(r+dr, c+dc) for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]])
+    return filled
+
+def apply_shape_to_grid(grid: ColoredGrid, shape: Set[Tuple[int, int]]) -> ColoredGrid:
+    output_grid = grid.deep_copy()
+    for r, c in shape:
+        if output_grid.get_cell(r, c) == 0:
+            output_grid.set_cell(r, c, 2)
+    return output_grid
+
+def manhattan_distance(p1: Tuple[int, int], p2: Tuple[int, int]) -> int:
+    return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
 
 def find_crosses(grid: ColoredGrid) -> List[Tuple[int, int]]:
     crosses = []
