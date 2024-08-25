@@ -5,16 +5,6 @@ def get_bounding_box(region: List[Tuple[int, int]]) -> Tuple[int, int, int, int]
     x_coords, y_coords = zip(*region)
     return min(x_coords), max(x_coords), min(y_coords), max(y_coords)
 
-def color_mapping(point: Tuple[int, int], bounding_box: Tuple[int, int, int, int]) -> int:
-    x, y = point
-    x_min, x_max, y_min, y_max = bounding_box
-    x_mid, y_mid = (x_min + x_max) // 2, (y_min + y_max) // 2
-    
-    if x <= x_mid:
-        return 2 if y <= y_mid else 3
-    else:
-        return 4 if y <= y_mid else 1
-
 def solve_103eff5b(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by replacing color 8 regions with a quadrant-based color pattern.
@@ -25,11 +15,11 @@ def solve_103eff5b(input_grid: ColoredGrid) -> ColoredGrid:
     3. For each color 8 region:
        a. Find its bounding box.
        b. Divide the bounding box into four quadrants.
-       c. Assign colors to the quadrants in clockwise order:
+       c. Assign colors to the quadrants:
           - Top-left: color 2 (red)
           - Top-right: color 4 (yellow)
-          - Bottom-right: color 1 (blue)
           - Bottom-left: color 3 (green)
+          - Bottom-right: color 1 (blue)
     4. Transform the grid by applying the quadrant-based color mapping to each color 8 region.
     5. Return the transformed grid.
     """
@@ -37,9 +27,24 @@ def solve_103eff5b(input_grid: ColoredGrid) -> ColoredGrid:
     color_8_regions = input_grid.find_connected_regions(8)
     
     for region in color_8_regions:
-        bounding_box = get_bounding_box(region)
-        new_grid = new_grid.apply_function_to_regions(
-            lambda r: color_mapping((r[0][0], r[0][1]), bounding_box)
-        )
+        min_x, max_x, min_y, max_y = get_bounding_box(region)
+        mid_x = (min_x + max_x) // 2
+        mid_y = (min_y + max_y) // 2
+        
+        for y in range(min_y, max_y + 1):
+            for x in range(min_x, max_x + 1):
+                if input_grid.values[y][x] == 8:  # Only change color 8 cells
+                    if x <= mid_x:
+                        if y <= mid_y:
+                            new_color = 2  # Top-left: red
+                        else:
+                            new_color = 3  # Bottom-left: green
+                    else:
+                        if y <= mid_y:
+                            new_color = 4  # Top-right: yellow
+                        else:
+                            new_color = 1  # Bottom-right: blue
+                    
+                    new_grid.values[y][x] = new_color
     
     return new_grid
