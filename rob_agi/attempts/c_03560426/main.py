@@ -7,17 +7,18 @@ def solve_03560426(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by rearranging colored shapes into a compact arrangement.
     
     1. Extracts shapes from bottom to top, preserving their order.
-    2. Places shapes in a new grid, starting from the top-left corner.
-    3. Stacks shapes vertically, creating new stacks to the right when needed.
-    4. Maintains the original form and orientation of each shape.
-    5. Compacts the arrangement by moving shapes left if possible.
-    6. Fills remaining space with black (0).
+    2. Generates all possible rotations for each shape.
+    3. Places shapes in a new grid, starting from the top-left corner.
+    4. Tries all rotations to find the most compact arrangement.
+    5. Maintains the original order of shapes.
+    6. Compacts the arrangement by moving shapes left if possible.
+    7. Fills remaining space with black (0).
     
     Returns the transformed grid with shapes arranged compactly in the top-left quadrant.
     """
     shapes = extract_shapes(input_grid)
     output_grid = ColoredGrid(values=[[0 for _ in range(10)] for _ in range(10)])
-    place_shapes(shapes, output_grid)
+    place_shapes_with_rotations(shapes, output_grid)
     compact_arrangement(output_grid)
     return output_grid
 
@@ -55,21 +56,35 @@ def bfs(grid: ColoredGrid, start_r: int, start_c: int, visited: set) -> List[Tup
     
     return [(r - min_r, c - min_c) for r, c in shape]  # Store relative coordinates
 
-def place_shapes(shapes: List[Dict[str, any]], output_grid: ColoredGrid) -> None:
-    stacks = [0]  # Keep track of the bottom of each stack
+def rotate_shape(shape: List[Tuple[int, int]]) -> List[List[Tuple[int, int]]]:
+    rotations = [shape]
+    for _ in range(3):  # Generate 3 more rotations
+        new_rotation = [(y, -x) for x, y in rotations[-1]]
+        min_x = min(x for x, _ in new_rotation)
+        min_y = min(y for _, y in new_rotation)
+        new_rotation = [(x - min_x, y - min_y) for x, y in new_rotation]
+        rotations.append(new_rotation)
+    return rotations
+
+def place_shapes_with_rotations(shapes: List[Dict[str, any]], output_grid: ColoredGrid) -> None:
     for shape in shapes:
-        placed = False
-        for i, bottom in enumerate(stacks):
-            if can_place_shape(output_grid, shape["coords"], (bottom, i)):
-                place_shape(output_grid, shape["coords"], (bottom, i), shape["color"])
-                stacks[i] = bottom + max(y for _, y in shape["coords"]) + 1
-                placed = True
-                break
-        if not placed:
-            # Start a new stack
-            stacks.append(0)
-            place_shape(output_grid, shape["coords"], (0, len(stacks) - 1), shape["color"])
-            stacks[-1] = max(y for _, y in shape["coords"]) + 1
+        rotations = rotate_shape(shape["coords"])
+        best_position = None
+        best_rotation = None
+        min_area = float('inf')
+        
+        for rotation in rotations:
+            for r in range(10):
+                for c in range(10):
+                    if can_place_shape(output_grid, rotation, (r, c)):
+                        area = calculate_area(output_grid, rotation, (r, c))
+                        if area < min_area:
+                            min_area = area
+                            best_position = (r, c)
+                            best_rotation = rotation
+        
+        if best_position:
+            place_shape(output_grid, best_rotation, best_position, shape["color"])
 
 def can_place_shape(grid: ColoredGrid, shape: List[Tuple[int, int]], position: Tuple[int, int]) -> bool:
     rows, cols = grid.get_dimensions()
@@ -83,6 +98,17 @@ def place_shape(grid: ColoredGrid, shape: List[Tuple[int, int]], position: Tuple
     for x, y in shape:
         new_x, new_y = position[0] + x, position[1] + y
         grid.values[new_x][new_y] = color
+
+def calculate_area(grid: ColoredGrid, shape: List[Tuple[int, int]], position: Tuple[int, int]) -> int:
+    min_x, max_x = float('inf'), float('-inf')
+    min_y, max_y = float('inf'), float('-inf')
+    for x, y in shape:
+        new_x, new_y = position[0] + x, position[1] + y
+        min_x = min(min_x, new_x)
+        max_x = max(max_x, new_x)
+        min_y = min(min_y, new_y)
+        max_y = max(max_y, new_y)
+    return (max_x - min_x + 1) * (max_y - min_y + 1)
 
 def compact_arrangement(grid: ColoredGrid) -> None:
     rows, cols = grid.get_dimensions()
