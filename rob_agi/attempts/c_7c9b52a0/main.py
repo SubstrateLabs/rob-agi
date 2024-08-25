@@ -10,9 +10,11 @@ def solve_7c9b52a0(input_grid: ColoredGrid) -> ColoredGrid:
     1. Identifies the background color
     2. Finds non-background color clusters using flood fill
     3. Extracts minimal rectangles containing these clusters
-    4. Arranges the rectangles in a new grid, preserving their left-to-right order
-       and packing them efficiently
+    4. Arranges the rectangles in a new grid, optimizing for compactness
     5. Returns the new compact grid containing only the extracted regions
+
+    The arrangement step now sorts regions by area and uses a more sophisticated
+    packing algorithm to create a more compact output.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed
@@ -72,39 +74,53 @@ def solve_7c9b52a0(input_grid: ColoredGrid) -> ColoredGrid:
         if not regions:
             return ColoredGrid(values=[[]])
 
-        output = []
-        current_row = []
-        max_height = 0
-        max_width = 0
+        # Sort regions by area in descending order
+        sorted_regions = sorted(regions, key=lambda r: r[2] * r[3], reverse=True)
 
-        for top, left, height, width in regions:
-            if current_row and sum(r[3] for r in current_row) + width > sum(r[2] for r in current_row):
-                output.append(current_row)
-                current_row = []
-                max_height = 0
+        max_width = max(r[3] for r in sorted_regions)
+        total_area = sum(r[2] * r[3] for r in sorted_regions)
+        initial_height = max(total_area // max_width, max(r[2] for r in sorted_regions))
 
-            current_row.append((top, left, height, width))
-            max_height = max(max_height, height)
-            max_width = max(max_width, sum(r[3] for r in current_row))
+        def can_place(grid, region, x, y):
+            height, width = region[2], region[3]
+            if y + height > len(grid) or x + width > len(grid[0]):
+                return False
+            return all(grid[y+i][x+j] == 0 for i in range(height) for j in range(width))
 
-        if current_row:
-            output.append(current_row)
+        def place_region(grid, region, x, y):
+            top, left, height, width = region
+            subgrid = input_grid.extract_subgrid(top, left, height, width)
+            for i in range(height):
+                for j in range(width):
+                    grid[y+i][x+j] = subgrid.values[i][j]
 
-        packed_grid = [[0 for _ in range(max_width)] for _ in range(sum(max(r[2] for r in row) for row in output))]
+        while True:
+            grid = [[0 for _ in range(max_width)] for _ in range(initial_height)]
+            placed = True
 
-        y_offset = 0
-        for row in output:
-            x_offset = 0
-            row_height = max(r[2] for r in row)
-            for top, left, height, width in row:
-                subgrid = input_grid.extract_subgrid(top, left, height, width)
-                for i in range(height):
-                    for j in range(width):
-                        packed_grid[y_offset + i][x_offset + j] = subgrid.values[i][j]
-                x_offset += width
-            y_offset += row_height
+            for region in sorted_regions:
+                placed = False
+                for y in range(len(grid)):
+                    for x in range(len(grid[0])):
+                        if can_place(grid, region, x, y):
+                            place_region(grid, region, x, y)
+                            placed = True
+                            break
+                    if placed:
+                        break
+                if not placed:
+                    break
 
-        return ColoredGrid(values=packed_grid)
+            if placed:
+                # Trim empty rows and columns
+                while grid and all(cell == 0 for cell in grid[-1]):
+                    grid.pop()
+                while grid and all(row[-1] == 0 for row in grid):
+                    for row in grid:
+                        row.pop()
+                return ColoredGrid(values=grid)
+
+            initial_height += 1
 
     bg_color = find_background_color(input_grid)
     regions = find_regions(input_grid, bg_color)
