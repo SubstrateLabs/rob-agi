@@ -7,44 +7,46 @@ def solve_97239e3d(input_grid: ColoredGrid) -> ColoredGrid:
     
     The solution follows these steps:
     1. Scan the input grid to identify non-black and non-sky colored squares.
-    2. Create an expansion order based on top-to-bottom, left-to-right position.
-    3. For each colored square, expand horizontally and vertically within its quadrant.
-    4. Preserve the 17th row and column (index 16) from the original grid.
-    5. Handle multiple colors in the same quadrant by processing them in order.
+    2. Sort colored squares based on their position (top-to-bottom, left-to-right).
+    3. For each colored square, calculate the maximum possible expansion within its quadrant.
+    4. Fill the expanded area with the color, respecting sky-colored squares.
+    5. Preserve the 17th row and column (index 16) from the original grid.
     
-    Expansion stops at quadrant boundaries, sky (8) squares, or other expanded colors.
+    Expansion is limited by quadrant boundaries, sky (8) squares, or other expanded colors.
     """
     output_grid = input_grid.deep_copy()
     
     def get_colored_squares() -> List[Tuple[int, int, int]]:
         return [(r, c, input_grid.get_cell(r, c)) 
-                for r in range(17) 
-                for c in range(17) 
+                for r in range(16) 
+                for c in range(16) 
                 if input_grid.get_cell(r, c) not in [0, 8]]
     
     colored_squares = sorted(get_colored_squares(), key=lambda x: (x[0], x[1]))
     
     def expand_in_quadrant(row: int, col: int, color: int):
-        row_start = 0 if row < 8 else 9
-        row_end = 7 if row < 8 else 16
-        col_start = 0 if col < 8 else 9
-        col_end = 7 if col < 8 else 16
-
-        # Expand horizontally
-        for c in range(col_start, col_end + 1):
-            if output_grid.get_cell(row, c) in [0, color]:
-                output_grid.set_cell(row, c, color)
-
-        # Expand vertically
-        for r in range(row_start, row_end + 1):
-            if output_grid.get_cell(r, col) in [0, color]:
-                output_grid.set_cell(r, col, color)
-
-        # Ensure the original position is colored (intersection point)
-        output_grid.set_cell(row, col, color)
+        # Calculate maximum expansion in each direction
+        up = min(row, 7 - row) if row < 8 else min(row - 8, 7)
+        down = min(7 - row, row) if row < 8 else min(15 - row, row - 8)
+        left = min(col, 7 - col) if col < 8 else min(col - 8, 7)
+        right = min(7 - col, col) if col < 8 else min(15 - col, col - 8)
+        
+        expansion_size = min(up, down, left, right)
+        
+        start_x = row - expansion_size if row >= 8 else row
+        start_y = col - expansion_size if col >= 8 else col
+        
+        for i in range(start_x, start_x + expansion_size * 2 + 1):
+            for j in range(start_y, start_y + expansion_size * 2 + 1):
+                if output_grid.get_cell(i, j) != 8:  # Preserve sky-colored squares
+                    output_grid.set_cell(i, j, color)
     
     for row, col, color in colored_squares:
-        if row != 16 and col != 16:  # Skip expansion for 17th row/column
-            expand_in_quadrant(row, col, color)
+        expand_in_quadrant(row, col, color)
+    
+    # Preserve the 17th row and column
+    for i in range(17):
+        output_grid.set_cell(16, i, input_grid.get_cell(16, i))
+        output_grid.set_cell(i, 16, input_grid.get_cell(i, 16))
     
     return output_grid
