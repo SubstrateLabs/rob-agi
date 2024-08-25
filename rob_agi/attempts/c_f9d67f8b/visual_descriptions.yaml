@@ -1,0 +1,83 @@
+example_0:
+  input: |
+    The grid is 30x30. The overall pattern is complex and appears to have several distinct regions. In the center, there's a large brown (9) square or rectangle, approximately 6x6 in size. This brown area is surrounded by a border of sky blue (8) squares. Outside of this, there's a pattern of various colors forming what looks like a frame or border around the central area. This frame consists of repeating patterns of colors, primarily using red (2), green (3), yellow (4), gray (5), magenta (6), and orange (7). The corners of the grid have distinct patterns, with the top-left and bottom-right corners having a blue (1) square surrounded by magenta (6) squares, while the top-right and bottom-left corners have a reversed pattern with a magenta square surrounded by blue squares. The edges of the grid have alternating patterns of colors, creating a visually complex border.
+  output: |
+    The grid remains 30x30, but significant changes have occurred. The most noticeable change is that the large brown (9) square in the center has completely disappeared. The sky blue (8) border that surrounded it has expanded to fill most of the central area where the brown square was. The outer frame or border pattern remains largely intact, with only minor changes in some areas. The corner patterns with blue and magenta squares are unchanged. The overall effect is that the central area of the grid has been "cleared out" or "opened up", while the complex border pattern remains as a frame around this now more open central region.
+
+example_1:
+  input: |
+    This 30x30 grid has a very different pattern from the previous example. The most striking feature is a large cross or plus sign shape in the center, composed primarily of brown (9) squares. This cross divides the grid into four quadrants. Each quadrant contains a distinct pattern:
+    1. Top-left: A pattern of blue (1) and magenta (6) squares.
+    2. Top-right: A pattern of yellow (4) and orange (7) squares.
+    3. Bottom-left: A pattern of red (2) and green (3) squares.
+    4. Bottom-right: A pattern of gray (5) and sky blue (8) squares.
+    The cross itself has some internal patterning, with sky blue (8) squares appearing within the brown. The edges of the grid have various color patterns that don't seem to follow the quadrant divisions.
+  output: |
+    The 30x30 grid structure remains, but there have been significant changes:
+    1. The large brown cross in the center has completely disappeared.
+    2. The patterns in each quadrant have expanded to fill the space left by the removed cross.
+    3. The top-left quadrant's blue and magenta pattern now extends further towards the center.
+    4. The top-right quadrant's yellow and orange pattern has similarly expanded.
+    5. The bottom-left quadrant's red and green pattern has grown towards the center.
+    6. The bottom-right quadrant's gray and sky blue pattern has filled in its portion of the former cross.
+    7. The edge patterns remain largely unchanged.
+    The overall effect is that the central dividing cross has been removed, allowing the quadrant patterns to meet in the center of the grid.
+
+example_2:
+  input: |
+    This 30x30 grid presents a complex, symmetrical pattern. The most prominent feature is a large octagon shape in the center, primarily composed of brown (9) squares. This octagon is surrounded by a border of sky blue (8) squares. Outside of this central feature, there are four distinct corner regions:
+    1. Top-left and bottom-right: These corners have a pattern of red (2), green (3), and blue (1) squares.
+    2. Top-right and bottom-left: These corners have a pattern of yellow (4), gray (5), and magenta (6) squares.
+    The spaces between these corner regions and the central octagon are filled with various color patterns, creating a complex, mandala-like overall design. The very edges of the grid have alternating color patterns that frame the entire design.
+  output: |
+    The 30x30 grid structure is maintained, but significant changes have occurred:
+    1. The large brown octagon in the center has completely disappeared.
+    2. The sky blue border that surrounded the octagon has expanded to fill much of the central area.
+    3. The corner patterns have remained largely intact:
+       - The top-left and bottom-right corners still have their red, green, and blue patterns.
+       - The top-right and bottom-left corners maintain their yellow, gray, and magenta patterns.
+    4. The patterns between the corners and the center have expanded slightly towards the center, filling some of the space left by the removed octagon.
+    5. The edge patterns remain unchanged.
+    The overall effect is that the central octagon has been "erased" and replaced by an expansion of the surrounding sky blue area, while the complex patterns around the edges of the grid have been preserved.
+
+example_3:
+  input: |
+    This 30x30 grid displays a complex, asymmetrical pattern. The central feature is an irregular shape composed primarily of brown (9) squares. This shape is not geometrically regular like in previous examples, but more organic or blob-like. Surrounding this brown shape is a border of sky blue (8) squares, which is also irregular in width. The rest of the grid is filled with various color patterns:
+    1. The top-left region has a pattern of blue (1), magenta (6), and orange (7) squares.
+    2. The top-right region has a pattern of red (2), green (3), and yellow (4) squares.
+    3. The bottom-left region has a pattern of gray (5), sky blue (8), and white (possibly represented by 0) squares.
+    4. The bottom-right region has a mixed pattern of various colors.
+    The edges of the grid have alternating color patterns that frame the entire design, similar to previous examples.
+  output: |
+    The 30x30 grid structure is maintained, but significant changes have occurred:
+    1. The irregular brown shape in the center has completely disappeared.
+    2. The sky blue border that surrounded the brown shape has expanded to fill much of the central area, taking on an irregular shape that mirrors the original brown shape.
+    3. The surrounding color patterns have remained largely intact:
+       - The top-left region still has its blue, magenta, and orange pattern.
+       - The top-right region maintains its red, green, and yellow pattern.
+       - The bottom-left region keeps its gray, sky blue, and white pattern.
+       - The bottom-right region retains its mixed color pattern.
+    4. These surrounding patterns have expanded slightly towards the center, filling some of the space left by the removed brown shape.
+    5. The edge patterns remain unchanged.
+    The overall effect is that the central brown shape has been "erased" and replaced by an expansion of the surrounding sky blue area, while the complex patterns around the edges of the grid have been preserved. The asymmetry of the original design is maintained in the transformed grid.
+
+test_case_0:
+  input: |
+    This 30x30 grid presents a complex, symmetrical pattern. The central feature is a large, roughly circular or oval shape composed primarily of brown (9) squares. This shape is surrounded by a border of sky blue (8) squares. The rest of the grid is filled with various color patterns arranged in a symmetrical manner:
+    1. The top and bottom regions have similar patterns composed of red (2), green (3), and blue (1) squares.
+    2. The left and right regions have patterns composed of yellow (4), gray (5), and magenta (6) squares.
+    3. The corner regions have distinct patterns:
+       - Top-left and bottom-right corners have a blue (1) square surrounded by magenta (6) squares.
+       - Top-right and bottom-left corners have a magenta (6) square surrounded by blue (1) squares.
+    The edges of the grid have alternating color patterns that frame the entire design, similar to previous examples. The overall effect is a complex, mandala-like pattern with clear symmetry along both horizontal and vertical axes.
+  output: |
+    Based on the pattern observed in the previous examples, we can predict that the output grid will maintain its 30x30 structure but with the following changes:
+    1. The large brown circular/oval shape in the center will completely disappear.
+    2. The sky blue border that surrounded the brown shape will expand to fill much of the central area, taking on a roughly circular or oval shape.
+    3. The surrounding color patterns will remain largely intact:
+       - The top and bottom regions will keep their red, green, and blue patterns.
+       - The left and right regions will maintain their yellow, gray, and magenta patterns.
+       - The corner patterns will remain unchanged, with the blue and magenta square arrangements preserved.
+    4. These surrounding patterns may expand slightly towards the center, filling some of the space left by the removed brown shape.
+    5. The edge patterns will remain unchanged.
+    The overall effect will be that the central brown shape is "erased" and replaced by an expansion of the surrounding sky blue area, while the complex patterns around the edges of the grid are preserved. The symmetry of the original design will be maintained in the transformed grid.
