@@ -7,7 +7,7 @@ def solve_5833af48(input_grid: ColoredGrid) -> ColoredGrid:
     1. Remove the black border and identify the non-border area.
     2. Determine the background color (dominant color in the large rectangle).
     3. Analyze patterns in the top-left and top-right corners.
-    4. Calculate the output grid size based on the non-border dimensions.
+    4. Calculate the output grid size based on the complexity of the input pattern.
     5. Create an initial output grid filled with the background color.
     6. Transform the input patterns into a symmetrical sky blue (8) pattern.
     7. Apply the transformed pattern to the output grid, ensuring symmetry.
@@ -24,15 +24,19 @@ def solve_5833af48(input_grid: ColoredGrid) -> ColoredGrid:
     background_color = get_background_color(non_border)
 
     # Calculate output dimensions
-    out_rows = (rows - 2) // 2 + 3
-    out_cols = cols - 1
+    pattern_complexity = sum(row.count(8) for row in non_border[:4])
+    out_rows = min(max(6, pattern_complexity), 9)
+    out_cols = min(max(9, pattern_complexity + 3), 12)
+
+    # Ensure odd dimensions for perfect symmetry
+    out_rows = out_rows if out_rows % 2 == 1 else out_rows + 1
+    out_cols = out_cols if out_cols % 2 == 1 else out_cols + 1
 
     # Create initial output grid
     output = [[background_color for _ in range(out_cols)] for _ in range(out_rows)]
 
     # Transform and apply pattern
-    pattern = transform_pattern(non_border)
-    apply_pattern(output, pattern)
+    apply_transformed_pattern(output, non_border)
 
     # Refine and balance the pattern
     refine_pattern(output)
@@ -83,23 +87,42 @@ def get_dominant_color(grid: List[List[int]]) -> int:
     flat = [cell for row in grid for cell in row if cell != 0]
     return max(set(flat), key=flat.count)
 
-def transform_pattern(grid: List[List[int]]) -> List[Tuple[int, int]]:
-    pattern = []
-    rows, cols = len(grid), len(grid[0])
-    for r in range(min(4, rows)):
-        for c in range(min(5, cols)):
-            if grid[r][c] == 8:
-                pattern.append((r, c))
-    return pattern
-
-def apply_pattern(output: List[List[int]], pattern: List[Tuple[int, int]]):
+def apply_transformed_pattern(output: List[List[int]], input_pattern: List[List[int]]):
     rows, cols = len(output), len(output[0])
-    for r, c in pattern:
-        if r < rows and c < cols:
-            output[r][c] = 8
-        if r < rows and cols - c - 1 >= 0:
-            output[r][cols - c - 1] = 8
-        if rows - r - 1 >= 0 and c < cols:
-            output[rows - r - 1][c] = 8
-        if rows - r - 1 >= 0 and cols - c - 1 >= 0:
-            output[rows - r - 1][cols - c - 1] = 8
+    center_row, center_col = rows // 2, cols // 2
+
+    # Create a basic symmetrical pattern
+    for r in range(min(4, len(input_pattern))):
+        for c in range(min(5, len(input_pattern[0]))):
+            if input_pattern[r][c] == 8:
+                # Apply symmetrically in all four quadrants
+                output[center_row - r][center_col - c] = 8
+                output[center_row - r][center_col + c] = 8
+                output[center_row + r][center_col - c] = 8
+                output[center_row + r][center_col + c] = 8
+
+    # Ensure pattern touches all edges
+    output[0][center_col] = 8
+    output[-1][center_col] = 8
+    output[center_row][0] = 8
+    output[center_row][-1] = 8
+
+def refine_pattern(output: List[List[int]]):
+    rows, cols = len(output), len(output[0])
+    center_row, center_col = rows // 2, cols // 2
+
+    # Add diagonal elements
+    output[1][1] = output[-2][1] = output[1][-2] = output[-2][-2] = 8
+
+    # Ensure symmetry and balance
+    for r in range(rows):
+        for c in range(cols):
+            if output[r][c] == 8:
+                output[rows - r - 1][c] = 8
+                output[r][cols - c - 1] = 8
+                output[rows - r - 1][cols - c - 1] = 8
+
+    # Additional refinements for aesthetic appeal
+    if rows >= 7 and cols >= 9:
+        output[center_row - 1][center_col] = output[center_row + 1][center_col] = 8
+        output[center_row][center_col - 1] = output[center_row][center_col + 1] = 8
