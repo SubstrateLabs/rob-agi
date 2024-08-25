@@ -9,7 +9,7 @@ def solve_12422b43(input_grid: ColoredGrid) -> ColoredGrid:
     2. Extends these patterns downwards, filling all zero (empty) cells.
     3. Preserves existing non-zero values in the grid.
     4. Repeats the pattern as needed to fill the entire column.
-    5. Continues the pattern even after encountering non-zero cells.
+    5. Resets the pattern at the start of each non-zero sequence in a column.
     6. Leaves the first column unchanged.
     
     Args:
@@ -30,8 +30,10 @@ def solve_12422b43(input_grid: ColoredGrid) -> ColoredGrid:
         if pattern:
             p_index = 0
             for r in range(rows):
-                if output_grid.get_cell(r, c) == 0:
+                if output_grid.get_cell(r, c) != 0:
+                    p_index = 0  # Reset pattern index when encountering a non-zero cell
+                else:
                     output_grid.set_cell(r, c, pattern[p_index])
-                p_index = (p_index + 1) % len(pattern)
+                    p_index = (p_index + 1) % len(pattern)
     
     return output_grid
