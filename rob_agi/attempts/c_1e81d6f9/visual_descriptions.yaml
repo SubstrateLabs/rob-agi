@@ -1,81 +1,95 @@
 example_0:
   input: |
-    A 15x15 grid with a gray (5) T-shaped object in the top-left corner. The T is 4 cells wide at the top and 4 cells tall. The rest of the grid is mostly black (0) with scattered colored cells:
-    - Red (2) in the top-left and bottom-right
-    - Green (3) near the top-right
-    - Blue (1) in the middle-left and middle-right
-    - Yellow (4) in the bottom-left and middle
-    - Orange (7) in the middle-right and bottom
-    - Sky (8) in the middle
-    - Brown (9) in the bottom-left
-    - Magenta (6) in the bottom-left
+    A 15x15 grid with a prominent gray (5) T-shaped object in the top-left corner. The T is 4 cells wide at the top and 4 cells tall, forming a clear boundary. The rest of the grid is predominantly black (0) with isolated colored cells:
+    - Red (2): Two isolated cells, one in the top-left quadrant and one in the bottom-right
+    - Green (3): A single isolated cell near the top-right corner
+    - Blue (1): Two isolated cells, one in the middle-left and one in the middle-right
+    - Yellow (4): Two isolated cells, one in the bottom-left quadrant and one in the middle
+    - Orange (7): Two isolated cells, one in the middle-right and one near the bottom
+    - Sky blue (8): A single isolated cell in the middle of the grid
+    - Brown (9): A single isolated cell in the bottom-left quadrant
+    - Magenta (6): A single isolated cell in the bottom-left quadrant
+    Note: No clear patterns or clusters of non-gray colors are present.
+
   output: |
-    The 15x15 grid maintains the gray (5) T-shaped object in the top-left corner. Many of the scattered colored cells have been removed, leaving only:
-    - Red (2) in the top-left
-    - Green (3) near the top-right
-    - Blue (1) in the middle-left and middle-right
-    - Yellow (4) in the middle
-    - Orange (7) in the middle-right
-    - Sky (8) in the middle
-    - Brown (9) in the bottom-left
-    - Magenta (6) in the bottom-left
+    The 15x15 grid retains the gray (5) T-shaped object in the top-left corner, unchanged. The transformation has removed several isolated colored cells, resulting in:
+    - Preservation of one cell for each color present in the input
+    - Retention of cells that were more isolated in the input
+    - A maximum of 3-4 cells per color
+    - Maintained spatial distribution, avoiding clustering
+    Specific changes:
+    - Red (2): Kept in the top-left, removed from bottom-right
+    - All other colors: Kept one instance of each in their original positions
+    - Several black (0) cells have been added where colored cells were removed
 
 example_1:
   input: |
-    A 15x15 grid with a gray (5) T-shaped object in the top-left corner, identical to example_0. The rest of the grid has more scattered colored cells:
-    - Yellow (4) in the top-left, middle, and forming a small cluster in the middle-right
-    - Blue (1) in the top-right, middle-left, and bottom-right
-    - Brown (9) in the top-middle and bottom-left
-    - Red (2) in the top-middle, middle-right, and forming a cluster in the bottom-right
-    - Green (3) in the middle-left and bottom, forming a small cluster
-    - Magenta (6) in the middle-left
-    - Orange (7) in the bottom-middle
-    - Sky (8) in the top-left and bottom-right
+    A 15x15 grid with the identical gray (5) T-shaped object in the top-left corner. The rest of the grid has a higher density of colored cells compared to example_0:
+    - Yellow (4): Forms a small cluster (3-4 cells) in the middle-right, with additional isolated cells in the top-left and middle
+    - Blue (1): Three isolated cells spread across the grid (top-right, middle-left, bottom-right)
+    - Brown (9): Two isolated cells (top-middle and bottom-left)
+    - Red (2): Forms a notable cluster (4-5 cells) in the bottom-right, with additional cells in the top-middle and middle-right
+    - Green (3): Forms a small cluster (2-3 cells) in the bottom, with an additional cell in the middle-left
+    - Magenta (6): A single isolated cell in the middle-left
+    - Orange (7): A single isolated cell in the bottom-middle
+    - Sky blue (8): Two isolated cells (top-left and bottom-right)
+    Note: Presence of small clusters and a more even distribution of colors across the grid.
+
   output: |
-    The 15x15 grid maintains the gray (5) T-shaped object in the top-left corner. Many of the scattered colored cells have been removed, leaving only:
-    - Yellow (4) in the top-left and middle
-    - Blue (1) in the top-right and middle-left
-    - Brown (9) in the top-middle and bottom-left
-    - Red (2) in the top-middle, middle-right, and bottom-right (reduced cluster)
-    - Green (3) in the middle-left and bottom (reduced cluster)
-    - Magenta (6) in the middle-left
-    - Orange (7) in the bottom-middle
-    - Sky (8) in the top-left and bottom-right
+    The 15x15 grid maintains the gray (5) T-shaped object in the top-left corner. The transformation has balanced color distribution and reduced clustering:
+    - Yellow (4): Kept in the top-left and middle, cluster in middle-right reduced to a single cell
+    - Blue (1): Maintained in the top-right and middle-left, removed from bottom-right
+    - Brown (9): Both instances preserved due to their isolation
+    - Red (2): Cluster in bottom-right significantly reduced (1-2 cells), kept in top-middle and middle-right
+    - Green (3): Small cluster in bottom reduced to one cell, kept in middle-left
+    - Magenta (6), Orange (7), Sky blue (8): All instances preserved due to initial isolation and low count
+    Note: The output demonstrates a balance between preserving larger structures, maintaining color variety, and reducing overall color density.
 
 example_2:
   input: |
-    A 15x15 grid with the same gray (5) T-shaped object in the top-left corner. The rest of the grid has scattered colored cells:
-    - Green (3) in the top-left, forming a small cluster
-    - Magenta (6) in the top-middle and middle-left
-    - Brown (9) scattered in the top-right, middle, and bottom-left
-    - Red (2) in the top-middle, middle-left, and bottom-middle
-    - Yellow (4) forming clusters in the middle-left and middle-right
-    - Blue (1) in the middle-right and bottom-left
-    - Orange (7) in the bottom-right
-    - Sky (8) in the top-middle and bottom-right
-    - An extra gray (5) cell in the middle
+    A 15x15 grid with the consistent gray (5) T-shaped object in the top-left corner. The grid shows a mix of clustered and isolated colored cells:
+    - Green (3): Small cluster (2-3 cells) in the top-left, isolated cell in the bottom
+    - Magenta (6): Two isolated cells (top-middle and middle-left)
+    - Brown (9): Multiple isolated cells scattered across top-right, middle, and bottom-left
+    - Red (2): Three isolated cells (top-middle, middle-left, bottom-middle)
+    - Yellow (4): Two small clusters (2-3 cells each) in middle-left and middle-right
+    - Blue (1): Two isolated cells (middle-right and bottom-left)
+    - Orange (7): Single isolated cell in the bottom-right
+    - Sky blue (8): Two isolated cells (top-middle and bottom-right)
+    - An additional gray (5) cell isolated in the middle, separate from the T-shape
+    Note: More complex color distribution with a mix of small clusters and isolated cells.
+
   output: |
-    The 15x15 grid maintains the gray (5) T-shaped object in the top-left corner. Many of the scattered colored cells have been removed, leaving only:
-    - Green (3) in the top-left (reduced cluster)
-    - Magenta (6) in the top-middle and middle-left
-    - Brown (9) in the top-right and bottom-left (reduced occurrences)
-    - Red (2) in the top-middle, middle-left, and bottom-middle
-    - Yellow (4) in the middle-left and middle-right (reduced clusters)
-    - Blue (1) in the middle-right and bottom-left
-    - Orange (7) in the bottom-right
-    - Sky (8) in the top-middle and bottom-right
-    - The extra gray (5) cell in the middle is preserved
+    The 15x15 grid preserves the gray (5) T-shaped object in the top-left corner and maintains the isolated gray cell in the middle. The transformation balances color distribution and cluster reduction:
+    - Green (3): Cluster in top-left reduced to 1-2 cells, bottom cell removed
+    - Magenta (6): Both cells preserved due to isolation
+    - Brown (9): Reduced to two cells (top-right and bottom-left), maintaining spatial spread
+    - Red (2): All three cells preserved, likely due to their isolation and spread
+    - Yellow (4): Both clusters reduced to single cells, maintaining spatial distribution
+    - Blue (1): Both cells preserved due to isolation and low count
+    - Orange (7): Single cell preserved
+    - Sky blue (8): Both cells preserved due to isolation and low count
+    Note: The output demonstrates preservation of isolated cells, reduction of clusters, and maintenance of color variety and spatial distribution.
 
 test_case_0:
   input: |
-    A 15x15 grid with the familiar gray (5) T-shaped object in the top-left corner. The rest of the grid has scattered colored cells:
-    - Green (3) forming a cluster in the top-left and one cell in the bottom
-    - Blue (1) in the top-right, middle-right, and bottom-right
-    - Magenta (6) in the top-middle and middle-left
-    - Yellow (4) forming clusters in the top-right, middle-left, and bottom-left
-    - Red (2) scattered in the middle and bottom-right
-    - Brown (9) in the top-middle, middle-right, and bottom-right
-    - Orange (7) in the bottom-middle
-    - Sky (8) in the top-left and bottom-right
+    A 15x15 grid with the consistent gray (5) T-shaped object in the top-left corner. The grid presents a complex mix of clusters and isolated cells:
+    - Green (3): Notable cluster (4-5 cells) in the top-left, isolated cell in the bottom
+    - Blue (1): Three isolated cells spread across the grid (top-right, middle-right, bottom-right)
+    - Magenta (6): Two isolated cells (top-middle and middle-left)
+    - Yellow (4): Three small clusters (2-3 cells each) in top-right, middle-left, and bottom-left
+    - Red (2): Multiple isolated cells scattered in the middle and bottom-right areas
+    - Brown (9): Three isolated cells (top-middle, middle-right, bottom-right)
+    - Orange (7): Single isolated cell in the bottom-middle
+    - Sky blue (8): Two isolated cells (top-left and bottom-right)
+    Note: This case presents a more challenging scenario with multiple clusters and a high degree of color mixing throughout the grid.
+
   output: |
-    The output is not provided for the test case.
+    The output is not provided for the test case. The solution should aim to:
+    - Preserve the gray T-shaped object
+    - Reduce the green cluster in the top-left while maintaining its presence
+    - Keep isolated cells of each color where possible
+    - Reduce yellow clusters to single cells or small groups
+    - Maintain spatial distribution of colors
+    - Limit each color to 3-4 occurrences
+    - Ensure every color present in the input appears at least once in the output
