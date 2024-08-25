@@ -4,15 +4,16 @@ from typing import List, Tuple, Dict
 def solve_e41c6fd3(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by identifying shapes, grouping them by color family,
-    sorting within each family, and arranging them in rows at the top of the grid.
+    sorting within each family, and arranging them efficiently in the upper part of the grid.
     
     1. Identifies all shapes in the input grid using connected regions.
     2. Groups shapes into color families: Cool (1, 8), Warm (2, 4), Other (3, 5, 6, 7, 9).
     3. Sorts shapes within each family by color number.
-    4. Places the sorted shapes in a new grid, starting from the second row, leaving one column space between shapes.
-    5. If shapes don't fit in a single row, continues on the next row.
-    6. Preserves the internal structure of each shape, including empty spaces.
-    7. Returns a new ColoredGrid with the arranged shapes.
+    4. Calculates total shape area to determine vertical positioning.
+    5. Places shapes efficiently, starting from cool colors, then warm, then others.
+    6. Adjusts vertical positioning based on total shape area.
+    7. Preserves the internal structure of each shape, including empty spaces.
+    8. Returns a new ColoredGrid with the arranged shapes.
     """
     # Find all shapes in the grid
     shapes = []
@@ -37,13 +38,19 @@ def solve_e41c6fd3(input_grid: ColoredGrid) -> ColoredGrid:
         family_shapes.sort(key=lambda x: x[0])
         grouped_shapes.extend(family_shapes)
     
+    # Calculate total shape area
+    total_area = sum((max_y - min_y + 1) * (max_x - min_x + 1) for _, (min_y, min_x, max_y, max_x), _ in shapes)
+    
     # Create a new grid
     rows, cols = input_grid.get_dimensions()
     new_grid = [[0 for _ in range(cols)] for _ in range(rows)]
     
+    # Determine starting row
+    start_row = 2 if total_area > (rows * cols) // 2 else (rows - (total_area // cols)) // 2
+    
     # Place shapes in the new grid
     current_col = 0
-    current_row = 1
+    current_row = start_row
     row_height = 0
     for color, (min_y, min_x, max_y, max_x), region in grouped_shapes:
         shape_height = max_y - min_y + 1
