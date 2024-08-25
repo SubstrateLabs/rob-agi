@@ -4,14 +4,13 @@ from typing import List, Tuple
 def solve_15113be4(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by enhancing or introducing a secondary color (sky blue, magenta, or green)
-    in a balanced pattern. The function follows these steps:
+    in a balanced pattern, focusing on the top-left quadrant. The function follows these steps:
     1. Identifies the secondary color to use (3: green, 6: magenta, or 8: sky blue).
-    2. Enhances existing secondary color areas by forming L-shapes.
-    3. Introduces new L-shapes on the left side and top of the grid.
-    4. Extends the pattern across the upper-left quadrant.
-    5. Balances the design in the lower-right quadrant.
+    2. Enhances existing secondary color areas by forming L-shapes in the top-left quadrant.
+    3. Introduces new L-shapes in the top-left quadrant in a systematic pattern.
+    4. Preserves the yellow grid structure throughout the process.
+    5. Makes minimal changes to other quadrants.
     6. Performs a final pass for consistency.
-    7. Preserves the yellow grid structure throughout the process.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -22,10 +21,9 @@ def solve_15113be4(input_grid: ColoredGrid) -> ColoredGrid:
     output_grid = input_grid.deep_copy()
     secondary_color = identify_secondary_color(output_grid)
 
-    enhance_existing_areas(output_grid, secondary_color)
+    enhance_top_left_quadrant(output_grid, secondary_color)
     introduce_new_l_shapes(output_grid, secondary_color)
-    extend_upper_left_pattern(output_grid, secondary_color)
-    balance_lower_right(output_grid, secondary_color)
+    minimal_changes_other_quadrants(output_grid, secondary_color)
     final_consistency_pass(output_grid, secondary_color)
 
     return output_grid
@@ -41,10 +39,10 @@ def identify_secondary_color(grid: ColoredGrid) -> int:
     else:
         return 8  # default to sky blue if no secondary color is present
 
-def enhance_existing_areas(grid: ColoredGrid, color: int):
+def enhance_top_left_quadrant(grid: ColoredGrid, color: int):
     rows, cols = grid.get_dimensions()
-    for r in range(rows):
-        for c in range(cols):
+    for r in range(rows // 2):
+        for c in range(cols // 2):
             if grid.get_cell(r, c) == color:
                 for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                     nr, nc = r + dr, c + dc
@@ -54,30 +52,25 @@ def enhance_existing_areas(grid: ColoredGrid, color: int):
 
 def introduce_new_l_shapes(grid: ColoredGrid, color: int):
     rows, cols = grid.get_dimensions()
-    for r in range(0, rows, 2):
-        for c in range(0, cols, 2):
-            if r == 0 or c == 0:
-                if all(grid.get_cell(r+dr, c+dc) in [0, 1] for dr in range(2) for dc in range(2)):
-                    grid.set_cell(r, c, color)
-                    grid.set_cell(r + (1 if r == 0 else 0), c + (1 if c == 0 else 0), color)
-
-def extend_upper_left_pattern(grid: ColoredGrid, color: int):
-    rows, cols = grid.get_dimensions()
     for r in range(0, rows // 2, 3):
         for c in range(0, cols // 2, 3):
             if not any(grid.get_cell(r+dr, c+dc) == color for dr in range(3) for dc in range(3)):
-                grid.set_cell(r + (2 if (r // 3 + c // 3) % 2 == 0 else 0),
-                              c + (2 if (r // 3 + c // 3) % 2 == 0 else 0), color)
-                grid.set_cell(r + (1 if (r // 3 + c // 3) % 2 == 0 else 0),
-                              c + (0 if (r // 3 + c // 3) % 2 == 0 else 1), color)
+                if is_valid_cell(grid, r, c) and is_valid_cell(grid, r+2, c+2):
+                    grid.set_cell(r + (2 if (r // 3 + c // 3) % 2 == 0 else 0),
+                                  c + (2 if (r // 3 + c // 3) % 2 == 0 else 0), color)
+                    grid.set_cell(r + (1 if (r // 3 + c // 3) % 2 == 0 else 0),
+                                  c + (0 if (r // 3 + c // 3) % 2 == 0 else 1), color)
 
-def balance_lower_right(grid: ColoredGrid, color: int):
+def minimal_changes_other_quadrants(grid: ColoredGrid, color: int):
     rows, cols = grid.get_dimensions()
     for r in range(rows // 2, rows):
-        for c in range(cols - 1):
-            if grid.get_cell(r, c) == 1 and grid.get_cell(r, c + 1) == 1:
-                grid.set_cell(r, c, color)
-                break
+        for c in range(cols):
+            if grid.get_cell(r, c) == color and not has_adjacent_color(grid, r, c, color):
+                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                    nr, nc = r + dr, c + dc
+                    if is_valid_cell(grid, nr, nc) and grid.get_cell(nr, nc) in [0, 1]:
+                        grid.set_cell(nr, nc, color)
+                        break
 
 def final_consistency_pass(grid: ColoredGrid, color: int):
     rows, cols = grid.get_dimensions()
