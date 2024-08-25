@@ -5,11 +5,12 @@ def solve_12422b43(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by extending vertical patterns downwards.
     
-    1. Identifies vertical patterns in each column, starting from the top.
+    1. Identifies vertical patterns in each column, starting from the second column.
     2. Extends these patterns downwards, filling all zero (empty) cells.
     3. Preserves existing non-zero values in the grid.
     4. Repeats the pattern as needed to fill the entire column.
-    5. Stops filling when encountering a non-zero cell.
+    5. Continues the pattern even after encountering non-zero cells.
+    6. Leaves the first column unchanged.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -27,14 +28,10 @@ def solve_12422b43(input_grid: ColoredGrid) -> ColoredGrid:
                 pattern.append(input_grid.get_cell(r, c))
         
         if pattern:
-            r = 0
-            p = 0
-            while r < rows:
+            p_index = 0
+            for r in range(rows):
                 if output_grid.get_cell(r, c) == 0:
-                    output_grid.set_cell(r, c, pattern[p])
-                    p = (p + 1) % len(pattern)
-                else:
-                    break
-                r += 1
+                    output_grid.set_cell(r, c, pattern[p_index])
+                p_index = (p_index + 1) % len(pattern)
     
     return output_grid
