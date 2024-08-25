@@ -3,39 +3,25 @@ from typing import List
 
 def solve_66f2d22f(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by analyzing 2x4 sections and marking points of interest.
+    Transforms the input grid by analyzing 2x4 sections and marking columns of interest.
     
     The function works as follows:
     1. Creates a new 7x4 output grid.
     2. Analyzes each 2x4 section of the input grid (corresponding to 2 columns).
-    3. If a section contains color transitions or intersections, marks the corresponding
+    3. If a section contains any non-black squares, marks the corresponding
        column in the output grid as gray (5). Otherwise, marks it as black (0).
-    4. Color transitions include vertical, horizontal, and diagonal changes between
-       non-black colors. Intersections are areas with 3 or more different colors.
     
-    This process effectively detects and highlights the boundaries and intersections
-    of colored regions in the input grid.
+    This process effectively detects and highlights the presence of colored regions
+    in the input grid, simplifying the complex color patterns into a binary representation.
     """
     output_grid = ColoredGrid(values=[[0 for _ in range(7)] for _ in range(4)])
     
     def analyze_section(section: List[List[int]]) -> bool:
-        unique_colors = set()
-        for i in range(2):
-            for j in range(4):
-                if section[i][j] != 0:
-                    unique_colors.add(section[i][j])
-                if i == 0 and j < 3:
-                    # Check vertical and diagonal transitions
-                    if section[i][j] != 0 and section[i+1][j] != 0 and section[i][j] != section[i+1][j]:
-                        return True
-                    if section[i][j] != 0 and section[i+1][j+1] != 0 and section[i][j] != section[i+1][j+1]:
-                        return True
-                if j < 3:
-                    # Check horizontal transitions
-                    if section[i][j] != 0 and section[i][j+1] != 0 and section[i][j] != section[i][j+1]:
-                        return True
-        
-        return len(unique_colors) >= 3
+        """
+        Check if the 2x4 section contains any non-black squares.
+        Return True if it does, False otherwise.
+        """
+        return any(cell != 0 for row in section for cell in row)
     
     for i in range(7):
         section = [
