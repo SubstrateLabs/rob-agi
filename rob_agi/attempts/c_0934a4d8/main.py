@@ -4,68 +4,80 @@ from collections import Counter
 
 def solve_0934a4d8(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the puzzle by analyzing the input grid and constructing a smaller output grid
-    that captures the essence of the input's color distribution and transitions.
+    Solves the puzzle by analyzing the input grid for repeating motifs and constructing a smaller output grid
+    that captures the essence of the input's pattern and color distribution.
     
     The function performs the following steps:
-    1. Analyzes the input grid for color frequencies and transitions
-    2. Determines an appropriate output size based on the input's complexity
-    3. Constructs an output grid that represents key colors and transitions
-    4. Ensures the output has at least 3 distinct colors and captures the input's essence
+    1. Analyzes the input grid for repeating motifs of various sizes
+    2. Identifies the most significant motif based on frequency and coverage
+    3. Determines the output grid size based on the significant motif
+    4. Constructs an output grid that represents the key motif and color distribution
+    5. Ensures the output has at least 3 distinct colors and captures the input's essence
     """
-    rows, cols = input_grid.get_dimensions()
-    color_freq = analyze_color_frequency(input_grid)
-    transitions = analyze_color_transitions(input_grid)
-    
-    output_size = determine_output_size(color_freq, transitions)
-    output_grid = construct_output_grid(color_freq, transitions, output_size)
+    motif, motif_size = find_significant_motif(input_grid)
+    output_size = determine_output_size(motif_size)
+    output_grid = construct_output_grid(input_grid, motif, output_size)
     
     return output_grid
 
-def analyze_color_frequency(grid: ColoredGrid) -> Dict[int, int]:
-    return Counter(color for row in grid.values for color in row)
+def find_significant_motif(grid: ColoredGrid) -> Tuple[List[List[int]], Tuple[int, int]]:
+    rows, cols = grid.get_dimensions()
+    max_window_size = min(rows, cols) // 2
+    best_motif = None
+    best_score = 0
+    best_size = (1, 1)
 
-def analyze_color_transitions(grid: ColoredGrid) -> Dict[Tuple[int, int], int]:
-    transitions = Counter()
-    for row in grid.values:
-        for i in range(len(row) - 1):
-            transitions[(row[i], row[i+1])] += 1
-    return transitions
+    for window_height in range(2, max_window_size + 1):
+        for window_width in range(2, max_window_size + 1):
+            motifs = Counter()
+            for i in range(0, rows - window_height + 1):
+                for j in range(0, cols - window_width + 1):
+                    motif = tuple(tuple(grid.values[i+x][j:j+window_width]) for x in range(window_height))
+                    motifs[motif] += 1
+            
+            if motifs:
+                most_common_motif, frequency = motifs.most_common(1)[0]
+                coverage = frequency * window_height * window_width / (rows * cols)
+                score = frequency * coverage
+                if score > best_score:
+                    best_motif = list(map(list, most_common_motif))
+                    best_score = score
+                    best_size = (window_height, window_width)
 
-def determine_output_size(color_freq: Dict[int, int], transitions: Dict[Tuple[int, int], int]) -> Tuple[int, int]:
-    unique_colors = len(color_freq)
-    complexity = len(transitions)
-    if unique_colors <= 4 and complexity <= 10:
-        return (3, 3)
-    elif unique_colors <= 6 and complexity <= 20:
-        return (4, 4)
+    return best_motif or [[grid.values[0][0]]], best_size
+
+def determine_output_size(motif_size: Tuple[int, int]) -> Tuple[int, int]:
+    height, width = motif_size
+    if height * width < 9:
+        factor = max(2, (9 // (height * width)) + 1)
+        return (height * factor, width * factor)
+    elif height * width > 81:
+        factor = ((height * width) // 81) + 1
+        return (height // factor, width // factor)
     else:
-        return (5, 5)
+        return motif_size
 
-def construct_output_grid(color_freq: Dict[int, int], transitions: Dict[Tuple[int, int], int], size: Tuple[int, int]) -> ColoredGrid:
+def construct_output_grid(input_grid: ColoredGrid, motif: List[List[int]], size: Tuple[int, int]) -> ColoredGrid:
     rows, cols = size
     output = [[0 for _ in range(cols)] for _ in range(rows)]
     
-    # Fill the grid with the most frequent colors
-    top_colors = [color for color, _ in sorted(color_freq.items(), key=lambda x: x[1], reverse=True)]
+    # Fill the grid with the motif
+    motif_height, motif_width = len(motif), len(motif[0])
     for i in range(rows):
         for j in range(cols):
-            output[i][j] = top_colors[(i * cols + j) % len(top_colors)]
+            output[i][j] = motif[i % motif_height][j % motif_width]
     
     # Ensure at least 3 distinct colors
-    if len(set(top_colors[:rows*cols])) < 3:
-        for i in range(3):
-            output[i][i] = top_colors[i]
+    color_freq = Counter(color for row in input_grid.values for color in row)
+    top_colors = [color for color, _ in color_freq.most_common()]
+    distinct_colors = set(color for row in output for color in row)
     
-    # Apply some common transitions
-    top_transitions = sorted(transitions.items(), key=lambda x: x[1], reverse=True)
-    for (color1, color2), _ in top_transitions[:min(5, len(top_transitions))]:
-        for i in range(rows):
-            for j in range(cols - 1):
-                if output[i][j] == color1:
-                    output[i][j+1] = color2
-                    break
-            if j < cols - 1:
+    if len(distinct_colors) < 3:
+        for i, color in enumerate(top_colors):
+            if color not in distinct_colors:
+                output[i % rows][i % cols] = color
+                distinct_colors.add(color)
+            if len(distinct_colors) >= 3:
                 break
     
     return ColoredGrid(values=output)
