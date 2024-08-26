@@ -8,18 +8,18 @@ def solve_505fff84(input_grid: ColoredGrid) -> ColoredGrid:
     
     The function performs the following steps:
     1. Converts the input grid to a binary representation (1 for red, 0 for others)
-    2. Analyzes the distribution of red squares and identifies key features
-    3. Generates candidate patterns based on the most significant features
-    4. Evaluates and selects the best candidate pattern
-    5. Refines the selected pattern to ensure it captures the essence of the input
+    2. Analyzes the distribution and structure of red squares
+    3. Determines the appropriate output size based on input characteristics
+    4. Creates an abstract pattern that captures the essence of the input
+    5. Refines and balances the pattern to match input density and structure
     6. Returns the final pattern as a new ColoredGrid
     """
     binary_grid = convert_to_binary(input_grid)
     features = extract_features(binary_grid)
-    candidates = generate_candidates(features, binary_grid)
-    best_candidate = evaluate_candidates(candidates, binary_grid)
-    final_pattern = refine_pattern(best_candidate, binary_grid)
-    return final_pattern
+    output_size = determine_output_size(binary_grid, features)
+    abstract_pattern = create_abstract_pattern(binary_grid, features, output_size)
+    final_pattern = refine_and_balance_pattern(abstract_pattern, features)
+    return ColoredGrid(values=final_pattern)
 
 def convert_to_binary(grid: ColoredGrid) -> np.ndarray:
     return np.array(grid.values) == 2
@@ -30,6 +30,7 @@ def extract_features(binary_grid: np.ndarray) -> dict:
     features['row_density'] = np.mean(binary_grid, axis=1)
     features['col_density'] = np.mean(binary_grid, axis=0)
     features['largest_component'] = largest_connected_component(binary_grid)
+    features['frame'] = detect_frame(binary_grid)
     return features
 
 def largest_connected_component(binary_grid: np.ndarray) -> List[Tuple[int, int]]:
@@ -52,57 +53,75 @@ def largest_connected_component(binary_grid: np.ndarray) -> List[Tuple[int, int]
                     largest_component = component
     return largest_component
 
-def generate_candidates(features: dict, binary_grid: np.ndarray) -> List[np.ndarray]:
-    candidates = []
+def detect_frame(binary_grid: np.ndarray) -> bool:
+    rows, cols = binary_grid.shape
+    top = np.any(binary_grid[0, :])
+    bottom = np.any(binary_grid[-1, :])
+    left = np.any(binary_grid[:, 0])
+    right = np.any(binary_grid[:, -1])
+    return (top and bottom and left and right)
+
+def determine_output_size(binary_grid: np.ndarray, features: dict) -> Tuple[int, int]:
+    input_rows, input_cols = binary_grid.shape
+    aspect_ratio = input_cols / input_rows
     
-    # Candidate 1: Based on overall density
-    size = max(2, min(6, int(np.sqrt(np.sum(binary_grid)))))
-    candidate = np.random.rand(size, size) < features['density']
-    candidates.append(candidate)
+    if aspect_ratio > 2:
+        return (1, 7)
+    elif aspect_ratio < 0.5:
+        return (5, 1)
+    elif input_rows <= 5 and input_cols <= 5:
+        return (input_rows, input_cols)
+    else:
+        return (3, 4) if aspect_ratio > 1 else (4, 3)
+
+def create_abstract_pattern(binary_grid: np.ndarray, features: dict, output_size: Tuple[int, int]) -> np.ndarray:
+    output = np.zeros(output_size, dtype=int)
     
-    # Candidate 2: Based on largest connected component
+    # Map largest component
     if features['largest_component']:
-        min_i = min(i for i, j in features['largest_component'])
-        max_i = max(i for i, j in features['largest_component'])
-        min_j = min(j for i, j in features['largest_component'])
-        max_j = max(j for i, j in features['largest_component'])
-        candidate = binary_grid[min_i:max_i+1, min_j:max_j+1]
-        candidates.append(candidate)
+        component = np.array(features['largest_component'])
+        min_i, min_j = np.min(component, axis=0)
+        max_i, max_j = np.max(component, axis=0)
+        component_height, component_width = max_i - min_i + 1, max_j - min_j + 1
+        scale_i = output_size[0] / component_height
+        scale_j = output_size[1] / component_width
+        for i, j in component:
+            new_i = int((i - min_i) * scale_i)
+            new_j = int((j - min_j) * scale_j)
+            if 0 <= new_i < output_size[0] and 0 <= new_j < output_size[1]:
+                output[new_i, new_j] = 1
     
-    # Candidate 3: Based on row and column densities
-    rows = np.argsort(features['row_density'])[-3:]
-    cols = np.argsort(features['col_density'])[-3:]
-    candidate = binary_grid[np.ix_(rows, cols)]
-    candidates.append(candidate)
+    # Represent frame if detected
+    if features['frame']:
+        output[0, :] = 1
+        output[-1, :] = 1
+        output[:, 0] = 1
+        output[:, -1] = 1
     
-    return candidates
+    return output
 
-def evaluate_candidates(candidates: List[np.ndarray], binary_grid: np.ndarray) -> np.ndarray:
-    best_score = -1
-    best_candidate = None
-    for candidate in candidates:
-        score = evaluate_pattern(candidate, binary_grid)
-        if score > best_score:
-            best_score = score
-            best_candidate = candidate
-    return best_candidate
-
-def evaluate_pattern(pattern: np.ndarray, binary_grid: np.ndarray) -> float:
-    pattern_density = np.mean(pattern)
-    grid_density = np.mean(binary_grid)
-    size_score = 1 / (np.abs(np.log(pattern.size / binary_grid.size)) + 1)
-    density_score = 1 / (np.abs(pattern_density - grid_density) + 0.1)
-    return size_score * density_score
-
-def refine_pattern(pattern: np.ndarray, binary_grid: np.ndarray) -> ColoredGrid:
-    # Ensure minimum size
-    while pattern.shape[0] < 2 or pattern.shape[1] < 2:
-        pattern = np.pad(pattern, ((0, 1), (0, 1)), mode='edge')
+def refine_and_balance_pattern(pattern: np.ndarray, features: dict) -> List[List[int]]:
+    target_density = features['density']
+    current_density = np.mean(pattern)
+    
+    while abs(current_density - target_density) > 0.1:
+        if current_density < target_density:
+            # Add a red square
+            zero_indices = np.where(pattern == 0)
+            if len(zero_indices[0]) > 0:
+                idx = np.random.randint(len(zero_indices[0]))
+                pattern[zero_indices[0][idx], zero_indices[1][idx]] = 1
+        else:
+            # Remove a red square
+            one_indices = np.where(pattern == 1)
+            if len(one_indices[0]) > 0:
+                idx = np.random.randint(len(one_indices[0]))
+                pattern[one_indices[0][idx], one_indices[1][idx]] = 0
+        
+        current_density = np.mean(pattern)
     
     # Ensure at least one red square
     if np.sum(pattern) == 0:
         pattern[0, 0] = 1
     
-    # Convert back to ColoredGrid format
-    values = [[2 if cell else 0 for cell in row] for row in pattern]
-    return ColoredGrid(values=values)
+    return [[2 if cell else 0 for cell in row] for row in pattern]
