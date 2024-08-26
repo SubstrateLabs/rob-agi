@@ -65,7 +65,15 @@ def solve_94be5b80(input_grid: ColoredGrid) -> ColoredGrid:
     for color in top_colors:
         if color not in existing_colors:
             layout.append((color, -1, -1))  # -1 indicates a new horseshoe
-    layout.sort(key=lambda x: (x[1] if x[1] != -1 else float('inf'), top_colors.index(x[0])))
+
+    # Sort layout, handling colors not in top_colors
+    def sort_key(x):
+        if x[1] != -1:  # Existing horseshoe
+            return (x[1], top_colors.index(x[0]) if x[0] in top_colors else len(top_colors))
+        else:  # New horseshoe
+            return (float('inf'), top_colors.index(x[0]))
+
+    layout.sort(key=sort_key)
 
     # Calculate output grid size
     output_rows = min(max(len(layout) * 5 - 2, rows), 30)  # Limit to 30 rows or input height, whichever is larger
