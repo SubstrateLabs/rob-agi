@@ -11,7 +11,7 @@ def solve_e6de6e8f(input_grid: ColoredGrid) -> ColoredGrid:
     4. For each decision point:
        a. If the corresponding position in the bottom row is red, go straight down.
        b. If not, go diagonally down-right.
-    5. Continue the path to the bottom of the grid.
+    5. Continue the path to the bottom of the grid, shifting right if necessary.
     6. Return the completed output grid.
     """
     output = [[0 for _ in range(7)] for _ in range(8)]
@@ -23,21 +23,26 @@ def solve_e6de6e8f(input_grid: ColoredGrid) -> ColoredGrid:
     for i, decision_point in enumerate(decision_points):
         go_straight = input_grid.values[1][decision_point] == 2
 
-        while current_row < 8 and current_col < 7:
+        while current_row < 8 and 0 <= current_col < 7:
             output[current_row][current_col] = 2
             current_row += 1
-            if not go_straight and current_col < 6:
+            if not go_straight:
                 current_col += 1
-            if i < len(decision_points) - 1 and current_col >= decision_points[i+1]:
+                break
+            if i < len(decision_points) - 1 and current_col == decision_points[i+1]:
                 break
 
         if i < len(decision_points) - 1:
             current_row = 1
             current_col = decision_points[i+1]
 
-    # Ensure the path reaches the bottom
-    while current_row < 8 and current_col < 7:
+    # Ensure the path reaches the bottom, shifting right if necessary
+    while current_row < 8:
+        if current_col >= 7:
+            current_col = 6
         output[current_row][current_col] = 2
         current_row += 1
+        if current_col < 6 and output[current_row-1][current_col+1] != 2:
+            current_col += 1
 
     return ColoredGrid(values=output)
