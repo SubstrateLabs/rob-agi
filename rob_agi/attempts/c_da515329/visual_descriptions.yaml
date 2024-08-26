@@ -1,23 +1,41 @@
 example_0:
   input: |
-    A 22x22 grid mostly filled with black (0). There's a sky-colored (8) cross or plus sign in the center. The cross is 7 squares wide and 7 squares tall, with the center square being black instead of sky-colored.
+    A 22x22 grid with a black (0) background. In the center, there's a sky-colored (8) cross or plus sign. The cross spans 7 cells vertically and horizontally, with the central cell being black. This creates a distinctive 'hole' in the middle of the cross.
   output: |
-    A complex 22x22 grid with a large sky-colored (8) frame or border. Inside this frame is an intricate maze-like pattern of sky-colored paths on a black background. The pattern is symmetrical and consists of concentric frames or borders, with various offshoots and connections. The center retains a sky-colored cross shape, but it's now part of a larger, more complex structure.
+    A 22x22 grid with a complex, asymmetrical maze-like pattern. Key features:
+    1. A continuous sky-colored (8) border frames the entire grid, except for the top-left corner which remains black.
+    2. The central cross from the input is preserved and integrated into a larger structure.
+    3. Maze-like paths of varying widths extend from the center, creating a balance between open areas and intricate passages.
+    4. The pattern is asymmetrical but maintains a sense of balance across the four quadrants.
+    5. Small structural elements (2x2 squares) are scattered in larger empty areas, adding visual interest.
+    6. All sky-colored cells are connected, forming a single continuous structure.
 
 example_1:
   input: |
-    A 12x12 grid mostly filled with black (0). There's a small sky-colored (8) shape in the center resembling an upside-down 'T' or a small cross. It's 3 squares wide and 3 squares tall.
+    A 12x12 grid with a black (0) background. In the center, there's a small sky-colored (8) shape resembling an upside-down 'T' or a small cross. This shape is 3 cells wide and 3 cells tall, with the bottom-center cell extending one cell lower.
   output: |
-    A 12x12 grid with a complex sky-colored (8) pattern on a black background. The pattern forms a large, asymmetrical maze-like structure. It has a thick border on the top, right, and bottom edges, with various internal paths and chambers. The left side is more open, with the pattern extending inwards from the top and bottom.
+    A 12x12 grid transformed into an asymmetrical, maze-like pattern. Key features:
+    1. A continuous sky-colored (8) border surrounds the grid on three sides (top, right, bottom), with the left side more open.
+    2. The original 'T' shape is incorporated into a larger, more complex structure.
+    3. Maze-like paths of varying widths create a balance between open spaces and narrow passages.
+    4. The pattern is asymmetrical, with more complexity on the right side and more open space on the left.
+    5. Small structural elements are added to break up larger empty areas.
+    6. All sky-colored cells are interconnected, forming a single continuous structure.
 
 example_2:
   input: |
-    A 16x16 grid mostly filled with black (0). There's a sky-colored (8) shape in the center resembling a plus sign or cross. The vertical part of the cross is 5 squares tall, while the horizontal part is 5 squares wide.
+    A 16x16 grid with a black (0) background. In the center, there's a sky-colored (8) plus sign or cross. The vertical part spans 5 cells, and the horizontal part also spans 5 cells, creating a symmetrical cross shape.
   output: |
-    A 16x16 grid with an intricate sky-colored (8) pattern on a black background. The pattern forms a large, asymmetrical maze-like structure. It has a thick border on the left, bottom, and right edges, with various internal paths and chambers. The top side is more open, with the pattern extending downwards. The original cross shape is still visible in the center, but it's now integrated into a much larger and more complex structure.
+    A 16x16 grid transformed into an intricate, asymmetrical maze-like pattern. Key features:
+    1. A continuous sky-colored (8) border frames three sides (left, bottom, right), with the top more open and the pattern extending downward.
+    2. The original cross shape is still visible in the center but is now part of a larger, more complex structure.
+    3. Maze-like paths of varying widths create a dynamic balance between open areas and narrow passages.
+    4. The pattern is asymmetrical but maintains a sense of balance across the four quadrants.
+    5. Small structural elements (2x2 squares) are added to larger empty areas for visual interest.
+    6. All sky-colored cells are connected, forming a single continuous structure that extends from the center to the edges.
 
 test_case_0:
   input: |
-    A 16x16 grid mostly filled with black (0). There's a sky-colored (8) shape in the center resembling a plus sign or cross. The vertical part of the cross is 5 squares tall, while the horizontal part is 5 squares wide.
+    A 16x16 grid with a black (0) background. In the center, there's a sky-colored (8) plus sign or cross. The vertical and horizontal parts both span 5 cells, creating a symmetrical cross shape centered in the grid.
   output: |
-    This is a test case, so no output is provided to describe.
+    This is a test case, so no output is provided to describe. The solution should apply similar transformation principles as seen in the examples.
