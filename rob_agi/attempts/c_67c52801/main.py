@@ -8,14 +8,16 @@ def solve_67c52801(input_grid: ColoredGrid) -> ColoredGrid:
     The transformation follows these rules:
     1. The bottom row of the input grid remains unchanged.
     2. Colored cell groups move downward and to the left, maintaining their shapes and relative order.
-    3. Empty space (black/0) fills from the top and right.
+    3. Single colored cells in the second-to-last row move as far left as possible.
+    4. Empty space (black/0) fills from the top and right.
     
     The algorithm works as follows:
     1. Initialize the output grid with zeros and copy the bottom row from the input.
     2. Identify and group connected colored cells.
-    3. Place each group in the lowest, leftmost available position that fits the entire group.
-    4. Preserve the relative order of groups.
-    5. Return the transformed grid.
+    3. Sort groups based on their bottom position and leftmost cell.
+    4. Place each group in the lowest, leftmost available position that fits the entire group.
+    5. Handle single cells in the second-to-last row.
+    6. Return the transformed grid.
     
     Returns:
     ColoredGrid: The transformed grid according to the specified rules.
@@ -29,9 +31,15 @@ def solve_67c52801(input_grid: ColoredGrid) -> ColoredGrid:
     # Identify color groups
     color_groups = identify_color_groups(input_grid)
     
+    # Sort color groups
+    color_groups.sort(key=lambda g: (-max(r for r, _, _ in g), min(c for _, c, _ in g)))
+    
     # Place color groups
     for group in color_groups:
         place_group(output_grid, group)
+    
+    # Handle single cells in second-to-last row
+    handle_single_cells(input_grid, output_grid)
     
     return output_grid
 
@@ -82,3 +90,14 @@ def can_place_group(grid: ColoredGrid, group: List[Tuple[int, int, int]], start_
                 return False
     
     return True
+
+def handle_single_cells(input_grid: ColoredGrid, output_grid: ColoredGrid):
+    rows, cols = input_grid.get_dimensions()
+    second_last_row = rows - 2
+    
+    for c in range(cols):
+        if input_grid.values[second_last_row][c] != 0 and output_grid.values[second_last_row][c] == 0:
+            for new_c in range(cols):
+                if output_grid.values[second_last_row][new_c] == 0:
+                    output_grid.values[second_last_row][new_c] = input_grid.values[second_last_row][c]
+                    break
