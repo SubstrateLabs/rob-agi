@@ -15,8 +15,9 @@ def solve_14754a24(input_grid: ColoredGrid) -> ColoredGrid:
     7. Optimizes coverage by extending existing red regions.
     8. Performs multiple optimization passes to improve the solution.
     9. Validates the final grid to ensure all red squares are part of valid L-shapes.
+    10. Falls back to the original grid if validation fails.
     
-    Returns a new ColoredGrid with the transformed values.
+    Returns a new ColoredGrid with the transformed values or the original grid if transformation fails.
     """
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
@@ -134,7 +135,7 @@ def solve_14754a24(input_grid: ColoredGrid) -> ColoredGrid:
                                         0 <= r+dr2 < rows and 0 <= c+dc2 < cols and grid.values[r+dr2][c+dc2] in [0, 5]):
                                         grid.values[r+dr1][c+dc1] = 2
                                         grid.values[r+dr2][c+dc2] = 2
-                                        return  # Only create one partial L-shape per isolated yellow
+                                        break  # Only create one partial L-shape per isolated yellow
     
     process_yellow_squares()
     optimize_pattern()
