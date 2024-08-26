@@ -3,38 +3,39 @@ from typing import List, Tuple
 
 def solve_2f0c5170(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Extracts the most complex pattern from black regions in the input grid,
+    Extracts the most complex pattern from non-black regions in the input grid,
     centers it in an optimally sized output grid, and returns it as a new ColoredGrid.
     
-    1. Identifies all black regions in the input grid
-    2. Extracts patterns from each black region, focusing on non-black cells
-    3. Analyzes complexity of patterns based on non-black cell count, color variety, and spread
+    1. Identifies all non-black regions in the input grid
+    2. Extracts patterns from each non-black region
+    3. Analyzes complexity of patterns based on cell count, color variety, and spread
     4. Selects the most complex pattern
     5. Determines optimal output grid size based on the pattern
     6. Centers the pattern in the new grid with a minimal black border
     7. Optimizes the final grid size
     8. Returns the result as a ColoredGrid, or a 5x5 black grid if no pattern is found
     """
-    def find_black_regions(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
+    def find_non_black_regions(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
         rows, cols = grid.get_dimensions()
         visited = set()
         regions = []
         
-        def dfs(r: int, c: int) -> List[Tuple[int, int]]:
-            if (r, c) in visited or grid.get_cell(r, c) != 0:
+        def dfs(r: int, c: int, color: int) -> List[Tuple[int, int]]:
+            if (r, c) in visited or grid.get_cell(r, c) != color:
                 return []
             visited.add((r, c))
             region = [(r, c)]
             for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
                 nr, nc = r + dr, c + dc
                 if 0 <= nr < rows and 0 <= nc < cols:
-                    region.extend(dfs(nr, nc))
+                    region.extend(dfs(nr, nc, color))
             return region
         
         for r in range(rows):
             for c in range(cols):
-                if grid.get_cell(r, c) == 0 and (r, c) not in visited:
-                    regions.append(dfs(r, c))
+                color = grid.get_cell(r, c)
+                if color != 0 and (r, c) not in visited:
+                    regions.append(dfs(r, c, color))
         
         return regions
 
@@ -45,19 +46,18 @@ def solve_2f0c5170(input_grid: ColoredGrid) -> ColoredGrid:
         max_c = max(c for _, c in region)
         
         pattern = ColoredGrid(values=[[0 for _ in range(max_c - min_c + 1)] for _ in range(max_r - min_r + 1)])
-        non_black_cells = 0
+        cells = 0
         unique_colors = set()
         max_distance = 0
         
         for r, c in region:
             color = grid.get_cell(r, c)
             pattern.set_cell(r - min_r, c - min_c, color)
-            if color != 0:
-                non_black_cells += 1
-                unique_colors.add(color)
-                max_distance = max(max_distance, r - min_r, c - min_c)
+            cells += 1
+            unique_colors.add(color)
+            max_distance = max(max_distance, r - min_r, c - min_c)
         
-        return pattern, non_black_cells, len(unique_colors), max_distance
+        return pattern, cells, len(unique_colors), max_distance
 
     def determine_output_size(pattern: ColoredGrid, max_distance: int) -> int:
         rows, cols = pattern.get_dimensions()
@@ -221,14 +221,14 @@ def solve_2f0c5170(input_grid: ColoredGrid) -> ColoredGrid:
                                 (new_cols - optimized.num_cols + 1) // 2)
 
     # Main logic
-    black_regions = find_black_regions(input_grid)
-    if not black_regions:
+    non_black_regions = find_non_black_regions(input_grid)
+    if not non_black_regions:
         return ColoredGrid(values=[[0 for _ in range(5)] for _ in range(5)])  # Return a 5x5 black grid if no regions found
     
     patterns = []
-    for region in black_regions:
-        pattern, non_black_cells, unique_colors, max_distance = extract_pattern(input_grid, region)
-        complexity_score = non_black_cells * unique_colors * max_distance
+    for region in non_black_regions:
+        pattern, cells, unique_colors, max_distance = extract_pattern(input_grid, region)
+        complexity_score = cells * unique_colors * max_distance
         patterns.append((pattern, complexity_score, max_distance))
     
     if not patterns:
@@ -238,7 +238,7 @@ def solve_2f0c5170(input_grid: ColoredGrid) -> ColoredGrid:
     chosen_pattern, _, max_distance = max(patterns, key=lambda x: x[1])
     
     output_size = determine_output_size(chosen_pattern, max_distance)
-    centered_pattern = center_pattern(chosen_pattern, output_size[0])
+    centered_pattern = center_pattern(chosen_pattern, output_size)
     optimized_pattern = optimize_grid_size(centered_pattern)
     
     return optimized_pattern
