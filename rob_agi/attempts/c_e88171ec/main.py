@@ -4,37 +4,39 @@ from typing import List, Tuple, Set
 def solve_e88171ec(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the e88171ec challenge by finding the largest contiguous region of black cells
-    and filling it with the largest possible centered, even-dimensioned sky blue (8) rectangle.
+    and filling it with the largest possible sky blue (8) rectangle.
 
     The solution follows these steps:
     1. Find all contiguous regions of black (0) cells.
     2. Select the largest black region.
-    3. Determine the dimensions of the sky blue rectangle (even numbers, max 4x4).
-    4. Optimize the placement of the sky blue rectangle within the black region.
-    5. Fill the chosen area with sky blue (8).
+    3. Attempt to place a 4x4 sky blue rectangle in the largest region.
+    4. If a 4x4 doesn't fit, attempt to place a 2x2 sky blue rectangle.
+    5. Place the rectangle in the bottom-right most position possible within the region.
+    6. Fill the chosen area with sky blue (8).
 
-    If no suitable region is found, return the original grid unchanged.
+    If no suitable region is found or no rectangle fits, return the original grid unchanged.
     """
-    output_grid = input_grid.deep_copy()
     black_regions = find_black_regions(input_grid)
     
     if not black_regions:
-        return output_grid
+        return input_grid
     
     largest_region = get_largest_region(black_regions)
     if len(largest_region) < 4:
-        return output_grid
+        return input_grid
     
     bounding_box = get_bounding_box(largest_region)
-    blue_rectangle = calculate_blue_rectangle(largest_region, bounding_box)
+    blue_rectangle = find_rectangle_position(largest_region, bounding_box)
     
     if blue_rectangle:
-        width, height, top_left = blue_rectangle
-        for r in range(top_left[0], top_left[0] + height):
-            for c in range(top_left[1], top_left[1] + width):
+        output_grid = input_grid.deep_copy()
+        size, (top, left) = blue_rectangle
+        for r in range(top, top + size):
+            for c in range(left, left + size):
                 output_grid.set_cell(r, c, 8)
+        return output_grid
     
-    return output_grid
+    return input_grid
 
 def find_black_regions(grid: ColoredGrid) -> List[Set[Tuple[int, int]]]:
     rows, cols = grid.get_dimensions()
@@ -68,16 +70,15 @@ def get_bounding_box(region: Set[Tuple[int, int]]) -> Tuple[int, int, int, int]:
     max_c = max(c for _, c in region)
     return min_r, max_r, min_c, max_c
 
-def calculate_blue_rectangle(region: Set[Tuple[int, int]], bounding_box: Tuple[int, int, int, int]) -> Tuple[int, int, Tuple[int, int]]:
+def find_rectangle_position(region: Set[Tuple[int, int]], bounding_box: Tuple[int, int, int, int]) -> Optional[Tuple[int, Tuple[int, int]]]:
     min_r, max_r, min_c, max_c = bounding_box
-    center_r, center_c = (min_r + max_r) // 2, (min_c + max_c) // 2
     
     for size in [4, 2]:
-        for dr in range(-1, 2):
-            for dc in range(-1, 2):
-                top = center_r - size // 2 + dr
-                left = center_c - size // 2 + dc
-                if all((r, c) in region for r in range(top, top + size) for c in range(left, left + size)):
-                    return size, size, (top, left)
+        for r in range(max_r, min_r - 1, -1):
+            for c in range(max_c, min_c - 1, -1):
+                if r - size + 1 < min_r or c - size + 1 < min_c:
+                    continue
+                if all((rr, cc) in region for rr in range(r - size + 1, r + 1) for cc in range(c - size + 1, c + 1)):
+                    return size, (r - size + 1, c - size + 1)
     
     return None
