@@ -6,10 +6,10 @@ def solve_7d419a02(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by changing some blue (8) regions to yellow (4).
     
     The transformation follows these rules:
-    1. Large blue regions are framed with yellow, keeping the center blue.
-    2. Small blue regions on the edges or adjacent to changed regions become yellow.
-    3. Full blue columns on the edges of the grid become yellow.
-    4. Black (0) and magenta (6) cells remain unchanged.
+    1. Blue regions of 2x2 or larger that touch black (0) cells are changed to yellow.
+    2. Single-width blue lines and regions not touching black remain blue.
+    3. Black (0) and magenta (6) cells remain unchanged.
+    4. The transformation is applied consistently across the entire grid.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -18,60 +18,62 @@ def solve_7d419a02(input_grid: ColoredGrid) -> ColoredGrid:
     ColoredGrid: The transformed grid.
     """
     grid = input_grid.deep_copy()
-    regions = find_regions(grid)
-    for region in regions:
-        process_region(grid, region)
-    handle_full_columns(grid)
+    rows, cols = grid.get_dimensions()
+
+    for row in range(rows):
+        for col in range(cols):
+            if is_blue(grid.values[row][col]):
+                if is_2x2_or_larger_blue(grid, row, col):
+                    if touches_black(grid, row, col) and not is_part_of_larger_blue(grid, row, col):
+                        change_region_to_yellow(grid, row, col)
+
     return grid
 
 def is_blue(cell: int) -> bool:
     return cell == 8
 
-def is_changeable(cell: int) -> bool:
-    return cell == 8
+def is_black(cell: int) -> bool:
+    return cell == 0
 
-def find_regions(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
-    regions = []
-    visited = set()
-    for r in range(grid.num_rows):
-        for c in range(grid.num_cols):
-            if is_blue(grid.values[r][c]) and (r, c) not in visited:
-                region = []
-                stack = [(r, c)]
-                while stack:
-                    curr_r, curr_c = stack.pop()
-                    if (curr_r, curr_c) not in visited and is_blue(grid.values[curr_r][curr_c]):
-                        visited.add((curr_r, curr_c))
-                        region.append((curr_r, curr_c))
-                        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                            new_r, new_c = curr_r + dr, curr_c + dc
-                            if 0 <= new_r < grid.num_rows and 0 <= new_c < grid.num_cols:
-                                stack.append((new_r, new_c))
-                regions.append(region)
-    return regions
+def touches_black(grid: ColoredGrid, row: int, col: int) -> bool:
+    for dr in [-1, 0, 1]:
+        for dc in [-1, 0, 1]:
+            if dr == 0 and dc == 0:
+                continue
+            new_row, new_col = row + dr, col + dc
+            if 0 <= new_row < grid.num_rows and 0 <= new_col < grid.num_cols:
+                if is_black(grid.values[new_row][new_col]):
+                    return True
+    return False
 
-def process_region(grid: ColoredGrid, region: List[Tuple[int, int]]):
-    min_r = min(r for r, _ in region)
-    max_r = max(r for r, _ in region)
-    min_c = min(c for _, c in region)
-    max_c = max(c for _, c in region)
-    width = max_c - min_c + 1
-    height = max_r - min_r + 1
-    
-    if width > 2 and height > 2:
-        frame_width = min(width // 4, height // 4, 2)
-        for r, c in region:
-            if (r - min_r < frame_width or max_r - r < frame_width or
-                c - min_c < frame_width or max_c - c < frame_width):
-                grid.values[r][c] = 4  # Change to yellow
-    else:
-        if min_c == 0 or max_c == grid.num_cols - 1 or min_r == 0 or max_r == grid.num_rows - 1:
-            for r, c in region:
-                grid.values[r][c] = 4  # Change to yellow
+def is_2x2_or_larger_blue(grid: ColoredGrid, row: int, col: int) -> bool:
+    if row + 1 < grid.num_rows and col + 1 < grid.num_cols:
+        return (is_blue(grid.values[row][col]) and
+                is_blue(grid.values[row][col+1]) and
+                is_blue(grid.values[row+1][col]) and
+                is_blue(grid.values[row+1][col+1]))
+    return False
 
-def handle_full_columns(grid: ColoredGrid):
-    for c in range(grid.num_cols):
-        if all(is_blue(grid.values[r][c]) for r in range(grid.num_rows)):
-            if c == 0 or c == grid.num_cols - 1:
-                for r in range(grid.num_rows):
-                    grid.values[r][c] = 4  # Change to yellow
+def is_part_of_larger_blue(grid: ColoredGrid, row: int, col: int) -> bool:
+    for dr in [-1, 0, 1]:
+        for dc in [-1, 0, 1]:
+            if dr == 0 and dc == 0:
+                continue
+            new_row, new_col = row + dr, col + dc
+            if 0 <= new_row < grid.num_rows and 0 <= new_col < grid.num_cols:
+                if is_blue(grid.values[new_row][new_col]) and not touches_black(grid, new_row, new_col):
+                    return True
+    return False
+
+def change_region_to_yellow(grid: ColoredGrid, start_row: int, start_col: int):
+    stack = [(start_row, start_col)]
+    while stack:
+        row, col = stack.pop()
+        if is_blue(grid.values[row][col]):
+            grid.values[row][col] = 4  # Change to yellow
+            # Add neighboring blue cells to stack
+            for dr, dc in [(-1,0), (1,0), (0,-1), (0,1)]:
+                new_row, new_col = row + dr, col + dc
+                if 0 <= new_row < grid.num_rows and 0 <= new_col < grid.num_cols:
+                    if is_blue(grid.values[new_row][new_col]):
+                        stack.append((new_row, new_col))
