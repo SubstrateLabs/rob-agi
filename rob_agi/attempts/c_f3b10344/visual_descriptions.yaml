@@ -1,23 +1,90 @@
 example_0:
   input: |
-    The grid is 30x30. There are two blue (1) rectangular shapes in the upper left quadrant, each 7x7 squares. They are separated by 3 columns of black (0) squares. In the lower right quadrant, there are two green (3) rectangular shapes, also 7x7 squares, separated by 3 columns of black squares. The rest of the grid is filled with black (0) squares.
+    Grid size: 30x30
+    Shapes:
+    1. Two blue (1) squares, each 7x7, in the upper left quadrant
+       - Separated by 3 columns of black (0) squares
+    2. Two green (3) squares, each 7x7, in the lower right quadrant
+       - Separated by 3 columns of black (0) squares
+    Background: All remaining cells are black (0)
+    Key challenge: Connect blue and green shapes across the grid
+
   output: |
-    The grid layout is mostly the same as the input, with the addition of a sky blue (8) connection between the shapes. A 3-cell wide sky blue bridge connects the bottom of the upper left blue shape to the top of the lower right green shape. This bridge runs vertically through the center of the grid, then horizontally to connect to the green shape.
+    Grid size: 30x30
+    Original shapes: Preserved as in input
+    New elements:
+    1. Sky blue (8) connection:
+       - 3-cell wide continuous path
+       - Connects all non-black shapes
+       - Route: From bottom of upper left blue square, vertically down the center, then horizontally right to top of lower right green square
+    Key observations:
+    - Single, unbroken sky blue path
+    - Path is consistently 3 cells wide
+    - Efficient use of space, minimizing unnecessary turns
 
 example_1:
   input: |
-    The grid is 30x30. In the upper left quadrant, there's a red (2) 7x7 square shape. To its right, separated by 3 columns, is a magenta (6) 5x5 square. Below this magenta square is another 5x5 magenta square. In the lower left quadrant, there's a 4x4 red square. In the upper right quadrant, there's a 5x6 magenta rectangle. The rest of the grid is filled with black (0) squares.
+    Grid size: 30x30
+    Shapes:
+    1. Red (2) 7x7 square in upper left quadrant
+    2. Two magenta (6) 5x5 squares:
+       - One to the right of the red square, separated by 3 columns
+       - Another directly below the first magenta square
+    3. Red (2) 4x4 square in lower left quadrant
+    4. Magenta (6) 5x6 rectangle in upper right quadrant
+    Background: All remaining cells are black (0)
+    Key challenge: Connect shapes of different sizes and positions
+
   output: |
-    The layout is similar to the input, with the addition of sky blue (8) connections. A 3-cell wide sky blue bridge connects the right side of the upper left red square to the left side of the upper magenta square. Another sky blue bridge connects the bottom of this magenta square to the top of the one below it. A third bridge connects the bottom right of the lower magenta square to the top left of the red square in the lower left. Finally, a bridge connects the right side of this red square to the left side of the magenta rectangle in the upper right.
+    Grid size: 30x30
+    Original shapes: Preserved as in input
+    New elements:
+    1. Sky blue (8) connections:
+       - All paths are 3 cells wide
+       - Path 1: Right side of upper left red square to left side of upper magenta square
+       - Path 2: Bottom of upper magenta square to top of lower magenta square
+       - Path 3: Bottom right of lower magenta square to top left of lower left red square
+       - Path 4: Right side of lower left red square to left side of upper right magenta rectangle
+    Key observations:
+    - Single, continuous sky blue network
+    - Efficient routing, minimizing path length
+    - Consistent 3-cell width maintained at all points
 
 example_2:
   input: |
-    The grid is 30x30. In the upper left quadrant, there's a yellow (4) 7x7 square, with a 6x6 yellow square to its right, separated by 3 columns. In the upper right, there's a 3x5 yellow rectangle. In the lower left, there's a 3x5 yellow rectangle. In the center right, there's a 6x3 magenta (6) rectangle. In the lower right, there's a 3x3 magenta square. The rest of the grid is black (0).
+    Grid size: 30x30
+    Shapes:
+    1. Yellow (4) 7x7 square in upper left quadrant
+    2. Yellow (4) 6x6 square to the right of the first, separated by 3 columns
+    3. Yellow (4) 3x5 rectangle in upper right
+    4. Yellow (4) 3x5 rectangle in lower left
+    5. Magenta (6) 6x3 rectangle in center right
+    6. Magenta (6) 3x3 square in lower right
+    Background: All remaining cells are black (0)
+    Key challenge: Connect multiple shapes of varying sizes across the entire grid
+
   output: |
-    The layout is similar to the input, with the addition of sky blue (8) connections. A 3-cell wide sky blue bridge connects the right side of the upper left yellow square to the left side of the upper right yellow square. Another bridge connects the bottom of the upper right yellow square to the top of the magenta rectangle in the center right. A third bridge connects the bottom of this magenta rectangle to the top of the magenta square in the lower right. A fourth bridge connects the left side of the lower left yellow rectangle to the left side of the upper left yellow square. Finally, a fifth bridge connects the right side of the lower left yellow rectangle to the left side of the lower right magenta square.
+    Grid size: 30x30
+    Original shapes: Preserved as in input
+    New elements:
+    1. Sky blue (8) connections:
+       - All paths are 3 cells wide
+       - Path 1: Right of upper left yellow square to left of upper right yellow square
+       - Path 2: Bottom of upper right yellow square to top of center right magenta rectangle
+       - Path 3: Bottom of center magenta rectangle to top of lower right magenta square
+       - Path 4: Left side of lower left yellow rectangle to left side of upper left yellow square
+       - Path 5: Right side of lower left yellow rectangle to left side of lower right magenta square
+    Key observations:
+    - Single, unbroken sky blue network connecting all shapes
+    - Efficient use of space, avoiding unnecessary detours
+    - Consistent 3-cell width maintained throughout the network
 
 test_case_0:
   input: |
-    The grid is 30x30. There are no visible shapes or patterns. The entire grid is filled with black (0) squares.
+    Grid size: 30x30
+    Content: Entirely filled with black (0) squares
+    Key challenge: Handling edge case with no shapes to connect
+
   output: |
-    The output is not provided for the test case.
+    Output not provided for test cases. 
+    Expected behavior: Return the input grid unchanged, as there are no shapes to connect.
