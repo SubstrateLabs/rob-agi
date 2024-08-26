@@ -1,6 +1,8 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Set
 
+from typing import List, Tuple, Set
+
 def solve_4ff4c9da(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by expanding sky blue (8) formations symmetrically.
@@ -11,10 +13,12 @@ def solve_4ff4c9da(input_grid: ColoredGrid) -> ColoredGrid:
     
     Steps:
     1. Identify initial sky blue formations
-    2. Expand formations vertically and horizontally
-    3. Ensure symmetry across both axes
-    4. Fill corner regions if surrounded by sky blue cells
-    5. Repeat expansion until no new cells are added
+    2. Perform vertical mirroring
+    3. Perform horizontal mirroring for specific formations
+    4. Propagate edge and corner formations
+    5. Expand center vertical formations
+    6. Iterate until stabilization
+    7. Ensure final vertical symmetry
     
     Returns a new ColoredGrid with the transformed pattern.
     """
@@ -23,76 +27,80 @@ def solve_4ff4c9da(input_grid: ColoredGrid) -> ColoredGrid:
     center_r, center_c = rows // 2, cols // 2
     
     while True:
-        new_cells = expand_formations(grid, center_r, center_c)
-        if not new_cells:
+        previous_grid = grid.deep_copy()
+        
+        vertical_mirror(grid, center_r)
+        horizontal_mirror(grid, center_c)
+        propagate_edges(grid)
+        expand_center_vertical(grid, center_c)
+        ensure_vertical_symmetry(grid, center_c)
+        
+        if is_stable(grid, previous_grid):
             break
-    
-    fill_corners(grid)
-    ensure_symmetry(grid, center_r, center_c)
     
     return grid
 
-def expand_formations(grid: ColoredGrid, center_r: int, center_c: int) -> Set[Tuple[int, int]]:
-    new_cells = set()
+def vertical_mirror(grid: ColoredGrid, center_r: int):
     rows, cols = grid.get_dimensions()
-    
     for r in range(rows):
         for c in range(cols):
             if grid.get_cell(r, c) == 8:
-                new_cells.update(expand_cell(grid, r, c, rows, cols))
-    
-    for r, c in new_cells:
-        grid.set_cell(r, c, 8)
-    
-    return new_cells
+                mirror_r = 2 * center_r - r
+                if 0 <= mirror_r < rows and grid.get_cell(mirror_r, c) in [0, 1]:
+                    grid.set_cell(mirror_r, c, 8)
 
-def expand_cell(grid: ColoredGrid, r: int, c: int, rows: int, cols: int) -> Set[Tuple[int, int]]:
-    new_cells = set()
-    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-    
-    for dr, dc in directions:
-        nr, nc = r + dr, c + dc
-        if 0 <= nr < rows and 0 <= nc < cols and grid.get_cell(nr, nc) in [0, 1]:
-            new_cells.add((nr, nc))
-    
-    return new_cells
-
-def fill_corners(grid: ColoredGrid):
+def horizontal_mirror(grid: ColoredGrid, center_c: int):
     rows, cols = grid.get_dimensions()
-    corners = [(0, 0), (0, cols-1), (rows-1, 0), (rows-1, cols-1)]
-    
-    for r, c in corners:
-        if is_corner_surrounded(grid, r, c):
-            flood_fill_corner(grid, r, c)
-
-def is_corner_surrounded(grid: ColoredGrid, r: int, c: int) -> bool:
-    rows, cols = grid.get_dimensions()
-    directions = [(0, 1), (1, 0)] if r == 0 and c == 0 else \
-                 [(0, -1), (1, 0)] if r == 0 and c == cols-1 else \
-                 [(0, 1), (-1, 0)] if r == rows-1 and c == 0 else \
-                 [(0, -1), (-1, 0)]
-    
-    return all(grid.get_cell(r + dr, c + dc) == 8 for dr, dc in directions)
-
-def flood_fill_corner(grid: ColoredGrid, r: int, c: int):
-    rows, cols = grid.get_dimensions()
-    stack = [(r, c)]
-    
-    while stack:
-        r, c = stack.pop()
-        if grid.get_cell(r, c) in [0, 1]:
-            grid.set_cell(r, c, 8)
-            for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                nr, nc = r + dr, c + dc
-                if 0 <= nr < rows and 0 <= nc < cols and grid.get_cell(nr, nc) in [0, 1]:
-                    stack.append((nr, nc))
-
-def ensure_symmetry(grid: ColoredGrid, center_r: int, center_c: int):
-    rows, cols = grid.get_dimensions()
-    
     for r in range(rows):
         for c in range(cols):
             if grid.get_cell(r, c) == 8:
-                mirror_r, mirror_c = 2 * center_r - r, 2 * center_c - c
-                if 0 <= mirror_r < rows and 0 <= mirror_c < cols and grid.get_cell(mirror_r, mirror_c) in [0, 1]:
-                    grid.set_cell(mirror_r, mirror_c, 8)
+                if is_horizontal_line(grid, r, c) or is_square(grid, r, c):
+                    mirror_c = 2 * center_c - c
+                    if 0 <= mirror_c < cols and grid.get_cell(r, mirror_c) in [0, 1]:
+                        grid.set_cell(r, mirror_c, 8)
+
+def is_horizontal_line(grid: ColoredGrid, r: int, c: int) -> bool:
+    cols = grid.get_dimensions()[1]
+    return c > 0 and c < cols - 1 and grid.get_cell(r, c-1) == 8 and grid.get_cell(r, c+1) == 8
+
+def is_square(grid: ColoredGrid, r: int, c: int) -> bool:
+    rows, cols = grid.get_dimensions()
+    if r < rows - 1 and c < cols - 1:
+        return all(grid.get_cell(r+dr, c+dc) == 8 for dr in range(2) for dc in range(2))
+    return False
+
+def propagate_edges(grid: ColoredGrid):
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        if grid.get_cell(r, 0) == 8:
+            grid.set_cell(r, cols-1, 8)
+        if grid.get_cell(r, cols-1) == 8:
+            grid.set_cell(r, 0, 8)
+    for c in range(cols):
+        if grid.get_cell(0, c) == 8:
+            grid.set_cell(rows-1, c, 8)
+        if grid.get_cell(rows-1, c) == 8:
+            grid.set_cell(0, c, 8)
+
+def expand_center_vertical(grid: ColoredGrid, center_c: int):
+    rows, cols = grid.get_dimensions()
+    center_range = range(center_c - cols//4, center_c + cols//4 + 1)
+    for c in center_range:
+        if any(grid.get_cell(r, c) == 8 for r in range(rows)):
+            for r in range(rows):
+                if grid.get_cell(r, c) in [0, 1]:
+                    grid.set_cell(r, c, 8)
+
+def ensure_vertical_symmetry(grid: ColoredGrid, center_c: int):
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        for c in range(cols):
+            if grid.get_cell(r, c) == 8:
+                mirror_c = 2 * center_c - c
+                if 0 <= mirror_c < cols and grid.get_cell(r, mirror_c) in [0, 1]:
+                    grid.set_cell(r, mirror_c, 8)
+
+def is_stable(grid: ColoredGrid, previous_grid: ColoredGrid) -> bool:
+    rows, cols = grid.get_dimensions()
+    return all(grid.get_cell(r, c) == previous_grid.get_cell(r, c) 
+               for r in range(rows) for c in range(cols))
