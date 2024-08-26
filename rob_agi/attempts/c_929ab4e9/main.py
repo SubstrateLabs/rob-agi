@@ -5,62 +5,79 @@ from collections import defaultdict
 def solve_929ab4e9(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the grid transformation challenge by:
-    1. Identifying the central region to be filled
-    2. Analyzing the surrounding area for patterns
-    3. Creating a pattern map based on relative positions
-    4. Filling the central region using the pattern map
-    5. Returning the modified grid
+    1. Identifying the masked area (red squares)
+    2. Analyzing the global pattern and symmetry
+    3. Reconstructing the pattern in the masked area
+    4. Verifying and adjusting for perfect symmetry
+    5. Returning the modified grid with the reconstructed pattern
     """
-    # Identify the central region
-    central_region = identify_central_region(input_grid)
-    
-    # Analyze surrounding area and create pattern map
-    pattern_map = create_pattern_map(input_grid, central_region)
-    
-    # Fill the central region
-    output_grid = fill_central_region(input_grid, central_region, pattern_map)
-    
-    return output_grid
+    masked_area = identify_masked_area(input_grid)
+    symmetry_axes = find_symmetry_axes(input_grid)
+    reconstructed_grid = reconstruct_pattern(input_grid, masked_area, symmetry_axes)
+    return verify_and_adjust_symmetry(reconstructed_grid, symmetry_axes)
 
-def identify_central_region(grid: ColoredGrid) -> List[Tuple[int, int]]:
-    rows, cols = grid.get_dimensions()
-    central_region = []
-    for r in range(rows):
-        for c in range(cols):
-            if grid.values[r][c] == 2:  # Assuming 2 (red) is always the color to be replaced
-                central_region.append((r, c))
-    return central_region
+def identify_masked_area(grid: ColoredGrid) -> List[Tuple[int, int]]:
+    return [(r, c) for r in range(grid.num_rows) for c in range(grid.num_cols) if grid.values[r][c] == 2]
 
-def create_pattern_map(grid: ColoredGrid, central_region: List[Tuple[int, int]]) -> Dict[Tuple[float, float], int]:
-    pattern_map = {}
-    rows, cols = grid.get_dimensions()
-    min_r = min(r for r, _ in central_region)
-    max_r = max(r for r, _ in central_region)
-    min_c = min(c for _, c in central_region)
-    max_c = max(c for _, c in central_region)
-    
-    for r in range(rows):
-        for c in range(cols):
-            if (r, c) not in central_region:
-                rel_r = (r - min_r) / (max_r - min_r) if max_r > min_r else 0.5
-                rel_c = (c - min_c) / (max_c - min_c) if max_c > min_c else 0.5
-                pattern_map[(rel_r, rel_c)] = grid.values[r][c]
-    
-    return pattern_map
+def find_symmetry_axes(grid: ColoredGrid) -> Tuple[bool, bool, bool, bool]:
+    horizontal = all(grid.values[r] == grid.values[-r-1] for r in range(grid.num_rows // 2))
+    vertical = all(row[c] == row[-c-1] for row in grid.values for c in range(grid.num_cols // 2))
+    diagonal1 = all(grid.values[r][c] == grid.values[c][r] for r in range(grid.num_rows) for c in range(grid.num_cols))
+    diagonal2 = all(grid.values[r][c] == grid.values[grid.num_rows-1-c][grid.num_cols-1-r] 
+                    for r in range(grid.num_rows) for c in range(grid.num_cols))
+    return horizontal, vertical, diagonal1, diagonal2
 
-def fill_central_region(grid: ColoredGrid, central_region: List[Tuple[int, int]], pattern_map: Dict[Tuple[float, float], int]) -> ColoredGrid:
+def reconstruct_pattern(grid: ColoredGrid, masked_area: List[Tuple[int, int]], 
+                        symmetry_axes: Tuple[bool, bool, bool, bool]) -> ColoredGrid:
     output_grid = grid.deep_copy()
-    min_r = min(r for r, _ in central_region)
-    max_r = max(r for r, _ in central_region)
-    min_c = min(c for _, c in central_region)
-    max_c = max(c for _, c in central_region)
+    horizontal, vertical, diagonal1, diagonal2 = symmetry_axes
     
-    for r, c in central_region:
-        rel_r = (r - min_r) / (max_r - min_r) if max_r > min_r else 0.5
-        rel_c = (c - min_c) / (max_c - min_c) if max_c > min_c else 0.5
+    for r, c in masked_area:
+        candidates = []
+        if horizontal:
+            candidates.append(grid.values[grid.num_rows-1-r][c])
+        if vertical:
+            candidates.append(grid.values[r][grid.num_cols-1-c])
+        if diagonal1:
+            candidates.append(grid.values[c][r])
+        if diagonal2:
+            candidates.append(grid.values[grid.num_rows-1-c][grid.num_cols-1-r])
         
-        # Find the closest pattern point
-        closest_point = min(pattern_map.keys(), key=lambda k: ((k[0]-rel_r)**2 + (k[1]-rel_c)**2))
-        output_grid.values[r][c] = pattern_map[closest_point]
+        if candidates:
+            output_grid.values[r][c] = max(set(candidates), key=candidates.count)
+        else:
+            # If no symmetry, use the most common color in the grid
+            colors = [grid.values[i][j] for i in range(grid.num_rows) for j in range(grid.num_cols) if grid.values[i][j] != 2]
+            output_grid.values[r][c] = max(set(colors), key=colors.count)
     
     return output_grid
+
+def verify_and_adjust_symmetry(grid: ColoredGrid, symmetry_axes: Tuple[bool, bool, bool, bool]) -> ColoredGrid:
+    horizontal, vertical, diagonal1, diagonal2 = symmetry_axes
+    adjusted_grid = grid.deep_copy()
+    
+    for r in range(grid.num_rows):
+        for c in range(grid.num_cols):
+            symmetry_colors = [adjusted_grid.values[r][c]]
+            if horizontal:
+                symmetry_colors.append(adjusted_grid.values[grid.num_rows-1-r][c])
+            if vertical:
+                symmetry_colors.append(adjusted_grid.values[r][grid.num_cols-1-c])
+            if diagonal1:
+                symmetry_colors.append(adjusted_grid.values[c][r])
+            if diagonal2:
+                symmetry_colors.append(adjusted_grid.values[grid.num_rows-1-c][grid.num_cols-1-r])
+            
+            final_color = max(set(symmetry_colors), key=symmetry_colors.count)
+            adjusted_grid.values[r][c] = final_color
+            
+            if horizontal:
+                adjusted_grid.values[grid.num_rows-1-r][c] = final_color
+            if vertical:
+                adjusted_grid.values[r][grid.num_cols-1-c] = final_color
+            if diagonal1:
+                adjusted_grid.values[c][r] = final_color
+            if diagonal2:
+                adjusted_grid.values[grid.num_rows-1-c][grid.num_cols-1-r] = final_color
+    
+    return adjusted_grid
