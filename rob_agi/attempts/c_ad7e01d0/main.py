@@ -5,9 +5,9 @@ def solve_ad7e01d0(input_grid: ColoredGrid) -> ColoredGrid:
     Transform the input grid into a larger grid using a recursive, fractal-like approach:
     1. The output grid size is the square of the input grid size.
     2. Initially repeat the input pattern across the entire output grid.
-    3. For odd-sized inputs, keep the left column, top row, and bottom row, then recurse on the inner area.
-    4. For even-sized inputs, keep the four corners, then recurse on the center if large enough.
-    5. Recursively apply this process until the base case is reached.
+    3. For odd-sized inputs, clear the inner area leaving a frame of width 1, then recurse on the inner area.
+    4. For even-sized inputs, divide into four quadrants, clear the inner area of each quadrant leaving a frame of width 1, then recurse on each cleared inner area.
+    5. Recursively apply this process until the base case (size <= input size) is reached.
     """
     n = len(input_grid.values)
     output_size = n * n
@@ -35,15 +35,16 @@ def solve_ad7e01d0(input_grid: ColoredGrid) -> ColoredGrid:
             if size > n + 2:
                 apply_pattern(top + 1, left + 1, size - 2)
         else:  # Even-sized input
-            # Clear the center
-            center_start = size // 2 - n // 2
-            center_end = center_start + n
-            for i in range(top + center_start, top + center_end):
-                for j in range(left + center_start, left + center_end):
-                    output_values[i][j] = 0
-            # Recurse on the center if large enough
-            if size > 2 * n:
-                apply_pattern(top + center_start, left + center_start, n)
+            quadrant_size = size // 2
+            for quad_top in [top, top + quadrant_size]:
+                for quad_left in [left, left + quadrant_size]:
+                    # Clear the inner area of each quadrant
+                    for i in range(quad_top + 1, quad_top + quadrant_size - 1):
+                        for j in range(quad_left + 1, quad_left + quadrant_size - 1):
+                            output_values[i][j] = 0
+                    # Recurse on the cleared inner area of each quadrant
+                    if quadrant_size > n + 2:
+                        apply_pattern(quad_top + 1, quad_left + 1, quadrant_size - 2)
     
     apply_pattern(0, 0, output_size)
     return ColoredGrid(values=output_values)
