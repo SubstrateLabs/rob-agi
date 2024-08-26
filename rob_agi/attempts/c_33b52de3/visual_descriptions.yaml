@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The input grid is a 23x23 square. The majority of the grid is filled with black (0), creating a background. There's a repeating pattern of gray (5) squares forming a grid-like structure. This gray structure consists of 3x3 squares separated by single black rows and columns. The gray squares have a hollow center, creating a frame-like appearance. At the bottom right corner, there's a small 3x5 rectangular area with a mix of colors (red, blue, and green), forming a distinct pattern against the black and gray background.
+  output: |
+    The output grid maintains the same 23x23 size and overall structure as the input. The black (0) background remains unchanged. The key difference is in the previously gray (5) squares, which are now filled with colors. The coloring follows a pattern: red (2), blue (1), and green (3). These colored squares maintain the frame-like structure with hollow centers. The colored pattern in the bottom right corner remains unchanged from the input.
+
+example_1:
+  input: |
+    This 23x23 grid has a black (0) background. The top-left corner contains a 5x7 rectangular area with a mix of colors (blue, sky blue, and yellow). The rest of the grid features a pattern of gray (5) 3x3 squares, similar to the previous example, but they start from the 6th column and 2nd row. These gray squares form a grid-like structure with hollow centers, separated by single black rows and columns.
+  output: |
+    The output maintains the 23x23 size and black background. The colored rectangle in the top-left corner remains unchanged. The previously gray (5) squares are now filled with colors, primarily blue (1), sky blue (8), and yellow (4). The coloring pattern seems to correspond to the colors present in the top-left rectangle. The colored squares maintain the frame-like structure with hollow centers, and their positioning on the grid remains the same as the gray squares in the input.
+
+test_case_0:
+  input: |
+    This is a 23x23 grid with a black (0) background. There's no distinct pattern in the top-left corner. Instead, the grid-like structure of 3x3 squares starts from the 7th column and 2nd row. These squares are gray (5) with hollow centers, forming a frame-like appearance. They are separated by single black rows and columns. The pattern extends to the right and bottom edges of the grid.
+  output: |
+    As this is a test case, no output grid is provided. Based on the previous examples, we might expect the gray (5) squares to be replaced with colors, possibly corresponding to a color pattern that would be present in the top-left corner if there was one. The overall structure, including the positioning of the squares and the black background, would likely remain the same.
