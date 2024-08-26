@@ -11,7 +11,7 @@ def solve_13713586(input_grid: ColoredGrid) -> ColoredGrid:
     2. Identify all colored positions (excluding black and gray).
     3. Sort colored positions from top to bottom, then left to right.
     4. Expand each color vertically.
-    5. Expand each color horizontally, limited by its vertical height.
+    5. Expand each color horizontally, limited by the rightmost position of its color.
     6. Repeat horizontal expansion until no changes occur or max iterations reached.
     7. Preserve gray boundaries throughout the process.
 
@@ -37,15 +37,15 @@ def solve_13713586(input_grid: ColoredGrid) -> ColoredGrid:
                 break
             grid.values[r][col] = color
 
-    def expand_horizontally(grid: ColoredGrid, row: int, col: int, color: int, limit: int):
+    def expand_horizontally(grid: ColoredGrid, row: int, col: int, color: int, right_limit: int):
         # Expand left
-        for c in range(col-1, max(col-limit-1, -1), -1):
+        for c in range(col-1, -1, -1):
             if grid.values[row][c] not in [0, color]:
                 break
             grid.values[row][c] = color
         
         # Expand right
-        for c in range(col+1, min(col+limit+1, cols)):
+        for c in range(col+1, right_limit):
             if grid.values[row][c] not in [0, color]:
                 break
             grid.values[row][c] = color
@@ -63,13 +63,14 @@ def solve_13713586(input_grid: ColoredGrid) -> ColoredGrid:
     max_iterations = 5  # Adjust as needed
     for _ in range(max_iterations):
         changed = False
-        for row, col, color in colored_positions:
-            vertical_height = sum(1 for r in range(rows) if grid.values[r][col] == color)
-            horizontal_limit = min(vertical_height, 5)  # Adjust the fixed value as needed
-            old_values = [row[:] for row in grid.values]
-            expand_horizontally(grid, row, col, color, horizontal_limit)
-            if grid.values != old_values:
-                changed = True
+        for color in set(color for _, _, color in colored_positions):
+            color_positions = [(r, c) for r, c, clr in colored_positions if clr == color]
+            right_limit = max(c for _, c in color_positions) + 1
+            for row, col in color_positions:
+                old_values = [row[:] for row in grid.values]
+                expand_horizontally(grid, row, col, color, right_limit)
+                if grid.values != old_values:
+                    changed = True
         if not changed:
             break
     
