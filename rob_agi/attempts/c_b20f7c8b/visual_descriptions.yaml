@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid is 22x18. The left side (6 columns) is mostly filled with sky blue (8) squares, with some magenta (6), gray (5), and yellow (4) squares forming small patterns within. The middle section (7 columns) is mostly black (0), with two 5x5 red (2) squares containing blue (1) patterns inside. The right side (9 columns) is mostly black (0), with two 5x5 red (2) squares similar to the middle section. There are also some green (3) squares at the bottom left of the sky blue section.
+  output: |
+    The grid layout remains 22x18. The left side (6 columns) is unchanged, still mostly sky blue (8) with the same patterns. The middle and right sections have changed significantly. The two 5x5 squares in the middle are now solid green (3) and gray (5). The two 5x5 squares on the right are now solid yellow (4) and magenta (6). All other black (0) spaces remain unchanged.
+
+example_1:
+  input: |
+    The grid is 22x18. The right side (6 columns) is mostly filled with sky blue (8), with some red (2), green (3), yellow (4), and orange (7) squares forming small patterns within. The left and middle sections (16 columns total) are mostly black (0), with four 5x5 squares. Two of these squares are red (2) with blue (1) patterns inside, one is solid green (3), and one contains a mix of red (2) and blue (1) squares.
+  output: |
+    The grid layout remains 22x18. The right side (6 columns) is unchanged, still mostly sky blue (8) with the same patterns. The left and middle sections have changed significantly. The two 5x5 squares on the left are now solid red (2) and solid yellow (4). The two 5x5 squares in the middle are now solid green (2) and solid magenta (4). All other black (0) spaces remain unchanged.
+
+example_2:
+  input: |
+    The grid is 22x18. The left side (6 columns) is mostly filled with sky blue (8), with some blue (1), green (3), magenta (6), and yellow (4) squares forming small patterns within. The middle and right sections (16 columns total) are mostly black (0), with four 5x5 squares. Two of these squares are red (2) with blue (1) patterns inside, one is solid magenta (6), and one is solid blue (1).
+  output: |
+    The grid layout remains 22x18. The left side (6 columns) is unchanged, still mostly sky blue (8) with the same patterns. The middle and right sections have changed significantly. The two 5x5 squares in the middle are now solid green (3) and solid red (2). The two 5x5 squares on the right are now solid yellow (4) and solid magenta (4). All other black (0) spaces remain unchanged.
+
+test_case_0:
+  input: |
+    The grid is 22x18. The left side (6 columns) is mostly filled with sky blue (8), with some magenta (6), gray (5), and yellow (4) squares forming small patterns within. The middle section (7 columns) is mostly black (0), with two 5x5 red (2) squares containing blue (1) patterns inside. The right side (9 columns) is mostly black (0), with two 5x5 red (2) squares similar to the middle section. There are also some green (3) squares at the bottom left of the sky blue section.
+  output: |
+    The output grid is not provided for this test case.
