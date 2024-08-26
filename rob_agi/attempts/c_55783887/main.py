@@ -16,20 +16,21 @@ def solve_55783887(input_grid: ColoredGrid) -> ColoredGrid:
     
     The result creates continuous diagonal lines for each color, extending diagonally beyond the dots,
     while connecting all dots of the same color and allowing intersections between different colors.
+    Single dots are preserved without creating paths.
     """
     background_color = find_background_color(input_grid)
     colored_dots = find_colored_dots(input_grid, background_color)
     output_grid = ColoredGrid(values=[[background_color for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
     
     for color, dots in colored_dots.items():
-        path = create_extended_path(dots, input_grid.num_rows, input_grid.num_cols)
-        connected_path = connect_points(path)
-        draw_path(output_grid, connected_path, color)
-    
-    # Ensure all original dots are preserved
-    for color, dots in colored_dots.items():
-        for dot in dots:
-            output_grid.set_cell(dot[0], dot[1], color)
+        if len(dots) > 1:
+            path = create_extended_path(dots, input_grid.num_rows, input_grid.num_cols)
+            connected_path = connect_points(path)
+            draw_path(output_grid, connected_path, color)
+        else:
+            # For single dots, just preserve them without creating a path
+            r, c = dots[0]
+            output_grid.set_cell(r, c, color)
     
     return output_grid
 
@@ -49,19 +50,23 @@ def find_colored_dots(grid: ColoredGrid, background_color: int) -> Dict[int, Lis
 
 def create_extended_path(dots: List[Tuple[int, int]], max_row: int, max_col: int) -> List[Tuple[int, int]]:
     sorted_dots = sorted(dots)
-    if len(sorted_dots) == 1:
-        r, c = sorted_dots[0]
-        return [(max(0, r-1), max(0, c-1)), (r, c), (min(max_row-1, r+1), min(max_col-1, c+1))]
-    
     first_dot, last_dot = sorted_dots[0], sorted_dots[-1]
     
     # Extend diagonally before the first dot
-    start = (max(0, first_dot[0] - 1), max(0, first_dot[1] - 1))
+    start = extend_path(first_dot, (-1, -1), max_row, max_col)
     
     # Extend diagonally after the last dot
-    end = (min(max_row - 1, last_dot[0] + 1), min(max_col - 1, last_dot[1] + 1))
+    end = extend_path(last_dot, (1, 1), max_row, max_col)
     
     return [start] + sorted_dots + [end]
+
+def extend_path(dot: Tuple[int, int], direction: Tuple[int, int], max_row: int, max_col: int) -> Tuple[int, int]:
+    r, c = dot
+    dr, dc = direction
+    while 0 <= r + dr < max_row and 0 <= c + dc < max_col:
+        r += dr
+        c += dc
+    return (r, c)
 
 def connect_points(path: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
     connected_path = []
