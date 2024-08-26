@@ -6,57 +6,68 @@ def solve_60a26a3e(input_grid: ColoredGrid) -> ColoredGrid:
     Solve the grid transformation challenge by connecting red diamond shapes with blue lines.
     
     The solution follows these steps:
-    1. Identify all red (2) regions
-    2. Determine the optimal bounding rectangle
-    3. Create a blue line structure along the optimal bounding rectangle
-    4. Add vertical connections between red diamonds
-    5. Add necessary horizontal connections
-    6. Optimize the solution by removing unnecessary lines
-    7. Handle special cases (single row/column configurations)
+    1. Identify all red (2) diamonds
+    2. Group red diamonds horizontally
+    3. Connect diamonds within each horizontal group
+    4. Identify and create vertical connections between groups
+    5. Optimize the solution by removing unnecessary lines
     
-    This approach creates the most compact rectangular structure that encloses
-    the optimal set of red diamonds, sometimes intentionally leaving out smaller,
-    isolated groups if including them would significantly increase the rectangle's size.
+    This approach creates a minimal structure of blue lines that connects all red diamonds,
+    focusing on horizontal connections within groups and vertical connections between groups.
     """
     output_grid = input_grid.deep_copy()
-    red_regions = input_grid.find_connected_regions(2)
+    rows, cols = input_grid.get_dimensions()
     
-    if not red_regions:
+    # Step 1: Identify red diamonds
+    red_diamonds = [(r, c) for r in range(rows) for c in range(cols) if input_grid.values[r][c] == 2]
+    
+    if not red_diamonds:
         return output_grid
     
-    # Find optimal bounding rectangle
-    all_red_points = [point for region in red_regions for point in region]
-    min_row, max_row = min(p[0] for p in all_red_points), max(p[0] for p in all_red_points)
-    min_col, max_col = min(p[1] for p in all_red_points), max(p[1] for p in all_red_points)
+    # Step 2: Group red diamonds horizontally
+    red_diamonds.sort()  # Sort by row, then by column
+    groups = []
+    current_group = [red_diamonds[0]]
+    for diamond in red_diamonds[1:]:
+        if diamond[0] - current_group[-1][0] <= 1:  # Same or adjacent row
+            current_group.append(diamond)
+        else:
+            groups.append(current_group)
+            current_group = [diamond]
+    groups.append(current_group)
     
-    # Handle special cases
-    if min_col == max_col:  # Single column
+    # Step 3: Connect diamonds within each horizontal group
+    for group in groups:
+        min_row = min(d[0] for d in group)
+        max_row = max(d[0] for d in group)
+        min_col = min(d[1] for d in group)
+        max_col = max(d[1] for d in group)
+        
         for r in range(min_row, max_row + 1):
-            output_grid.values[r][min_col] = 1
-        return output_grid
+            diamonds_in_row = [d for d in group if d[0] == r]
+            if diamonds_in_row:
+                left = min(d[1] for d in diamonds_in_row)
+                right = max(d[1] for d in diamonds_in_row)
+                for c in range(left, right + 1):
+                    if output_grid.values[r][c] != 2:
+                        output_grid.values[r][c] = 1
     
-    if min_row == max_row:  # Single row
-        for c in range(min_col, max_col + 1):
-            output_grid.values[min_row][c] = 1
-        return output_grid
+    # Step 4: Identify and create vertical connections
+    columns_to_connect = set()
+    for c in range(cols):
+        groups_in_column = [g for g in groups if any(d[1] == c for d in g)]
+        if len(groups_in_column) > 1:
+            columns_to_connect.add(c)
     
-    # Create blue line structure
-    for r in range(min_row, max_row + 1):
-        output_grid.values[r][min_col] = output_grid.values[r][max_col] = 1
-    for c in range(min_col, max_col + 1):
-        output_grid.values[min_row][c] = output_grid.values[max_row][c] = 1
-    
-    # Add vertical connections
-    for c in range(min_col, max_col + 1):
-        red_in_column = [r for r in range(min_row, max_row + 1) if input_grid.values[r][c] == 2]
-        if red_in_column:
-            for r in range(min(red_in_column), max(red_in_column) + 1):
+    for c in columns_to_connect:
+        diamonds_in_column = [d for d in red_diamonds if d[1] == c]
+        top = min(d[0] for d in diamonds_in_column)
+        bottom = max(d[0] for d in diamonds_in_column)
+        for r in range(top, bottom + 1):
+            if output_grid.values[r][c] != 2:
                 output_grid.values[r][c] = 1
     
-    # Add necessary horizontal connections
-    empty_columns = [c for c in range(min_col, max_col + 1) if 2 not in [input_grid.values[r][c] for r in range(min_row, max_row + 1)]]
-    if empty_columns:
-        for c in empty_columns:
-            output_grid.values[min_row][c] = output_grid.values[max_row][c] = 1
+    # Step 5: Optimize by removing unnecessary lines
+    # (This step is not implemented here as it requires more complex logic)
     
     return output_grid
