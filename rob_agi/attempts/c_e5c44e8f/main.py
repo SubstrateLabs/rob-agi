@@ -30,14 +30,44 @@ def solve_e5c44e8f(input_grid: ColoredGrid) -> ColoredGrid:
     clean_up_e_shape(output_grid)
     connect_disconnected_parts(output_grid)
 
+    # Verify the solution
+    if not verify_solution(output_grid, input_grid):
+        # If verification fails, revert to the input grid
+        return input_grid
+
     return output_grid
 
-def find_initial_green(grid: ColoredGrid) -> Optional[Tuple[int, int]]:
+def verify_solution(output_grid: ColoredGrid, input_grid: ColoredGrid) -> bool:
+    # Check if all red cells are preserved
+    for r in range(output_grid.num_rows):
+        for c in range(output_grid.num_cols):
+            if input_grid.get_cell(r, c) == 2 and output_grid.get_cell(r, c) != 2:
+                return False
+
+    # Check if the 'E' is connected and touches at least two edges
+    green_cells = [(r, c) for r in range(output_grid.num_rows) for c in range(output_grid.num_cols) if output_grid.get_cell(r, c) == 3]
+    if not green_cells:
+        return False
+
+    connected_cells = flood_fill(output_grid, green_cells[0][0], green_cells[0][1])
+    if len(connected_cells) != len(green_cells):
+        return False
+
+    edges_touched = sum([
+        any(output_grid.get_cell(0, c) == 3 for c in range(output_grid.num_cols)),
+        any(output_grid.get_cell(output_grid.num_rows-1, c) == 3 for c in range(output_grid.num_cols)),
+        any(output_grid.get_cell(r, 0) == 3 for r in range(output_grid.num_rows)),
+        any(output_grid.get_cell(r, output_grid.num_cols-1) == 3 for r in range(output_grid.num_rows))
+    ])
+    return edges_touched >= 2
+
+def find_initial_green(grid: ColoredGrid) -> Tuple[int, int]:
     for r in range(grid.num_rows):
         for c in range(grid.num_cols):
             if grid.get_cell(r, c) == 3:
                 return r, c
-    return None
+    # If no green cell is found, return the center of the grid
+    return grid.num_rows // 2, grid.num_cols // 2
 
 def find_leftmost_column(grid: ColoredGrid) -> int:
     for c in range(grid.num_cols):
