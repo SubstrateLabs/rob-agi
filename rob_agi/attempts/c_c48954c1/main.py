@@ -2,52 +2,54 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_c48954c1(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transform a 3x3 input grid into a 9x9 grid by applying rotations and reflections.
+    Transform a 3x3 input grid into a 9x9 grid by applying reflections.
     
     The input grid is placed in the center of the 9x9 grid. The surrounding sections
-    are filled with rotated and reflected versions of the input:
+    are filled with reflected versions of the input:
     - Center: Original input
-    - Top-left, top-right, bottom-left, bottom-right: Rotated 180 degrees
+    - Top-left, top-right, bottom-left, bottom-right: Reflected diagonally
     - Top-center, bottom-center: Reflected horizontally
     - Middle-left, middle-right: Reflected vertically
     """
-    def rotate_180(grid):
-        return [row[::-1] for row in grid[::-1]]
-
-    def reflect_horizontal(grid):
+    def mirror_horizontal(grid):
         return [row[::-1] for row in grid]
 
-    def reflect_vertical(grid):
+    def mirror_vertical(grid):
         return grid[::-1]
 
     new_grid = [[0 for _ in range(9)] for _ in range(9)]
 
-    # Center: Original input
+    # Place the original input in the center
     for i in range(3):
         for j in range(3):
             new_grid[i+3][j+3] = input_grid.values[i][j]
 
-    # Top-left, top-right, bottom-left, bottom-right: Rotated 180 degrees
-    rotated_180 = rotate_180(input_grid.values)
-    for i in range(3):
-        for j in range(3):
-            new_grid[i][j] = rotated_180[i][j]  # Top-left
-            new_grid[i][j+6] = rotated_180[i][j]  # Top-right
-            new_grid[i+6][j] = rotated_180[i][j]  # Bottom-left
-            new_grid[i+6][j+6] = rotated_180[i][j]  # Bottom-right
+    # Fill top-left quadrant (already done as it's part of the input)
+    top_left = [row[:3] for row in new_grid[3:6]]
 
-    # Top-center, bottom-center: Reflected horizontally
-    reflected_h = reflect_horizontal(input_grid.values)
+    # Fill top-center quadrant
+    top_center = mirror_horizontal(top_left)
     for i in range(3):
-        for j in range(3):
-            new_grid[i][j+3] = reflected_h[i][j]  # Top-center
-            new_grid[i+6][j+3] = reflected_h[i][j]  # Bottom-center
+        new_grid[i][3:6] = top_center[i]
 
-    # Middle-left, middle-right: Reflected vertically
-    reflected_v = reflect_vertical(input_grid.values)
+    # Fill top-right quadrant
+    top_right = mirror_horizontal(top_center)
     for i in range(3):
-        for j in range(3):
-            new_grid[i+3][j] = reflected_v[i][j]  # Middle-left
-            new_grid[i+3][j+6] = reflected_v[i][j]  # Middle-right
+        new_grid[i][6:9] = top_right[i]
+
+    # Fill middle-left quadrant
+    middle_left = mirror_vertical(top_left)
+    for i in range(3):
+        new_grid[3+i][:3] = middle_left[i]
+
+    # Fill middle-right quadrant
+    middle_right = mirror_vertical(top_right)
+    for i in range(3):
+        new_grid[3+i][6:9] = middle_right[i]
+
+    # Fill bottom row of quadrants
+    bottom_half = mirror_vertical([row for row in new_grid[:6]])
+    for i in range(3):
+        new_grid[6+i] = bottom_half[i]
 
     return ColoredGrid(values=new_grid)
