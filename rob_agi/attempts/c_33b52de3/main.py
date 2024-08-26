@@ -6,29 +6,36 @@ def solve_33b52de3(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by replacing gray (5) patterns with colored patterns.
     
     The solution follows these steps:
-    1. Identify the "key" area (small colored pattern in the bottom-left corner).
+    1. Identify the "key" area (small colored pattern in any corner of the grid).
     2. Generate a coloring sequence based on the key area.
     3. Map the gray patterns in the grid.
     4. Apply the coloring sequence to the gray patterns.
-    5. Preserve existing colored areas.
+    5. Preserve existing colored areas and pattern structure.
     
-    The coloring sequence is applied row by row, repeating if necessary.
+    If no key is found, a default color sequence is used.
+    The coloring sequence is applied to patterns, repeating if necessary.
     The structure of each pattern is maintained, only changing gray (5) to the new color.
     """
     
     def find_key_area(grid: ColoredGrid) -> List[List[int]]:
         rows, cols = grid.get_dimensions()
-        key_area = []
-        for r in range(rows-3, rows):
-            row = []
-            for c in range(1, 6):
-                if grid.get_cell(r, c) != 0:
-                    row.append(grid.get_cell(r, c))
-            if row:
-                key_area.append(row)
-        return key_area
+        corners = [(0, 0), (0, cols-5), (rows-5, 0), (rows-5, cols-5)]
+        for top, left in corners:
+            key_area = []
+            for r in range(top, top+5):
+                row = []
+                for c in range(left, left+5):
+                    if grid.get_cell(r, c) not in [0, 5]:
+                        row.append(grid.get_cell(r, c))
+                if row:
+                    key_area.append(row)
+            if key_area:
+                return key_area
+        return []  # Return empty list if no key found
 
     def generate_color_sequence(key_area: List[List[int]]) -> List[int]:
+        if not key_area:
+            return [1, 2, 3, 4]  # Default sequence if no key found
         return [color for row in key_area for color in row if color != 0]
 
     def map_patterns(grid: ColoredGrid) -> List[Tuple[int, int, int, int]]:
@@ -42,6 +49,8 @@ def solve_33b52de3(input_grid: ColoredGrid) -> ColoredGrid:
         return patterns
 
     def apply_color_sequence(grid: ColoredGrid, patterns: List[Tuple[int, int, int, int]], color_sequence: List[int]) -> ColoredGrid:
+        if not color_sequence:
+            return grid  # Return original grid if color sequence is empty
         new_grid = grid.deep_copy()
         for i, (top, left, bottom, right) in enumerate(patterns):
             color = color_sequence[i % len(color_sequence)]
