@@ -1,35 +1,34 @@
 from rob_agi.colored_grid import ColoredGrid
-import random
 
 def solve_da515329(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the da515329 challenge by transforming the input grid into a maze-like structure.
+    Solves the da515329 challenge by transforming the input grid into a structured pattern.
     
     The solution involves the following steps:
     1. Analyze the input grid to find the plus sign center and dimensions
-    2. Initialize the output grid with the original plus sign
-    3. Expand the central structure while maintaining symmetry
-    4. Implement recursive division for maze generation
-    5. Create a frame with characteristic gaps and protrusions
-    6. Ensure connectivity and fill isolated areas
-    7. Add final details and optimize based on grid size
+    2. Create the outermost rectangle frame
+    3. Generate nested rectangles with openings
+    4. Connect the rectangles and the central plus sign
+    5. Add characteristic edge patterns
+    6. Add isolated pixels
+    7. Make final adjustments and optimizations based on grid size
     
     Args:
     input_grid (ColoredGrid): The input grid containing a plus sign
 
     Returns:
-    ColoredGrid: The transformed grid with a maze-like structure
+    ColoredGrid: The transformed grid with a structured pattern
     """
     rows, cols = input_grid.get_dimensions()
     new_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
     
     center, plus_width, plus_height = analyze_input(input_grid)
-    copy_plus_sign(input_grid, new_grid)
-    expand_central_structure(new_grid, center, plus_width, plus_height)
-    recursive_division(new_grid, 0, 0, rows, cols, center, plus_width, plus_height)
-    create_frame(new_grid)
-    ensure_connectivity(new_grid)
-    add_final_details(new_grid)
+    create_outer_frame(new_grid)
+    generate_nested_rectangles(new_grid, center, plus_width, plus_height)
+    connect_structures(new_grid, center)
+    add_edge_patterns(new_grid)
+    add_isolated_pixels(new_grid)
+    final_adjustments(new_grid, input_grid)
     
     return new_grid
 
@@ -43,111 +42,115 @@ def analyze_input(grid: ColoredGrid) -> tuple:
             if grid.values[r][c] == 8:
                 if center is None:
                     center = (r, c)
-                plus_height = max(plus_height, r - center[0] + 1)
-                plus_width = max(plus_width, c - center[1] + 1)
+                plus_height = max(plus_height, abs(r - center[0]) * 2 + 1)
+                plus_width = max(plus_width, abs(c - center[1]) * 2 + 1)
     
-    return center, plus_width * 2 - 1, plus_height * 2 - 1
+    return center, plus_width, plus_height
 
-def copy_plus_sign(input_grid: ColoredGrid, new_grid: ColoredGrid):
-    rows, cols = input_grid.get_dimensions()
+def create_outer_frame(grid: ColoredGrid):
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        for c in range(cols):
+            if (r == 0 or r == rows - 1 or c == 0 or c == cols - 1) and not (r < 2 and c < 2):
+                grid.values[r][c] = 8
+
+def generate_nested_rectangles(grid: ColoredGrid, center: tuple, plus_width: int, plus_height: int):
+    rows, cols = grid.get_dimensions()
+    top, left = 2, 2
+    bottom, right = rows - 3, cols - 3
+    opening_side = 0  # 0: top, 1: right, 2: bottom, 3: left
+
+    while right - left > plus_width and bottom - top > plus_height:
+        for r in range(top, bottom + 1):
+            for c in range(left, right + 1):
+                if r in (top, bottom) or c in (left, right):
+                    if not (opening_side == 0 and r == top and left + (right - left) // 2 - 1 <= c <= left + (right - left) // 2) and \
+                       not (opening_side == 1 and c == right and top + (bottom - top) // 2 - 1 <= r <= top + (bottom - top) // 2) and \
+                       not (opening_side == 2 and r == bottom and left + (right - left) // 2 - 1 <= c <= left + (right - left) // 2) and \
+                       not (opening_side == 3 and c == left and top + (bottom - top) // 2 - 1 <= r <= top + (bottom - top) // 2):
+                        grid.values[r][c] = 8
+
+        top += 2
+        left += 2
+        bottom -= 2
+        right -= 2
+        opening_side = (opening_side + 1) % 4
+
+def connect_structures(grid: ColoredGrid, center: tuple):
+    rows, cols = grid.get_dimensions()
+    r, c = center
+
+    # Connect vertically
+    for i in range(r, rows):
+        if grid.values[i][c] == 8:
+            break
+        grid.values[i][c] = 8
+    for i in range(r, -1, -1):
+        if grid.values[i][c] == 8:
+            break
+        grid.values[i][c] = 8
+
+    # Connect horizontally
+    for j in range(c, cols):
+        if grid.values[r][j] == 8:
+            break
+        grid.values[r][j] = 8
+    for j in range(c, -1, -1):
+        if grid.values[r][j] == 8:
+            break
+        grid.values[r][j] = 8
+
+def add_edge_patterns(grid: ColoredGrid):
+    rows, cols = grid.get_dimensions()
+
+    # Right edge pattern
+    for r in range(3, rows - 3, 3):
+        grid.values[r][cols-1] = grid.values[r][cols-2] = 0
+
+    # Bottom edge pattern
+    for c in range(3, cols - 3, 3):
+        grid.values[rows-1][c] = grid.values[rows-2][c] = 0
+        if c + 1 < cols:
+            grid.values[rows-1][c+1] = 8
+
+def add_isolated_pixels(grid: ColoredGrid):
+    rows, cols = grid.get_dimensions()
+    isolated_pixels = [
+        (1, cols // 4), (2, cols // 3),
+        (rows // 4, 1), (rows // 3, 2),
+        (rows - 3, cols - 3), (rows - 4, cols - 4)
+    ]
+    for r, c in isolated_pixels:
+        if 0 <= r < rows and 0 <= c < cols:
+            grid.values[r][c] = 8
+
+def final_adjustments(new_grid: ColoredGrid, input_grid: ColoredGrid):
+    rows, cols = new_grid.get_dimensions()
+    
+    # Ensure the original plus sign is preserved
     for r in range(rows):
         for c in range(cols):
             if input_grid.values[r][c] == 8:
                 new_grid.values[r][c] = 8
 
-def expand_central_structure(grid: ColoredGrid, center: tuple, width: int, height: int):
-    rows, cols = grid.get_dimensions()
-    for r in range(max(0, center[0] - height), min(rows, center[0] + height + 1)):
-        for c in range(max(0, center[1] - width), min(cols, center[1] + width + 1)):
-            if random.random() < 0.7:  # 70% chance to expand
-                grid.values[r][c] = 8
+    # Keep top-left corner open
+    new_grid.values[0][0] = new_grid.values[0][1] = new_grid.values[1][0] = 0
 
-def recursive_division(grid: ColoredGrid, x: int, y: int, width: int, height: int, center: tuple, plus_width: int, plus_height: int):
-    if width < 4 or height < 4:
-        return
-    
-    horizontal = random.choice([True, False]) if width != height else width < height
-    
-    if horizontal:
-        divide_horizontally(grid, x, y, width, height, center, plus_width, plus_height)
-    else:
-        divide_vertically(grid, x, y, width, height, center, plus_width, plus_height)
-
-def divide_horizontally(grid: ColoredGrid, x: int, y: int, width: int, height: int, center: tuple, plus_width: int, plus_height: int):
-    divide_y = random.randint(y + 1, y + height - 2)
-    passage = random.randint(x, x + width - 1)
-    
-    for i in range(x, x + width):
-        if i != passage and not is_in_plus(i, divide_y, center, plus_width, plus_height):
-            grid.values[divide_y][i] = 8
-    
-    recursive_division(grid, x, y, width, divide_y - y, center, plus_width, plus_height)
-    recursive_division(grid, x, divide_y + 1, width, y + height - divide_y - 1, center, plus_width, plus_height)
-
-def divide_vertically(grid: ColoredGrid, x: int, y: int, width: int, height: int, center: tuple, plus_width: int, plus_height: int):
-    divide_x = random.randint(x + 1, x + width - 2)
-    passage = random.randint(y, y + height - 1)
-    
-    for i in range(y, y + height):
-        if i != passage and not is_in_plus(divide_x, i, center, plus_width, plus_height):
-            grid.values[i][divide_x] = 8
-    
-    recursive_division(grid, x, y, divide_x - x, height, center, plus_width, plus_height)
-    recursive_division(grid, divide_x + 1, y, x + width - divide_x - 1, height, center, plus_width, plus_height)
-
-def is_in_plus(x: int, y: int, center: tuple, plus_width: int, plus_height: int) -> bool:
-    return (center[0] - plus_height // 2 <= y <= center[0] + plus_height // 2 and
-            center[1] - plus_width // 2 <= x <= center[1] + plus_width // 2)
-
-def create_frame(grid: ColoredGrid):
-    rows, cols = grid.get_dimensions()
-    for r in range(rows):
-        for c in range(cols):
-            if r == 0 or r == rows - 1 or c == 0 or c == cols - 1:
-                if random.random() < 0.9:  # 90% chance to be part of the frame
-                    grid.values[r][c] = 8
-    
-    # Add characteristic gaps
-    for _ in range(4):
-        side = random.choice(['top', 'bottom', 'left', 'right'])
-        if side == 'top':
-            grid.values[0][random.randint(1, cols - 2)] = 0
-        elif side == 'bottom':
-            grid.values[rows - 1][random.randint(1, cols - 2)] = 0
-        elif side == 'left':
-            grid.values[random.randint(1, rows - 2)][0] = 0
-        else:  # right
-            grid.values[random.randint(1, rows - 2)][cols - 1] = 0
-
-def ensure_connectivity(grid: ColoredGrid):
-    rows, cols = grid.get_dimensions()
+    # Ensure connectivity
+    center = (rows // 2, cols // 2)
     visited = set()
-    
+
     def dfs(r, c):
-        if not (0 <= r < rows and 0 <= c < cols) or grid.values[r][c] == 0 or (r, c) in visited:
+        if not (0 <= r < rows and 0 <= c < cols) or new_grid.values[r][c] == 0 or (r, c) in visited:
             return
         visited.add((r, c))
         for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
             dfs(r + dr, c + dc)
-    
-    # Start DFS from the center
-    center = (rows // 2, cols // 2)
+
     dfs(center[0], center[1])
-    
-    # Fill in unvisited sky blue cells
+
+    # Remove unconnected sky blue pixels
     for r in range(rows):
         for c in range(cols):
-            if grid.values[r][c] == 8 and (r, c) not in visited:
-                grid.values[r][c] = 0
-
-def add_final_details(grid: ColoredGrid):
-    rows, cols = grid.get_dimensions()
-    # Ensure corners are empty
-    grid.values[0][0] = grid.values[0][cols-1] = grid.values[rows-1][0] = grid.values[rows-1][cols-1] = 0
-    
-    # Add some random paths for larger grids
-    if rows > 15 and cols > 15:
-        for _ in range(rows * cols // 50):  # Add paths proportional to grid size
-            r, c = random.randint(1, rows - 2), random.randint(1, cols - 2)
-            if grid.values[r][c] == 0:
-                grid.values[r][c] = 8
+            if new_grid.values[r][c] == 8 and (r, c) not in visited:
+                new_grid.values[r][c] = 0
