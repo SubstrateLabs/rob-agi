@@ -8,13 +8,13 @@ def solve_e9ac8c9e(input_grid: ColoredGrid) -> ColoredGrid:
     2. Identify the four colored squares in the quadrants around the gray area, searching outward from each corner.
     3. Create a new grid where the gray area is replaced by an expanded formation of the surrounding colors,
        each color occupying a quarter of the space previously taken by the gray area.
-    4. The new formation is placed in the center of the grid, maintaining the size of the original gray area.
+    4. The new formation is always placed in the center of the grid, regardless of the original gray area's position.
     5. Clear the original positions of the surrounding colors and any remaining gray cells.
     6. Handle cases where the gray area might touch the grid boundaries or have odd dimensions.
     
     The gray area is removed in the output, and the surrounding colored squares are expanded
     to fill the space in a compact, symmetrical arrangement, regardless of their original distances from the gray area.
-    The new arrangement is always centered in the grid.
+    The new arrangement is always centered in the grid, maintaining the size of the original gray area.
     """
     # Find the gray area
     gray_top, gray_left, gray_height, gray_width = find_gray_area(input_grid)
@@ -22,7 +22,7 @@ def solve_e9ac8c9e(input_grid: ColoredGrid) -> ColoredGrid:
     # Find the four colors
     colors = find_colors(input_grid, gray_top, gray_left, gray_height, gray_width)
     
-    # Create the output grid as a copy of the input
+    # Create the output grid filled with black (0)
     output = ColoredGrid(values=[[0 for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
     
     # Calculate the new block dimensions
