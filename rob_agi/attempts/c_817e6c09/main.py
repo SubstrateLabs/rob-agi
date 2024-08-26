@@ -1,13 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
 
-def is_corner(row, col, grid):
-    rows, cols = grid.get_dimensions()
-    return (row == 0 or row == rows - 2) and (col == 0 or col == cols - 2)
-
-def is_top_edge(row, col, grid):
-    cols = grid.get_dimensions()[1]
-    return row == 0 and col > 0 and col < cols - 2
-
 def is_red_square(row, col, grid):
     return all(grid.values[r][c] == 2 for r in range(row, row + 2) for c in range(col, col + 2))
 
