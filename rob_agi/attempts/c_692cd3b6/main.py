@@ -6,30 +6,29 @@ def solve_692cd3b6(input_grid: ColoredGrid) -> ColoredGrid:
     Solve the challenge by connecting two 'C' shapes with yellow, extending to grid edges when necessary.
     
     1. Identify the two 'C' shapes (red color 2 with gray color 5 inside).
-    2. Perform a flood fill starting from one 'C' shape to connect to the other.
-    3. Extend yellow to grid edges if a 'C' shape touches an edge.
-    4. Clean up unnecessary yellow areas.
-    5. Preserve the original 'C' shapes.
+    2. Determine the bounding box for the yellow connecting path.
+    3. Fill the connecting area with yellow, including the openings of the C-shapes.
+    4. Extend yellow to grid edges if the connecting area touches an edge.
+    5. Clean up any unnecessary yellow areas.
+    6. Preserve the original 'C' shapes.
     
-    This approach ensures the minimum necessary yellow area to connect the 'C' shapes
-    while extending to the grid edges when required.
+    This approach ensures the most direct yellow path between the C-shapes
+    while extending to the grid edges only when necessary.
     """
-    rows, cols = input_grid.get_dimensions()
-    
     # Step 1: Identify 'C' shapes
     c_shapes = find_c_shapes(input_grid)
     
-    # Step 2: Create a new grid and perform flood fill
+    # Step 2 & 3: Determine bounding box and fill connecting area
     new_grid = input_grid.deep_copy()
-    flood_fill(new_grid, c_shapes)
+    fill_connecting_area(new_grid, c_shapes)
     
-    # Step 3: Extend yellow to grid edges if necessary
-    extend_to_edges(new_grid, c_shapes)
+    # Step 4: Extend yellow to grid edges if necessary
+    extend_to_edges(new_grid)
     
-    # Step 4: Clean up unnecessary yellow
+    # Step 5: Clean up unnecessary yellow
     clean_up_yellow(new_grid)
     
-    # Step 5: Preserve original 'C' shapes
+    # Step 6: Preserve original 'C' shapes
     preserve_c_shapes(new_grid, c_shapes)
     
     return new_grid
@@ -69,44 +68,73 @@ def get_occupied_rows_cols(shapes: List[List[Tuple[int, int]]]) -> Tuple[Set[int
             occupied_cols.add(c)
     return occupied_rows, occupied_cols
 
-def flood_fill(grid: ColoredGrid, c_shapes: List[List[Tuple[int, int]]]):
-    rows, cols = grid.get_dimensions()
-    start = find_start_point(grid, c_shapes[0])
-    queue = [start]
-    visited = set()
+def fill_connecting_area(grid: ColoredGrid, c_shapes: List[List[Tuple[int, int]]]):
+    if len(c_shapes) != 2:
+        raise ValueError("Expected exactly two C-shapes")
     
-    while queue:
-        r, c = queue.pop(0)
-        if (r, c) in visited or not (0 <= r < rows and 0 <= c < cols):
-            continue
-        visited.add((r, c))
-        
-        if grid.values[r][c] == 0:
-            grid.values[r][c] = 4
-            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                queue.append((r + dr, c + dc))
+    # Find bounding boxes for each C-shape
+    bbox1 = get_bounding_box(c_shapes[0])
+    bbox2 = get_bounding_box(c_shapes[1])
+    
+    # Determine the connecting area
+    connecting_bbox = get_connecting_bbox(bbox1, bbox2)
+    
+    # Fill the connecting area
+    for r in range(connecting_bbox[0], connecting_bbox[2] + 1):
+        for c in range(connecting_bbox[1], connecting_bbox[3] + 1):
+            if grid.values[r][c] == 0:
+                grid.values[r][c] = 4
+    
+    # Fill C-shape openings
+    fill_c_shape_openings(grid, c_shapes)
 
-def find_start_point(grid: ColoredGrid, shape: List[Tuple[int, int]]) -> Tuple[int, int]:
-    rows, cols = grid.get_dimensions()
-    for r, c in shape:
-        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            nr, nc = r + dr, c + dc
-            if 0 <= nr < rows and 0 <= nc < cols and grid.values[nr][nc] == 0:
-                return (nr, nc)
-    return shape[0]  # Fallback to first point in shape if no adjacent black cell
+def get_bounding_box(shape: List[Tuple[int, int]]) -> Tuple[int, int, int, int]:
+    min_r = min(r for r, _ in shape)
+    max_r = max(r for r, _ in shape)
+    min_c = min(c for _, c in shape)
+    max_c = max(c for _, c in shape)
+    return (min_r, min_c, max_r, max_c)
 
-def extend_to_edges(grid: ColoredGrid, c_shapes: List[List[Tuple[int, int]]]):
-    rows, cols = grid.get_dimensions()
+def get_connecting_bbox(bbox1: Tuple[int, int, int, int], bbox2: Tuple[int, int, int, int]) -> Tuple[int, int, int, int]:
+    min_r = min(bbox1[0], bbox2[0])
+    min_c = min(bbox1[1], bbox2[1])
+    max_r = max(bbox1[2], bbox2[2])
+    max_c = max(bbox1[3], bbox2[3])
+    return (min_r, min_c, max_r, max_c)
+
+def fill_c_shape_openings(grid: ColoredGrid, c_shapes: List[List[Tuple[int, int]]]):
     for shape in c_shapes:
-        for r, c in shape:
-            if r == 0 or r == rows - 1:
-                for i in range(cols):
-                    if grid.values[r][i] == 0:
-                        grid.values[r][i] = 4
-            if c == 0 or c == cols - 1:
-                for i in range(rows):
-                    if grid.values[i][c] == 0:
-                        grid.values[i][c] = 4
+        bbox = get_bounding_box(shape)
+        center = ((bbox[0] + bbox[2]) // 2, (bbox[1] + bbox[3]) // 2)
+        for r in range(bbox[0], bbox[2] + 1):
+            for c in range(bbox[1], bbox[3] + 1):
+                if grid.values[r][c] == 0 and (r, c) != center:
+                    grid.values[r][c] = 4
+
+def extend_to_edges(grid: ColoredGrid):
+    rows, cols = grid.get_dimensions()
+    
+    # Check top and bottom edges
+    for c in range(cols):
+        if grid.values[0][c] == 4:
+            for r in range(rows):
+                if grid.values[r][c] == 0:
+                    grid.values[r][c] = 4
+        if grid.values[rows-1][c] == 4:
+            for r in range(rows-1, -1, -1):
+                if grid.values[r][c] == 0:
+                    grid.values[r][c] = 4
+    
+    # Check left and right edges
+    for r in range(rows):
+        if grid.values[r][0] == 4:
+            for c in range(cols):
+                if grid.values[r][c] == 0:
+                    grid.values[r][c] = 4
+        if grid.values[r][cols-1] == 4:
+            for c in range(cols-1, -1, -1):
+                if grid.values[r][c] == 0:
+                    grid.values[r][c] = 4
 
 def clean_up_yellow(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
