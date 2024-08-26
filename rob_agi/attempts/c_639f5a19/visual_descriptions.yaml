@@ -1,17 +1,45 @@
 example_0:
   input: |
-    The input grid shows a large sky blue (8) rectangular shape on a black (0) background. The shape is composed of two distinct rectangles: one in the upper left corner (8x8 in size) and another larger one (12x10 in size) in the bottom right area. These rectangles are separated by black space, creating an L-shaped negative space between them.
+    The input grid (23x23) contains two sky blue (color 8) rectangles on a black (color 0) background. The first rectangle (8x8) is located in the upper-left corner, starting at (1,2). The second, larger rectangle (12x10) is positioned in the bottom-right, starting at (10,7). These rectangles are separated by black space, forming an L-shaped negative space.
   output: |
-    The output grid transforms the sky blue rectangles into a colorful pattern. The upper left rectangle is divided into a 4x4 grid of smaller 2x2 squares, each filled with a different color (magenta, blue, yellow, red, green). The bottom right rectangle is similarly divided, but into a 6x5 grid of 2x2 colored squares. The color pattern is consistent: magenta in the top-left, blue in the top-right, yellow in the center, red in the bottom-left, and green in the bottom-right of each 4x4 section. The black background remains unchanged.
+    The output grid maintains the same dimensions and black background. The sky blue rectangles are transformed into a repeating color pattern:
+    1. The 8x8 rectangle is divided into four 4x4 sections.
+    2. The 12x10 rectangle is divided into six 4x4 sections and three 4x2 sections.
+    3. Each 4x4 section follows this pattern:
+       - Top-left (2x2): Magenta (6)
+       - Top-right (2x2): Blue (1)
+       - Center (2x2): Yellow (4)
+       - Bottom-left (2x2): Red (2)
+       - Bottom-right (2x2): Green (3)
+    4. The 4x2 sections in the larger rectangle follow the top half of this pattern.
+    The pattern adapts to fit the rectangle dimensions while maintaining color positions.
 
 example_1:
   input: |
-    This input grid features two sky blue (8) rectangles on a black (0) background. The first rectangle is positioned on the left side of the grid, spanning from the top to about two-thirds down (12x10 in size). The second rectangle is smaller (8x8 in size) and located in the bottom right corner of the grid. There is black space separating these two rectangles, forming an inverted L-shape.
+    The input grid (23x23) features two sky blue (color 8) rectangles on a black (color 0) background. A larger rectangle (12x12) spans the left side from the top, starting at (1,5). A smaller rectangle (8x8) is positioned in the bottom-right corner, starting at (14,1). Black space separates these rectangles, creating an inverted L-shape.
   output: |
-    The output grid transforms the sky blue rectangles into a colorful pattern, similar to the previous example. The larger left rectangle is divided into a 6x5 grid of 2x2 colored squares, while the smaller bottom-right rectangle is divided into a 4x4 grid of 2x2 squares. The color pattern remains consistent: magenta in the top-left, blue in the top-right, yellow in the center, red in the bottom-left, and green in the bottom-right of each 4x4 section. The black background is preserved.
+    The output grid preserves the original dimensions and black background. The sky blue rectangles are transformed as follows:
+    1. The 12x12 rectangle is divided into nine 4x4 sections.
+    2. The 8x8 rectangle is divided into four 4x4 sections.
+    3. Each 4x4 section consistently follows this pattern:
+       - Top-left (2x2): Magenta (6)
+       - Top-right (2x2): Blue (1)
+       - Center (2x2): Yellow (4)
+       - Bottom-left (2x2): Red (2)
+       - Bottom-right (2x2): Green (3)
+    The pattern adapts to the rectangle sizes while maintaining relative color positions.
 
 test_case_0:
   input: |
-    The input for this test case is not provided in the given code snippet.
+    The input grid for this test case is not provided. It's expected to contain one or more sky blue (color 8) regions of varying sizes and shapes on a black (color 0) background.
   output: |
-    The output for this test case is not provided in the given code snippet, as it is meant to be solved by applying the pattern observed in the examples.
+    The output grid should transform all sky blue regions according to the pattern observed in the examples:
+    1. Divide each region into 4x4 sections (or smaller if the region size doesn't allow full 4x4 sections).
+    2. Apply the color pattern to each section:
+       - Top-left: Magenta (6)
+       - Top-right: Blue (1)
+       - Center: Yellow (4)
+       - Bottom-left: Red (2)
+       - Bottom-right: Green (3)
+    3. Adapt the pattern to fit irregular shapes while maintaining relative color positions.
+    4. Preserve the black background and any non-sky blue areas.
