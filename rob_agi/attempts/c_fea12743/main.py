@@ -7,50 +7,54 @@ Region = namedtuple('Region', ['id', 'color', 'cells', 'centroid', 'quadrant'])
 def solve_fea12743(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the fea12743 challenge by:
-    1. Dividing the grid into quadrants
-    2. Analyzing each quadrant for size and complexity of red shapes
-    3. Ranking quadrants based on a scoring system
-    4. Applying color transformations:
-       - Highest-ranked quadrant remains red (2)
-       - Second-highest becomes green (3), unless it's bottom-right
-       - Remaining quadrants become sky blue (8)
-       - Bottom-right is never sky blue, becomes green (3) if not highest-ranked
+    1. Analyzing the grid to find all red regions
+    2. Scoring quadrants based on the size and complexity of red shapes
+    3. Determining the starting quadrant for color transformation
+    4. Applying color transformations in a counterclockwise cycle:
+       - Starting quadrant remains red (2)
+       - Next quadrant becomes green (3)
+       - Following quadrant becomes sky blue (8)
+       - Last quadrant follows the cycle, but bottom-right is never sky blue
     5. Preserving black cells (0)
     """
-    # Step 1: Divide the grid into quadrants
-    rows, cols = input_grid.get_dimensions()
-    mid_row, mid_col = rows // 2, cols // 2
-
-    # Step 2-3: Analyze quadrants and rank them
-    quadrant_scores = analyze_and_score_quadrants(input_grid, mid_row, mid_col)
+    # Step 1-2: Analyze grid and score quadrants
+    quadrant_scores = analyze_and_score_quadrants(input_grid)
+    
+    # Step 3: Determine starting quadrant
     ranked_quadrants = rank_quadrants(quadrant_scores)
-
+    
     # Step 4-5: Apply color transformation
-    new_grid = apply_color_transformation(input_grid, ranked_quadrants, mid_row, mid_col)
-
+    regions = find_regions(input_grid)
+    color_order = get_color_transformation_order(ranked_quadrants[0])
+    new_grid = apply_color_transformation(input_grid, regions, color_order)
+    
+    # Handle bottom-right special case
+    handle_bottom_right_special_case(new_grid, input_grid.num_rows // 2, input_grid.num_cols // 2)
+    
     return new_grid
 
-def analyze_and_score_quadrants(grid: ColoredGrid, mid_row: int, mid_col: int) -> Dict[str, float]:
+def analyze_and_score_quadrants(grid: ColoredGrid) -> Dict[str, float]:
+    regions = find_regions(grid)
     quadrant_scores = {'top-left': 0, 'top-right': 0, 'bottom-left': 0, 'bottom-right': 0}
-    for quadrant in quadrant_scores:
-        regions = find_regions(grid, quadrant, mid_row, mid_col)
-        size = sum(len(region) for region in regions)
-        complexity = sum(calculate_complexity(region) for region in regions)
-        quadrant_scores[quadrant] = size * 0.7 + complexity * 0.3
+    for region in regions:
+        size = len(region.cells)
+        complexity = calculate_complexity(region.cells)
+        quadrant_scores[region.quadrant] += size * 0.7 + complexity * 0.3
     return quadrant_scores
 
-def find_regions(grid: ColoredGrid, quadrant: str, mid_row: int, mid_col: int) -> List[Set[Tuple[int, int]]]:
+def find_regions(grid: ColoredGrid) -> List[Region]:
     regions = []
     visited = set()
-    row_range = range(mid_row) if 'top' in quadrant else range(mid_row, grid.num_rows)
-    col_range = range(mid_col) if 'left' in quadrant else range(mid_col, grid.num_cols)
-    
-    for r in row_range:
-        for c in col_range:
+    for r in range(grid.num_rows):
+        for c in range(grid.num_cols):
             if grid.values[r][c] == 2 and (r, c) not in visited:
-                region = flood_fill(grid, r, c, 2)
-                regions.append(region)
-                visited.update(region)
+                cells = flood_fill(grid, r, c, 2)
+                size = len(cells)
+                complexity = calculate_complexity(cells)
+                centroid = calculate_centroid(cells)
+                quadrant = get_quadrant(centroid, grid.num_rows // 2, grid.num_cols // 2)
+                regions.append(Region(len(regions), 2, cells, centroid, quadrant))
+                visited.update(cells)
     return regions
 
 def calculate_complexity(region: Set[Tuple[int, int]]) -> int:
