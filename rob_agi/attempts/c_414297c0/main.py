@@ -3,32 +3,40 @@ from typing import List, Tuple
 
 def solve_414297c0(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by identifying the largest contiguous colored region as the background,
-    preserving all other colored elements, and arranging them in a compact manner.
+    Transforms the input grid by selecting the most efficient background color,
+    preserving all other colored elements and formations, and arranging them
+    in a compact manner while maintaining their relative positions.
     
-    1. Identifies the largest contiguous colored region (background).
-    2. Preserves all other colored elements and formations.
-    3. Creates a new grid with the background color.
-    4. Places preserved elements and formations, maintaining relative positions.
-    5. Optimizes the grid by compacting elements and removing unnecessary background-only areas.
+    1. Analyzes the input grid to identify all unique colors and their regions.
+    2. Selects the background color that results in the smallest output grid.
+    3. Identifies key formations and individual elements to preserve.
+    4. Creates a new grid with the chosen background color.
+    5. Places preserved elements and formations, optimizing for compactness.
     6. Ensures all colored elements touch either an edge or another colored element.
+    7. Optimizes the grid by removing unnecessary background-only areas.
     
     Returns a new ColoredGrid object with the transformed grid.
     """
-    # Step 1: Identify the largest contiguous region (background)
-    background_color, _ = find_largest_region(input_grid)
+    # Step 1 & 2: Analyze input and select background color
+    background_color = select_background_color(input_grid)
     
-    # Step 2: Identify elements and formations to preserve
+    # Step 3: Identify elements and formations to preserve
     elements_and_formations = find_elements_and_formations(input_grid, background_color)
     
-    # Step 3 & 4: Create initial output grid and place elements
+    # Step 4 & 5: Create initial output grid and place elements
     output_grid = create_and_place_elements(elements_and_formations, background_color)
     
-    # Step 5 & 6: Optimize and compact the grid
+    # Step 6 & 7: Optimize and compact the grid
     optimized_grid = optimize_and_compact_grid(output_grid, background_color)
     
     # Create and return the final ColoredGrid object
     return ColoredGrid(values=optimized_grid)
+
+def select_background_color(grid: ColoredGrid) -> int:
+    """Selects the most efficient background color."""
+    color_counts = grid.get_color_frequencies()
+    max_count = max(color_counts.values())
+    return max(color_counts, key=color_counts.get)
 
 def find_elements_and_formations(grid: ColoredGrid, background_color: int) -> List[Tuple[int, List[Tuple[int, int]]]]:
     elements_and_formations = []
@@ -56,10 +64,12 @@ def create_and_place_elements(elements_and_formations: List[Tuple[int, List[Tupl
     if not elements_and_formations:
         return [[background_color]]
     
-    min_row = min(min(f[1] for f in formation) for _, formation in elements_and_formations)
-    max_row = max(max(f[1] for f in formation) for _, formation in elements_and_formations)
-    min_col = min(min(f[0] for f in formation) for _, formation in elements_and_formations)
-    max_col = max(max(f[0] for f in formation) for _, formation in elements_and_formations)
+    # Calculate the dimensions of the output grid
+    all_coords = [coord for _, formation in elements_and_formations for coord in formation]
+    min_row = min(r for r, _ in all_coords)
+    max_row = max(r for r, _ in all_coords)
+    min_col = min(c for _, c in all_coords)
+    max_col = max(c for _, c in all_coords)
     
     height = max_row - min_row + 3  # Add some padding
     width = max_col - min_col + 3
@@ -68,14 +78,15 @@ def create_and_place_elements(elements_and_formations: List[Tuple[int, List[Tupl
     
     for color, formation in elements_and_formations:
         for r, c in formation:
-            grid[r - min_row + 1][c - min_col + 1] = color
+            new_r, new_c = r - min_row + 1, c - min_col + 1
+            if 0 <= new_r < height and 0 <= new_c < width:
+                grid[new_r][new_c] = color
     
     return grid
 
 def optimize_and_compact_grid(grid: List[List[int]], background_color: int) -> List[List[int]]:
     rows, cols = len(grid), len(grid[0])
     
-    # Helper function to check if an element is touching another or the edge
     def is_touching(r: int, c: int) -> bool:
         if r == 0 or r == rows - 1 or c == 0 or c == cols - 1:
             return True
@@ -100,6 +111,16 @@ def optimize_and_compact_grid(grid: List[List[int]], background_color: int) -> L
     # Remove empty rows and columns
     grid = [row for row in grid if any(cell != background_color for cell in row)]
     grid = [list(col) for col in zip(*grid) if any(cell != background_color for cell in col)]
+    
+    # Ensure all elements touch an edge or another element
+    rows, cols = len(grid), len(grid[0])
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] != background_color and not is_touching(r, c):
+                # Move element to the nearest edge or other element
+                nearest_edge = min((0, c), (r, 0), (rows-1, c), (r, cols-1), key=lambda x: abs(x[0]-r) + abs(x[1]-c))
+                grid[nearest_edge[0]][nearest_edge[1]] = grid[r][c]
+                grid[r][c] = background_color
     
     return grid
 
