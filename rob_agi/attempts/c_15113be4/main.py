@@ -3,14 +3,18 @@ from typing import List, Tuple
 
 def solve_15113be4(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by enhancing or introducing a secondary color (sky blue, magenta, or green)
+    Transforms the input grid by enhancing or introducing a secondary color (green, magenta, or sky blue)
     in a balanced pattern across all quadrants. The function follows these steps:
     1. Identifies the secondary color to use (3: green, 6: magenta, or 8: sky blue).
-    2. Analyzes the existing pattern and distribution of the secondary color.
-    3. Enhances existing secondary color areas by forming L-shapes or small clusters.
-    4. Introduces new instances of the secondary color in a balanced manner.
-    5. Preserves the yellow grid structure throughout the process.
-    6. Performs a final pass for consistency and balance.
+    2. Analyzes the existing pattern and distribution of colors in each quadrant.
+    3. Enhances existing secondary color areas by forming geometric patterns like L-shapes or small clusters.
+    4. Introduces new instances of the secondary color in a balanced manner across quadrants.
+    5. Preserves the yellow (4) grid structure throughout the process.
+    6. Interacts with existing colors, especially blue (1), to create visually interesting patterns.
+    7. Performs final passes for consistency, balance, and visual appeal.
+
+    The transformation aims to create a balanced, aesthetically pleasing distribution of the secondary color
+    while maintaining the original grid's structure and enhancing existing patterns.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -69,10 +73,12 @@ def introduce_new_instances(grid: ColoredGrid, color: int):
     rows, cols = grid.get_dimensions()
     for r in range(0, rows, 3):
         for c in range(0, cols, 3):
-            if not any(grid.get_cell(r+dr, c+dc) == color for dr in range(3) for dc in range(3)):
-                if is_valid_cell(grid, r, c) and is_valid_cell(grid, r+1, c+1):
+            if not any(is_valid_cell(grid, r+dr, c+dc) and grid.get_cell(r+dr, c+dc) == color 
+                       for dr in range(3) for dc in range(3)):
+                if is_valid_cell(grid, r, c):
                     grid.set_cell(r, c, color)
-                    grid.set_cell(r+1, c if r % 2 == 0 else c+1, color)
+                    if is_valid_cell(grid, r+1, c+1):
+                        grid.set_cell(r+1, c if r % 2 == 0 else c+1, color)
 
 def balance_distribution(grid: ColoredGrid, color: int):
     analysis = analyze_pattern(grid, color)
