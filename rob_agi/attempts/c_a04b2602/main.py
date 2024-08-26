@@ -53,7 +53,14 @@ def solve_a04b2602(input_grid: ColoredGrid) -> ColoredGrid:
     def create_blue_pattern(region: List[Tuple[int, int]]):
         red_dots = [(r, c) for r, c in region if input_grid.get_cell(r, c) == 2]
         region_size = len(region)
+        red_dot_density = len(red_dots) / region_size
         blue_cells = set()
+        queue = []
+
+        # Initialize parameters
+        base_probability = 0.7
+        influence_radius = max(3, region_size // 20)
+        edge_preservation_factor = 0.5
 
         # Initialize blue patterns around red dots
         for r, c in red_dots:
@@ -62,37 +69,60 @@ def solve_a04b2602(input_grid: ColoredGrid) -> ColoredGrid:
                 if (nr, nc) in region and input_grid.get_cell(nr, nc) != 2:
                     output_grid.set_cell(nr, nc, 1)
                     blue_cells.add((nr, nc))
+                    queue.append((nr, nc))
 
         # Expand blue patterns
-        expansion_iterations = min(5, region_size // 10)
-        for _ in range(expansion_iterations):
-            new_blue_cells = set()
+        while queue:
+            r, c = queue.pop(0)
+            neighbors = get_neighbors(r, c)
+            for nr, nc in neighbors:
+                if (nr, nc) in region and (nr, nc) not in blue_cells and input_grid.get_cell(nr, nc) != 2:
+                    # Calculate distances
+                    edge_distance = min(nr, nc, rows-1-nr, cols-1-nc)
+                    red_dot_distance = min(abs(nr-rr) + abs(nc-cc) for rr, cc in red_dots)
+                    
+                    # Adjust probability
+                    prob = base_probability
+                    prob *= (1 - (red_dot_distance / influence_radius))
+                    prob *= (1 + (edge_distance / influence_radius) * edge_preservation_factor)
+                    prob *= (1 + red_dot_density)
+                    
+                    if random.random() < prob:
+                        output_grid.set_cell(nr, nc, 1)
+                        blue_cells.add((nr, nc))
+                        queue.append((nr, nc))
+
+        # Ensure connectivity
+        blue_cells_list = list(blue_cells)
+        if blue_cells_list:
+            connected = set()
+            stack = [blue_cells_list[0]]
+            while stack:
+                r, c = stack.pop()
+                if (r, c) not in connected:
+                    connected.add((r, c))
+                    stack.extend([(nr, nc) for nr, nc in get_neighbors(r, c) if (nr, nc) in blue_cells])
+            
             for r, c in blue_cells:
-                neighbors = get_neighbors(r, c)
-                for nr, nc in neighbors:
-                    if (nr, nc) in region and (nr, nc) not in blue_cells and random.random() < 0.7:
-                        new_blue_cells.add((nr, nc))
-            blue_cells.update(new_blue_cells)
-            for r, c in new_blue_cells:
-                if input_grid.get_cell(r, c) != 2:
-                    output_grid.set_cell(r, c, 1)
+                if (r, c) not in connected:
+                    path = [(r, c)]
+                    while path[-1] not in connected:
+                        nr, nc = min(get_neighbors(*path[-1]), key=lambda x: (x not in connected, random.random()))
+                        path.append((nr, nc))
+                    for pr, pc in path:
+                        output_grid.set_cell(pr, pc, 1)
+                        connected.add((pr, pc))
 
-        # Preserve some green areas
-        green_preservation_rate = max(0.2, 1 - (region_size / 100))
+        # Fine-tune patterns
         for r, c in region:
-            if (r, c) not in blue_cells and random.random() < green_preservation_rate:
-                output_grid.set_cell(r, c, 3)
-
-        # Connect blue areas in larger regions
-        if region_size > 50:
-            for _ in range(region_size // 20):
-                r, c = random.choice(list(blue_cells))
-                direction = random.choice([(0,1),(1,0),(0,-1),(-1,0)])
-                for _ in range(3):
-                    r, c = r + direction[0], c + direction[1]
-                    if (r, c) in region and input_grid.get_cell(r, c) != 2:
-                        output_grid.set_cell(r, c, 1)
-                        blue_cells.add((r, c))
+            if output_grid.get_cell(r, c) == 1:
+                green_neighbors = sum(1 for nr, nc in get_neighbors(r, c) if output_grid.get_cell(nr, nc) == 3)
+                if green_neighbors > 5 and random.random() < 0.3:
+                    output_grid.set_cell(r, c, 3)
+            elif output_grid.get_cell(r, c) == 3:
+                blue_neighbors = sum(1 for nr, nc in get_neighbors(r, c) if output_grid.get_cell(nr, nc) == 1)
+                if blue_neighbors > 6 and random.random() < 0.7:
+                    output_grid.set_cell(r, c, 1)
 
     green_regions = find_green_regions()
     for region in green_regions:
@@ -104,6 +134,11 @@ def solve_a04b2602(input_grid: ColoredGrid) -> ColoredGrid:
                 for nr, nc in neighbors:
                     if (nr, nc) in region and input_grid.get_cell(nr, nc) != 2:
                         output_grid.set_cell(nr, nc, 1)
+            # Ensure at least one green cell remains if possible
+            if all(output_grid.get_cell(r, c) != 3 for r, c in region):
+                if len(region) > 1:
+                    r, c = random.choice([cell for cell in region if input_grid.get_cell(*cell) != 2])
+                    output_grid.set_cell(r, c, 3)
         else:
             create_blue_pattern(region)
 
