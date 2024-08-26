@@ -1,38 +1,39 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Dict
+from itertools import combinations
 
 def solve_e74e1818(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by flipping shapes vertically within their bounds to achieve a more balanced and symmetrical composition.
+    Transforms the input grid by selectively flipping shapes vertically within their bounds
+    to achieve a more balanced and symmetrical composition.
     
     The solution involves the following steps:
     1. Identify distinct shapes in the grid
-    2. Analyze each shape's characteristics and determine if it should be flipped
-    3. Iteratively flip shapes and evaluate the overall grid symmetry and balance
-    4. Reconstruct the grid with the optimal configuration of flipped shapes
+    2. Analyze each shape's characteristics (weight distribution, bounds)
+    3. Generate and evaluate all possible combinations of flipped shapes
+    4. Select the best combination based on balance, symmetry, and weight distribution
+    5. Reconstruct the grid with the optimal configuration of flipped shapes
     
     This function aims to improve vertical symmetry and balance of the image while maintaining
     the vertical ordering and horizontal positions of shapes.
     """
     shapes = identify_shapes(input_grid)
-    initial_symmetry = calculate_vertical_symmetry(input_grid)
-    initial_center_of_mass = calculate_center_of_mass(input_grid)
+    initial_metrics = calculate_grid_metrics(input_grid, shapes)
     
     best_grid = input_grid
-    best_symmetry = initial_symmetry
-    best_center_of_mass = initial_center_of_mass
+    best_metrics = initial_metrics
+    best_flips = {}
     
-    for color, shape in shapes.items():
-        flipped_shape = flip_shape_vertically(shape)
-        temp_grid = reconstruct_grid(shapes, input_grid, {color: flipped_shape})
-        temp_symmetry = calculate_vertical_symmetry(temp_grid)
-        temp_center_of_mass = calculate_center_of_mass(temp_grid)
-        
-        if temp_symmetry > best_symmetry or (temp_symmetry == best_symmetry and temp_center_of_mass[0] > best_center_of_mass[0]):
-            best_grid = temp_grid
-            best_symmetry = temp_symmetry
-            best_center_of_mass = temp_center_of_mass
-            shapes[color] = flipped_shape
+    for i in range(len(shapes) + 1):
+        for flip_combination in combinations(shapes.keys(), i):
+            flipped_shapes = {color: flip_shape_vertically(shape) for color, shape in shapes.items() if color in flip_combination}
+            temp_grid = reconstruct_grid(shapes, input_grid, flipped_shapes)
+            temp_metrics = calculate_grid_metrics(temp_grid, shapes)
+            
+            if is_better_configuration(temp_metrics, best_metrics):
+                best_grid = temp_grid
+                best_metrics = temp_metrics
+                best_flips = flipped_shapes
     
     return best_grid
 
@@ -61,6 +62,17 @@ def identify_shapes(grid: ColoredGrid) -> Dict[int, List[Tuple[int, int]]]:
     
     return shapes
 
+def calculate_grid_metrics(grid: ColoredGrid, shapes: Dict[int, List[Tuple[int, int]]]) -> Dict:
+    center_of_mass = calculate_center_of_mass(grid)
+    symmetry = calculate_vertical_symmetry(grid)
+    weight_distribution = calculate_weight_distribution(shapes)
+    
+    return {
+        "center_of_mass": center_of_mass,
+        "symmetry": symmetry,
+        "weight_distribution": weight_distribution
+    }
+
 def calculate_center_of_mass(grid: ColoredGrid) -> Tuple[float, float]:
     total_mass = sum(sum(row) for row in grid.values)
     if total_mass == 0:
@@ -79,6 +91,16 @@ def calculate_vertical_symmetry(grid: ColoredGrid) -> float:
                 symmetry_score += 1
     return symmetry_score / (grid.num_rows * grid.num_cols // 2)
 
+def calculate_weight_distribution(shapes: Dict[int, List[Tuple[int, int]]]) -> float:
+    total_score = 0
+    for shape in shapes.values():
+        min_r = min(r for r, _ in shape)
+        max_r = max(r for r, _ in shape)
+        mid_r = (min_r + max_r) / 2
+        lower_half = sum(1 for r, _ in shape if r > mid_r)
+        total_score += lower_half / len(shape)
+    return total_score / len(shapes)
+
 def flip_shape_vertically(shape: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
     min_r = min(r for r, _ in shape)
     max_r = max(r for r, _ in shape)
@@ -94,3 +116,13 @@ def reconstruct_grid(shapes: Dict[int, List[Tuple[int, int]]], original_grid: Co
                 new_grid[r][c] = color
     
     return ColoredGrid(values=new_grid)
+
+def is_better_configuration(new_metrics: Dict, best_metrics: Dict) -> bool:
+    if new_metrics["symmetry"] > best_metrics["symmetry"]:
+        return True
+    elif new_metrics["symmetry"] == best_metrics["symmetry"]:
+        if new_metrics["weight_distribution"] > best_metrics["weight_distribution"]:
+            return True
+        elif new_metrics["weight_distribution"] == best_metrics["weight_distribution"]:
+            return new_metrics["center_of_mass"][0] > best_metrics["center_of_mass"][0]
+    return False
