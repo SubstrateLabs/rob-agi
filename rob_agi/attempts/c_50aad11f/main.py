@@ -6,12 +6,11 @@ def solve_50aad11f(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by identifying magenta shapes, assigning them colors
     based on adjacent color indicators, and arranging them in a new grid.
     
-    1. Identifies connected magenta regions in the input grid.
-    2. Finds color indicators for each magenta region.
-    3. Assigns colors to magenta regions based on the indicators.
-    4. Creates a new grid with the colored shapes arranged horizontally.
-    5. Compresses shapes vertically to fit in 4 rows.
-    6. Optimizes the grid size by removing trailing black columns.
+    1. Identifies and sorts connected magenta regions in the input grid.
+    2. Assigns colors to magenta regions based on nearby non-black, non-magenta colors.
+    3. Creates a new grid with the colored shapes arranged horizontally.
+    4. Compresses shapes vertically to fit in 4 rows while preserving key features.
+    5. Adds spacing between shapes and optimizes the grid size.
     
     Returns a new ColoredGrid with the transformed arrangement.
     """
@@ -43,13 +42,13 @@ def solve_50aad11f(input_grid: ColoredGrid) -> ColoredGrid:
         rows, cols = input_grid.get_dimensions()
         for region in regions:
             indicator = 0  # Default color (black) if no indicator found
-            min_x = min(x for x, _ in region)
-            max_x = max(x for x, _ in region)
-            min_y = min(y for _, y in region)
-            max_y = max(y for _, y in region)
+            min_x = max(0, min(x for x, _ in region) - 1)
+            max_x = min(rows - 1, max(x for x, _ in region) + 1)
+            min_y = max(0, min(y for _, y in region) - 1)
+            max_y = min(cols - 1, max(y for _, y in region) + 1)
             
-            for x in range(max(0, min_x - 1), min(rows, max_x + 2)):
-                for y in range(max(0, min_y - 1), min(cols, max_y + 2)):
+            for x in range(min_x, max_x + 1):
+                for y in range(min_y, max_y + 1):
                     cell_color = input_grid.get_cell(x, y)
                     if cell_color not in [0, 6]:
                         indicator = cell_color
@@ -72,21 +71,30 @@ def solve_50aad11f(input_grid: ColoredGrid) -> ColoredGrid:
             return [(r - min_r, c - min_c) for r, c in shape]
         
         compression_ratio = max_height / height
-        compressed_shape = []
+        compressed_shape = set()
         for r, c in shape:
-            new_r = int((r - min_r) * compression_ratio)
-            if new_r < max_height:
-                compressed_shape.append((new_r, c - min_c))
-        return compressed_shape
+            new_r = min(max_height - 1, int((r - min_r) * compression_ratio))
+            compressed_shape.add((new_r, c - min_c))
+        
+        # Ensure key features are preserved
+        if len(compressed_shape) < len(set(c for _, c in shape)):
+            # If we lost horizontal information, use a different compression method
+            columns = set(c for _, c in shape)
+            compressed_shape = set((r % max_height, c) for r, c in shape if c in columns)
+        
+        return sorted(compressed_shape)
 
     magenta_regions = find_magenta_regions()
+    if not magenta_regions:
+        return ColoredGrid(values=[[0] for _ in range(4)])
+
     color_indicators = find_color_indicators(magenta_regions)
     colored_regions = list(zip(color_indicators, magenta_regions))
 
     max_height = 4
     total_width = sum(max(c for _, c in region) - min(c for _, c in region) + 1 for _, region in colored_regions) + len(colored_regions) - 1
 
-    output_grid = ColoredGrid(values=[[0 for _ in range(total_width)] for _ in range(max_height)])
+    output_grid = ColoredGrid(values=[[0 for _ in range(max(1, total_width))] for _ in range(max_height)])
 
     current_col = 0
     for color, region in colored_regions:
@@ -97,7 +105,7 @@ def solve_50aad11f(input_grid: ColoredGrid) -> ColoredGrid:
         current_col += width + 1
 
     # Remove trailing black columns
-    while all(output_grid.get_cell(r, -1) == 0 for r in range(max_height)):
+    while output_grid.get_dimensions()[1] > 1 and all(output_grid.get_cell(r, -1) == 0 for r in range(max_height)):
         for row in output_grid.values:
             row.pop()
 
