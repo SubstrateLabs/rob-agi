@@ -38,25 +38,49 @@ def are_grids_identical(grid1: ColoredGrid, grid2: ColoredGrid) -> bool:
 
 def solve_d931c21c(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by applying a cellular automaton-like rule iteratively until the grid stabilizes.
-    
-    The rule is as follows:
-    1. Blue (1) cells remain blue.
+    Transforms the input grid based on the following rules:
+    1. Blue (1) cells remain unchanged.
     2. Black (0) cells:
        - If they have at least one blue neighbor, they become red (2).
-       - If they have at least one red neighbor, they become green (3).
+       - If they have at least one red neighbor (after applying the previous rule), they become green (3).
        - Otherwise, they remain black.
-    3. The process repeats until the grid no longer changes.
-    
+    3. All other colored cells remain unchanged.
+    4. If no changes occur after applying these rules, the original grid is returned.
+
+    The transformation is applied only once, not iteratively.
     Neighbors are considered in all 8 directions (including diagonals).
     """
-    prev_grid = input_grid
-    max_iterations = 100  # Safety mechanism to prevent infinite loops
-    
-    for _ in range(max_iterations):
-        new_grid = apply_rule(prev_grid)
-        if are_grids_identical(new_grid, prev_grid):
-            return new_grid
-        prev_grid = new_grid
-    
-    return prev_grid  # Return the last state if max iterations reached
+    new_grid = input_grid.deep_copy()
+    rows, cols = new_grid.get_dimensions()
+    changes_made = False
+
+    def get_neighbors(row: int, col: int) -> List[Tuple[int, int]]:
+        neighbors = []
+        for dr in [-1, 0, 1]:
+            for dc in [-1, 0, 1]:
+                if dr == 0 and dc == 0:
+                    continue
+                new_row, new_col = row + dr, col + dc
+                if 0 <= new_row < rows and 0 <= new_col < cols:
+                    neighbors.append((new_row, new_col))
+        return neighbors
+
+    # First pass: change black cells to red if they have blue neighbors
+    for row in range(rows):
+        for col in range(cols):
+            if new_grid.get_cell(row, col) == 0:  # Black cell
+                neighbors = get_neighbors(row, col)
+                if any(new_grid.get_cell(r, c) == 1 for r, c in neighbors):
+                    new_grid.set_cell(row, col, 2)  # Change to red
+                    changes_made = True
+
+    # Second pass: change black cells to green if they have red neighbors
+    for row in range(rows):
+        for col in range(cols):
+            if new_grid.get_cell(row, col) == 0:  # Black cell
+                neighbors = get_neighbors(row, col)
+                if any(new_grid.get_cell(r, c) == 2 for r, c in neighbors):
+                    new_grid.set_cell(row, col, 3)  # Change to green
+                    changes_made = True
+
+    return new_grid if changes_made else input_grid
