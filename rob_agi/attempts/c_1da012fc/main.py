@@ -5,37 +5,40 @@ from itertools import cycle
 def solve_1da012fc(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the grid transformation challenge by:
-    1. Identifying the gray area and the unique colors within it.
+    1. Identifying the gray area and extracting the color sequence within it.
     2. Finding the most common non-zero, non-gray color outside the gray area.
     3. Identifying connected regions of this target color.
     4. Sorting regions by their top-left coordinate.
-    5. Transforming each region to a new color based on the sequence of colors in the gray area.
+    5. Transforming each region to a new color based on the cyclic sequence of colors from the gray area.
     6. Returning the transformed grid.
     """
-    # Identify the gray area and colors within it
+    # Step 1: Identify the gray area and extract color sequence
     gray_area = [(r, c) for r, row in enumerate(input_grid.values) for c, val in enumerate(row) if val == 5]
-    colors_in_gray = sorted(set(input_grid.values[r][c] for r, c in gray_area if input_grid.values[r][c] != 5))
-    new_colors = cycle(colors_in_gray)
+    color_sequence = []
+    for r, c in sorted(gray_area):
+        color = input_grid.values[r][c]
+        if color != 5 and color not in color_sequence:
+            color_sequence.append(color)
+    color_cycle = cycle(color_sequence)
 
-    # Find the most common non-zero, non-gray color outside the gray area
+    # Step 2: Find the most common non-zero, non-gray color outside the gray area
     color_counts = Counter(cell for r, row in enumerate(input_grid.values) 
                            for c, cell in enumerate(row) 
                            if cell not in [0, 5] and (r, c) not in gray_area)
     target_color = color_counts.most_common(1)[0][0]
 
-    # Find connected regions of the target color
+    # Step 3: Find connected regions of the target color
     regions = input_grid.find_connected_regions(target_color)
 
-    # Sort regions by top-left coordinate
+    # Step 4: Sort regions by top-left coordinate
     regions.sort(key=lambda region: min(region))
 
-    # Create output grid
+    # Step 5: Transform regions
     output_grid = input_grid.deep_copy()
-
-    # Transform regions
     for region in regions:
-        new_color = next(new_colors)
-        for row, col in region:
-            output_grid.values[row][col] = new_color
+        new_color = next(color_cycle)
+        for r, c in region:
+            output_grid.values[r][c] = new_color
 
+    # Step 6: Return the transformed grid
     return output_grid
