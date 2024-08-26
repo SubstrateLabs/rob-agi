@@ -16,7 +16,10 @@ def solve_aee291af(input_grid: ColoredGrid) -> Optional[ColoredGrid]:
     
     The valid patterns include:
     - 4x4 grid with two red squares arranged vertically or diagonally
-    - 5x5 grid with red squares forming a cross shape
+    - 5x5 grid with red squares forming a cross shape (center and four adjacent squares)
+    
+    The function ensures that the pattern found exactly matches one of these configurations,
+    without any additional red squares in the region.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -57,7 +60,7 @@ def find_red_pattern(coords: List[Tuple[int, int]], top: int, left: int, size: i
     ]
     
     for pattern in patterns:
-        if set(pattern).issubset(set(relative_coords)):
+        if set(pattern).issubset(set(relative_coords)) and len(set(relative_coords)) == len(pattern):
             return pattern
     
     return None
