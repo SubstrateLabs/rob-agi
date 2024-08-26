@@ -12,6 +12,7 @@ def solve_9b4c17c4(input_grid: ColoredGrid) -> ColoredGrid:
     4. Preserves the vertical position and shape of red regions.
     5. Maintains proper spacing between regions and zone edges.
     6. Handles cases where regions might already be at the correct edge.
+    7. Ensures that no red region extends beyond the zone boundaries.
     """
     rows, cols = input_grid.get_dimensions()
     output_grid = input_grid.deep_copy()
@@ -55,7 +56,7 @@ def solve_9b4c17c4(input_grid: ColoredGrid) -> ColoredGrid:
             new_start = end_col
             for region in regions:
                 region_width = max(c for _, c in region) - min(c for _, c in region) + 1
-                new_start = min(new_start, end_col)  # Ensure we don't go past the zone boundary
+                new_start = min(new_start, end_col - region_width + 1)  # Ensure region fits within zone
                 offset = new_start - max(c for _, c in region)
                 for r, c in region:
                     output_grid.values[r][c] = input_grid.values[r][start_col]  # Restore original background
@@ -65,7 +66,7 @@ def solve_9b4c17c4(input_grid: ColoredGrid) -> ColoredGrid:
             new_start = start_col
             for region in regions:
                 region_width = max(c for _, c in region) - min(c for _, c in region) + 1
-                new_start = max(new_start, start_col)  # Ensure we don't go past the zone boundary
+                new_start = max(new_start, start_col)  # Ensure region fits within zone
                 offset = new_start - min(c for _, c in region)
                 for r, c in region:
                     output_grid.values[r][c] = input_grid.values[r][start_col]  # Restore original background
