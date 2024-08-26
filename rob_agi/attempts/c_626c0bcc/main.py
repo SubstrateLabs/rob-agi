@@ -1,5 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 def solve_626c0bcc(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -7,10 +7,11 @@ def solve_626c0bcc(input_grid: ColoredGrid) -> ColoredGrid:
     
     The algorithm works as follows:
     1. Identify all connected sky-colored regions.
-    2. Sort regions based on their top-left coordinate.
-    3. For each region:
-       a. Place 2x2 blue (1) squares in corners or along edges.
-       b. Fill remaining cells with red (2), green (3), and yellow (4) in a specific order.
+    2. Analyze each region to determine its type (large, thin, or small).
+    3. Color each region based on its type:
+       - Large regions: Place 2x2 blue (1) squares in corners and fill with a specific pattern.
+       - Thin regions: Use alternating colors.
+       - Small regions: Use a fixed pattern.
     4. Resolve any remaining color conflicts.
     
     This approach ensures no adjacent cells (including diagonally) have the same non-black color,
@@ -18,46 +19,53 @@ def solve_626c0bcc(input_grid: ColoredGrid) -> ColoredGrid:
     """
     rows, cols = input_grid.get_dimensions()
     output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
-    sky_regions = sorted(input_grid.find_connected_regions(8), key=lambda r: (min(r)[0], min(r)[1]))
+    sky_regions = input_grid.find_connected_regions(8)
     
     for region in sky_regions:
-        color_region(output_grid, region)
+        region_type, blue_locations = analyze_region(region)
+        color_region(output_grid, region, region_type, blue_locations)
     
     resolve_all_conflicts(output_grid)
     return output_grid
 
-def color_region(grid: ColoredGrid, region: List[Tuple[int, int]]):
-    corners = find_corners(region)
-    
-    # Place blue squares
-    for corner in corners:
-        place_shape(grid, region, (2, 2), 1, corner[0], corner[1])
-    
-    # Fill remaining cells
-    colors = [2, 3, 4]  # red, green, yellow
-    color_index = 0
-    for r, c in region:
-        if grid.get_cell(r, c) == 0:
-            grid.set_cell(r, c, colors[color_index])
-            color_index = (color_index + 1) % 3
-
-def find_corners(region: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
+def analyze_region(region: List[Tuple[int, int]]) -> Tuple[str, List[Tuple[int, int]]]:
     min_row, min_col = min(region)
     max_row, max_col = max(region)
-    corners = [
-        (min_row, min_col),
-        (min_row, max_col - 1),
-        (max_row - 1, min_col),
-        (max_row - 1, max_col - 1)
-    ]
-    return [corner for corner in corners if corner in region]
+    width = max_col - min_col + 1
+    height = max_row - min_row + 1
+    
+    if width >= 3 and height >= 3:
+        blue_locations = [(min_row, min_col), (min_row, max_col-1), (max_row-1, min_col), (max_row-1, max_col-1)]
+        return "large", [loc for loc in blue_locations if loc in region]
+    elif width <= 2 or height <= 2:
+        return "thin", []
+    else:
+        return "small", []
+
+def color_region(grid: ColoredGrid, region: List[Tuple[int, int]], region_type: str, blue_locations: List[Tuple[int, int]]):
+    if region_type == "large":
+        for r, c in blue_locations:
+            place_shape(grid, region, (2, 2), 1, r, c)
+        colors = [2, 3, 4]  # red, green, yellow
+        color_index = 0
+        for r, c in region:
+            if grid.get_cell(r, c) == 0:
+                grid.set_cell(r, c, colors[color_index])
+                color_index = (color_index + 1) % 3
+    elif region_type == "thin":
+        colors = [2, 3, 4]
+        for i, (r, c) in enumerate(region):
+            grid.set_cell(r, c, colors[i % 3])
+    else:  # small
+        colors = [2, 3, 4, 2]
+        for i, (r, c) in enumerate(region):
+            grid.set_cell(r, c, colors[i])
 
 def place_shape(grid: ColoredGrid, region: List[Tuple[int, int]], shape: Tuple[int, int], color: int, row: int, col: int):
     for r in range(row, row + shape[0]):
         for c in range(col, col + shape[1]):
             if (r, c) in region:
                 grid.set_cell(r, c, color)
-                region.remove((r, c))
 
 def resolve_all_conflicts(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
