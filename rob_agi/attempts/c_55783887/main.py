@@ -1,6 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Dict
-import math
 
 def solve_55783887(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -50,8 +49,9 @@ def find_colored_dots(grid: ColoredGrid, background_color: int) -> Dict[int, Lis
 
 def create_extended_path(dots: List[Tuple[int, int]], max_row: int, max_col: int) -> List[Tuple[int, int]]:
     sorted_dots = sorted(dots)
-    if not sorted_dots:
-        return []
+    if len(sorted_dots) == 1:
+        r, c = sorted_dots[0]
+        return [(max(0, r-1), max(0, c-1)), (r, c), (min(max_row-1, r+1), min(max_col-1, c+1))]
     
     first_dot, last_dot = sorted_dots[0], sorted_dots[-1]
     
@@ -74,17 +74,14 @@ def get_diagonal_path(start: Tuple[int, int], end: Tuple[int, int]) -> List[Tupl
     current = start
     while current != end:
         path.append(current)
-        dx = end[1] - current[1]
-        dy = end[0] - current[0]
-        if dx != 0:
-            step_x = sign(dx)
+        dr = sign(end[0] - current[0])
+        dc = sign(end[1] - current[1])
+        if dr != 0 and dc != 0:
+            current = (current[0] + dr, current[1] + dc)
+        elif dr != 0:
+            current = (current[0] + dr, current[1])
         else:
-            step_x = 0
-        if dy != 0:
-            step_y = sign(dy)
-        else:
-            step_y = 0
-        current = (current[0] + step_y, current[1] + step_x)
+            current = (current[0], current[1] + dc)
     path.append(end)
     return path
 
