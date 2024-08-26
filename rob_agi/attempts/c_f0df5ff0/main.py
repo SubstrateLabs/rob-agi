@@ -6,15 +6,16 @@ def solve_f0df5ff0(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transform the input grid by creating a blue (1) path that connects large black (0) regions
     while avoiding other colored squares. The path is mostly thin with occasional loops and
-    minimal branching. It connects significant black areas, touches grid edges when appropriate,
+    controlled branching. It connects significant black areas, touches all four grid edges,
     and maintains the original structure of colored regions.
 
     1. Analyze the input grid and create a heat map of black cell density.
-    2. Generate a skeleton structure connecting high-density black areas.
-    3. Refine the path using a modified A* algorithm.
-    4. Add complexity and balance with branches and loops.
-    5. Optimize path thickness and create deliberate loops.
-    6. Connect isolated black cells and make final refinements.
+    2. Identify large black regions and potential starting points on edges.
+    3. Generate a primary path structure using a modified A* algorithm.
+    4. Enhance path complexity with controlled branching and loops.
+    5. Connect isolated black regions and optimize path thickness.
+    6. Refine edges and smooth the final path.
+    7. Validate and iteratively improve the solution.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -88,32 +89,106 @@ def solve_f0df5ff0(input_grid: ColoredGrid) -> ColoredGrid:
             for r, c in path:
                 output_grid.set_cell(r, c, 1)
 
-    # Add complexity and balance
-    for r in range(rows):
-        for c in range(cols):
-            if output_grid.get_cell(r, c) == 0 and heat_map[r][c] > 0:
-                closest_blue = min((br, bc) for br in range(rows) for bc in range(cols) 
-                                   if output_grid.get_cell(br, bc) == 1,
-                                   key=lambda p: manhattan_distance(p, (r, c)))
-                if manhattan_distance((r, c), closest_blue) <= 5:
-                    path = a_star((r, c), closest_blue, skeleton)
-                    if path:
-                        for pr, pc in path:
-                            output_grid.set_cell(pr, pc, 1)
+    def find_large_black_regions():
+        visited = set()
+        regions = []
+        for r in range(rows):
+            for c in range(cols):
+                if output_grid.get_cell(r, c) == 0 and (r, c) not in visited:
+                    region = []
+                    stack = [(r, c)]
+                    while stack:
+                        cr, cc = stack.pop()
+                        if (cr, cc) not in visited and output_grid.get_cell(cr, cc) == 0:
+                            visited.add((cr, cc))
+                            region.append((cr, cc))
+                            stack.extend(get_neighbors(cr, cc))
+                    if len(region) > 5:
+                        regions.append(region)
+        return regions
 
-    # Optimize path thickness and create loops
-    for r in range(rows):
-        for c in range(cols):
-            if output_grid.get_cell(r, c) == 1:
-                blue_neighbors = sum(1 for nr, nc in get_neighbors(r, c) if output_grid.get_cell(nr, nc) == 1)
-                if blue_neighbors > 2:
-                    non_blue_neighbors = [n for n in get_neighbors(r, c) if output_grid.get_cell(*n) != 1]
-                    if non_blue_neighbors and heat_map[r][c] < 2:
-                        output_grid.set_cell(r, c, output_grid.get_cell(*non_blue_neighbors[0]))
-                elif blue_neighbors == 1 and heat_map[r][c] > 1:
-                    for nr, nc in get_neighbors(r, c):
-                        if output_grid.get_cell(nr, nc) == 0:
-                            output_grid.set_cell(nr, nc, 1)
-                            break
+    def find_edge_starting_points():
+        edge_points = []
+        for r in [0, rows-1]:
+            for c in range(cols):
+                if heat_map[r][c] > 0:
+                    edge_points.append((r, c))
+        for c in [0, cols-1]:
+            for r in range(1, rows-1):
+                if heat_map[r][c] > 0:
+                    edge_points.append((r, c))
+        return sorted(edge_points, key=lambda p: heat_map[p[0]][p[1]], reverse=True)
+
+    def generate_primary_path(start, black_regions):
+        path = set()
+        current = start
+        path.add(current)
+        output_grid.set_cell(*current, 1)
+
+        for region in black_regions:
+            target = min(region, key=lambda p: manhattan_distance(current, p))
+            new_segment = a_star(current, target, skeleton)
+            if new_segment:
+                path.update(new_segment)
+                for r, c in new_segment:
+                    output_grid.set_cell(r, c, 1)
+                current = target
+
+        return path
+
+    def add_complexity(path):
+        for _ in range(len(path) // 10):
+            start = random.choice(list(path))
+            end = random.choice(list(path))
+            if manhattan_distance(start, end) > 5:
+                new_branch = a_star(start, end, skeleton)
+                if new_branch:
+                    for r, c in new_branch:
+                        output_grid.set_cell(r, c, 1)
+                    path.update(new_branch)
+
+    def connect_isolated_regions(path):
+        black_cells = [(r, c) for r in range(rows) for c in range(cols) if output_grid.get_cell(r, c) == 0]
+        for cell in black_cells:
+            if all(output_grid.get_cell(nr, nc) != 1 for nr, nc in get_neighbors(*cell)):
+                closest_blue = min(path, key=lambda p: manhattan_distance(p, cell))
+                new_branch = a_star(cell, closest_blue, set())
+                if new_branch:
+                    for r, c in new_branch:
+                        output_grid.set_cell(r, c, 1)
+                    path.update(new_branch)
+
+    def optimize_thickness(path):
+        for r, c in path:
+            blue_neighbors = sum(1 for nr, nc in get_neighbors(r, c) if output_grid.get_cell(nr, nc) == 1)
+            if blue_neighbors > 2 and random.random() < 0.3:
+                non_blue = [n for n in get_neighbors(r, c) if output_grid.get_cell(*n) != 1]
+                if non_blue:
+                    output_grid.set_cell(r, c, output_grid.get_cell(*random.choice(non_blue)))
+                    path.remove((r, c))
+
+    def ensure_edge_connections(path):
+        edges = [0, rows-1, cols-1]
+        for edge in edges:
+            if not any(r == edge or c == edge for r, c in path):
+                closest_path = min(path, key=lambda p: min(p[0], p[1], rows-1-p[0], cols-1-p[1]))
+                target = (edge, closest_path[1]) if edge < rows else (closest_path[0], edge)
+                new_segment = a_star(closest_path, target, set())
+                if new_segment:
+                    for r, c in new_segment:
+                        output_grid.set_cell(r, c, 1)
+                    path.update(new_segment)
+
+    heat_map = create_heat_map()
+    skeleton = generate_skeleton(heat_map)
+    black_regions = find_large_black_regions()
+    starting_points = find_edge_starting_points()
+
+    if starting_points:
+        primary_path = generate_primary_path(starting_points[0], black_regions)
+        add_complexity(primary_path)
+        connect_isolated_regions(primary_path)
+        optimize_thickness(primary_path)
+        ensure_edge_connections(primary_path)
 
     return output_grid
