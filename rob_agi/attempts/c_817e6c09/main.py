@@ -17,15 +17,15 @@ def is_red_rectangle(row, col, grid):
 def solve_817e6c09(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transform the input grid by changing 2x2 red rectangles to sky blue,
-    except for those touching the corners or edges of the grid.
+    except for those in the top row or rightmost column.
     
     The function works as follows:
     1. Create a deep copy of the input grid.
-    2. Iterate through each cell in the grid.
+    2. Iterate through each cell in the grid, considering it as the top-left corner of a 2x2 rectangle.
     3. For each cell, if it's part of a 2x2 red rectangle:
-       - If the rectangle touches a corner, keep it red.
-       - If the rectangle touches an edge, keep it red.
-       - If the rectangle is surrounded by empty space, change it to sky blue.
+       - If the rectangle is in the top row, keep it red.
+       - If the rectangle is in the rightmost column, keep it red.
+       - Otherwise, change it to sky blue.
     4. Return the modified grid.
     """
     output_grid = input_grid.deep_copy()
@@ -34,18 +34,10 @@ def solve_817e6c09(input_grid: ColoredGrid) -> ColoredGrid:
     for row in range(rows - 1):  # -1 because we're checking 2x2 rectangles
         for col in range(cols - 1):
             if is_red_rectangle(row, col, input_grid):
-                if (is_corner(row, col, input_grid) or 
-                    is_corner(row + 1, col, input_grid) or 
-                    is_corner(row, col + 1, input_grid) or 
-                    is_corner(row + 1, col + 1, input_grid)):
-                    continue  # Keep red if touching a corner
-                elif (is_edge(row, col, input_grid) or 
-                      is_edge(row + 1, col, input_grid) or 
-                      is_edge(row, col + 1, input_grid) or 
-                      is_edge(row + 1, col + 1, input_grid)):
-                    continue  # Keep red if touching an edge
+                if row == 0 or col == cols - 2:
+                    continue  # Keep red if in top row or rightmost column
                 else:
-                    # Change to sky blue if surrounded by empty space
+                    # Change to sky blue
                     for r in range(row, row + 2):
                         for c in range(col, col + 2):
                             output_grid.values[r][c] = 8
