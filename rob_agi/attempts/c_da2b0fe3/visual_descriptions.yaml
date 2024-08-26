@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 10x10 grid with a red (2) rectangular shape in the center. The shape resembles an open-ended rectangle or a "U" shape. It's positioned from rows 2 to 6 and columns 2 to 5. The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The grid is mostly identical to the input, with the red "U" shape preserved. The key difference is a horizontal green (3) line that spans the entire width of the grid in row 4. This green line intersects with the red shape, creating a kind of crossbar effect.
+
+example_1:
+  input: |
+    A 10x10 grid featuring a blue (1) shape that resembles a butterfly or hourglass. The shape is centered in the grid, spanning rows 1 to 6 and columns 1 to 7. The widest parts of the shape are at the top and bottom, with a narrower "waist" in the middle. The rest of the grid is filled with black (0).
+  output: |
+    The grid is largely the same as the input, maintaining the blue butterfly/hourglass shape. The significant change is the addition of a horizontal green (3) line that spans the entire width of the grid in row 4. This green line intersects with the blue shape, cutting through its "waist".
+
+example_2:
+  input: |
+    A 10x10 grid with a gray (5) pattern that looks like two connected "E" shapes or a stylized "B". The pattern spans rows 1 to 5 and columns 1 to 6. It consists of three horizontal lines connected by two vertical lines on the left side, and one vertical line on the right side. The rest of the grid is filled with black (0).
+  output: |
+    The grid maintains the gray "E" or "B" shape from the input, but adds a vertical green (3) line that runs through the entire height of the grid in column 4. This green line intersects with the gray shape, effectively splitting it in half vertically. The green line extends beyond the gray shape, reaching from the top to the bottom of the grid.
+
+test_case_0:
+  input: |
+    A 10x10 grid with a red (2) rectangular shape in the center. The shape resembles an open-ended rectangle or a "U" shape. It's positioned from rows 2 to 6 and columns 2 to 5. The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The output is not provided for this test case.

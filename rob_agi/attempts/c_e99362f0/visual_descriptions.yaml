@@ -1,0 +1,35 @@
+example_0:
+  input: |
+    An 11x9 grid with a distinct vertical yellow (4) line in the middle. On the left side, there's a concentration of orange (7) in the top-left corner, with some black (0) spaces. Red (2) is present in the bottom-left. On the right side, there's brown (9) in the upper portion and sky blue (8) in the lower-right corner. The yellow line divides the grid into two clear halves.
+  output: |
+    A 5x4 grid with a mix of colors. The top-left corner is orange (7), while the top-right has brown (9) and sky blue (8). The bottom-left has black (0) and orange (7), and the bottom-right has sky blue (8) and red (2). The colors seem to be distributed to reflect the general layout of the input grid, but in a more compact form.
+
+example_1:
+  input: |
+    An 11x9 grid with a central yellow (4) vertical line. The left side has orange (7) concentrated in the upper portion. The right side has brown (9) in the upper area and sky blue (8) in the lower area. Red (2) is present in the bottom-left quadrant. The distribution of colors is somewhat similar to the previous example, but with slight variations in placement.
+  output: |
+    A 5x4 grid with sky blue (8) dominating the top row and right side. Brown (9) and orange (7) are present in the middle, with some black (0) spaces. The bottom-left has orange (7), while red (2) is in the second row. The compact grid seems to capture the essence of the color distribution from the input.
+
+example_2:
+  input: |
+    An 11x9 grid with a central yellow (4) vertical line. The left side is dominated by orange (7), especially in the upper half. The right side has brown (9) in the upper portion. Red (2) is present in the bottom-left quadrant, and there's some sky blue (8) in the bottom-right. The orange area on the left is more solid and extensive compared to previous examples.
+  output: |
+    A 5x4 grid predominantly filled with orange (7). Sky blue (8) appears on the edges, brown (9) is in the bottom-left, and red (2) is in the bottom-right corner. The dominance of orange reflects the large orange area in the input grid.
+
+example_3:
+  input: |
+    An 11x9 grid with the familiar yellow (4) vertical line in the center. Orange (7) is scattered on the left side, while brown (9) is more prevalent on the right upper side. Red (2) forms a solid block in the bottom-left quadrant, and sky blue (8) is present in the bottom-right area. The color distribution is similar to previous examples but with some variations.
+  output: |
+    A 5x4 grid with sky blue (8) dominating, especially on the left side and bottom. Brown (9) appears in the top-right and middle. Red (2) is in the bottom-left, and orange (7) is present in the middle-right. There's a black (0) space in the top-right corner. The output seems to capture the general color distribution of the input, emphasizing the most prominent colors.
+
+example_4:
+  input: |
+    An 11x9 grid with the central yellow (4) vertical line. The left side has a significant presence of orange (7), while the right side is dominated by brown (9) in the upper half and sky blue (8) in the lower half. Red (2) forms a solid block in the bottom-left quadrant. This example shows a more clear-cut division of colors in each quadrant.
+  output: |
+    A 5x4 grid predominantly filled with sky blue (8). Brown (9) appears in the top-left corner, red (2) in the top-right. Orange (7) is present in the bottom half, with some black (0) spaces. The output grid seems to emphasize the sky blue from the input while still representing other major colors.
+
+example_5:
+  input: |
+    An 11x9 grid with the yellow (4) vertical line in the center. Orange (7) is scattered on the left side, brown (9) is concentrated in the upper-right quadrant. Red (2) forms a jagged pattern in the bottom-left, and sky blue (8) is present in the bottom-right. The color distribution is similar to previous examples but with unique patterns for each color.
+  output: |
+    A 5x4 grid with a mix of colors. Orange (7) is prominent in the top-left and bottom-right. Sky blue (8) is scattered throughout. Brown (9) appears in the top-right and middle-left. Red (2) is in the middle. The output grid seems to capture the essence of the color distribution from the input, with each major color represented.

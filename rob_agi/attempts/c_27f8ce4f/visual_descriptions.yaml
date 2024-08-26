@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 3x3 grid with a distinct pattern. The top-left and top-middle squares are sky blue (8). The top-right and middle-right squares are blue (1). The middle-left square is sky blue (8), while the middle-middle square is magenta (6). The bottom-left square is yellow (4), the bottom-middle is brown (9), and the bottom-right is magenta (6).
+  output: |
+    A 9x9 grid where the input 3x3 grid is replicated three times in an "L" shape. The original input occupies the top-left 3x3 area, another copy is directly below it, and a third copy is to the right of the original. The remaining spaces (the entire right third and bottom third of the grid, except for the bottom-left 3x3 area) are filled with black (0), representing empty space.
+
+example_1:
+  input: |
+    A 3x3 grid with a distinct color pattern. The top-left and top-middle squares are orange (7). The top-right and middle-right squares are blue (1). The middle-left square is yellow (4), and the middle-middle square is orange (7). The bottom-left and bottom-middle squares are green (3), while the bottom-right square is orange (7).
+  output: |
+    A 9x9 grid where the input 3x3 grid is replicated three times in an "L" shape, but rotated 90 degrees clockwise compared to the previous example. The original input occupies the top-left 3x3 area, another copy is directly to its right, and a third copy is in the bottom-right 3x3 area of the grid. The remaining spaces (the middle and bottom thirds of the left column, and the middle third of the grid) are filled with black (0), representing empty space.
+
+example_2:
+  input: |
+    A 3x3 grid with a mixed color pattern. The top-left square is yellow (4), top-middle is gray (5), and top-right is yellow (4) again. The middle row has red (2) in the left and middle squares, with gray (5) on the right. The bottom row has gray (5) in the left and middle squares, with yellow (4) on the right.
+  output: |
+    A 9x9 grid where the input 3x3 grid is replicated three times in an "L" shape, but rotated 180 degrees compared to the first example. The original input occupies the middle 3x3 area of the right column, another copy is directly to its left, and a third copy is in the bottom-left 3x3 area of the grid. The remaining spaces (the top third of the grid, and the left and middle thirds of the right column) are filled with black (0), representing empty space.
+
+example_3:
+  input: |
+    A 3x3 grid with varied colors. The top row is blue (1), red (2), and green (3) from left to right. The middle row has brown (9) in the left and middle squares, with blue (1) on the right. The bottom row has red (2) on the left, brown (9) in the middle, and yellow (4) on the right.
+  output: |
+    A 9x9 grid where the input 3x3 grid is replicated three times in an "L" shape, but rotated 270 degrees clockwise compared to the first example. The original input occupies the middle 3x3 area of the grid, another copy is directly to its right, and a third copy is in the bottom-middle 3x3 area of the grid. The remaining spaces (the entire top third of the grid, the left third of the middle row, and the left third of the bottom row) are filled with black (0), representing empty space.

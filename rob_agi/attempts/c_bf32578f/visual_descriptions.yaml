@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 10x10 grid with mostly black (empty) space. There's an orange (7) zigzag pattern starting from the middle-right, moving diagonally down-left, then straight down for two squares, then diagonally down-right. The pattern resembles a stylized lightning bolt or a sideways 'Z'.
+  output: |
+    A 10x10 grid with mostly black (empty) space. In the center, there's a 4x4 orange (7) square shape. The square is not completely filled; it has a 2x2 orange square in the middle with additional orange squares on each side, forming a cross or plus sign within the larger square.
+
+example_1:
+  input: |
+    A 6x6 grid with a sky blue (8) 'L' shape occupying the left side and top of the grid. The 'L' is three squares wide at the top and left side, with the rest of the grid being black (empty).
+  output: |
+    A 6x6 grid with a centered 4x4 sky blue (8) square. The square is positioned with one row of black (empty) space above and below it, filling the entire width of the grid in the middle four rows.
+
+example_2:
+  input: |
+    A 6x6 grid with a magenta (6) diagonal line starting from the top-middle, moving down-left to the bottom-left, then bouncing back up diagonally to the bottom-middle. The pattern forms a shallow 'V' shape.
+  output: |
+    A 6x6 grid with a centered 4x4 magenta (6) shape. The shape is not a full square, but rather a cross or plus sign made of 2x2 squares. There's one row of black (empty) space above and below the shape, and one column of black space on each side.
+
+test_case_0:
+  input: |
+    This test case is not provided in the given test file.
+  output: |
+    This test case is not provided in the given test file.

@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    An 8x4 grid with mostly black (empty) spaces. There are seven green dots (3) arranged in a diagonal pattern from top-right to bottom-left. The green dots are spaced out, not touching each other directly.
+  output: |
+    The same 8x4 grid, but now the spaces between and around the green dots are filled with red (2). The red forms a continuous shape that connects all the green dots, creating a diagonal band from top-right to bottom-left. The edges of the grid remain black.
+
+example_1:
+  input: |
+    An 8x3 grid with mostly black spaces. There are five yellow dots (4) arranged in a shallow V-shape. Two yellow dots are on the top row, two on the middle row (closer to the center), and one in the center of the bottom row.
+  output: |
+    The same 8x3 grid, but now the spaces between the yellow dots in the top two rows are filled with red (2). The red forms a triangular shape connecting the four upper yellow dots. The bottom yellow dot and the edges of the grid remain unchanged.
+
+example_2:
+  input: |
+    A 12x5 grid with mostly black spaces. There are thirteen sky blue dots (8) arranged in a complex pattern. They form a large diamond or X shape, with additional dots extending from the corners of this shape.
+  output: |
+    The same 12x5 grid, but now the spaces within and around the sky blue dots are filled with red (2). The red forms a continuous shape that connects all the sky blue dots, creating a large diamond or X shape with extensions. The edges of the grid and some interior spaces remain black.
+
+example_3:
+  input: |
+    An 8x5 grid with mostly black spaces. There are eight blue dots (1) arranged in a diagonal line from top-left to bottom-right. The blue dots are evenly spaced, forming a perfect diagonal.
+  output: |
+    The same 8x5 grid, but now the spaces between and around the blue dots are filled with red (2). The red forms a continuous shape that connects all the blue dots, creating a diagonal band from top-left to bottom-right. The band is wider in the middle and tapers at the ends. The edges of the grid remain black.

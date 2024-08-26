@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 10x10 grid with a mix of black (0), blue (1), and green (3) squares. There's a noticeable pattern of black squares forming a continuous path that starts from the top edge, winds through the grid, and ends at the right edge. This path is not straight but meanders through the grid, sometimes touching itself but never crossing. The rest of the grid is filled with blue and green squares in no particular pattern.
+  output: |
+    The same 10x10 grid structure, but with significant changes. The continuous path of black squares from the input has been transformed into a path of gray (5) squares, maintaining its exact shape and route. All other black squares not part of this main path have been changed to red (2). The blue and green squares remain unchanged in their positions. This creates a clear visual of a gray path winding through the grid against a background of mixed colors.
+
+example_1:
+  input: |
+    Another 10x10 grid, predominantly filled with black (0), green (3), and blue (1) squares. There's a notable concentration of black squares forming a continuous path that starts from the left edge, meanders through the center of the grid, and exits at the bottom edge. This path is not straight and forms several bends and turns. The rest of the grid is filled with green and blue squares, with a few isolated black squares not connected to the main path.
+  output: |
+    The 10x10 grid structure is maintained, but with key changes. The main continuous path of black squares from the input has been converted to gray (5) squares, preserving its exact route and shape. All other black squares not part of this main path have been changed to red (2). The green and blue squares remain in their original positions. This transformation highlights the winding gray path against the mixed color background, making it stand out more clearly.
+
+example_2:
+  input: |
+    A 10x10 grid with a mix of black (0), blue (1), and green (3) squares. There's a distinct pattern of black squares forming a continuous path that starts from the left edge, winds through the grid in a complex pattern, and ends at the bottom edge. This path has several turns and bends, sometimes nearly touching itself. The rest of the grid is filled with blue and green squares in no particular pattern, with some isolated black squares not connected to the main path.
+  output: |
+    The 10x10 grid maintains its structure, but with notable changes. The continuous path of black squares from the input has been transformed into a path of gray (5) squares, keeping its exact shape and route. All other black squares not part of this main path have been changed to red (2). The blue and green squares remain unchanged in their positions. This transformation creates a clear visual of a gray path winding through the grid against a background of mixed colors, with the previously isolated black squares now standing out as red.
+
+example_3:
+  input: |
+    A 10x10 grid primarily composed of black (0), blue (1), and green (3) squares. There's a prominent pattern of black squares forming a continuous path that starts from the left edge, meanders through the grid in a complex pattern, and ends at the right edge. This path has multiple turns and bends, creating a maze-like appearance. The top-left corner of the grid has a concentration of black squares. The rest of the grid is filled with blue and green squares in no particular pattern, with some isolated black squares not connected to the main path.
+  output: |
+    The 10x10 grid structure is preserved, but with significant alterations. The main continuous path of black squares from the input has been converted to gray (5) squares, maintaining its exact route and shape. All other black squares not part of this main path, including those in the top-left corner, have been changed to red (2). The blue and green squares remain in their original positions. This transformation emphasizes the winding gray path against the mixed color background, with the previously black areas in the top-left now appearing as a cluster of red squares.
+
+test_case_0:
+  input: |
+    A 10x10 grid with a mix of black (0), blue (1), and green (3) squares. There's a noticeable pattern of black squares forming a continuous path that starts from the top edge, winds through the grid in a complex pattern, and ends at the bottom edge. This path has several turns and bends, sometimes nearly touching itself. The rest of the grid is filled with blue and green squares in no particular pattern, with some isolated black squares not connected to the main path.
+  output: |
+    The output grid is not provided for this test case.

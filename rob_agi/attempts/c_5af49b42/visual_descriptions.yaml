@@ -1,0 +1,61 @@
+example_0:
+  input: |
+    A 14x12 grid mostly filled with black (0). There are four colored "dots" scattered across the grid:
+    - A red dot (2) in the 3rd row, 8th column
+    - A blue dot (1) in the 6th row, 3rd column
+    - A yellow dot (4) in the 8th row, 12th column
+    - A horizontal line of six colors (2, 3, 5, 1, 6, 4) in the bottom row, starting from the left
+  output: |
+    A 14x12 grid mostly filled with black (0). The four colored dots from the input have been transformed into horizontal lines:
+    - The red dot (2) has become a line of six colors (2, 3, 5, 1, 6, 4) in the 3rd row, starting from the 8th column
+    - The blue dot (1) has become a line of five colors (3, 5, 1, 6, 4) in the 6th row, starting from the 1st column
+    - The yellow dot (4) has become a line of six colors (2, 3, 5, 1, 6, 4) in the 8th row, starting from the 7th column
+    - The original line in the bottom row remains unchanged
+
+example_1:
+  input: |
+    A 15x13 grid mostly filled with black (0). There are five colored "dots" scattered across the grid:
+    - A red dot (2) in the 2nd row, 3rd column
+    - A sky blue dot (8) in the 3rd row, 12th column
+    - A blue dot (1) in the 6th row, 5th column
+    - A magenta dot (6) in the 9th row, 3rd column
+    - A yellow dot (4) in the 9th row, 9th column
+    - A horizontal line of seven colors (1, 2, 4, 3, 5, 7, 8, 6) in the bottom row, starting from the left
+  output: |
+    A 15x13 grid mostly filled with black (0). The five colored dots from the input have been transformed into horizontal lines:
+    - The red dot (2) has become a line of four colors (1, 2, 4, 3) in the 2nd row, starting from the 2nd column
+    - The sky blue dot (8) has become a line of four colors (5, 7, 8, 6) in the 3rd row, starting from the 10th column
+    - The blue dot (1) has become a line of four colors (1, 2, 4, 3) in the 6th row, starting from the 5th column
+    - The magenta dot (6) has become a line of three colors (7, 8, 6) in the 9th row, starting from the 1st column
+    - The yellow dot (4) has become a line of four colors (1, 2, 4, 3) in the 9th row, starting from the 7th column
+    - The original line in the bottom row remains unchanged
+
+example_2:
+  input: |
+    A 13x13 grid mostly filled with black (0). There are five colored elements scattered across the grid:
+    - A horizontal line of four colors (4, 3, 7, 8) in the top row, starting from the 10th column
+    - A blue dot (1) in the 3rd row, 3rd column
+    - A sky blue dot (8) in the 6th row, 7th column
+    - A red dot (2) in the 9th row, 12th column
+    - A yellow dot (4) in the 10th row, 2nd column
+    - A horizontal line of three colors (1, 6, 2) in the bottom row, starting from the left
+  output: |
+    A 13x13 grid mostly filled with black (0). The colored elements from the input have been transformed:
+    - The line in the top row remains unchanged
+    - The blue dot (1) has become a line of three colors (1, 6, 2) in the 3rd row, starting from the 3rd column
+    - The sky blue dot (8) has become a line of four colors (4, 3, 7, 8) in the 6th row, starting from the 4th column
+    - The red dot (2) has become a line of three colors (1, 6, 2) in the 9th row, starting from the 10th column
+    - The yellow dot (4) has become a line of four colors (4, 3, 7, 8) in the 10th row, starting from the 2nd column
+    - The line in the bottom row remains unchanged
+
+test_case_0:
+  input: |
+    A 13x13 grid mostly filled with black (0). There are five colored elements scattered across the grid:
+    - A horizontal line of four colors (4, 3, 7, 8) in the top row, starting from the 10th column
+    - A blue dot (1) in the 3rd row, 3rd column
+    - A sky blue dot (8) in the 6th row, 7th column
+    - A red dot (2) in the 9th row, 12th column
+    - A yellow dot (4) in the 10th row, 2nd column
+    - A horizontal line of three colors (1, 6, 2) in the bottom row, starting from the left
+  output: |
+    The output is not provided for the test case.

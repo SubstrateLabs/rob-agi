@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 5x5 grid with a blue (1) U-shaped pattern on the top and left sides. The U-shape is one cell thick. The center and right side of the grid are mostly black (0), with a 2x2 red (2) square in the bottom right corner.
+  output: |
+    A 2x2 grid that appears to be a simplified representation of the input. The top-left and bottom-left cells are blue (1), while the top-right is black (0) and the bottom-right is blue (1).
+
+example_1:
+  input: |
+    A 5x5 grid with a blue (1) pattern that forms an incomplete rectangle. The top row has blue cells at the edges with black (0) in between. The left side has a continuous blue line, while the right side has a gap in the middle. The bottom right corner has a 2x2 red (2) square, similar to the previous example.
+  output: |
+    A 2x2 grid where the top-left cell is black (0), and the other three cells are blue (1), forming an L-shape.
+
+example_2:
+  input: |
+    A 5x5 grid with a sparse blue (1) pattern. There are two blue cells in the top-left corner, forming an L-shape. The right side has a single blue cell at the top. The bottom-left corner has two blue cells. The bottom-right corner contains a 2x2 red (2) square, consistent with the previous examples.
+  output: |
+    A 2x2 grid where the left column is entirely blue (1), and the right column is entirely black (0).
+
+test_case_0:
+  input: |
+    This test case is not provided in the given test file. There is no additional input grid to describe.
+  output: |
+    There is no expected output grid provided for a test case in the given test file.

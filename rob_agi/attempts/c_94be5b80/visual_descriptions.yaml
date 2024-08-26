@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The input grid shows three vertical lines at the top, colored yellow (4), blue (1), and magenta (6) respectively. These lines are 3 units tall and positioned side by side. Below these lines, there are two horseshoe-shaped objects. The first horseshoe is blue (1) and positioned in the middle of the grid. The second horseshoe is magenta (6) and positioned at the bottom of the grid. Both horseshoes have the same shape: a horizontal line at the top, two vertical lines extending downwards from the ends of the top line, and another horizontal line connecting the bottom of these vertical lines. The rest of the grid is filled with black (0), representing empty space.
+  output: |
+    The output grid shows three horseshoe-shaped objects. The topmost horseshoe is yellow (4), followed by the blue (1) horseshoe in the middle, and the magenta (6) horseshoe at the bottom. All three horseshoes have the same shape as described in the input. The yellow horseshoe has replaced the three vertical lines that were at the top of the input grid. There are exactly two rows of black (0) space between each horseshoe. The rest of the grid is filled with black (0), representing empty space.
+
+example_1:
+  input: |
+    The input grid shows four vertical lines at the top right corner, colored orange (7), red (2), blue (1), and green (3) respectively. These lines are 3 units tall. Below these lines, there are two horseshoe-shaped objects. The first horseshoe is red (2) and positioned slightly above the middle of the grid. The second horseshoe is blue (1) and positioned below the red horseshoe. Both horseshoes have the same shape as described in the previous example. The rest of the grid is filled with black (0), representing empty space.
+  output: |
+    The output grid shows four horseshoe-shaped objects, all with the same shape as described earlier. From top to bottom, the horseshoes are colored orange (7), red (2), blue (1), and green (3). The orange horseshoe is positioned where the vertical lines were in the input. There are exactly two rows of black (0) space between each horseshoe. The horseshoes are aligned vertically, with their left edges lining up. The rest of the grid is filled with black (0), representing empty space.
+
+test_case_0:
+  input: |
+    This test case is not provided in the given test file. There is no input grid to describe for a test case.
+  output: |
+    This test case is not provided in the given test file. There is no expected output grid to describe for a test case.

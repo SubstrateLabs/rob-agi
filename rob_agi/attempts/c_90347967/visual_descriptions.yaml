@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 7x9 grid mostly filled with black (0). There's a small cluster of colored squares in the center-left area. From top to bottom: a horizontal line of green (3), red (2), gray (5); below that, two green (3) squares; and at the bottom, a blue (1) square next to a yellow (4) square. This cluster forms a rough L-shape.
+  output: |
+    A 7x9 grid mostly filled with black (0). The colored squares from the input have been moved to the top-right corner and rotated 90 degrees clockwise. The pattern now forms a rough reversed L-shape. From left to right: yellow (4), blue (1); above that, two green (3) squares; and at the top, a vertical line of gray (5), red (2), green (3).
+
+example_1:
+  input: |
+    A small 3x3 grid. The left column contains magenta (6) at the top and two red (2) squares below. The middle column has gray (5) in the center. The right column is all black (0).
+  output: |
+    A small 3x3 grid. The colored squares have been rearranged. The top row now contains black (0), blue (1), red (2). The middle row has black (0), gray (5), red (2). The bottom row is black (0), black (0), magenta (6).
+
+example_2:
+  input: |
+    A 9x9 grid mostly filled with black (0). There's a small cluster of colored squares in the top-left corner. From top to bottom: two green (3) squares and a gray (5) square in a horizontal line; below that, two blue (1) squares; and at the bottom, a single red (2) square.
+  output: |
+    A 9x9 grid mostly filled with black (0). The colored squares from the input have been moved to the top-right corner and rotated 90 degrees clockwise. The pattern now forms a rough T-shape. From left to right: a single red (2) square; next to it, two blue (1) squares; above them, a vertical line of gray (5) and two green (3) squares.

@@ -1,0 +1,55 @@
+example_0:
+  input: |
+    A 7x15 grid with several distinct shapes and a yellow vertical line:
+    - A blue L-shape in the top-left corner
+    - A red vertical line to the right of the blue shape
+    - A magenta shape resembling an inverted T in the bottom-left
+    - A green shape like a sideways U in the bottom-center
+    - A yellow vertical line running through the entire grid, slightly right of center
+    - A single gray cell in the top-right corner
+    The rest of the grid is filled with black (empty space)
+  output: |
+    A 7x7 grid with the shapes from the input compressed and rearranged:
+    - The gray cell is now in the top-center
+    - The blue L-shape is below the gray cell, compressed vertically
+    - The magenta inverted T is to the right of the blue shape, compressed horizontally
+    - The red vertical line is to the left of the magenta shape, compressed vertically
+    - The green U shape is at the bottom, spanning most of the width
+    The rest of the grid is filled with black (empty space)
+
+example_1:
+  input: |
+    A 15x15 grid with several shapes and a yellow vertical line:
+    - A red shape like an inverted T in the top-left corner
+    - Three magenta shapes resembling inverted Ts: top-center, middle-center, and bottom-left
+    - Three blue L-shapes: middle-left, bottom-center, and bottom-right
+    - A green shape like a sideways U in the middle-left
+    - A yellow vertical line running through the entire grid, slightly right of center
+    - A single gray cell in the top-right quadrant
+    The rest of the grid is filled with black (empty space)
+  output: |
+    A 15x7 grid with the shapes from the input compressed and rearranged:
+    - The gray cell is now in the top-left corner
+    - The red inverted T is below the gray cell, compressed vertically
+    - Two blue L-shapes are stacked below the red shape, compressed vertically
+    - Three magenta inverted Ts are stacked on the right side, compressed horizontally
+    - The green U shape is in the middle-left, compressed horizontally
+    - Another blue L-shape is at the bottom-left
+    The rest of the grid is filled with black (empty space)
+
+example_2:
+  input: |
+    An 11x15 grid with several shapes and a yellow vertical line:
+    - Two red shapes like inverted Ts in the top-left and middle-left
+    - Three magenta shapes resembling inverted Ts: top-center, middle-center, and bottom-left
+    - One blue L-shape in the middle-left
+    - A yellow vertical line running through the entire grid, slightly right of center
+    - A single gray cell in the top-right quadrant
+    The rest of the grid is filled with black (empty space)
+  output: |
+    An 11x7 grid with the shapes from the input compressed and rearranged:
+    - The gray cell is now in the top-center
+    - Two red inverted Ts are stacked on the right side, compressed horizontally
+    - Three magenta inverted Ts are stacked on the right side, below the red shapes, compressed horizontally
+    - The blue L-shape is in the bottom-left, compressed vertically
+    The rest of the grid is filled with black (empty space)

@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid consists of a repeating pattern of 5x5 squares separated by black (0) borders. Each 5x5 square has a blue (1) border, with the interior 3x3 filled mostly with sky blue (8). In the center of each 3x3, there's a different color: some have yellow (4), some have red (2), and others remain sky blue (8).
+  output: |
+    The output grid maintains the same overall structure of 5x5 squares separated by black borders. The blue borders of each square remain unchanged. The key difference is in the center of each 3x3 interior: all yellow (4) and sky blue (8) centers have been replaced with red (2), creating a consistent pattern across all squares.
+
+example_1:
+  input: |
+    This grid shows a similar pattern of 5x5 squares separated by black borders, but with red (2) borders instead of blue. The interior 3x3 of each square is filled with green (3), with some variations: some have blue (1) in the top-left corner, some have magenta (6) in the top-middle, and two squares in the bottom row have sky blue (8) in the top-left corner.
+  output: |
+    The output maintains the 5x5 square structure with black borders and red outlines. The key changes are: 1) All squares now have blue (1) in the top-left corner of their 3x3 interior, replacing any other colors that were there. 2) The magenta (6) in the top-middle of some squares has been consistently applied to all squares in the second row from the top. 3) The sky blue (8) in the bottom row has been moved to all squares in the bottom row, occupying the top-left corner position.
+
+example_2:
+  input: |
+    This grid shows a pattern of 4x4 squares separated by black borders. Each square has a sky blue (8) border. The interior 2x2 of each square is filled with yellow (4), with some variations: some have orange (7) in the top-middle, and one square in the middle row has green (3) in the bottom-left corner.
+  output: |
+    The output maintains the 4x4 square structure with black borders and sky blue outlines. The changes are: 1) All squares in the second row now have orange (7) in the top-middle of their 2x2 interior, making this consistent across the row. 2) The green (3) in the bottom-left corner of one square in the middle row has been replicated in all squares in that row. 3) All other interior positions remain yellow (4) as in the input.
+
+test_case_0:
+  input: |
+    This grid follows the same pattern of 4x4 squares separated by black borders, with sky blue (8) borders for each square. The interior 2x2 of each square is filled with yellow (4), with some variations: some have orange (7) in the top-middle, and one square in the bottom row has green (3) in the bottom-left corner.
+  output: |
+    The output is not provided for this test case.

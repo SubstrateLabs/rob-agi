@@ -1,0 +1,53 @@
+example_0:
+  input: |
+    The grid contains three distinct shapes:
+    1. An 8x8 sky blue (8) square in the top-left corner. It has an irregular hollow interior.
+    2. A 9x7 magenta (6) rectangle on the right side, starting from the third row. It is hollow.
+    3. An 8x8 yellow (4) square in the bottom-left quadrant. It is hollow.
+    The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The grid maintains the same overall structure as the input, with three distinct shapes:
+    1. The sky blue (8) square remains unchanged in position and outer shape.
+    2. The magenta (6) rectangle is now filled with a pattern that follows its contours. The pattern starts from the top-left corner and spirals inward, leaving some spaces empty.
+    3. The yellow (4) square is now filled with a similar spiral pattern, starting from the top-left corner and moving inward.
+    The black (0) empty space remains unchanged.
+
+example_1:
+  input: |
+    The grid contains five distinct shapes:
+    1. A 5x5 green (3) square in the top-left quadrant. It is hollow.
+    2. A 7x5 red (2) rectangle on the right side, starting from the second row. It is hollow.
+    3. A 7x5 yellow (4) rectangle on the left side, starting from the seventh row. It is hollow.
+    4. A 5x5 gray (5) square in the bottom-right quadrant. It has an irregular filled pattern inside.
+    5. A 5x3 orange (7) rectangle at the bottom-left, three rows from the bottom. It is hollow.
+    The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The grid maintains the overall structure of the input, with some key changes:
+    1. The green (3) square is now filled with a spiral pattern starting from the top-left corner.
+    2. The red (2) rectangle is filled with a similar spiral pattern, starting from the top-left corner.
+    3. The yellow (4) rectangle is filled with a spiral pattern, starting from the top-left corner.
+    4. The gray (5) square remains unchanged.
+    5. The orange (7) rectangle has been completely removed.
+    The black (0) empty space remains unchanged.
+
+example_2:
+  input: |
+    The grid contains five distinct shapes:
+    1. A 7x7 red (2) square in the top-left quadrant. It is hollow.
+    2. A 4x4 green (3) square in the top-right quadrant. It is hollow.
+    3. A 7x7 sky blue (8) square in the top-left quadrant, overlapping with the red square. It has an irregular filled pattern inside.
+    4. A 7x7 blue (1) square in the bottom-right quadrant. It is hollow.
+    5. A 6x8 orange (7) rectangle at the bottom-left. It is hollow.
+    The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The grid maintains the overall structure of the input, with some key changes:
+    1. The red (2) square is now filled with a spiral pattern starting from the top-left corner.
+    2. The green (3) square has been completely removed.
+    3. The sky blue (8) square remains unchanged.
+    4. The blue (1) square is now filled with a spiral pattern, starting from the top-left corner.
+    5. The orange (7) rectangle has been completely removed.
+    The black (0) empty space remains unchanged.
+
+test_case_0:
+  input: |
+    The grid contains no output, as this is a test case.

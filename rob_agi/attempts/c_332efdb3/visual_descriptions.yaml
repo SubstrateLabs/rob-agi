@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 7x7 grid entirely filled with black (0) squares. This appears as a completely empty or blank space.
+  output: |
+    A 7x7 grid with a distinctive pattern. The outer border is entirely blue (1). Inside this border, there's a checkerboard pattern of blue (1) and black (0) squares. The pattern forms a grid where every other square is blue, creating a series of blue crosses or plus signs throughout the grid.
+
+example_1:
+  input: |
+    A 5x5 grid entirely filled with black (0) squares. Like the previous example, this appears as a completely empty or blank space.
+  output: |
+    A 5x5 grid with a pattern similar to example_0. The outer border is entirely blue (1). Inside this border, there's a checkerboard pattern of blue (1) and black (0) squares. The pattern forms a smaller version of the grid seen in example_0, with blue crosses or plus signs visible.
+
+example_2:
+  input: |
+    A 9x9 grid entirely filled with black (0) squares. Once again, this appears as a completely empty or blank space, just larger than the previous examples.
+  output: |
+    A 9x9 grid following the same pattern as the previous examples, but on a larger scale. The outer border is entirely blue (1). Inside this border, there's a checkerboard pattern of blue (1) and black (0) squares. This creates a larger version of the grid seen in examples 0 and 1, with more blue crosses or plus signs visible due to the increased size.

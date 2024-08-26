@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 3x3 grid with a vertical green (3) line on the left side. The middle column has yellow (4) in the bottom two rows. The right column is entirely black (0) except for a red (2) square in the bottom-right corner.
+  output: |
+    A 6x6 grid that appears to be a symmetrical expansion of the input. The central 2x2 area is filled with green (3). This green core is surrounded by a frame-like structure. The top and bottom rows mirror each other, as do the leftmost and rightmost columns. Each corner contains a red (2) square. Adjacent to each corner is a yellow (4) square, forming a partial frame around the green core. The remaining spaces are filled with black (0), creating a symmetrical pattern.
+
+example_1:
+  input: |
+    A 4x4 grid with a distinctive pattern. The left column starts with black (0) at the top, followed by three yellow (4) squares. The second column is entirely magenta (6). The third column alternates between black (0) and green (3), starting with black. The rightmost column has green (3) in the second row, with the rest being black (0).
+  output: |
+    An 8x8 grid that appears to be a symmetrical expansion of the input. The central 4x4 area closely resembles the input grid, but with some modifications. The magenta (6) column from the input is now two columns wide in the center. The yellow (4) and green (3) elements form a frame-like structure around this magenta core. The corners of the grid are black (0), and there's a symmetrical pattern of green (3) squares forming a partial outer frame. The overall effect is a balanced, mirror-image expansion of the original pattern in both horizontal and vertical directions.
+
+test_case_0:
+  input: |
+    A 4x4 grid with a distinctive pattern. The left column starts with black (0) at the top, followed by three yellow (4) squares. The second column is entirely magenta (6). The third column alternates between black (0) and green (3), starting with black. The rightmost column has green (3) in the second row, with the rest being black (0).
+  output: |
+    Not provided in the test case.

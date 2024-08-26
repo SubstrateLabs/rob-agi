@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 23x19 grid with a large blue (1) rectangular shape in the top-left quadrant. The shape has a border of blue and is filled with various colors. There's a red (2) dot in the top-left corner of the blue shape, a yellow (4) dot in the top-right corner, and a green (3) dot in the bottom-left corner. Inside the blue shape is a sky blue (8) pattern resembling a stick figure or abstract shape. The rest of the grid is filled with black (0), representing empty space. There are three isolated colored dots at the bottom of the grid: green (3), yellow (4), and red (2).
+  output: |
+    A 10x10 grid that appears to be a cropped and centered version of the blue shape from the input. The blue (1) border remains intact. The red (2), yellow (4), and green (3) dots are now positioned in the corners: red in bottom-right, yellow in top-right, and green in top-left. The sky blue (8) pattern is preserved and centered within the blue border.
+
+example_1:
+  input: |
+    A 22x21 grid with a blue (1) rectangular shape in the top-right quadrant. The shape has a blue border and is filled with various colors. There's a yellow (4) dot in the top-left corner of the blue shape, and a gray (5) dot in the bottom-left corner. Inside the blue shape is a red (2) pattern forming a 'T' shape. The rest of the grid is black (0), representing empty space. There are three isolated colored dots at the bottom of the grid: yellow (4), gray (5), and sky blue (8).
+  output: |
+    A 9x9 grid that appears to be a cropped and centered version of the blue shape from the input. The blue (1) border remains intact. The yellow (4) and gray (5) dots are now positioned in the corners: yellow in top-left and gray in bottom-left. The red (2) 'T' shape is preserved and centered within the blue border. A new sky blue (8) dot appears in the top-right corner.
+
+example_2:
+  input: |
+    A 22x25 grid with a blue (1) rectangular shape in the middle-left area. The shape has a blue border and is filled with various colors. There's a red (2) dot in the top-left corner of the blue shape, a green (3) dot in the top-right corner, and a yellow (4) dot in the bottom-right corner. Inside the blue shape is a gray (5) pattern forming a vertical line slightly off-center to the right. The rest of the grid is black (0), representing empty space. There are four isolated colored dots outside the blue shape: yellow (4), red (2), green (3), and another yellow (4).
+  output: |
+    A 12x10 grid that appears to be a cropped and centered version of the blue shape from the input. The blue (1) border remains intact. The red (2), green (3), and yellow (4) dots are now positioned in the corners: red in top-left, green in top-right, and yellow in bottom-right. The gray (5) vertical line pattern is preserved and remains slightly off-center to the right within the blue border.
+
+test_case_0:
+  input: |
+    A 23x19 grid with a large blue (1) rectangular shape in the top-left quadrant. The shape has a border of blue and is filled with various colors. There's a red (2) dot in the top-left corner of the blue shape, a yellow (4) dot in the top-right corner, and a green (3) dot in the bottom-left corner. Inside the blue shape is a sky blue (8) pattern resembling a stick figure or abstract shape. The rest of the grid is filled with black (0), representing empty space. There are three isolated colored dots at the bottom of the grid: green (3), yellow (4), and red (2).
+  output: |
+    Not provided in the test case.

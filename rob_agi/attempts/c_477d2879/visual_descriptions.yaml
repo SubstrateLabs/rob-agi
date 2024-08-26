@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The input grid shows a complex shape resembling a stylized letter 'B' or a butterfly. The shape is primarily composed of blue (1) pixels, with a single red (2) pixel near the center-left and a single sky blue (8) pixel slightly right of center. There's also an isolated green (3) pixel in the top-right quadrant. The rest of the grid is filled with black (0), which can be interpreted as empty space.
+  output: |
+    The output grid shows an expanded and filled version of the input shape. The blue shape has been filled in entirely with blue (2) pixels. The areas around and inside the 'B' shape are now filled with green (3), extending to the edges of the grid. The red pixel from the input has expanded to fill a small area, replacing some of the blue. The sky blue pixel has expanded significantly, filling much of the interior of the 'B' shape. Black pixels no longer exist in the output.
+
+example_1:
+  input: |
+    The input grid shows a complex network of blue (1) lines forming various shapes and connections. There are isolated pixels of different colors: red (2) in the top-left, green (3) near the top-left, sky blue (8) and magenta (6) in the right half, orange (7) in the bottom-left, and yellow (4) near the bottom. The rest of the grid is filled with black (0).
+  output: |
+    The output grid shows a dramatic transformation where each color has expanded to fill adjacent areas. The top-left is dominated by red (2), transitioning to green (3) and then blue (3) moving right and down. The right side is largely filled with sky blue (8), with some magenta (6) areas. The bottom-left corner is filled with orange (7). Yellow (4) has expanded to fill the bottom-right corner. The original blue lines have mostly been overtaken by other colors, only remaining in areas where they were most concentrated in the input.
+
+example_2:
+  input: |
+    The input grid shows a complex pattern of blue (1) lines forming various shapes and connections. There are isolated pixels of different colors: brown (9) in the top-left, magenta (6) near the top-left, sky blue (8) in the left-center, green (3) slightly right of center, red (2) near the bottom, and orange (7) in the bottom-left corner. The rest of the grid is filled with black (0).
+  output: |
+    The output grid shows a dramatic transformation where each color has expanded to fill adjacent areas. The top-left corner is brown (9), transitioning to magenta (6) below it. A large portion of the grid is filled with sky blue (8), especially on the right side and bottom. Green (3) has expanded to fill a significant area in the center-left. Red (2) has grown to fill the bottom-center area. Orange (7) has expanded from the bottom-left corner. The original blue lines have mostly been overtaken by other colors, only remaining in a few small areas where they were most concentrated in the input.
+
+test_case_0:
+  input: |
+    This test case is not provided in the given code snippet. There are only three examples (example_0, example_1, and example_2) and no separate test cases.
+  output: |
+    As there is no separate test case provided, there is no output to describe.

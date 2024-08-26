@@ -2,33 +2,34 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_90347967(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by rotating it 90 degrees clockwise and moving non-black cells to the top-right corner.
+    Transforms the input grid by moving non-black cells to the top-right corner and rotating them 90 degrees clockwise.
     
-    1. Scans the input grid from left to right, bottom to top.
-    2. Creates new columns (which will become rows after rotation) preserving the order of non-zero elements.
-    3. Pads shorter columns with zeros at the beginning to ensure right alignment.
-    4. Transposes the resulting grid to complete the 90-degree clockwise rotation.
+    1. Collects all non-black cells from the input grid.
+    2. Sorts the collected cells based on their original position (bottom to top, left to right).
+    3. Creates a new grid with the same dimensions as the input.
+    4. Places the sorted non-black cells in the top-right corner of the new grid, rotated 90 degrees clockwise.
+    5. Fills the rest of the new grid with black (0) cells.
     """
     rows, cols = input_grid.get_dimensions()
-    new_columns = []
+    non_black_cells = []
 
-    # Scan and create new columns
-    for col in range(cols):
-        new_column = [input_grid.values[row][col] for row in range(rows-1, -1, -1) if input_grid.values[row][col] != 0]
-        if new_column:
-            new_columns.append(new_column)
+    # Collect non-black cells
+    for row in range(rows-1, -1, -1):
+        for col in range(cols):
+            if input_grid.values[row][col] != 0:
+                non_black_cells.append((row, col, input_grid.values[row][col]))
 
-    # Find the maximum length of new columns
-    max_length = max(len(col) for col in new_columns) if new_columns else 0
+    # Sort cells based on their original position
+    non_black_cells.sort(key=lambda x: (x[1], -x[0]))
 
-    # Pad shorter columns with zeros at the beginning
-    padded_columns = [([0] * (max_length - len(col))) + col for col in new_columns]
+    # Create a new grid filled with black cells
+    new_grid = [[0 for _ in range(cols)] for _ in range(rows)]
 
-    # Create the new grid by transposing padded_columns
-    new_grid_values = list(map(list, zip(*padded_columns)))
+    # Place non-black cells in the top-right corner, rotated 90 degrees clockwise
+    for i, (_, _, value) in enumerate(non_black_cells):
+        new_row = i // cols
+        new_col = cols - 1 - (i % cols)
+        if new_row < rows:
+            new_grid[new_row][new_col] = value
 
-    # Pad the new grid with zeros if necessary to maintain the original dimensions
-    while len(new_grid_values) < rows:
-        new_grid_values.append([0] * cols)
-    
-    return ColoredGrid(values=new_grid_values)
+    return ColoredGrid(values=new_grid)

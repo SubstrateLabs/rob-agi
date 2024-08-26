@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 4x4 grid with predominantly red (2) squares. There are three sky blue (8) squares forming an L-shape: one in the top-left corner, one in the bottom-left corner, and one in the third row, third column. The rest of the squares are red.
+  output: |
+    A 4x20 grid that appears to be an expanded version of the input. The pattern from the input is repeated five times horizontally. The red background and the L-shaped sky blue pattern are maintained in each repetition. The repetitions are seamless, creating a continuous pattern across the wider grid.
+
+example_1:
+  input: |
+    A 4x4 grid with a mix of colors. The top row alternates between brown (9), gray (5), blue (1), and gray (5). The second row has blue (1), gray (5), brown (9), and blue (1). The third row starts with brown (9), then blue (1), and ends with two gray (5) squares. The bottom row has three gray (5) squares followed by a blue (1) square.
+  output: |
+    A 4x20 grid that is an expanded version of the input. The pattern from the 4x4 input is repeated five times horizontally. Each color maintains its position relative to the original pattern, creating a seamless, continuous design across the wider grid. The alternating colors and the specific arrangements in each row are preserved throughout the expansion.
+
+example_2:
+  input: |
+    A 4x4 grid with a diverse color pattern. The top row has gray (5), gray (5), red (2), gray (5). The second row alternates between red (2) and green (3). The third row has gray (5), red (2), gray (5), green (3). The bottom row alternates between green (3) and gray (5), ending with red (2).
+  output: |
+    A 4x20 grid that expands the input pattern. The 4x4 input is repeated five times horizontally, maintaining the exact color arrangement of the original. This creates a wider grid where each row's color pattern is consistently repeated. The diverse color mix and the specific positioning of colors in the original are preserved across the expanded grid.
+
+example_3:
+  input: |
+    A 4x4 grid with a pattern of yellows (4), blues (1), and oranges (7). The top row alternates yellow (4), blue (1), blue (1), yellow (4). The second row is mostly orange (7) with a yellow (4) in the third column. The third row has blue (1), yellow (4), and two blue (1) squares. The bottom row starts with yellow (4) and has three blue (1) squares.
+  output: |
+    A 4x20 grid that extends the input pattern. The original 4x4 pattern is repeated five times horizontally. This creates a wider grid where the specific arrangement of yellows, blues, and oranges from the input is maintained and repeated. The alternating patterns in each row and the positioning of the different colors are consistently preserved across the expanded grid.

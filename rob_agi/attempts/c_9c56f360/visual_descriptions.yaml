@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 7x6 grid with mostly black (0) and sky blue (8) squares. There's a distinct pattern of sky blue squares scattered throughout the grid. In the bottom right corner, there's a 2x2 square of green (3) squares. The sky blue squares form a loose, irregular pattern across the grid, with some clustering but no clear shape.
+  output: |
+    The grid maintains its 7x6 size and most of the sky blue (8) and black (0) pattern. The key difference is the 2x2 green (3) square has moved from the bottom right corner to the middle of the grid, now occupying rows 4-5 and columns 0-1. The surrounding pattern of sky blue squares remains largely unchanged.
+
+example_1:
+  input: |
+    An 8x7 grid dominated by black (0) and sky blue (8) squares. There's a vertical line of four green (3) squares on the rightmost column. The sky blue squares form an irregular pattern across the grid, with some clustering but no clear shape. There are more sky blue squares in the upper half of the grid.
+  output: |
+    The grid maintains its 8x7 size and most of the sky blue (8) and black (0) pattern. The key change is in the green (3) squares. Instead of a vertical line on the right, they now form a broken diagonal line from the top-right to the middle-left of the grid. The surrounding pattern of sky blue squares remains largely unchanged.
+
+example_2:
+  input: |
+    A 9x8 grid with a mix of black (0), sky blue (8), and green (3) squares. There's a 3x2 rectangle of green squares in the top-right corner. Sky blue squares form an irregular pattern across the grid, with some clustering but no clear shape. There's a higher concentration of sky blue squares in the left half and bottom of the grid.
+  output: |
+    The grid maintains its 9x8 size and most of the sky blue (8) and black (0) pattern. The key change is in the green (3) squares. The 3x2 rectangle in the top-right has been broken up and redistributed. Now there are three 2x2 squares of green: one in the middle-right, one in the middle-left, and one in the bottom-left. The surrounding pattern of sky blue squares remains largely unchanged.
+
+test_case_0:
+  input: |
+    A 9x8 grid with a mix of black (0), sky blue (8), and green (3) squares. There's a 3x2 rectangle of green squares in the top-right corner. Sky blue squares form an irregular pattern across the grid, with some clustering but no clear shape. There's a higher concentration of sky blue squares in the left half and bottom of the grid.
+  output: |
+    The output grid is not provided for this test case.

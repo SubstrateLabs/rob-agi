@@ -1,0 +1,28 @@
+example_0:
+  input: |
+    The grid is 30x30. There's a large, complex blue (1) shape in the center, resembling a cross or star with irregular extensions. At the top-right, there's a small 4x4 blue square. In the bottom-left quadrant, there's another complex blue shape with multiple protrusions. Near the bottom-right, there's a 3x3 square with a green (3) center. The rest of the grid is black (0).
+  output: |
+    The overall structure is maintained, but colors have changed and intensified. The central shape now has red (2) and green (3) sections, with the center being red. The top-right square is now yellow (4). The bottom-left shape has more red sections. The 3x3 square near the bottom-right is now entirely green (3). There's a general progression of colors from blue to red/green/yellow, with higher-value colors appearing in the centers or key points of the shapes.
+
+example_1:
+  input: |
+    The grid is 20x20. There are four distinct blue (1) shapes. In the top-left, there's a 4x4 square with a green (3) center. Top-right has a 4x4 square with a yellow (4) center. Bottom-left has a cross shape. Bottom-right has an L-shape connecting to a 3x3 square. There's also a small blue square in the center-right. The rest is black (0).
+  output: |
+    The shapes remain in the same positions, but colors have changed. The top-left square now has two green cells. The top-right square now has four yellow cells. The bottom-left cross has its center changed to green. The bottom-right L-shape and square now have red (2) centers. The small square in the center-right is now yellow. There's a progression of colors within each shape, typically intensifying towards the center.
+
+example_2:
+  input: |
+    The grid is 18x18. There are several blue (1) shapes. Top-center has two 4x4 squares connected. Right-center has a 3x3 square. Bottom-left has a 4x4 square. Bottom-center has a large irregular shape. There are yellow (4) and green (3) single cells within some blue shapes. The bottom-right has a magenta (6) cell within a blue square. The rest is black (0).
+  output: |
+    The shapes remain in the same positions, but colors have changed and intensified. The top-center squares now have yellow centers. The right-center square has a green center. The bottom-left square now has a magenta center. The large irregular shape in the bottom-center now has multiple magenta cells. The single colored cells within the blue shapes have expanded to fill more of their containing shapes. There's a clear progression of colors, with higher-value colors (yellow, green, magenta) expanding within the blue shapes.
+
+test_case_0:
+  input: |
+    The grid is 18x18. There are several blue (1) shapes. Top-left has a 4x4 square. Top-right has an irregular shape with a protrusion. Center-left has a cross shape. Bottom-center has a large irregular shape spanning most of the bottom half. There are yellow (4) and green (3) single cells within some blue shapes. The bottom-right corner of the large shape has a magenta (6) cell. The rest is black (0).
+  output: |
+    As this is a test case, we don't have the actual output to describe. Based on the pattern observed in the examples, we might expect:
+    - The shapes to remain in the same positions
+    - Colors to change and intensify, especially towards the centers of shapes
+    - Single colored cells (yellow, green, magenta) to expand within their blue containers
+    - A progression of colors, with higher-value colors taking more prominence in key areas of the shapes
+    - The overall structure to be maintained, but with a more complex and colorful interior

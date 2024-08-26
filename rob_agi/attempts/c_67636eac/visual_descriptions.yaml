@@ -1,0 +1,39 @@
+example_0:
+  input: |
+    A 17x13 grid with mostly black (0) background. There are three distinct shapes:
+    1. A red (2) cross-like shape in the top-left, centered around (2,2).
+    2. A green (3) cross-like shape in the middle-left, centered around (6,5).
+    3. A sky blue (8) cross-like shape in the top-right, centered around (3,14).
+    Each shape consists of a central cell surrounded by four adjacent cells in the cardinal directions.
+  output: |
+    A 3x9 grid containing three cross-like shapes side by side:
+    1. A red (2) cross on the left.
+    2. A green (3) cross in the middle.
+    3. A sky blue (8) cross on the right.
+    Each cross is separated by a column of black (0) cells.
+
+example_1:
+  input: |
+    A 16x10 grid with mostly black (0) background. There are three distinct diamond shapes:
+    1. A green (3) diamond near the top, centered around (2,3).
+    2. A blue (1) diamond in the middle, centered around (7,4).
+    3. A sky blue (8) diamond near the bottom, centered around (12,5).
+    Each diamond consists of a central cell surrounded by four cells in diagonal directions.
+  output: |
+    A 9x3 grid containing three diamond shapes stacked vertically:
+    1. A green (3) diamond at the top.
+    2. A blue (1) diamond in the middle.
+    3. A sky blue (8) diamond at the bottom.
+    Each diamond is separated by a row of black (0) cells.
+
+example_2:
+  input: |
+    A 12x10 grid with mostly black (0) background. There are two distinct X-shaped patterns:
+    1. A red (2) X-shape in the top-left, centered around (2,3).
+    2. A blue (1) X-shape in the bottom-left, centered around (7,2).
+    Each X-shape consists of a central cell surrounded by four cells in diagonal directions, forming an X.
+  output: |
+    A 6x3 grid containing two X-shaped patterns stacked vertically:
+    1. A red (2) X-shape at the top.
+    2. A blue (1) X-shape at the bottom.
+    The X-shapes are directly adjacent to each other vertically, with no separating black cells.

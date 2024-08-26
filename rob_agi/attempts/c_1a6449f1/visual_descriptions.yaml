@@ -1,0 +1,57 @@
+example_0:
+  input: |
+    The input grid is 19x13 in size. The most prominent feature is a large, inverted L-shaped structure made of sky blue (8) that runs along the top and left side of the grid. This structure is 1 unit thick. Inside this L-shape, there's a diverse array of colors and patterns:
+    - In the top-left corner, there's a small cluster of various colors (5, 3, 0, 8, 0, 6).
+    - The right side of the grid has a vertical line of orange (7) squares near the bottom-right corner.
+    - There are several isolated squares of different colors scattered throughout the grid.
+    - The bottom-right quadrant has a distinct pattern: a 5x5 square outline made of orange (7), with the top-left corner missing.
+    - Inside this orange square, there are a few colored squares, including blue (1) and brown (9).
+  output: |
+    The output grid is significantly smaller, 6x7 in size. It appears to be a section extracted from the input grid:
+    - The top-left corner starts with a yellow (4) square.
+    - There's a partial sky blue (8) line running vertically on the right side.
+    - The bottom-left area contains a cluster of colors, including brown (9), blue (1), and magenta (6).
+    - The right side has a pattern of alternating colors, including orange (7) and yellow (4).
+    This output seems to be a specific region from the input grid, focusing on an area with diverse color patterns.
+
+example_1:
+  input: |
+    The input grid is 21x23 in size. The most striking feature is a thick vertical line of red (2) running down the center of the grid. This line is 3 units wide and spans the entire height of the grid. Other notable features include:
+    - On the left side of the red line, there's a pattern of horizontal lines made of brown (9) squares, spaced apart vertically.
+    - On the right side of the red line, there's a large rectangular region filled with yellow (4) squares.
+    - The bottom-right corner has a distinct L-shaped pattern made of orange (3) squares.
+    - There are various isolated colored squares scattered throughout the grid, creating a complex and diverse pattern.
+  output: |
+    The output grid is much smaller, 8x10 in size. It appears to be a section extracted from the bottom-right quadrant of the input grid:
+    - The most prominent feature is the L-shaped pattern of orange (3) squares, which was visible in the input grid's bottom-right corner.
+    - There's a cluster of magenta (6) squares in the top-left area.
+    - The right side contains a vertical line of yellow (4) squares.
+    - Various other colored squares are present, creating a diverse pattern similar to the corresponding area in the input grid.
+
+example_2:
+  input: |
+    The input grid is 22x21 in size. The most notable feature is a thick horizontal line of orange (7) running across the middle of the grid. This line is 3 units thick. Other significant elements include:
+    - A vertical line of blue (1) squares running down the left side of the grid, intersecting with the orange horizontal line.
+    - In the top-left quadrant, there's a pattern of alternating colors forming a partial frame or border.
+    - The bottom-right quadrant contains a large cluster of orange (7) squares forming an irregular shape.
+    - Various isolated colored squares are scattered throughout the grid, creating a complex overall pattern.
+  output: |
+    The output grid is much smaller, 5x5 in size. It appears to be a section extracted from the input grid:
+    - The grid contains no black (0) squares, making it fully colored.
+    - The top-left corner has a magenta (6) square.
+    - The right side contains a vertical line of yellow (4) squares.
+    - The bottom-left area has a cluster of orange (7) squares.
+    - Other colors present include blue (1), green (3), and gray (5).
+    This output seems to capture a small, densely colored region from the input grid.
+
+test_case_0:
+  input: |
+    The input grid is 22x21 in size. Notable features include:
+    - A thick horizontal line of orange (7) running across the middle of the grid, similar to example_2.
+    - A vertical line of blue (1) squares on the left side, intersecting with the orange line.
+    - In the top-left quadrant, there's a pattern of alternating colors forming a partial frame or border.
+    - The bottom-right quadrant contains a large cluster of orange (7) squares forming an irregular shape.
+    - Various isolated colored squares are scattered throughout the grid, creating a complex overall pattern.
+    This input grid appears very similar to the input grid in example_2.
+  output: |
+    The output grid is not provided for this test case, as it is meant to be solved based on the pattern identified from the previous examples.

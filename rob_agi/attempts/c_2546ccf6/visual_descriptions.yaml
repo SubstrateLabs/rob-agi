@@ -1,0 +1,44 @@
+example_0:
+  input: |
+    The grid is 19x17 in size. It's divided into three vertical sections by magenta (6) lines. These lines form four columns each, creating three equal-width sections. There are also three horizontal magenta lines dividing the grid into four rows of varying heights. The top and bottom rows are 4 cells high, while the middle two rows are 5 and 4 cells high respectively. This creates a grid of 12 rectangular sections.
+
+    In the middle section, there's a yellow (4) pattern that resembles an hourglass or butterfly shape. It's centered vertically and horizontally within its section. The top part of the shape has a solid yellow square at the top, then two diagonal lines extending down and out. The bottom part is similar but inverted, with the solid square at the bottom.
+
+    The rest of the grid is filled with black (0), which can be interpreted as empty space.
+
+  output: |
+    The output grid maintains the same overall structure as the input, with the magenta (6) lines dividing the grid into 12 sections. The key difference is in the yellow (4) pattern.
+
+    The yellow pattern in the middle section has been mirrored vertically. Now, both the top and bottom halves of the middle section contain identical yellow patterns. Each half has a solid yellow square in the center, with two diagonal lines extending outward.
+
+    The top and bottom sections of the grid remain empty (black, 0), preserving the original structure.
+
+example_1:
+  input: |
+    The grid is 18x19 in size. Similar to the previous example, it's divided into three vertical sections by red (2) lines, each section being 5 cells wide. There are also three horizontal red lines creating four rows of varying heights.
+
+    In the leftmost section, there's a green (3) pattern that resembles a stylized letter 'F' or a flag. It starts at the top with a full width (3 cells) horizontal line, then has a vertical line down the left side, with a shorter horizontal line in the middle.
+
+    In the middle section, there's a similar green pattern, but it's positioned lower, starting from the second row. It's slightly different, resembling more of an inverted 'L' shape.
+
+    In the bottom-left section, there's a blue (1) pattern. It forms a shape like an upside-down 'L' or a right angle, with the vertical part on the right side.
+
+    The rest of the grid is filled with black (0), representing empty space.
+
+  output: |
+    The output grid maintains the same overall structure with the red (2) lines dividing the grid into sections.
+
+    The green (3) pattern in the leftmost section has been mirrored vertically. Now, both the top and bottom halves of this section contain identical green patterns resembling the stylized 'F' or flag shape.
+
+    The green pattern in the middle section has also been mirrored vertically. The top half now matches the bottom half, both showing the inverted 'L' shape.
+
+    The blue (1) pattern in the bottom-left section has been mirrored vertically as well. The top-left section now contains a mirrored version of the 'L' shape, forming a shape like a 7 or an upright 'L'.
+
+    The rightmost section and the middle sections of the top and bottom rows remain empty (black, 0), preserving the original structure.
+
+test_case_0:
+  input: |
+    This grid appears to be identical to the input of example_1. It's an 18x19 grid divided into sections by red (2) lines. The green (3) and blue (1) patterns are in the same positions as described in the input of example_1.
+
+  output: |
+    As this is a test case, no output is provided. Based on the pattern observed in the previous examples, we would expect the output to mirror the patterns vertically within each section, similar to what was described in the output of example_1.

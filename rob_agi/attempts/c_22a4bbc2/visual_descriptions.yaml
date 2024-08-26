@@ -1,0 +1,94 @@
+example_0:
+  input: |
+    The grid is 15x3. There are several distinct regions:
+    1. Two 2x2 blue squares at the top left corner.
+    2. Two 2x3 sky blue rectangles below the blue squares.
+    3. Two 2x2 blue squares below the sky blue rectangles, offset to the right.
+    4. A 1x3 blue horizontal line in the middle.
+    5. Two 2x2 sky blue squares below the blue line, aligned with the left edge.
+    6. Three 3x3 blue squares at the bottom.
+    7. Two 2x3 sky blue rectangles at the very bottom.
+    The rest is filled with black (empty space).
+  output: |
+    The grid structure is identical to the input, but with these changes:
+    1. The top two 2x2 blue squares are now red.
+    2. The two 2x2 blue squares in the middle (offset to the right) are now red.
+    3. The bottom three 3x3 blue squares are now red.
+    All other elements remain unchanged.
+
+example_1:
+  input: |
+    The grid is 19x5. It contains several distinct patterns:
+    1. A 2x3 sky blue rectangle at the top center, bordered by black on both sides.
+    2. A 3x5 blue 'T' shape below the sky rectangle, with the vertical part not touching the bottom.
+    3. Two 2x4 sky blue rectangles in the middle, separated by a column of black.
+    4. A 5x1 blue horizontal line below the sky rectangles.
+    5. Two 4x2 blue rectangles below the line, separated by a column of black.
+    6. A 2x4 sky blue rectangle below and to the left of the blue rectangles.
+    7. Two 2x2 blue squares at the bottom right corner.
+    8. A 3x3 sky blue square at the bottom left corner.
+    The rest is filled with black (empty space).
+  output: |
+    The grid structure is mostly identical to the input, with these changes:
+    1. The top 2x3 sky blue rectangle is now red.
+    2. The 5x1 blue horizontal line in the middle is now red.
+    3. The 2x4 sky blue rectangle near the bottom left is now red.
+    4. The two 2x2 blue squares at the bottom right are now red.
+    All other elements remain unchanged.
+
+example_2:
+  input: |
+    The grid is 20x4. It contains several distinct patterns:
+    1. A 2x3 blue rectangle at the top left corner.
+    2. A 4x1 sky blue horizontal line below the blue rectangle.
+    3. Two 2x2 blue squares below the sky line, separated by two columns of black.
+    4. Two 2x4 sky blue rectangles in the middle, separated by four rows of black.
+    5. A 4x1 blue horizontal line between the sky rectangles.
+    6. Two 2x2 blue squares below the bottom sky rectangle, aligned with the left edge.
+    7. A 2x3 sky blue rectangle near the bottom, aligned with the right edge.
+    8. Two 2x2 blue squares at the bottom left corner.
+    9. A 4x1 sky blue horizontal line at the very bottom.
+    The rest is filled with black (empty space).
+  output: |
+    The grid structure is mostly identical to the input, with these changes:
+    1. The top 2x3 blue rectangle is now red.
+    2. The two 2x4 sky blue rectangles in the middle are now red.
+    3. The 4x1 blue horizontal line between the sky rectangles is now red.
+    4. The 2x3 sky blue rectangle near the bottom right is now red.
+    5. The bottom left 2x2 blue squares are now red.
+    All other elements remain unchanged.
+
+example_3:
+  input: |
+    The grid is 14x5. It contains several distinct patterns:
+    1. A 3x1 blue horizontal line at the top left corner.
+    2. A 4x1 sky blue horizontal line below the blue line, offset to the right by one column.
+    3. A 4x1 blue horizontal line below the sky line.
+    4. Two 2x2 sky blue squares in the middle, separated by a column of black.
+    5. Two 3x2 blue rectangles below the sky squares, separated by a column of black.
+    6. A 4x1 sky blue horizontal line below the blue rectangles.
+    7. Two 2x2 blue squares near the bottom, separated by a column of black.
+    8. Two 5x2 sky blue rectangles at the very bottom.
+    The rest is filled with black (empty space).
+  output: |
+    The grid structure is mostly identical to the input, with these changes:
+    1. The top 3x1 blue horizontal line is now red.
+    2. The two 2x2 sky blue squares in the middle are now red.
+    3. The 4x1 sky blue horizontal line below the blue rectangles is now red.
+    4. The two 2x2 blue squares near the bottom are now red.
+    All other elements remain unchanged.
+
+test_case_0:
+  input: |
+    The grid is 14x5. It contains several distinct patterns:
+    1. A 3x1 blue horizontal line at the top left corner.
+    2. A 4x1 sky blue horizontal line below the blue line, offset to the right by one column.
+    3. A 4x1 blue horizontal line below the sky line.
+    4. Two 2x2 sky blue squares in the middle, separated by a column of black.
+    5. Two 3x2 blue rectangles below the sky squares, separated by a column of black.
+    6. A 4x1 sky blue horizontal line below the blue rectangles.
+    7. Two 2x2 blue squares near the bottom, separated by a column of black.
+    8. Two 5x2 sky blue rectangles at the very bottom.
+    The rest is filled with black (empty space).
+  output: |
+    The output grid is not provided for this test case.

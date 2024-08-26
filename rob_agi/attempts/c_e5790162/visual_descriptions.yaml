@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 6x6 grid mostly filled with black (empty) squares. There is a single green square (3) in the top-left corner of the third row. There is also a single magenta square (6) in the middle of the third row, three squares to the right of the green square.
+  output: |
+    The same 6x6 grid, but now with a green path connecting the original green square to the magenta square. The path extends horizontally from the green square to the magenta square, then continues vertically downward to the bottom edge of the grid. The path forms an inverted "L" shape.
+
+example_1:
+  input: |
+    An 8x6 grid mostly filled with black (empty) squares. There is a single green square (3) at the left edge of the fourth row. A magenta square (6) is located two squares to the right of the green square in the same row. There is also a sky blue square (8) in the middle of the seventh row.
+  output: |
+    The same 8x6 grid, but now with a green path connecting all colored squares. The path starts at the original green square, extends horizontally to the magenta square, then continues vertically down to the sky blue square. After reaching the sky blue square, the path extends horizontally to the right edge of the grid.
+
+example_2:
+  input: |
+    An 8x8 grid mostly filled with black (empty) squares. There is a single green square (3) at the left edge of the third row. A magenta square (6) is located in the middle of the same row, three squares to the right of the green square. Another magenta square (6) is at the right edge of the fifth row. A sky blue square (8) is in the middle of the sixth row.
+  output: |
+    The same 8x8 grid, but now with a green path connecting all colored squares. The path starts at the original green square, extends horizontally to the first magenta square, then goes vertically down two rows and horizontally right to the second magenta square. From there, it moves vertically down one row to connect with the sky blue square. After reaching the sky blue square, the path extends vertically down to the bottom edge of the grid.
+
+example_3:
+  input: |
+    A 6x6 grid mostly filled with black (empty) squares. There is a single green square (3) at the left edge of the third row. A sky blue square (8) is located at the right edge of the same row.
+  output: |
+    The same 6x6 grid, but now with a green path connecting the green and sky blue squares. The path starts at the original green square and extends horizontally across the entire third row to the sky blue square. Additionally, the path extends vertically upward from the middle of the horizontal line, reaching the top edge of the grid.
+
+example_4:
+  input: |
+    A 9x8 grid mostly filled with black (empty) squares. There is a magenta square (6) in the top row, third column from the left. A sky blue square (8) is in the second row, third column from the right. Another sky blue square (8) is in the fifth row, fourth column from the left. A green square (3) is at the left edge of the fifth row.
+  output: |
+    The same 9x8 grid, but now with a green path connecting all colored squares. The path starts at the green square in the fifth row, extends horizontally right to the sky blue square in the same row, then moves vertically up to the second row. It then extends horizontally right to the sky blue square in that row, and finally moves vertically up to connect with the magenta square in the top row. The path forms a shape resembling an inverted and backwards "F".

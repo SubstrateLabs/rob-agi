@@ -1,0 +1,48 @@
+example_0:
+  input: |
+    A 10x13 grid with several colored shapes scattered across it. The shapes are:
+    - A small red (2) L-shape in the top-left corner
+    - A 2x2 gray (5) square in the upper-right quadrant
+    - A small green (3) L-shape in the middle-left area
+    - Two magenta (6) squares side by side in the bottom-left area
+    - A single sky blue (8) square to the right of the magenta squares
+    The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The same 10x13 grid, but all the colored shapes have been moved to the right side of the grid. Their vertical positions and relative arrangements remain the same:
+    - The red L-shape is now in the top-right corner
+    - The gray square is directly below the red shape
+    - The green L-shape is below the gray square
+    - The magenta squares and sky blue square are at the bottom-right
+    The left side of the grid is now entirely filled with black (0), empty space.
+
+example_1:
+  input: |
+    A 6x6 grid with several colored shapes:
+    - A vertical green (3) line of two squares at the top-left
+    - A red (2) shape forming an inverted L in the right half
+    - Two sky blue (8) squares: one in the middle-left, one in the bottom-left
+    - A horizontal magenta (6) line of three squares at the bottom
+    The rest is black (0) empty space.
+  output: |
+    The same 6x6 grid, but all colored shapes have been moved to the right side:
+    - The green vertical line is now at the top-right
+    - The red inverted L shape remains in the right half but is pushed further right
+    - The two sky blue squares are now in the middle-right and bottom-right
+    - The magenta horizontal line is now at the bottom-right
+    The left side of the grid is now entirely black (0) empty space.
+
+example_2:
+  input: |
+    A 6x6 grid with several colored shapes:
+    - A red (2) shape forming an inverted L in the top-left corner
+    - Two magenta (6) squares vertically aligned on the left edge
+    - Two sky blue (8) squares: one in the middle, one at the bottom-left
+    - A small green (3) vertical line of two squares in the bottom-right quadrant
+    The rest is black (0) empty space.
+  output: |
+    The same 6x6 grid, but all colored shapes have been moved to the right side:
+    - The red inverted L shape is now in the top-right corner
+    - The two magenta squares are vertically aligned on the right edge
+    - One sky blue square is in the middle-right, the other at the bottom-right
+    - The green vertical line remains in the bottom-right quadrant but is pushed to the right edge
+    The left side of the grid is now entirely black (0) empty space.

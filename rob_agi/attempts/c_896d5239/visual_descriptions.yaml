@@ -1,0 +1,28 @@
+example_0:
+  input: |
+    A 13x12 grid with a mix of black (0), blue (1), and green (3) squares. The green squares are sparsely distributed, appearing in 7 locations: (2,4), (3,3), (3,5), (4,2), (4,6), (9,5), (9,6), (10,3), and (11,2). Blue squares form irregular patterns throughout the grid. Black squares fill the remaining spaces, creating a somewhat random appearance.
+  output: |
+    The grid maintains its 13x12 size and preserves the original positions of blue (1) and green (3) squares. The significant change is the addition of sky blue (8) squares forming rectangles. These rectangles are bounded by green squares at their corners. The largest sky blue rectangle is 6x6, located in the bottom right corner. Two smaller sky blue rectangles appear: a 3x3 in the top left quadrant and a 2x2 in the middle right area. The rest of the grid remains unchanged from the input.
+
+example_1:
+  input: |
+    A 15x12 grid primarily composed of black (0), blue (1), and green (3) squares. Green squares are scattered throughout, appearing in 8 locations. Blue squares form irregular patterns and clusters. The overall appearance is busy and somewhat random, with no clear geometric shapes or patterns evident.
+  output: |
+    The 15x12 grid maintains the original positions of blue (1) and green (3) squares. The key change is the introduction of sky blue (8) squares forming rectangles bounded by green squares at the corners. Three distinct sky blue rectangles are visible: a 4x2 rectangle in the upper right quadrant, a 3x3 rectangle in the middle left area, and a 3x4 rectangle in the bottom left corner. The rest of the grid remains unchanged from the input.
+
+example_2:
+  input: |
+    A 15x16 grid with a mix of black (0), blue (1), and green (3) squares. Green squares are dispersed throughout the grid, appearing in about 10 locations. Blue squares form irregular patterns and clusters. The overall appearance is busy and somewhat random, with no clear geometric shapes or patterns evident.
+  output: |
+    The 15x16 grid preserves the original positions of blue (1) and green (3) squares. The significant change is the addition of sky blue (8) squares forming rectangles bounded by green squares at the corners. Several sky blue rectangles are visible:
+    1. A 4x4 rectangle in the top left quadrant
+    2. A 5x2 rectangle in the middle right area
+    3. A 3x6 rectangle spanning the bottom right corner
+    4. Two overlapping rectangles in the bottom left: a 3x3 and a 2x4
+    The rest of the grid remains unchanged from the input.
+
+test_case_0:
+  input: |
+    This is the same as example_2, as there are no additional test cases provided in the given test file.
+  output: |
+    This is the same as the output description for example_2, as there are no additional test cases provided in the given test file.

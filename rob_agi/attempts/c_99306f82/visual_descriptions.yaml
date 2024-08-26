@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 10x10 grid with a blue (1) rectangular outline near the center. The outline is 6x6 squares, starting at position (2,2) and ending at (7,7). The interior of this blue rectangle is empty (black, 0). There's a single green (3) square in the top-left corner at (0,0), and a single red (2) square at (1,1). The rest of the grid is empty (black, 0).
+  output: |
+    The same 10x10 grid with the blue (1) rectangular outline unchanged. The interior of the blue rectangle is now filled with a pattern. The outermost layer inside the blue outline is filled with green (3). Inside that is a 2x2 square of red (2) at the center. The single green and red squares in the top-left corner remain unchanged. The rest of the grid outside the blue rectangle is still empty (black, 0).
+
+example_1:
+  input: |
+    A 15x15 grid with a larger blue (1) rectangular outline. The blue rectangle starts at (3,3) and ends at (11,11), making it 9x9 squares. The interior of this blue rectangle is empty (black, 0). In the top-left corner, there's a diagonal line of colored squares: red (2) at (0,0), magenta (6) at (1,1), and yellow (4) at (2,2). The rest of the grid is empty (black, 0).
+  output: |
+    The same 15x15 grid with the blue (1) rectangular outline unchanged. The interior of the blue rectangle is now filled with a concentric pattern of colors matching the diagonal in the top-left corner. The outermost layer inside the blue outline is filled with red (2). Inside that is a layer of magenta (6). The innermost 3x3 square is filled with yellow (4). The diagonal line of colored squares in the top-left corner remains unchanged. The rest of the grid outside the blue rectangle is still empty (black, 0).
+
+example_2:
+  input: |
+    A 15x15 grid with a blue (1) rectangular outline slightly off-center. The blue rectangle starts at (4,4) and ends at (13,13), making it 10x10 squares. The interior of this blue rectangle is empty (black, 0). In the top-left corner, there's a diagonal line of colored squares extending further: sky (8) at (0,0), magenta (6) at (1,1), yellow (4) at (2,2), and red (2) at (3,3). The rest of the grid is empty (black, 0).
+  output: |
+    The same 15x15 grid with the blue (1) rectangular outline unchanged. The interior of the blue rectangle is now filled with a concentric pattern of colors matching the diagonal in the top-left corner. The outermost layer inside the blue outline is filled with sky (8). Inside that is a layer of magenta (6). Then a layer of yellow (4). The innermost 2x2 square is filled with red (2). The diagonal line of colored squares in the top-left corner remains unchanged. The rest of the grid outside the blue rectangle is still empty (black, 0).

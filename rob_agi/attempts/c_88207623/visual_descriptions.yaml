@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The grid contains two distinct yellow shapes with red borders. The larger shape is in the top-left quadrant, resembling an irregular polygon or blob. The smaller shape is in the bottom-right quadrant, looking like a small, irregular cluster. There's a single sky blue pixel (8) near the top-right of the larger shape. A single green pixel (3) is located to the right of the smaller shape. The rest of the grid is filled with black (0), representing empty space.
+  output: |
+    The two yellow shapes with red borders remain unchanged. The sky blue pixel near the larger shape has expanded, forming a border around the top, right, and bottom of the shape. Similarly, the green pixel near the smaller shape has expanded, partially surrounding it on the right and bottom sides. The expansions of both colors stop at the grid edges or when encountering other colored pixels. The black space between and around the shapes has been partially filled by these color expansions.
+
+example_1:
+  input: |
+    The grid contains two distinct yellow shapes with red borders. The larger shape is in the top-right quadrant, resembling an irregular polygon. The smaller shape is in the bottom-left quadrant, also irregular. There's a single gray pixel (5) near the left side of the larger shape. A single orange pixel (7) is located to the right of the smaller shape. The rest of the grid is filled with black (0), representing empty space.
+  output: |
+    The two yellow shapes with red borders remain unchanged. The gray pixel near the larger shape has expanded, forming a partial border around the left and top sides of the shape. Similarly, the orange pixel near the smaller shape has expanded, surrounding it on the right and bottom sides, and partially on the top. The expansions of both colors stop at the grid edges or when encountering other colored pixels. The black space between and around the shapes has been partially filled by these color expansions.
+
+test_case_0:
+  input: |
+    This test case is not provided in the given code snippet. There are only two examples (example_0 and example_1) in the test file, and no separate test cases.
+  output: |
+    As there is no test case provided in the given code, there is no output to describe.

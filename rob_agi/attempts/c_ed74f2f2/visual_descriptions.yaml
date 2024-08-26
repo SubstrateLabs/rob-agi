@@ -1,0 +1,35 @@
+example_0:
+  input: |
+    A 5x9 grid with a gray (5) shape resembling an inverted 'U' or horseshoe. The shape is positioned in the center of the grid, surrounded by black (0) space. The left and right arms of the 'U' are three cells tall, while the bottom connecting part is one cell wide. There's a one-cell gap in the bottom-right corner of the 'U'.
+  output: |
+    A 3x3 grid with a red (2) outline of a square. The outline is complete on three sides (top, left, and right), but the bottom-right corner is black (0), creating a small gap in the square outline.
+
+example_1:
+  input: |
+    A 5x9 grid with a gray (5) shape that looks like two separate 'L' shapes. The left 'L' is inverted and the right 'L' is rotated 90 degrees clockwise. These shapes are surrounded by black (0) space. There's a one-cell gap between the two 'L' shapes in the middle of the grid.
+  output: |
+    A 3x3 grid with a green (3) shape that resembles an inverted 'U' or horseshoe. The shape occupies the entire left side and top of the grid, with the bottom-right cell being black (0).
+
+example_2:
+  input: |
+    A 5x9 grid with a gray (5) shape that looks like two separate figures. On the left, there's an inverted 'U' shape. On the right, there's an 'L' shape rotated 90 degrees clockwise. These shapes are surrounded by black (0) space and are separated by a one-cell gap in the middle of the grid.
+  output: |
+    A 3x3 grid with a blue (1) shape that forms an incomplete square. The square is missing its center cell and the bottom-right corner. The remaining five blue cells form an 'L' shape on the left and top, and an inverted 'L' shape on the right.
+
+example_3:
+  input: |
+    A 5x9 grid with a gray (5) shape that resembles an inverted 'U' on the left side, connected to an 'F' shape on the right side. The shapes are surrounded by black (0) space. The bottom of the 'F' shape extends one cell further down than the 'U' shape.
+  output: |
+    A 3x3 grid with a blue (1) shape forming an almost complete square. Only the bottom-right corner is black (0), while the rest of the cells, including the center, are blue.
+
+example_4:
+  input: |
+    A 5x9 grid with a gray (5) shape that looks like two separate 'L' shapes. The left 'L' is inverted, while the right 'L' is in its standard orientation. These shapes are surrounded by black (0) space and are separated by a one-cell gap in the middle of the grid.
+  output: |
+    A 3x3 grid with a red (2) shape that forms an incomplete square. The square is missing its bottom-right corner and the middle cell of its right side. The remaining five red cells form an inverted 'U' shape with an extra cell attached to the bottom-right.
+
+example_5:
+  input: |
+    A 5x9 grid with a gray (5) shape that resembles two disconnected figures. On the left, there's an inverted 'L' shape. On the right, there's another 'L' shape rotated 90 degrees counterclockwise. These shapes are surrounded by black (0) space and are separated by a one-cell gap in the middle of the grid.
+  output: |
+    A 3x3 grid with a red (2) shape forming three disconnected cells. Two red cells are in the top-left and bottom-left corners, forming a vertical line on the left side. The third red cell is in the middle of the right side. The remaining cells are black (0).

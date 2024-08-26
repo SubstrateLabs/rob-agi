@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 6x9 grid with a distinct vertical blue line (color 1) in the 5th column. To the left of this line is a pattern of yellow (4) and black (0) squares. The yellow squares form a rough L-shape along the left and top edges. To the right of the blue line, the grid is mostly black with a few scattered yellow squares.
+  output: |
+    A 6x4 grid composed entirely of sky blue (8) and black (0) squares. The sky blue squares form a distinct pattern that resembles the yellow pattern from the input, but more compact and shifted slightly. The black squares appear where there were gaps in the yellow pattern of the input.
+
+example_1:
+  input: |
+    A 6x9 grid with a vertical blue line (color 1) in the 5th column. To the left of this line is a mix of yellow (4) and black (0) squares, with yellow being more prevalent. To the right of the blue line, there's a mix of yellow and black squares, with black being more common.
+  output: |
+    A 6x4 grid composed of sky blue (8) and black (0) squares. The sky blue squares form a dominant pattern, occupying most of the grid. There are a few black squares scattered throughout, mostly on the left side and top-right corner.
+
+example_2:
+  input: |
+    A 6x9 grid with a vertical blue line (color 1) in the 5th column. Both sides of the blue line contain a mix of yellow (4) and black (0) squares, with yellow being more prevalent overall. The yellow squares form various patterns and clusters throughout the grid.
+  output: |
+    A 6x4 grid composed entirely of sky blue (8) and black (0) squares. The sky blue squares form the dominant pattern, covering most of the grid. There are a few black squares scattered throughout, forming small gaps in the sky blue pattern.
+
+example_3:
+  input: |
+    A 6x9 grid with a vertical blue line (color 1) in the 5th column. To the left of this line, there's a mix of yellow (4) and black (0) squares, with yellow forming distinct patterns. To the right of the blue line, there's also a mix of yellow and black, but with more black squares present.
+  output: |
+    A 6x4 grid composed of sky blue (8) and black (0) squares. The sky blue squares form the dominant pattern, covering most of the grid. There are a few black squares scattered throughout, mostly on the left side and in the middle-right area.
+
+example_4:
+  input: |
+    A 6x9 grid with a vertical blue line (color 1) in the 5th column. Both sides of the blue line contain a mix of yellow (4) and black (0) squares. The yellow squares form various patterns and clusters throughout the grid, with some areas having more concentration of yellow than others.
+  output: |
+    A 6x4 grid composed of sky blue (8) and black (0) squares. The sky blue squares form the dominant pattern, covering most of the grid. There are a few black squares scattered throughout, mostly on the left side and top-right corner.

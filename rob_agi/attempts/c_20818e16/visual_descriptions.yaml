@@ -1,0 +1,43 @@
+example_0:
+  input: |
+    A 14x14 grid with a yellow (4) background. There are three distinct shapes:
+    1. A red (2) rectangular shape in the top-left, 6x3 in size.
+    2. A blue (1) L-shaped object in the middle-right, 5x5 in size.
+    3. A green (3) small rectangle in the bottom-left, 4x2 in size.
+    The shapes are surrounded by the yellow background, not touching each other.
+  output: |
+    A compact 6x8 grid containing the same three shapes from the input, rearranged:
+    1. The green (3) rectangle is now in the top-left corner.
+    2. The blue (1) L-shape is directly below the green rectangle.
+    3. The red (2) rectangle fills the entire right side of the grid.
+    There is no yellow background visible.
+
+example_1:
+  input: |
+    A 16x15 grid with a sky blue (8) background. Three distinct shapes are present:
+    1. A large red (2) rectangle on the right side, 9x5 in size.
+    2. A green (3) rectangle in the middle-left, 6x6 in size.
+    3. A small gray (5) square in the bottom-right, 2x2 in size.
+    The shapes are surrounded by the sky blue background, not touching each other.
+  output: |
+    A compact 6x9 grid containing the same three shapes from the input, rearranged:
+    1. The gray (5) square is now in the top-left corner.
+    2. The green (3) rectangle fills the left side of the grid below the gray square.
+    3. The red (2) rectangle occupies the entire right side of the grid.
+    There is no sky blue background visible.
+
+example_2:
+  input: |
+    A 15x15 grid with a black (0) background. Four distinct shapes are present:
+    1. A yellow (4) rectangle in the top-left, 5x3 in size.
+    2. A large magenta (6) rectangle in the center-right, 8x9 in size.
+    3. A green (3) square in the bottom-left, 4x4 in size.
+    4. A small sky blue (8) rectangle in the top-right, 2x1 in size.
+    The shapes are surrounded by the black background, not touching each other.
+  output: |
+    A compact 8x8 grid containing the same four shapes from the input, rearranged:
+    1. The sky blue (8) rectangle is now in the top-left corner.
+    2. The green (3) square is directly below the sky blue rectangle.
+    3. The yellow (4) rectangle is below the green square.
+    4. The magenta (6) rectangle fills the entire right side and bottom of the grid.
+    There is no black background visible.

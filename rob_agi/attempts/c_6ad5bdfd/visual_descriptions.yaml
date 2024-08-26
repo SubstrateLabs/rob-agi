@@ -1,0 +1,69 @@
+example_0:
+  input: |
+    A 10x6 grid with various colored objects and patterns:
+    - Two sky blue (8) squares in the top right corner
+    - A green (3) vertical line of two squares on the left side, second and third rows
+    - A yellow (4) vertical line of two squares, fourth and fifth columns, second and third rows
+    - A magenta (6) vertical line of two squares on the right side, fourth and fifth rows
+    - A blue (1) horizontal line of two squares on the left side, fifth row
+    - Two gray (5) squares in the middle, seventh row
+    - A red (2) horizontal line spanning the entire bottom row
+    - The rest of the grid is filled with black (0) squares
+  output: |
+    A 10x6 grid with all colored objects moved to the bottom:
+    - The top 6 rows are entirely black (0)
+    - The bottom 4 rows contain all the colored objects from the input:
+      - Two sky blue (8) squares in the top right corner of the colored section
+      - A green (3) vertical line of two squares on the left side
+      - A yellow (4) vertical line of two squares, fourth and fifth columns
+      - A magenta (6) vertical line of two squares on the right side
+      - A blue (1) horizontal line of two squares on the left side
+      - Two gray (5) squares in the middle
+      - A red (2) horizontal line spanning the entire bottom row
+    - The colored objects maintain their relative positions to each other
+
+example_1:
+  input: |
+    A 5x11 grid with various colored objects and patterns:
+    - A red (2) vertical line spanning the entire left column
+    - Two green (3) squares in the top row, third and fourth columns
+    - Two yellow (4) squares in the top row, eighth and ninth columns
+    - Two gray (5) squares in the second row, sixth column and third row, sixth column
+    - Two magenta (6) squares in the third row, ninth and tenth columns
+    - Two orange (7) squares in the bottom row, third and fourth columns
+    - Two sky blue (8) squares in the fourth and fifth rows, eighth column
+    - The rest of the grid is filled with black (0) squares
+  output: |
+    A 5x11 grid with all colored objects moved to the left:
+    - The red (2) vertical line remains in the leftmost column
+    - All other colored objects are shifted left, maintaining their vertical positions:
+      - Green (3) squares now in the second column
+      - Yellow (4) squares now in the third and fourth columns of the top row
+      - Gray (5) squares now in the fifth column
+      - Magenta (6) squares now in the third column of the third row
+      - Orange (7) squares now in the second and third columns of the bottom row
+      - Sky blue (8) squares now in the fourth column of the fourth and fifth rows
+    - The right side of the grid is filled with black (0) squares
+    - The colored objects maintain their relative vertical positions to each other
+
+example_2:
+  input: |
+    A 5x10 grid with various colored objects and patterns:
+    - A red (2) vertical line spanning the entire right column
+    - Two yellow (4) squares in the top row, second and third columns
+    - Two gray (5) squares in the second row, fourth and fifth columns
+    - Two magenta (6) squares in the second and third rows, eighth column
+    - Two brown (9) squares in the fourth and fifth rows, second column
+    - Two sky blue (8) squares in the fourth row, fifth and sixth columns
+    - The rest of the grid is filled with black (0) squares
+  output: |
+    A 5x10 grid with all colored objects moved to the right:
+    - The red (2) vertical line remains in the rightmost column
+    - All other colored objects are shifted right, maintaining their vertical positions:
+      - Yellow (4) squares now in the eighth and ninth columns of the top row
+      - Gray (5) squares now in the seventh and eighth columns of the second row
+      - Magenta (6) squares now in the ninth column of the second and third rows
+      - Brown (9) squares now in the seventh column of the fourth and fifth rows
+      - Sky blue (8) squares now in the eighth and ninth columns of the fourth row
+    - The left side of the grid is filled with black (0) squares
+    - The colored objects maintain their relative vertical positions to each other

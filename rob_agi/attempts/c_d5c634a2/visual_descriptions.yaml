@@ -1,0 +1,88 @@
+example_0:
+  input: |
+    A 15x15 grid with mostly black (empty) space. There are several red (2) shapes scattered throughout:
+    - A small inverted L shape in the top-left quadrant
+    - A horizontal line of 3 red squares in the middle-left
+    - A horizontal line of 3 red squares with a single red square below its center, in the middle-right
+    - A horizontal line of 3 red squares in the bottom-left quadrant
+    - Two separate horizontal lines of 3 red squares in the bottom-right quadrant
+  output: |
+    A 3x6 grid with a mix of colors:
+    - Top row: Green (3), Black (0), Green (3), Blue (1), Black (0), Blue (1)
+    - Middle row: All Black (0)
+    - Bottom row: Green (3), Black (0), Black (0), Blue (1), Black (0), Blue (1)
+example_1:
+  input: |
+    A 5x4 grid with a red (2) shape:
+    - A horizontal line of 3 red squares at the top
+    - A single red square in the second row, second column
+    - A horizontal line of 3 red squares at the bottom
+    The rest is black (empty) space.
+  output: |
+    A 3x6 grid with minimal coloring:
+    - Top row: Green (3), Black (0), Black (0), Blue (1), Black (0), Black (0)
+    - Middle and bottom rows: All Black (0)
+example_2:
+  input: |
+    A 6x5 grid with red (2) shapes:
+    - A horizontal line of 3 red squares at the top
+    - A single red square in the second row, second column
+    - A horizontal line of 3 red squares in the fourth row
+    - A horizontal line of 3 red squares at the bottom, with a single red square above its center
+    The rest is black (empty) space.
+  output: |
+    A 3x6 grid with some coloring:
+    - Top row: Green (3), Black (0), Black (0), Blue (1), Black (0), Black (0)
+    - Middle row: All Black (0)
+    - Bottom row: Black (0), Black (0), Black (0), Blue (1), Black (0), Black (0)
+example_3:
+  input: |
+    A 6x7 grid with red (2) shapes:
+    - A horizontal line of 3 red squares at the top-right
+    - A horizontal line of 3 red squares at the top-left, with a single red square below its right end
+    - A horizontal line of 3 red squares in the middle-right
+    - A horizontal line of 3 red squares at the bottom-left
+    The rest is black (empty) space.
+  output: |
+    A 3x6 grid with some coloring:
+    - Top row: Green (3), Black (0), Black (0), Blue (1), Black (0), Black (0)
+    - Middle row: All Black (0)
+    - Bottom row: Green (3), Black (0), Black (0), Blue (1), Black (0), Black (0)
+example_4:
+  input: |
+    An 8x7 grid with red (2) shapes:
+    - A horizontal line of 3 red squares near the top-left
+    - Two separate horizontal lines of 3 red squares in the middle, one above the other
+    - A horizontal line of 3 red squares near the bottom
+    - Several single red squares scattered throughout
+    The rest is black (empty) space.
+  output: |
+    A 3x6 grid with some coloring:
+    - Top row: Green (3), Black (0), Black (0), Blue (1), Black (0), Blue (1)
+    - Middle row: All Black (0)
+    - Bottom row: Black (0), Black (0), Black (0), Blue (1), Black (0), Black (0)
+example_5:
+  input: |
+    An 8x7 grid with red (2) shapes:
+    - A horizontal line of 3 red squares in the second row from the top
+    - A horizontal line of 3 red squares in the middle-right
+    - A horizontal line of 3 red squares near the bottom-left
+    - A horizontal line of 3 red squares at the bottom-right
+    - Several single red squares scattered throughout
+    The rest is black (empty) space.
+  output: |
+    A 3x6 grid with some coloring:
+    - Top row: Green (3), Black (0), Green (3), Blue (1), Black (0), Black (0)
+    - Middle row: All Black (0)
+    - Bottom row: Green (3), Black (0), Black (0), Black (0), Black (0), Black (0)
+example_6:
+  input: |
+    An 8x7 grid with red (2) shapes:
+    - Four separate horizontal lines of 3 red squares, roughly evenly spaced vertically
+    - Several single red squares scattered throughout, some adjacent to the lines
+    The rest is black (empty) space.
+  output: |
+    A 3x6 grid with some coloring:
+    - Top row: Green (3), Black (0), Green (3), Blue (1), Black (0), Black (0)
+    - Middle row: All Black (0)
+    - Bottom row: Green (3), Black (0), Green (3), Black (0), Black (0), Black (0)

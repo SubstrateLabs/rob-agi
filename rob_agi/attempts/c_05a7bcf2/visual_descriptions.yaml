@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 30x30 grid with mostly black (empty) space. There's a horizontal sky blue (8) line across the middle, dividing the grid into two halves. In the top half, there are scattered yellow (4) regions, mostly in the upper left quadrant. In the bottom half, there's a thick red (2) line at the bottom with some red dots above it.
+  output: |
+    The grid maintains its 30x30 size and the sky blue (8) horizontal line in the middle. The yellow (4) regions in the top half have expanded downwards and rightwards, stopping at the sky blue line. The red (2) regions in the bottom half have expanded upwards and leftwards, also stopping at the sky blue line. The top left quadrant above the sky blue line is now filled with green (3) where it wasn't yellow. All remaining empty spaces are filled with sky blue (8).
+
+example_1:
+  input: |
+    A 30x30 grid with a vertical sky blue (8) line running down the middle. The left side has scattered yellow (4) regions, while the right side has scattered red (2) regions. The yellow and red regions are mostly concentrated in the middle rows of the grid.
+  output: |
+    The 30x30 grid maintains the vertical sky blue (8) line in the middle. On the left side, yellow (4) regions have expanded rightwards to the sky blue line and downwards. On the right side, red (2) regions have expanded leftwards to the sky blue line and upwards. The top left quadrant is filled with green (3) where it wasn't yellow. All remaining empty spaces are filled with sky blue (8).
+
+example_2:
+  input: |
+    A 30x30 grid with a horizontal sky blue (8) line slightly above the middle. There are scattered yellow (4) regions in the top half, mostly in the upper left and right corners. A thick red (2) line runs across the bottom of the grid, with some red dots above it.
+  output: |
+    The 30x30 grid keeps the horizontal sky blue (8) line. Yellow (4) regions in the top half have expanded downwards and rightwards to the sky blue line. The red (2) regions have expanded upwards and leftwards to the sky blue line. The top left and right corners above the sky blue line are filled with green (3) where they weren't yellow. All remaining empty spaces are filled with sky blue (8).
+
+test_case_0:
+  input: |
+    A 30x30 grid that appears mostly empty (black). There's no clear dividing line. Yellow (4) regions are scattered in the top half, with concentrations in the upper left and right. Red (2) regions are mostly in the bottom half, with a thick line at the very bottom and some dots above it.
+  output: |
+    The description for the output is not provided in the test case, so I cannot describe it.

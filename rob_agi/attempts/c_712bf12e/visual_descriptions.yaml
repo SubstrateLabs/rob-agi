@@ -1,0 +1,34 @@
+example_0:
+  input: |
+    The input grid is 13x12 in size. It primarily consists of black (0) and gray (5) squares. The gray squares form a sparse, irregular pattern across the grid. There are three red (2) squares in the bottom row, spaced out evenly. The overall impression is of a scattered, asymmetrical arrangement of gray dots on a black background, with a hint of red at the bottom.
+  output: |
+    The output grid maintains the same 13x12 size and preserves the original gray (5) and black (0) squares from the input. The key difference is the addition of red (2) squares. These red squares form two distinct patterns:
+    1. A vertical line of red squares extends from each of the original red squares in the bottom row, reaching to the top of the grid.
+    2. Horizontal red lines connect these vertical red lines at various points, creating a ladder-like structure.
+    The result is a network of red lines that divides the grid into sections, with the original gray squares still visible within these sections.
+
+example_1:
+  input: |
+    The input grid is 14x13 in size. It consists mainly of black (0) and gray (5) squares. The gray squares form various patterns:
+    1. Several 2x2 square clusters of gray.
+    2. Individual gray squares scattered throughout.
+    3. A few small L-shaped patterns of gray squares.
+    There are three red (2) squares in the bottom row, unevenly spaced. The overall impression is of a more complex and varied arrangement of gray shapes on a black background compared to the previous example, with the same hint of red at the bottom.
+  output: |
+    The output grid maintains the 14x13 size and preserves all original gray (5) and black (0) squares. As in the previous example, red (2) squares have been added in two main patterns:
+    1. Vertical lines extend from each of the original red squares in the bottom row to the top of the grid.
+    2. Horizontal red lines connect these vertical lines at various points.
+    The red lines create a more complex network in this case, due to the uneven spacing of the original red squares. This network divides the grid into irregular sections, with the original gray patterns still visible within these sections. The red lines appear to avoid cutting through the gray square clusters where possible.
+
+example_2:
+  input: |
+    The input grid is 15x13 in size. It consists primarily of black (0) and gray (5) squares. The gray squares form various patterns:
+    1. Several clusters of gray squares, including some larger groupings.
+    2. A few diagonal lines of gray squares.
+    3. Scattered individual gray squares.
+    There are three red (2) squares in the bottom row, unevenly spaced. The overall impression is of a dense and varied arrangement of gray shapes on a black background, with the familiar hint of red at the bottom.
+  output: |
+    The output grid maintains the 15x13 size and preserves all original gray (5) and black (0) squares. As in previous examples, red (2) squares have been added in two main patterns:
+    1. Vertical lines extend from each of the original red squares in the bottom row to the top of the grid.
+    2. Horizontal red lines connect these vertical lines at various points.
+    The red lines create a complex network due to the uneven spacing of the original red squares. This network divides the grid into irregular sections, with the original gray patterns still visible within these sections. The red lines appear to navigate around the gray square clusters and patterns where possible, creating a more intricate interplay between the red network and the existing gray structures.

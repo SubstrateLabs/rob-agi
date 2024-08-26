@@ -1,0 +1,42 @@
+example_0:
+  input: |
+    A 5x15 grid with a complex pattern of black (0) and gray (5) cells. The gray cells form several disconnected regions and lines. There's a large L-shaped gray region on the left side and top of the grid. Multiple smaller gray regions are scattered throughout, including a few isolated gray cells. The black cells form various shapes, including some larger contiguous areas.
+  output: |
+    The grid maintains the same basic structure as the input, but with two significant changes:
+    1. A large contiguous area of black cells in the bottom right has been filled with sky blue (8), creating a distinct region.
+    2. A small area of black cells at the bottom left, adjacent to gray cells, has been filled with orange (7).
+    All original gray (5) cells remain unchanged. The top left quadrant of the grid is mostly unaffected.
+
+example_1:
+  input: |
+    A 9x10 grid with a mix of black (0) and gray (5) cells. The gray cells form several distinct shapes:
+    - A large inverted T-shape on the right side
+    - A smaller T-shape on the left side
+    - A horizontal line across the middle
+    - Several isolated gray cells
+    The black cells form larger contiguous areas, especially in the top-right and bottom-left corners.
+  output: |
+    The grid maintains the basic structure of gray cells, but with significant changes to the black areas:
+    1. The large black area in the top-right corner has been filled with sky blue (8), extending into the center.
+    2. Two small areas of black cells adjacent to gray cells in the top-left have been filled with orange (7).
+    3. The bottom half of the grid remains largely unchanged, maintaining its original black and gray pattern.
+
+example_2:
+  input: |
+    A 12x10 grid with an intricate pattern of black (0) and gray (5) cells. The gray cells form several distinct shapes:
+    - A large cross-like structure in the center
+    - Several vertical lines on the left side
+    - A horizontal line near the bottom
+    - Isolated gray cells scattered throughout
+    The black cells form various shapes and sizes of contiguous areas, with larger areas in the top-right and bottom-right corners.
+  output: |
+    The grid maintains the basic structure of gray cells, but with significant changes to the black areas:
+    1. The large black area in the bottom-right corner has been filled with sky blue (8), creating a distinct region.
+    2. Two small areas of black cells adjacent to gray cells in the top-left have been filled with orange (7).
+    3. The top-right quadrant and the left side of the grid remain largely unchanged, maintaining their original black and gray patterns.
+
+test_case_0:
+  input: |
+    This test case is not provided in the given code snippet. There are only three examples (example_0, example_1, and example_2) in the test file, and no separate test cases.
+  output: |
+    As there is no separate test case provided in the given code, there is no output to describe for a test case.

@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    The grid contains two distinct shapes: a large 'X' shape made of sky blue (8) color, and a small inverted 'T' shape made of blue (1) color. The 'X' shape spans almost the entire grid, with its center slightly above the middle. The inverted 'T' shape is positioned at the center of the grid, intersecting with the 'X'. The rest of the grid is filled with black (0), which can be considered as empty space.
+  output: |
+    The grid now shows a transformation where the shapes have swapped colors and positions. The large 'X' shape is now blue (1) and has moved down, while the inverted 'T' shape is now sky blue (8) and has moved up. The blue 'X' is slightly larger and more spread out compared to the original sky blue 'X'. The sky blue inverted 'T' is now positioned near the top center of the grid. The rest of the grid remains black (0).
+
+example_1:
+  input: |
+    The grid contains several distinct shapes made of red (2) and a small shape made of green (3). There are three red 'U' shapes aligned horizontally at the top of the grid. Below them, slightly off-center to the right, is another red shape that looks like an inverted 'L'. To the right of this 'L' shape is a small green shape that resembles a backwards 'L'. The rest of the grid is black (0).
+  output: |
+    The grid shows a transformation where the shapes have changed color and some have moved. The three 'U' shapes at the top are now green (3) instead of red. The inverted 'L' shape has moved to the bottom right and is now green. The small backwards 'L' shape that was green is now red (2) and has moved to the left, adjacent to the inverted 'L' shape. The rest of the grid remains black (0).
+
+example_2:
+  input: |
+    The grid contains two distinct patterns. In the upper half, there's a pattern of green (3) squares forming what looks like two incomplete rectangles or 'C' shapes facing each other. In the lower half, there's a sky blue (8) shape that resembles a plus sign or a cross. The rest of the grid is black (0).
+  output: |
+    The grid shows a transformation where the two patterns have swapped positions and slightly changed. The sky blue (8) cross shape is now in the upper half of the grid and has expanded, with each arm of the cross now three squares long instead of one. The green (3) pattern is now in the lower half and has condensed into a single incomplete rectangle or 'C' shape. The rest of the grid remains black (0).
+
+example_3:
+  input: |
+    The grid contains several small shapes made of blue (1) and orange (7) squares. In the top left quadrant, there are two diagonal lines of blue squares, each two squares long. In the top right quadrant, there's a similar pattern but with orange squares. In the bottom half of the grid, there are three more diagonal lines of blue squares, each two squares long, arranged vertically. The rest of the grid is black (0).
+  output: |
+    The grid shows a transformation where the colors of the shapes have swapped and their positions have slightly changed. The blue diagonal lines in the top left are now orange (7). The orange diagonal lines in the top right are now blue (1). The three blue diagonal lines in the bottom half are now orange and have moved slightly upward and to the left. The rest of the grid remains black (0).
+
+test_case_0:
+  input: |
+    The input for the test case is not provided in the given code.
+  output: |
+    The expected output for the test case is not provided in the given code.

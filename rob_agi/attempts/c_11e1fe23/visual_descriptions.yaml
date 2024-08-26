@@ -1,0 +1,45 @@
+example_0:
+  input: |
+    A 10x12 grid mostly filled with black (0). There are three colored dots:
+    - A red dot (2) in the second row, fourth column
+    - A blue dot (1) in the second row, tenth column
+    - A green dot (3) in the eighth row, fourth column
+    These dots form a triangle shape, with the red and blue dots at the top corners and the green dot at the bottom.
+  output: |
+    The same 10x12 grid with the original three dots in place, plus additional dots forming a line:
+    - The original red dot (2) in the second row, fourth column
+    - The original blue dot (1) in the second row, tenth column
+    - A new red dot (2) in the fourth row, sixth column
+    - A new gray dot (5) in the fifth row, seventh column
+    - A new blue dot (1) in the fourth row, eighth column
+    - The original green dot (3) in the eighth row, fourth column
+    - A new green dot (3) in the sixth row, sixth column
+    These new dots form a zigzag line connecting the original three dots, creating a closed shape.
+
+example_1:
+  input: |
+    An 11x12 grid mostly filled with black (0). There are three colored dots:
+    - A red dot (2) in the fourth row, ninth column
+    - A sky blue dot (8) in the tenth row, third column
+    - A magenta dot (6) in the tenth row, ninth column
+    These dots form a triangle shape, with the red dot at the top and the sky blue and magenta dots at the bottom corners.
+  output: |
+    The same 11x12 grid with the original three dots in place, plus additional dots forming a line:
+    - The original red dot (2) in the fourth row, ninth column
+    - A new red dot (2) in the sixth row, seventh column
+    - A new gray dot (5) in the seventh row, sixth column
+    - A new sky blue dot (8) in the eighth row, fifth column
+    - The original sky blue dot (8) in the tenth row, third column
+    - The original magenta dot (6) in the tenth row, ninth column
+    - A new magenta dot (6) in the eighth row, seventh column
+    These new dots form a zigzag line connecting the original three dots, creating a closed shape.
+
+test_case_0:
+  input: |
+    An 11x12 grid mostly filled with black (0). There are three colored dots:
+    - A red dot (2) in the fourth row, ninth column
+    - A sky blue dot (8) in the tenth row, third column
+    - A magenta dot (6) in the tenth row, ninth column
+    These dots form a triangle shape, with the red dot at the top and the sky blue and magenta dots at the bottom corners.
+  output: |
+    The output grid is not provided for the test case.

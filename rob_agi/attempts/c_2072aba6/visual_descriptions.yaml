@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 3x3 grid with a cross-like pattern. The center and four corners are gray (5), while the middle of each edge is black (0). This forms a plus sign or cross shape made of gray squares.
+  output: |
+    A 6x6 grid with a complex checkerboard-like pattern. The pattern is symmetrical both horizontally and vertically. The center forms a 2x2 alternating blue (1) and red (2) square. This central square is surrounded by a frame of black (0) squares, except at the middle of each side where the blue-red pattern extends outward, forming a cross-like shape. The corners of the grid are also black (0).
+
+example_1:
+  input: |
+    A 3x3 grid with gray (5) squares forming a diagonal line from top-left to bottom-right. All other squares are black (0).
+  output: |
+    A 6x6 grid with three 2x2 squares of alternating blue (1) and red (2) placed diagonally from top-left to bottom-right. These colored squares are surrounded by black (0) squares, creating a stair-step pattern of colored areas separated by black space.
+
+example_2:
+  input: |
+    A 3x3 grid with gray (5) squares forming an 'L' shape along the bottom and right edges. The top-left corner and the two squares above the 'L' are black (0).
+  output: |
+    A 6x6 grid with a complex pattern. The bottom-right quadrant (3x3) is filled with alternating blue (1) and red (2) squares in a checkerboard pattern. This pattern extends upwards in the rightmost column and leftwards in the bottom row, forming an 'L' shape of colored squares. The rest of the grid is filled with black (0) squares, creating a stark contrast between the colored 'L' shape and the black background.
+
+test_case_0:
+  input: |
+    A 3x3 grid with gray (5) squares forming an 'L' shape along the bottom and right edges. The top-left corner and the two squares above the 'L' are black (0).
+  output: |
+    The output grid is not provided in the test case, so there's no output to describe.

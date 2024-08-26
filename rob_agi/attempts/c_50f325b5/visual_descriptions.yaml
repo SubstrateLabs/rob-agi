@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    An 11x18 grid with various colors scattered throughout. There's a small yellow (8) region in the center-right area, spanning 3 cells in a horizontal line. The rest of the grid is filled with a mix of red (2), orange (7), green (3), yellow (4), and black (0) cells, with no clear pattern.
+  output: |
+    The grid is mostly identical to the input, but the yellow (8) region has expanded slightly. It now forms a more irregular shape, extending one cell upwards and one cell to the left, creating a small cluster of 5 yellow cells instead of the original 3 in a line.
+
+example_1:
+  input: |
+    A 14x17 grid with a mix of colors. There are two small yellow (8) regions: one near the center consisting of 3 cells in an L-shape, and another single yellow cell in the bottom-right quadrant. The rest of the grid is filled with various colors including red (2), orange (7), green (3), yellow (4), and black (0).
+  output: |
+    The grid is largely the same as the input, but both yellow (8) regions have expanded. The central region has grown to form a larger, more irregular shape. The single yellow cell in the bottom-right has expanded into a small cluster. Some cells adjacent to the original yellow regions have been converted to yellow, while maintaining connectivity with the original yellow cells.
+
+example_2:
+  input: |
+    A 15x18 grid with various colors. There's a small yellow (8) region near the center-left, consisting of 3 cells in an L-shape. The rest of the grid is filled with a mix of colors, predominantly red (2), orange (7), green (3), yellow (4), and black (0).
+  output: |
+    The grid is mostly the same as the input, but the yellow (8) region has expanded significantly. It now forms a larger, irregular shape that extends both upwards and downwards from its original position. The expansion seems to favor vertical growth, creating a somewhat elongated cluster of yellow cells.
+
+example_3:
+  input: |
+    An 18x17 grid with various colors. There's a yellow (8) region in the top-left corner, forming a small cluster of 4 cells. The rest of the grid is filled with a mix of colors, mainly red (2), orange (7), green (3), yellow (4), and black (0).
+  output: |
+    The grid is largely identical to the input, but the yellow (8) region has expanded. It now forms a larger, irregular shape that extends further to the right and down from its original position in the top-left corner. The expansion seems to favor growth towards the center of the grid, creating a more spread-out cluster of yellow cells.
+
+test_case_0:
+  input: |
+    An 18x17 grid with various colors. There's a yellow (8) region in the top-left corner, forming a small cluster of 4 cells. The rest of the grid is filled with a mix of colors, mainly red (2), orange (7), green (3), yellow (4), and black (0). This input appears identical to the input of example_3.
+  output: |
+    The expected output is not provided for this test case.

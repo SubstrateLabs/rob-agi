@@ -1,0 +1,39 @@
+example_0:
+  input: |
+    A 12x12 grid mostly filled with black (0). There are two colored squares:
+    - A sky blue (8) square at position (2,3)
+    - A green (3) square at position (10,9)
+  output: |
+    The same 12x12 grid, but with additions:
+    - The sky blue (8) square has expanded into a 3x4 rectangle, with the original square at the bottom-right corner
+    - The green (3) square has expanded into an inverted L-shape, 3 squares wide and 2 squares tall
+
+example_1:
+  input: |
+    A 14x15 grid mostly filled with black (0). There are two colored squares:
+    - A green (3) square at position (4,9)
+    - A gray (5) square at position (11,5)
+  output: |
+    The same 14x15 grid, but with additions:
+    - The green (3) square has expanded into a T-shape, 6 squares wide at the top and 5 squares tall
+    - The gray (5) square has expanded into an inverted T-shape, 6 squares wide at the top and 3 squares tall
+
+example_2:
+  input: |
+    A 12x10 grid mostly filled with black (0). There are three colored squares:
+    - A sky blue (8) square at position (3,2)
+    - A yellow (4) square at position (4,6)
+    - A gray (5) square at position (8,7)
+  output: |
+    The same 12x10 grid, but with additions:
+    - The sky blue (8) square has expanded into a 4x3 rectangle, with the original square at the bottom-right corner
+    - The yellow (4) square has expanded into a 5x4 rectangle, with the original square at the top-left corner
+    - The gray (5) square has expanded into an inverted T-shape, 3 squares wide at the top and 4 squares tall
+
+example_3:
+  input: |
+    An 11x8 grid mostly filled with black (0). There is one colored square:
+    - A brown (9) square at position (4,4)
+  output: |
+    The same 11x8 grid, but with additions:
+    - The brown (9) square has expanded into a T-shape, 4 squares wide at the top and 5 squares tall

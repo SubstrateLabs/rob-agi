@@ -1,0 +1,60 @@
+example_0:
+  input: |
+    The input grid is 19x13 in size. It consists of a series of rectangular shapes separated by magenta (6) lines. The magenta lines form a cross-like pattern, dividing the grid into 9 rectangular sections. Each section contains a 2x2 square of a specific color, surrounded by black (0). The colors of these squares are:
+    - Top left: Yellow (4)
+    - Top center: Magenta (6)
+    - Top right: Sky (8)
+    - Middle left: Sky (8)
+    - Middle center: Magenta (6)
+    - Middle right: Green (3)
+    - Bottom left: Magenta (6)
+    - Bottom center: Sky (8)
+    - Bottom right: Yellow (4)
+    The magenta lines forming the cross pattern are one unit thick, creating a grid-like structure.
+  output: |
+    The output grid is much smaller, 3x3 in size. It contains three colored squares arranged diagonally from top-left to bottom-right:
+    - Top-left: Green (3)
+    - Center: Yellow (4)
+    - Bottom-right: Sky (8)
+    The remaining cells are black (0).
+
+example_1:
+  input: |
+    The input grid is 16x16 in size. It has a similar structure to the previous example, with green (3) lines forming a cross-like pattern that divides the grid into 9 rectangular sections. Each section contains a 2x2 square of a specific color, surrounded by black (0). The colors of these squares are:
+    - Top left: Green (3)
+    - Top center: Blue (1)
+    - Top right: Red (2)
+    - Middle left: Red (2)
+    - Middle center: Blue (1)
+    - Middle right: Green (3)
+    - Bottom left: Blue (1)
+    - Bottom center: Green (3)
+    - Bottom right: Green (3)
+    The green lines forming the cross pattern are one unit thick, creating a grid-like structure.
+  output: |
+    The output grid is 2x3 in size. It contains:
+    - Top row: Red (2), Red (2), Black (0)
+    - Bottom row: Blue (1), Blue (1), Blue (1)
+
+example_2:
+  input: |
+    The input grid is 18x16 in size. It follows a similar pattern to the previous examples, with red (2) lines forming a cross-like pattern that divides the grid into 12 rectangular sections (4 columns and 3 rows). Each section contains a 2x2 square of a specific color, surrounded by black (0). The colors of these squares are:
+    - Top row: Yellow (4), Blue (1), Blue (1), Sky (8)
+    - Middle row: Red (2), Yellow (4), Red (2), Red (2)
+    - Bottom row: Yellow (4), Yellow (4), Red (2), Red (2)
+    The red lines forming the cross pattern are one unit thick, creating a grid-like structure.
+  output: |
+    The output grid is 3x4 in size. It contains:
+    - Top row: Sky (8), Black (0), Black (0), Black (0)
+    - Middle row: Blue (1), Blue (1), Black (0), Black (0)
+    - Bottom row: Yellow (4), Yellow (4), Yellow (4), Yellow (4)
+
+test_case_0:
+  input: |
+    The input grid is 18x16 in size. It follows the same pattern as the previous examples, with red (2) lines forming a cross-like pattern that divides the grid into 12 rectangular sections (4 columns and 3 rows). Each section contains a 2x2 square of a specific color, surrounded by black (0). The colors of these squares are:
+    - Top row: Yellow (4), Blue (1), Blue (1), Sky (8)
+    - Middle row: Red (2), Yellow (4), Red (2), Red (2)
+    - Bottom row: Yellow (4), Yellow (4), Red (2), Red (2)
+    The red lines forming the cross pattern are one unit thick, creating a grid-like structure.
+  output: |
+    The output is not provided for this test case.

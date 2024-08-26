@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The input grid is a 16x16 square with a symmetrical pattern. The center of the grid (4x4 area) contains mostly 3's (green) surrounded by 8's (sky blue). This central area is enclosed by a frame-like structure made of 6's (magenta) and 2's (red). The corners of the grid are filled with 9's (brown) and 1's (blue). There are also 4's (yellow) present in specific locations, forming a cross-like pattern when connected. The overall impression is of a complex, symmetrical design with a distinct center and framed edges.
+  output: |
+    The output is a much smaller 4x4 grid. It appears to be an extraction or simplification of a part of the input grid. The top-left corner is 2 (red), followed by 8 (sky blue) in the top-right and bottom-left corners. The bottom-right corner is 6 (magenta). This small grid seems to capture some essence of the color distribution and pattern from the larger input grid.
+
+example_1:
+  input: |
+    This 16x16 grid also has a symmetrical pattern, but with a different color scheme and design. The center has a 3x3 area of 9's (brown) surrounded by 2's (red). This is enclosed by a larger square made of alternating 9's and 2's. The corners of the grid contain patterns of 1's (blue), 7's (orange), and 5's (gray). There are also 8's (sky blue), 4's (yellow), and 6's (magenta) distributed in a symmetrical pattern throughout the grid. The overall impression is of a complex, mandala-like design with a clear center and intricate border patterns.
+  output: |
+    The output is again a 4x4 grid, seemingly extracted or derived from the input. It contains mostly 9's (brown) and 2's (red), which were prominent in the center of the input grid. The bottom-right corner is 2 (red), while the bottom-left corner is 4 (yellow). This small grid appears to capture some key elements of the central pattern in the larger input grid.
+
+example_2:
+  input: |
+    This 16x16 grid has a different pattern compared to the previous two. It's dominated by shades of blue, orange, and brown (7's, 8's, 9's, and 1's). The center of the grid has a distinct 4x4 area filled with 1's, 2's, and 5's (blue, red, and gray). This central area is surrounded by a pattern of 1's and 7's. The corners and edges of the grid are filled with alternating 7's, 8's, and 9's, creating a frame-like effect. There's also a noticeable 4x4 area of 3's (green) in the bottom-left quadrant of the grid. The overall impression is of a more organic, less geometrically rigid pattern compared to the previous examples.
+  output: |
+    The output is once again a 4x4 grid. It contains a mix of colors that were present in the input grid, but doesn't seem to directly correspond to any specific 4x4 area in the input. The top-left corner is 7 (orange), the top-right and bottom-left corners are 1 (blue), and the bottom-right corner is 9 (brown). The grid also contains 5 (gray) and 8 (sky blue), which were present in the input but not as prominently. This output seems to capture some essence of the color distribution in the input, but in a less obvious way than the previous examples.
+
+test_case_0:
+  input: |
+    The input for the test case is not provided in the test file. Based on the pattern from the examples, we would expect it to be a 16x16 grid with some kind of symmetrical or patterned design.
+  output: |
+    The expected output for the test case is not provided in the test file. Based on the pattern from the examples, we would expect it to be a 4x4 grid that in some way captures or represents key elements or patterns from the (unseen) input grid.

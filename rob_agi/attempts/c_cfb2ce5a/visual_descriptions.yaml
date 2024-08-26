@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 10x10 grid with a black border. In the top-left quadrant, there's a pattern of red (2) and blue (1) squares forming a rough diamond or cross shape. A single green (3) square is below this pattern. To the right, there's a single sky blue (8) square. In the bottom-left, there's a single yellow (4) square. In the bottom-right, there's a single gray (5) square. An orange (7) square sits roughly in the center of the grid.
+  output: |
+    A 10x10 grid with a black border. The red and blue pattern in the top-left has expanded, maintaining its general shape but filling more of the quadrant. The green (3) has expanded downward and to the right. The sky blue (8) has expanded to fill most of the top-right quadrant. The orange (7) has expanded into a larger square shape. The yellow (4) has expanded into a larger area in the bottom-left, intermingling with the expanded orange. The gray (5) has expanded into a larger area in the bottom-right. All colors have expanded while maintaining the black border.
+
+example_1:
+  input: |
+    A 10x10 grid with a black border. In the top-left, there's a pattern of green (3) squares forming a rough L-shape, with sky blue (8) squares nestled within. To the right of this is a brown (9) square, and below it an orange (7) square. In the center-left, there's a yellow (4) square. Below this, there's a pattern of blue (1), gray (5), and red (2) squares in a horizontal line.
+  output: |
+    A 10x10 grid with a black border. The green and sky blue pattern in the top-left has expanded to fill most of the top-left quadrant, maintaining its general structure but larger. The brown (9) has expanded to fill the top-right corner. The orange (7) has expanded into a larger area in the center-right. The yellow (4), blue (1), gray (5), and red (2) have all expanded into larger areas, filling the bottom half of the grid in a pattern that resembles their original positions but larger and more intertwined. All colors have expanded while maintaining the black border.
+
+example_2:
+  input: |
+    A 10x10 grid with a black border. In the top-left, there's a pattern of sky blue (8) and red (2) squares forming a rough checkerboard or cross shape. To the right of this is a magenta (6) square. Below the pattern, there's a gray (5) square next to a yellow (4) square. To the right of these is a green (3) square. There are two isolated blue (1) squares, one in the center-right and one in the bottom-right quadrant.
+  output: |
+    A 10x10 grid with a black border. The sky blue and red pattern in the top-left has expanded, maintaining its checkerboard-like structure but filling more of the top-left quadrant. The magenta (6) has expanded to fill most of the top-right quadrant. The gray (5) and yellow (4) have expanded into larger areas in the bottom-left, forming a pattern. The green (3) has expanded into a larger area on the right side. The blue (1) has expanded to form a cross-like shape that intersects with all other colors, appearing in the center and all four corners of the expanded grid. All colors have expanded while maintaining the black border.

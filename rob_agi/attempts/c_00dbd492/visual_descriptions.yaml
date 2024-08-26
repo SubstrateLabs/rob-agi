@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 7x7 grid with a red (2) square outline. The outline is 5x5 and positioned in the top-left corner of the grid. The interior of the square is black (0), except for a single red (2) pixel in the center. The rest of the grid is filled with black (0).
+  output: |
+    The same 7x7 grid with the red (2) square outline preserved. The interior of the square is now filled with sky blue (8), except for the central red (2) pixel which remains unchanged. The rest of the grid outside the square remains black (0).
+
+example_1:
+  input: |
+    A 9x9 grid with a red (2) rectangular outline. The rectangle is 7x7 and positioned in the top-left corner of the grid. The interior of the rectangle is entirely black (0). The rest of the grid is filled with black (0).
+  output: |
+    The same 9x9 grid with the red (2) rectangular outline preserved. The interior of the rectangle is now filled with yellow (4), except for a single red (2) pixel in the center. The rest of the grid outside the rectangle remains black (0).
+
+example_2:
+  input: |
+    A 15x15 grid with two distinct red (2) rectangular outlines. The first rectangle is 9x9 and positioned in the top-right corner of the grid. Its interior is black (0) except for a single red (2) pixel slightly off-center. The second rectangle is 5x5 and positioned in the bottom-left corner of the grid. Its interior is black (0) except for a single red (2) pixel in the center. The rest of the grid is filled with black (0).
+  output: |
+    The same 15x15 grid with both red (2) rectangular outlines preserved. The interior of the larger rectangle in the top-right is now filled with green (3), except for the off-center red (2) pixel which remains unchanged. The interior of the smaller rectangle in the bottom-left is now filled with sky blue (8), except for the central red (2) pixel which remains unchanged. The rest of the grid outside both rectangles remains black (0).
+
+example_3:
+  input: |
+    A 13x13 grid with two distinct red (2) rectangular outlines. The first rectangle is 5x5 and positioned in the top-left corner of the grid. Its interior is black (0) except for a single red (2) pixel in the center. The second rectangle is 7x7 and positioned in the bottom-right corner of the grid. Its interior is black (0) except for a single red (2) pixel slightly off-center. The rest of the grid is filled with black (0).
+  output: |
+    The same 13x13 grid with both red (2) rectangular outlines preserved. The interior of the smaller rectangle in the top-left is now filled with sky blue (8), except for the central red (2) pixel which remains unchanged. The interior of the larger rectangle in the bottom-right is now filled with yellow (4), except for the off-center red (2) pixel which remains unchanged. The rest of the grid outside both rectangles remains black (0).

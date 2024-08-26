@@ -1,0 +1,47 @@
+example_0:
+  input: |
+    The grid contains several distinct shapes or objects:
+    1. A red (2) inverted triangle or arrowhead at the top.
+    2. A green (3) shallow arc or smile shape in the middle.
+    3. A blue (1) square or box in the lower middle.
+    4. A yellow (4) T-shape at the bottom.
+    All shapes are surrounded by black (0) space, which forms a border around the entire grid and fills gaps between shapes.
+  output: |
+    The grid contains the same shapes as the input, but their positions have changed:
+    1. The red (2) triangle is now upright and at the top.
+    2. The green (3) arc is now inverted, forming a frown shape.
+    3. The blue (1) square remains in the same position.
+    4. The yellow (4) T-shape is now inverted and at the bottom.
+    The black (0) border and spacing between shapes remains consistent.
+
+example_1:
+  input: |
+    The grid contains several distinct shapes:
+    1. A blue (1) wide U-shape at the top.
+    2. A sky blue (8) horizontal line in the upper middle.
+    3. A gray (5) shape resembling an upside-down cup in the center.
+    4. A red (2) small inverted T-shape near the bottom.
+    5. A green (3) horizontal line at the bottom.
+    All shapes are surrounded by black (0) space.
+  output: |
+    The grid contains the same shapes as the input, but some have changed position:
+    1. The blue (1) U-shape is now right-side up and slightly lower.
+    2. The sky blue (8) line remains in the same position.
+    3. The gray (5) cup shape is now right-side up.
+    4. The red (2) T-shape is now right-side up and slightly lower.
+    5. The green (3) line remains in the same position at the bottom.
+    The black (0) border and spacing between shapes remains consistent.
+
+example_2:
+  input: |
+    The grid contains three distinct shapes:
+    1. A brown (9) crown-like shape at the top, with three peaks.
+    2. A yellow (4) horizontal line in the middle.
+    3. A green (3) shape at the bottom, resembling a wide U with a dot in the center.
+    All shapes are surrounded by black (0) space.
+  output: |
+    The grid contains the same shapes as the input, but their positions have changed:
+    1. The brown (9) crown shape is now inverted, forming a cup-like shape with three valleys.
+    2. The yellow (4) line remains in the same position in the middle.
+    3. The green (3) shape is now inverted, forming an arch with a dot at the bottom.
+    The black (0) border and spacing between shapes remains consistent.

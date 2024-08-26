@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The grid is 15x13. There are three horizontal gray lines (color 5) spanning the entire width of the grid at rows 4, 8, and 12. Between these gray lines, there are three small objects. Each object consists of two red squares (color 2) followed by one green square (color 3). These objects appear to be shifting to the right in each section. The first object starts at column 2 in row 2, the second at column 3 in row 6, and the third at column 4 in row 10. The last object appears at column 5 in row 14. The rest of the grid is filled with black (color 0), which can be considered empty space.
+  output: |
+    The output grid is much smaller, only 3x13. It contains a single object consisting of two red squares (color 2) followed by one green square (color 3), positioned in the middle row (row 2) starting at column 6. The rest of the grid is filled with black (color 0), representing empty space.
+
+example_1:
+  input: |
+    The grid is 15x13. Similar to the previous example, there are three horizontal gray lines (color 5) spanning the entire width of the grid at rows 4, 8, and 12. Between these gray lines, there are four blue objects (color 1) of increasing length. The first object is two squares wide in row 2, the second is four squares wide in row 6, the third is six squares wide in row 10, and the last is eight squares wide in row 14. These blue objects all start from the leftmost column. The rest of the grid is filled with black (color 0), representing empty space.
+  output: |
+    The output grid is much smaller, only 3x13. It contains a single blue object (color 1) that is ten squares wide, positioned in the middle row (row 2) starting from the leftmost column. The rest of the grid is filled with black (color 0), representing empty space.
+
+test_case_0:
+  input: |
+    There is no separate test case provided in this file. The two examples (example_0 and example_1) serve as both examples and test cases for this challenge.
+  output: |
+    As there is no separate test case, there is no output to describe for a test case.

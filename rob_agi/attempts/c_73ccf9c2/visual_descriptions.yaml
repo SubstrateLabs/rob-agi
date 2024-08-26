@@ -1,0 +1,41 @@
+example_0:
+  input: |
+    The input grid is 23x23. It contains several distinct shapes made of blue (1) pixels on a black (0) background. The shapes are:
+    1. A large irregular shape in the top-left corner, resembling a distorted letter 'E'.
+    2. A smaller, roughly diamond-shaped object in the center-left area.
+    3. A shape resembling a thick, curved line or boomerang in the bottom-right quadrant.
+    4. A small cross or plus sign shape in the bottom-right corner.
+    The rest of the grid is filled with black (0) pixels, representing empty space.
+  output: |
+    The output grid is much smaller, 4x4. It contains a single shape made of blue (1) pixels on a black (0) background. The shape resembles a stylized letter 'F' or a right-facing arrow, occupying most of the grid space.
+
+example_1:
+  input: |
+    The input grid is 21x21. It contains several distinct shapes made of red (2) pixels on a black (0) background. The shapes are:
+    1. A large, complex shape in the top-left quadrant, resembling a distorted letter 'W' or a crab claw.
+    2. A shape in the center-right area that looks like a thick plus sign or a cross.
+    3. A small, irregular shape in the bottom-left corner, resembling a distorted letter 'E'.
+    The rest of the grid is filled with black (0) pixels, representing empty space.
+  output: |
+    The output grid is 5x4. It contains a single shape made of red (2) pixels on a black (0) background. The shape resembles a stylized bird or airplane facing right, with a distinct "beak" or "nose" on the left, "wings" in the middle, and a "tail" on the right.
+
+example_2:
+  input: |
+    The input grid is 20x20. It contains several distinct shapes made of green (3) pixels on a black (0) background. The shapes are:
+    1. Two similar shapes in the top half, each resembling a thick plus sign or cross.
+    2. A shape in the center-left area that looks like a thick vertical line with small horizontal lines at each end.
+    3. A larger, more complex shape in the bottom-right quadrant, resembling a distorted letter 'E' or a comb.
+    The rest of the grid is filled with black (0) pixels, representing empty space.
+  output: |
+    The output grid is 7x5. It contains a single shape made of green (3) pixels on a black (0) background. The shape resembles a stylized butterfly or bow tie, with a central vertical line and symmetrical "wings" or lobes on either side.
+
+test_case_0:
+  input: |
+    The input grid is 20x20. It contains several distinct shapes made of green (3) pixels on a black (0) background. The shapes are:
+    1. A shape in the top-left quadrant resembling a thick plus sign or cross.
+    2. A larger, more complex shape in the center-right area, looking like a distorted letter 'E' or a comb.
+    3. A shape in the bottom-left quadrant that looks like a thick vertical line with small horizontal lines at each end, similar to a capital 'I'.
+    4. A small, irregular shape in the bottom-right corner, resembling a distorted letter 'Z'.
+    The rest of the grid is filled with black (0) pixels, representing empty space.
+  output: |
+    The output is not provided for this test case.

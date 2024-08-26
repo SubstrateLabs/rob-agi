@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 7x3 grid with scattered colors. The first row has magenta (6) in the leftmost column and sky blue (8) in the rightmost column, with yellow (4) in the middle. The second row has magenta in the second column, yellow in the middle, and sky blue in the rightmost column. The third row has magenta in the second column, yellow in the middle, and two sky blue squares in the fifth and sixth columns.
+  output: |
+    A 3x3 grid with a pattern of red (2) and black (0) squares. The top row has red in the first and third columns. The middle row has red in the second and third columns. The bottom row has red in the first and second columns.
+
+example_1:
+  input: |
+    A 7x3 grid with scattered colors. The first row has magenta (6) in the third column, yellow (4) in the middle, and two sky blue (8) squares in the fifth and sixth columns. The second row has magenta in the second column, yellow in the middle, and two sky blue squares in the sixth and seventh columns. The third row has two magenta squares in the second and third columns, yellow in the middle, and sky blue in the fifth column.
+  output: |
+    A 3x3 grid filled mostly with red (2) squares. Only the middle square in the second row is black (0).
+
+example_2:
+  input: |
+    A 7x3 grid with scattered colors. The first row has magenta (6) in the third column, yellow (4) in the middle, and sky blue (8) in the fifth and seventh columns. The second row has magenta in the first and third columns, with yellow in the middle. The third row has two magenta squares in the second and third columns, yellow in the middle, and sky blue in the fifth and seventh columns.
+  output: |
+    A 3x3 grid with a pattern of red (2) and black (0) squares. The first column is all red. The second column has black in the first two rows and red in the last row. The third column is all red.
+
+example_3:
+  input: |
+    A 7x3 grid with scattered colors. The first row has two magenta (6) squares in the first and third columns, with yellow (4) in the middle. The second row has two magenta squares in the first two columns, yellow in the middle, and sky blue (8) in the fifth and seventh columns. The third row has three magenta squares in the first three columns, yellow in the middle, and sky blue in the sixth column.
+  output: |
+    A 3x3 grid mostly filled with red (2) squares. Only the middle square in the first row is black (0).
+
+example_4:
+  input: |
+    A 7x3 grid with scattered colors. The first row has magenta (6) in the third column, yellow (4) in the middle, and sky blue (8) in the fifth and seventh columns. The second row has magenta in the second column, yellow in the middle, and sky blue in the sixth column. The third row has yellow in the middle and sky blue in the fifth column.
+  output: |
+    A 3x3 grid with a pattern of red (2) and black (0) squares. The top row has red in the first and third columns. The middle row has red only in the second column. The bottom row has red only in the first column.

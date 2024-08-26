@@ -1,0 +1,72 @@
+example_0:
+  input: |
+    The grid contains several green (3) shapes on a black (0) background. There are four distinct shapes:
+    1. A large rectangular frame in the top-left corner, 7x6 in size.
+    2. A smaller rectangular frame to the right of the first, 5x5 in size.
+    3. Another rectangular frame in the top-right corner, 6x6 in size.
+    4. A larger, more complex shape in the bottom half of the grid. It resembles an irregular 'U' shape or a box with an open top. The left and right sides of this shape are 5 squares tall, while the bottom is 11 squares wide.
+    All shapes are outlined, with black spaces inside them.
+  output: |
+    The output grid maintains the same basic structure as the input, but with significant modifications:
+    1. The large rectangular frame in the top-left is now connected to the smaller frame to its right. The right side of the first frame and the left side of the second frame have been removed, creating one larger shape.
+    2. The rectangular frame in the top-right remains unchanged.
+    3. The complex 'U' shape in the bottom half has been modified. It now has a continuous top line connecting the left and right sides, forming a complete rectangle. Additionally, there are two vertical lines inside this shape, dividing it into three sections.
+    4. New connections have been added:
+       - A vertical line connects the top-left shape to the bottom shape.
+       - A diagonal line connects the top-right corner of the bottom shape to the top-right rectangular frame.
+    Overall, the output appears more interconnected, with fewer isolated shapes.
+
+example_1:
+  input: |
+    The grid contains several green (3) shapes on a black (0) background:
+    1. In the top-left, there's a rectangular frame, 6x6 in size.
+    2. To its right, there's a smaller 4x4 square.
+    3. In the top-right, there's another 6x6 rectangular frame.
+    4. In the middle-left, there's a 7x4 rectangular frame.
+    5. Below it, there's an 11x5 rectangular frame.
+    6. In the bottom-right, there's a 4x4 square shape.
+    All shapes are outlined, with black spaces inside them.
+  output: |
+    The output grid shows significant modifications to the input shapes:
+    1. The top-left rectangular frame is now connected to the small square to its right, forming a larger L-shaped structure.
+    2. The top-right rectangular frame remains unchanged.
+    3. The middle-left rectangular frame is now connected to the larger frame below it, forming a tall, irregular shape.
+    4. The bottom-right square has been expanded into a larger rectangular frame, now 6x5 in size.
+    5. New connections have been added:
+       - A line connects the top of the middle-left shape to the bottom of the top-left shape.
+       - A line connects the right side of the bottom-left shape to the left side of the bottom-right shape.
+       - A diagonal line connects the top-right corner of the bottom-right shape to the bottom-right corner of the top-right shape.
+    The result is a more interconnected structure with fewer isolated shapes.
+
+example_2:
+  input: |
+    The grid contains several green (3) shapes on a black (0) background:
+    1. In the top-left, there's a 9x9 square frame.
+    2. To its right, there's a 6x7 rectangular frame.
+    3. In the bottom-left, there's a 7x7 square frame.
+    4. In the middle-right, there's a small 3x4 rectangular shape.
+    5. In the bottom-right, there's a small 3x3 square.
+    All shapes except the middle-right rectangle are outlined, with black spaces inside them. The middle-right rectangle is filled in.
+  output: |
+    The output grid shows significant modifications to the input shapes:
+    1. The top-left square frame is now connected to the rectangular frame on its right. The right side of the square and the left side of the rectangle have been removed, creating one larger shape.
+    2. The bottom-left square frame has been modified. Its top side now connects to the shape above it, and its right side extends to connect with the bottom-right shapes.
+    3. The middle-right rectangle has been expanded upward to connect with the top shapes.
+    4. The bottom-right square has been slightly expanded and is now connected to the shapes above and to its left.
+    5. New internal structures have been added:
+       - A vertical line divides the top-left shape into two sections.
+       - Two horizontal lines have been added in the bottom-left shape.
+    6. The entire structure is now interconnected, forming a single, complex shape with no isolated parts.
+
+test_case_0:
+  input: |
+    The grid contains several green (3) shapes on a black (0) background:
+    1. In the top-left, there's a 6x6 square frame.
+    2. To its right, there's a 9x9 square frame.
+    3. In the bottom-left, there's a 4x4 square shape.
+    4. In the middle-right, there's a 7x5 rectangular frame.
+    5. In the bottom-right, there's a 11x5 rectangular frame.
+    6. Between the bottom shapes, there's a small 3x3 square.
+    All shapes except the bottom-left square are outlined, with black spaces inside them. The bottom-left square is filled in.
+  output: |
+    The output is not provided for the test case.

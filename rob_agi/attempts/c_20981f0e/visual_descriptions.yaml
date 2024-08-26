@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The grid is 19x13. There are four red dots (2) in rows 3, 8, and 13, evenly spaced horizontally. Between these red dots are blue (1) shapes that resemble incomplete rectangles or 'U' shapes. These blue shapes are not aligned vertically and appear at different heights in each section between the red dots. The rest of the grid is filled with black (0).
+  output: |
+    The grid maintains its 19x13 size and the four red dots (2) remain in their original positions. The blue (1) shapes have been rearranged. They now form more complete rectangles and are aligned vertically in each section between the red dots. The shapes in each section are now at the same height, creating a more organized appearance. Empty rows (all black) have been introduced above and below the blue shapes to accommodate this alignment.
+
+example_1:
+  input: |
+    The grid is 16x14. There are three rows of red dots (2) at rows 2, 7, and 12, with four dots in each row, evenly spaced horizontally. Between these rows of red dots are blue (1) shapes. These shapes are irregular and appear at different heights in each section. Some resemble partial rectangles or 'L' shapes. The rest of the grid is filled with black (0).
+  output: |
+    The grid maintains its 16x14 size and the red dots (2) remain in their original positions. The blue (1) shapes have been rearranged and aligned vertically in each section between the rows of red dots. They now form more complete rectangles or 'L' shapes, and are positioned at consistent heights within each section. Empty rows (all black) have been introduced above and below the blue shapes to accommodate this alignment.
+
+example_2:
+  input: |
+    The grid is 10x17. There are five rows of red dots (2) at rows 2, 7, 12, and 17, with two dots in each row at the leftmost and 6th column. Between these rows of red dots are blue (1) shapes. These shapes are irregular and appear at different heights and horizontal positions in each section. Some resemble partial rectangles or 'L' shapes. The rest of the grid is filled with black (0).
+  output: |
+    The grid maintains its 10x17 size and the red dots (2) remain in their original positions. The blue (1) shapes have been rearranged and aligned both vertically and horizontally in each section between the rows of red dots. They now form more complete rectangles or 'L' shapes, and are positioned at consistent heights and horizontal positions within each section. Empty rows and columns (all black) have been introduced around the blue shapes to accommodate this alignment.

@@ -1,0 +1,30 @@
+example_0:
+  input: |
+    The grid contains three distinct vertical sections, each 7 columns wide, separated by two columns of black space. Each section contains a pattern that resembles a stylized face or mask. The face consists of a magenta (6) "forehead", two sky blue (8) "eyes" with green (3) "pupils", and a black (0) "mouth" area. The face is surrounded by black space, creating a frame-like effect. There are scattered green (3) pixels throughout the grid, which appear somewhat random and don't seem to be part of the main pattern.
+  output: |
+    The output grid maintains the three vertical sections, but the patterns within each section are more uniform and symmetrical. The faces are now identical in all three sections. The scattered green pixels have been removed, leaving only the structured face patterns. Each face now has a consistent structure: magenta (6) "forehead", four sky blue (8) "eye" squares with two green (3) "pupil" squares in the center, and a black (0) "mouth" area. The faces are perfectly aligned vertically and horizontally within their sections.
+
+example_1:
+  input: |
+    The grid is divided into three vertical sections, each 6 columns wide, separated by single columns of black space. Each section contains a pattern that resembles a colorful building or structure. The structure has a blue (1) base, red (2) middle section, and green (3) top. There are scattered green (3) and blue (1) pixels throughout the grid, which appear somewhat random and don't conform to the main pattern. Some rows are entirely black, creating horizontal divisions in the grid.
+  output: |
+    The output grid maintains the three vertical sections and the basic structure of the "buildings". However, the patterns are now perfectly uniform across all sections. Each "building" has a consistent structure: two rows of blue (1) at the base, two rows of red (2) in the middle, and two rows of green (3) at the top. The scattered pixels have been removed, leaving only the structured building patterns. The black rows separating the structures horizontally remain intact, creating a clear division between each set of buildings.
+
+example_2:
+  input: |
+    The grid is divided into three vertical sections, each 5 columns wide, separated by single columns of black space. Each section contains a pattern that resembles a simple face or mask. The face consists of a red (2) "forehead", green (3) "eyes" and "cheeks", and blue (1) "mouth". There are scattered green (3) and red (2) pixels throughout the grid, which appear somewhat random and don't conform to the main pattern. Some rows are entirely black, creating horizontal divisions in the grid.
+  output: |
+    The output grid maintains the three vertical sections and the basic structure of the "faces". However, the patterns are now perfectly uniform across all sections. Each face has a consistent structure: one row of red (2) at the top, two rows of green (3) for "eyes", and one row of blue (1) for "mouth". The scattered pixels have been removed, leaving only the structured face patterns. The black rows separating the faces horizontally remain intact, creating a clear division between each set of faces. The rightmost columns that were previously filled with scattered pixels are now entirely black.
+
+test_case_0:
+  input: |
+    The grid is divided into three vertical sections, each 5 columns wide, separated by single columns of black space. Each section contains a pattern that resembles a simple face or mask, similar to example_2. However, the colors and exact arrangement vary slightly between sections and rows. There are scattered green (3) and red (2) pixels throughout the grid, particularly in the rightmost columns. Some rows are entirely or mostly black, creating horizontal divisions in the grid.
+  output: |
+    Based on the pattern observed in the previous examples, we would expect the output to have the following characteristics:
+    1. The three vertical sections would be maintained, each 5 columns wide and separated by single black columns.
+    2. The face patterns in each section would become identical and symmetrical.
+    3. Each face would likely have a consistent structure: possibly one row of red (2) at the top, two rows of green (3) for "eyes", and one row of blue (1) for "mouth".
+    4. The scattered pixels would be removed, leaving only the structured face patterns.
+    5. The black rows separating the faces horizontally would remain intact.
+    6. The rightmost columns that were previously filled with scattered pixels would become entirely black.
+    7. The overall grid would appear more organized and symmetrical compared to the input.

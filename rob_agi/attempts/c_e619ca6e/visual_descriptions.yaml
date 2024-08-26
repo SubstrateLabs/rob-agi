@@ -1,0 +1,43 @@
+example_0:
+  input: |
+    A 29x29 grid mostly filled with black (0). There are three distinct green (3) squares:
+    1. A 3x3 square in the top-left quadrant, centered around row 4, column 5.
+    2. A 3x3 square in the top-right quadrant, centered around row 7, column 22.
+    3. A 4x2 rectangle in the bottom-left quadrant, centered around row 15, column 11.
+  output: |
+    A 29x29 grid with an intricate pattern of green (3) squares on a black (0) background. The pattern appears to be an expansion of the input's green squares:
+    1. The top-left 3x3 square has expanded into a larger pattern with 'arms' extending outwards.
+    2. The top-right 3x3 square has similarly expanded, with 'arms' reaching towards the edges and center.
+    3. The bottom-left rectangle has grown into a complex shape with multiple 'arms' and extensions.
+    The green areas are interconnected, forming a cohesive pattern across the grid. There are also several isolated 3x3 green squares that appear to be new formations.
+
+example_1:
+  input: |
+    A 25x22 grid mostly filled with black (0). There is a single green (3) rectangle:
+    1. A 5x2 rectangle in the center-top of the grid, spanning rows 9-10 and columns 6-10.
+  output: |
+    A 25x22 grid with an expanded pattern of green (3) squares on a black (0) background. The pattern appears to be a growth from the original rectangle:
+    1. The original rectangle has expanded downwards and outwards.
+    2. There are now multiple 'arms' or 'branches' extending from the central structure.
+    3. The pattern is roughly symmetrical, with similar extensions on both left and right sides.
+    4. The bottom of the grid now has several 3x3 green squares that weren't present in the input.
+
+example_2:
+  input: |
+    A 29x27 grid mostly filled with black (0). There are two distinct green (3) areas:
+    1. A 3x3 square in the top-left quadrant, centered around row 6, column 9.
+    2. A 4x2 rectangle in the center-right of the grid, spanning rows 14-17 and columns 16-17.
+  output: |
+    A 29x27 grid with an intricate pattern of green (3) squares on a black (0) background. The pattern is an expansion of the input's green areas:
+    1. The top-left 3x3 square has grown into a larger structure with multiple 'arms' extending outwards and downwards.
+    2. The center-right rectangle has expanded into a complex shape with 'arms' reaching in various directions, particularly towards the bottom-right corner.
+    3. New 3x3 green squares have appeared in various locations, particularly in the bottom half of the grid.
+    4. The expanded green areas create a connected network across much of the grid, with some isolated green squares as well.
+
+test_case_0:
+  input: |
+    A 29x27 grid mostly filled with black (0). There are two distinct green (3) areas:
+    1. A 3x3 square in the top-left quadrant, centered around row 5, column 9.
+    2. A 4x2 rectangle in the center-right of the grid, spanning rows 14-17 and columns 16-17.
+  output: |
+    This is a test case, so no output grid is provided. Based on the pattern observed in the examples, we would expect an expansion of the green areas similar to what was seen in the previous examples.

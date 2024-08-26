@@ -1,0 +1,35 @@
+example_0:
+  input: |
+    The grid is 28x25 in size. It consists of a repeating pattern of 3x3 red (2) squares with yellow (4) or green (3) centers, separated by black (0) spaces. The pattern repeats 5 times horizontally and 4 times vertically. In the second and fourth rows of the pattern, some of the red squares have blue (1) centers instead of yellow or green.
+  output: |
+    The grid maintains the same size and overall structure as the input. The main changes are:
+    1. Yellow (4) centers in red squares have expanded horizontally to fill the entire width of the red square.
+    2. Blue (1) centers in red squares have expanded vertically, extending beyond the original red square boundaries into the black spaces above and below, stopping at the next red square border.
+    3. Green (3) centers in red squares have expanded vertically, but only within the confines of their original red square.
+
+example_1:
+  input: |
+    The grid is 29x25 in size. It consists of a repeating pattern of 5x5 green (3) squares with various colored centers (red, yellow, blue, sky blue), separated by black (0) spaces. The pattern repeats 5 times horizontally and 4 times vertically.
+  output: |
+    The grid maintains the same size and overall structure as the input. The main changes are:
+    1. Yellow (4) and sky blue (8) centers in green squares have expanded horizontally to fill the entire width of the green square.
+    2. Blue (1) centers in green squares have expanded vertically within the confines of the green square.
+    3. The expansion effects extend into the black spaces between the green squares, creating a more connected pattern.
+
+example_2:
+  input: |
+    The grid is 29x27 in size. It consists of a repeating pattern of 3x3 blue (1) squares with red (2) or green (3) centers, separated by black (0) spaces. The pattern repeats 5 times horizontally and 5 times vertically, with larger black spaces between each row of patterns.
+  output: |
+    The grid maintains the same size and overall structure as the input. The main changes are:
+    1. Green (3) centers in blue squares have expanded vertically, extending beyond the original blue square boundaries into the black spaces above and below, connecting with the next blue square in the column.
+    2. The expansion of green centers creates continuous vertical green lines through the entire height of the grid where green centers were originally aligned.
+    3. Red (2) centers and blue squares without green centers remain unchanged.
+
+test_case_0:
+  input: |
+    The grid is 29x27 in size. It consists of a repeating pattern of 3x3 blue (1) squares with red (2) centers, separated by black (0) spaces. The pattern repeats 5 times horizontally and 5 times vertically, with larger black spaces between each row of patterns. Two of the blue squares in each column (the second and fourth in the pattern) have yellow (4) centers instead of red.
+  output: |
+    Based on the patterns observed in the examples, we would expect the following changes:
+    1. Yellow (4) centers in blue squares would likely expand horizontally to fill the entire width of the blue square.
+    2. There might be some vertical expansion of colors, but it's unclear whether this would apply to red centers in blue squares or how it would interact with the yellow centers.
+    3. The overall structure and size of the grid would remain the same, with changes occurring primarily within and possibly between the blue squares.

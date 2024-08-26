@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 3x3 grid with a cross-like pattern. The center and four corners are gray (5), while the remaining four squares are black (0). This forms a simple '+' shape made of gray squares.
+  output: |
+    A 15x15 grid that appears to be an expanded version of the input. The central cross pattern is preserved but enlarged. The gray cross now spans the entire grid, with its arms being 3 squares wide. The corners of the grid remain black. The overall effect is a large gray '+' shape on a black background, perfectly centered in the grid.
+
+example_1:
+  input: |
+    A 3x3 grid with an 'L' shape made of gray squares (5). The top-left, center, and bottom-right squares are gray, while the rest are black (0).
+  output: |
+    A 15x15 grid that seems to be an expanded version of the input. The 'L' shape is preserved but enlarged and rotated. The main body of the 'L' is 3 squares wide and spans from the top-left corner to the bottom-right corner. There's an additional gray square at the top-right and bottom-left corners, creating a slight 'hook' at each end of the 'L'. The rest of the grid is filled with black squares.
+
+example_2:
+  input: |
+    A 3x3 grid with gray squares (5) forming a diagonal line from top-left to bottom-right. The remaining squares are black (0).
+  output: |
+    A 15x15 grid that appears to be an expanded version of the input. The diagonal line of gray squares is preserved but enlarged. It now spans from the top-left corner to the bottom-right corner, with a width of 3 squares. Additionally, there are 3x3 gray squares at the top-left, center, and bottom-right of the grid, connected by the diagonal line. The rest of the grid is filled with black squares.

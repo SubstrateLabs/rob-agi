@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    The input grid shows a pattern of sky blue (8) and black (0) squares. There are two distinct sky blue regions: a larger one occupying most of the left side and bottom right corner, and a smaller disconnected region in the top right. The black squares form a rough diagonal pattern from top right to bottom left, with some additional black squares scattered throughout.
+  output: |
+    The output grid maintains the same overall pattern as the input, but with color changes. The larger sky blue region is now split into two colors: gray (5) for the left side and bottom right, and red (2) for some squares that were previously sky blue. The smaller disconnected region in the top right is now entirely red. Black squares remain unchanged.
+
+example_1:
+  input: |
+    This grid also uses sky blue (8) and black (0) squares. There's a large, continuous sky blue region that forms a rough 'C' shape around the edges of the grid, with some intrusions of black squares. The center of the grid has more black squares, creating a partial separation between the top and bottom of the 'C' shape.
+  output: |
+    The output maintains the overall structure of the input but introduces three colors. The large 'C' shape is now divided into red (2) and gray (5) regions. The top left and bottom right portions of the 'C' are red, while the rest is gray. The black squares remain unchanged, preserving the partial separation in the center.
+
+example_2:
+  input: |
+    This grid has a more complex pattern of sky blue (8) and black (0) squares. Sky blue squares form several disconnected regions of varying sizes. There's a larger sky blue region on the left side, another in the top right corner, and several smaller regions scattered throughout. Black squares create a network of paths between these regions.
+  output: |
+    The output preserves the structure of the input but uses three colors instead of two. The sky blue regions are now a mix of red (2) and gray (5). The larger region on the left is split between red and gray, as is the region in the top right. Smaller regions are either entirely red or entirely gray. The black squares remain unchanged, maintaining the network of paths between colored regions.
+
+example_3:
+  input: |
+    This grid shows a large, continuous region of sky blue (8) squares that covers most of the grid, with black (0) squares forming a rough 'L' shape in the top right corner and a few scattered black squares elsewhere. The sky blue region has a few small intrusions of black squares.
+  output: |
+    The output maintains the overall structure but introduces three colors. The large sky blue region is now divided into red (2) and gray (5) areas. The left side and bottom of the grid are predominantly red, while the center and right side are mostly gray. The black squares, including the 'L' shape in the top right and the scattered squares, remain unchanged.
+
+test_case_0:
+  input: |
+    This test case is not provided in the given code snippet.
+  output: |
+    This test case is not provided in the given code snippet.

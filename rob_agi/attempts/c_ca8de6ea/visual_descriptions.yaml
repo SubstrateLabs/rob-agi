@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 5x5 grid with a blue square in the top-left corner, a brown square in the top-right corner, a gray square in the second row second column, a sky blue square in the second row fourth column, an orange square in the center, a sky blue square in the fourth row second column, a gray square in the fourth row fourth column, and a brown square in the bottom-left corner, and a blue square in the bottom-right corner. The rest of the squares are black (empty).
+  output: |
+    A 3x3 grid where the corners match the corners of the input grid (blue in top-left and bottom-right, brown in top-right and bottom-left). The center square is orange. The middle squares of each edge are gray on top and bottom, and sky blue on left and right.
+
+example_1:
+  input: |
+    A 5x5 grid with a magenta square in the top-left corner, an orange square in the top-right corner, a red square in the second row second column, a yellow square in the second row fourth column, a green square in the center, a yellow square in the fourth row second column, a red square in the fourth row fourth column, and an orange square in the bottom-left corner, and a magenta square in the bottom-right corner. The rest of the squares are black (empty).
+  output: |
+    A 3x3 grid where the corners match the corners of the input grid (magenta in top-left and bottom-right, orange in top-right and bottom-left). The center square is green. The middle squares of each edge are red on top and bottom, and yellow on left and right.
+
+example_2:
+  input: |
+    A 5x5 grid with a red square in the top-left corner, a blue square in the top-right corner, a green square in the second row second column, a magenta square in the second row fourth column, a yellow square in the center, a magenta square in the fourth row second column, a green square in the fourth row fourth column, and a blue square in the bottom-left corner, and a red square in the bottom-right corner. The rest of the squares are black (empty).
+  output: |
+    A 3x3 grid where the corners match the corners of the input grid (red in top-left and bottom-right, blue in top-right and bottom-left). The center square is yellow. The middle squares of each edge are green on top and bottom, and magenta on left and right.
+
+test_case_0:
+  input: |
+    A 5x5 grid with a magenta square in the top-left corner, an orange square in the top-right corner, a red square in the second row second column, a yellow square in the second row fourth column, a green square in the center, a yellow square in the fourth row second column, a red square in the fourth row fourth column, and an orange square in the bottom-left corner, and a magenta square in the bottom-right corner. The rest of the squares are black (empty).
+  output: |
+    Not provided in the test case.

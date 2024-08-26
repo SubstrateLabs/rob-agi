@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    The grid is 17x7. There are several red (2) 2x2 squares scattered across the grid. These squares are positioned at various locations: top-left corner, top-right corner, middle-left, middle-right, bottom-right, and a few in between. The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The grid maintains its 17x7 size. Most of the red (2) 2x2 squares have been transformed into sky blue (8) 2x2 squares. Specifically, all the squares touching the edges of the grid (top, left, right) have changed to sky blue. The red squares not touching any edge (in the middle of the grid) have remained red. The black (0) spaces remain unchanged.
+
+example_1:
+  input: |
+    The grid is 14x7. There are several red (2) 2x2 squares distributed across the grid. These squares are positioned at various locations: top-right corner, middle-left, middle-right, and bottom-middle. The rest of the grid is filled with black (0), representing empty space.
+  output: |
+    The grid maintains its 14x7 size. Some of the red (2) 2x2 squares have been transformed into sky blue (8) 2x2 squares. Specifically, the squares touching the top and bottom edges of the grid have changed to sky blue. The red squares not touching these edges (in the middle of the grid) have remained red. The black (0) spaces remain unchanged.
+
+example_2:
+  input: |
+    The grid is 15x7. There are several red (2) 2x2 squares scattered across the grid. These squares are positioned at various locations: top-middle, top-right, middle-left, middle-right, bottom-left, and bottom-middle. The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The grid maintains its 15x7 size. Most of the red (2) 2x2 squares have been transformed into sky blue (8) 2x2 squares. Specifically, all the squares touching the edges of the grid (top, left, right, bottom) have changed to sky blue. The red squares not touching any edge (in the middle of the grid) have remained red. The black (0) spaces remain unchanged.
+
+example_3:
+  input: |
+    The grid is 7x7. There are three red (2) 2x2 squares in the grid. One is in the top-right corner, one is in the middle-left edge, and one is in the bottom-middle. The rest of the grid is filled with black (0), representing empty space.
+  output: |
+    The grid maintains its 7x7 size. Two of the red (2) 2x2 squares have been transformed into sky blue (8) 2x2 squares. Specifically, the squares touching the edges of the grid (top-right and middle-left) have changed to sky blue. The red square in the bottom-middle, not touching any edge, has remained red. The black (0) spaces remain unchanged.
+
+example_4:
+  input: |
+    The grid is 5x7. There are two red (2) 2x2 squares in the grid. One is in the top-left corner, and one is in the bottom-right corner. The rest of the grid is filled with black (0), representing empty space.
+  output: |
+    The grid maintains its 5x7 size. One of the red (2) 2x2 squares has been transformed into a sky blue (8) 2x2 square. Specifically, the square in the bottom-right corner has changed to sky blue. The red square in the top-left corner has remained red. The black (0) spaces remain unchanged.

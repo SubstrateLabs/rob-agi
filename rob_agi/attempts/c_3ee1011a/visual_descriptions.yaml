@@ -1,0 +1,51 @@
+example_0:
+  input: |
+    A 29x29 grid mostly filled with black (0). There are three distinct colored regions:
+    1. A horizontal red (2) line of 5 squares in the 5th row, starting from the 3rd column.
+    2. A single sky blue (8) square in the 10th row, 16th column.
+    3. A horizontal green (3) line of 4 squares in the 13th row, starting from the 9th column.
+  output: |
+    A 5x5 grid with a distinct pattern:
+    1. The outer border is entirely red (2), forming a square frame.
+    2. Inside this frame is a 3x3 square of green (3).
+    3. At the very center is a single sky blue (8) square.
+
+example_1:
+  input: |
+    A 22x21 grid mostly filled with black (0). There are three distinct colored regions:
+    1. A vertical green (3) line of 4 squares in the 4th column, starting from the 4th row.
+    2. A vertical blue (1) line of 6 squares in the 14th column, starting from the 3rd row.
+    3. Two magenta (6) squares vertically aligned in the 9th column, 9th and 10th rows.
+  output: |
+    A 6x6 grid with a distinct pattern:
+    1. The outer border is entirely blue (1), forming a square frame.
+    2. Inside this frame is a 4x4 square of green (3).
+    3. At the center are four magenta (6) squares forming a 2x2 square.
+
+example_2:
+  input: |
+    A 24x20 grid mostly filled with black (0). There are four distinct colored regions:
+    1. A vertical sky blue (8) line of 8 squares in the 15th column, starting from the 1st row.
+    2. Two orange (7) squares horizontally aligned in the 9th row, 5th and 6th columns.
+    3. A vertical yellow (4) line of 4 squares in the 10th column, starting from the 10th row.
+    4. A horizontal green (3) line of 6 squares in the 16th row, starting from the 8th column.
+  output: |
+    An 8x8 grid with a distinct pattern:
+    1. The outer border is entirely sky blue (8), forming a square frame.
+    2. Inside this frame is a 6x6 square of green (3).
+    3. Inside the green square is a 4x4 square of yellow (4).
+    4. At the center are four orange (7) squares forming a 2x2 square.
+
+test_case_0:
+  input: |
+    A 24x20 grid mostly filled with black (0). There are four distinct colored regions:
+    1. A vertical sky blue (8) line of 8 squares in the 15th column, starting from the 1st row.
+    2. Two orange (7) squares horizontally aligned in the 9th row, 5th and 6th columns.
+    3. A vertical yellow (4) line of 4 squares in the 10th column, starting from the 10th row.
+    4. A horizontal green (3) line of 6 squares in the 16th row, starting from the 8th column.
+  output: |
+    An 8x8 grid with a distinct pattern:
+    1. The outer border is entirely sky blue (8), forming a square frame.
+    2. Inside this frame is a 6x6 square of green (3).
+    3. Inside the green square is a 4x4 square of yellow (4).
+    4. At the center are four orange (7) squares forming a 2x2 square.

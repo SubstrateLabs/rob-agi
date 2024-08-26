@@ -1,0 +1,38 @@
+example_0:
+  input: |
+    The grid is predominantly yellow (4), with several blue (1) regions. There's a large L-shaped blue region in the top-left corner. Another significant blue region is in the center-right, shaped like an inverted T. A large rectangular blue region occupies the bottom-center of the grid. There are also two small blue regions: one in the top-right corner and another small L-shaped region in the bottom-left.
+  output: |
+    The grid maintains its yellow (4) background but with significant transformations. The blue regions are now outlined in red (2) and filled differently:
+    1. The large L-shape in the top-left is now filled with blue (1) and outlined in red.
+    2. The inverted T-shape is now filled with sky blue (8) and outlined in red.
+    3. The large rectangle in the bottom-center is filled with blue (1) and outlined in red.
+    4. The small region in the top-right is now sky blue (8) and outlined in red.
+    5. The small L-shape in the bottom-left is now a special structure: outlined in red, with the corner filled with sky blue (8) and the rest blue (1).
+    There's also a new red line segmenting the top portion of the grid, and the left edge of the grid is now entirely red.
+
+example_1:
+  input: |
+    The grid is mostly yellow (4) with several blue (1) regions. There's an L-shaped blue region in the top-left corner, a T-shaped blue region in the top-right, and a large rectangular blue region in the bottom-center. There are also two small blue regions: one in the center-left and another small region in the center-right.
+  output: |
+    The grid maintains its yellow (4) background but with significant changes:
+    1. The L-shape in the top-left is now outlined in red (2) and filled with sky blue (8).
+    2. The T-shape in the top-right is outlined in red, filled with sky blue, with its center filled with magenta (6).
+    3. The large rectangle in the bottom-center is filled with blue (1) and outlined in red.
+    4. The small regions in the center are now part of a red outline structure.
+    The left edge and top edge of the grid are now red, and there's a red segmentation line separating the top and bottom portions of the grid.
+
+example_2:
+  input: |
+    The grid is predominantly yellow (4). There's a small 3x3 blue (1) square in the top-left quadrant, a single blue pixel in the right-center, and a larger irregular blue shape in the bottom-center that resembles a distorted rectangle or cross.
+  output: |
+    The yellow (4) background is maintained with several transformations:
+    1. The 3x3 blue square is now outlined in red (2) and filled with blue (1).
+    2. The single blue pixel is now a 3x3 structure: red outline with blue center.
+    3. The irregular shape in the bottom is now a larger rectangle, outlined in red, filled mostly with sky blue (8), with a small 2x2 magenta (6) square in its top-left corner.
+    There are also new red outlines and segmentation lines added to the grid, particularly around and above the transformed regions.
+
+test_case_0:
+  input: |
+    The grid is mostly yellow (4) with several blue (1) regions. There's a 3x3 blue square in the top-left quadrant, a single blue pixel in the top-right quadrant, and a larger irregular blue shape in the bottom-center that resembles a distorted rectangle or cross with a yellow "hole" in it.
+  output: |
+    The output grid is not provided for the test case.

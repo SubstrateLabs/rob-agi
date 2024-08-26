@@ -1,0 +1,53 @@
+example_0:
+  input: |
+    The grid contains several distinct shapes made of blue (1) and sky (8) colors on a black (0) background. These shapes appear to be L-shaped tetrominos or similar configurations. The shapes are scattered across the grid, with some overlapping or touching. There are five main clusters of these shapes:
+    1. Top-left: A small L-shape (3x2)
+    2. Top-middle: A larger L-shape (3x3)
+    3. Middle-right: An inverted L-shape (3x3)
+    4. Bottom-left: Another L-shape (3x2)
+    5. Bottom-middle: A larger, more complex shape (4x3)
+    Each shape contains at least one sky (8) colored square, usually at a corner or end of the L.
+  output: |
+    The output grid retains only three of the original shapes, removing any that are similar or smaller versions of others. The remaining shapes are:
+    1. Top-right: The small L-shape (2x2)
+    2. Middle-right: The inverted L-shape (3x3)
+    3. Bottom-middle: The larger, complex shape (4x3)
+    All other shapes have been removed, leaving more black (0) space. The retained shapes maintain their original positions and colors.
+
+example_1:
+  input: |
+    The grid contains several distinct shapes and patterns made of blue (1) and sky (8) colors on a black (0) background. The shapes are more varied and complex than in the previous example:
+    1. Top-left: A 3x3 square with a sky (8) square in the center
+    2. Top-right: A 3x2 rectangle
+    3. Middle-left: A large 4x4 square with a sky (8) square in the top-left corner
+    4. Middle-right: A complex 4x3 shape with two sky (8) squares
+    5. Bottom-right: Another complex 4x4 shape with three sky (8) squares arranged diagonally
+    The shapes are spread out across the grid with some empty space between them.
+  output: |
+    The output grid retains only one shape from the original input:
+    1. Top-left: The 3x3 square with a sky (8) square in the center
+    All other shapes and patterns have been completely removed, leaving the rest of the grid as black (0) space. The retained shape maintains its original position and colors.
+
+example_2:
+  input: |
+    The grid contains multiple shapes and patterns made of blue (1) and sky (8) colors on a black (0) background. The shapes are varied and distributed across the grid:
+    1. Top-left: A 4x4 square
+    2. Top-middle: A complex 4x4 shape with three sky (8) squares
+    3. Top-right: A small 2x2 L-shape
+    4. Middle-right: A 4x3 rectangle
+    5. Middle-left: A 5x3 shape resembling a cross or plus sign
+    6. Bottom-middle: A 3x3 square with a sky (8) square in the center
+    7. Bottom-right: A 4x4 square with sky (8) squares in opposite corners
+    The shapes are densely packed with little empty space between them.
+  output: |
+    The output grid retains only three shapes from the original input:
+    1. Top-left: The 4x4 square
+    2. Middle-right: The 4x3 rectangle
+    3. Bottom-middle: The 3x3 square with a sky (8) square in the center
+    All other shapes and patterns have been removed, leaving more black (0) space. The retained shapes maintain their original positions and colors.
+
+test_case_0:
+  input: |
+    The input grid is not provided in the test file.
+  output: |
+    The expected output grid is not provided in the test file.

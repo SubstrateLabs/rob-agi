@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The grid is predominantly filled with various colors, creating a complex pattern. There are several black (0) regions scattered throughout, particularly noticeable in the top-left and bottom-right areas. The center of the grid contains a mix of colors, including red (2), green (3), yellow (5), orange (7), and brown (9). There are also some sky blue (8) squares present, mainly in the left and central parts of the grid.
+  output: |
+    The output grid maintains most of the original color pattern but introduces a continuous blue (1) path that weaves through the grid. This blue path starts from the left edge, moves through the center, and reaches the bottom edge. It appears to connect some of the larger black regions, creating a network-like structure. The path is mostly thin (one square wide) but occasionally forms small loops or branches. The blue path touches all four edges of the grid at some point.
+
+example_1:
+  input: |
+    This grid has a more sparse and scattered color distribution compared to the previous example. There are numerous white (0) spaces, giving the grid an open feel. The colors present include red (2), green (3), yellow (4), and magenta (6), distributed in small clusters or individual squares throughout the grid. There's a noticeable absence of large contiguous color regions.
+  output: |
+    The output grid introduces a blue (1) path that snakes through the previously empty spaces. This path is more prominent and covers more area than in the previous example. It forms a complex network, connecting various parts of the grid and touching all four edges. The path creates several loops and branches, particularly in the center and left side of the grid. All other colored squares remain unchanged, with the blue path weaving around them.
+
+example_2:
+  input: |
+    This grid presents a busy and colorful pattern with very few black (0) spaces. It features a mix of all colors, with notable presence of brown (9), orange (7), and green (3). The colors are distributed in small clusters or individual squares, creating a mosaic-like appearance. There are some larger clusters of similar colors, particularly in the bottom-right quadrant.
+  output: |
+    The output grid maintains most of the original color pattern but introduces a blue (1) path that weaves through the grid. This path is less prominent than in the previous examples due to the busy nature of the original grid. It starts from the left edge, creates a loop in the top-left quadrant, then moves towards the center and bottom-right of the grid. The path touches all four edges and creates several small branches and loops. It appears to connect some of the larger clusters of similar colors, particularly in the bottom half of the grid.

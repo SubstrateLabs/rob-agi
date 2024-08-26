@@ -1,0 +1,41 @@
+example_0:
+  input: |
+    A 16x16 grid predominantly filled with blue (1). There are three distinct non-blue regions:
+    1. A 4x4 black (0) square in the top-left corner, with a small 2x2 red (2) square inside it.
+    2. A 4x4 region in the top-right, mostly black with a 2x2 green (3) square in its top-right corner.
+    3. A 4x4 black square in the bottom-center, with a yellow (4) bar across its top row.
+  output: |
+    A compact 4x4 grid containing all the non-blue elements from the input:
+    1. The yellow (4) bar forms the top row.
+    2. The green (3) 2x2 square occupies the middle-right.
+    3. The red (2) 2x2 square is in the bottom-left corner.
+    4. The remaining spaces are filled with black (0).
+
+example_1:
+  input: |
+    A 16x16 grid predominantly filled with sky blue (8). There are four distinct non-sky blue regions:
+    1. A 4x4 region in the top-left, mostly black (0) with a 2x2 blue (1) square in its top-left corner.
+    2. A 4x4 region in the top-right, mostly black with a 2x2 green (3) square in its top-right corner.
+    3. A 4x4 region in the middle-left, forming a small red (2) triangle or arrow pointing down-right, surrounded by black.
+    4. A 4x4 region in the bottom-right, mostly black with two yellow (4) squares in its bottom-right corner.
+  output: |
+    A compact 3x4 grid containing all the non-sky blue elements from the input:
+    1. The top row contains black (0) and green (3) squares.
+    2. The middle row has the blue (1) squares and the top of the red (2) triangle.
+    3. The bottom row completes the red triangle and includes the yellow (4) squares.
+
+example_2:
+  input: |
+    A 16x16 grid predominantly filled with brown (9). There are two distinct non-brown regions:
+    1. A 5x7 region in the top-left, forming a complex shape made of black (0) and blue (1). The blue forms a curved or zigzag line.
+    2. A 5x5 region in the middle-right, mostly black with a red (2) shape that looks like an inverted 'L' or a small staircase.
+  output: |
+    A compact 4x5 grid containing all the non-brown elements from the input:
+    1. The top three rows represent the complex shape from the top-left of the input, preserving the curved blue line surrounded by black.
+    2. The bottom row shows the inverted 'L' or staircase shape in red, surrounded by black.
+
+test_case_0:
+  input: |
+    This test case is not provided in the given code snippet.
+  output: |
+    This test case is not provided in the given code snippet.

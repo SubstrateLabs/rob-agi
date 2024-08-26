@@ -1,0 +1,35 @@
+example_0:
+  input: |
+    A complex 17x13 grid with various colored elements. The most prominent features are two pairs of sky blue (8) rectangles, one pair in the top-right quadrant and another in the bottom-left. There are several scattered brown (9) elements, often appearing near the edges. The grid has a mix of other colors distributed throughout, including some small clusters of red (2), green (3), and yellow (4). There's a noticeable gray (5) element in the top-right corner. The grid has many black (0) spaces, giving it a sparse appearance overall.
+  output: |
+    A much smaller 5x4 grid, seemingly extracted from the input. It contains a mix of colors, with the most prominent being a magenta (6) element in the top-left corner. The grid includes green (3), yellow (4), blue (1), and gray (5) elements, arranged in a pattern that doesn't immediately correspond to any obvious shape or object.
+
+example_1:
+  input: |
+    A 15x12 grid with several distinct features. The most striking elements are two pairs of sky blue (8) rectangles, one pair in the middle-left and another in the middle-right of the grid. There's a pattern of orange (7) elements forming a partial frame in the top-right quadrant. The grid also contains scattered brown (9) elements, often appearing in small clusters. There's a noticeable vertical line of red (2) elements in the right half of the grid. The bottom half of the grid is more sparsely populated with colored elements compared to the top half.
+  output: |
+    A very small 4x2 grid, appearing to be extracted from the input. It contains a mix of colors including green (3), yellow (4), orange (7), and blue (1). The arrangement doesn't form any immediately recognizable pattern or shape.
+
+example_2:
+  input: |
+    A 10x12 grid with several distinct features. The most prominent elements are two pairs of sky blue (8) rectangles, one pair in the middle-left and another in the middle-right of the grid. There's a cluster of brown (9) elements in the top-left corner. The grid also contains scattered red (2) and green (3) elements. There's a noticeable yellow (4) element in the top-right corner. The bottom half of the grid is more sparsely populated with colored elements compared to the top half.
+  output: |
+    A small 6x2 grid, seemingly extracted from the input. It contains a mix of colors including brown (9), orange (7), yellow (4), green (3), and blue (1). The arrangement doesn't form any immediately recognizable pattern or shape, but it appears to be a continuous section from the input grid.
+
+example_3:
+  input: |
+    A complex 17x12 grid with various colored elements. The most prominent features are three pairs of sky blue (8) rectangles, distributed across the grid. There are several scattered brown (9) elements, often appearing near the edges or in small clusters. The grid has a mix of other colors distributed throughout, including some small clusters of red (2), green (3), and yellow (4). There's a noticeable vertical line of orange (7) elements in the left third of the grid. The grid has many black (0) spaces, giving it a somewhat sparse appearance overall.
+  output: |
+    A 6x5 grid, seemingly extracted from the input. It contains a mix of colors, with green (3), yellow (4), orange (7), blue (1), and red (2) elements. The arrangement doesn't form any immediately recognizable pattern or shape, but it appears to be a continuous section from the input grid. The left column is entirely filled with colored elements, while the right side has more black (0) spaces.
+
+example_4:
+  input: |
+    A 16x13 grid with several distinct features. The most prominent elements are three pairs of sky blue (8) rectangles, distributed across the grid. There are scattered brown (9) elements, often appearing in small clusters or near the edges. The grid also contains a mix of other colors, including red (2), green (3), and yellow (4) elements. There's a noticeable cluster of orange (7) elements in the top-left quadrant. The grid has many black (0) spaces, giving it a somewhat sparse appearance overall.
+  output: |
+    A small 3x4 grid, seemingly extracted from the input. It contains a mix of colors including green (3), yellow (4), and red (2). The arrangement doesn't form any immediately recognizable pattern or shape, but it appears to be a continuous section from the input grid. The top-left element is green (3), and the bottom-right is red (2).
+
+test_case_0:
+  input: |
+    A 16x13 grid with several distinct features. The most prominent elements are three pairs of sky blue (8) rectangles, distributed across the grid. There are scattered brown (9) elements, often appearing in small clusters or near the edges. The grid also contains a mix of other colors, including red (2), green (3), and yellow (4) elements. There's a noticeable cluster of orange (7) elements in the top-left quadrant. The grid has many black (0) spaces, giving it a somewhat sparse appearance overall.
+  output: |
+    No output grid is provided for this test case.

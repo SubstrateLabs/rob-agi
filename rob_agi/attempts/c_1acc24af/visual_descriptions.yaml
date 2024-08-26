@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid is 12x12. There's a blue (1) L-shaped structure in the upper-right quadrant. The L-shape is 3 cells wide at the top, extends down 3 cells on the right side, and has a 1-cell wide base that stretches across most of the grid. In the bottom-left quadrant, there's a gray (5) 2x2 square. To its right, there's a single gray cell. The rest of the grid is black (0).
+  output: |
+    The grid layout is mostly the same as the input. The blue L-shaped structure remains unchanged. The key difference is in the gray area: the 2x2 square in the bottom-left quadrant has been changed from gray (5) to red (2). The single gray cell to its right remains gray.
+
+example_1:
+  input: |
+    The grid is 12x12. There's a blue (1) structure in the top-left quadrant, forming an inverted U-shape. It's 4 cells wide at the top, extends down 3 cells on both sides, and has a 1-cell wide base that stretches across the entire grid width. In the bottom half, there are several gray (5) regions: a 2x2 square in the bottom-left, two 2x2 squares side by side in the bottom-center, and a small L-shaped formation (3 cells) in the bottom-right. The rest is black (0).
+  output: |
+    The grid layout is mostly the same as the input. The blue inverted U-shaped structure remains unchanged. The key difference is in the gray areas: the 2x2 square in the bottom-left and the two 2x2 squares in the bottom-center have all been changed from gray (5) to red (2). The small L-shaped gray formation in the bottom-right remains gray.
+
+example_2:
+  input: |
+    The grid is 12x12. There are two blue (1) structures in the top half: an inverted U-shape on the left (3 cells wide, 3 cells tall) and a C-shape on the right (3 cells wide, 4 cells tall). These are connected by a 1-cell wide blue line at the bottom. In the bottom half, there are several gray (5) regions: a 2x2 square in the bottom-left corner, a 3x3 square in the bottom-center with its top-left cell missing, and an L-shaped formation (5 cells) in the bottom-right. There's also a single gray cell above the L-shape. The rest is black (0).
+  output: |
+    The grid layout is mostly the same as the input. The blue structures in the top half remain unchanged. The key differences are in the gray areas: the 2x2 square in the bottom-left corner, the 3x3 square (minus one cell) in the bottom-center, and the L-shaped formation in the bottom-right have all been changed from gray (5) to red (2). The single gray cell above the L-shape remains gray.
+
+example_3:
+  input: |
+    The grid is 12x12. There's a complex blue (1) structure in the middle-top half. It consists of two inverted U-shapes connected by a horizontal line, with some additional connections. In the bottom half, there are several gray (5) regions: a 3x3 square in the bottom-left with its top-right cell missing, a 3x2 rectangle in the bottom-center, and two separate 2x2 squares on the right side. There's also a single gray cell to the left of the rightmost 2x2 square. The rest is black (0).
+  output: |
+    The grid layout is mostly the same as the input. The complex blue structure in the top half remains unchanged. The key differences are in the gray areas: the 3x3 square (minus one cell) in the bottom-left and the 3x2 rectangle in the bottom-center have been changed from gray (5) to red (2). The two 2x2 squares on the right side and the single gray cell remain gray.

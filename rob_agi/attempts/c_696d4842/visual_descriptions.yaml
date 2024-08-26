@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 30x30 grid with mostly black (empty) space. There's a yellow (4) L-shaped structure in the upper left quadrant, starting from row 5, column 6. It extends downwards for 11 cells and then turns right for 6 cells. There's a single red (2) cell at row 15, column 19. In the lower right quadrant, there's a blue (1) structure that resembles an inverted 'T'. It starts at row 23, column 10 with a horizontal line of 3 cells, then extends downwards for 4 cells. There's also a single magenta (6) cell at row 23, column 3.
+  output: |
+    The 30x30 grid maintains its overall structure but with significant changes. The yellow L-shape has been modified: the vertical part remains but is now red (2) from rows 5-10, and yellow (4) from rows 11-15. The horizontal part has been extended to span the entire width of the grid from column 6 to 19, ending at the red cell. The blue inverted 'T' structure has been transformed into a magenta (6) structure with the same shape but slightly larger. The horizontal part now spans 5 cells instead of 3. The single magenta cell in the input has been replaced by a horizontal line of 5 sky blue (8) cells from columns 2-6 in row 23.
+
+example_1:
+  input: |
+    A 20x20 grid with several distinct structures. In the top left, there's a green (3) 'L' shape starting at row 4, column 2, extending right for 5 cells and then down for 2 cells. Below this, there's a yellow (4) cell at row 5, column 10. In the center, there's a vertical yellow line from rows 6-10 in column 10. At the bottom, there's a magenta (6) horizontal line from columns 4-10 in row 15. There's also a sky blue (8) cell at row 10, column 6.
+  output: |
+    The 20x20 grid maintains its basic structure but with modifications. The green 'L' shape has been partially replaced: the horizontal part is now sky blue (8), while the vertical part remains green. The single yellow cell above the vertical yellow line has been connected to it, forming a continuous vertical yellow line from rows 5-10. The magenta horizontal line at the bottom has been extended to the left, now spanning from columns 4-11. A new vertical magenta line has been added, extending from rows 6-15 in column 10, connecting the yellow vertical line to the magenta horizontal line. The sky blue cell has been moved up to row 4, column 6, aligning with the new sky blue horizontal line.
+
+example_2:
+  input: |
+    A 20x20 grid with several structures. There's a magenta (6) cell at the top in row 0, column 8. Below this, there's a yellow (4) structure resembling a backwards 'F'. It starts with a vertical line from rows 3-6 in column 4, then has two horizontal extensions: one from columns 2-4 in row 3, and another from columns 4-8 in row 6. In the bottom half, there's a green (3) structure shaped like a '7'. It has a horizontal line from columns 3-9 in row 12, then a vertical line from rows 13-16 in column 9. This vertical line then extends right for 3 cells in row 16. There's also a sky blue (8) cell in the bottom right at row 16, column 18.
+  output: |
+    The 20x20 grid maintains its overall structure but with significant modifications. The magenta cell at the top has been extended downward, forming a vertical line from rows 0-3 in column 8. The yellow 'F' structure has been modified: the top horizontal part is now magenta (6), while the rest remains yellow. The vertical part of the yellow structure has been extended upward to connect with the magenta line. The green '7' structure has been partially modified: the horizontal part is now sky blue (8), while the vertical part remains green. The vertical green line has been extended downward to the bottom of the grid. The horizontal extension at the bottom of the green line has been significantly extended, now reaching all the way to the right edge of the grid, ending at the sky blue cell which remains in its original position.
+
+test_case_0:
+  input: |
+    A 20x20 grid with several distinct structures. At the top, there's a magenta (6) cell in row 0, column 8. In the upper left quadrant, there's a yellow (4) structure shaped like a backwards 'L'. It has a horizontal line from columns 2-4 in row 3, then a vertical line from rows 3-6 in column 4. This vertical line then extends right to form another horizontal line from columns 4-8 in row 6. In the center, there's a yellow cell at row 4, column 8. In the bottom half, there's a green (3) structure shaped like a '7'. It has a horizontal line from columns 3-9 in row 12, then a vertical line from rows 13-16 in column 9. This vertical line then extends right for 3 cells in row 16. There's also a sky blue (8) cell in the bottom right at row 16, column 18.
+  output: |
+    The output grid is not provided for the test case.

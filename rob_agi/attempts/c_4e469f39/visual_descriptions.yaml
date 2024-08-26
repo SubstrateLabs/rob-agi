@@ -1,0 +1,27 @@
+example_0:
+  input: |
+    A 10x10 grid mostly filled with black (0). In the center, there's a gray (5) shape that resembles an uppercase letter "H". The H is 4 rows tall and 4 columns wide, with the horizontal bar of the H being 1 row thick in the middle.
+  output: |
+    The grid is mostly the same as the input, but with two key differences:
+    1. A red (2) line has been added, starting from the left edge of the grid in row 3, extending right until it reaches the left side of the gray H.
+    2. The inside of the H has been filled with red (2), creating a red rectangle within the gray H shape.
+
+example_1:
+  input: |
+    A 10x10 grid mostly filled with black (0). In the right half of the grid, there's a gray (5) shape that resembles an uppercase letter "P". The P is 5 rows tall and 3 columns wide, with the loop of the P being 2 rows tall.
+  output: |
+    The grid is mostly the same as the input, but with two key differences:
+    1. A red (2) line has been added, starting from the right edge of the grid in row 3, extending left until it reaches the right side of the gray P.
+    2. The inside of the P has been filled with red (2), creating a red rectangle within the loop of the gray P shape.
+
+example_2:
+  input: |
+    A 10x10 grid mostly filled with black (0). There are two gray (5) shapes:
+    1. In the top-left quadrant, a shape resembling an uppercase letter "P". The P is 4 rows tall and 3 columns wide, with the loop of the P being 2 rows tall.
+    2. In the bottom-right quadrant, a shape resembling an uppercase letter "U". The U is 3 rows tall and 4 columns wide.
+  output: |
+    The grid is mostly the same as the input, but with several key differences:
+    1. A red (2) line has been added in row 2, starting from the left edge of the grid and extending right across the entire width of the grid.
+    2. The inside of the P in the top-left has been filled with red (2), creating a red rectangle within the loop of the gray P shape.
+    3. A red (2) line has been added in row 7, starting from the left edge of the grid and extending right until it reaches the left side of the gray U in the bottom-right.
+    4. The inside of the U in the bottom-right has been filled with red (2), creating a red rectangle within the gray U shape.

@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 20x20 grid with several red (2) rectangular blocks scattered throughout. There are three blue (1) dots: one in the top-left corner, one in the bottom-right corner, and one in the middle of the left edge. The rest of the grid is filled with black (0) squares.
+  output: |
+    The same 20x20 grid, but now with a continuous blue (1) path connecting all three blue dots. This path follows the edges of the grid and makes right-angle turns to avoid the red blocks. The red blocks remain unchanged. The areas enclosed by the blue path that were previously black are now filled with blue, creating larger blue regions.
+
+example_1:
+  input: |
+    A 10x20 grid with several red (2) rectangular blocks. There are two blue (1) dots: one in the top-left area and one in the bottom-left area. The rest of the grid is filled with black (0) squares.
+  output: |
+    The same 10x20 grid, but now with a continuous blue (1) path connecting the two blue dots. This path runs vertically down the left side of the grid, making right-angle turns to avoid the red blocks. The red blocks remain unchanged. The areas to the left of this blue path that were previously black are now filled with blue.
+
+example_2:
+  input: |
+    A 13x14 grid with several red (2) rectangular blocks scattered throughout. There are three blue (1) dots: one in the top-right corner, one in the middle-left edge, and one near the bottom-center. The rest of the grid is filled with black (0) squares.
+  output: |
+    The same 13x14 grid, but now with a continuous blue (1) path connecting all three blue dots. This path follows the edges of the grid and makes right-angle turns to avoid the red blocks. The red blocks remain unchanged. The areas enclosed by the blue path that were previously black are now filled with blue, creating larger blue regions. The blue path forms a sort of 'U' shape around the central red blocks.

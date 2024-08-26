@@ -1,0 +1,35 @@
+example_0:
+  input: |
+    A 24x24 grid with a complex pattern. The dominant colors are orange (7), yellow (4), and sky blue (8). There's a large symmetrical pattern resembling a stylized flower or mandala. The center has a 10x10 square of mostly gray (5) with some yellow (4) details. This is surrounded by a border of orange (7) and blue (1). The corners of the grid have patterns of sky blue (8), orange (7), and yellow (4) that mirror each other. There are also red (2) accents in the corners.
+  output: |
+    A small 3x3 grid. The top row is gray (5), yellow (4), orange (7). The middle row is blue (1), yellow (4), orange (7). The bottom row is yellow (4), orange (7), orange (7).
+
+example_1:
+  input: |
+    A 24x24 grid with a complex symmetrical pattern. The dominant colors are brown (9), red (2), and gray (5). The center has a large 12x12 square filled with a pattern of brown (9), yellow (4), and orange (7) squares. This central square is surrounded by a border of red (2) and gray (5). The corners of the grid have patterns of brown (9), red (2), and blue (1) that mirror each other. There are also green (3) accents in the bottom left corner.
+  output: |
+    A 2x6 grid. The top row is yellow (4), yellow (4), brown (9), brown (9), orange (7), orange (7). The bottom row is orange (7), orange (7), yellow (4), orange (7), yellow (4), yellow (4).
+
+example_2:
+  input: |
+    A 24x24 grid with a symmetrical pattern. The dominant colors are blue (1), orange (7), and sky blue (8). The center has a large 12x12 square filled with a pattern of sky blue (8), brown (9), and orange (7) squares. This central square is surrounded by a border of blue (1) and orange (7). The corners of the grid have patterns of blue (1), orange (7), and sky blue (8) that mirror each other. There are also green (3) accents forming a square in the bottom left corner.
+  output: |
+    A 7x8 grid. The pattern is mostly sky blue (8), orange (7), and blue (1), with some red (2) accents. The left side has more sky blue (8) while the right side has more orange (7) and blue (1). There's a diagonal pattern from top-left to bottom-right.
+
+example_3:
+  input: |
+    A 24x24 grid with a symmetrical pattern. The dominant colors are brown (9), red (2), gray (5), and blue (1). The center has a large 12x12 square filled with a pattern of blue (1), magenta (6), and yellow (4) squares. This central square is surrounded by a border of brown (9), red (2), and gray (5). The corners of the grid have patterns of brown (9), red (2), and gray (5) that mirror each other. There are also green (3) accents forming a large square in the center-left part of the grid.
+  output: |
+    A 7x8 grid. The pattern is mostly blue (1), magenta (6), and yellow (4), with some red (2) and brown (9) accents. The left side has more blue (1) and magenta (6) while the right side has more yellow (4) and red (2). There's a diagonal pattern from top-left to bottom-right.
+
+example_4:
+  input: |
+    A 24x24 grid with a symmetrical pattern. The dominant colors are red (2), brown (9), gray (5), and orange (7). The center has a large 12x12 square filled with a pattern of yellow (4), sky blue (8), and magenta (6) squares. This central square is surrounded by a border of red (2), brown (9), and gray (5). The corners of the grid have patterns of red (2), brown (9), and orange (7) that mirror each other. There are also green (3) accents forming a large square in the center-left part of the grid.
+  output: |
+    A 5x5 grid. The pattern is mostly gray (5), brown (9), yellow (4), and magenta (6). The top-left corner is gray (5), the bottom-right corner is brown (9). There's a diagonal pattern from top-left to bottom-right with yellow (4) and magenta (6) squares.
+
+test_case_0:
+  input: |
+    A 24x24 grid with a symmetrical pattern. The dominant colors are red (2), brown (9), gray (5), and orange (7). The center has a large 12x12 square filled with a pattern of yellow (4), sky blue (8), and magenta (6) squares. This central square is surrounded by a border of red (2), brown (9), and gray (5). The corners of the grid have patterns of red (2), brown (9), and orange (7) that mirror each other. There are also green (3) accents forming a large square in the center-left part of the grid.
+  output: |
+    Not provided in the test case.

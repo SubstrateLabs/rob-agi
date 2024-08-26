@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 15x15 grid with two distinct zones: a blue (1) zone in the upper half and a sky blue (8) zone in the lower half. In the blue zone, there are three separate red (2) regions: two 2x2 squares and one 3x3 square. In the sky blue zone, there are two red regions: a single red cell and a 3x3 square.
+  output: |
+    The same 15x15 grid structure with blue and sky blue zones. However, all red regions in the blue zone have been moved to the rightmost edge of the blue area, maintaining their vertical position and shape. In the sky blue zone, all red regions have been moved to the leftmost edge, also maintaining their vertical position and shape.
+
+example_1:
+  input: |
+    A 13x11 grid divided vertically into two zones: a blue (1) zone on the left and a sky blue (8) zone on the right. In the blue zone, there are three red (2) regions: two 2x2 squares and one 3x2 rectangle. In the sky blue zone, there are two red regions: one 2x3 rectangle and one 2x2 square.
+  output: |
+    The same 13x11 grid structure. In the blue zone, all red regions have been moved to the rightmost edge of the blue area, maintaining their vertical position and shape. In the sky blue zone, all red regions have been moved to the leftmost edge of the sky blue area, also maintaining their vertical position and shape.
+
+example_2:
+  input: |
+    A 14x12 grid divided vertically into three zones: a sky blue (8) zone on the left, a blue (1) zone in the middle, and another sky blue (8) zone on the right. In the left sky blue zone, there are three red (2) regions: two 2x2 squares and one 2x1 rectangle. In the blue zone, there are three red regions: one 2x2 square, one 3x2 rectangle, and another 2x2 square. In the right sky blue zone, there are no red regions.
+  output: |
+    The same 14x12 grid structure. In the left sky blue zone, all red regions have been moved to the leftmost edge, maintaining their vertical position and shape. In the blue zone, all red regions have been moved to the rightmost edge, also maintaining their vertical position and shape. The right sky blue zone remains unchanged.
+
+example_3:
+  input: |
+    An 11x12 grid divided horizontally into two zones: a sky blue (8) zone in the upper half and a blue (1) zone in the lower half. In the sky blue zone, there are two red (2) regions: one 2x2 square and one 3x2 rectangle. In the blue zone, there are three red regions: two 2x2 squares and one single red cell.
+  output: |
+    The same 11x12 grid structure. In the sky blue zone, all red regions have been moved to the leftmost edge, maintaining their vertical position and shape. In the blue zone, all red regions have been moved to the rightmost edge, also maintaining their vertical position and shape.

@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    The grid is 30x30. The top and bottom rows, as well as the leftmost and rightmost columns, form a frame-like border consisting of various colors (3, 9, 4, 2). Inside this frame is a large black (0) rectangular area, taking up most of the grid's interior. This black area is interrupted by a few colored regions: two small rectangular areas in the top-right and bottom-left corners (colors 7, 2), and a larger irregular shape in the center-right area (colors 7, 2, 3).
+  output: |
+    The grid maintains its 30x30 size and the colored frame-like border. The previously black (0) area has been filled with a pattern that appears to be an extension or continuation of the colored regions that were present in the input. The top-right and bottom-left colored rectangles have expanded to fill more of the previously black space. The center-right irregular shape has also expanded, filling a significant portion of the grid with a pattern of colors 7, 2, and 3. The pattern seems to follow the logic of the original colored areas, extending their patterns to fill the entire space.
+
+example_1:
+  input: |
+    The grid is 30x30. It has a complex pattern of colors (7, 8, 5, 9, 3) covering most of the grid. There are several black (0) areas scattered throughout the grid, forming irregular shapes. The largest black area is in the bottom-right quadrant of the grid, with smaller black areas in the center and towards the left side.
+  output: |
+    The grid remains 30x30. All previously black (0) areas have been filled with colors that match and continue the patterns of the surrounding colored areas. The large black area in the bottom-right has been filled with a pattern that seems to be an extension of the colors and patterns from its edges. The smaller black areas in the center and left side have also been filled, maintaining continuity with the surrounding color patterns. The overall effect is a complete, uninterrupted pattern across the entire grid.
+
+example_2:
+  input: |
+    The grid is 30x30. It features a complex pattern of colors (6, 4, 3, 8, 5, 1) covering most of the grid. There are black (0) areas forming a rough 'T' shape in the center of the grid, with the vertical part of the 'T' extending from the top to about two-thirds down the grid, and the horizontal part spanning almost the full width in the lower third of the grid.
+  output: |
+    The grid maintains its 30x30 size. The black (0) 'T' shape has been completely filled with colors that continue the patterns from the surrounding areas. The vertical part of the 'T' has been filled with a pattern that extends from the top, matching the colors and patterns of the adjacent areas. The horizontal part of the 'T' has been filled similarly, with patterns extending from both sides to meet in the middle. The result is a fully colored grid with no remaining black areas, and the pattern appears continuous and coherent across the entire grid.
+
+example_3:
+  input: |
+    The grid is 30x30. It has a complex pattern of colors (8, 7, 5, 9, 3) covering most of the grid. There are several black (0) areas forming irregular shapes. The largest black area is in the center-right of the grid, with smaller black areas scattered in the bottom-left quadrant and a few small spots in the top-right.
+  output: |
+    The grid remains 30x30. All black (0) areas have been filled with colors that continue the patterns from the surrounding colored areas. The large black area in the center-right has been filled with a pattern that extends from its edges, matching the surrounding colors and patterns. The smaller black areas in the bottom-left and the spots in the top-right have also been filled, maintaining continuity with the adjacent color patterns. The result is a complete, uninterrupted pattern across the entire grid, with no remaining black areas.
+
+test_case_0:
+  input: |
+    The grid is 30x30. It features a complex pattern of colors (6, 4, 3, 8, 5, 1) covering most of the grid. There are black (0) areas forming an irregular shape that resembles an inverted 'L' or a backwards 'J'. This black area starts from the top-left corner, extends about halfway down the left side, then turns right and extends almost to the right edge of the grid. There are also a few small black spots scattered in the bottom-right quadrant of the grid.
+  output: |
+    Based on the pattern observed in the examples, we would expect the output to be a 30x30 grid where all black (0) areas have been filled with colors that continue the patterns from the surrounding colored areas. The inverted 'L' or backwards 'J' shape would likely be filled with a pattern that extends from its edges, matching the colors and patterns of the adjacent areas. The small black spots in the bottom-right quadrant would also be filled, maintaining continuity with the surrounding color patterns. The result would be a complete, uninterrupted pattern across the entire grid, with no remaining black areas.

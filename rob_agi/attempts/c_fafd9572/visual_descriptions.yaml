@@ -1,0 +1,33 @@
+example_0:
+  input: |
+    The grid contains several distinct shapes and patterns:
+    1. In the top-left corner, there's a 3x3 blue (1) cross or plus sign shape.
+    2. Directly below it, there's another 3x3 blue cross, slightly offset to the right.
+    3. In the bottom-left quadrant, there's a third 3x3 blue cross.
+    4. In the top-right corner, there's a small L-shaped pattern of red (2) and green (3) squares.
+    5. The rest of the grid is filled with black (0) squares, which can be considered as empty space.
+    The overall impression is of three blue crosses scattered across the left side of the grid, with a small colored accent in the top-right corner.
+  output: |
+    The output grid shows a transformation of the input:
+    1. The top-left blue cross has been changed to red (2).
+    2. The middle blue cross (slightly offset to the right) has been changed to green (3).
+    3. The bottom-left blue cross has been split: the top half is green (3), the bottom half is red (2).
+    4. The small L-shaped pattern in the top-right corner remains unchanged.
+    5. All black (empty) spaces remain the same.
+    The overall effect is that the blue crosses have been recolored, with the bottom one split into two colors.
+
+example_1:
+  input: |
+    This grid has a simpler pattern:
+    1. In the top-right quadrant, there are two separate blue (1) L-shapes, mirror images of each other.
+    2. In the middle-left, there's another blue L-shape.
+    3. Near the top-left corner, there's a small pattern: a red (2) square, a yellow (4) square to its right, and a green (3) square below the red one.
+    4. The rest of the grid is filled with black (0) squares (empty space).
+    The overall impression is of scattered L-shapes with a small colorful accent in the corner.
+  output: |
+    The output grid shows a transformation similar to the previous example:
+    1. The top-right L-shapes have been recolored: the left one is now red (2), the right one is now yellow (4).
+    2. The middle-left L-shape has been changed to green (3).
+    3. The small pattern in the top-left (red, yellow, green squares) remains unchanged.
+    4. All black (empty) spaces remain the same.
+    As in the previous example, the blue shapes have been recolored, each to a different color.

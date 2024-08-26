@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 3x3 grid with orange (7) as the dominant color. The top-left and bottom-right corners are orange. The center is also orange. The top-right corner is magenta (6), and the bottom-left corner is blue (1). The middle of the right edge is magenta, and the middle of the left edge is red (2).
+  output: |
+    A 9x9 grid that appears to be an expanded version of the input. The central 3x3 section is identical to the input. The grid is symmetrical both horizontally and vertically. The corners (top-left, top-right, bottom-left, bottom-right) are all 3x3 sections that look like the input rotated 180 degrees. The top-center and bottom-center 3x3 sections are horizontal reflections of the input. The middle-left and middle-right 3x3 sections are vertical reflections of the input.
+
+example_1:
+  input: |
+    A 3x3 grid with a mix of colors. The left column is magenta (6) at the top, blue (1) in the middle, and yellow (4) at the bottom. The middle column is all blue (1). The right column is all orange (7).
+  output: |
+    A 9x9 grid that expands on the input pattern. The central 3x3 section is identical to the input. The grid shows symmetry both horizontally and vertically. The four corners (top-left, top-right, bottom-left, bottom-right) are 3x3 sections that appear to be the input rotated 180 degrees. The top-center and bottom-center 3x3 sections are horizontal reflections of the input. The middle-left and middle-right 3x3 sections are vertical reflections of the input.
+
+example_2:
+  input: |
+    A 3x3 grid with a diagonal pattern. The top-left to bottom-right diagonal is blue (1). The top-right corner is yellow (4), the bottom-left corner is magenta (6). The remaining two squares are brown (9).
+  output: |
+    A 9x9 grid that expands the input pattern. The central 3x3 section is identical to the input. The grid displays symmetry both horizontally and vertically. The four corners (top-left, top-right, bottom-left, bottom-right) are 3x3 sections that look like the input rotated 180 degrees. The top-center and bottom-center 3x3 sections are horizontal reflections of the input. The middle-left and middle-right 3x3 sections are vertical reflections of the input.

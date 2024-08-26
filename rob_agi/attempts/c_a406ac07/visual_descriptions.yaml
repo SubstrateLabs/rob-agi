@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The input grid is a 10x10 square. The right column is filled with colors in descending order from brown (9) at the top to gray (5) at the bottom, with each color occupying two rows. The bottom row is filled with the same color pattern. The rest of the grid is filled with black (0), creating an L-shaped black area.
+  output: |
+    The output grid maintains the same overall structure as the input, but with significant changes. The colored squares from the right column and bottom row have expanded inward, forming 2x2 squares of each color. These squares are positioned in a diagonal pattern from top-left to bottom-right, with the brown squares at the top-left and the gray squares at the bottom-right. The remaining space is still filled with black (0).
+
+example_1:
+  input: |
+    The input is another 10x10 grid. The right column shows a pattern of colors from gray (5) at the top to brown (9) at the bottom, with some colors repeated. The bottom row mirrors this pattern. The rest of the grid is filled with black (0), again creating an L-shaped black area.
+  output: |
+    The output grid keeps the same basic structure but expands the colored areas. The single gray (5) square becomes a 1x1 square in the top-left and bottom-right. The orange (6) expands to a 2x2 square. The orange (7) forms a 3x3 square. The sky (8) becomes a single square. The brown (9) expands to a 3x3 square in the bottom-right corner. The remaining space is filled with black (0).
+
+example_2:
+  input: |
+    This 10x10 grid has a similar L-shaped pattern. The right column shows sky (8) for three rows, then yellow (4) for two, gray (5) for two, and green (3) for three. The bottom row reflects this pattern. The rest is black (0).
+  output: |
+    The output maintains the L-shape but expands the colored areas. The sky (8) color forms a 3x3 square in the top-left. The yellow (4) expands to a 3x3 square below it. The gray (5) becomes a 2x2 square. The green (3) forms a 3x3 square in the bottom-right corner. The remaining space is black (0).

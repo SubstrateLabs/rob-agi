@@ -1,0 +1,64 @@
+example_0:
+  input: |
+    A 7x6 grid with mostly black (empty) space. There are three distinct colored regions:
+    1. A small red (2) region in the top-left, consisting of two squares.
+    2. A green (3) square region in the middle-right, consisting of four squares in a 2x2 formation.
+    3. A blue (1) line at the bottom, with one square missing in the middle.
+  output: |
+    A 7x6 grid where the colored regions from the input have been moved to the bottom of the grid:
+    1. The red (2) region is now two squares wide at the bottom-left corner.
+    2. The green (3) square region is now at the bottom-right corner.
+    3. The blue (1) line remains at the bottom, but the gap has been filled.
+    The rest of the grid is black (empty).
+
+example_1:
+  input: |
+    An 8x8 grid with several distinct colored regions:
+    1. A red (2) square region in the top-left corner, 3x3 in size.
+    2. A gray (5) square region in the middle-right, 2x2 in size.
+    3. A sky blue (8) line at the bottom, with two squares missing.
+    The rest is black (empty) space.
+  output: |
+    An 8x8 grid where the colored regions from the input have been moved to the bottom of the grid:
+    1. The red (2) square region is now at the bottom-right corner.
+    2. The gray (5) square region is now at the bottom-left corner.
+    3. The sky blue (8) line remains at the bottom, but the gaps have been filled.
+    The rest of the grid is black (empty).
+
+example_2:
+  input: |
+    A 4x5 grid with two distinct colored regions:
+    1. A sky blue (8) region in the top-right corner, consisting of two squares.
+    2. A green (3) region occupying most of the bottom two rows, with one square missing in the top-left of this region.
+  output: |
+    A 4x5 grid where the colored regions have been rearranged:
+    1. The sky blue (8) region is now two vertical squares in the second column from the left.
+    2. The green (3) region now fully occupies the bottom two rows without any gaps.
+    The rest of the grid is black (empty).
+
+example_3:
+  input: |
+    A 9x12 grid with several distinct colored regions:
+    1. A gray (5) vertical line of two squares in the top-right quadrant.
+    2. A magenta (6) square region, 2x2 in size, in the left-middle area.
+    3. An orange (7) region, roughly L-shaped, in the middle-right area.
+    4. A blue (1) broken line at the bottom, with several gaps.
+    The rest is black (empty) space.
+  output: |
+    A 9x12 grid where all colored regions have been moved to the bottom:
+    1. The gray (5) region is now two horizontal squares on the third row from the bottom, on the left side.
+    2. The magenta (6) square region is now on the second row from the bottom, just to the right of the gray region.
+    3. The orange (7) region now forms a solid 3x3 square on the right side of the second and third rows from the bottom.
+    4. The blue (1) line now fully occupies the bottom row without gaps.
+    The rest of the grid is black (empty).
+
+test_case_0:
+  input: |
+    A 9x12 grid with several distinct colored regions:
+    1. A gray (5) vertical line of two squares in the top-right quadrant.
+    2. A magenta (6) square region, 2x2 in size, in the left-middle area.
+    3. An orange (7) region, roughly L-shaped, in the middle-right area.
+    4. A blue (1) broken line at the bottom, with several gaps.
+    The rest is black (empty) space.
+  output: |
+    Not provided in the test case.

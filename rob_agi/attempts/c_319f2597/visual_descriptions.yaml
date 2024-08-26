@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid is 20x20. There's a prominent vertical line of black (0) squares in the 8th and 9th columns, starting from row 7 and extending to the bottom. This line is interrupted by two pairs of black squares in rows 7-8. The rest of the grid is filled with various colors, creating a colorful, mosaic-like pattern.
+  output: |
+    The grid maintains its 20x20 size. The vertical line of black squares in columns 8-9 is now continuous from row 7 to the bottom, without interruptions. Additionally, row 7 is now entirely black except for a single non-black square in column 11. The upper-left 6x8 section remains unchanged, while the rest of the grid shows scattered changes to black squares, particularly in the lower half.
+
+example_1:
+  input: |
+    The grid is 20x20. There's a distinctive pattern in columns 7-8, starting as black (0) squares from row 12 downwards. Above this, in rows 1-11, these columns contain various colors. The rest of the grid is filled with a colorful, seemingly random pattern of different colors.
+  output: |
+    The grid maintains its 20x20 size. The black area in columns 7-8 now extends from row 3 to the bottom, creating a longer vertical line. Rows 12 and 13 are now almost entirely black, with only a few non-black squares remaining. The upper-left 6x6 section remains largely unchanged, while the rest of the grid shows scattered changes to black squares, particularly in the lower half and right side.
+
+example_2:
+  input: |
+    The grid is 20x20. There's a small 2x2 black (0) square in the center-right area, specifically at rows 5-6 and columns 15-16. The rest of the grid is filled with various colors in a seemingly random pattern.
+  output: |
+    The grid maintains its 20x20 size. The 2x2 black square has expanded into a vertical black line in columns 15-16, extending from the top to row 13. Additionally, rows 5-6 are now almost entirely black, with only a few non-black squares remaining. The upper-left section remains largely unchanged, while the rest of the grid shows scattered changes to black squares, particularly in the central and lower areas.
+
+test_case_0:
+  input: |
+    The grid is 20x20. There's no clear pattern or distinctive feature like in the previous examples. The entire grid is filled with various colors in a seemingly random distribution, creating a colorful mosaic-like appearance.
+  output: |
+    As this is a test case, no output is provided. Based on the pattern observed in the examples, we might expect to see the formation of black lines or areas, potentially expanding from any existing black squares or creating new ones in specific columns or rows.

@@ -1,0 +1,35 @@
+example_0:
+  input: |
+    An 11x14 grid with a complex pattern of red (2) and black (0) squares forming the majority. There are isolated blue (1) squares in the 4th, 6th, 8th, and 12th rows. Sky blue (8) squares appear in the 4th, 6th, 8th, 9th, and 12th rows. The pattern seems to have some symmetry but is not entirely regular. Red squares often form small clusters or lines.
+  output: |
+    A 5x5 grid with a simpler pattern. It consists mainly of red (2) squares forming a rough C-shape or partial frame around the edges. The interior and top-right corner contain black (0) squares. The pattern is more structured and symmetrical compared to the input.
+
+example_1:
+  input: |
+    A 4x11 grid with a sparse pattern. Red (2) squares are scattered throughout, forming small clusters. There are two blue (1) squares in the 3rd row and one sky blue (8) square in the same row. The pattern is mostly open with black (0) squares dominating.
+  output: |
+    A 1x7 grid showing a very simple pattern. It contains three red (2) squares separated by black (0) squares. The red squares are positioned at the 2nd, 6th, and 7th positions in the row.
+
+example_2:
+  input: |
+    A 5x10 grid with a pattern dominated by red (2) and black (0) squares. There are blue (1) squares in the 2nd and 4th rows, and sky blue (8) squares in the 2nd and 4th rows as well. The red squares form partial frames or lines in places.
+  output: |
+    A 2x3 grid showing a simple pattern. The top row alternates red (2) and black (0), while the bottom row is black (0), red (2), black (0). This forms a small, asymmetrical pattern.
+
+example_3:
+  input: |
+    A 6x12 grid with a complex pattern. Red (2) squares form partial frames and clusters. There are blue (1) squares in the 1st, 3rd, and 5th rows. Sky blue (8) squares appear in the 2nd, 3rd, and 5th rows. The pattern has some vertical symmetry but is not entirely regular.
+  output: |
+    A 3x4 grid showing a more structured pattern. The top row alternates red (2) and black (0). The middle row is all red (2). The bottom row starts with black (0) and then has three red (2) squares. This forms a partial frame or C-shape.
+
+example_4:
+  input: |
+    An 8x12 grid with a complex pattern. Red (2) squares form various clusters and lines. There are three blue (1) squares in the first three rows of the first column. Sky blue (8) squares appear in a vertical line in the 7th column of the first three rows. The pattern has some vertical symmetry but is not entirely regular.
+  output: |
+    A 3x6 grid showing a more structured pattern. The top row alternates red (2) and black (0) squares. The middle row has a similar pattern but with one more black square. The bottom row starts with black (0), then has two red (2) squares, followed by black (0), and ends with two more red (2) squares. This forms a partial frame with some internal structure.
+
+test_case_0:
+  input: |
+    An 8x12 grid with a complex pattern primarily composed of red (2) and black (0) squares. There are blue (1) squares in the 1st, 3rd, and 7th rows. Sky blue (8) squares appear in the 2nd, 4th, and 8th rows. The red squares form various clusters, partial frames, and lines throughout the grid. The pattern has some symmetry but is not entirely regular.
+  output: |
+    Not provided in the test case.

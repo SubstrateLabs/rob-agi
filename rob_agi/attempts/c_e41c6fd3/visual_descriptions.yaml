@@ -1,0 +1,57 @@
+example_0:
+  input: |
+    A 23x13 grid with three distinct shapes:
+    1. A red (2) inverted T-shape in the top-left quadrant.
+    2. A sky blue (8) square with a hollow center in the top-middle.
+    3. A yellow (4) square in the bottom-right quadrant.
+    All shapes are surrounded by black (0) space.
+    The red shape is 5x7, the sky blue is 6x6, and the yellow is 5x5.
+    Each shape has a 2x2 hollow space inside it at the bottom.
+  output: |
+    A 23x13 grid with the same three shapes, but they have been moved:
+    1. The red (2) inverted T-shape is now in the top-left corner.
+    2. The sky blue (8) square is now in the top-center.
+    3. The yellow (4) square is now in the top-right corner.
+    All shapes maintain their original size and internal structure.
+    The shapes are aligned at the top of the grid with two rows of black (0) space above them.
+    The rest of the grid below the shapes is filled with black (0) space.
+
+example_1:
+  input: |
+    A 30x14 grid with four distinct shapes spread across the grid:
+    1. A sky blue (8) shape resembling a thick backwards L in the top-left quadrant.
+    2. A blue (1) shape resembling an inverted U in the top-right quadrant.
+    3. A magenta (6) shape resembling a thick backwards L in the bottom-left quadrant.
+    4. A green (3) shape resembling an inverted U in the bottom-right quadrant.
+    All shapes have a 2x2 hollow space inside them.
+    The shapes are surrounded by black (0) space.
+  output: |
+    A 30x14 grid with the same four shapes, but they have been rearranged:
+    1. The sky blue (8) shape is now in the top-left corner.
+    2. The magenta (6) shape is now in the top-center-left.
+    3. The blue (1) shape is now in the top-center-right.
+    4. The green (3) shape is now in the top-right corner.
+    All shapes maintain their original size and internal structure.
+    The shapes are aligned at the top of the grid with two rows of black (0) space above them.
+    The rest of the grid below the shapes is filled with black (0) space.
+
+example_2:
+  input: |
+    A 30x16 grid with five distinct shapes spread across the grid:
+    1. A blue (1) shape resembling a thick T in the top-left quadrant.
+    2. A sky blue (8) shape resembling a thick backwards L in the top-center.
+    3. A yellow (4) shape resembling a thick backwards L in the middle-left.
+    4. A red (2) shape resembling a thick backwards L in the bottom-center.
+    5. A green (3) shape resembling a thick backwards L in the top-right quadrant.
+    All shapes have a 2x2 hollow space inside them.
+    The shapes are surrounded by black (0) space.
+  output: |
+    A 30x16 grid with the same five shapes, but they have been rearranged:
+    1. The blue (1) shape is now in the top-left corner.
+    2. The yellow (4) shape is now in the top-center-left.
+    3. The sky blue (8) shape is now in the top-center.
+    4. The red (2) shape is now in the top-center-right.
+    5. The green (3) shape is now in the top-right corner.
+    All shapes maintain their original size and internal structure.
+    The shapes are aligned at the top of the grid with two rows of black (0) space above them.
+    The rest of the grid below the shapes is filled with black (0) space.

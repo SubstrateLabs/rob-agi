@@ -1,0 +1,59 @@
+example_0:
+  input: |
+    An 11x13 grid with three distinct shapes:
+    1. A red (2) 'T' shape in the leftmost column, appearing three times vertically.
+    2. A blue (1) 'plus' or 'cross' shape in the middle, appearing four times vertically.
+    3. A green (3) rectangular shape on the right, appearing four times vertically.
+    These shapes are separated by rows of black (0), creating a pattern that repeats vertically.
+  output: |
+    A 3x11 grid that appears to be a condensed version of the input:
+    1. The red 'T' shape on the left.
+    2. The blue 'plus' shape in the middle.
+    3. The green rectangular shape on the right.
+    This seems to be one complete set of the pattern from the input.
+
+example_1:
+  input: |
+    A 9x11 grid with three distinct shapes:
+    1. A red (2) zigzag or lightning bolt shape on the left, appearing three times vertically.
+    2. A green (3) triangular or arrowhead shape in the middle, appearing three times vertically.
+    3. A blue (1) 'L' shape on the right, appearing three times vertically.
+    These shapes are separated by rows of black (0), creating a pattern that repeats vertically.
+  output: |
+    A 3x11 grid that appears to be a condensed and slightly modified version of the input:
+    1. The red zigzag shape on the left, now more symmetrical.
+    2. The green triangular shape in the middle, now more defined.
+    3. The blue 'L' shape on the right, now inverted to face the other direction.
+    This seems to be one complete, idealized set of the pattern from the input.
+
+example_2:
+  input: |
+    A 5x15 grid with four distinct shapes:
+    1. A red (2) 'F' shape on the far left.
+    2. A green (3) 'zigzag' shape left of center.
+    3. A blue (1) 'L' shape right of center.
+    4. A gray (5) vertical line on the far right.
+    These shapes appear once, separated by columns of black (0).
+  output: |
+    A 3x15 grid that appears to be a modified version of the input:
+    1. The red 'F' shape is now a full 'E' shape on the left.
+    2. The green 'zigzag' is now a more defined 'Z' shape.
+    3. The blue 'L' shape is now a full '+' or 'cross' shape.
+    4. The gray vertical line is now a full rectangle on the right.
+    Each shape seems to have been completed or idealized from its input form.
+
+example_3:
+  input: |
+    A 9x15 grid with four distinct shapes, each appearing twice vertically:
+    1. A red (2) 'X' shape on the far left.
+    2. A green (3) diamond shape left of center.
+    3. A blue (1) '+' or 'cross' shape right of center.
+    4. A gray (5) 'T' shape on the far right.
+    These shapes are separated by rows of black (0), creating a pattern that repeats vertically.
+  output: |
+    A 3x15 grid that appears to be a condensed and slightly modified version of the input:
+    1. The red 'X' shape on the far left, now more symmetrical.
+    2. The green diamond shape left of center, now more defined.
+    3. The blue '+' or 'cross' shape right of center, unchanged.
+    4. The gray 'T' shape on the far right, now a full rectangle.
+    This seems to be one complete, idealized set of the pattern from the input.

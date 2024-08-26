@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 3x3 grid with brown (9) squares forming an inverted L-shape along the top and right edges. The rest of the squares are black (0).
+  output: |
+    A 9x9 grid with brown (9) squares forming a complex pattern. The pattern resembles a larger version of the input, with the inverted L-shape repeated and rotated in each corner of the grid. The brown squares form continuous lines that connect these corner shapes, creating a symmetrical design. The rest of the grid is filled with black (0) squares.
+
+example_1:
+  input: |
+    A 3x3 grid with sky blue (8) squares forming a backwards Z-shape. The top-left and bottom-right corners are sky blue, connected by a diagonal line of sky blue squares. The rest of the squares are black (0).
+  output: |
+    A 9x9 grid with sky blue (8) squares forming a complex pattern. The pattern is similar to the input but expanded and repeated. Each corner of the grid contains a 3x3 section that resembles the input pattern, but rotated to fit the corner position. These corner patterns are connected by single sky blue squares along the edges of the grid, forming a symmetrical design. The rest of the grid is filled with black (0) squares.
+
+example_2:
+  input: |
+    A 3x3 grid with orange (7) squares forming a cross or plus sign shape. The center and all four edges of the grid are orange, while the corners are black (0).
+  output: |
+    A 9x9 grid with orange (7) squares forming a sparse, symmetrical pattern. The pattern consists of five distinct elements: a single orange square in the center, and four L-shaped patterns in each corner of the grid. These L-shapes are formed by two orange squares each. The rest of the grid is filled with black (0) squares, creating a lot of empty space between the orange elements.
+
+test_case_0:
+  input: |
+    A 3x3 grid with brown (9) squares forming an inverted L-shape along the top and right edges. The rest of the squares are black (0).
+  output: |
+    The output is not provided for this test case.

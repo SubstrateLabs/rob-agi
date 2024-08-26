@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The grid is 16x13 in size. It appears to be mostly composed of gray (5) and black (0) squares. The gray squares form an irregular border around the edges of the grid, with some intrusions into the center. The center of the grid is predominantly black, forming a large irregular shape. There's a single green (3) square near the center of the grid, surrounded by black squares.
+  output: |
+    The output grid maintains the same overall structure as the input, with the gray border and large black center. However, many of the black squares within the center have been replaced with green (3) squares. These green squares appear in a regular pattern, forming a kind of checkerboard or grid within the black area. The original green square from the input remains in its position.
+
+example_1:
+  input: |
+    The grid is 13x13 in size. It has a complex pattern of gray (5) and black (0) squares. The gray squares form an irregular border around the edges, with some intrusions into the center. The center is predominantly black. There's a single blue (1) square slightly off-center, surrounded by black squares.
+  output: |
+    The output grid maintains the same overall structure of gray and black squares. However, many of the black squares within the center have been replaced with blue (1) squares. These blue squares form a regular grid or checkerboard pattern within the black area. The original blue square from the input remains in its position. Additionally, some black squares on the edges of the gray border have also been replaced with blue squares.
+
+test_case_0:
+  input: |
+    This test case is not provided in the given test file. There is no additional input grid to describe.
+  output: |
+    This test case is not provided in the given test file. There is no additional output grid to describe.

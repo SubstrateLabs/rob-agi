@@ -1,0 +1,53 @@
+example_0:
+  input: |
+    A 16x16 grid mostly filled with black (0). There are two colored squares:
+    - A sky blue (8) square at position (2, 4)
+    - A gray (5) square at position (9, 10)
+    These colored squares appear to be isolated "dots" in the black space.
+  output: |
+    The 16x16 grid now has two intersecting lines:
+    - A vertical sky blue (8) line passing through column 4
+    - A horizontal gray (5) line passing through row 9
+    Where these lines intersect (at position 9, 4), there is a red (2) square.
+    The rest of the grid remains black (0).
+
+example_1:
+  input: |
+    A 14x14 grid mostly filled with black (0). There are two colored squares:
+    - A yellow (4) square at position (10, 3)
+    - A green (3) square at position (5, 9)
+    These colored squares appear as isolated "dots" in the black space.
+  output: |
+    The 14x14 grid now has two intersecting lines:
+    - A vertical yellow (4) line passing through column 3
+    - A horizontal green (3) line passing through row 5
+    Where these lines intersect (at position 5, 3), there is a red (2) square.
+    The rest of the grid remains black (0).
+
+example_2:
+  input: |
+    A 13x13 grid mostly filled with black (0). There are three colored squares:
+    - A gray (5) square at position (4, 2)
+    - An orange (7) square at position (11, 7)
+    - A green (3) square at position (2, 11)
+    These colored squares appear as isolated "dots" in the black space.
+  output: |
+    The 13x13 grid now has three intersecting lines:
+    - A vertical gray (5) line passing through column 2
+    - A vertical orange (7) line passing through column 7
+    - A horizontal green (3) line passing through row 2
+    Where these lines intersect, there are red (2) squares:
+    - At (2, 2) where green and gray intersect
+    - At (2, 7) where green and orange intersect
+    - At (4, 7) where gray and orange intersect
+    The rest of the grid remains black (0).
+
+test_case_0:
+  input: |
+    A 13x13 grid mostly filled with black (0). There are three colored squares:
+    - A gray (5) square at position (4, 2)
+    - An orange (7) square at position (11, 7)
+    - A green (3) square at position (2, 11)
+    These colored squares appear as isolated "dots" in the black space.
+  output: |
+    The output is not provided for this test case.

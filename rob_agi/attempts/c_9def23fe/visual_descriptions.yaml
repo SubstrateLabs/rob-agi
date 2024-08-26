@@ -1,0 +1,64 @@
+example_0:
+  input: |
+    A 25x21 grid with a prominent red rectangle (color 2) in the top-left corner, spanning from row 1 to row 8 and column 2 to column 9. The rest of the grid is mostly black (0), with several sky blue dots (color 8) scattered around:
+    - One at (1, 21)
+    - One at (2, 19)
+    - One at (4, 15)
+    - One at (7, 18)
+    - One at (12, 3)
+    - One at (13, 9)
+    - One at (15, 5)
+    - One at (17, 8)
+  output: |
+    The red rectangle has expanded both horizontally and vertically:
+    - It now spans the full width of the grid in rows 3, 5, 6, 7, and 8.
+    - Vertically, it extends from row 0 to row 20, with varying widths.
+    The sky blue dots remain in their original positions.
+    New vertical red lines appear at columns 2, 4, and 6, extending from row 9 to the bottom.
+    New horizontal red lines appear at rows 0, 1, 3, 5, 6, 7, and 8, extending across the full width.
+
+example_1:
+  input: |
+    A 15x20 grid with a red rectangle (color 2) in the center, spanning from row 5 to row 9 and column 4 to column 8. The rest of the grid is mostly black (0), with several green dots (color 3) scattered around:
+    - Two in column 4: rows 1 and 8
+    - One in column 6: row 3
+    - Two in column 8: rows 1 and 13
+    - One in column 12: row 5
+    - One in column 13: row 8
+    - One in column 5: row 16
+  output: |
+    The red rectangle has expanded both horizontally and vertically:
+    - It now spans the full width of the grid in rows 6 and 9.
+    - Vertically, it extends from row 0 to row 19, with varying widths.
+    The green dots remain in their original positions.
+    New vertical red lines appear at columns 4, 5, 6, and 7, extending from row 0 to the bottom.
+    New horizontal red lines appear at rows 5, 6, 7, 8, and 9, extending across the full width where they intersect with the vertical lines.
+
+example_2:
+  input: |
+    A 17x20 grid with a red rectangle (color 2) slightly off-center, spanning from row 4 to row 9 and column 5 to column 10. The rest of the grid is mostly black (0), with several yellow dots (color 4) scattered around:
+    - Two in row 1: columns 6 and 10
+    - One in row 4: column 2
+    - Two in row 8: columns 1 and 2
+    - One in row 9: column 14
+    - One in row 13: column 5
+    - One in row 14: column 9
+  output: |
+    The red rectangle has expanded both horizontally and vertically:
+    - It now spans the full width of the grid in rows 5, 6, 7, 8, and 9.
+    - Vertically, it extends from row 0 to row 19, with varying widths.
+    The yellow dots remain in their original positions.
+    New vertical red lines appear at columns 5, 6, 7, 8, 9, and 10, extending from row 0 to the bottom.
+    New horizontal red lines appear at rows 0, 1, 4, 5, 6, 7, 8, and 9, extending across the full width where they intersect with the vertical lines.
+
+test_case_0:
+  input: |
+    A 17x20 grid with a red rectangle (color 2) slightly off-center, spanning from row 4 to row 9 and column 5 to column 10. The rest of the grid is mostly black (0), with several yellow dots (color 4) scattered around:
+    - Two in row 1: columns 6 and 10
+    - One in row 4: column 2
+    - Two in row 8: columns 1 and 2
+    - One in row 9: column 14
+    - One in row 13: column 5
+    - One in row 14: column 9
+  output: |
+    Not provided in the test case.

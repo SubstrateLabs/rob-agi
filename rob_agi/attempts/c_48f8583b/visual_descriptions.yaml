@@ -1,0 +1,35 @@
+example_0:
+  input: |
+    A 3x3 grid with a mix of colors. The top row is brown-brown-magenta (9-9-6), the middle row is green-sky-sky (3-8-8), and the bottom row is sky-green-green (8-3-3). There's a diagonal of brown from top-left to middle, and a diagonal of green from middle to bottom-right.
+  output: |
+    A 9x9 grid where the input 3x3 grid is placed in the top-right corner. The rest of the grid is filled with black (0), creating a large empty space around the original pattern.
+
+example_1:
+  input: |
+    A 3x3 grid with sky, gray, and brown colors. The top row is sky-gray-gray (8-5-5), the middle row is all sky (8-8-8), and the bottom row is gray-brown-brown (5-9-9). There's a vertical line of sky in the left column.
+  output: |
+    A 9x9 grid where the input 3x3 grid is placed in the bottom-right corner. The pattern is then duplicated to its left, creating a 3x6 colored area. The rest of the grid is filled with black (0), leaving the top two-thirds and left third empty.
+
+example_2:
+  input: |
+    A 3x3 grid with orange and blue colors in a symmetrical pattern. The corners are orange (7), the sides are blue (1), and the center is orange (7). It forms a cross-like pattern of blue surrounded by orange.
+  output: |
+    A 9x9 grid where the input 3x3 pattern is repeated four times, forming a larger 6x6 pattern in the center. This creates a symmetrical design with four orange crosses connected by blue lines. The corners of the 9x9 grid are left black (0).
+
+example_3:
+  input: |
+    A 3x3 grid with green, red, and orange colors. The left column is green-red-gray (3-2-5), the middle column is red-red-gray (2-2-5), and the right column is all orange (7-7-7). There's a horizontal divide between the top two rows and the bottom row.
+  output: |
+    A 9x9 grid where the input 3x3 grid is placed in the top-left corner. The rest of the grid is filled with black (0), leaving a large empty space to the right and below the original pattern.
+
+example_4:
+  input: |
+    A 3x3 grid with blue, magenta, and gray colors. The top row is blue-magenta-magenta (1-6-6), the middle row is gray-blue-magenta (5-1-6), and the bottom row is all gray (5-5-5). There's a diagonal of blue from top-left to middle.
+  output: |
+    A 9x9 grid where the input 3x3 pattern is repeated twice. The original is in the top-left corner, and a copy is placed directly below it in the middle-left. The rest of the grid is filled with black (0), leaving the right two-thirds and bottom third empty.
+
+example_5:
+  input: |
+    A 3x3 grid with yellow and red colors. The top row is yellow-yellow-red (4-4-2), the middle row is all red (2-2-2), and the bottom row is red-yellow-red (2-4-2). It forms a symmetrical pattern with yellow corners except for the top-right.
+  output: |
+    A 9x9 grid where the input 3x3 pattern is repeated three times. The original is in the top-left corner, a copy is placed to its right, and another copy is in the bottom-left corner. This creates a larger 6x3 pattern in the top-left and a 3x3 pattern in the bottom-left. The rest of the grid is filled with black (0), leaving the bottom-right quarter empty.

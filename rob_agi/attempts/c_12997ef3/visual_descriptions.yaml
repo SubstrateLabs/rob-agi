@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 14x11 grid mostly filled with black (0). There's a small blue (1) shape in the top-left corner, resembling an irregular cross or plus sign. In the 8th row, there's a horizontal line of four colors: red (2), green (3), and yellow (4), each separated by a black square.
+  output: |
+    A 3x9 grid with a distinct pattern. The top row alternates between colored squares (red, green, yellow) and black squares. The middle row has the same colors but shifted one position to the right, with black filling the gaps. The bottom row is solid colors matching the top row pattern.
+
+example_1:
+  input: |
+    A 9x11 grid mostly black (0). There's a small blue (1) shape in the middle-left, resembling an inverted 'T'. In the right half, there's a vertical line of three colors: green (3), magenta (6), and sky (8), each separated by two black squares.
+  output: |
+    A 9x3 grid showing three distinct 3x3 patterns, one for each color (green, magenta, sky). Each pattern has the color in the center of the top row, full color in the bottom row, and a T-shape of the color in the middle row.
+
+example_2:
+  input: |
+    A 10x11 grid mostly black (0). There's a blue (1) shape in the top-left corner, resembling a small cluster or cloud. In the 7th row, there's a horizontal line of two colors: green (3) and red (2), separated by a black square.
+  output: |
+    A 3x6 grid showing two distinct 3x3 patterns, one for green and one for red. Each pattern has the color in the left and right of the top row, full color in the bottom row, and an inverted U-shape of the color in the middle row.
+
+example_3:
+  input: |
+    An 11x11 grid mostly black (0). There's a blue (1) shape near the top-left, resembling a small irregular cluster. In the top-right quadrant, there's a vertical line of three colors: magenta (6), blue (1), and red (2), each separated by one or more black squares.
+  output: |
+    A 6x3 grid showing three distinct 3x2 patterns, one for each color (magenta, blue, red). Each pattern has the color in the top-left, full color in the bottom row, and the color in the middle-right.
+
+test_case_0:
+  input: |
+    An 11x11 grid mostly black (0). There's a blue (1) shape near the top-left, resembling a small irregular cluster. In the top-right quadrant, there's a vertical line of three colors: magenta (6), blue (1), and red (2), each separated by one or more black squares.
+  output: |
+    Not provided in the test case.

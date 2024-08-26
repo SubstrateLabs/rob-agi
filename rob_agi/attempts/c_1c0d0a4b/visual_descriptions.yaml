@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 5x13 grid with a sky blue (8) pattern on a black (0) background. The pattern resembles a stylized letter "H" or two vertical lines connected by a horizontal line. The vertical lines are not solid, but have gaps. The top row and bottom row are entirely black. The second row from the top has three separate sky blue squares. The middle row has the most sky blue squares, forming a connected horizontal line with small gaps on either end.
+  output: |
+    A 5x13 grid with a red (2) pattern on a black (0) background. The pattern is different from the input, resembling more of an abstract shape or symbol. The top and bottom rows are entirely black. The second row from the top has four separate red squares. The third row has the most red squares, forming a disconnected pattern. The fourth row has only two red squares. The overall shape is less symmetric than the input and more scattered.
+
+example_1:
+  input: |
+    A 9x13 grid with a sky blue (8) pattern on a black (0) background. The pattern is more complex than the previous example, resembling multiple interconnected shapes or symbols. There are three distinct sections separated by rows of black. The top section (rows 1-4) has a pattern that looks like an incomplete grid or lattice. The middle section (row 6) has a single horizontal line of sky blue squares with small gaps. The bottom section (rows 7-8) has a pattern that looks like an inverted 'U' shape connected to two vertical lines.
+  output: |
+    A 9x13 grid with a red (2) pattern on a black (0) background. The pattern is significantly different from the input. The top section (rows 1-3) has scattered red squares forming no clear shape. The middle section (rows 5-6) has a more defined pattern, with row 5 having only one red square and row 6 having a horizontal line of red squares with gaps. The bottom section (rows 7-8) has a pattern that somewhat mirrors the top section but is not identical. Overall, the output pattern appears more random and less structured than the input.
+
+example_2:
+  input: |
+    A 9x9 grid with a sky blue (8) pattern on a black (0) background. The pattern is asymmetrical and complex. It consists of several disconnected shapes. In the top left, there's a horizontal line of three sky blue squares. Below it, there are two vertical lines of different lengths. In the middle right, there's a 2x2 square of sky blue. In the bottom left, there's an L-shaped pattern. In the bottom right, there's a horizontal line of three sky blue squares.
+  output: |
+    A 9x9 grid with a red (2) pattern on a black (0) background. The pattern is significantly different from the input. It appears more scattered and less structured. There are no complete lines or squares. The top left has a single red square. The middle left has a small cluster of red squares. The middle right has two disconnected red squares. The bottom right has a small cluster of red squares. Overall, the pattern seems to be a transformation of the input, but the exact relationship is not immediately clear.
+
+test_case_0:
+  input: |
+    A 9x9 grid with a sky blue (8) pattern on a black (0) background. The pattern is asymmetrical and complex. It consists of several disconnected shapes. In the top left, there's a horizontal line of three sky blue squares. Below it, there are two vertical lines of different lengths. In the middle right, there's a 2x2 square of sky blue. In the bottom left, there's an L-shaped pattern. In the bottom right, there's a horizontal line of three sky blue squares.
+  output: |
+    Not provided in the test case.

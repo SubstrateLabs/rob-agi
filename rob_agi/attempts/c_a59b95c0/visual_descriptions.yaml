@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 3x3 grid with a pattern of brown, orange, and magenta squares. The top row is brown-orange-brown, the middle row is brown-magenta-orange, and the bottom row is orange-magenta-magenta. This creates a somewhat asymmetrical pattern with brown dominating the top left, orange in the top right and bottom left, and magenta in the bottom right.
+  output: |
+    A 9x9 grid that appears to be the input grid repeated 3x3 times. The original 3x3 pattern is tiled to fill the larger grid, creating a repeating pattern of the brown, orange, and magenta squares. This repetition creates a larger, more complex pattern with interesting symmetries and repetitions of the original design.
+
+example_1:
+  input: |
+    A 3x3 grid with a pattern of green and yellow squares. The top row is green-yellow-yellow, the middle row is all green, and the bottom row repeats the top row (green-yellow-yellow). This creates a symmetrical pattern with green forming a T-shape and yellow filling the upper corners.
+  output: |
+    A 6x6 grid that is the input grid repeated 2x2 times. The original 3x3 pattern is tiled to fill the larger grid, creating a repeating pattern of the green T-shapes surrounded by yellow corners. This repetition creates a larger, more complex pattern with interesting symmetries and a checkerboard-like effect of the green T-shapes.
+
+example_2:
+  input: |
+    A 3x3 grid with a mix of sky blue, red, and green squares. The top row is sky-red-blue, the middle row is blue-sky-green, and the bottom row is red-blue-green. This creates an asymmetrical pattern with no clear dominant color or shape.
+  output: |
+    A 12x12 grid that is the input grid repeated 4x4 times. The original 3x3 pattern is tiled to fill the larger grid, creating a repeating pattern of the sky blue, red, green, and blue squares. This repetition creates a larger, more complex pattern that emphasizes the lack of symmetry in the original design, creating an almost chaotic, colorful mosaic effect.
+
+example_3:
+  input: |
+    A 3x3 grid dominated by orange squares with some red squares. The top row is all orange, the middle row is orange-red-red, and the bottom row is orange-orange-red. This creates a pattern where orange forms an L-shape and red fills the bottom right corner.
+  output: |
+    A 6x6 grid that is the input grid repeated 2x2 times. The original 3x3 pattern is tiled to fill the larger grid, creating a repeating pattern of the orange L-shapes with red corners. This repetition creates a larger pattern where the red squares form a kind of zigzag or staircase pattern through the orange background.
+
+example_4:
+  input: |
+    A 3x3 grid with a mix of red, green, and blue squares. The top row is red-green-red, the middle row is green-green-red, and the bottom row is red-red-blue. This creates an asymmetrical pattern with red dominating the edges, green in the center and top, and a single blue square in the bottom right corner.
+  output: |
+    A 9x9 grid that is the input grid repeated 3x3 times. The original 3x3 pattern is tiled to fill the larger grid, creating a repeating pattern of the red, green, and blue squares. This repetition creates a larger, more complex pattern that emphasizes the asymmetry of the original design. The blue squares now form a regular pattern of dots across the grid, while the red and green squares create various shapes and patterns in between.

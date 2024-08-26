@@ -1,0 +1,46 @@
+example_0:
+  input: |
+    The grid contains several red (2) dots arranged in a pattern. There are three distinct groups of red dots:
+    1. In the top-left quadrant, there's a diamond shape made of 5 red dots.
+    2. In the top-right quadrant, there's another diamond shape made of 5 red dots.
+    3. In the bottom-right quadrant, there's a smaller diamond shape made of 3 red dots.
+    The rest of the grid is filled with black (0), which can be considered as empty space.
+  output: |
+    The output grid maintains the same red dot pattern as the input, but with some additions:
+    1. The top two diamond shapes are now connected by a horizontal blue (1) line.
+    2. A vertical blue line extends downward from the center of the horizontal line, connecting to the smaller diamond shape in the bottom-right quadrant.
+    The rest of the grid remains filled with black (0) as empty space.
+
+example_1:
+  input: |
+    The grid contains three distinct red (2) diamond shapes, each made of 5 dots:
+    1. One in the left side of the grid.
+    2. One in the center of the grid.
+    3. One in the right side of the grid.
+    These diamonds are arranged in a horizontal line across the middle of the grid.
+    Below these, there's another partial diamond shape made of 4 red dots in the bottom-center of the grid.
+    The rest of the grid is filled with black (0) as empty space.
+  output: |
+    The output grid maintains the same red dot pattern as the input, with these additions:
+    1. The three complete diamond shapes in the middle are now connected by two horizontal blue (1) lines.
+    2. A vertical blue line extends downward from the center diamond, connecting it to the partial diamond shape at the bottom.
+    The rest of the grid remains filled with black (0) as empty space.
+
+example_2:
+  input: |
+    The grid contains four distinct red (2) diamond shapes, each made of 5 dots:
+    1. One small diamond in the top-center of the grid.
+    2. Two diamonds side by side in the middle of the grid.
+    3. One diamond in the bottom-center of the grid.
+    The rest of the grid is filled with black (0) as empty space.
+  output: |
+    The output grid maintains the same red dot pattern as the input, with these additions:
+    1. The two side-by-side diamonds in the middle are now connected by a horizontal blue (1) line.
+    2. Vertical blue lines extend from the center of this horizontal line, one going up to connect with the top diamond, and one going down to connect with the bottom diamond.
+    The rest of the grid remains filled with black (0) as empty space.
+
+test_case_0:
+  input: |
+    The input grid for the test case is not provided in the given code snippet.
+  output: |
+    The expected output grid for the test case is not provided in the given code snippet.

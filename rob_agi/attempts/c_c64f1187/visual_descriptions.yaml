@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    The input grid is 18x20. The top row contains single squares of different colors (red, green, yellow, sky) spaced out. The second and third rows have a pattern of blue squares forming incomplete rectangles or 'U' shapes. The rest of the top section is empty (black).
+    
+    The bottom half of the grid contains a pattern of 2x2 gray squares arranged in rows, with single colored squares (red, yellow, green, sky) placed in some of the bottom-right corners of these gray squares. These colored squares appear to correspond to the colors in the top row.
+  output: |
+    The output grid is smaller, 8x11. It appears to be a condensed version of the input.
+    
+    The top two rows contain 2x2 squares of the colors from the top row of the input (red, green, yellow, sky), arranged left to right.
+    
+    The bottom half mirrors the pattern from the input, with 2x2 squares of the same colors (red, yellow, green) arranged in a similar pattern, but more compact. The sky color appears as a 2x1 rectangle in the bottom right.
+
+example_1:
+  input: |
+    The input grid is 17x18. The second row contains single squares of different colors (red, green, orange) spaced out. The third and fourth rows have a pattern of blue squares forming incomplete rectangles or 'U' shapes, similar to the previous example.
+    
+    The bottom half of the grid contains a pattern of 2x2 gray squares arranged in rows, with single colored squares (green, orange, red) placed in some of the bottom-right corners of these gray squares. These colored squares appear to correspond to the colors in the second row.
+  output: |
+    The output grid is smaller, 8x14. It appears to be a condensed version of the input.
+    
+    The top two rows contain 2x2 squares of the colors from the second row of the input (green, green, orange), arranged left to right. The second green square is incomplete (only 2x1).
+    
+    The bottom half mirrors the pattern from the input, with 2x2 squares of the same colors (red, red, green, green, orange) arranged in a similar pattern, but more compact. Some of these squares are incomplete, missing their bottom-right corner.
+
+test_case_0:
+  input: |
+    This test case is not provided in the given code snippet. There is no additional input grid to describe.
+  output: |
+    There is no expected output grid provided for a test case in the given code snippet.

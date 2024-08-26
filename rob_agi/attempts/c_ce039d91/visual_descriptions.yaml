@@ -1,0 +1,56 @@
+example_0:
+  input: |
+    A 10x10 grid with mostly black (0) background. There are several gray (5) cells forming distinct shapes:
+    - A single gray cell in the top-left quadrant
+    - Two single gray cells in the top-right quadrant
+    - A large 'T' shape in the center, made of gray cells
+    - Two small clusters of gray cells in the bottom-left quadrant
+  output: |
+    The grid maintains its 10x10 size and black background. The changes are:
+    - The large 'T' shape in the center has been transformed from gray (5) to blue (1)
+    - One of the small clusters in the bottom-left quadrant has changed from gray to blue
+    - All other gray cells remain unchanged
+
+example_1:
+  input: |
+    A 10x10 grid with mostly black (0) background. Gray (5) cells form several distinct shapes:
+    - A 2x2 square in the top-center
+    - An irregular shape resembling a thick 'L' or boot in the center-left
+    - A single cell on each far edge of the grid (left and right) in the middle row
+    - Three separate clusters in the bottom half, including a 2x2 square
+  output: |
+    The 10x10 grid maintains its black background. Changes to gray cells:
+    - The 2x2 square in the top-center is now blue (1)
+    - The thick 'L' shape is mostly blue, with one gray cell remaining
+    - The single cells on the far edges are now blue
+    - In the bottom half, the 2x2 square remains gray, one cluster is now blue, and one is partially blue
+
+example_2:
+  input: |
+    A 10x10 grid with black (0) background. Gray (5) cells form various patterns:
+    - Several single cells scattered around the edges
+    - A horizontal line of four cells in the top-left quadrant
+    - Two 2x2 squares in the bottom-right quadrant
+    - An 'L' shape in the bottom-left corner
+    - A few small clusters elsewhere
+  output: |
+    The 10x10 grid keeps its black background. Changes to gray cells:
+    - Most single cells on the edges have turned blue (1)
+    - The horizontal line of four cells is now blue
+    - One 2x2 square in the bottom-right is blue, the other partially blue
+    - The 'L' shape in the bottom-left is now blue
+    - Some small clusters have turned blue, others remain gray
+
+example_3:
+  input: |
+    A 10x10 grid with black (0) background. Gray (5) cells form a scattered pattern:
+    - Several single cells along the edges and corners
+    - Two 2x2 squares in the top-center
+    - A few small clusters and single cells throughout the grid
+    - No large connected shapes
+  output: |
+    The 10x10 grid maintains its black background. Changes to gray cells:
+    - Most single cells along the edges and corners have turned blue (1)
+    - Both 2x2 squares in the top-center are now blue
+    - Some small clusters have turned blue, while others remain gray
+    - Overall, more isolated gray cells have become blue, while some in clusters remain gray

@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid appears to have a frame-like structure. There are gray (5) lines forming a rectangular frame, with some breaks. The top and bottom rows, as well as the leftmost and rightmost columns, are mostly filled with gray (5) squares, creating a border effect. Inside this frame, there are mostly black (0) squares, which can be interpreted as empty space. There are a few colored squares scattered within the frame: blue (1) in the top-left and bottom-right corners, red (2) in a few places along the gray lines.
+  output: |
+    The frame structure is maintained, but the empty spaces inside have been filled. The gray (5) lines remain unchanged. The previously black (0) areas are now filled with either blue (1) or red (2) in a specific pattern. The top-left quadrant is filled with blue (1), while the bottom-right quadrant is filled with red (2). The other two quadrants have a mix of blue (1) and red (2), with red dominating. The colored squares that were originally on the gray lines remain unchanged.
+
+example_1:
+  input: |
+    This grid also has a frame-like structure, but with a different pattern. The gray (5) lines form three distinct rectangles - one large outer rectangle and two smaller inner rectangles. The top and bottom rows are mostly gray (5), with blue (1) and red (2) squares at the corners. The inner rectangles are outlined in gray (5) with some blue (1) and red (2) squares interrupting the lines. The spaces inside the rectangles are mostly black (0), representing empty space.
+  output: |
+    The frame structure is maintained, but the empty spaces have been filled. The gray (5) lines remain unchanged. The spaces inside the outer rectangle, but outside the inner rectangles, are now filled with blue (1). The spaces inside the two inner rectangles are filled differently: the upper rectangle is filled with blue (1), while the lower rectangle is filled with red (2). The colored squares that were originally on the gray lines remain unchanged.
+
+example_2:
+  input: |
+    This grid has a more complex structure with multiple intersecting gray (5) lines forming various compartments. There are three horizontal gray lines and three vertical gray lines, creating a 4x4 grid of smaller compartments. Some of these compartments contain colored squares: blue (1), red (2), and one instance of yellow (4). The rest of the spaces within the compartments are black (0), representing empty space.
+  output: |
+    The structure of gray (5) lines remains unchanged. The empty spaces within the compartments have been filled with colors, following a specific pattern. The top-left quadrant is mostly filled with red (2), except for the original colored squares. The bottom-right quadrant is mostly filled with blue (1). The other two quadrants have a mix of red (2) and blue (1), with the color seeming to spread from the nearest colored square in the input. The original colored squares on the gray lines remain unchanged.
+
+test_case_0:
+  input: |
+    This test case is not provided in the given code snippet. There is no information about a test case input or output in the provided test file.
+  output: |
+    As there is no test case provided in the given code, there is no output to describe.

@@ -1,0 +1,36 @@
+example_0:
+  input: |
+    A 15x15 grid mostly filled with black (0). There are three blue (1) dots scattered across the grid:
+    - One in the top-left quadrant at (1,1)
+    - One near the center at (3,3)
+    - One in the top-right quadrant at (5,5)
+    The rest of the grid is empty (black).
+  output: |
+    The same 15x15 grid with the original three blue (1) dots in their positions. Additionally, there are four new red (2) dots forming a diagonal line from top-left to bottom-right:
+    - At (7,7)
+    - At (9,9)
+    - At (11,11)
+    - At (13,13)
+    These new red dots form a perfect diagonal, equally spaced, starting after the last blue dot and continuing to near the bottom-right corner.
+
+example_1:
+  input: |
+    A 15x15 grid mostly filled with black (0). There are three blue (1) dots in different positions:
+    - One in the very top-left corner at (0,0)
+    - One near the center at (4,4)
+    - One in the bottom-right quadrant at (8,8)
+    The rest of the grid is empty (black).
+  output: |
+    The same 15x15 grid with the original three blue (1) dots in their positions. Additionally, there is one new red (2) dot:
+    - Located at (12,12)
+    This new red dot continues the diagonal pattern formed by the blue dots, maintaining the same spacing between points.
+
+test_case_0:
+  input: |
+    A 15x15 grid mostly filled with black (0). There are three blue (1) dots forming a diagonal line:
+    - One in the top-left corner at (0,0)
+    - One near the top-left at (2,2)
+    - One slightly left and above center at (4,4)
+    The rest of the grid is empty (black).
+  output: |
+    The output grid is not provided in the test case, so I cannot describe it.

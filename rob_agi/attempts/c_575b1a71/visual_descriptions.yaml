@@ -1,0 +1,56 @@
+example_0:
+  input: |
+    A 10x10 grid predominantly filled with gray (5) squares. There are several black (0) squares scattered throughout the grid, forming a pattern:
+    - One black square in the top-right quadrant (row 0, column 5)
+    - Two black squares in the left side of the grid (row 3 and row 5-6, column 1)
+    - Three black squares forming a vertical line in the center-right area (rows 4-6, column 4)
+    - One black square in the center-right (row 3, column 5)
+    - Three black squares forming a vertical line on the right edge (rows 7-9, column 8)
+    - Two black squares in the bottom-center area (row 8, columns 4-5)
+    The black squares create an asymmetrical pattern against the gray background.
+  output: |
+    The 10x10 grid maintains the same overall structure as the input, with the gray (5) background. However, the black (0) squares have been replaced with different colors:
+    - Green (3) replaces the black square in the top-right quadrant
+    - Blue (1) replaces the two black squares on the left side
+    - Red (2) replaces the three black squares in the center-right vertical line
+    - Green (3) replaces the single black square in the center-right
+    - Yellow (4) replaces the three black squares on the right edge
+    - Red (2) and Green (3) replace the two black squares in the bottom-center area
+    The colored squares now form a more vibrant pattern against the gray background, with each distinct group of previously black squares assigned a unique color.
+
+example_1:
+  input: |
+    A 10x10 grid predominantly filled with gray (5) squares. There are several black (0) squares scattered throughout the grid, forming a sparser pattern compared to the previous example:
+    - Two black squares in the top row (columns 0 and 7)
+    - One black square in the center-left area (row 2, column 4)
+    - One black square in the center-right area (row 3, column 7)
+    - One black square in the center-left area (row 4, column 4)
+    - One black square in the bottom-left quadrant (row 7, column 4)
+    - One black square near the bottom-right corner (row 8, column 8)
+    - One black square in the bottom row (row 9, column 4)
+    The black squares are more evenly distributed across the grid compared to the previous example.
+  output: |
+    The 10x10 grid maintains the same overall structure as the input, with the gray (5) background. The black (0) squares have been replaced with different colors:
+    - Blue (1) replaces the left black square in the top row
+    - Green (3) replaces the right black square in the top row
+    - Red (2) replaces all four black squares in the central column (column 4)
+    - Green (3) replaces the black square in the center-right area
+    - Yellow (4) replaces the black square near the bottom-right corner
+    The colored squares now form a more vibrant pattern against the gray background. Notably, all the squares in the central column (column 4) have been assigned the same color (red), while the other positions received unique colors.
+
+example_2:
+  input: |
+    A 10x10 grid predominantly filled with gray (5) squares. The black (0) squares in this grid form a different pattern, mostly concentrated on the right side:
+    - Two adjacent black squares in the top-right area (row 0, columns 5-6)
+    - Two adjacent black squares in the bottom-right corner (row 5, columns 8-9)
+    - One black square above the bottom-right corner (row 4, column 9)
+    - One black square in the bottom-right quadrant (row 8, column 9)
+    - One black square in the center-right area (row 7, column 6)
+    This pattern creates a right-heavy distribution of black squares.
+  output: |
+    The 10x10 grid maintains the same overall structure as the input, with the gray (5) background. The black (0) squares have been replaced with different colors:
+    - Blue (1) and Red (2) replace the two adjacent black squares in the top-right area
+    - Green (3) and Yellow (4) replace the two adjacent black squares in the bottom-right corner
+    - Yellow (4) also replaces the black squares above and below the bottom-right corner
+    - Red (2) replaces the black square in the center-right area
+    The colored squares now form a more vibrant pattern against the gray background. The right side of the grid, which was previously dominated by black squares, now features a variety of colors. The yellow squares form a small vertical line on the right edge.

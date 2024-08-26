@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 19x12 grid with a mix of colors. The most prominent colors are sky blue (8) and black (0). There's a notable yellow-magenta formation in the bottom-left quadrant, forming a rough L-shape. This formation consists of two yellow (4) squares above three magenta (6) squares. The rest of the grid has a scattered pattern of various colors, with sky blue being the most frequent.
+  output: |
+    The grid is mostly identical to the input, with one significant change in the top-right quadrant. A new yellow-magenta formation has been added, replacing some of the existing colors. This new formation is a 3x3 square with yellow (4) in the top-right corner and along the right edge, while magenta (6) fills the remaining cells. The original yellow-magenta formation in the bottom-left quadrant remains unchanged.
+
+example_1:
+  input: |
+    An 18x16 grid with a diverse mix of colors. The most common colors are blue (1) and sky blue (8). There's a notable yellow-magenta formation near the center-left of the grid, forming a rough T-shape. This formation consists of one yellow (4) square surrounded by five magenta (6) squares. The rest of the grid has a scattered pattern of various colors, with no clear dominant pattern.
+  output: |
+    The grid is mostly identical to the input, with one significant change in the top-left quadrant. A new yellow-magenta formation has been added, replacing some of the existing colors. This new formation is a 3x3 square with yellow (4) in the top-left corner and along the left edge, while magenta (6) fills the remaining cells. The original yellow-magenta formation near the center-left remains unchanged.
+
+example_2:
+  input: |
+    A 17x17 grid with a mix of colors, predominantly sky blue (8) and black (0). There's a notable yellow-magenta formation in the top-left quadrant, forming a T-shape. This formation consists of three yellow (4) squares surrounded by four magenta (6) squares. The rest of the grid has a scattered pattern of various colors, with no clear dominant pattern besides the prevalence of sky blue.
+  output: |
+    The grid is mostly identical to the input, with one significant change in the bottom-right corner. A new yellow-magenta formation has been added, replacing some of the existing colors. This new formation is a 2x2 square with yellow (4) in the top-left and bottom-right corners, while magenta (6) fills the remaining cells. The original yellow-magenta formation in the top-left quadrant remains unchanged.
+
+test_case_0:
+  input: |
+    A 17x17 grid with a mix of colors, predominantly sky blue (8) and black (0). There's a notable yellow-magenta formation in the top-left quadrant, forming a T-shape. This formation consists of three yellow (4) squares surrounded by four magenta (6) squares. The rest of the grid has a scattered pattern of various colors, with no clear dominant pattern besides the prevalence of sky blue.
+  output: |
+    The output grid is not provided for the test case, as it is meant to be solved.

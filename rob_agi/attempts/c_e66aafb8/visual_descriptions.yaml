@@ -1,0 +1,69 @@
+example_0:
+  input: |
+    A 24x24 grid with a complex pattern. The grid is mostly filled with various colors, creating a symmetrical design. The center of the grid (rows 11-14, columns 11-14) contains a 4x4 square of 9's (brown). This brown square is surrounded by a pattern that repeats in all four quadrants of the grid. Each quadrant contains a mix of colors, with some notable features:
+    - A 5x5 black square (0's) in the bottom-right of each quadrant
+    - Diagonal lines of similar colors extending from the corners towards the center
+    - A border-like pattern around the edges of the grid
+    The overall effect is a mandala-like symmetrical design with a distinct center and repeating patterns in each quadrant.
+  output: |
+    An 8x5 grid that appears to be an extracted pattern from the input. This grid contains a mix of colors, primarily 2 (red), 7 (orange), 9 (brown), 8 (sky), 6 (magenta), 3 (green), and 5 (gray). The pattern doesn't seem to directly correspond to any single quadrant from the input, but rather appears to be a representative sample of the color patterns and transitions found in the larger input grid. The extracted pattern maintains some of the diagonal color transitions and color groupings seen in the input, but in a more compact form.
+
+example_1:
+  input: |
+    A 24x24 grid with a symmetrical pattern. The grid is dominated by shades of blue (3, 4, 9) and gray (5), with some yellow (4) and brown (9) accents. The pattern is highly structured with a clear central focus:
+    - A 3x3 square of 0's (black) in the exact center (rows 11-13, columns 11-13)
+    - Surrounding this black square is a frame-like structure of 9's (brown)
+    - The rest of the grid consists of repeating patterns in each quadrant, with diagonal lines and symmetrical color distributions
+    - The corners of the grid contain 7's (orange), creating a visual anchor
+    The overall effect is reminiscent of a stylized flower or star shape with a dark center and radiating patterns.
+  output: |
+    A small 3x4 grid that appears to be an extracted essence of the input pattern. The grid contains only four colors: 6 (magenta), 9 (brown), 4 (yellow), and 7 (orange). The pattern is simple but maintains some of the structural elements from the input:
+    - A diagonal line of 9's (brown) from top-left to bottom-right
+    - 7's (orange) in two corners, mirroring the corner elements in the input
+    - 6's (magenta) and 4's (yellow) filling the remaining spaces
+    This output seems to capture key color transitions and structural elements from the input in a highly condensed form.
+
+example_2:
+  input: |
+    A 24x24 grid with a symmetrical pattern. The grid is dominated by shades of blue (1, 2, 8) and gray (5), with accents of red (2) and yellow (4). The pattern has a clear structure:
+    - A 6x6 square of 0's (black) in the bottom-right quadrant (rows 16-21, columns 18-23)
+    - The rest of the grid consists of repeating patterns in each quadrant, with diagonal lines and symmetrical color distributions
+    - The corners and edges of the grid contain repeating patterns of 6's (magenta) and 8's (sky blue)
+    - There's a noticeable frame-like structure around the center of the grid
+    The overall effect is a balanced, geometric design with a distinct empty space in one quadrant.
+  output: |
+    A 5x6 grid that appears to be an extracted pattern from the input. This grid contains a mix of colors, primarily 8 (sky blue), 1 (blue), 6 (magenta), 2 (red), and 5 (gray). The pattern seems to capture elements from the non-black areas of the input:
+    - A concentration of 8's (sky blue) in the top-left corner
+    - A diagonal transition from 8's to 1's and 6's
+    - A mix of 2's (red) and 5's (gray) in the bottom-right area
+    This output appears to represent a condensed version of the color transitions and patterns found in the non-black areas of the input grid.
+
+example_3:
+  input: |
+    A 24x24 grid with a symmetrical pattern. The grid is dominated by shades of blue (4, 5, 6, 9) and gray (5), with accents of red (2) and yellow (4). The pattern has a distinct structure:
+    - A 7x7 square of 0's (black) in the top-left quadrant (rows 6-12, columns 0-6)
+    - The rest of the grid consists of repeating patterns in each quadrant, with diagonal lines and symmetrical color distributions
+    - There's a noticeable frame-like structure around the center of the grid, composed mainly of 5's (gray) and 7's (orange)
+    - The corners of the grid contain repeating patterns of 5's (gray) and 4's (yellow)
+    The overall effect is a balanced, geometric design with a distinct empty space in one quadrant, similar to example_2 but with the black square in a different location.
+  output: |
+    An 8x3 grid that appears to be an extracted pattern from the input. This grid contains a mix of colors, primarily 5 (gray), 9 (brown), 2 (red), 7 (orange), and 6 (magenta). The pattern seems to capture elements from the non-black areas of the input:
+    - A concentration of 5's (gray) and 9's (brown) in the top rows
+    - A transition to 2's (red) and 7's (orange) in the middle
+    - A mix of 6's (magenta) and 4's (yellow) in the bottom row
+    This output appears to represent a condensed version of the color transitions and patterns found in the non-black areas of the input grid, capturing the essence of the color distribution and transitions.
+
+example_4:
+  input: |
+    A 24x24 grid with a symmetrical pattern. The grid is dominated by shades of blue (3, 4, 5, 8) and gray (5), with accents of red (2) and yellow (4). The pattern has a unique structure:
+    - A 7x7 square of 0's (black) in the top-left quadrant (rows 6-12, columns 0-6)
+    - The rest of the grid consists of repeating patterns in each quadrant, with diagonal lines and symmetrical color distributions
+    - There's a noticeable frame-like structure around the center of the grid, composed mainly of 6's (magenta) and 7's (orange)
+    - The corners of the grid contain repeating patterns of 7's (orange) and 6's (magenta)
+    The overall effect is a balanced, geometric design with a distinct empty space in one quadrant, similar to example_3 but with slightly different color distributions.
+  output: |
+    A 6x7 grid that appears to be an extracted pattern from the input. This grid contains a mix of colors, primarily 3 (green), 5 (gray), 4 (yellow), 8 (sky blue), 1 (blue), and 6 (magenta). The pattern seems to capture elements from the non-black areas of the input:
+    - A concentration of 3's (green) and 5's (gray) in the left columns
+    - A transition to 4's (yellow) and 8's (sky blue) in the middle
+    - A mix of 1's (blue) and 6's (magenta) in the right columns
+    This output appears to represent a condensed version of the color transitions and patterns found in the non-black areas of the input grid, capturing the essence of the color distribution and transitions in a vertical orientation.

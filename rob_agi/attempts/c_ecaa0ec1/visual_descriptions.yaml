@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 12x10 grid with mostly black (empty) space. There's a small blue and sky blue structure in the center-right, resembling a partial 3x3 square. The structure has sky blue (8) on the top-left and right, with blue (1) filling the rest. There are four isolated yellow (4) dots: two above the structure, one to its left, and one below-right.
+  output: |
+    A 12x10 grid, mostly black. The blue and sky blue structure is more compact and centered. It forms a complete 3x3 square with sky blue (8) on the left side, blue (1) in the center column and top-right, and sky blue (8) in the bottom-right. There's a single yellow (4) dot above and to the left of the structure.
+
+example_1:
+  input: |
+    A 10x10 grid with a blue and sky blue structure in the center-left. The structure is 3x3 with blue (1) on top, sky blue (8) in the middle, and a mix of blue (1) and sky blue (8) at the bottom. There are five isolated yellow (4) dots scattered around: two in the top-left, one top-right, and two on the left side of the structure.
+  output: |
+    A 10x10 grid with a rearranged blue and sky blue 3x3 structure in the center-left. The new arrangement has sky blue (8) in the top-right and bottom-left corners, with blue (1) filling the rest. There's a single yellow (4) dot above and to the left of the structure.
+
+example_2:
+  input: |
+    An 11x10 grid with a blue and sky blue 3x3 structure in the center-left. The structure has sky blue (8) on top, blue (1) in the middle-left and bottom, and sky blue (8) in the middle-right. There are four isolated yellow (4) dots: one above the structure, two below it, and one to its left.
+  output: |
+    An 11x10 grid with a rearranged blue and sky blue 3x3 structure in the center-left. The new arrangement has sky blue (8) in the top-left and bottom-right corners, with blue (1) filling the rest. There's a single yellow (4) dot below and to the left of the structure.
+
+example_3:
+  input: |
+    An 11x11 grid with a blue and sky blue 3x3 structure slightly right of center. The structure has blue (1) on top, sky blue (8) in the middle, and blue (1) at the bottom-left and right corners. There are four isolated yellow (4) dots: one above-right of the structure, one below-right, and two in the bottom-left area of the grid.
+  output: |
+    An 11x11 grid with a rearranged blue and sky blue 3x3 structure in the center. The new arrangement has sky blue (8) in the top-center and middle-left, with blue (1) filling the rest. There's a single yellow (4) dot below and to the right of the structure.

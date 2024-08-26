@@ -1,0 +1,35 @@
+example_0:
+  input: |
+    A 20x20 grid with scattered sky blue (8) squares and three blue (1) squares. The sky blue squares are distributed throughout the grid, creating a sparse pattern. The three blue squares are located at (6,0), (11,0), and (15,0), forming a vertical line on the left side of the grid.
+  output: |
+    The 20x20 grid maintains the original sky blue (8) squares. The three blue (1) squares have expanded into lines and regions. A horizontal blue line spans the entire width of the grid at row 6. Vertical blue lines extend from the original blue squares to the edges of the grid. The areas between these blue lines are filled with blue, creating larger blue regions. Some sky blue squares act as barriers, preventing the blue from spreading into certain areas.
+
+example_1:
+  input: |
+    A 10x10 grid with scattered gray (5) squares and two blue (1) squares. The gray squares create a sparse pattern throughout the grid. The blue squares are located at (3,0) and (8,0), both in the leftmost column.
+  output: |
+    The 10x10 grid maintains the original gray (5) squares. The two blue (1) squares have expanded into lines and regions. A horizontal blue line connects the two original blue squares. Vertical blue lines extend from these squares to the edges of the grid where possible. The area between these blue lines is filled with blue, creating a larger blue region. The gray squares act as barriers, preventing the blue from spreading into certain areas.
+
+example_2:
+  input: |
+    A 6x6 grid with two gray (5) squares and one blue (1) square. The gray squares are at (1,2) and (3,3). The blue square is at (3,0) in the leftmost column.
+  output: |
+    The 6x6 grid maintains the original gray (5) squares. The blue (1) square has expanded into lines and a region. A horizontal blue line extends from the original blue square to the right edge of the grid. Vertical blue lines extend from this horizontal line to the top and bottom edges of the grid where possible. The area between these blue lines is filled with blue, creating a larger blue region. The gray squares act as barriers, preventing the blue from spreading into certain areas.
+
+example_3:
+  input: |
+    A 6x6 grid with three sky blue (8) squares and one blue (1) square. The sky blue squares are at (2,2), (3,1), and (4,4). The blue square is at (2,0) in the leftmost column.
+  output: |
+    The 6x6 grid maintains the original sky blue (8) squares. The blue (1) square has expanded into lines and a region. A horizontal blue line extends from the original blue square to the right edge of the grid. Vertical blue lines extend from this horizontal line to the top edge of the grid. The area between these blue lines is filled with blue, creating a larger blue region. The sky blue squares act as barriers, preventing the blue from spreading into certain areas.
+
+example_4:
+  input: |
+    A 13x13 grid with scattered gray (5) squares and two blue (1) squares. The gray squares create a sparse pattern throughout the grid. The blue squares are located at (4,0) and (11,0), both in the leftmost column.
+  output: |
+    The 13x13 grid maintains the original gray (5) squares. The two blue (1) squares have expanded into lines and regions. A horizontal blue line connects the two original blue squares. Vertical blue lines extend from these squares to the edges of the grid where possible. The areas between these blue lines are filled with blue, creating larger blue regions. The gray squares act as barriers, preventing the blue from spreading into certain areas.
+
+example_5:
+  input: |
+    A 7x7 grid with four sky blue (8) squares and one blue (1) square. The sky blue squares are at (0,3), (3,2), (3,4), and (5,2). The blue square is at (3,0) in the leftmost column.
+  output: |
+    The 7x7 grid maintains the original sky blue (8) squares. The blue (1) square has expanded into lines and a region. A horizontal blue line extends from the original blue square to the right edge of the grid. Vertical blue lines extend from this horizontal line to the top and bottom edges of the grid where possible. The area between these blue lines is filled with blue, creating a larger blue region. The sky blue squares act as barriers, preventing the blue from spreading into certain areas.

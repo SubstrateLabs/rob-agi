@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid contains three green cross shapes (color 3) on a black background (color 0). The crosses are located in the top-left, middle-right, and bottom-center of the grid. Each cross is made up of five green squares arranged in a '+' shape.
+  output: |
+    The grid maintains the three green crosses from the input, but now they are connected by a red path (color 2). The red path starts from the bottom-right of the top-left cross, moves diagonally down and right, then turns to connect to the top-left of the middle-right cross. From there, it continues diagonally down and left to connect to the top-right of the bottom-center cross. The path is thin, consisting of single red squares.
+
+example_1:
+  input: |
+    The grid contains four green cross shapes (color 3) on a black background (color 0). The crosses are located in the top-left, top-right, middle-left, and bottom-center of the grid. Each cross is made up of five green squares arranged in a '+' shape.
+  output: |
+    The grid maintains the four green crosses from the input, but now they are connected by a red path (color 2). The path starts from the bottom-right of the top-left cross, moves diagonally down and right, then turns to connect to the top-left of the top-right cross. From there, it moves diagonally down and left to connect to the right side of the middle-left cross. Finally, it continues diagonally down and right to connect to the top-left of the bottom-center cross. The path is thin, consisting of single red squares.
+
+example_2:
+  input: |
+    The grid contains five green cross shapes (color 3) on a black background (color 0). The crosses are located in the top-right, middle-right, middle-left, bottom-left, and bottom-right of the grid. Each cross is made up of five green squares arranged in a '+' shape.
+  output: |
+    The grid maintains the five green crosses from the input, but now two of them are connected by a red path (color 2). The path connects the middle-left cross to the middle-right cross. It starts from the right side of the middle-left cross, moves horizontally right for two squares, then diagonally up and right to connect to the left side of the middle-right cross. The path is thin, consisting of single red squares. The other three crosses remain unconnected.
+
+test_case_0:
+  input: |
+    The grid contains five green cross shapes (color 3) on a black background (color 0). The crosses are located in the top-left, top-right, middle-center, bottom-left, and bottom-right of the grid. Each cross is made up of five green squares arranged in a '+' shape.
+  output: |
+    The output grid is not provided for the test case.

@@ -1,0 +1,35 @@
+example_0:
+  input: |
+    The input grid is 10x10. The top-left quadrant (5x5) is predominantly yellow (4) with some black (0) spaces. The top-right quadrant is mostly green (3) with some black spaces. The bottom-left quadrant is primarily brown (9) with some black spaces. The bottom-right quadrant is mostly sky blue (8) with many black spaces. There's a clear division between the four quadrants, each having its dominant color.
+  output: |
+    The output grid is 5x5. It appears to be a compressed version of the input, maintaining the general color distribution of the four quadrants. The top-left is mostly yellow and green, the top-right is predominantly green, the bottom-left is mainly brown, and the bottom-right is a mix of sky blue and green. The compression seems to preserve the dominant colors and their relative positions from the input.
+
+example_1:
+  input: |
+    The input grid is 10x10. The top half is dominated by yellow (4) and green (3), with yellow more prevalent in the left and green more in the right. There are significant black (0) spaces throughout. The bottom half is characterized by brown (9) and sky blue (8), with brown more common in the left and sky blue in the right. Again, there are many black spaces interspersed.
+  output: |
+    The output grid is 5x5. It reflects a compressed version of the input, maintaining the general color distribution. The top row shows brown, yellow, and sky blue, representing the varied colors from the input. The middle rows are predominantly green, reflecting the strong green presence in the input. The bottom rows show a mix of green, brown, and sky blue, capturing the color variety from the input's bottom half.
+
+example_2:
+  input: |
+    The input grid is 10x10. The top-left quadrant is mostly yellow (4) with some black (0) spaces. The top-right quadrant is predominantly green (3) with a few black spaces. The bottom-left quadrant is mainly brown (9) with some black spaces. The bottom-right quadrant is mostly sky blue (8) with several black spaces interspersed. The color boundaries between quadrants are quite distinct.
+  output: |
+    The output grid is 5x5. It appears to be a condensed version of the input, preserving the general color distribution. The top-left corner is green, possibly representing a blend of the yellow and green from the input. The rest of the top row and most of the second row are green, reflecting the strong green presence in the input. The bottom-right area shows a mix of brown and sky blue, capturing the colors from the input's bottom half. The middle of the grid shows some brown, possibly representing the brown from the input's bottom-left quadrant.
+
+example_3:
+  input: |
+    The input grid is 10x10. The top-left quadrant is a mix of yellow (4) and black (0). The top-right quadrant is mostly green (3) with some black spaces. The bottom-left quadrant is primarily brown (9) with black spaces. The bottom-right quadrant is a mix of sky blue (8) and black. The color boundaries between quadrants are less distinct than in previous examples, with colors slightly bleeding into adjacent quadrants.
+  output: |
+    The output grid is 5x5. It represents a compressed version of the input, maintaining the general color distribution but with some interesting variations. The top-left shows black, brown, and yellow, capturing the variety in the input's top-left. The top-right is predominantly green, reflecting the input's top-right. The bottom-left shows yellow and green, possibly representing a blend of colors from the input. The bottom-right is mostly green with some sky blue, capturing elements from the input's right side.
+
+example_4:
+  input: |
+    The input grid is 10x10. The top-left quadrant is mostly yellow (4) with significant black (0) spaces. The top-right quadrant is primarily green (3) with many black spaces. The bottom-left quadrant is mainly brown (9) with several black spaces. The bottom-right quadrant is mostly sky blue (8) with many black spaces. There's a higher proportion of black spaces in this input compared to previous examples.
+  output: |
+    The output grid is 5x5. It appears to be a condensed representation of the input, preserving the general color distribution while accounting for the increased presence of black spaces. The top-left shows brown and green, possibly representing a blend of colors from the input's left side. The top-right is predominantly green with some black, reflecting the input's top-right. The bottom-left shows mostly black and green, capturing the increased black spaces and some color from the input. The bottom-right is primarily green, possibly representing a blend of the input's green and sky blue areas.
+
+example_5:
+  input: |
+    The input grid is 10x10. The top-left quadrant is mostly yellow (4) with significant black (0) spaces. The top-right quadrant is primarily green (3) with some black spaces. The bottom-left quadrant is dominated by brown (9) with few black spaces. The bottom-right quadrant is mostly sky blue (8) with several black spaces. The color boundaries between quadrants are less distinct, with colors bleeding more into adjacent areas.
+  output: |
+    The output grid is 5x5. It represents a compressed version of the input, maintaining the general color distribution but with some interesting variations. The top-left shows yellow and brown, capturing the variety in the input's left side. The top-right is predominantly green, reflecting the input's top-right. The middle row shows a mix of green and brown, possibly representing the blending of colors from different quadrants. The bottom rows show a mix of brown, sky blue, and green, capturing the variety of colors from the input's bottom half. There's also a black space in the bottom-right, possibly reflecting the presence of black spaces in the input.

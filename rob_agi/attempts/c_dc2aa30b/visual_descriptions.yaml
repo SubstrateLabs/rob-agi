@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The grid is divided into three sections by two horizontal black lines. The top section is predominantly red with some blue cells. The middle section has a mix of red and blue cells. The bottom section is predominantly blue with some red cells. There are vertical black lines dividing each section into three columns.
+  output: |
+    The grid maintains the same structure with three sections divided by black lines. However, the color dominance has been inverted. The top section is now predominantly blue with specific red cells. The middle section has a more balanced mix of red and blue. The bottom section is now predominantly red with one specific blue cell. The vertical black lines remain unchanged.
+
+example_1:
+  input: |
+    Similar to example_0, the grid is divided into three sections by horizontal black lines. The top section has a mix of blue and red cells. The middle section is predominantly blue with some red cells. The bottom section has a mix of red and blue cells, slightly favoring red. Vertical black lines divide each section into three columns.
+  output: |
+    The grid structure remains the same with three sections and vertical dividers. The top section is now predominantly blue with specific red cells. The middle section has a more balanced mix of red and blue, with slightly more red than in the input. The bottom section is now predominantly red with specific blue cells. The black lines remain unchanged.
+
+example_2:
+  input: |
+    The grid follows the same structure as previous examples. The top section is predominantly red with one blue cell. The middle section is predominantly blue with some red cells. The bottom section has a mix of red and blue cells, slightly favoring blue. Vertical black lines divide each section into three columns.
+  output: |
+    The grid structure is maintained. The top section is now predominantly blue with specific red cells. The middle section has a more balanced mix of red and blue, with slightly more red than in the input. The bottom section is now predominantly red with one specific blue cell. The black lines remain unchanged.

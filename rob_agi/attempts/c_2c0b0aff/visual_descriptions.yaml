@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A large 23x23 grid with mostly black (empty) space. There are several sky blue (8) and green (3) patterns scattered across the grid. These patterns appear to be rectangular or square shapes, with green squares interspersed within the sky blue areas. The patterns are not uniform and vary in size and arrangement. They are primarily concentrated in the center and edges of the grid, leaving the corners mostly empty.
+  output: |
+    A smaller 8x7 grid filled entirely with sky blue (8) and green (3) squares. The pattern appears to be a condensed version of one of the larger patterns from the input. It has a structured arrangement with green squares forming a sort of irregular lattice within the sky blue background.
+
+example_1:
+  input: |
+    A 24x24 grid with two main sections of patterns, separated by empty black space. The patterns are composed of sky blue (8) and green (3) squares. The top section spans the width of the grid and is about 8 rows tall. The bottom section is slightly taller and occupies the left two-thirds of the grid. Both sections contain intricate arrangements of sky blue and green squares, forming various shapes and patterns.
+  output: |
+    A 9x8 grid filled with sky blue (8) and green (3) squares. The pattern appears to be a condensed version of one of the sections from the input. It has a structured arrangement with green squares forming an irregular pattern within the sky blue background. The pattern is more complex than in the previous example, with more green squares and a less uniform distribution.
+
+example_2:
+  input: |
+    A 24x24 grid with three distinct sections of patterns, separated by empty black space. The top and bottom sections span the width of the grid and are about 8 rows tall each. The middle section is on the right side of the grid and is about 8 columns wide. All sections are composed of sky blue (8) and green (3) squares, forming intricate patterns and shapes within each section.
+  output: |
+    An 8x8 grid filled with sky blue (8) and green (3) squares. The pattern appears to be a condensed version of one of the sections from the input. It has a structured arrangement with green squares forming an irregular pattern within the sky blue background. The pattern is similar in complexity to the previous example, with a mix of larger sky blue areas and smaller green details.
+
+example_3:
+  input: |
+    A 22x20 grid with four distinct sections of patterns, separated by empty black space. The top-left and bottom-right sections are roughly square, while the top-right and bottom-left sections are rectangular. All sections are composed of sky blue (8) and green (3) squares, forming intricate patterns and shapes within each section. The patterns vary in complexity and arrangement across the sections.
+  output: |
+    An 11x8 grid filled with sky blue (8) and green (3) squares. The pattern appears to be a condensed version of one of the larger sections from the input. It has a more structured arrangement compared to previous examples, with green squares forming a more regular pattern within the sky blue background. The pattern includes several diagonal lines of green squares and larger areas of continuous sky blue.
+
+test_case_0:
+  input: |
+    A 24x24 grid with four distinct sections of patterns, separated by empty black space. The sections are roughly in each corner of the grid, with varying sizes and shapes. All sections are composed of sky blue (8) and green (3) squares, forming intricate patterns and shapes within each section. The patterns vary in complexity and arrangement across the sections, with some appearing more structured than others.
+  output: |
+    Not provided in the test case.

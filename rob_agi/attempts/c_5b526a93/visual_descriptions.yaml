@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid is 19x17 in size. There are three distinct 3x3 blue square patterns visible. These patterns consist of blue (1) squares forming the corners and center of a 3x3 grid, with black (0) squares in the middle of each side. The first pattern is located at the top-left corner (rows 3-5, columns 2-4). The second pattern is in the middle-left (rows 9-11, columns 2-4). The third pattern is at the bottom of the grid, spanning the entire width with three identical blue square patterns side by side (rows 15-17, columns 2-4, 6-8, and 12-14). The rest of the grid is filled with black (0) squares.
+  output: |
+    The output grid maintains the same 19x17 size. The first blue square pattern at the top-left remains unchanged. However, the second and third patterns have been transformed. The second pattern (middle-left) has been changed to sky blue (8), maintaining the same structure but with a different color. For the third set of patterns at the bottom, only the leftmost pattern remains blue (1), while the other two have been changed to sky blue (8). Additionally, two new sky blue patterns have been added in the same rows as the second pattern (rows 3-5 and 9-11), in columns 6-8 and 12-14. The rest of the grid remains filled with black (0) squares.
+
+example_1:
+  input: |
+    The grid is 22x16 in size. There are five 3x3 blue square patterns visible, all following the same structure as in the previous example (blue corners and center, black middle sides). The first three patterns are at the top of the grid, side by side in the first three rows (columns 1-3, 6-8, and 12-14). The fourth pattern is in the middle-left of the grid (rows 7-9, columns 1-3). The fifth pattern is directly below the fourth (rows 11-13, columns 1-3). There's also a sixth pattern at the bottom-left (rows 18-20, columns 1-3). The rest of the grid is filled with black (0) squares.
+  output: |
+    The output grid maintains the same 22x16 size. The top row of three blue square patterns remains unchanged. However, all other blue patterns (the fourth, fifth, and sixth) have been transformed to sky blue (8). Additionally, for each of these transformed patterns, two new sky blue patterns have been added in the same rows, in columns 6-8 and 12-14. This creates three rows (7-9, 11-13, and 18-20) where there are now three sky blue patterns side by side. The rest of the grid remains filled with black (0) squares.
+
+test_case_0:
+  input: |
+    There is no output grid provided for this test case. The input grid is 22x16 in size. It contains five 3x3 blue square patterns, all following the same structure as in the previous examples (blue corners and center, black middle sides). The patterns are arranged as follows:
+    1. Top-left corner (rows 1-3, columns 1-3)
+    2. Middle-top (rows 1-3, columns 6-8)
+    3. Top-right corner (rows 1-3, columns 12-14)
+    4. Middle-left (rows 7-9, columns 1-3)
+    5. Bottom-left (rows 18-20, columns 1-3)
+    The rest of the grid is filled with black (0) squares.
+  output: |
+    As this is a test case, no output grid is provided. The solution would need to be generated based on the pattern identified from the previous examples.

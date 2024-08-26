@@ -1,0 +1,46 @@
+example_0:
+  input: |
+    A 12x9 grid with mostly black (empty) space. There are three distinct magenta shapes:
+    1. A large irregular shape in the top-left quadrant, resembling an upside-down 'L' with an extra protrusion.
+    2. A small 2x2 square in the middle-left area.
+    3. An irregular shape in the bottom-right quadrant, resembling a sideways 'T' with an extra cell on top.
+    There's a single sky blue cell adjacent to the top-left shape, and a single blue cell adjacent to the bottom-right shape.
+  output: |
+    An 8x4 grid containing two distinct shapes:
+    1. A sky blue shape occupying the top-left quadrant, mirroring the large irregular magenta shape from the input.
+    2. A blue shape occupying the bottom-right quadrant, mirroring the irregular magenta shape from the input.
+    The shapes are compressed vertically to fit within 4 rows, and arranged horizontally with some black space between them.
+
+example_1:
+  input: |
+    A 12x14 grid with mostly black (empty) space. There are two distinct magenta shapes:
+    1. An irregular shape in the top-left quadrant, resembling a sideways 'T' with an extra cell on the right.
+    2. A larger irregular shape in the top-right quadrant, resembling an inverted 'L' with extra cells.
+    There's a single green cell below the left shape, and a single red cell below the right shape.
+  output: |
+    An 8x4 grid containing two distinct shapes:
+    1. A green shape on the left side, mirroring the left magenta shape from the input.
+    2. A red shape on the right side, mirroring the right magenta shape from the input.
+    Both shapes are compressed vertically to fit within 4 rows, and arranged horizontally with some black space between them.
+
+example_2:
+  input: |
+    An 18x12 grid with mostly black (empty) space. There are four distinct magenta shapes:
+    1. A large irregular shape in the top-left, resembling an 'F' or 'E' with missing parts.
+    2. A small irregular shape in the middle-left, resembling a sideways 'L'.
+    3. A medium irregular shape in the top-right, resembling a 'Y' or 'T'.
+    4. A small irregular shape in the bottom-right, resembling an upside-down 'L'.
+    There are single colored cells adjacent to each shape: blue (left), green (middle-left), yellow (right), and orange (bottom-right).
+  output: |
+    A 12x4 grid containing four distinct shapes, each corresponding to a magenta shape from the input:
+    1. A blue shape on the far left.
+    2. A green shape to its right.
+    3. A yellow shape further right.
+    4. An orange shape on the far right.
+    All shapes are compressed vertically to fit within 4 rows, and arranged horizontally with some black space between them.
+
+test_case_0:
+  input: |
+    The input grid for the test case is not provided in the given code.
+  output: |
+    The expected output grid for the test case is not provided in the given code.

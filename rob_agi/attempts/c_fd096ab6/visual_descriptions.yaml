@@ -1,0 +1,44 @@
+example_0:
+  input: |
+    A 22x22 grid predominantly filled with blue (1). There are several small clusters of different colors scattered across the grid:
+    - A yellow (4) hook-like shape in the top-left quadrant
+    - Two magenta (6) dots in the right half, vertically aligned
+    - Two sky blue (8) dots diagonally adjacent in the middle-left area
+    - Two red (2) dots diagonally adjacent in the bottom-right quadrant
+    - Two green (3) dots vertically adjacent in the bottom-left quadrant
+  output: |
+    The same 22x22 grid, still predominantly blue (1), but with the colored clusters expanded and reshaped:
+    - The yellow (4) hook is now a more defined hook shape
+    - The magenta (6) dots have become a small L-shape
+    - The sky blue (8) dots have formed a small hook shape
+    - The red (2) dots have become a small L-shape
+    - The green (3) dots have expanded into a small hook shape
+    All shapes maintain their general position but have grown slightly and taken on more defined forms.
+
+example_1:
+  input: |
+    A 24x24 grid predominantly filled with blue (1). There are several small clusters of different colors:
+    - A yellow (4) shape resembling a backwards 'C' in the top-left quadrant
+    - Two magenta (6) dots vertically aligned in the top-right quadrant
+    - Two orange (7) dots diagonally adjacent in the right half
+    - Two sky blue (8) dots vertically adjacent in the left half
+    - Three green (3) dots in a horizontal line in the bottom half
+  output: |
+    The same 24x24 grid, still predominantly blue (1), but with the colored clusters expanded and reshaped:
+    - The yellow (4) 'C' shape has been filled in to form a more solid backwards 'C'
+    - The magenta (6) dots have expanded into a hook shape pointing upwards
+    - The orange (7) dots have formed a small hook shape
+    - The sky blue (8) dots have expanded into a hook shape pointing left
+    - The green (3) line has expanded into a hook shape pointing downwards
+    All shapes have grown and taken on more defined hook-like or filled-in forms while maintaining their general positions.
+
+test_case_0:
+  input: |
+    A 24x24 grid predominantly filled with blue (1). There are several small clusters of different colors:
+    - A yellow (4) shape resembling a backwards 'C' in the top-left quadrant
+    - Two magenta (6) dots vertically aligned in the top-right quadrant
+    - Two orange (7) dots diagonally adjacent in the right half
+    - Two sky blue (8) dots vertically adjacent in the left half
+    - Three green (3) dots in a horizontal line in the bottom half
+  output: |
+    Not provided in the test case.

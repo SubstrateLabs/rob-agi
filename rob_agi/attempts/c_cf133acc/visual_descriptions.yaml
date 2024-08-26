@@ -1,0 +1,43 @@
+example_0:
+  input: |
+    The grid is 15x15. The top 9 rows are entirely black (0). In the 10th row, there are two horizontal lines: a red (2) line from columns 1-3 and 5-8, and a green (3) line from columns 9-15. The 11th row is all black. In the 12th to 15th rows, there's a vertical green (3) line in the 4th column. In the last three rows (13-15), there's also a vertical yellow (4) line in the 10th column.
+  output: |
+    The grid is 15x15. The top 9 rows now have two vertical lines: a red (2) line in the 4th column and a green (3) line in the 10th column, both extending from row 1 to 9. The 10th row remains unchanged from the input. Rows 11-15 are identical to the input, with the vertical green (3) line in the 4th column and the vertical yellow (4) line in the 10th column.
+
+example_1:
+  input: |
+    The grid is 15x15. In the 4th row, there's a horizontal green (3) line from columns 1-3 and 5-7. In the 7th row, there's a horizontal magenta (6) line from columns 7-9 and 11-15. In the 9th row, there's a horizontal yellow (4) line from columns 1-3 and 5-7, followed by an orange (7) line from columns 8-9 and 11-15. From rows 10-15, there's a vertical gray (5) line in the 10th column. In rows 12-15, there's also a vertical blue (1) line in the 4th column.
+  output: |
+    The grid is 15x15. There are now several vertical lines extending from the top of the grid:
+    - A green (3) line in the 4th column from rows 1-3
+    - A magenta (6) line in the 10th column from rows 1-6
+    - A yellow (4) line in the 4th column from rows 5-8
+    - An orange (7) line in the 10th column from rows 8-9
+    The horizontal lines in rows 4, 7, and 9 remain unchanged from the input. The vertical gray (5) line in the 10th column and the blue (1) line in the 4th column in the lower part of the grid also remain unchanged.
+
+example_2:
+  input: |
+    The grid is 15x15. There are several horizontal lines:
+    - Row 3: Orange (7) line from columns 7-9 and 11-15
+    - Row 4: Sky blue (8) line from columns 1 and 3-6
+    - Row 6: Magenta (6) line from columns 6-9 and 11-15
+    - Row 9: Green (3) line from columns 1 and 3-6
+    - Row 12: Brown (9) line from columns 1 and 3-6, followed by a gray (5) line from columns 7-9 and 11-15
+    In the last row (15), there are two blue (1) dots in columns 2 and 10.
+  output: |
+    The grid is 15x15. The horizontal lines from the input have been transformed into vertical lines:
+    - Column 2: Sky blue (8) line from rows 1-4, green (3) line from rows 5-9, brown (9) line from rows 10-12, blue (1) line from rows 13-15
+    - Column 10: Orange (7) line from rows 1-3, magenta (6) line from rows 4-6, gray (5) line from rows 7-12, blue (1) line from rows 13-15
+    The horizontal components of each line in the input remain in their original positions. The blue dots in the last row of the input are now the endpoints of the vertical blue lines in columns 2 and 10.
+
+test_case_0:
+  input: |
+    The grid is 15x15. There are several horizontal lines:
+    - Row 3: Orange (7) line from columns 7-9 and 11-15
+    - Row 4: Sky blue (8) line from columns 1 and 3-6
+    - Row 6: Magenta (6) line from columns 6-9 and 11-15
+    - Row 9: Green (3) line from columns 1 and 3-6
+    - Row 12: Brown (9) line from columns 1 and 3-6, followed by a gray (5) line from columns 7-9 and 11-15
+    In the last row (15), there are two blue (1) dots in columns 2 and 10.
+  output: |
+    The output grid is not provided for this test case.

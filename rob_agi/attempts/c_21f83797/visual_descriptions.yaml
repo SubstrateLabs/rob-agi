@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 13x13 grid mostly filled with black (0). There are two red dots (2) placed in the grid. One red dot is at position (3, 3) near the top-left quadrant, and the other is at position (9, 8) in the bottom-right quadrant.
+  output: |
+    A 13x13 grid with a complex pattern. There's a red (2) cross or plus sign spanning the entire grid, intersecting at the two points where the input red dots were. The horizontal arms of the cross are at rows 3 and 9, while the vertical arms are at columns 3 and 8. Inside the central rectangle formed by the cross, there's a blue (1) filled square. The blue square is 5x5 in size, positioned from (4,4) to (8,8). The rest of the grid remains black (0).
+
+example_1:
+  input: |
+    A 13x13 grid mostly filled with black (0). There are two red dots (2) placed in the grid. One red dot is at position (4, 2) in the left side of the grid, and the other is at position (8, 10) in the right side of the grid.
+  output: |
+    A 13x13 grid with a complex pattern. There's a red (2) cross or plus sign spanning the entire grid, intersecting at the two points where the input red dots were. The horizontal arms of the cross are at rows 4 and 8, while the vertical arms are at columns 2 and 10. Inside the central rectangle formed by the cross, there's a blue (1) filled rectangle. The blue rectangle is 3x7 in size, positioned from (5,3) to (7,9). The rest of the grid remains black (0).
+
+test_case_0:
+  input: |
+    This test case is not provided in the given information.
+  output: |
+    This test case is not provided in the given information.

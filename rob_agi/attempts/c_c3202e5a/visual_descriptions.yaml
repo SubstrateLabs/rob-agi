@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The input grid is 23x23 in size. It's divided into a 4x4 grid of sections by horizontal and vertical lines of sky blue (8). Each section is 5x5, except for the rightmost column and bottom row which are 3x5 and 5x3 respectively. The sky blue lines form a grid pattern across the entire input. Within each section, there are various colored squares scattered seemingly randomly, with black (0) being the predominant background color. The colors used include blue (1), red (2), green (3), yellow (4), gray (5), magenta (6), orange (7), and brown (9).
+  output: |
+    The output grid is much smaller, only 5x5 in size. It contains mostly black (0) squares with a few red (2) squares forming a pattern. The red squares are concentrated in the bottom right corner, forming a rough L-shape or right angle.
+
+example_1:
+  input: |
+    This input grid is also 23x23 in size. Similar to the previous example, it's divided into a 4x4 grid of sections by horizontal and vertical lines, but this time the lines are green (3). The sections are sized the same as in the previous example. Within each section, there are various colored squares scattered seemingly randomly, with black (0) being the predominant background color. The colors used include blue (1), red (2), yellow (4), gray (5), magenta (6), orange (7), sky blue (8), and brown (9).
+  output: |
+    The output grid is 5x5 in size. It contains mostly black (0) squares with several orange (7) squares forming a pattern. The orange squares are concentrated in the top left corner and along the right edge, forming a rough backwards L-shape or right angle.
+
+example_2:
+  input: |
+    This input grid is 23x23 in size. It's divided into a 5x5 grid of sections by horizontal and vertical lines of gray (5). The sections are 3x3 in size, except for the rightmost column and bottom row which are 3x4 and 4x3 respectively. Within each section, there are various colored squares scattered seemingly randomly, with black (0) being the predominant background color. The colors used include blue (1), red (2), green (3), yellow (4), magenta (6), orange (7), sky blue (8), and brown (9).
+  output: |
+    The output grid is much smaller, only 3x3 in size. It contains mostly black (0) squares with a few yellow (4) squares forming a simple pattern. The yellow squares form an L-shape or right angle in the top right corner of the grid.
+
+test_case_0:
+  input: |
+    The input grid for this test case is not provided in the test file. Based on the pattern from the examples, it would likely be a 23x23 grid divided into sections by colored lines, with various colored squares scattered within each section.
+  output: |
+    The expected output for this test case is not provided in the test file. Based on the pattern from the examples, it would likely be a smaller grid (possibly 5x5 or 3x3) with a pattern of colored squares forming an L-shape or right angle against a predominantly black background.

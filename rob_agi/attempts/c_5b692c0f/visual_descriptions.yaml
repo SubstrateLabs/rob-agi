@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The grid contains two distinct shapes. The first shape, in the upper left, resembles a stylized bird or airplane. It's primarily blue (1) with a yellow (4) stripe across its body. The shape has a "head" pointing to the left, a wide body, and a tail-like structure. The second shape, in the lower right, looks like a tree or a mushroom. It's primarily red (2) with a yellow (4) trunk or stem. The "canopy" of this tree-like shape is irregular, with some gaps in its structure. Both shapes are surrounded by black (0) space.
+  output: |
+    The two shapes from the input have been modified and enhanced. The bird/airplane shape in the upper left has been made more symmetrical. Its body has been extended downward, creating a mirror image of the top half. The yellow stripe remains consistent. The tree/mushroom shape in the lower right has also been made more symmetrical and complete. Its "canopy" has been filled out to create a more regular, rounded shape. The yellow trunk remains, but some yellow spots have been added to the canopy, creating a more balanced appearance. The overall silhouette of both shapes is more defined and regular compared to the input.
+
+example_1:
+  input: |
+    The grid shows a single, large shape that resembles a stylized fish or aquatic creature. The body of the shape is primarily green (3), with a yellow (4) stripe running down its center, resembling a spine. The shape has a rounded head on the left side, a wide body, and a tail-like structure on the right. There are some irregularities in the shape, with gaps and protrusions in the green areas. The shape is surrounded by black (0) space.
+  output: |
+    The fish-like shape has been refined and made more symmetrical. The overall silhouette is smoother and more regular. The head of the shape on the left has been filled out to create a more rounded appearance. The body has been adjusted to be more symmetrical top to bottom, with the green areas filled in where there were gaps. The yellow spine remains consistent down the center. The tail area on the right has been slightly modified to be more symmetrical. Overall, the shape appears more balanced and "complete" compared to the input, while maintaining its general fish-like appearance.
+
+test_case_0:
+  input: |
+    This grid is identical to the input of example_0. It contains two distinct shapes: a bird/airplane-like shape in blue (1) with a yellow (4) stripe in the upper left, and a tree/mushroom-like shape in red (2) with a yellow (4) trunk in the lower right. Both shapes are surrounded by black (0) space.
+  output: |
+    The expected output is not provided for this test case.

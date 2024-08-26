@@ -1,0 +1,31 @@
+example_0:
+  input: |
+    A large rectangular frame of red (2) surrounds a central area. The frame is 10x10 squares, with a 1-square thick border. Inside this frame are four distinct 4x4 colored squares arranged in a 2x2 grid:
+    - Top-left: green (3)
+    - Top-right: yellow (4)
+    - Bottom-left: blue (1)
+    - Bottom-right: sky blue (8)
+    The entire structure is surrounded by a border of black (0), creating a 14x14 grid overall.
+  output: |
+    The output is a more compact version of the input. The red (2) frame remains, now forming a perfect 10x10 square with no gaps. The four colored squares inside have expanded to fill the entire inner area of the frame:
+    - Top-left: green (3), now 4x4
+    - Top-right: yellow (4), now 4x4
+    - Bottom-left: blue (1), now 4x4
+    - Bottom-right: sky blue (8), now 4x4
+    The black border has been removed, resulting in a 10x10 grid.
+
+example_1:
+  input: |
+    A smaller rectangular frame of red (2) is positioned off-center in a 14x14 grid of mostly black (0). The frame is 6x6 squares with a 1-square thick border. Inside this frame are four distinct 1x1 colored squares arranged in a 2x2 grid:
+    - Top-left: green (3)
+    - Top-right: gray (5)
+    - Bottom-left: magenta (6)
+    - Bottom-right: sky blue (8)
+    The colored squares are separated by empty (black) space within the red frame.
+  output: |
+    The output is a more compact version of the input. The red (2) frame remains as a 6x6 square. The four colored squares inside have expanded to fill the entire inner area of the frame:
+    - Top-left: green (3), now 2x2
+    - Top-right: gray (5), now 2x2
+    - Bottom-left: magenta (6), now 2x2
+    - Bottom-right: sky blue (8), now 2x2
+    The black border has been removed, resulting in a 6x6 grid.

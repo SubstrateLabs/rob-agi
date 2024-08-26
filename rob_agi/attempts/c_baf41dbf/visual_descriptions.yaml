@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The grid is 17x8. There is a green (3) rectangular shape in the top-left corner, spanning 6x4 cells. The shape has a hollow interior, with green borders and two internal green lines forming a cross. There are two magenta (6) dots: one at (2,11) and another at (6,4). The rest of the grid is filled with black (0).
+  output: |
+    The grid remains 17x8. The green shape has expanded to the right, now spanning 10x5 cells. It maintains its hollow interior and cross structure, but scaled up. The magenta dots remain in their original positions. The rest of the grid is still filled with black (0).
+
+example_1:
+  input: |
+    The grid is 15x11. There is a small green (3) shape in the center-left area, spanning 3x3 cells. It has a hollow interior with a single green cell in the center. There are two magenta (6) dots: one at (3,1) and another at (9,5). The rest of the grid is filled with black (0).
+  output: |
+    The grid remains 15x11. The green shape has expanded significantly, now spanning 5x7 cells. It maintains its hollow interior with a single green cell in the center, but scaled up. The shape has expanded more vertically than horizontally. The magenta dots remain in their original positions. The rest of the grid is still filled with black (0).
+
+example_2:
+  input: |
+    The grid is 15x15. There is a green (3) shape in the center, spanning 6x5 cells. It has a complex interior structure with multiple hollow areas. There are three magenta (6) dots: at (4,12), (6,1), and (14,7). The rest of the grid is filled with black (0).
+  output: |
+    The grid remains 15x15. The green shape has expanded significantly, now spanning 10x11 cells. It maintains its complex interior structure but scaled up. The shape has expanded more vertically than horizontally, reaching almost to the bottom of the grid. The magenta dots remain in their original positions. The rest of the grid is still filled with black (0).

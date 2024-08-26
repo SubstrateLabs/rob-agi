@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 30x30 grid with a complex pattern. The dominant colors are blue (1), brown (9), and orange (7). There's a noticeable diagonal pattern from top-left to bottom-right, with alternating stripes of colors. The top-left corner starts with green (3), and the bottom-right corner ends with blue (1). There are scattered patches of magenta (6) and yellow (4) throughout. The pattern seems to have a repetitive nature but with some variations.
+  output: |
+    A much smaller 4x4 grid. The colors are green (3), blue (1), brown (9), and yellow (4). The top-left corner is green (3), and the bottom-right corner is yellow (4). The pattern is simpler and appears to be a condensed version of some elements from the input grid.
+
+example_1:
+  input: |
+    Another 30x30 grid with a different complex pattern. This grid has more variety in colors, including all colors from 1 to 9. There's a noticeable symmetry along the diagonal from top-left to bottom-right. The center of the grid (rows 15-16, columns 15-16) has a distinct pattern of alternating 2's and 7's. The corners of the grid have similar patterns: top-left and bottom-right corners have a 3-1-4 sequence, while top-right and bottom-left corners have a 9-9-3 sequence.
+  output: |
+    A 5x4 grid with a simpler pattern. The colors are green (3), blue (1), yellow (4), and red (2). The top row is [3,1,4,4,4] and the bottom row is [4,3,5,2,3]. There's a vertical symmetry in the middle column.
+
+example_2:
+  input: |
+    A 30x30 grid with another complex pattern. This grid has a distinct central region (rows 9-22, columns 9-22) that stands out with more yellow (4) and gray (5) colors. The outer region has more brown (9), blue (1), and orange (7). There's a noticeable diagonal symmetry, with the top-right quadrant mirroring the bottom-left quadrant, and the top-left quadrant mirroring the bottom-right quadrant.
+  output: |
+    A 9x4 grid with a simpler pattern. The dominant colors are brown (9), orange (7), magenta (6), and yellow (4). The left column alternates between 9 and 6, while the right column alternates between 4 and 1. The middle two columns have a more varied pattern.
+
+example_3:
+  input: |
+    A 30x30 grid with a complex pattern that has clear symmetry. The grid is divided into four quadrants, each 15x15. The top-left and bottom-right quadrants are identical, as are the top-right and bottom-left quadrants. Each quadrant has a distinct pattern, with the dominant colors being orange (7), magenta (6), and brown (9). There's a noticeable 8x8 sky blue (8) square in the center-right of the grid (rows 9-16, columns 23-30).
+  output: |
+    A much smaller 3x7 grid. The pattern is simpler but still colorful. The top row is [3,7,4,4,4,4,7], the middle row is [6,7,7,9,9,7,7], and the bottom row is [7,6,9,7,7,9,6]. There's a symmetry between the left and right halves of the grid.
+
+test_case_0:
+  input: |
+    A 30x30 grid with a complex pattern. The dominant colors are green (3), blue (1), and brown (9). There's a noticeable diagonal pattern from top-left to bottom-right, with alternating stripes of colors. The corners have distinct patterns: top-left is green (3), top-right is orange (7), bottom-left is blue (1), and bottom-right is brown (9). There are scattered patches of magenta (6) and yellow (4) throughout. The center of the grid (rows 14-17, columns 14-17) has a distinct pattern of alternating 5's and 2's.
+  output: |
+    The output grid is not provided for the test case.

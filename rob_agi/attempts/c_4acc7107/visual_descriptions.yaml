@@ -1,0 +1,50 @@
+example_0:
+  input: |
+    A 10x10 grid with two distinct shapes:
+    1. A blue (1) inverted T-shape in the top-left quadrant, with a single blue cell at the top and a wider base of 3 cells.
+    2. A magenta (6) shape in the middle-right area, resembling an inverted L or a chair. It has a vertical line of 3 cells and a horizontal base of 2 cells.
+    The rest of the grid is filled with black (0), representing empty space.
+  output: |
+    A 10x10 grid with the same two shapes, but their positions and orientations have changed:
+    1. The blue (1) shape is now at the bottom of the grid. It has been flipped vertically, with the single cell at the bottom and the wider part at the top. It maintains its left-right position.
+    2. The magenta (6) shape is now at the bottom-left corner. It has been flipped vertically, with the horizontal part now at the bottom and the vertical part extending upwards.
+    The rest of the grid remains black (0), representing empty space.
+
+example_1:
+  input: |
+    A 10x10 grid with two distinct color regions:
+    1. A green (3) region in the left side, forming an irregular shape. It has a solid rectangular block in the top-left and a separate, smaller rectangular block below it.
+    2. A yellow (4) region on the right side, forming a scattered pattern. It has a larger concentration in the middle-right, with some isolated cells extending towards the bottom-right corner.
+    The rest of the grid is black (0), representing empty space.
+  output: |
+    A 10x10 grid with the same two color regions, but their positions have changed:
+    1. The green (3) region is now at the bottom-left corner. It appears to have been flipped vertically, with the larger part now at the bottom and the smaller part above it.
+    2. The yellow (4) region is now concentrated at the bottom-right corner. It has been flipped vertically, with the denser part at the bottom and the scattered cells above it.
+    Both regions maintain their relative left-right positions and overall shapes.
+    The rest of the grid remains black (0), representing empty space.
+
+example_2:
+  input: |
+    A 10x10 grid with two distinct color regions:
+    1. A sky blue (8) region forming an irregular shape. It has a larger concentration in the top-left corner and a separate, smaller cluster in the middle-left area.
+    2. A yellow (4) region forming a scattered pattern mainly in the right half of the grid. It has a larger concentration in the middle-right and some isolated cells in the top-right and bottom-right areas.
+    The rest of the grid is black (0), representing empty space.
+  output: |
+    A 10x10 grid with the same two color regions, but their positions have changed:
+    1. The sky blue (8) region is now at the bottom-left corner. It appears to have been flipped vertically, with the larger part now at the bottom and the smaller part above it.
+    2. The yellow (4) region is now concentrated at the bottom-right corner. It has been flipped vertically, with the denser part at the bottom and the scattered cells above it.
+    Both regions maintain their relative left-right positions and overall shapes.
+    The rest of the grid remains black (0), representing empty space.
+
+example_3:
+  input: |
+    A 10x10 grid with two distinct color regions:
+    1. An orange (7) region forming two separate shapes. One is an irregular shape in the top-left quadrant, and the other is a rectangular block in the bottom-right corner.
+    2. A brown (9) region forming two separate shapes. One is a rectangular block in the top-right corner, and the other is a wider rectangular block in the middle of the grid.
+    The rest of the grid is black (0), representing empty space.
+  output: |
+    A 10x10 grid with the same two color regions, but their positions have changed:
+    1. The orange (7) region is now concentrated at the bottom-left corner. Both parts appear to have been flipped vertically and brought together, with the larger, irregular part at the bottom and the smaller rectangular part above it.
+    2. The brown (9) region is now at the bottom-right corner. Both parts have been flipped vertically and brought together, forming a larger block at the bottom with a smaller part above it.
+    Both regions maintain their relative left-right positions and overall shapes.
+    The rest of the grid remains black (0), representing empty space.

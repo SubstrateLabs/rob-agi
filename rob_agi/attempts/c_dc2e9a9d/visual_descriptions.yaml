@@ -1,0 +1,65 @@
+example_0:
+  input: |
+    A 22x17 grid with a green (3) shape in the upper left quadrant. The shape resembles an irregular 'U' or horseshoe, with a 5x5 square outline and an additional protrusion on the left side. The rest of the grid is black (0).
+
+    There's another small green shape in the bottom right quadrant. It's a 3x4 rectangle with a single green square below it, forming a simple 'T' shape.
+  output: |
+    The original green shapes remain unchanged.
+
+    A blue (1) shape, mirroring the larger green shape, appears in the upper right quadrant. It's slightly modified, with the protrusion on the right side instead of the left.
+
+    A sky blue (8) shape appears in the center of the grid. It's a 5x5 square with the corners removed, forming a cross or plus sign shape.
+
+example_1:
+  input: |
+    A 23x19 grid with three distinct green (3) shapes.
+
+    In the upper left quadrant, there's a large shape resembling a square with a bite taken out of the bottom right corner. It's 5x5 in size.
+
+    In the upper right quadrant, there's a smaller 3x3 square shape.
+
+    In the bottom right quadrant, there's another 5x5 square shape, but this one has a protrusion on the right side, making it look like a sideways 'P'.
+
+    The rest of the grid is black (0).
+  output: |
+    The original green shapes remain unchanged.
+
+    A blue (1) shape, mirroring the large green shape from the upper left, appears in the upper right quadrant, overlapping with the small green square.
+
+    A sky blue (8) shape appears in the center of the grid. It's a 5x5 square with a single square extending upward from the top edge.
+
+    Another blue (1) shape appears in the bottom left quadrant, mirroring the green 'P' shape from the bottom right.
+
+example_2:
+  input: |
+    A 22x21 grid with four distinct green (3) shapes.
+
+    In the top right corner, there's a 3x3 square with an additional square on top, forming a 'T' shape.
+
+    In the upper left quadrant, there's a 5x5 square shape with a protrusion on the left side, resembling a sideways 'P'.
+
+    In the bottom center, there's another 5x5 square shape, but this one has a single square extending downward from the bottom edge.
+
+    The rest of the grid is black (0).
+  output: |
+    The original green shapes remain unchanged.
+
+    A blue (1) shape, mirroring the upper left green 'P' shape, appears to its right.
+
+    A sky blue (8) shape appears in the center-left of the grid. It's a 5x5 square with a single square extending upward from the top edge, similar to the green shape in the bottom center but rotated 180 degrees.
+
+    Another blue (1) shape appears in the bottom right quadrant, mirroring the green shape from the bottom center.
+
+test_case_0:
+  input: |
+    A 22x21 grid with four distinct green (3) shapes.
+
+    In the top right corner, there's a 3x3 square with an additional square on top, forming a 'T' shape.
+
+    In the upper left quadrant, there's a 5x5 square shape with a protrusion on the left side, resembling a sideways 'P'.
+
+    In the bottom center, there's another 5x5 square shape, but this one has a single square extending downward from the bottom edge.
+
+    The rest of the grid is black (0).
+  output: |
+    The output grid is not provided for the test case.

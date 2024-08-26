@@ -1,0 +1,89 @@
+example_0:
+  input: |
+    A 9x9 grid with mostly black (empty) space. There are four colored objects:
+    1. A green (3) single cell in the top-left quadrant
+    2. A magenta (6) single cell in the top-right quadrant
+    3. A 2x2 red (2) square in the center
+    4. A sky blue (8) single cell in the bottom-left quadrant
+    5. An orange (7) single cell in the bottom-right quadrant
+  output: |
+    A 9x9 grid where the colored objects from the input have expanded diagonally:
+    1. The green (3) cell has expanded to the top-right corner
+    2. The magenta (6) cell has expanded to the bottom-right corner
+    3. The 2x2 red (2) square remains unchanged in the center
+    4. The sky blue (8) cell has expanded to the top-left corner
+    5. The orange (7) cell has expanded to the bottom-left corner
+    The expansion forms a symmetrical pattern, with each color reaching a corner of the grid
+
+example_1:
+  input: |
+    A 12x12 grid with several colored objects scattered throughout:
+    1. A sky blue (8) cell in the top-right quadrant
+    2. A 2x2 red (2) square slightly right and up from center
+    3. A green (3) cell below the red square
+    4. A magenta (6) cell to the right of the green cell
+    5. An orange (7) cell in the far right, middle row
+    6. Another 2x2 red (2) square in the bottom-left quadrant
+    7. A sky blue (8) cell to the left of this red square
+    8. A green (3) cell above the bottom-left red square
+    9. An orange (7) cell to the right of the green cell
+    10. A magenta (6) cell in the bottom-right corner
+  output: |
+    A 12x12 grid where the colored objects have expanded in various directions:
+    1. The top sky blue (8) cell has expanded diagonally to the top-right corner
+    2. The central 2x2 red (2) square remains unchanged
+    3. The green (3) cells have expanded diagonally, forming lines
+    4. The magenta (6) cells have expanded, one reaching the right edge, one the bottom-right corner
+    5. The orange (7) cells have expanded, forming diagonal lines
+    6. The bottom-left 2x2 red (2) square remains unchanged
+    7. The bottom sky blue (8) cell has expanded diagonally to the bottom-left corner
+    The expansion creates a complex, interconnected pattern with diagonal lines and preserved red squares
+
+example_2:
+  input: |
+    A 12x12 grid with colored objects arranged in a somewhat symmetrical pattern:
+    1. A magenta (6) cell in the top-left quadrant
+    2. An orange (7) cell to its right
+    3. A 2x2 red (2) square below the orange cell
+    4. A sky blue (8) cell to the left of the red square
+    5. Another 2x2 red (2) square below the first one
+    6. A green (3) cell to its right
+    7. A magenta (6) cell below the green cell
+    8. An orange (7) cell to its right
+    9. A 2x2 red (2) square below the orange cell
+    10. A sky blue (8) cell to its right
+  output: |
+    A 12x12 grid where the colored objects have expanded in various directions:
+    1. The magenta (6) cells have expanded diagonally
+    2. The orange (7) cells have expanded diagonally
+    3. The 2x2 red (2) squares remain unchanged
+    4. The sky blue (8) cells have expanded diagonally
+    5. The green (3) cells have expanded diagonally
+    The expansion creates a complex pattern with diagonal lines, preserved red squares, and a somewhat symmetrical arrangement
+
+example_3:
+  input: |
+    An 8x8 grid with colored objects arranged in a somewhat symmetrical pattern:
+    1. A green (3) cell in the top-left corner
+    2. An orange (7) cell to its right
+    3. A 2x2 red (2) square below the green cell
+    4. A magenta (6) cell below the red square
+    5. A sky blue (8) cell to its right
+    6. Another magenta (6) cell in the middle-right
+    7. An orange (7) cell to its right
+    8. A 2x2 red (2) square below the magenta cell
+    9. A sky blue (8) cell below the red square
+    10. A green (3) cell to its right
+  output: |
+    An 8x8 grid where the colored objects have expanded or shifted:
+    1. The top-left green (3) cell has moved to the right
+    2. The top orange (7) cell has moved diagonally to the center
+    3. The top-left 2x2 red (2) square remains unchanged
+    4. The left magenta (6) cell has expanded diagonally to the bottom-left corner
+    5. The left sky blue (8) cell has expanded diagonally to the top-left corner
+    6. The right magenta (6) cell has expanded diagonally to the top-right corner
+    7. The right orange (7) cell has expanded diagonally to the bottom-right corner
+    8. The bottom-right 2x2 red (2) square remains unchanged
+    9. The bottom sky blue (8) cell has moved to the left
+    10. The bottom-right green (3) cell has moved up
+    The transformation creates a more symmetrical pattern with diagonal expansions and some color shifts

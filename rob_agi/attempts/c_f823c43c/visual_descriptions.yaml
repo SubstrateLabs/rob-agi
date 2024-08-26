@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The grid is 19x15 in size. The dominant color is sky blue (8), forming a background. There are scattered magenta (6) squares throughout the grid, creating an irregular pattern. Yellow (4) squares appear in alternating rows, forming a striped pattern. The magenta squares seem to form loose clusters or regions, interrupting the regular blue-yellow pattern.
+  output: |
+    The grid maintains its 19x15 size, but the pattern has been simplified. The entire background is now uniformly sky blue (8). The yellow (4) squares remain in their alternating row pattern, creating stripes. All magenta (6) squares have been removed, resulting in a clean, regular pattern of blue background with yellow stripes.
+
+example_1:
+  input: |
+    The grid is 12x12 in size. The dominant color is orange (7), forming the background. Sky blue (8) squares appear regularly in certain rows, creating a partial grid pattern. Magenta (6) squares are scattered throughout, interrupting the orange background and sometimes replacing the sky blue squares in the grid pattern.
+  output: |
+    The grid maintains its 12x12 size. The pattern has been regularized. The orange (7) background remains dominant. The sky blue (8) squares now form a complete and regular grid pattern, appearing in every third column of every other row. All magenta (6) squares have been removed, resulting in a clean, consistent pattern of orange background with a regular sky blue grid overlay.
+
+test_case_0:
+  input: |
+    This is the same as the input for example_0. The grid is 19x15 in size with a dominant sky blue (8) background. Scattered magenta (6) squares create an irregular pattern throughout. Yellow (4) squares appear in alternating rows, forming a striped pattern. The magenta squares seem to form loose clusters or regions, interrupting the regular blue-yellow pattern.
+  output: |
+    As this is a test case, no output is provided. However, based on the pattern observed in example_0, we might expect the output to be similar: a 19x15 grid with a uniform sky blue (8) background, retaining the yellow (4) squares in their alternating row pattern, and with all magenta (6) squares removed.

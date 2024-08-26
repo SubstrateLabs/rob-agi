@@ -1,0 +1,20 @@
+example_0:
+  input: |
+    A 12x10 grid mostly filled with black (0). There's a small red (2) cross or plus sign in the center. The cross is 3x3 in size, with the center and four adjacent squares colored red.
+  output: |
+    A 12x10 grid with a complex pattern. The red cross from the input is preserved in the center. Around it, there's a symmetrical pattern:
+    - Blue (1) dots form a diamond shape, with single dots at the corners of an imaginary square.
+    - Sky blue (8) forms lines extending from the red cross, both vertically and horizontally.
+    - Yellow (4) appears at regular intervals along these sky blue lines.
+    - The pattern extends beyond the original red cross, creating a larger, more intricate design.
+
+example_1:
+  input: |
+    A 7x16 grid mostly filled with black (0). There's a small red (2) cross or plus sign near the top-left corner. The cross is 3x3 in size, with the center and four adjacent squares colored red.
+  output: |
+    A 7x16 grid with a pattern similar to example_0, but adjusted for the different grid size and cross position:
+    - The red cross from the input is preserved in its original position.
+    - Blue (1) dots form a partial diamond shape around the cross.
+    - Sky blue (8) lines extend from the red cross, both vertically and horizontally, reaching the edges of the grid.
+    - Yellow (4) appears at regular intervals along the horizontal sky blue line.
+    - The pattern is not centered in the grid but extends from the original cross position.

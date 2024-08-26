@@ -1,61 +1,17 @@
 example_0:
   input: |
-    An 11x11 grid with mostly black (empty) squares. There are three colored squares:
-    - A gray (5) square in the top-left corner
-    - A magenta (6) square adjacent to the gray square
-    - A blue (1) square in the middle of the 5th row, 4th column
+    A mostly empty 11x11 grid with two colored squares in the top-left corner: a gray (5) square at (0,0) and a magenta (6) square at (0,1). There's also a single blue (1) square near the center at (4,3).
   output: |
-    An 11x11 grid with a distinct pattern:
-    - A rectangular shape formed by gray (5) and magenta (6) squares
-    - The shape resembles an incomplete rectangle or 'C' shape
-    - Gray forms most of the shape, with magenta forming the right side
-    - The blue (1) square from the input is preserved inside this shape
-    - The shape is positioned in the upper-left quadrant of the grid
-    - The rest of the grid remains black (empty)
+    An 11x11 grid with a distinct shape formed by gray (5) and magenta (6) squares. The shape resembles a rectangular frame or box with an opening on the right side. The frame is made of gray squares, with magenta squares forming the left side and part of the top. The blue (1) square from the input is now inside this frame, slightly off-center. The rest of the grid remains black (0).
 
 example_1:
   input: |
-    An 11x11 grid, mostly black (empty). Three colored squares:
-    - A green (3) square in the top-left corner
-    - A red (2) square adjacent to the green square
-    - A blue (1) square in the 7th row, 7th column
+    An 11x11 grid with two colored squares in the top-left corner: a green (3) square at (0,0) and a red (2) square at (0,1). There's also a single blue (1) square in the lower right quadrant at (6,6).
   output: |
-    An 11x11 grid with a distinct rectangular shape:
-    - The shape is formed by green (3) and red (2) squares
-    - It resembles a rectangle with an opening at the bottom-left corner
-    - Green forms the top and left sides, red forms the right and bottom sides
-    - The blue (1) square from the input is preserved inside this shape
-    - The shape is centered in the grid, leaving empty space around all sides
-    - The rest of the grid remains black (empty)
+    An 11x11 grid with a distinct rectangular shape formed by green (3) and red (2) squares. The shape is larger than in the previous example and positioned more centrally. It forms a complete rectangle with green squares making up most of the perimeter, and red squares forming the right side and part of the bottom. The blue (1) square from the input is now inside this rectangle, positioned slightly off-center. The rest of the grid remains black (0).
 
 example_2:
   input: |
-    A 12x12 grid, mostly black (empty). Three colored squares:
-    - A gray (5) square in the top-left corner
-    - A green (3) square adjacent to the gray square
-    - A blue (1) square in the 7th row, 6th column
+    A 12x12 grid with two colored squares in the top-left corner: a gray (5) square at (0,0) and a green (3) square at (0,1). There's also a single blue (1) square slightly left of center at (6,5).
   output: |
-    A 12x12 grid with a complex rectangular shape:
-    - The shape is formed by gray (5) and green (3) squares
-    - It resembles a large rectangle with smaller rectangles inside
-    - Gray forms most of the outer and inner shapes
-    - Green forms the right side of the outer rectangle and some inner lines
-    - The blue (1) square from the input is preserved inside one of the inner rectangles
-    - The shape spans most of the grid, leaving some empty space on the right and bottom
-    - The rest of the grid remains black (empty)
-
-test_case_0:
-  input: |
-    A 13x13 grid, mostly black (empty). Three colored squares:
-    - A red (2) square in the top-left corner
-    - A sky blue (8) square adjacent to the red square
-    - A blue (1) square in the 6th row, 7th column
-  output: |
-    A 13x13 grid with a complex rectangular shape:
-    - The shape is formed by red (2) and sky blue (8) squares
-    - It resembles a large rectangle with smaller rectangles inside
-    - Red forms the bottom and some inner lines
-    - Sky blue forms most of the outer shape and some inner lines
-    - The blue (1) square from the input is preserved inside one of the inner rectangles
-    - The shape spans the entire grid, touching all four edges
-    - There is no empty space left in the grid
+    A 12x12 grid with a complex shape formed by gray (5) and green (3) squares. The shape resembles two interconnected rectangles. The outer rectangle is made primarily of gray squares, with green squares forming the right side and part of the bottom. Inside this, there's a smaller rectangle also made of gray squares. The blue (1) square from the input is now inside the inner rectangle, slightly off-center. The rest of the grid remains black (0).

@@ -1,0 +1,66 @@
+example_0:
+  input: |
+    A 7x7 grid with several distinct patterns:
+    - Top-left corner: A 2x2 red square
+    - Top-right corner: A 2x2 green square, with one green square detached below
+    - Bottom-left corner: A 2x2 pattern of alternating red and green squares
+    - Bottom-right corner: A 2x2 red square
+    - Center: Mostly black (empty) with some scattered colored squares
+    The grid has a somewhat symmetrical feel, with 2x2 patterns in three corners
+  output: |
+    A 3x3 grid with a simple pattern:
+    - Top-left corner (0,0): Blue square
+    - Center (1,1): Blue square
+    - All other squares: Black (empty)
+
+example_1:
+  input: |
+    A 7x5 grid with two distinct patterns:
+    - Top-left corner: A 2x2 green square
+    - Bottom-right quadrant: A 2x2 red square that spans the corner
+    The rest of the grid is black (empty)
+  output: |
+    A 3x3 grid with a very simple pattern:
+    - Top-left corner (0,0): Blue square
+    - All other squares: Black (empty)
+
+example_2:
+  input: |
+    A 7x7 grid with a symmetrical pattern:
+    - Top-left corner: A 2x2 green square
+    - Top-right corner: A 2x2 green square
+    - Bottom-left corner: A 2x2 green square
+    - Bottom-right corner: A 2x2 red square
+    - Center: Mostly black (empty) with two red squares in the middle-right
+    The grid has perfect symmetry with 2x2 squares in all four corners
+  output: |
+    A 3x3 grid with a diagonal pattern:
+    - Top-left corner (0,0): Blue square
+    - Center (1,1): Blue square
+    - Bottom-right corner (2,2): Blue square
+    - All other squares: Black (empty)
+
+example_3:
+  input: |
+    A 5x7 grid with an asymmetrical pattern:
+    - Top-left corner: A 2x2 green square
+    - Bottom-right quadrant: A 2x2 green square
+    - A few scattered green squares elsewhere
+    Most of the grid is black (empty)
+  output: |
+    A 3x3 grid with a simple pattern:
+    - Top-left corner (0,0): Blue square
+    - Center (1,1): Blue square
+    - All other squares: Black (empty)
+
+example_4:
+  input: |
+    A 5x5 grid with two distinct patterns:
+    - Top-right quadrant: A 2x2 red square
+    - Bottom-left quadrant: A 2x2 green square
+    - A red square in the bottom-right corner
+    The rest of the grid is black (empty)
+  output: |
+    A 3x3 grid with a very simple pattern:
+    - Top-left corner (0,0): Blue square
+    - All other squares: Black (empty)

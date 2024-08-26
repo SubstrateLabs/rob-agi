@@ -1,0 +1,35 @@
+example_0:
+  input: |
+    A 12x10 grid mostly filled with black (0) squares. There are two yellow (4) squares: one at (2,3) and another at (8,6). There are also five gray (5) squares scattered across the grid at positions (0,6), (3,8), (4,1), (5,4), (7,0), and (11,9).
+  output: |
+    The grid maintains its 12x10 size and most of the black and gray squares. The key changes are:
+    1. Around the yellow square at (2,3), a 3x3 red (2) square has been created, centered on the yellow square.
+    2. Around the yellow square at (8,6), a 5x5 red (2) square has been created, centered on the yellow square.
+    The red squares do not overlap with any gray squares or extend beyond the grid boundaries.
+
+example_1:
+  input: |
+    A 9x10 grid mostly filled with black (0) squares. There is one yellow (4) square at position (3,4) and one gray (5) square at position (3,1).
+  output: |
+    The grid maintains its 9x10 size and most of the black squares. The key change is:
+    A 5x5 red (2) square has been created, centered on the yellow square at (3,4).
+    The red square extends from rows 1 to 5 and columns 2 to 6.
+    The gray square at (3,1) remains unchanged and is not overlapped by the red square.
+
+example_2:
+  input: |
+    A 9x8 grid mostly filled with black (0) squares. There is one yellow (4) square at position (3,3) and one gray (5) square at position (1,2).
+  output: |
+    The grid maintains its 9x8 size and most of the black squares. The key change is:
+    A 3x3 red (2) square has been created, centered on the yellow square at (3,3).
+    The red square extends from rows 2 to 4 and columns 2 to 4.
+    The gray square at (1,2) remains unchanged and is not overlapped by the red square.
+
+example_3:
+  input: |
+    A 9x11 grid mostly filled with black (0) squares. There is one yellow (4) square at position (5,4) and one gray (5) square at position (1,5).
+  output: |
+    The grid maintains its 9x11 size and most of the black squares. The key change is:
+    A 7x7 red (2) square has been created, centered on the yellow square at (5,4).
+    The red square extends from rows 2 to 8 and columns 1 to 7.
+    The gray square at (1,5) remains unchanged and is not overlapped by the red square.

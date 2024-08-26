@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid is 23x23 in size. It's dominated by a yellow (4) background forming a grid-like structure. There are 8x8 sky blue (8) squares in the top-left corner, forming a larger square. Blue (1) dots are scattered throughout, mostly in the right half and bottom of the grid. There are black (0) spaces, primarily in the right half, creating a pattern of empty spaces within the yellow grid.
+  output: |
+    The grid maintains its 23x23 size and yellow (4) grid-like structure. The sky blue (8) square in the top-left corner is slightly altered, with two L-shaped patterns added using sky blue (8) in the top-right and bottom-left of this square. Some blue (1) dots have been replaced or moved, particularly in the upper-left quadrant. The overall pattern of black (0) spaces remains largely the same.
+
+example_1:
+  input: |
+    The grid is 23x23. It's dominated by a yellow (4) grid-like structure. Blue (1) dots are scattered throughout, forming various patterns. There's a magenta (6) L-shaped structure in the bottom-right corner. Black (0) spaces are interspersed, creating a pattern within the yellow grid.
+  output: |
+    The 23x23 grid maintains its yellow (4) structure. Some blue (1) dots have been replaced by magenta (6), forming L-shapes or partial L-shapes in various locations, particularly in the top-left quadrant. The magenta (6) L-shape in the bottom-right corner remains unchanged. Some blue (1) dots have been moved or removed, while others remain in place.
+
+example_2:
+  input: |
+    The grid is 23x23. It has a yellow (4) grid-like structure. The top-left corner contains a 7x7 square of green (3) and black (0) in a checkerboard-like pattern. Blue (1) dots are scattered throughout. The bottom half of the grid contains more complex patterns of blue (1) dots.
+  output: |
+    The 23x23 yellow (4) grid structure remains. The green (3) and black (0) pattern in the top-left is largely unchanged, but green (3) has been introduced in L-shapes or partial L-shapes throughout the grid, replacing some blue (1) dots. These green L-shapes appear in various orientations. Some blue (1) dots have been moved or removed, while others remain in their original positions.
+
+test_case_0:
+  input: |
+    The grid is 23x23 with a yellow (4) grid-like structure. Blue (1) dots are scattered throughout, forming various patterns. There's a 7x7 square in the top-left corner filled with sky blue (8) and black (0) in a pattern. The bottom-right quadrant contains more complex arrangements of blue (1) dots.
+  output: |
+    The output grid is not provided for the test case.

@@ -1,0 +1,45 @@
+example_0:
+  input: |
+    The grid is 11x9 in size. It contains several distinct rectangular regions separated by black (0) rows and columns. There are four main regions:
+    1. Top-left: A 2x2 region with red (2) and yellow (4) squares.
+    2. Top-right: A 2x2 region with sky (8) squares and red (2) and yellow (4) squares below.
+    3. Middle-left: A 2x2 region with gray (5) and brown (9) squares.
+    4. Middle-right: A 2x2 region with green (3) and red (2) squares.
+    5. Bottom-left: A 2x2 region with red (2) and yellow (4) squares.
+    6. Bottom-right: A 2x2 region with sky (8) and green (3) squares.
+    7. Very bottom: A 2x2 region with blue (1) squares and a single red (2) square.
+    These regions are separated by black (0) rows and columns, creating a grid-like structure.
+  output: |
+    The output grid is 11x2 in size. It appears to be a compressed version of the input, where each region is represented by its rightmost column:
+    1. Top: gray (5) and sky (8) squares.
+    2. Second row: gray (5) and sky (8) squares.
+    3. Third row: black (0) squares.
+    4. Fourth row: red (2) and green (3) squares.
+    5. Fifth row: red (2) and green (3) squares.
+    6. Sixth row: black (0) squares.
+    7. Seventh row: green (3) and green (3) squares.
+    8. Eighth row: sky (8) and sky (8) squares.
+    9. Ninth row: black (0) squares.
+    10. Tenth row: brown (9) and brown (9) squares.
+    11. Bottom row: brown (9) and orange (7) squares.
+
+example_1:
+  input: |
+    The grid is 8x9 in size. It contains several distinct rectangular regions separated by black (0) rows and columns. There are three main regions:
+    1. Top-left: A 2x2 region with red (2) and yellow (4) squares.
+    2. Top-right: A 2x2 region with red (2) and yellow (4) squares, with sky (8) and magenta (6) squares below.
+    3. Middle-left: A 2x2 region with blue (1) and red (2) squares.
+    4. Middle-right: A 2x2 region with gray (5) and yellow (4) squares.
+    5. Bottom-left: A 2x2 region with green (3) and orange (7) squares.
+    6. Bottom-right: A 2x2 region with sky (8) squares and green (3) and orange (7) squares below.
+    These regions are separated by black (0) rows and columns, creating a grid-like structure.
+  output: |
+    The output grid is 8x2 in size. It appears to be a compressed version of the input, where each region is represented by its rightmost column:
+    1. Top: magenta (6) and sky (8) squares.
+    2. Second row: sky (8) and sky (8) squares.
+    3. Third row: black (0) squares.
+    4. Fourth row: yellow (4) and gray (5) squares.
+    5. Fifth row: yellow (4) and gray (5) squares.
+    6. Sixth row: black (0) squares.
+    7. Seventh row: sky (8) and sky (8) squares.
+    8. Bottom row: sky (8) and green (3) squares.

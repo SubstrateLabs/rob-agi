@@ -1,0 +1,69 @@
+example_0:
+  input: |
+    The input grid shows a pattern of sky blue (8) shapes on a black (0) background. There are three distinct sky blue shapes:
+    1. A large rectangular shape in the top right corner, with a small black square inside it.
+    2. A smaller rectangular shape in the middle left, with a black square in its center.
+    3. A T-shaped structure at the bottom, consisting of a horizontal bar with three vertical extensions downward.
+  output: |
+    The output grid maintains the same overall structure as the input, but with color changes:
+    1. The large rectangular shape in the top right is now blue (1).
+    2. The smaller rectangular shape in the middle left is also blue (1).
+    3. The T-shaped structure at the bottom is now green (3).
+    The black (0) background and internal black squares remain unchanged.
+
+example_1:
+  input: |
+    The input grid displays several sky blue (8) shapes on a black (0) background:
+    1. A large rectangular shape with internal divisions in the top left quadrant.
+    2. A smaller square shape in the middle right.
+    3. A large, complex shape in the bottom left, resembling an inverted 'L' with additional extensions.
+    4. A rectangular shape with internal divisions in the bottom right.
+  output: |
+    The output grid preserves the shapes from the input but assigns different colors:
+    1. The large rectangular shape in the top left is now red (2).
+    2. The smaller square shape in the middle right is now blue (1).
+    3. The complex shape in the bottom left is now green (3).
+    4. The rectangular shape in the bottom right is now blue (1), matching the middle right shape.
+    The black (0) background remains unchanged.
+
+example_2:
+  input: |
+    The input grid shows multiple sky blue (8) shapes on a black (0) background:
+    1. A rectangular shape with internal divisions in the top left.
+    2. A complex shape in the top right, resembling a rectangle with additional squares attached.
+    3. A cross-like shape in the middle left.
+    4. A small square in the bottom right.
+  output: |
+    The output grid maintains the same shapes but assigns new colors:
+    1. The rectangular shape in the top left is now blue (1).
+    2. The complex shape in the top right is now red (2).
+    3. The cross-like shape in the middle left is now green (3).
+    4. The small square in the bottom right is now blue (1), matching the top left shape.
+    The black (0) background remains unchanged.
+
+example_3:
+  input: |
+    The input grid displays several sky blue (8) shapes on a black (0) background:
+    1. A small square in the top left corner.
+    2. A large, complex shape spanning the top of the grid, resembling a wide rectangle with internal divisions and extensions.
+    3. A square shape with internal divisions in the middle left.
+    4. A large, complex shape in the bottom right quadrant, resembling an inverted 'U' with additional extensions and internal divisions.
+    5. A small square in the bottom left corner.
+  output: |
+    The output grid preserves the shapes from the input but assigns different colors:
+    1. The small square in the top left is now yellow (4).
+    2. The large, complex shape at the top is also yellow (4).
+    3. The square shape in the middle left is now green (3).
+    4. The large, complex shape in the bottom right is now red (2).
+    5. The small square in the bottom left is now blue (1).
+    The black (0) background remains unchanged.
+
+test_case_0:
+  input: |
+    The input grid shows several sky blue (8) shapes on a black (0) background:
+    1. A small square in the top left corner.
+    2. A large, complex shape spanning most of the top half, resembling a wide rectangle with internal divisions and a protrusion on the bottom right.
+    3. A cross-like shape in the bottom left quadrant.
+    4. A square shape with internal divisions in the bottom right corner.
+  output: |
+    The output is not provided for this test case.

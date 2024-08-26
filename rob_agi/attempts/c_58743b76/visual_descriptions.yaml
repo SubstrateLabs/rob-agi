@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The grid is 10x10. The top-left corner (2x2) contains four different colors: blue (1), yellow (4), green (3), and red (2). The rest of the top two rows are filled with sky blue (8). The remaining 8x8 area is mostly black (0) with several blue (1) dots scattered throughout. These blue dots appear to be randomly placed and do not form any clear pattern or shape.
+  output: |
+    The grid layout remains 10x10. The top-left 2x2 corner is unchanged, keeping the same four colors. The sky blue (8) area in the top two rows is also unchanged. In the 8x8 black area, the previously blue (1) dots have changed colors. Some have become yellow (4), others green (3), and some red (2). The placement of these colored dots corresponds exactly to where the blue dots were in the input, but now with varied colors.
+
+example_1:
+  input: |
+    The grid is 12x12. The top-right corner (2x2) contains four different colors: yellow (4), magenta (6), blue (1), and red (2). The rest of the top two rows and the rightmost two columns are filled with sky blue (8). The remaining 10x10 area is mostly black (0) with several red (2) dots scattered throughout. These red dots seem more numerous than the blue dots in the previous example and are spread across the black area without forming any clear pattern.
+  output: |
+    The grid layout remains 12x12. The top-right 2x2 corner is unchanged, keeping the same four colors. The sky blue (8) areas in the top two rows and rightmost two columns are also unchanged. In the 10x10 black area, the previously red (2) dots have changed colors. Some have become yellow (4), others magenta (6), some blue (1), and a few remain red (2). The placement of these colored dots corresponds exactly to where the red dots were in the input, but now with varied colors.
+
+test_case_0:
+  input: |
+    There is no separate test case provided in the given test file. The two examples (example_0 and example_1) serve as both examples and test cases in this instance.
+  output: |
+    As there is no separate test case, there is no output to describe.

@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 6x6 grid with two distinct shapes. The first shape is a blue (1) cross or plus sign in the top-left corner, occupying a 3x3 area. The second shape is a sky blue (8) cross or plus sign in the bottom-right corner, also occupying a 3x3 area. The rest of the grid is filled with black (0), which can be interpreted as empty space.
+  output: |
+    The 6x6 grid maintains the same overall structure, but with one significant change. The blue (1) cross in the top-left corner has been transformed into a sky blue (8) cross, matching the color of the cross in the bottom-right corner. The sky blue (8) cross in the bottom-right corner remains unchanged. The rest of the grid is still filled with black (0) empty space.
+
+example_1:
+  input: |
+    A 9x9 grid with multiple shapes and colors. In the top-left quadrant, there's a blue (1) shape resembling an inverted 'L' or a partial square. In the top-right, there's a smaller blue (1) 'L' shape. In the bottom-right corner, there's a 2x2 brown (9) square with an additional brown cell below it. In the bottom-left, there's a magenta (6) shape that looks like a sideways 'T'. In the middle-right, there are two orange (7) cells. The rest of the grid is filled with black (0) empty space.
+  output: |
+    The 9x9 grid maintains the same overall structure, but with color changes to some shapes. The blue (1) inverted 'L' in the top-left has become magenta (6). The blue (1) 'L' in the top-right has become orange (7). The brown (9) shape in the bottom-right has expanded slightly, with the single cell below the square now incorporated into a 3x2 rectangle. The magenta (6) 'T' shape in the bottom-left and the orange (7) cells in the middle-right remain unchanged. The rest of the grid is still black (0) empty space.
+
+example_2:
+  input: |
+    An 11x11 grid with various shapes and colors. In the top-left, there's a blue (1) cross or plus sign. In the top-right, there's a brown (9) 'L' shape. In the middle-left, there's a green (3) shape like an inverted 'T'. In the middle-right, there are two magenta (6) cells vertically aligned. In the bottom-left, there's another blue (1) shape forming a small 'L'. In the bottom-right, there's an orange (7) shape resembling an upside-down 'T'. The rest is black (0) empty space.
+  output: |
+    The 11x11 grid maintains the overall structure but with several color changes and slight shape modifications. The blue (1) cross in the top-left has become orange (7). The brown (9) 'L' in the top-right is unchanged. The green (3) inverted 'T' in the middle-left is unchanged. The two magenta (6) cells in the middle-right remain the same. The blue (1) 'L' in the bottom-left has become green (3). The orange (7) upside-down 'T' in the bottom-right is unchanged. Additionally, the blue (1) shape in the middle (previously unmentioned) has become brown (9) and expanded slightly to form a small cross. The rest remains black (0) empty space.
+
+test_case_0:
+  input: |
+    An 11x11 grid with multiple shapes and colors. In the top-left, there's a red (2) 'L' shape. In the top-right, there's a yellow (4) 'T' shape. In the middle-left, there's a blue (1) shape resembling a sideways 'H'. In the bottom-left, there's a sky blue (8) shape like an upside-down 'L'. In the bottom-right, there's a green (3) shape forming a small cross or plus sign. The rest of the grid is filled with black (0) empty space.
+  output: |
+    The output grid is not provided for this test case.

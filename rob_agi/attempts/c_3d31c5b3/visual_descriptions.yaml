@@ -1,0 +1,35 @@
+example_0:
+  input: |
+    A 12x6 grid with distinct patterns in each third. The top third is predominantly gray (5) with some black (0) spaces. The middle third has yellow (4) elements with black spaces. The bottom third contains red (2) and sky blue (8) elements with black spaces. The patterns in each third are not uniform but have some structure.
+  output: |
+    A 3x6 grid that appears to be a condensed version of the input. The top row is mostly gray (5) with red (2) on the edges. The middle row is a mix of gray and yellow (4). The bottom row is gray with some black (0) spaces.
+
+example_1:
+  input: |
+    Another 12x6 grid with three distinct sections. The top third is mostly gray (5) with some black (0). The middle third has yellow (4) elements scattered among black spaces. The bottom third is a mix of red (2) and sky blue (8), with sky blue dominating the lower rows.
+  output: |
+    A 3x6 grid summarizing the input. The top row is mostly gray with yellow (4) in the center. The middle row alternates between gray, sky blue (8), and black. The bottom row has red, yellow, and gray elements.
+
+example_2:
+  input: |
+    A 12x6 grid with three sections. The top third has a scattered pattern of gray (5) and black (0). The middle third contains yellow (4) elements with black spaces. The bottom third is dominated by red (2) in the upper part and sky blue (8) in the lower part.
+  output: |
+    A 3x6 grid that condenses the input. Each row contains a mix of gray, sky blue, and yellow, with some variation in pattern and dominance of colors.
+
+example_3:
+  input: |
+    A 12x6 grid with three distinct sections. The top third is mostly gray (5) with some black (0) spaces. The middle third has yellow (4) elements with black spaces. The bottom third contains red (2) elements in the upper part and sky blue (8) elements in the lower part.
+  output: |
+    A 3x6 grid summarizing the input. The top row is mostly gray with yellow on the right. The middle row is a mix of gray and sky blue. The bottom row is entirely gray (5).
+
+example_4:
+  input: |
+    A 12x6 grid with three sections. The top third has scattered gray (5) elements with black (0) spaces. The middle third contains yellow (4) elements with black spaces. The bottom third has red (2) elements in the upper part and sky blue (8) elements dominating the lower part.
+  output: |
+    A 3x6 grid condensing the input. The top row has gray, yellow, and sky blue elements. The middle row contains red, gray, yellow, and black elements. The bottom row has yellow, gray, and sky blue elements.
+
+example_5:
+  input: |
+    A 12x6 grid with three sections. The top third is dominated by gray (5) with some black (0) spaces. The middle third has yellow (4) elements with black spaces. The bottom third contains red (2) elements in the upper part and sky blue (8) elements in the lower part.
+  output: |
+    A 3x6 grid summarizing the input. The top row has yellow, gray, and red elements. The middle row is mostly gray with some yellow and red. The bottom row is entirely gray (5).

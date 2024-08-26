@@ -31,7 +31,8 @@ def solve_11e1fe23(input_grid: ColoredGrid) -> ColoredGrid:
     left_dot, right_dot = sorted(closest_pair, key=lambda dot: dot[1])
     mid_row = (left_dot[0] + right_dot[0]) // 2
     mid_col = (left_dot[1] + right_dot[1]) // 2
-    height = max(1, abs(left_dot[0] - right_dot[0]) // 2)
+    width = right_dot[1] - left_dot[1]
+    height = max(1, abs(left_dot[0] - right_dot[0]))
     
     # Step 4: Color the diamond
     top_color = left_dot[2]
@@ -42,10 +43,10 @@ def solve_11e1fe23(input_grid: ColoredGrid) -> ColoredGrid:
     # Step 5: Draw the diamond
     new_grid = input_grid.deep_copy()
     diamond_points = [
-        (mid_row - height, mid_col, top_color),
+        (mid_row - height // 2, mid_col, top_color),
         (mid_row, left_dot[1], left_color),
         (mid_row, right_dot[1], right_color),
-        (mid_row + height, mid_col, bottom_color)
+        (mid_row + height // 2, mid_col, bottom_color)
     ]
     
     for point in diamond_points:

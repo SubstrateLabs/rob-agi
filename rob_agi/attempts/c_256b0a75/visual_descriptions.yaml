@@ -1,0 +1,106 @@
+example_0:
+  input: |
+    A 23x21 grid mostly filled with black (0). There are scattered colored squares:
+    - A yellow (4) square in the top right quadrant
+    - A green (3) square in the left side, about 1/5 down
+    - A magenta (6) square slightly right of center, about 1/5 down
+    - Two red (2) squares in the left side, about 1/3 down
+    - Four sky (8) squares forming a small square shape slightly right of center, about 1/3 down
+    - An orange (7) square slightly right of center, about halfway down
+    - Another yellow (4) square on the left side, about halfway down
+    - Two orange (7) squares forming a horizontal line slightly left of center, about 2/3 down
+    - Three sky (8) squares forming an L shape slightly right of center, about 2/3 down
+    - A brown (9) square on the right side, about 2/3 down
+    - A blue (1) square slightly right of center, near the bottom
+    - Another blue (1) square on the left side, at the bottom
+    - Another brown (9) square on the right side, near the bottom
+  output: |
+    The grid is transformed with large colored regions:
+    - A vertical orange (7) stripe runs down the center, widening at the top and bottom
+    - Two vertical sky (8) stripes flank the orange stripe in the middle third of the grid
+    - A horizontal red (2) stripe runs across the top left corner
+    - A yellow (4) region fills the top left corner
+    - A magenta (6) dot is embedded in the orange region near the top
+    - A green (3) dot is in the top left, just below the red stripe
+    - Two brown (9) dots are on the right side, one about 2/3 down and one near the bottom
+    - A vertical blue (1) stripe runs down the right side of the bottom third of the grid
+    The rest of the grid remains black (0)
+
+example_1:
+  input: |
+    A 22x24 grid mostly filled with black (0). There are scattered colored squares:
+    - Two yellow (4) squares in the top left corner
+    - An orange (7) square about 1/8 down on the left side
+    - A red (2) square and a brown (9) square in the left quadrant, about 1/6 down
+    - Two blue (1) squares forming a vertical line slightly left of center, about 1/4 down
+    - Two sky (8) squares forming a horizontal line on the right side, about 1/4 down
+    - A magenta (6) square slightly left of center, about 1/3 down
+    - Four sky (8) squares forming a square shape slightly left of center, about halfway down
+    - An orange (7) square on the right side, about halfway down
+    - A brown (9) square on the left side, about 2/3 down
+    - An orange (7) square slightly left of center, about 2/3 down
+    - A gray (5) square on the right side, about 2/3 down
+    - A blue (1) square near the bottom left corner
+    - A brown (9) square near the bottom right corner
+    - A yellow (4) square in the bottom right corner
+  output: |
+    The grid is transformed with large colored regions:
+    - A blue (1) region fills most of the middle section of the grid
+    - Two vertical sky (8) stripes run through the blue region, slightly left of center
+    - A horizontal red (2) stripe runs across the top left corner
+    - A yellow (4) region fills the top left corner
+    - Two brown (9) squares are in the top left quadrant
+    - An orange (7) region fills the right side and bottom of the grid
+    - A vertical gray (5) stripe runs down the right side
+    - A magenta (6) square is embedded in the blue region near the top left
+    - A yellow (4) square is in the bottom right corner
+    The rest of the grid remains black (0)
+
+example_2:
+  input: |
+    A 23x23 grid mostly filled with black (0). There are scattered colored squares:
+    - An orange (7) square and a gray (5) square near the top right corner
+    - A brown (9) square slightly right of center, about 1/6 down
+    - A blue (1) square slightly left of center, about 1/6 down
+    - A magenta (6) square slightly right of center, about 1/4 down
+    - Four sky (8) squares forming a square shape on the left side, about 1/3 down
+    - A gray (5) square on the left side, about 1/3 down
+    - A magenta (6) square on the right side, about 1/3 down
+    - A blue (1) square slightly left of center, about 2/3 down
+    - Two sky (8) squares forming a horizontal line on the left side, about 2/3 down
+    - Two green (3) squares forming a vertical line slightly right of center, about 2/3 down
+    - A blue (1) square near the bottom right corner
+    - A gray (5) square and a red (2) square near the bottom left corner
+    - A brown (9) square slightly right of center, near the bottom
+  output: |
+    The grid is transformed with large colored regions:
+    - A green (3) region fills most of the middle and right sections of the grid
+    - Two vertical sky (8) stripes run through the green region, slightly left of center
+    - An orange (7) stripe runs across the top of the grid
+    - A vertical blue (1) stripe runs down the left side
+    - Three magenta (6) squares are embedded in the green region: two on the right side and one near the top left
+    - Two brown (9) squares are in the top right quadrant
+    - A gray (5) square is in the top left corner
+    - A red (2) square is near the bottom left corner
+    The rest of the grid remains black (0)
+
+test_case_0:
+  input: |
+    A 23x23 grid mostly filled with black (0). There are scattered colored squares:
+    - A yellow (4) square in the top left corner
+    - An orange (7) square near the top right corner
+    - A gray (5) square slightly right of center, near the top
+    - A brown (9) square slightly right of center, about 1/6 down
+    - A blue (1) square on the left side, about 1/6 down
+    - A magenta (6) square slightly right of center, about 1/4 down
+    - Four sky (8) squares forming a square shape on the left side, about 1/3 down
+    - A gray (5) square on the left side, about 1/3 down
+    - A magenta (6) square on the right side, about 1/3 down
+    - A blue (1) square slightly left of center, about 2/3 down
+    - Two sky (8) squares forming a horizontal line on the left side, about 2/3 down
+    - Two green (3) squares forming a vertical line slightly right of center, about 2/3 down
+    - A blue (1) square near the bottom right corner
+    - A gray (5) square and a red (2) square near the bottom left corner
+    - A brown (9) square slightly right of center, near the bottom
+  output: |
+    The output grid is not provided for this test case.

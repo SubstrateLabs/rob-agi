@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 5x5 grid with mostly black (0) squares. There are three gray (5) squares forming a diagonal pattern from top-right to bottom-left. The gray squares are not touching each other and are separated by black squares.
+  output: |
+    A 10x10 grid, which is double the size of the input. The gray squares from the input have been expanded into 2x2 blocks of gray squares. These blocks maintain their relative positions but are now spaced further apart due to the grid expansion. Additionally, there's a diagonal line of blue (1) squares running from the top-left corner to the bottom-right corner. This blue diagonal intersects with the expanded gray blocks in some places.
+
+example_1:
+  input: |
+    A small 2x2 grid with a single red (2) square in the top-left corner. The rest of the squares are black (0).
+  output: |
+    A 4x4 grid, double the size of the input. The red square has been expanded into a 2x2 block of red squares in the top-left corner. The rest of the grid is mostly black, except for a diagonal line of blue (1) squares running from the top-left to the bottom-right, starting in the third row and third column.
+
+example_2:
+  input: |
+    A 6x6 grid that is mostly black (0). There are two green (3) squares: one in the top-right corner and another in the middle-left of the grid.
+  output: |
+    A 12x12 grid, double the size of the input. The two green squares from the input have been expanded into 2x2 blocks of green squares, maintaining their relative positions but now spaced further apart due to the grid expansion. There's also a diagonal line of blue (1) squares running from the top-left corner to the bottom-right corner. This blue diagonal does not intersect with the expanded green blocks.

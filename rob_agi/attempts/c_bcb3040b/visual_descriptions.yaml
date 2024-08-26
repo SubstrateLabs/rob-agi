@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 16x16 grid predominantly filled with black (0) and blue (1) squares. There are two red (2) squares at opposite corners: top-left and bottom-right. The blue squares form various patterns and clusters throughout the grid, with some areas more densely populated than others. There's no clear overall pattern, but there are some noticeable blue lines and clusters.
+  output: |
+    The grid maintains its 16x16 size and most of its original structure. The key difference is a diagonal line of red (2) and green (3) squares running from the top-left to the bottom-right corner. This line follows the main diagonal of the grid, with red squares on the diagonal itself and two green squares appearing in the middle of this line. The rest of the grid remains largely unchanged from the input.
+
+example_1:
+  input: |
+    A 12x12 grid with a mix of black (0) and blue (1) squares. Two red (2) squares are positioned at the ends of the 9th row (counting from top, 0-indexed). The blue squares form various patterns, including some vertical lines and clusters. The bottom half of the grid appears to have more blue squares than the top half.
+  output: |
+    The grid maintains its 12x12 size. The most significant change is in the 9th row, which is now filled with alternating red (2) and green (3) squares, creating a striking horizontal line across the grid. The two original red squares at the ends of this row remain in place. The rest of the grid is unchanged from the input.
+
+example_2:
+  input: |
+    A 10x10 grid with a mix of black (0) and blue (1) squares. Two red (2) squares are positioned in the 7th column (counting from left, 0-indexed): one near the top and one near the bottom. The blue squares form various patterns and clusters throughout the grid, with some areas more densely populated than others.
+  output: |
+    The grid maintains its 10x10 size. The most notable change is in the 7th column, which now contains a vertical line of alternating red (2) and green (3) squares. This line extends from the top red square to the bottom red square, which remain in their original positions. The rest of the grid is unchanged from the input.

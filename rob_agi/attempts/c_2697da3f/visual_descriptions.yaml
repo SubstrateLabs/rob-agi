@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 9x7 grid with a yellow (4) cross-like shape in the center. The cross has thicker horizontal arms and thinner vertical arms. The cross is surrounded by black (0) space. The cross doesn't touch the edges of the grid.
+  output: |
+    A 15x15 grid with a more complex yellow (4) pattern. The pattern resembles four interconnected crosses, forming a larger symmetrical design. The design touches all four edges of the grid. The center of the grid has a small 3x3 black (0) square. The overall pattern has rotational symmetry.
+
+example_1:
+  input: |
+    A 7x7 grid with a small yellow (4) shape in the center. The shape looks like a sideways 'T' or an arrow pointing right. It's surrounded by black (0) space and doesn't touch the edges.
+  output: |
+    An 11x11 grid with a more complex yellow (4) pattern. The pattern is symmetrical and resembles four arrow-like shapes pointing towards the center from each corner. The arrows don't quite touch in the middle, leaving a small black (0) cross in the center. The pattern touches all four edges of the grid.
+
+example_2:
+  input: |
+    An 8x7 grid with a yellow (4) shape in the center. The shape looks like two parallel vertical lines connected by three horizontal lines (resembling a ladder or an equals sign with an extra line). It's surrounded by black (0) space and doesn't touch the edges.
+  output: |
+    An 11x11 grid with a more complex yellow (4) pattern. The pattern is symmetrical and resembles the original shape rotated and repeated four times, forming a cross-like structure. The pattern touches all four edges of the grid. There's a small black (0) cross in the very center.
+
+example_3:
+  input: |
+    An 8x8 grid with a yellow (4) shape in the bottom-left corner. The shape looks like two vertical lines on the left edge, connected by horizontal lines at the top and bottom, with two shorter horizontal lines in between. It resembles a distorted 'E' shape. The shape touches the left and bottom edges of the grid.
+  output: |
+    A 15x15 grid with a complex yellow (4) pattern. The original shape is repeated and rotated to form a symmetrical design that touches all four edges of the grid. The pattern creates a frame-like structure with ornate corners. There's a small black (0) cross in the very center, and larger black spaces in each quadrant of the grid.

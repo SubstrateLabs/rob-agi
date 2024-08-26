@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The input grid is 20x20. The most prominent feature is a 7x7 square of red (2) in the center of the grid. This red square is surrounded by a mix of orange (7) and magenta (6) pixels, forming a somewhat chaotic border. In the bottom right quadrant, there's a 5x5 square of yellow (4). In the top left quadrant, there's a 3x3 square of brown (9). The rest of the grid is filled with a scattered pattern of black (0), orange (7), and magenta (6) pixels, creating a noisy background.
+  output: |
+    The output is a small 3x3 grid entirely filled with yellow (4) pixels.
+
+example_1:
+  input: |
+    The input grid is 20x20. The most striking feature is a 5x5 square of gray (5) in the top right quadrant. There's also a 4x4 square of brown (9) in the top left quadrant. In the bottom left quadrant, there's a 7x5 rectangular area of yellow (4). The center of the grid contains a 5x5 square of green (3). The rest of the grid is predominantly filled with sky blue (8) and black (0) pixels, with some scattered blue (1) pixels throughout.
+  output: |
+    The output is a small 3x3 grid entirely filled with green (3) pixels.
+
+example_2:
+  input: |
+    The input grid is 20x20. The most prominent feature is a large, irregular shape made of sky blue (8) pixels that starts in the top left quadrant and extends towards the center. In the center-right area, there's a large, irregular shape made of magenta (6) pixels. In the bottom right quadrant, there's a smaller irregular shape made of yellow (4) pixels. The rest of the grid is filled with a scattered pattern of red (2), green (3), and black (0) pixels, creating a noisy background.
+  output: |
+    The output is a small 3x3 grid entirely filled with sky blue (8) pixels.

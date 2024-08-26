@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 3x3 grid with three distinct horizontal stripes. The top row is mostly red (2) with a green (3) square on the right. The middle row is entirely gray (5). The bottom row is entirely black (0).
+  output: |
+    Almost identical to the input, but with one change: In the bottom row, the middle square is now red (2) instead of black (0).
+
+example_1:
+  input: |
+    A 5x5 grid with distinct horizontal sections. The top two rows are colorful and varied. The third row is entirely gray (5). The bottom two rows are entirely black (0).
+  output: |
+    Nearly identical to the input, with one change: In the bottom row, the middle square is now yellow (4) instead of black (0).
+
+example_2:
+  input: |
+    A 7x7 grid with distinct horizontal sections. The top three rows are colorful and varied. The fourth row is entirely gray (5). The bottom three rows are entirely black (0).
+  output: |
+    Almost the same as the input, but with one change: In the very bottom row, the middle square is now blue (1) instead of black (0).
+
+test_case_0:
+  input: |
+    A 7x7 grid with distinct horizontal sections. The top three rows are colorful and varied. The fourth row is entirely gray (5). The bottom three rows are entirely black (0).
+  output: |
+    Not provided in the test case.

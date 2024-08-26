@@ -1,0 +1,57 @@
+example_0:
+  input: |
+    The grid is 20x16. There are several distinct shapes visible:
+    1. In the top left, there's an orange (7) L-shaped object.
+    2. Below that, there's a blue (1) shape that resembles a distorted 'E'.
+    3. In the middle right, there's another orange (7) L-shaped object.
+    4. In the bottom right quadrant, there's a blue (1) shape that looks like a distorted 'F'.
+    The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The grid maintains its 20x16 size. The shapes have changed:
+    1. The orange L-shapes have disappeared.
+    2. The blue 'E' shape in the top left has turned green (3).
+    3. The blue 'F' shape in the bottom right has turned yellow (4).
+    4. A new magenta (6) shape has appeared in the middle right, resembling a hollow square.
+    The rest of the grid remains black (0) or empty.
+
+example_1:
+  input: |
+    The grid is 8x6. There are two distinct shapes:
+    1. In the top left, there's an orange (7) L-shaped object.
+    2. Below that, there's a blue (1) shape that resembles a distorted 'E' or perhaps a comb.
+    The rest of the grid is filled with black (0), considered as empty space.
+  output: |
+    The grid maintains its 8x6 size. The shapes have changed:
+    1. The orange L-shape has disappeared completely.
+    2. The blue 'E' or comb shape has turned green (3).
+    The rest of the grid remains black (0) or empty.
+
+example_2:
+  input: |
+    The grid is 9x11. There are several distinct shapes:
+    1. In the top right, there's an orange (7) L-shaped object.
+    2. In the middle left, there's another orange (7) L-shaped object.
+    3. In the bottom left, there's a blue (1) shape that resembles a distorted 'E' or perhaps a comb.
+    4. In the middle right, there's a blue (1) shape that looks like a distorted 'F' or perhaps a rake.
+    The rest of the grid is filled with black (0), considered as empty space.
+  output: |
+    The grid maintains its 9x11 size. The shapes have changed:
+    1. Both orange L-shapes have disappeared completely.
+    2. The blue 'E' or comb shape in the bottom left has turned yellow (4).
+    3. The blue 'F' or rake shape in the middle right has turned magenta (6).
+    The rest of the grid remains black (0) or empty.
+
+example_3:
+  input: |
+    The grid is 8x12. There are several distinct shapes:
+    1. In the top left, there's an orange (7) L-shaped object.
+    2. In the middle right, there's another orange (7) L-shaped object.
+    3. In the top left quadrant, there's a blue (1) shape that resembles a distorted 'E' or perhaps a comb.
+    4. In the bottom right quadrant, there's a blue (1) shape that looks like a distorted 'F' or perhaps a rake.
+    The rest of the grid is filled with black (0), considered as empty space.
+  output: |
+    The grid maintains its 8x12 size. The shapes have changed:
+    1. Both orange L-shapes have disappeared completely.
+    2. The blue 'E' or comb shape in the top left has turned sky blue (8).
+    3. The blue 'F' or rake shape in the bottom right has turned green (3).
+    The rest of the grid remains black (0) or empty.

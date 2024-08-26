@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 11x10 grid predominantly filled with sky blue (8). There's a blue (1) shape resembling an inverted 'L' in the top-left quadrant. Another blue shape in the bottom-right quadrant forms a partial rectangle with an open top.
+  output: |
+    The grid maintains its 11x10 size and sky blue (8) background. The blue (1) shapes remain unchanged. Red (2) has been added to fill in the enclosed spaces within the blue shapes. Specifically, the area inside the inverted 'L' in the top-left and the area inside the partial rectangle in the bottom-right are now filled with red.
+
+example_1:
+  input: |
+    A 7x9 grid with a gray (5) background. In the center, there's a blue (1) shape that resembles a rectangle with its bottom-right corner missing. This blue shape is surrounded by gray on all sides.
+  output: |
+    The 7x9 grid maintains its gray (5) background and the blue (1) shape remains unchanged. The space inside the blue shape, which was previously gray, is now filled with red (2). Additionally, the area to the left of the blue shape, which extends to the edge of the grid, is also filled with red.
+
+example_2:
+  input: |
+    An 11x9 grid with a brown (9) background. There are two distinct blue (1) shapes. The top shape resembles a rectangle with its top-right corner missing. The bottom shape looks like an inverted 'U' or a partial rectangle open at the bottom.
+  output: |
+    The 11x9 grid keeps its brown (9) background, and the blue (1) shapes remain unchanged. Red (2) has been added to fill the enclosed spaces within both blue shapes. In the top shape, the area inside the partial rectangle is filled with red. In the bottom shape, the area inside the inverted 'U' is filled with red. Additionally, the space to the right of the bottom shape, extending to the edge of the grid, is also filled with red.
+
+test_case_0:
+  input: |
+    An 11x9 grid with a brown (9) background. There are two distinct blue (1) shapes. The top shape resembles a rectangle with its top-right corner missing. The bottom shape looks like an inverted 'U' or a partial rectangle open at the bottom.
+  output: |
+    The output grid is identical to the input grid for this test case, as it's the same as example_2.

@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 6x6 grid with mostly black (0) squares. There's a pattern of sky blue (8) squares forming a rough L-shape in the top-right and extending down the middle. The sky blue squares are concentrated in the top-right quadrant, with a few scattered in the middle-left and bottom-left areas.
+  output: |
+    A 5x5 grid with a distinct pattern. The corners form 2x2 squares of sky blue (8). The center column and row are black (0), creating a cross shape that divides the grid into four quadrants. This results in a symmetrical pattern with sky blue corners and a black cross.
+
+example_1:
+  input: |
+    A 6x6 grid with a heavy concentration of sky blue (8) squares in the top half. The top-left quadrant is entirely sky blue. The top-right has mostly sky blue with two black squares. The bottom half is predominantly black with a few sky blue squares in the middle-left area.
+  output: |
+    A 5x5 grid with all four corners filled with 2x2 squares of sky blue (8). The center column and row are black (0), forming a cross shape that divides the grid into four equal quadrants. The pattern is completely symmetrical.
+
+example_2:
+  input: |
+    A 6x6 grid with a concentration of sky blue (8) squares in the top-middle and middle-left areas. There's a single sky blue square in the top-right corner. The bottom half of the grid is entirely black (0).
+  output: |
+    A 5x5 grid with sky blue (8) 2x2 squares in the top-left, top-right, and bottom-left corners. The bottom-right corner is black (0). The center column and row are black, forming a cross shape that divides the grid.
+
+example_3:
+  input: |
+    A 6x6 grid with a heavy concentration of sky blue (8) squares in the middle rows. The top row has two sky blue squares on the right side. The bottom two rows are entirely black (0). The pattern of sky blue squares forms a rough horizontal band across the middle of the grid.
+  output: |
+    A 5x5 grid with all four corners filled with 2x2 squares of sky blue (8). The center column and row are black (0), forming a cross shape that divides the grid into four equal quadrants. The pattern is completely symmetrical, identical to the output of example_1.
+
+example_4:
+  input: |
+    A 6x6 grid with a scattered pattern of sky blue (8) squares. There's a concentration in the middle-left area, some in the top-middle, and a few in the middle-right. The bottom two rows are entirely black (0). There's a single sky blue square in the top-right corner.
+  output: |
+    A 5x5 grid with sky blue (8) 2x2 squares in the top-left, top-right, and bottom-left corners. The bottom-right corner is black (0). The center column and row are black, forming a cross shape that divides the grid. This output is identical to the output of example_2.

@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 23x28 grid mostly filled with black (0). There's a small orange (7) pattern in the top-left quadrant. The pattern resembles a simple stick figure or a capital letter 'H'. It's 5 cells tall and 3 cells wide, positioned at row 5, column 6. The 'H' shape is formed by two vertical lines of orange cells with a horizontal line connecting them in the middle.
+  output: |
+    A 23x28 grid with the original orange 'H' pattern preserved in its original position. The pattern has been replicated horizontally and vertically across the grid, creating a repeating pattern. The replications alternate between orange (7) and magenta (6) colors. There are 4 full repetitions horizontally and 3 vertically, with partial patterns at the right and bottom edges. Each repetition is separated by one column or row of black (0) cells.
+
+example_1:
+  input: |
+    A 23x28 grid mostly filled with black (0). There's a small orange (7) pattern in the top-left quadrant. The pattern forms a simple square bracket shape or a capital letter 'C'. It's 3 cells tall and 3 cells wide, positioned at row 6, column 3. The 'C' shape is formed by two horizontal lines at the top and bottom, connected by a vertical line on the left side.
+  output: |
+    A 23x28 grid with the original orange 'C' pattern preserved in its original position. The pattern has been replicated horizontally and vertically across the grid, creating a repeating pattern. The replications alternate between orange (7) and magenta (6) colors. There are 4 full repetitions horizontally and 3 vertically, with partial patterns at the right and bottom edges. Each repetition is separated by one column or row of black (0) cells. The pattern starts closer to the left edge compared to the previous example.
+
+test_case_0:
+  input: |
+    A 23x28 grid mostly filled with black (0). There's a small orange (7) pattern in the top-left quadrant. The pattern forms a simple plus sign or a capital letter 'T'. It's 3 cells tall and 3 cells wide, positioned at row 5, column 3. The 'T' shape is formed by a horizontal line at the top and a vertical line extending down from its center.
+  output: |
+    The output grid is not provided for the test case.

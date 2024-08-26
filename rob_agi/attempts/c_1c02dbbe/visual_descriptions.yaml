@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 15x15 grid with a large gray (5) rectangular area in the center, surrounded by black (0) space. The gray area is 11x10 cells, spanning from row 3 to 13 and column 3 to 13. There are three red (2) dots: one at the top of the gray area (row 2, column 8), one at the left side (row 9, column 2), and one inside the gray area near the top-left corner (row 3, column 3).
+  output: |
+    The 15x15 grid maintains its overall structure, but the gray area has been transformed. The top-left quadrant (6x7 cells) of the gray area is now filled with red (2), while the rest remains gray (5). The black (0) border around the grid and the spaces above and below the central rectangle are preserved.
+
+example_1:
+  input: |
+    A 15x15 grid with a large gray (5) rectangular area slightly off-center, spanning from row 2 to 13 and column 2 to 13. The gray area is surrounded by black (0) space. There are four colored dots: a green (3) dot at the top (row 1, column 8), another green dot on the left side (row 6, column 1), a yellow (4) dot on the right side (row 7, column 13), and another yellow dot at the bottom (row 13, column 12).
+  output: |
+    The 15x15 grid maintains its overall structure, but the gray area has been transformed. It's now divided into three distinct sections: the top-left section (7x7 cells) is filled with green (3), the bottom-right section (6x6 cells) is filled with yellow (4), and a strip of gray (5) remains between them. The black (0) border around the grid is preserved.
+
+example_2:
+  input: |
+    A 15x15 grid with a large gray (5) rectangular area spanning almost the entire grid, from row 1 to 14 and column 1 to 14. There are several colored dots around the edges: three blue (1) dots (top-left, top-center, left-center), two magenta (6) dots (bottom-left, left-center), and two yellow (4) dots (top-right, right-center).
+  output: |
+    The 15x15 grid is transformed into distinct color regions. The top-left quadrant (5x7 cells) is blue (1), the bottom-left quadrant (6x6 cells) is magenta (6), the top-right quadrant (7x7 cells) is yellow (4), and the remaining central and bottom-right areas are gray (5). The black (0) border around the grid is preserved.
+
+test_case_0:
+  input: |
+    This test case is identical to example_2, so the description is the same as example_2's input.
+  output: |
+    This test case is identical to example_2, so the description is the same as example_2's output.

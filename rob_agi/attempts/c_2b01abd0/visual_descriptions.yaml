@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid is 12x9. There's a horizontal blue line (color 1) in the middle of the grid, at row 5. Above this line, there's a red (color 2) and green (color 3) pattern. The pattern looks like an inverted 'T' shape, with red on the outside and green in the center. The rest of the grid is black (color 0).
+  output: |
+    The grid maintains its 12x9 size and the blue horizontal line. The pattern above the line has changed: it's now green on the outside and red in the center, effectively inverting the colors of the original pattern. Below the blue line, a mirror image of the original red-green pattern appears, maintaining its original color scheme (red outside, green inside).
+
+example_1:
+  input: |
+    The grid is 11x12. There's a vertical blue line (color 1) slightly right of center, at column 7. To the right of this line, there's a pattern made of sky blue (color 8) and yellow (color 4). The pattern resembles a small cluster or cloud, with yellow in the center surrounded by sky blue. The rest of the grid is black (color 0).
+  output: |
+    The grid maintains its 11x12 size and the vertical blue line. The sky blue and yellow pattern to the right of the line remains unchanged. On the left side of the blue line, a mirror image of the original pattern appears, but with the colors swapped: the outer part is now yellow, and the inner part is sky blue.
+
+example_2:
+  input: |
+    The grid is 14x11. There's a horizontal blue line (color 1) slightly below the center, at row 9. Below this line, there's a pattern made of gray (color 5) and magenta (color 6). The pattern looks like a simple house or structure, with a magenta frame and some gray elements. The rest of the grid is black (color 0).
+  output: |
+    The grid maintains its 14x11 size and the horizontal blue line. The gray and magenta pattern below the line has changed: the colors are now swapped, with gray replacing magenta and vice versa. Above the blue line, a mirror image of the original pattern appears, maintaining its original color scheme (magenta frame with gray elements).
+
+test_case_0:
+  input: |
+    The grid is 12x9. There's a horizontal blue line (color 1) in the middle of the grid, at row 5. Above this line, there's a pattern made of red (color 2) and green (color 3). The pattern looks like two separate clusters or shapes, with red forming the outer parts and green filling some inner areas. The rest of the grid is black (color 0).
+  output: |
+    The output grid is not provided for this test case.

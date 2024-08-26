@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 5x13 grid with a distinct vertical red line (color 2) in the 7th column. The rest of the grid is filled with black (0) and orange (7) squares. The orange squares form irregular patterns on both sides of the red line, with more orange on the left side.
+  output: |
+    A 5x6 grid where the rightmost column corresponds to the area right of the red line in the input. The grid is mostly filled with blue (1), with some black (0) squares scattered throughout. The pattern of blue and black squares roughly corresponds to the orange and black pattern from the left side of the red line in the input.
+
+example_1:
+  input: |
+    A 5x13 grid with a vertical red line (color 2) in the 7th column. The grid is filled with black (0) and orange (7) squares, with orange squares forming more continuous areas compared to the previous example. There's a notable concentration of orange squares in the top-left and bottom-right corners.
+  output: |
+    A 5x6 grid where the rightmost column again corresponds to the area right of the red line in the input. The grid is predominantly blue (1), with some black (0) squares. The blue areas seem to correspond to the orange areas from the left side of the red line in the input, while maintaining some of the patterns from the right side as well.
+
+example_2:
+  input: |
+    A 5x13 grid with a vertical red line (color 2) in the 7th column. The grid has black (0) and orange (7) squares, with orange squares forming more distinct patterns. There's a notable diagonal pattern of orange squares from top-left to bottom-right, interrupted by the red line.
+  output: |
+    A 5x6 grid where the rightmost column corresponds to the area right of the red line in the input. The grid is mostly blue (1), with some black (0) squares. The blue squares seem to form a pattern that combines elements from both sides of the red line in the input, with a strong diagonal component from top-left to bottom-right.
+
+example_3:
+  input: |
+    A 5x13 grid with a vertical red line (color 2) in the 7th column. The grid has black (0) and orange (7) squares. There's a notable concentration of orange squares in the top-right and bottom-left corners, with a more scattered pattern in the middle.
+  output: |
+    A 5x6 grid where the rightmost column corresponds to the area right of the red line in the input. The grid is predominantly blue (1), with some black (0) squares. The blue squares form a pattern that seems to combine elements from both sides of the red line in the input, with strong blue presence in the corners and some scattered black squares in the middle.

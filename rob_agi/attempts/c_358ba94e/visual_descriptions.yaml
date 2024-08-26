@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    The input grid is 18x14. The background is black (0). There are two distinct orange (7) shapes that resemble the letter 'S', one in the top-left quadrant and one in the bottom-right quadrant. Each 'S' shape is 5x5 squares in size. The 'S' shapes are not solid; they have a single black square inside them, creating a hole. The top-left 'S' has the hole in the middle-right, while the bottom-right 'S' has the hole in the middle-left.
+  output: |
+    The output grid is 5x5. It contains a single orange (7) 'S' shape that fills the entire grid. The 'S' shape has a single black square creating a hole in the middle-right position, similar to the top-left 'S' in the input grid.
+
+example_1:
+  input: |
+    The input grid is 19x15. The background is black (0). There are three distinct sky blue (8) shapes that resemble the letter 'S', located in the top-left, top-right, and bottom-left quadrants. Each 'S' shape is 5x5 squares in size. The 'S' shapes are not solid; they have two black squares inside them, creating holes. The holes are positioned differently in each 'S': top-left (middle-left and bottom-middle), top-right (top-middle and middle-right), bottom-left (top-middle and middle-left).
+  output: |
+    The output grid is 5x5. It contains a single sky blue (8) 'S' shape that fills the entire grid. The 'S' shape has two black squares creating holes in the top-middle and middle-left positions, similar to the bottom-left 'S' in the input grid.
+
+example_2:
+  input: |
+    The input grid is 19x16. The background is black (0). There are four distinct magenta (6) shapes that resemble the letter 'S', located in various positions: top-left, top-right, middle-left, and bottom-right. Each 'S' shape is 5x5 squares in size. The 'S' shapes are not solid; they have one or two black squares inside them, creating holes. The holes are positioned differently in each 'S': top-left (middle-left), top-right (top-middle and middle-right), middle-left (no holes, solid), bottom-right (middle-left and bottom-middle).
+  output: |
+    The output grid is 5x5. It contains a single magenta (6) 'S' shape that fills the entire grid. The 'S' shape has two black squares creating holes in the top-middle and middle-left positions, similar to the top-right 'S' in the input grid.
+
+example_3:
+  input: |
+    The input grid is 19x16. The background is black (0). There are five distinct red (2) shapes that resemble the letter 'S', located in various positions across the grid. Each 'S' shape is 5x5 squares in size. The 'S' shapes are not solid; they have zero to two black squares inside them, creating holes. The holes are positioned differently in each 'S': top-middle (middle-right), middle-right (solid), bottom-left (middle-left and top-middle), bottom-middle (solid), bottom-right (middle-left and bottom-middle).
+  output: |
+    The output grid is 5x5. It contains a single red (2) 'S' shape that fills the entire grid. The 'S' shape has one black square creating a hole in the middle-left position, which doesn't exactly match any of the 'S' shapes in the input grid but is similar to some of them.
+
+test_case_0:
+  input: |
+    The input grid is 19x16. The background is black (0). There are five distinct red (2) shapes that resemble the letter 'S', located in various positions across the grid. Each 'S' shape is 5x5 squares in size. The 'S' shapes are not solid; they have zero to two black squares inside them, creating holes. The holes are positioned differently in each 'S': top-middle (middle-right), middle-right (solid), bottom-left (middle-left and top-middle), bottom-middle (solid), bottom-right (middle-left and bottom-middle).
+  output: |
+    The output is not provided for this test case.

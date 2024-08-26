@@ -1,0 +1,49 @@
+example_0:
+  input: |
+    The grid is 13x13. The center 7 columns contain colored shapes, while the outer 3 columns on each side are black (empty). From top to bottom:
+    1. A sky blue (8) horizontal line
+    2. A red (2) horizontal line with a single red square extending down
+    3. A green (3) horizontal line
+    4. A complex blue (1) shape: two horizontal lines connected by a vertical line, forming a rough H shape
+    5. A yellow (4) horizontal line
+    All shapes are 7 squares wide, except for the single squares extending from the red and blue shapes.
+  output: |
+    The grid maintains its 13x13 size with empty black borders. The colored shapes are rearranged vertically:
+    1. The yellow (4) line is now at the top
+    2. The blue (1) H shape is next, maintaining its form
+    3. The green (3) line follows
+    4. The red (2) shape comes next, with its extending square
+    5. The sky blue (8) line is at the bottom
+    The shapes have been reordered from bottom to top based on their lowest point in the input grid.
+
+example_1:
+  input: |
+    A 13x13 grid with various shapes:
+    1. A blue (1) shape at the top, resembling a wide U or horseshoe
+    2. A red (2) shape forming a hollow rectangle
+    3. A green (3) shape like an inverted T or arrow pointing down
+    4. A yellow (4) horizontal line spanning the full width (except borders)
+    5. A gray (5) shape at the bottom, forming a wide U with a gap in the middle
+    The shapes are separated by empty space and bordered by black (0) on all sides.
+  output: |
+    The 13x13 grid maintains its size and black borders. The shapes are rearranged vertically:
+    1. The gray (5) wide U shape is now at the top
+    2. The yellow (4) horizontal line is next
+    3. The green (3) inverted T shape follows
+    4. The red (2) hollow rectangle is positioned below
+    5. The blue (1) horseshoe shape is at the bottom
+    The shapes are reordered from bottom to top based on their lowest point in the input grid.
+
+example_2:
+  input: |
+    A 7x7 grid with three distinct shapes:
+    1. A blue (1) horizontal line at the top
+    2. A red (2) square in the center
+    3. A green (3) T-shape at the bottom, with its stem extending upward
+    The shapes are surrounded by black (0) borders.
+  output: |
+    The 7x7 grid maintains its size and black borders. The shapes are rearranged vertically:
+    1. The green (3) T-shape is now at the top
+    2. The red (2) square is in the middle
+    3. The blue (1) horizontal line is at the bottom
+    The shapes are reordered from bottom to top based on their lowest point in the input grid.

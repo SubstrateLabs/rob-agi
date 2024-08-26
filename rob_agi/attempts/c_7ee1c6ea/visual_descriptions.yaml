@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid is 10x10. There's a gray (5) cross-like shape in the center, extending from edge to edge vertically and horizontally. The arms of the cross are 1 unit wide. The rest of the grid is filled with a mix of colors, predominantly brown (9), yellow (4), and black (0). There are some isolated squares of these colors scattered throughout. The corners are mostly filled with brown (9) squares.
+  output: |
+    The grid structure remains largely the same as the input. The gray (5) cross is unchanged. The main differences are in the central area enclosed by the gray cross. Some yellow (4) squares have been rearranged or changed color. For example, in the top-left quadrant of the cross, a yellow square has moved down and right. In the bottom-right quadrant, a yellow square has changed to brown (9). Overall, the changes are subtle and localized to the areas within the gray cross.
+
+example_1:
+  input: |
+    The grid is 10x10. There's a prominent gray (5) frame-like structure, 1 unit wide, that runs along the edges of the grid, leaving an 8x8 inner area. This inner area is filled with a mix of sky (8), magenta (6), and black (0) squares. The pattern inside appears somewhat random but with clusters of the same color. The top-left and bottom-right corners outside the gray frame are black (0), while the other two corners are sky (8).
+  output: |
+    The grid maintains the same 10x10 structure and the gray (5) frame remains unchanged. The main differences are within the 8x8 inner area. The distribution of sky (8) and magenta (6) squares has changed, creating larger contiguous areas of each color. For example, in the top-left quadrant of the inner area, there's now a larger cluster of sky squares. The bottom-right quadrant has more magenta squares grouped together. The black (0) squares remain in similar positions. The corners outside the gray frame are unchanged.
+
+example_2:
+  input: |
+    The grid is 10x10. There's a gray (5) frame similar to the previous example, but with an additional horizontal gray line in the middle, dividing the inner area into two 4x8 rectangles. The inner area is filled with a mix of green (3), red (2), and black (0) squares. The top row is predominantly green, and the bottom row is a mix of green and red. The left and right columns inside the frame are mostly green. There are scattered black squares throughout.
+  output: |
+    The 10x10 grid structure and the gray (5) frame remain the same. The main changes are within the inner area divided by the gray lines. The distribution of green (3) and red (2) squares has changed, creating more organized patterns. The top half now has more red squares on the left and green squares on the right. The bottom half shows a similar reorganization, with more distinct groupings of colors. Some black (0) squares have shifted positions. The top and bottom rows, as well as the leftmost and rightmost columns inside the frame, remain predominantly green, maintaining the border-like structure within the frame.
+
+test_case_0:
+  input: |
+    This grid is not provided in the test file. There is no input grid for a test case in the given code.
+  output: |
+    As there is no test case with both input and expected output in the given code, there is no output grid to describe for a test case.

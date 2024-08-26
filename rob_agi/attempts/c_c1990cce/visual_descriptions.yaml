@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A single row grid with 13 columns. There is a single red square (2) in the 7th position, surrounded by black squares (0) on both sides.
+  output: |
+    A 13x13 grid forming a diamond pattern. The central column matches the input, with the red square (2) in the 7th row. Red squares form a diamond shape, expanding outwards from the center. Blue squares (1) form an inner diamond shape within the red diamond. The rest of the grid is filled with black squares (0).
+
+example_1:
+  input: |
+    A single row grid with 5 columns. There is a single red square (2) in the middle (3rd position), surrounded by black squares (0) on both sides.
+  output: |
+    A 5x5 grid forming a diamond pattern. The central column matches the input, with the red square (2) in the 3rd row. Red squares form a diamond shape, expanding outwards from the center. A single blue square (1) appears in the 4th row, center position. The rest of the grid is filled with black squares (0).
+
+example_2:
+  input: |
+    A single row grid with 7 columns. There is a single red square (2) in the 4th position (center), surrounded by black squares (0) on both sides.
+  output: |
+    A 7x7 grid forming a diamond pattern. The central column matches the input, with the red square (2) in the 4th row. Red squares form a diamond shape, expanding outwards from the center. Blue squares (1) form a smaller diamond shape within the red diamond, but only in the bottom half of the grid. The rest of the grid is filled with black squares (0).
+
+test_case_0:
+  input: |
+    A single row grid with 13 columns. There is a single red square (2) in the 7th position, surrounded by black squares (0) on both sides.
+  output: |
+    Not provided in the test case. Based on the pattern observed in the examples, we would expect a 13x13 grid with a diamond pattern similar to example_0.

@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 15x13 grid with a large sky blue (8) rectangular shape in the center, surrounded by black (0) space. The sky blue rectangle has two small red (2) squares in its upper left corner, and two small green (3) squares in its lower right corner. The sky blue rectangle is 8x8 in size, positioned slightly to the left and top of the grid center.
+  output: |
+    A tiny 2x2 grid. The top-left cell is red (2), the top-right cell is black (0), the bottom-left cell is black (0), and the bottom-right cell is green (3).
+
+example_1:
+  input: |
+    A 16x15 grid with a large sky blue (8) rectangular shape taking up most of the central area, surrounded by black (0) space. The sky blue area is 12x10 in size. Within this sky blue area, there are four distinct 2x2 colored squares: blue (1) in the upper left, green (3) in the upper right, red (2) in the lower middle, and the rest is sky blue (8).
+  output: |
+    A tiny 2x2 grid. The top-left cell is blue (1), the top-right cell is green (3), the bottom-left cell is black (0), and the bottom-right cell is red (2).
+
+example_2:
+  input: |
+    A 16x14 grid with a large sky blue (8) rectangular shape taking up most of the central area, surrounded by black (0) space. The sky blue area is 10x12 in size. Within this sky blue area, there are three distinct 2x2 colored squares: gray (5) in the upper left, yellow (4) in the upper right, green (3) in the lower left, and the rest is sky blue (8).
+  output: |
+    A tiny 2x2 grid. The top-left cell is gray (5), the top-right cell is yellow (4), the bottom-left cell is green (3), and the bottom-right cell is black (0).

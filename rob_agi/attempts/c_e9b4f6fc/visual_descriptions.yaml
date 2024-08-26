@@ -1,0 +1,54 @@
+example_0:
+  input: |
+    A 13x13 grid with mostly black (0) background. There are two small colored regions:
+    1. In the top-left quadrant, there's a small 2x2 square with colors 2 (red), 3 (green) in the top row, and 1 (blue), 4 (yellow) in the bottom row.
+    2. In the bottom-right quadrant, there's a larger 6x6 square outlined in color 8 (sky blue). Inside this square:
+       - The top-left corner is filled with 8 (sky blue)
+       - There's a small inverted T-shape made of 4 (yellow) in the center-top
+       - The bottom half has a pattern of 3 (green) and 4 (yellow)
+  output: |
+    A 6x6 grid. The entire perimeter is color 8 (sky blue). Inside:
+    - The top-left corner is 8 (sky blue)
+    - There's a small inverted T-shape of 1 (blue) in the center-top
+    - The bottom half has a pattern of 2 (red) and 1 (blue), mirroring the input's 3 and 4 pattern
+
+example_1:
+  input: |
+    A 13x13 grid with mostly black (0) background. There are several colored regions:
+    1. Near the top-center, there are two isolated colors: 6 (magenta) and 8 (sky blue)
+    2. In the right-center, there are two isolated colors: 2 (red) and 1 (blue)
+    3. Below that, two more isolated colors: 4 (yellow) and 5 (gray)
+    4. The main feature is a large 7x8 rectangle in the bottom-left quadrant:
+       - The outline and bottom rows are color 3 (green)
+       - Inside, there's a pattern of 5 (gray), 1 (blue), and 8 (sky blue)
+  output: |
+    A 7x7 grid. The entire perimeter and bottom two rows are color 3 (green). Inside:
+    - The top-left has a 2x4 rectangle of 4 (yellow)
+    - Below that, a 2x2 square of 2 (red)
+    - To the right, a 2x3 rectangle of 3 (green)
+    - In the bottom-right corner, a 2x2 square of 6 (magenta)
+
+example_2:
+  input: |
+    A 13x13 grid with mostly black (0) background. There are several colored regions:
+    1. In the top-left quadrant, there's a 5x4 rectangle outlined in 8 (sky blue):
+       - Inside, there's a pattern of 2 (red) and 4 (yellow)
+    2. In the center-left, there are two isolated colors: 1 (blue) and 4 (yellow)
+    3. In the bottom-right, there are two isolated colors: 3 (green) and 2 (red)
+  output: |
+    A 4x7 grid. The entire perimeter is color 8 (sky blue). Inside:
+    - The top-left has 8 (sky blue)
+    - There's a pattern of 3 (green) and 1 (yellow) mirroring the input's 2 and 4 pattern
+
+example_3:
+  input: |
+    A 13x13 grid with mostly black (0) background. There are several colored regions:
+    1. Near the top-right, there are two isolated colors: 2 (red) and 4 (yellow)
+    2. In the left-center, there's a 4x5 rectangle:
+       - The left column and bottom row are 1 (blue)
+       - Inside, there's a pattern of 4 (yellow) and 8 (sky blue)
+    3. In the bottom-right, there are two isolated colors: 3 (green) and 8 (sky blue)
+  output: |
+    A 4x4 grid:
+    - The left column and bottom row are 1 (blue)
+    - Inside, there's a pattern of 2 (red) and 3 (green) mirroring the input's 4 and 8 pattern

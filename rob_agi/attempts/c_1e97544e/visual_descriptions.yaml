@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid shows a diagonal pattern of repeating color sequences. The main sequence appears to be 5, 6, 1, 2, 3, 4, which repeats across the rows. This sequence is shifted one position to the right in each subsequent row, creating a diagonal effect. There are several areas of black (0) squares, forming irregular shapes that interrupt the pattern. These black areas are mostly concentrated in the upper right, middle left, and lower middle portions of the grid. Some rows have repeated colors at the beginning, particularly visible in the first few rows with repeated 6's.
+  output: |
+    The output grid maintains the same diagonal pattern of repeating color sequences as the input, but all black (0) squares have been filled in with the appropriate colors to continue the pattern. The sequence 5, 6, 1, 2, 3, 4 now repeats consistently across all rows, with the diagonal shift preserved. The areas that were previously black in the input have been seamlessly integrated into the pattern, making the entire grid uniform in its diagonal color sequence.
+
+example_1:
+  input: |
+    This grid displays a similar diagonal pattern to the previous example, but with a different color sequence: 3, 4, 5, 6, 7, 1, 2. The sequence repeats across rows and shifts one position to the right in each subsequent row. There are several black (0) areas interrupting the pattern, primarily in the upper middle, middle left, and lower right portions of the grid. Some rows have repeated colors at the beginning, particularly noticeable with repeated 4's in the first few rows.
+  output: |
+    The output grid maintains the diagonal pattern of the color sequence 3, 4, 5, 6, 7, 1, 2, but all black (0) areas from the input have been filled in to continue the pattern seamlessly. The diagonal shift of the sequence is preserved across all rows, and the previously black areas are now indistinguishable from the rest of the pattern. The entire grid shows a uniform diagonal color sequence without any interruptions.
+
+example_2:
+  input: |
+    This grid presents a diagonal pattern with the color sequence 5, 6, 7, 8, 1, 2, 3, 4. The sequence repeats across rows and shifts one position to the right in each subsequent row. There are multiple black (0) areas interrupting the pattern, forming irregular shapes. These black areas are concentrated in the upper left, middle, and lower right portions of the grid. Some rows have repeated colors at the beginning, notably with repeated 6's in the first few rows. The lower right corner has a distinct pattern of its own, with several rows ending in repeated 0's followed by 2 and 3.
+  output: |
+    The output grid maintains the diagonal pattern of the color sequence 5, 6, 7, 8, 1, 2, 3, 4, but all black (0) areas from the input have been filled in to continue the pattern seamlessly. The diagonal shift of the sequence is preserved across all rows, and the previously black areas, including the distinct pattern in the lower right corner, are now fully integrated into the overall diagonal pattern. The entire grid shows a uniform diagonal color sequence without any interruptions or anomalies.
+
+test_case_0:
+  input: |
+    The input grid for the test case shows a similar diagonal pattern to the previous examples. The color sequence appears to be 5, 6, 7, 8, 1, 2, 3, 4, repeating across rows and shifting one position to the right in each subsequent row. There are several black (0) areas interrupting the pattern, forming irregular shapes. These black areas are concentrated in the upper left, middle, and lower right portions of the grid. Some rows have repeated colors at the beginning, particularly noticeable with repeated 6's in the first few rows. The lower right corner has a distinct pattern of its own, with several rows ending in repeated 0's followed by 2 and 3.
+  output: |
+    The expected output is not provided for the test case. Based on the pattern observed in the previous examples, it is likely that the output would maintain the diagonal pattern of the color sequence 5, 6, 7, 8, 1, 2, 3, 4, with all black (0) areas filled in to continue the pattern seamlessly. The diagonal shift of the sequence would be preserved across all rows, and the previously black areas, including the distinct pattern in the lower right corner, would be fully integrated into the overall diagonal pattern. The entire grid would show a uniform diagonal color sequence without any interruptions or anomalies.

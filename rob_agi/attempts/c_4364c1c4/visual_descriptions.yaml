@@ -1,0 +1,44 @@
+example_0:
+  input: |
+    A 16x12 grid with a sky blue (8) background. There are two distinct shapes:
+    1. A magenta (6) T-shaped object in the top-left corner, spanning rows 1-4 and columns 2-8.
+    2. A green (3) rectangular object below it, occupying rows 5-9 and columns 2-9. This green rectangle has a small sky blue (8) gap in its bottom-right corner (rows 9-10, columns 5-6).
+  output: |
+    The same 16x12 grid with a sky blue (8) background. The two shapes have been moved:
+    1. The magenta (6) T-shape has moved one cell to the left, now touching the left edge of the grid.
+    2. The green (3) rectangle has moved one cell down and one cell to the right. The small sky blue gap remains in the same relative position within the green shape.
+    Both shapes maintain their original size and form, just in new positions.
+
+example_1:
+  input: |
+    A 12x12 grid with a blue (1) background. There are three distinct shapes:
+    1. A yellow (4) shape in the top-left quadrant, resembling an inverted L or a boot. It spans rows 2-5 and columns 2-8.
+    2. A red (2) rectangle at the bottom, occupying rows 6-7 and columns 2-8.
+    3. A small blue (1) rectangle within the red shape, at rows 7-8 and columns 6-7.
+  output: |
+    The same 12x12 grid with a blue (1) background. The shapes have been repositioned:
+    1. The yellow (4) "boot" shape has moved one cell to the left, now touching the left edge of the grid.
+    2. The red (2) rectangle has moved one cell down and one cell to the right, now spanning rows 7-8 and columns 3-9.
+    3. The small blue (1) rectangle within the red shape maintains its relative position, moving with the red shape.
+    All shapes keep their original size and form, just in new positions.
+
+example_2:
+  input: |
+    A 12x13 grid with a green (3) background. There are four distinct shapes:
+    1. A small red (2) horizontal line at the top-right, spanning row 2, columns 7-9.
+    2. An orange (7) horizontal line just below the red one, in row 3, columns 7-9.
+    3. A sky blue (8) shape in the middle-left, resembling a square with an extension to the right. It occupies rows 5-9 and columns 1-4, with an additional part in rows 7-9, column 5.
+    4. A magenta (6) rectangle at the bottom-left, spanning rows 10-11 and columns 1-4.
+  output: |
+    The same 12x13 grid with a green (3) background. The shapes have been repositioned:
+    1. The red (2) line has moved one cell to the left, now in row 2, columns 6-8.
+    2. The orange (7) line has moved two cells to the right, now in row 3, columns 9-11.
+    3. The sky blue (8) shape has moved one cell to the left, now touching the left edge of the grid. Its form remains the same.
+    4. The magenta (6) rectangle has moved two cells to the right, now spanning rows 10-11 and columns 3-6.
+    All shapes maintain their original size and form, just in new positions.
+
+test_case_0:
+  input: |
+    This is the same as the input for example_0.
+  output: |
+    This is the same as the output for example_0.

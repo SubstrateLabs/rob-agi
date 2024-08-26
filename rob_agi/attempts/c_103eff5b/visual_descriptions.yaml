@@ -1,0 +1,72 @@
+example_0:
+  input: |
+    The input grid is 24x13 in size. The top-left corner (roughly 5x5) contains a small pattern of colored squares:
+    - A vertical line of 3 red squares (2) in column 2
+    - Two blue squares (1) in row 3, columns 3-4
+    - Two green squares (3) in column 4, rows 1-2
+    - Two yellow squares (4) in column 5, rows 2 and 4
+    The rest of the top-left is black (0).
+    
+    The bottom-right quadrant contains a larger pattern made of sky blue squares (8):
+    - A 6x2 rectangle in rows 12-13, columns 2-7
+    - A 2x2 square in rows 14-15, columns 4-5
+    - A 6x2 rectangle in rows 16-17, columns 4-9
+    - Two 2x2 squares in rows 18-19, columns 2-3 and 6-7
+    The rest of the grid is filled with black (0) squares.
+  output: |
+    The output grid maintains the same 24x13 size and keeps the small colored pattern in the top-left corner unchanged.
+    
+    The large sky blue (8) pattern in the bottom-right is transformed:
+    - The 6x2 rectangle in rows 12-13 becomes red (2)
+    - The 2x2 square in rows 14-15 becomes blue (1)
+    - The 6x2 rectangle in rows 16-17 is split: left half (3x2) remains blue (1), right half (3x2) becomes green (3)
+    - The two 2x2 squares in rows 18-19 both become yellow (4)
+    The rest of the grid remains black (0).
+
+example_1:
+  input: |
+    The input grid is 22x12 in size. The top-left corner (roughly 6x6) contains a small pattern of colored squares:
+    - A green square (3) at row 3, column 4
+    - A blue square (1) at row 3, column 5
+    - A yellow square (4) at row 4, column 3
+    - Another green square (3) at row 4, column 4
+    - A red square (2) at row 5, column 3
+    - Another yellow square (4) at row 5, column 5
+    The rest of the top-left is black (0).
+    
+    The bottom-right quadrant contains a larger pattern made of sky blue squares (8):
+    - A 6x3 rectangle in rows 10-12, columns 1-6
+    - A 6x3 rectangle in rows 13-15, columns 4-9
+    - A 3x3 square in rows 16-18, columns 1-3
+    - A 3x3 square in rows 16-18, columns 7-9
+    The rest of the grid is filled with black (0) squares.
+  output: |
+    The output grid maintains the same 22x12 size and keeps the small colored pattern in the top-left corner unchanged.
+    
+    The large sky blue (8) pattern in the bottom-right is transformed:
+    - The left half (3x3) of the 6x3 rectangle in rows 10-12 becomes red (2)
+    - The right half (3x3) of the 6x3 rectangle in rows 10-12 becomes yellow (4)
+    - The 6x3 rectangle in rows 13-15 becomes green (3)
+    - The 3x3 square in rows 16-18, columns 1-3 becomes yellow (4)
+    - The 3x3 square in rows 16-18, columns 7-9 becomes blue (1)
+    The rest of the grid remains black (0).
+
+test_case_0:
+  input: |
+    The input grid appears to be 22x12 in size. The top-left corner (roughly 6x6) contains a small pattern of colored squares:
+    - A green square (3) at row 3, column 4
+    - A blue square (1) at row 3, column 5
+    - A yellow square (4) at row 4, column 3
+    - Another green square (3) at row 4, column 4
+    - A red square (2) at row 5, column 3
+    - Another yellow square (4) at row 5, column 5
+    The rest of the top-left is black (0).
+    
+    The bottom-right quadrant contains a larger pattern made of sky blue squares (8):
+    - A 6x3 rectangle in rows 10-12, columns 1-6
+    - A 6x3 rectangle in rows 13-15, columns 4-9
+    - A 3x3 square in rows 16-18, columns 1-3
+    - A 3x3 square in rows 16-18, columns 7-9
+    The rest of the grid is filled with black (0) squares.
+  output: |
+    The output grid is not provided in the test case, so I cannot describe it.

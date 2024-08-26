@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 4x14 grid with a mix of black (0), green (3), and red (2) squares. There's a large green shape on the left side, spanning from the top to the bottom of the grid. It's irregular but generally concentrated on the left. On the right side, there's a smaller red shape, also irregular but more compact. The rest of the grid is filled with black squares.
+  output: |
+    A 4x7 grid with only black (0) and gray (5) squares. The pattern is more structured than the input. The first row is entirely black. The second row has a long stretch of gray squares in the middle. The third row has two gray squares on the left and right edges. The fourth row has gray squares on the left side.
+
+example_1:
+  input: |
+    A 4x14 grid with green (3) and red (2) squares on a black (0) background. There's a large, irregular green shape dominating the left side of the grid, with some parts extending to the middle. On the right side, there's a smaller, also irregular red shape. The shapes are not as compact as in the previous example, with more scattered squares.
+  output: |
+    A 4x7 grid with black (0) and gray (5) squares. The pattern is less dense than the previous output. There are two gray squares in the top-right corner, two in the bottom-left corner, and a few scattered gray squares elsewhere. Most of the grid remains black.
+
+example_2:
+  input: |
+    A 4x14 grid with green (3) and red (2) squares on a black (0) background. The green shape is more scattered than in previous examples, with parts on the left side and some in the middle. The red shape is more compact and concentrated on the right side of the grid.
+  output: |
+    A 4x7 grid with mostly black (0) squares and some gray (5) squares. The gray squares are mainly concentrated in the bottom-right quadrant of the grid, forming a small cluster. There's also one gray square in the top-right corner.
+
+example_3:
+  input: |
+    A 4x14 grid with green (3) and red (2) squares on a black (0) background. The green squares are more evenly distributed across the grid, forming small clusters and lines. The red squares are less prominent and mostly on the right side, with a small cluster in the bottom-right corner.
+  output: |
+    A 4x7 grid with a mix of black (0) and gray (5) squares. The gray squares form an interesting pattern, with diagonal lines and small clusters. There are more gray squares in this output compared to the previous examples, and they're more evenly distributed across the grid.

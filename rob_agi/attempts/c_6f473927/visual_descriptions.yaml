@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 10x5 grid with a red (2) shape on the right side. The shape resembles a jagged line or lightning bolt, starting from the top-right corner and zigzagging down to the bottom-right corner. The rest of the grid is filled with black (0).
+  output: |
+    A 10x10 grid that expands on the input. The original red shape is preserved on the right side. A new sky blue (8) pattern is added to the right of the red shape, filling the newly added columns. The sky blue pattern follows the contours of the red shape, creating a complementary pattern. Where the red shape juts out, the sky blue fills in behind it, and where the red shape recedes, the sky blue extends outward.
+
+example_1:
+  input: |
+    An 8x6 grid with a complex red (2) shape on the left side. The shape starts at the top-left corner, forms a thick line down, then creates various protrusions to the right. The bottom-left corner has a solid red square. The rest of the grid is black (0).
+  output: |
+    A 8x12 grid that expands on the input. The original red shape is preserved on the left side. A new sky blue (8) pattern is added to the left of the red shape, filling the newly added columns. The sky blue pattern complements the red shape, filling in spaces where the red shape recedes and creating a mirror image of sorts. The pattern is most pronounced at the top and bottom of the grid.
+
+example_2:
+  input: |
+    A small 3x3 grid with a simple red (2) shape. The shape consists of two red cells in the middle column and one red cell in the bottom-right corner. The rest is black (0).
+  output: |
+    A 3x6 grid that expands on the input. The original red shape is preserved on the left side. A new sky blue (8) pattern is added to the right of the red shape. The sky blue fills in spaces adjacent to the red cells, creating a complementary pattern that follows the contours of the red shape.
+
+example_3:
+  input: |
+    A small 3x3 grid with a red (2) shape on the left side. The shape forms an 'F' or backwards 'L', occupying the entire left column and the top two cells of the middle column. The rest is black (0).
+  output: |
+    A 3x6 grid that expands on the input. The original red 'F' shape is preserved but moved to the right side of the grid. A new sky blue (8) pattern is added to the left of the red shape. The sky blue pattern fills in the spaces to the left of the red shape, creating a complementary pattern that mirrors the red shape's contours.

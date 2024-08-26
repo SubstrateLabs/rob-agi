@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The grid is 11x11. There are three distinct red (2) shapes visible against a black (0) background. The shapes resemble incomplete or partial rectangles. The top shape is the largest, spanning the width of the grid from columns 4 to 10, with a height of 3 rows. It has a black space in the middle of its bottom row. Below this, there's a smaller rectangle in the center, 3x3 in size, also with a black space in the middle of its bottom row. At the bottom of the grid, there's another shape identical to the top one. The shapes are separated by rows of black squares.
+  output: |
+    The grid maintains its 11x11 size. The three red (2) shapes from the input are still present, but they've been modified. Each shape has been expanded horizontally, filling in the first three columns that were previously black. The vertical structure and spacing of the shapes remain the same. The black spaces within each shape (in the middle of the bottom rows) are preserved. The rows separating the shapes remain entirely black. The result is three more complete rectangular shapes, each now spanning from column 1 to 10.
+
+example_1:
+  input: |
+    The grid is 5x5. The bottom two rows contain a pattern made of sky blue (8) squares. In the fourth row, there are two pairs of sky blue squares at the edges, separated by a black square in the center. The fifth row alternates between sky blue and black, starting and ending with sky blue. The top three rows are entirely black (0).
+  output: |
+    The grid remains 5x5. The pattern from the bottom two rows of the input has been mirrored to the top two rows, creating a symmetrical design. The central row (row 3) remains entirely black. The pattern now resembles two identical "brackets" made of sky blue squares at the top and bottom of the grid, with black spaces between and in the center.
+
+test_case_0:
+  input: |
+    This is the same as example_0.
+  output: |
+    This is the same as example_0.

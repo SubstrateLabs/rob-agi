@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 10x10 grid with a complex pattern of gray (5) and black (0) squares, with some red (2) squares interspersed. The gray squares form irregular shapes and clusters, while the black squares create gaps and spaces. There are three red squares in a diagonal line from top-left to bottom-right, spaced out evenly.
+  output: |
+    A 10x10 grid with a clear vertical gradient. The top three rows are entirely black (0). The fourth row has three evenly spaced red (2) squares. The fifth row alternates between gray (5) and red (2) squares. From the sixth row downwards, the grid is filled entirely with gray (5) squares, creating a solid block at the bottom.
+
+example_1:
+  input: |
+    A 10x10 grid dominated by blue (1) and black (0) squares in a seemingly random pattern. There's a solid horizontal red (2) line across the middle of the grid (fourth row), dividing it into two halves. The top half has more blue squares, while the bottom half has a more even mix of blue and black.
+  output: |
+    A 10x10 grid with a clear horizontal division. The top three rows are entirely black (0). The fourth row is a solid red (2) line, identical to the input. The bottom six rows are filled entirely with blue (1) squares, creating a large solid block at the bottom.
+
+example_2:
+  input: |
+    A 10x10 grid with a complex diagonal pattern. The dominant colors are sky blue (8) and black (0), with a diagonal strip of red (2) squares running from the top-left to the bottom-right. The sky blue squares form irregular clusters and shapes, while the black squares create gaps and spaces. The red diagonal is not perfectly straight but follows a general diagonal path.
+  output: |
+    A 10x10 grid with a clear diagonal pattern from top-left to bottom-right. The top-left corner starts with black (0), then transitions to red (2), and finally to sky blue (8) in the bottom-right. Each color forms a triangular shape, with the red (2) forming a diagonal strip two squares wide separating the black and sky blue areas. The transition between colors is sharp and forms straight lines.
+
+test_case_0:
+  input: |
+    A 10x10 grid with a complex pattern of gray (5) and black (0) squares, with some red (2) squares interspersed. The gray squares form irregular shapes and clusters, while the black squares create gaps and spaces. There are three red squares in a diagonal line from top-left to bottom-right, spaced out evenly.
+  output: |
+    Not provided in the test case.

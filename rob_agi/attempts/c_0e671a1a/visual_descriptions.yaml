@@ -1,0 +1,80 @@
+example_0:
+  input: |
+    A 13x13 grid mostly filled with black (0). There are three colored squares:
+    - A red square (2) in the top-left quadrant at position (2, 1)
+    - A yellow square (4) in the top-right quadrant at position (6, 10)
+    - A green square (3) in the bottom-left quadrant at position (11, 3)
+    These colored squares form a triangle-like shape across the grid.
+  output: |
+    The same 13x13 grid, but now with a gray (5) rectangular path connecting the three colored squares:
+    - The red square (2) remains at (2, 1)
+    - The yellow square (4) remains at (6, 10)
+    - The green square (3) remains at (11, 3)
+    The gray path forms a rectangle that encloses these three squares, with:
+    - A horizontal line from (2, 1) to (2, 10)
+    - A vertical line from (2, 10) to (6, 10)
+    - A horizontal line from (6, 10) to (6, 3)
+    - A vertical line from (6, 3) to (11, 3)
+    The area inside this gray rectangle is not filled, except for the original colored squares.
+
+example_1:
+  input: |
+    A 13x13 grid mostly filled with black (0). There are three colored squares:
+    - A green square (3) near the top at position (1, 5)
+    - A red square (2) in the bottom-right quadrant at position (8, 11)
+    - A yellow square (4) in the bottom-left quadrant at position (10, 2)
+    These colored squares form a triangle-like shape across the grid.
+  output: |
+    The same 13x13 grid, but now with a gray (5) path connecting the three colored squares:
+    - The green square (3) remains at (1, 5)
+    - The red square (2) remains at (8, 11)
+    - The yellow square (4) remains at (10, 2)
+    The gray path forms a rectangle that encloses these three squares, with:
+    - A vertical line from (1, 5) to (8, 5)
+    - A horizontal line from (8, 5) to (8, 11)
+    - A vertical line from (8, 11) to (10, 11)
+    - A horizontal line from (10, 11) to (10, 2)
+    - A vertical line from (10, 2) to (1, 2)
+    - A horizontal line from (1, 2) to (1, 5)
+    The area inside this gray rectangle is not filled, except for the original colored squares.
+
+example_2:
+  input: |
+    A 13x13 grid mostly filled with black (0). There are three colored squares:
+    - A yellow square (4) in the top-left corner at position (1, 1)
+    - A green square (3) in the top-right quadrant at position (4, 11)
+    - A red square (2) in the bottom-left quadrant at position (10, 5)
+    These colored squares form a triangle-like shape across the grid.
+  output: |
+    The same 13x13 grid, but now with a gray (5) rectangular path connecting the three colored squares:
+    - The yellow square (4) remains at (1, 1)
+    - The green square (3) remains at (4, 11)
+    - The red square (2) remains at (10, 5)
+    The gray path forms a rectangle that encloses these three squares, with:
+    - A horizontal line from (1, 1) to (1, 11)
+    - A vertical line from (1, 11) to (4, 11)
+    - A vertical line from (4, 11) to (10, 11)
+    - A horizontal line from (10, 11) to (10, 1)
+    - A vertical line from (10, 1) to (1, 1)
+    The area inside this gray rectangle is not filled, except for the original colored squares.
+
+example_3:
+  input: |
+    A 13x13 grid mostly filled with black (0). There are three colored squares:
+    - A yellow square (4) near the top-right corner at position (1, 10)
+    - A red square (2) in the middle-left at position (5, 2)
+    - A green square (3) near the bottom-right corner at position (11, 9)
+    These colored squares form a triangle-like shape across the grid.
+  output: |
+    The same 13x13 grid, but now with a gray (5) rectangular path connecting the three colored squares:
+    - The yellow square (4) remains at (1, 10)
+    - The red square (2) remains at (5, 2)
+    - The green square (3) remains at (11, 9)
+    The gray path forms a rectangle that encloses these three squares, with:
+    - A vertical line from (1, 10) to (5, 10)
+    - A horizontal line from (5, 10) to (5, 2)
+    - A vertical line from (5, 2) to (11, 2)
+    - A horizontal line from (11, 2) to (11, 9)
+    - A vertical line from (11, 9) to (1, 9)
+    - A horizontal line from (1, 9) to (1, 10)
+    The area inside this gray rectangle is partially filled with gray, forming a solid gray region in the top-right corner.

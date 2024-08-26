@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    An 8x11 grid with a red (2) rectangular frame surrounding a mostly empty black (0) interior. The frame is one cell thick on all sides. Inside the frame, there are three gray (5) cells forming a diagonal line from top-left to bottom-right. The top-left gray cell is at (3,3), the middle at (4,5), and the bottom-right at (3,6).
+  output: |
+    An 8x11 grid with a thicker red (2) rectangular frame. The frame is now two cells thick on all sides except the top and bottom edges. The interior black (0) area is smaller. The three gray (5) cells remain in their original positions, but are now surrounded by the thicker red frame.
+
+example_1:
+  input: |
+    A 12x11 grid with a red (2) rectangular frame surrounding a mostly empty black (0) interior. The frame is one cell thick on all sides. Inside the frame, there are two gray (5) cells forming a diagonal line. The top gray cell is at (4,3) and the bottom one is at (5,4).
+  output: |
+    A 12x11 grid with a thicker red (2) rectangular frame. The frame is now three cells thick on all sides except the top and bottom edges, which remain one cell thick. The interior black (0) area is significantly smaller. The two gray (5) cells remain in their original positions, now surrounded by the thicker red frame.
+
+example_2:
+  input: |
+    A 12x12 grid with a red (2) rectangular frame surrounding a mostly empty black (0) interior. The frame is one cell thick on all sides. Inside the frame, there are four gray (5) cells forming a diamond shape. The gray cells are at positions (4,4), (5,6), (6,4), and (6,7).
+  output: |
+    A 12x12 grid with a thicker red (2) rectangular frame. The frame is now three cells thick on all sides except the top and bottom edges, which remain one cell thick. The interior black (0) area is significantly smaller. The four gray (5) cells remain in their original positions, now surrounded by the thicker red frame. The area around the gray cells remains black, forming a smaller interior rectangle.
+
+test_case_0:
+  input: |
+    A 12x12 grid with a red (2) rectangular frame surrounding a mostly empty black (0) interior. The frame is one cell thick on all sides. Inside the frame, there are four gray (5) cells forming a diamond shape. The gray cells are at positions (4,4), (5,6), (6,4), and (6,7).
+  output: |
+    Not provided in the test case.

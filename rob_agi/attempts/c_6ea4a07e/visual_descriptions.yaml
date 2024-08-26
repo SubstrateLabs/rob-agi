@@ -1,0 +1,35 @@
+example_0:
+  input: |
+    A 3x3 grid with a diagonal line of sky blue (8) squares from top-left to bottom-right. The rest of the squares are black (0).
+  output: |
+    A 3x3 grid where the original sky blue diagonal has been replaced with black (0). The remaining squares that were originally black are now red (2), forming an inverted L-shape on both sides of the diagonal.
+
+example_1:
+  input: |
+    A 3x3 grid with a diagonal line of green (3) squares from top-right to bottom-left. The rest of the squares are black (0).
+  output: |
+    A 3x3 grid where the original green diagonal has been replaced with black (0). The remaining squares that were originally black are now blue (1), forming an inverted L-shape on both sides of the diagonal.
+
+example_2:
+  input: |
+    A 3x3 grid with a vertical line of gray (5) squares on the left side. The rest of the squares are black (0).
+  output: |
+    A 3x3 grid where the original gray vertical line has been replaced with black (0). The remaining squares that were originally black are now yellow (4), forming an inverted L-shape on the right side and bottom of the grid.
+
+example_3:
+  input: |
+    A 3x3 grid with an inverted L-shape of gray (5) squares along the top and right side. The rest of the squares are black (0).
+  output: |
+    A 3x3 grid where the original gray inverted L-shape has been replaced with black (0). The remaining squares that were originally black are now yellow (4), forming an L-shape in the bottom-left corner of the grid.
+
+example_4:
+  input: |
+    A 3x3 grid with a vertical line of sky blue (8) squares in the middle column. The bottom-left square is also sky blue. The rest of the squares are black (0).
+  output: |
+    A 3x3 grid where the original sky blue squares have been replaced with black (0). The remaining squares that were originally black are now red (2), forming two separate L-shapes in the top-left and bottom-right corners.
+
+example_5:
+  input: |
+    A 3x3 grid with an X-shape of sky blue (8) squares. The center square is black (0).
+  output: |
+    A 3x3 grid where the original sky blue X-shape has been replaced with black (0). The remaining squares that were originally black (including the center) are now red (2), forming a plus (+) shape.

@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The grid is 11x7. There's a horizontal yellow (4) line in the middle, dividing the grid into two halves. In the top half, there are three vertical yellow lines, creating four columns. The outer columns are empty (black, 0). The second column from the left has a single green (3) square in the middle. The second column from the right has a single magenta (6) square in the middle. In the bottom half, there's a pattern of blue (1) squares. The leftmost column has two blue squares at the bottom. The next column has one blue square at the bottom. The middle-right section has a cluster of four blue squares forming an L shape.
+  output: |
+    The grid structure remains the same as the input, with the yellow lines unchanged. In the top half, the green and magenta squares remain in their positions. In the bottom half, the blue pattern is transformed. The leftmost column now has two green squares at the bottom. The next column has one green square at the bottom. The middle-right section now has a cluster of four red (2) squares forming an L shape. The rightmost column now has two magenta squares at the bottom.
+
+example_1:
+  input: |
+    The grid is 11x7. There are three horizontal yellow (4) lines dividing the grid into four sections. In the top section, there's a single orange (7) square in the second column. In the second section from the top, there's a pattern of blue (1) squares forming an inverted L shape on the right side. In the third section from the top, there's a single green (3) square in the second column. In the bottom section, there's a single sky blue (8) square in the second column, and a pattern of blue squares forming an L shape on the right side.
+  output: |
+    The grid structure and yellow lines remain the same. In the top section, the orange square expands to fill the entire right side of the section. In the second section, the blue inverted L shape is replaced with an orange inverted L shape. In the third section, the green square expands to fill the entire right side of the section. In the bottom section, the sky blue square expands to fill the entire right side of the section, replacing the blue L shape.
+
+test_case_0:
+  input: |
+    The grid is 11x7. There's a horizontal yellow (4) line in the middle, dividing the grid into two halves. In the top half, there are three vertical yellow lines, creating four columns. The outer columns are empty (black, 0). The second column from the left has a single green (3) square in the middle. The second column from the right has a single magenta (6) square in the middle. In the bottom half, there's a pattern of blue (1) squares. The leftmost column has two blue squares at the bottom. The next column has one blue square at the bottom. The middle-right section has a cluster of four blue squares forming an L shape.
+  output: |
+    The output is not provided for this test case.

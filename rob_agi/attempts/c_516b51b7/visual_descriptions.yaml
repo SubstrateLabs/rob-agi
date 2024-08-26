@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The grid shows two distinct blue (1) regions on a black (0) background. The first region is a 4x4 square in the top-left corner, separated from the edge by a single row/column of black. The second region is a 3x3 square in the top-right corner, also separated from the edge by black. Below these, there's a larger 5x6 rectangular blue region in the bottom-center of the grid, touching the bottom edge.
+  output: |
+    The output maintains the overall structure of the input, but with modifications to the blue regions. The 4x4 square now has a 2x2 red (2) center, creating a blue frame. The 3x3 square has a single red cell in its center. The large 5x6 rectangle has been transformed into a concentric pattern: a blue outer frame, then a red inner frame, and a 3x2 green (3) center.
+
+example_1:
+  input: |
+    The grid features a large 8x7 blue (1) rectangular region in the top-left corner, touching the left edge of the grid. It's separated from the top by one row of black (0). In the bottom-right corner, there's a smaller 3x3 blue square, separated from the edges by black.
+  output: |
+    The large 8x7 blue rectangle has been transformed into a concentric pattern. It now has a blue outer frame, a red (2) inner frame, and a complex center. The center has a green (3) frame surrounding a 2x2 red core. The small 3x3 square in the bottom-right has been minimally changed, with just its center cell turned red.
+
+example_2:
+  input: |
+    The grid contains two distinct blue (1) regions on a black (0) background. The larger region is an 8x8 square in the top-left quadrant, separated from the top and left edges by one row/column of black. The second region is a 7x5 rectangle in the bottom-right quadrant, touching the bottom edge of the grid.
+  output: |
+    Both blue regions have been transformed into concentric patterns. The 8x8 square now has a blue outer frame, a red (2) inner frame, a green (3) inner frame, and a 2x2 red core at its center. The 7x5 rectangle has been transformed into a blue outer frame, a red inner frame, and a 3x1 green center stripe.

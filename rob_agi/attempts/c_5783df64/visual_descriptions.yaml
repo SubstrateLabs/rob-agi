@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 6x6 grid with mostly black (empty) spaces. There are six colored squares arranged in a diagonal pattern from top-left to bottom-right. The colors are: magenta (6) in the top-left corner, yellow (4) in the second row, red (2) in the third row, green (3) in the fourth row, gray (5) in the fifth row, and blue (1) in the bottom-right corner. Orange (7) appears in the top-right corner, and brown (9) is in the third row from the bottom, second from the right.
+  output: |
+    A 3x3 grid where each cell contains a color from the input grid. The colors are arranged in the same diagonal pattern as in the input, but compressed into a smaller grid. The top row contains magenta (6), yellow (4), and orange (7). The middle row has red (2), green (3), and brown (9). The bottom row shows blue (1), gray (5), and sky (8).
+
+example_1:
+  input: |
+    A 9x9 grid, mostly black (empty). Colors are scattered across the grid in no immediately apparent pattern. Orange (7) is in the top-right quadrant. Yellow (4) is in the second row, second column. Red (2) is slightly right and below the center. Gray (5) is in the bottom-left corner. Green (3) and magenta (6) are in the third row from the bottom, on opposite sides. Brown (9) is in the second row from the bottom, in the middle. Blue (1) is in the bottom-right corner. Sky (8) is in the top-right corner.
+  output: |
+    A 3x3 grid where each cell contains a color from the input grid. The colors are arranged in a specific order, possibly based on their positions in the input grid. The top row contains yellow (4), orange (7), and sky (8). The middle row has gray (5), red (2), and blue (1). The bottom row shows green (3), brown (9), and magenta (6).
+
+example_2:
+  input: |
+    A 6x6 grid with mostly black (empty) spaces. There are six colored squares arranged in a pattern. Red (2) is in the top-left corner, and blue (1) is directly to its right. Orange (7) is in the top-right corner. Green (3) is in the second row, second column. Brown (9) is in the third row, second from the right. Gray (5) is in the fourth row, third column. Magenta (6) is in the second-to-last row, fourth column. Sky (8) is in the bottom-right corner. Yellow (4) is in the bottom-left corner.
+  output: |
+    A 3x3 grid where each cell contains a color from the input grid. The colors are arranged in a pattern that seems to follow their relative positions in the input grid. The top row contains red (2), blue (1), and orange (7). The middle row has green (3), gray (5), and brown (9). The bottom row shows yellow (4), magenta (6), and sky (8).
+
+test_case_0:
+  input: |
+    A 6x6 grid with mostly black (empty) spaces. There are six colored squares arranged in a pattern. Red (2) is in the top-left corner, and blue (1) is directly to its right. Orange (7) is in the top-right corner. Green (3) is in the second row, second column. Brown (9) is in the third row, second from the right. Gray (5) is in the fourth row, third column. Magenta (6) is in the second-to-last row, fourth column. Sky (8) is in the bottom-right corner. Yellow (4) is in the bottom-left corner.
+  output: |
+    The output is not provided for this test case.

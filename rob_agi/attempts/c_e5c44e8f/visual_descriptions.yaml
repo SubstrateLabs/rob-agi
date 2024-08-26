@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    An 11x11 grid mostly filled with black (0). There is a single green (3) cell in the center of the grid at position (5,5).
+  output: |
+    An 11x11 grid with a large, green (3) 'E' shape. The 'E' is formed by a vertical line on the left side of the grid, with three horizontal lines extending to the right - one at the top, one in the middle, and one at the bottom. The bottom row of the grid is entirely green, forming a base. The 'E' shape is surrounded by black (0) cells, with one column of black cells on the left and right sides, and one row of black cells at the top.
+
+example_1:
+  input: |
+    An 11x11 grid mostly filled with black (0). There are several red (2) cells scattered throughout the grid: two in the top row, one in the third row, two in the fourth row, two in the ninth row, one in the tenth row, and one in the bottom row. There is a single green (3) cell in the center of the grid at position (5,5).
+  output: |
+    An 11x11 grid with a large, green (3) 'E' shape similar to the previous example. The 'E' is slightly smaller, leaving two columns of cells on the right side. The red (2) cells from the input remain in their original positions, except for one that has been incorporated into the 'E' shape in the fourth row. The bottom row is not entirely green in this case; it maintains the original pattern with one red cell and the rest black.
+
+example_2:
+  input: |
+    An 11x11 grid mostly filled with black (0). There are several red (2) cells scattered throughout the grid: two in the top row, one in the second row, one in the fifth row, one in the sixth row, one in the seventh row, two in the eighth row, one in the tenth row, and one in the bottom row. There is a single green (3) cell in the fifth row, fourth column.
+  output: |
+    An 11x11 grid with a large, green (3) 'E' shape. The 'E' is positioned differently from the previous examples, with its vertical line starting from the third column and extending to the right. The horizontal lines of the 'E' reach the sixth column. The red (2) cells from the input remain in their original positions, except for those that have been incorporated into or overlapped by the 'E' shape. The bottom three rows of the grid maintain their original pattern with red and black cells.

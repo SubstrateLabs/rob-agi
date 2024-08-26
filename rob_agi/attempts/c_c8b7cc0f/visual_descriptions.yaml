@@ -1,0 +1,56 @@
+example_0:
+  input: |
+    A 7x7 grid with a distinctive pattern. The grid is mostly black (0), with yellow (4) and blue (1) elements:
+    - A blue L-shape along the bottom and left edges, forming a right angle.
+    - Four yellow dots scattered across the grid:
+      - Two in the second row (positions 2 and 6)
+      - One in the third row (position 3)
+      - One in the fourth row (last position)
+    - Two more yellow dots in the fifth and sixth rows, aligned vertically with the blue L-shape.
+  output: |
+    A small 3x3 grid with a simple pattern:
+    - The top row is entirely yellow (4)
+    - The rest of the grid (middle and bottom rows) is black (0)
+
+example_1:
+  input: |
+    A 9x9 grid with a distinctive pattern using black (0), blue (1), and magenta (6):
+    - A blue rectangular frame in the center, 7 units wide and 6 units tall
+    - Inside the blue frame, five magenta dots scattered in seemingly random positions
+    - Outside the frame, two magenta dots:
+      - One in the second row, third column
+      - One in the sixth row, second column
+    - The rest of the grid is filled with black (0)
+  output: |
+    A small 3x3 grid with a pattern:
+    - The top two rows are entirely magenta (6)
+    - The bottom row is black (0), except for the first cell which is magenta (6)
+
+example_2:
+  input: |
+    A 9x9 grid with a pattern using black (0), blue (1), and green (3):
+    - A blue rectangular frame, 7 units wide and 9 units tall, touching the bottom edge
+    - Inside the blue frame, six green dots scattered in seemingly random positions
+    - Outside the frame, three green dots:
+      - One at the top center (first row, sixth column)
+      - One to the left of the frame (fourth row, first column)
+      - One to the right of the frame (fourth row, last column)
+    - The rest of the grid is filled with black (0)
+  output: |
+    A small 3x3 grid with a simple pattern:
+    - The top row is entirely green (3)
+    - The middle row has one green (3) cell on the left, the rest is black (0)
+    - The bottom row is entirely black (0)
+
+test_case_0:
+  input: |
+    A 9x9 grid with a pattern using black (0), blue (1), and green (3):
+    - A blue rectangular frame, 7 units wide and 9 units tall, touching the bottom edge
+    - Inside the blue frame, six green dots scattered in seemingly random positions
+    - Outside the frame, three green dots:
+      - One at the top center (first row, sixth column)
+      - One to the left of the frame (fourth row, first column)
+      - One to the right of the frame (fourth row, last column)
+    - The rest of the grid is filled with black (0)
+  output: |
+    The output is not provided in the test case, so there's no description to give.

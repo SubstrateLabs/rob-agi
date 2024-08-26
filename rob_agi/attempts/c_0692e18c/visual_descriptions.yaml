@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 3x3 grid with a cross shape made of orange (7) squares. The center and four corners of the grid are orange, while the remaining four squares are black (0).
+  output: |
+    A 9x9 grid that appears to be an expanded version of the input. The orange cross shape is preserved but each orange square from the input is now represented by a 3x3 cross pattern. The black squares from the input are now 3x3 squares of black. This creates a larger, more detailed cross pattern with orange lines one square thick, separated by 3x3 black squares.
+
+example_1:
+  input: |
+    A 3x3 grid with magenta (6) squares forming an "L" shape in the bottom-left corner. The remaining squares are black (0).
+  output: |
+    A 9x9 grid that seems to be an expanded version of the input. Each magenta square from the input is now represented by a 3x3 "L" shaped pattern of magenta. The orientation of these "L" shapes varies: the bottom-left one points to the top-right, the middle-left one points to the top-left, and the top-left one points to the bottom-left. The black squares from the input are expanded into 3x3 black squares.
+
+example_2:
+  input: |
+    A 3x3 grid with yellow (4) squares in the top-left corner and bottom-right corner. The remaining squares are black (0).
+  output: |
+    A 9x9 grid that appears to be an expanded version of the input. Each yellow square from the input is now represented by a 3x3 pattern where the top row and left column are yellow, forming an "L" shape, with the remaining squares black. The orientation of these patterns varies: the top-left one has the "L" opening to the bottom-right, while the bottom-right one has the "L" opening to the top-left. The black squares from the input are expanded into 3x3 black squares.
+
+test_case_0:
+  input: |
+    A 3x3 grid with yellow (4) squares in the top two corners and black (0) squares elsewhere.
+  output: |
+    This output is not provided in the test file, as it's a test case to be solved.

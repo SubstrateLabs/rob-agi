@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 6x5 grid with a complex pattern. The top half is dominated by brown (9) squares, forming an irregular shape. There's a black (0) square in the top-right corner and another in the middle-left. The bottom half is primarily yellow (4), with a pattern that looks like an inverted 'T' shape. There are black squares interspersed within the yellow region.
+  output: |
+    A 3x5 grid with a simple pattern. It consists of only magenta (6) and black (0) squares. The magenta squares form a shape that resembles a sideways 'U' or a partial frame, with the open end facing right. The black squares fill the remaining spaces.
+
+example_1:
+  input: |
+    A 6x5 grid with a mixed pattern. The top row has brown (9) squares at the edges. The middle section is mostly black (0), with a brown square in the center-right. The bottom half is dominated by yellow (4), forming an irregular shape with some black squares interspersed.
+  output: |
+    A 3x5 grid with magenta (6) and black (0) squares. The magenta squares form a pattern that looks like an inverted 'E' shape on the left side, with an additional magenta square in the top-right corner.
+
+example_2:
+  input: |
+    A 6x5 grid with a scattered pattern. Brown (9) squares are distributed across the top half, forming no clear shape. The bottom half is primarily yellow (4), with some black (0) squares mixed in. There's a notable black square in the center of the grid.
+  output: |
+    A 3x5 grid with magenta (6) and black (0) squares. The magenta squares form a pattern that resembles a backwards 'Z' shape, with additional magenta squares in the top-left and bottom-right corners.
+
+example_3:
+  input: |
+    A 6x5 grid with a complex pattern. The top half has brown (9) squares forming a shape like a partial frame or a 'C'. The bottom half is dominated by yellow (4) squares, forming an irregular shape with black (0) squares interspersed, particularly in the center.
+  output: |
+    A 3x5 grid with magenta (6) and black (0) squares. The magenta squares form a dense pattern in the top-left quadrant, extending partially into the top-right and bottom-left. There's an isolated magenta square in the bottom-right corner.
+
+example_4:
+  input: |
+    A 6x5 grid with a scattered pattern. Brown (9) squares are concentrated in the top-left quadrant, with some extending to the right. The bottom half is primarily yellow (4), forming an irregular shape with black (0) squares mixed in, particularly in the center and right side.
+  output: |
+    A 3x5 grid with magenta (6) and black (0) squares. The magenta squares form a pattern that looks like two separate 'L' shapes - one in the top-right and one in the bottom-center, with an additional magenta square in the top-center.

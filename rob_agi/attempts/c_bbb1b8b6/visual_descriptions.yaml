@@ -1,0 +1,41 @@
+example_0:
+  input: |
+    A 4x9 grid with a vertical gray line in the middle. The left half contains a blue L-shape along the left and bottom edges, with black filling the rest. The right half has a red shape that touches the top and right edges, with some black spaces.
+  output: |
+    A 4x4 grid with a blue L-shape on the left and bottom edges, and a red shape filling the top-right corner. The shapes meet diagonally in the center.
+
+example_1:
+  input: |
+    A 4x9 grid with a vertical gray line in the middle. The left half has a blue L-shape along the left and bottom edges, with black filling the rest. The right half has a smaller red shape touching only the top edge, with black spaces below and to the right.
+  output: |
+    A 4x4 grid that is an exact copy of the left half of the input grid, showing only the blue L-shape and black spaces.
+
+example_2:
+  input: |
+    A 4x9 grid with a vertical gray line in the middle. The left half has a blue shape touching all edges except the right. The right half has a green shape touching all edges except the left, with some black spaces in between.
+  output: |
+    A 4x4 grid where the blue shape from the left half and the green shape from the right half are combined, touching all edges and meeting diagonally in the center.
+
+example_3:
+  input: |
+    A 4x9 grid with a vertical gray line in the middle. The left half has a blue shape that forms a complete frame. The right half has a magenta square in the center, surrounded by black spaces.
+  output: |
+    A 4x4 grid showing the blue frame from the left half, with the magenta square from the right half placed in the center.
+
+example_4:
+  input: |
+    A 4x9 grid with a vertical gray line in the middle. The left half has a blue shape forming a complete frame. The right half has a small red shape touching only the top edge, with black spaces below and to the sides.
+  output: |
+    A 4x4 grid showing only the blue frame from the left half of the input grid, with black spaces inside.
+
+example_5:
+  input: |
+    A 4x9 grid with a vertical gray line in the middle. The left half has a blue shape forming a frame open at the bottom. The right half has a green shape touching the top and partially the right edge, with black spaces below and to the left.
+  output: |
+    A 4x4 grid showing only the blue frame from the left half of the input grid, open at the bottom, with black spaces inside and at the bottom.
+
+example_6:
+  input: |
+    A 4x9 grid with a vertical gray line in the middle. The left half has a blue shape forming an irregular frame with an opening on the right side. The right half has an orange shape that forms an irregular pattern, touching the top and bottom edges.
+  output: |
+    A 4x4 grid combining the blue irregular frame from the left half with the orange pattern from the right half. The orange fills the opening in the blue frame and extends to touch the right edge.

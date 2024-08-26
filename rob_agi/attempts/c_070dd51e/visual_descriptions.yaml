@@ -1,0 +1,36 @@
+example_0:
+  input: |
+    A 30x20 grid mostly filled with black (0). There are several colored "dots" scattered across the grid:
+    - Two red dots (2) in column 6, rows 2 and 13
+    - Two green dots (3) in row 6, columns 3 and 11
+    - One yellow dot (4) in row 12, column 14
+    - Two gray dots (5) in row 20, columns 2 and 7
+    - Two magenta dots (6) in column 4, rows 18 and 27
+    - Two sky blue dots (8) in column 14, rows 12 and 17
+    These colored dots appear isolated and not connected to each other.
+  output: |
+    The same 30x20 grid, but now with "lines" connecting the previously isolated dots:
+    - A vertical red line (2) from row 2 to 13 in column 6
+    - A horizontal green line (3) in row 6 from column 3 to 11
+    - A vertical sky blue line (8) from row 12 to 17 in column 14
+    - A horizontal gray line (5) in row 20 from column 2 to 7
+    - A vertical magenta line (6) from row 18 to 27 in column 4
+    The yellow dot (4) remains unchanged and isolated.
+
+example_1:
+  input: |
+    A 20x10 grid mostly filled with black (0). There are several colored "dots" scattered across the grid:
+    - Two yellow dots (4) in column 3, rows 2 and 10
+    - Two green dots (3) in row 4, columns 2 and 7
+    - Two orange dots (7) in row 8, columns 2 and 5
+    - Two sky blue dots (8) in row 14, columns 1 and 6
+    - Two brown dots (9) in column 5, rows 12 and 18
+    These colored dots appear isolated and not connected to each other.
+  output: |
+    The same 20x10 grid, but now with "lines" connecting the previously isolated dots:
+    - A vertical yellow line (4) from row 2 to 10 in column 3
+    - A horizontal green line (3) in row 4 from column 2 to 7
+    - A horizontal orange line (7) in row 8 from column 2 to 5
+    - A horizontal sky blue line (8) in row 14 from column 1 to 6
+    - A vertical brown line (9) from row 12 to 18 in column 5
+    All previously isolated dots are now connected by lines of the same color.

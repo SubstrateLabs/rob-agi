@@ -1,0 +1,65 @@
+example_0:
+  input: |
+    A 12x8 grid with several distinct features:
+    1. Two vertical red (2) lines on the left side, spanning the full height except for one row.
+    2. A single vertical sky blue (8) line on the right side of the center, spanning the full height.
+    3. Two horizontal green (3) lines in the middle, each two rows thick.
+    4. A single horizontal magenta (6) line in the middle, one row thick.
+    5. The rest of the grid is filled with black (0), which can be seen as empty space.
+    The overall effect is like a stylized letter "H" with additional vertical lines.
+  output: |
+    A 1x1 grid containing only magenta (6).
+
+example_1:
+  input: |
+    An 11x9 grid with these key elements:
+    1. Two vertical yellow (4) lines slightly left of center, spanning the full height.
+    2. A single vertical sky blue (8) line on the right side, spanning the full height.
+    3. Two horizontal green (3) lines near the top, each one row thick.
+    4. Two horizontal magenta (6) lines in the middle, each one row thick.
+    5. The rest of the grid is black (0), representing empty space.
+    The layout resembles a stylized double-door or window frame.
+  output: |
+    A 1x1 grid containing only sky blue (8).
+
+example_2:
+  input: |
+    An 11x11 grid with these prominent features:
+    1. Two vertical red (2) lines on the left side, spanning the full height except for the middle.
+    2. A single vertical magenta (6) line in the center, spanning the full height.
+    3. Two vertical sky blue (8) lines on the right side, spanning the full height.
+    4. Three horizontal blue (1) lines near the top, each one row thick.
+    5. Two horizontal yellow (4) lines near the bottom, each one row thick.
+    6. The rest is filled with black (0) as empty space.
+    The overall effect is like a symmetrical pattern or a stylized building facade.
+  output: |
+    A 1x1 grid containing only magenta (6).
+
+example_3:
+  input: |
+    A 12x11 grid with these distinct elements:
+    1. Two vertical green (3) columns slightly right of center, each two columns wide.
+    2. A single vertical gray (5) line on the right side, spanning the full height.
+    3. One horizontal red (2) line near the top, one row thick.
+    4. Two horizontal blue (1) lines in the upper middle, each one row thick.
+    5. Two horizontal yellow (4) lines near the bottom, each one row thick.
+    6. The rest is black (0), representing empty space.
+    The layout resembles a complex, symmetrical structure or pattern.
+  output: |
+    A 1x1 grid containing only blue (1).
+
+example_4:
+  input: |
+    A small 3x3 grid with a simple pattern:
+    1. A cross shape formed by blue (1) in the center of each edge.
+    2. Green (3) filling the entire middle row.
+    3. Black (0) in the corners.
+    The effect is like a simple cross or plus sign.
+  output: |
+    A 1x1 grid containing only green (3).
+
+test_case_0:
+  input: |
+    The input grid for the test case is not provided in the given code.
+  output: |
+    The expected output grid for the test case is not provided in the given code.

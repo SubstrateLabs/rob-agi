@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid shows a rectangular shape made of red (2) pixels, with a green (3) cross intersecting it. The green cross extends vertically through the entire height of the grid and horizontally across the middle. The red rectangle surrounds this cross, creating a frame-like structure. The rest of the grid is filled with black (0) pixels, which can be considered as empty space.
+  output: |
+    The output grid maintains the overall structure but with some key changes. The green (3) cross has been shifted to the right edge of the red (2) rectangle. The horizontal green line that was in the middle has been removed, leaving only the vertical line on the right edge. The red rectangle remains intact. The rest of the grid is still filled with black (0) pixels.
+
+example_1:
+  input: |
+    This grid features a blue (1) rectangular frame with a sky blue (8) cross intersecting it. The sky blue cross extends vertically through the entire height of the grid and horizontally across the middle. The blue rectangle surrounds this cross. The horizontal line of the sky blue cross extends beyond the blue rectangle, creating a full line across the grid. The rest of the grid is filled with black (0) pixels.
+  output: |
+    In the output, the overall structure is maintained, but with significant changes. The sky blue (8) cross has been shifted to the right edge of the blue (1) rectangle. The horizontal sky blue line that was in the middle has been removed, leaving only the vertical line on the right edge. The blue rectangle remains intact. The horizontal sky blue line that extended beyond the rectangle in the input has now moved to the top and bottom edges of the blue rectangle, creating a frame-like structure around it. The rest of the grid is still filled with black (0) pixels.
+
+example_2:
+  input: |
+    This grid shows a green (3) square frame with a yellow (4) cross intersecting it. The yellow cross extends vertically through the entire height of the grid and horizontally across the middle. The green square surrounds this cross. The horizontal line of the yellow cross extends beyond the green square, creating a full line across the grid. The vertical line of the yellow cross also extends beyond the green square, filling the entire column. The rest of the grid is filled with black (0) pixels.
+  output: |
+    In the output, the structure is maintained but with notable changes. The yellow (4) cross has been shifted to the right edge of the green (3) square. The horizontal yellow line that was in the middle has been removed, leaving only the vertical line on the right edge. The green square remains intact. The horizontal yellow line that extended beyond the square in the input has now moved to the top and bottom edges of the green square, creating a frame-like structure around it. The vertical yellow line that extended beyond the square now only appears above and below the green square. The rest of the grid is still filled with black (0) pixels.
+
+test_case_0:
+  input: |
+    The input for the test case is not provided in the given code.
+  output: |
+    The output for the test case is not provided in the given code, as it is meant to be solved.

@@ -1,0 +1,45 @@
+example_0:
+  input: |
+    A 10x10 grid with a pattern of gray (5) squares forming three horizontal bands. Each band is two rows thick and consists of three 2x2 gray squares separated by two columns of black (0) squares. The bands are separated by two rows of black squares. The rightmost two columns are entirely black.
+  output: |
+    The same 10x10 grid structure, but with significant changes:
+    1. All previously black squares are now red (2), except for specific locations.
+    2. The gray (5) squares remain in their original positions.
+    3. Blue (1) squares appear in specific locations:
+       - Two blue squares in the third row, in the 9th and 10th columns.
+       - Two blue squares in the sixth row, in the 9th and 10th columns.
+       - Four blue squares in the bottom two rows, in the 3rd and 6th columns.
+    4. The rightmost two columns in the bottom two rows remain black (0).
+
+example_1:
+  input: |
+    A 10x10 grid with a similar pattern to example_0, but the gray (5) squares are shifted. There are three horizontal bands, each two rows thick, consisting of two 2x2 gray squares. These gray squares are in the 3rd-4th and 7th-8th columns of each band. The bands are separated by two rows of black squares. The leftmost two columns and rightmost two columns are entirely black.
+  output: |
+    The 10x10 grid structure is maintained, with these changes:
+    1. Most previously black squares are now red (2).
+    2. The gray (5) squares remain in their original positions.
+    3. Blue (1) squares appear in specific locations:
+       - Two blue squares in the 1st and 2nd columns of the third row.
+       - Two blue squares in the 9th and 10th columns of the third row.
+       - This pattern repeats in the sixth row.
+       - Four blue squares in the bottom two rows, in the 5th and 6th columns.
+    4. The leftmost two columns and rightmost two columns in the top two bands remain black (0).
+    5. The bottom two rows maintain black squares in the leftmost two and rightmost two columns.
+
+example_2:
+  input: |
+    A 10x10 grid with three horizontal bands of gray (5) squares. Each band is two rows thick and consists of three 2x2 gray squares. Unlike previous examples, these gray squares touch the left and right edges of the grid. The bands are separated by two rows of black squares. The 1st, 4th, and 7th columns are entirely black.
+  output: |
+    The 10x10 grid structure is maintained, with these changes:
+    1. Most previously black squares are now red (2).
+    2. The gray (5) squares remain in their original positions.
+    3. Blue (1) squares appear in specific locations:
+       - In the 1st and 10th columns of the 3rd, 4th, 7th, and 8th rows.
+       - In the 4th and 7th columns of the 3rd, 4th, 7th, and 8th rows.
+    4. The 1st and 10th columns in the rows with gray squares remain black (0).
+
+test_case_0:
+  input: |
+    A 10x10 grid with a pattern of gray (5) squares forming three horizontal bands. Each band is two rows thick and consists of two 2x2 gray squares. These gray squares are positioned in the 2nd-3rd and 7th-8th columns of each band. The bands are separated by two rows of black squares. The 1st, 5th-6th, and 10th columns are entirely black.
+  output: |
+    The output grid is not provided for the test case.

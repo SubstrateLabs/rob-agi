@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid contains a gray 'L' shape in the top-left corner, extending 4 cells down and 4 cells to the right. The rest of the grid is filled with various colors in a seemingly random pattern. There are some small clusters of the same color, but no clear overall pattern beyond the gray 'L'.
+  output: |
+    The gray 'L' shape in the top-left corner has been extended into a larger rectangle. The new rectangle extends about 2/3 of the way across the grid (9 cells) and 2/3 of the way down the grid (9 cells). The extension fills in the area between the original 'L' shape with gray (5), creating a solid gray rectangle in the top-left portion of the grid. The rest of the grid remains unchanged from the input.
+
+example_1:
+  input: |
+    There is a gray 'L' shape in the top-left corner, extending 4 cells down and 4 cells to the right. Unlike the previous example, this 'L' shape is not solid, with some cells within it being other colors. The rest of the grid contains various colors in no apparent pattern.
+  output: |
+    The gray 'L' shape has been extended into a larger rectangle, similar to the previous example. The new rectangle extends about 2/3 of the way across the grid (9 cells) and about 2/3 of the way down the grid (13 cells). The extension fills in the area between the original 'L' shape with gray (5), including filling in the non-gray cells that were within the original 'L'. This creates a solid gray rectangle in the left portion of the grid, extending further down than in the previous example. The rest of the grid remains unchanged from the input.
+
+example_2:
+  input: |
+    There is a gray 'L' shape in the top-left corner, extending 4 cells down and 4 cells to the right. Like the first example, this 'L' is solid gray. The rest of the grid contains various colors with no clear pattern.
+  output: |
+    The gray 'L' shape has been extended into a larger rectangle. In this case, the extension is different from the previous examples. The new rectangle extends about 2/3 of the way across the grid (11 cells) and about 2/3 of the way down the grid (11 cells). The extension fills in the area to the right and below the original 'L' shape with gray (5), creating a solid gray rectangle in the central portion of the grid. The top-left corner of this new rectangle aligns with the corner of the original 'L'. The rest of the grid remains unchanged from the input.
+
+test_case_0:
+  input: |
+    There is a gray 'L' shape in the top-left corner, extending 4 cells down and 4 cells to the right. This 'L' is solid gray. The rest of the grid contains various colors distributed in no apparent pattern.
+  output: |
+    The output is not provided for the test case.

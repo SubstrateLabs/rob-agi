@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The input grid is 20x8. There are six vertical lines of different colors on the left side: yellow (4), green (3), and red (2), each separated by black (0) columns. On the right side, there's a large sky blue (8) shape that resembles an inverted 'L'. This shape is 4 columns wide on top, extends down 4 rows, then narrows to 2 columns for 2 more rows. The rest of the grid is filled with black (0).
+  output: |
+    The output grid maintains the 20x8 size. The vertical lines from the input have been removed. The sky blue (8) shape has been transformed into three separate colored regions: yellow (4), green (3), and red (2). The yellow region occupies the top-left of the original shape, the green region is below it, and the red region is to the right. Each colored region maintains the shape of the part of the original sky blue shape it occupies. The rest of the grid remains black (0).
+
+example_1:
+  input: |
+    The input grid is 15x6. There are six vertical lines of different colors on the left side: blue (1), magenta (6), and orange (7), each separated by black (0) columns. On the right side, there's a sky blue (8) shape that forms an inverted 'U'. This shape is 3 columns wide, extends down the full height of the grid on the right side, and has a 3x2 extension to the left at the top.
+  output: |
+    The output grid maintains the 15x6 size. The vertical lines from the input have been removed. The sky blue (8) shape has been transformed into three separate colored regions: blue (1), magenta (6), and orange (7). The blue region occupies the top-left of the original shape, the magenta region is below it, and the orange region is to the right. Each colored region maintains the shape of the part of the original sky blue shape it occupies. The rest of the grid remains black (0).
+
+example_2:
+  input: |
+    The input grid is 18x7. There are seven vertical lines of different colors on the left side: green (3), red (2), yellow (4), and orange (7), each separated by black (0) columns. On the right side, there's a sky blue (8) shape that forms an irregular pattern. It starts with a 2x2 square at the top-right, extends left by 1 column for 2 rows, then forms a 4x2 rectangle at the bottom-right corner.
+  output: |
+    The output grid maintains the 18x7 size. The vertical lines from the input have been removed. The sky blue (8) shape has been transformed into four separate colored regions: green (3), red (2), yellow (4), and orange (7). The green region occupies the top-left of the original shape, the red region is below it, the yellow region is below that, and the orange region is to the right. Each colored region maintains the shape of the part of the original sky blue shape it occupies. The rest of the grid remains black (0).

@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The input grid is a 30x30 square. It has a complex pattern with alternating rows. The odd-numbered rows (1, 3, 5, etc.) are solid blue (1). The even-numbered rows (2, 4, 6, etc.) have a repeating pattern of colors: yellow (4), red (2), gray (5), green (3), blue (1). This pattern repeats across the entire row. There are several black (0) regions scattered throughout the grid, appearing as "holes" in the pattern. These black regions vary in size and shape, with some being rectangular and others more irregular.
+  output: |
+    The output grid maintains the same 30x30 size and overall structure as the input. The alternating row pattern is preserved, with odd rows being solid blue (1) and even rows having the repeating color sequence (yellow, red, gray, green, blue). The key difference is that all the black (0) regions present in the input have been filled in, matching the pattern of their surrounding areas. The result is a completely filled grid with no black spaces, maintaining the consistent alternating row pattern throughout.
+
+example_1:
+  input: |
+    This is another 30x30 grid with a distinct pattern. The grid alternates between solid blue (1) rows and rows with a repeating pattern of blue (1) and yellow (4). The pattern rows have blue squares in odd positions and yellow squares in even positions. There are several black (0) regions scattered across the grid, varying in size and shape. Some of these black regions span multiple rows and columns, creating larger "holes" in the pattern.
+  output: |
+    The output grid maintains the 30x30 size and the basic alternating row structure. All rows that were solid blue (1) in the input remain unchanged. The rows that had the blue-yellow alternating pattern are now completely filled, with blue (1) in odd positions and yellow (4) in even positions across the entire row. All black (0) regions from the input have been filled in to match the surrounding pattern, resulting in a grid with no black spaces and a consistent alternating row pattern throughout.
+
+example_2:
+  input: |
+    This 30x30 grid has a more complex color pattern. Odd-numbered rows are solid blue (1). Even-numbered rows have a repeating sequence of colors: yellow (4), orange (7), green (3), magenta (6), red (2), gray (5), blue (1). This sequence repeats across each even row. The grid contains multiple black (0) regions of varying sizes and shapes, scattered throughout. Some of these black regions are quite large, spanning multiple rows and columns, while others are smaller, affecting just a few cells.
+  output: |
+    The output grid maintains the 30x30 size and the basic structure of alternating row patterns. The odd-numbered rows remain solid blue (1). The even-numbered rows now consistently display the full color sequence (yellow, orange, green, magenta, red, gray, blue) repeating across the entire row. All black (0) regions from the input have been completely filled in, matching the pattern of their surrounding areas. The result is a grid with no black spaces, showing a consistent and uninterrupted pattern of alternating solid blue rows and multi-colored sequence rows throughout the entire grid.
+
+test_case_0:
+  input: |
+    This is a 30x30 grid with a pattern similar to the previous examples. Odd-numbered rows are solid blue (1). Even-numbered rows have a repeating sequence of colors: yellow (4), orange (7), green (3), magenta (6), red (2), gray (5), blue (1). This sequence repeats across each even row. There are multiple black (0) regions scattered throughout the grid. These black regions vary in size and shape, with some being quite large and spanning multiple rows and columns, while others are smaller and more localized. The black regions create "holes" or interruptions in the otherwise regular pattern.
+  output: |
+    Based on the pattern observed in the previous examples, we can infer that the output grid would maintain the 30x30 size and the basic structure of alternating row patterns. The odd-numbered rows would remain solid blue (1). The even-numbered rows would consistently display the full color sequence (yellow, orange, green, magenta, red, gray, blue) repeating across the entire row. All black (0) regions from the input would be completely filled in, matching the pattern of their surrounding areas. The result would be a grid with no black spaces, showing a consistent and uninterrupted pattern of alternating solid blue rows and multi-colored sequence rows throughout the entire 30x30 grid.

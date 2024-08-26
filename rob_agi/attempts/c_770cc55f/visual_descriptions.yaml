@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 9x4 grid with mostly black (0) squares. There's a green (3) horizontal line at the top spanning columns 1-3. A red (2) horizontal line spans the entire width at row 4. Two green (3) squares are at the bottom left corner.
+  output: |
+    Similar to the input, but with a vertical yellow (4) line added in column 1, spanning rows 1-3, connecting the top green line to the red line.
+
+example_1:
+  input: |
+    A 13x5 grid, mostly black (0). A magenta (6) horizontal line spans the top row from columns 1-4. Another magenta line is at the bottom, spanning columns 2-4. A red (2) horizontal line spans the entire width at row 6.
+  output: |
+    Similar to the input, but with a yellow (4) rectangle added. This rectangle spans columns 2-4 and rows 1-5, connecting the top magenta line to the red line.
+
+example_2:
+  input: |
+    A 13x5 grid, mostly black (0). Two blue (1) squares at the top left corner. A red (2) horizontal line spans the entire width at row 6. Four blue (1) squares form a horizontal line at the bottom left.
+  output: |
+    Similar to the input, but with a yellow (4) rectangle added. This rectangle spans columns 1-2 and rows 7-11, connecting the red line to the bottom blue line.
+
+example_3:
+  input: |
+    A 13x6 grid, mostly black (0). Two green (3) squares at the top right corner. A red (2) horizontal line spans the entire width at row 6. Five green (3) squares form a horizontal line at the bottom, spanning columns 1-5.
+  output: |
+    Similar to the input, but with a yellow (4) rectangle added. This rectangle spans columns 3-4 and rows 7-11, connecting the red line to the bottom green line.
+
+test_case_0:
+  input: |
+    A 13x6 grid, mostly black (0). Two green (3) squares at the top right corner. A red (2) horizontal line spans the entire width at row 6. Five green (3) squares form a horizontal line at the bottom, spanning columns 1-5.
+  output: |
+    Not provided in the test case.

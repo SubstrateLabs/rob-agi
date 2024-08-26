@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 3x29 grid. The top and bottom rows are entirely black (0). The middle row has two colored squares at the left edge: a red (2) square followed by a green (3) square. The rest of the middle row is black.
+  output: |
+    A 3x29 grid. The top and bottom rows remain entirely black (0). The middle row now contains a pattern of colored squares: it starts with the original red (2) and green (3) squares, followed by a repeating sequence of [black (0), red (2), black (0), black (0), green (3)] that continues to the end of the row, with the last green square at the very right edge.
+
+example_1:
+  input: |
+    A 3x19 grid. The top and bottom rows are entirely black (0). The middle row has four colored squares at the left edge: magenta (6), sky (8), black (0), and blue (1). The rest of the middle row is black.
+  output: |
+    A 3x19 grid. The top and bottom rows remain entirely black (0). The middle row now contains a pattern of colored squares: it starts with the original magenta (6), sky (8), black (0), and blue (1) squares, followed by a repeating sequence of [black (0), black (0), magenta (6), black (0), black (0), black (0), sky (8), black (0), black (0), black (0), black (0), blue (1)] that continues until the end of the row.
+
+example_2:
+  input: |
+    A 3x19 grid. The top and bottom rows are entirely black (0). The middle row has two colored squares at the left edge: blue (1) and red (2). The rest of the middle row is black.
+  output: |
+    A 3x19 grid. The top and bottom rows remain entirely black (0). The middle row now contains a pattern of colored squares: it starts with the original blue (1) and red (2) squares, followed by a repeating sequence of [black (0), blue (1), black (0), black (0), red (2)] that continues until the end of the row.

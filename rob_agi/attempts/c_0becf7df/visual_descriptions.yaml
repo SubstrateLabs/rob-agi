@@ -1,0 +1,50 @@
+example_0:
+  input: |
+    The grid contains several distinct colored regions. In the top-left corner, there's a small 2x2 square with colors 4 (yellow), 2 (red), 3 (green), and 7 (orange). The rest of the grid is mostly black (0), with a few colored regions:
+    - A vertical line of color 4 (yellow) in the right half of the grid
+    - An L-shaped region of color 3 (green) below and to the right of the top-left square
+    - A T-shaped region of color 2 (red) to the right of the green L-shape
+    - An inverted L-shaped region of color 7 (orange) in the bottom-left quadrant of the grid
+  output: |
+    The grid maintains the same overall structure, but with some color swaps:
+    - The top-left 2x2 square remains unchanged
+    - The vertical line that was yellow (4) is now red (2)
+    - The L-shaped region that was green (3) is now orange (7)
+    - The T-shaped region that was red (2) is now yellow (4)
+    - The inverted L-shaped region that was orange (7) is now green (3)
+    The black (0) regions remain unchanged.
+
+example_1:
+  input: |
+    The grid contains several colored regions:
+    - A 2x2 square in the top-left corner with colors 1 (blue), 3 (green), 2 (red), and 8 (sky)
+    - A vertical line of color 1 (blue) in the right half of the grid
+    - An inverted T-shaped region of color 1 (blue) in the center-top of the grid
+    - A rectangular region of color 3 (green) in the left-center of the grid
+    - An L-shaped region of color 8 (sky) in the right-center of the grid
+    - A vertical line of color 2 (red) in the bottom-center of the grid
+  output: |
+    The grid maintains the same overall structure, but with some color swaps:
+    - The top-left 2x2 square remains unchanged
+    - The vertical line and inverted T-shape that were blue (1) are now green (3)
+    - The rectangular region that was green (3) is now blue (1)
+    - The L-shaped region that was sky (8) is now red (2)
+    - The vertical line that was red (2) is now sky (8)
+    The black (0) regions remain unchanged.
+
+example_2:
+  input: |
+    The grid contains several colored regions:
+    - A 2x2 square in the top-left corner with colors 9 (brown), 4 (yellow), 7 (orange), and 6 (magenta)
+    - A small L-shaped region of color 9 (brown) in the top-right area
+    - A vertical line of color 4 (yellow) in the center-right of the grid
+    - An irregular shape of color 7 (orange) in the bottom-left quadrant
+    - An irregular shape of color 6 (magenta) in the bottom-right quadrant
+  output: |
+    The grid maintains the same overall structure, but with some color swaps:
+    - The top-left 2x2 square remains unchanged
+    - The L-shaped region that was brown (9) is now yellow (4)
+    - The vertical line that was yellow (4) is now brown (9)
+    - The irregular shape that was orange (7) is now magenta (6)
+    - The irregular shape that was magenta (6) is now orange (7)
+    The black (0) regions remain unchanged.

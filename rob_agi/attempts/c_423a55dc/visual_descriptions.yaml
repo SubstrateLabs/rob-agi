@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A sky blue (8) square shape is visible in the center of the grid. The square has a hollow center, creating a frame-like appearance. The rest of the grid is filled with black (0), which can be interpreted as empty space.
+  output: |
+    The sky blue (8) square shape has been transformed. It now appears as if it's been rotated and stretched diagonally. The top-left corner of the square remains in its original position, while the rest of the shape extends diagonally down and to the right. The hollow center is maintained, though distorted by the transformation.
+
+example_1:
+  input: |
+    A magenta (6) square shape is visible slightly off-center in the grid, positioned towards the right. Like in the previous example, the square has a hollow center, creating a frame-like appearance. The rest of the grid is filled with black (0), representing empty space.
+  output: |
+    The magenta (6) square shape has been transformed similarly to the previous example. It appears rotated and stretched diagonally, but this time from left to right. The top-left corner of the square has moved to the left edge of the grid, while the rest of the shape extends diagonally down and to the right. The hollow center is maintained, though distorted by the transformation.
+
+example_2:
+  input: |
+    A green (3) shape resembling an upside-down 'U' or a horseshoe is visible slightly off-center in the grid, positioned towards the right. The shape has a hollow center. The rest of the grid is filled with black (0), representing empty space.
+  output: |
+    The green (3) horseshoe shape has been transformed. It appears rotated and stretched diagonally from left to right. The top-left corner of the shape has moved to the left edge of the grid, while the rest extends diagonally down and to the right. The hollow center is maintained, though distorted by the transformation. The overall shape now resembles a distorted 'C' or a partial spiral.
+
+example_3:
+  input: |
+    A red (2) shape resembling a distorted 'G' or a square with a bite taken out of its bottom-right corner is visible slightly off-center in the grid, positioned towards the right. The shape has a hollow center. The rest of the grid is filled with black (0), representing empty space.
+  output: |
+    The red (2) 'G'-like shape has been transformed. It appears rotated and stretched diagonally from left to right. The top-left corner of the shape has moved to the left edge of the grid, while the rest extends diagonally down and to the right. The hollow center and the 'bite' out of the corner are maintained, though distorted by the transformation. The overall shape now resembles a distorted 'C' with an extra segment at the bottom-right.
+
+example_4:
+  input: |
+    A small sky blue (8) solid rectangle is visible in the top-left corner of the grid. The rectangle is 2x3 in size. The rest of the grid is filled with black (0), representing empty space.
+  output: |
+    The sky blue (8) rectangle has been slightly transformed. It now appears as if it's been stretched diagonally. The top row remains unchanged, while the second row has been shifted one space to the right, creating a parallelogram-like shape. The rest of the grid remains black (0).

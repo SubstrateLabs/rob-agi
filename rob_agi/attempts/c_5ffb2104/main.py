@@ -20,14 +20,11 @@ def solve_5ffb2104(input_grid: ColoredGrid) -> ColoredGrid:
     new_grid = [[0 for _ in range(cols)] for _ in range(rows)]
 
     for col in range(cols - 1, -1, -1):  # Start from rightmost column
+        new_col = cols - 1  # Start placing elements from the rightmost column
         for row in range(rows):
             if input_grid.values[row][col] != 0:
-                # Find rightmost available position
-                new_col = col
-                while new_col < cols - 1 and new_grid[row][new_col + 1] == 0:
-                    new_col += 1
-                
-                # Place the element
+                # Place the element in the rightmost available position
                 new_grid[row][new_col] = input_grid.values[row][col]
+        new_col -= 1  # Move to the next column to the left
 
     return ColoredGrid(values=new_grid)

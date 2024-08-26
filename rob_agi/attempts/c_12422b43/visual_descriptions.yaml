@@ -1,0 +1,35 @@
+example_0:
+  input: |
+    A 5x5 grid with a gray (5) vertical line on the left edge, two cells tall. A magenta (6) vertical line in the middle, one cell tall. A yellow (4) horizontal line in the second row, three cells wide in the middle.
+  output: |
+    The same as the input, but with two additions: The magenta (6) vertical line is now extended downward by one cell. The yellow (4) horizontal line is duplicated at the bottom of the grid.
+
+example_1:
+  input: |
+    An 8x7 grid with a gray (5) vertical line on the left edge, three cells tall. Two sky (8) cells at the top right corner. An orange (7) cell below the sky cells. Two yellow (4) cells to the right of the orange cell. Two green (3) cells below the yellow cells. Two blue (1) cells below the green cells.
+  output: |
+    The same as the input, with the following additions at the bottom of the grid: Two sky (8) cells, an orange (7) cell below them, and two yellow (4) cells to the right of the orange cell, mirroring the pattern at the top of the input grid.
+
+example_2:
+  input: |
+    A 9x7 grid with a gray (5) vertical line on the left edge, two cells tall. Two yellow (4) cells at the top right. Three sky (8) cells in the middle of the second row. A red (2) cell below the sky cells. Two green (3) cells below the red cell. Two yellow (4) cells below the green cells.
+  output: |
+    The same as the input, with the following additions: The pattern of yellow (4), sky (8), and yellow (4) cells is repeated twice at the bottom of the grid, creating three identical horizontal stripes.
+
+example_3:
+  input: |
+    A 13x6 grid with a gray (5) vertical line on the left edge, four cells tall. On the right side, from top to bottom: two green (3) cells, a green (3) and a red (2) cell, a red (2) and a green (3) cell, and two sky (8) cells repeated twice.
+  output: |
+    The same as the input, with the pattern on the right side (excluding the gray line) repeated twice more, filling the entire height of the grid.
+
+example_4:
+  input: |
+    A 7x6 grid with a gray (5) cell in the top left corner. A magenta (6) cell to its right. A sky (8) cell to the right of the magenta cell. In the second row, a sky (8) cell and a green (3) cell under the sky cell from the first row.
+  output: |
+    The same as the input, with the pattern of the magenta (6) and sky (8) cells repeated vertically down the grid, creating two vertical lines.
+
+test_case_0:
+  input: |
+    A 7x6 grid with a gray (5) cell in the top left corner. A magenta (6) cell to its right. A sky (8) cell to the right of the magenta cell. In the second row, a sky (8) cell and a green (3) cell under the sky cell from the first row.
+  output: |
+    Not provided in the test case.

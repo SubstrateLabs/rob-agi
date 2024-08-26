@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid is 30x30. The dominant colors are sky blue (8), brown (9), and gray (5) forming a complex pattern. There's a large magenta (6) region in the center, roughly rectangular in shape, spanning about 1/3 of the grid width and 1/2 of the grid height. This magenta region is surrounded by various other colors, creating a border-like effect. The corners and edges of the grid have distinct patterns, with repeating sequences of colors.
+  output: |
+    The grid remains 30x30. The magenta region in the center has been completely removed and replaced with a continuation of the surrounding pattern. The overall structure and patterns from the input grid are maintained, but they now extend into the area previously occupied by magenta. The corners and edges of the grid remain largely unchanged. The dominant colors are still sky blue (8), brown (9), and gray (5), forming complex patterns throughout the entire grid.
+
+example_1:
+  input: |
+    The grid is 30x30. It features a complex pattern with dominant colors of brown (9), green (3), and yellow (4). There's a large magenta (6) region in the center, roughly rectangular, spanning about 1/3 of the grid width and 1/2 of the grid height. This magenta area is surrounded by various other colors. The corners and edges have distinct patterns with repeating color sequences.
+  output: |
+    The grid remains 30x30. The central magenta region has been completely removed and replaced with a continuation of the surrounding pattern. The overall structure and patterns from the input are maintained, now extending into the area previously occupied by magenta. Corners and edges of the grid are largely unchanged. The dominant colors remain brown (9), green (3), and yellow (4), forming complex patterns throughout the entire grid.
+
+example_2:
+  input: |
+    The grid is 30x30. It features a complex pattern with dominant colors of sky blue (8), brown (9), and gray (5). There's a large magenta (6) region in the center, roughly rectangular, spanning about 1/3 of the grid width and 2/3 of the grid height. This magenta area is surrounded by various other colors. The corners and edges have distinct patterns with repeating color sequences.
+  output: |
+    The grid remains 30x30. The central magenta region has been completely removed and replaced with a continuation of the surrounding pattern. The overall structure and patterns from the input are maintained, now extending into the area previously occupied by magenta. Corners and edges of the grid are largely unchanged. The dominant colors remain sky blue (8), brown (9), and gray (5), forming complex patterns throughout the entire grid.
+
+example_3:
+  input: |
+    The grid is 30x30. It features a complex pattern with dominant colors of sky blue (8), brown (9), and yellow (4). There's a large magenta (6) region slightly off-center, roughly rectangular, spanning about 1/3 of the grid width and 1/3 of the grid height. This magenta area is surrounded by various other colors. The corners and edges have distinct patterns with repeating color sequences.
+  output: |
+    The grid remains 30x30. The magenta region has been completely removed and replaced with a continuation of the surrounding pattern. The overall structure and patterns from the input are maintained, now extending into the area previously occupied by magenta. Corners and edges of the grid are largely unchanged. The dominant colors remain sky blue (8), brown (9), and yellow (4), forming complex patterns throughout the entire grid.

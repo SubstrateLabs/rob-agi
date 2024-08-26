@@ -1,0 +1,52 @@
+example_0:
+  input: |
+    The input grid shows a complex shape made of green (3) cells. The shape resembles a stylized letter "E" or a comb-like structure. It's surrounded by black (0) cells, which can be considered as empty space. The green shape has various features:
+    - A horizontal line at the top
+    - Three vertical lines extending downwards
+    - Two shorter horizontal lines connecting the vertical lines
+    - A curved section at the bottom right
+    The shape is not symmetrical and has some interesting structural features like corners, intersections, and endpoints.
+  output: |
+    The output grid maintains the overall structure of the input, but with color changes that highlight specific structural features:
+    - Corners (where two adjacent green cells meet at a right angle) are now yellow (4)
+    - Intersections (where three or more green cells meet) are now red (2)
+    - Endpoints (where a green line terminates) are now yellow (4)
+    - Straight sections of the shape remain green (3)
+    - Black (0) cells remain unchanged
+    These color changes effectively highlight the structural components of the shape, making corners, intersections, and endpoints visually distinct.
+
+example_1:
+  input: |
+    The input grid shows a complex shape made of sky blue (8) cells. The shape resembles interconnected rectangular structures or a maze-like pattern. It's surrounded by black (0) cells, representing empty space. The sky blue shape has several notable features:
+    - A large rectangular outline in the top left
+    - A smaller rectangle attached to the bottom right of the large rectangle
+    - A long, winding path extending from the top right to the bottom right
+    - Several small protrusions and indentations along the path
+    The shape is asymmetrical and has many corners, intersections, and endpoints.
+  output: |
+    The output grid maintains the overall structure of the input, but with color changes that highlight specific structural features:
+    - Corners (where two adjacent sky blue cells meet at a right angle) are now yellow (4)
+    - Intersections (where three or more sky blue cells meet) are now red (2)
+    - Endpoints (where a sky blue line terminates) are now yellow (4)
+    - Straight sections of the shape remain sky blue (8)
+    - Black (0) cells remain unchanged
+    These color changes effectively highlight the structural components of the shape, making corners, intersections, and endpoints visually distinct. The maze-like quality of the shape becomes more apparent with these highlighted features.
+
+example_2:
+  input: |
+    The input grid shows a complex shape made of blue (1) cells. The shape resembles two interconnected structures:
+    1. In the top left, there's a shape that looks like a stylized letter "P" or a flag
+    2. In the bottom right, there's a shape that resembles a distorted letter "B" or a butterfly
+    These shapes are surrounded by black (0) cells, representing empty space. The blue shapes have several notable features:
+    - Multiple rectangular sections
+    - Curved and straight lines
+    - Various protrusions and indentations
+    The overall structure is asymmetrical and has many corners, intersections, and endpoints.
+  output: |
+    The output grid maintains the overall structure of the input, but with color changes that highlight specific structural features:
+    - Corners (where two adjacent blue cells meet at a right angle) are now yellow (4)
+    - Intersections (where three or more blue cells meet) are now red (2)
+    - Endpoints (where a blue line terminates) are now yellow (4)
+    - Straight sections of the shape remain blue (1)
+    - Black (0) cells remain unchanged
+    These color changes effectively highlight the structural components of the shapes, making corners, intersections, and endpoints visually distinct. The complex nature of the interconnected structures becomes more apparent with these highlighted features, emphasizing the intricate design of the shapes.

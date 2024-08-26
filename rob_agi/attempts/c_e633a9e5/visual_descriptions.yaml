@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 3x3 grid with distinct colors. The top row is magenta, gray, gray. The middle row is gray, blue, orange. The bottom row is yellow, gray, red. There's no clear pattern or object, just a mix of colors.
+  output: |
+    A 5x5 grid that appears to be an expanded version of the input. Each color from the input is now represented by a 2x2 square in the output. The top-left 2x2 is magenta, followed by a 2x2 gray square to its right. The second row is identical to the first. The third row starts with a 2x2 gray square, then blue, then orange. The fourth and fifth rows contain 2x2 squares of yellow, gray, and red, mirroring the bottom row of the input.
+
+example_1:
+  input: |
+    A 3x3 grid with various colors. The top row is blue, green, gray. The middle row is blue, red, sky. The bottom row is sky, green, sky. There's no obvious pattern, just a mix of colors.
+  output: |
+    A 5x5 grid that expands on the input. Each color from the input is now a 2x2 square in the output. The top-left 2x2 is blue, followed by green, then gray. The second row is identical to the first. The third row has 2x2 squares of blue, red, and sky. The fourth and fifth rows both contain 2x2 squares of sky, green, and sky, reflecting the bottom row of the input.
+
+example_2:
+  input: |
+    A 3x3 grid with different colors. The top row is red, green, orange. The middle row is red, blue, magenta. The bottom row is blue, gray, orange. No clear pattern, just a variety of colors.
+  output: |
+    A 5x5 grid that expands the input. Each color from the input becomes a 2x2 square in the output. The top-left 2x2 is red, then green, then orange. The second row is the same as the first. The third row has 2x2 squares of red, blue, and magenta. The fourth and fifth rows both contain 2x2 squares of blue, gray, and orange, mirroring the bottom row of the input.

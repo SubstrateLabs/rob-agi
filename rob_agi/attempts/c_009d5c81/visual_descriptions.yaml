@@ -1,0 +1,35 @@
+example_0:
+  input: |
+    A 14x14 grid with a sky blue (color 8) shape resembling a stylized bird or airplane in the upper half. The shape has a curved body with wings extending to the sides and a tail. Below this, in the bottom left quadrant, there's a small blue (color 1) cross or plus sign shape.
+  output: |
+    The grid is mostly unchanged, but the sky blue bird/airplane shape has been changed to red (color 2). The blue cross shape in the bottom left has been removed, leaving that area black (color 0) like the rest of the background.
+
+example_1:
+  input: |
+    A 14x14 grid with a sky blue (color 8) pattern in the center top half, resembling a simplified face or mask. It has two "eyes" and a "mouth" formed by the negative space. Below this, near the bottom, there's a small blue (color 1) shape that looks like an arrow pointing upwards or a simplified tree.
+  output: |
+    The grid is mostly unchanged, but the sky blue face/mask shape has been changed to green (color 3). The blue arrow/tree shape at the bottom has been removed, leaving that area black (color 0) like the rest of the background.
+
+example_2:
+  input: |
+    A 14x14 grid with a sky blue (color 8) pattern in the top half that resembles a grid or fence. It's made up of vertical and horizontal lines forming a 5x5 structure with some gaps. Near the bottom center, there's a small blue (color 1) cross or plus sign shape.
+  output: |
+    The grid is mostly unchanged, but the sky blue grid/fence pattern has been changed to red (color 2). The blue cross shape near the bottom has been removed, leaving that area black (color 0) like the rest of the background.
+
+example_3:
+  input: |
+    A 14x14 grid with a complex sky blue (color 8) shape in the top half and right side. It resembles an abstract tree or perhaps a river system with branches. Near the bottom left, there's a small blue (color 1) shape that looks like a simple house or tent (triangle on top of a square).
+  output: |
+    The grid is mostly unchanged, but the sky blue tree/river shape has been changed to orange (color 7). The blue house/tent shape at the bottom left has been removed, leaving that area black (color 0) like the rest of the background.
+
+example_4:
+  input: |
+    A 14x14 grid with a sky blue (color 8) shape in the center and upper right quadrant. It resembles a stylized bird or perhaps a boomerang, with a curved body and wing-like extensions. In the bottom left quadrant, there's a blue (color 1) shape that looks like a simple arrow pointing up-right or a stylized letter "Y".
+  output: |
+    The grid is mostly unchanged, but the sky blue bird/boomerang shape has been changed to green (color 3). The blue arrow/Y shape at the bottom left has been removed, leaving that area black (color 0) like the rest of the background.
+
+test_case_0:
+  input: |
+    A 14x14 grid with a sky blue (color 8) shape in the center and upper right quadrant. It resembles a stylized bird or perhaps a boomerang, with a curved body and wing-like extensions. In the bottom left quadrant, there's a blue (color 1) shape that looks like a simple arrow pointing up-right or a stylized letter "Y".
+  output: |
+    The output is not provided for the test case.

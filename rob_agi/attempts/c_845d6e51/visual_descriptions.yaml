@@ -1,0 +1,83 @@
+example_0:
+  input: |
+    The grid contains several distinct shapes and patterns:
+    1. A red (2) L-shaped object in the top-left corner.
+    2. A blue (1) vertical line of two squares in the top-left area.
+    3. A gray (5) horizontal line spanning the entire width of the grid in the fourth row.
+    4. A gray vertical line of three squares in the top-right area, intersecting with the horizontal gray line.
+    5. Multiple green (3) shapes scattered throughout the grid:
+       - A horizontal line of three squares in the top-right area.
+       - Two separate 3x3 L-shaped objects in the middle and bottom-right areas.
+       - Several smaller clusters and individual green squares.
+    The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The overall structure remains the same, but with some color changes:
+    1. The red L-shaped object in the top-left corner is unchanged.
+    2. The blue vertical line is unchanged.
+    3. The gray horizontal and vertical lines are unchanged.
+    4. All green shapes and squares have been transformed:
+       - The horizontal line of three squares in the top-right is now red.
+       - The two 3x3 L-shaped objects are now red.
+       - All other green clusters and individual squares have become blue.
+    The black (empty) spaces remain unchanged.
+
+example_1:
+  input: |
+    The grid contains several distinct shapes and patterns:
+    1. A red (2) vertical line of two squares in the top-left corner.
+    2. A yellow (4) inverted L-shape in the top-left area.
+    3. A blue (1) horizontal line of three squares in the top-middle area.
+    4. A gray (5) horizontal line spanning almost the entire width of the grid in the fourth row, with a vertical extension of three squares at the right end.
+    5. Multiple green (3) shapes scattered throughout the grid:
+       - Several clusters forming irregular shapes.
+       - A 3x3 square in the bottom-right corner.
+       - Various individual squares.
+    The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The overall structure remains the same, but with significant color changes:
+    1. The red vertical line in the top-left corner is unchanged.
+    2. The yellow inverted L-shape is unchanged.
+    3. The blue horizontal line is unchanged.
+    4. The gray horizontal and vertical lines are unchanged.
+    5. All green shapes and squares have been transformed:
+       - The large cluster in the top-right has become yellow.
+       - The cluster in the middle-left has become red.
+       - The 3x3 square in the bottom-right has become yellow.
+       - Other clusters and individual squares have become blue or red, seemingly alternating.
+    The black (empty) spaces remain unchanged.
+
+example_2:
+  input: |
+    The grid contains several distinct shapes and patterns:
+    1. A red (2) reversed L-shape in the top-left corner.
+    2. An orange (7) T-shape in the top-middle area.
+    3. A gray (5) horizontal line spanning the entire width of the grid in the fourth row, with a vertical extension of three squares at the right end.
+    4. Multiple green (3) shapes in the bottom half of the grid:
+       - A 3x4 rectangular shape with a square missing in the middle-bottom.
+       - A 3x3 square shape in the bottom-left.
+       - A small L-shape in the bottom-right.
+    The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The overall structure remains the same, but with some color changes:
+    1. The red reversed L-shape in the top-left corner is unchanged.
+    2. The orange T-shape in the top-middle area is unchanged.
+    3. The gray horizontal and vertical lines are unchanged.
+    4. All green shapes have been transformed:
+       - The 3x4 rectangular shape with a missing square has become orange.
+       - The 3x3 square shape in the bottom-left has become red.
+       - The small L-shape in the bottom-right has become red.
+    The black (empty) spaces remain unchanged.
+
+test_case_0:
+  input: |
+    The grid contains several distinct shapes and patterns:
+    1. A red (2) L-shape in the top-left corner.
+    2. A yellow (4) inverted L-shape in the top-left area.
+    3. A blue (1) horizontal line of three squares in the top-middle area.
+    4. A gray (5) horizontal line spanning almost the entire width of the grid in the fourth row, with a vertical extension of three squares at the right end.
+    5. Multiple green (3) shapes scattered throughout the bottom two-thirds of the grid:
+       - Several clusters forming irregular shapes.
+       - Various individual squares.
+    The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The output grid is not provided for this test case.

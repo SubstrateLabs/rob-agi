@@ -1,0 +1,15 @@
+example_0:
+  input: |
+    A 3x4 grid with a mix of magenta (6), red (2), and yellow (4) squares. The top row has a pattern of magenta, red, yellow, red. The middle row is red, red, magenta, magenta. The bottom row is magenta, yellow, red, yellow. There's no clear symmetry or obvious pattern at first glance.
+  output: |
+    A 6x8 grid that appears to be an expanded version of the input. The pattern is doubled both horizontally and vertically, creating a symmetrical design. The center of the grid (2x2 area) is filled with red squares. The corners are filled with 2x2 squares of alternating colors: top-left and bottom-right are yellow-magenta, while top-right and bottom-left are magenta-yellow. The middle of each edge has a 2x2 square of red.
+example_1:
+  input: |
+    A 3x4 grid with gray (5), brown (9), and orange (7) squares. The top row is gray, gray, brown, brown. The middle row is brown, gray, gray, gray. The bottom row is gray, orange, gray, orange. There's no immediate pattern visible.
+  output: |
+    A 6x8 grid that is an expanded version of the input. The pattern is doubled both horizontally and vertically, creating a symmetrical design. The center of the grid (2x2 area) is filled with brown squares. The corners are filled with 2x2 squares of alternating colors: top-left and bottom-right are orange-gray, while top-right and bottom-left are gray-orange. The middle of each edge has a 2x2 square of gray, except for the left and right edges which have brown-gray-gray-brown vertically.
+example_2:
+  input: |
+    A 3x4 grid with green (3), gray (5), and sky (8) squares. The top row is green, green, gray, gray. The middle row is gray, sky, gray, sky. The bottom row is sky, sky, gray, sky. There's no clear pattern immediately visible.
+  output: |
+    A 6x8 grid that is an expanded version of the input. The pattern is doubled both horizontally and vertically, creating a symmetrical design. The center of the grid (2x2 area) is filled with gray squares. The corners are filled with 2x2 squares of sky color. The top edge has a 2x2 square of green in the middle, while the bottom edge has a 2x2 square of sky. The left and right edges have a vertical pattern of sky-gray-gray-sky.

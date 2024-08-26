@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The input grid is 16x16. The top row contains four colored squares: blue (1), red (2), green (3), and magenta (6), followed by black (0) squares. The second row is entirely filled with gray (5) squares. The rest of the grid is mostly black (0), except for a single blue (1) square in the 10th row, 7th column.
+  output: |
+    The output grid maintains the same 16x16 size. The top two rows remain unchanged from the input. In the center of the grid, there's a large square pattern. This pattern is 7x7 squares, centered vertically and slightly left of center horizontally. The outer layer of this square is magenta (6). Inside this is a 5x5 square of green (3). Within that is a 3x3 square of red (2). At the very center is a single blue (1) square. The rest of the grid remains black (0).
+
+example_1:
+  input: |
+    The input grid is 16x16. The top row contains six colored squares: red (2), green (3), green (3), yellow (4), black (0), and sky (8), followed by black (0) squares. The second row is entirely filled with gray (5) squares. The rest of the grid is mostly black (0), except for a single red (2) square in the 12th row, 6th column.
+  output: |
+    The output grid maintains the 16x16 size. The top row is almost the same as the input, but the sky (8) square has been replaced with a gray (5) square. The second row remains unchanged, filled with gray (5). In the center of the grid, there's a large rectangular pattern. This pattern is 11x10 squares, centered vertically and slightly left of center horizontally. The outer layer of this rectangle is sky (8). Inside this is a 9x8 rectangle of black (0). Within that is a 7x6 rectangle of yellow (4). Inside that is a 5x4 rectangle of green (3). At the very center is a 3x2 rectangle of red (2). The rest of the grid remains black (0).
+
+test_case_0:
+  input: |
+    The input grid is 16x16. The top row contains six colored squares: red (2), green (3), green (3), yellow (4), black (0), and sky (8), followed by black (0) squares. The second row is entirely filled with gray (5) squares. The rest of the grid is mostly black (0), except for a single red (2) square in the 12th row, 6th column.
+  output: |
+    The output is not provided for the test case.

@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 5x5 grid with a red square (2) in the top-left and top-right corners. A blue (1) inverted U-shape connects these red squares, forming three sides of a rectangle. The rest of the grid is filled with black (0), representing empty space.
+  output: |
+    The same 5x5 grid structure as the input, but with yellow (4) filling all the empty spaces inside and below the blue inverted U-shape. The red squares and blue lines remain unchanged. The bottom row is entirely yellow, and the space outside the blue lines on the second to fourth rows remains black.
+
+example_1:
+  input: |
+    A 5x5 grid with a red square (2) in the top-right corner and another in the bottom-left corner. A blue (1) zigzag line connects these red squares, starting from the top-right, going down, then diagonally across the grid, and finally up to the bottom-left. The rest of the grid is black (0).
+  output: |
+    The same 5x5 grid structure, but with yellow (4) filling all the enclosed spaces created by the blue zigzag line and the grid edges. The area to the left of the top part of the zigzag and the area to the right of the bottom part of the zigzag are now yellow. The red squares and blue line remain unchanged. The bottom-right corner and the diagonal strip in the middle remain black.
+
+example_2:
+  input: |
+    A 6x6 grid with a red square (2) in the top-left corner and another in the bottom-right corner. There are two separate blue (1) lines: one horizontal line in the second row from the top, extending from the left edge to the fourth column, and another vertical line in the fourth column from the bottom, extending from the bottom edge to the third row from the bottom. The rest of the grid is black (0).
+  output: |
+    The same 6x6 grid structure, but with yellow (4) filling all the enclosed spaces created by the blue lines and the grid edges. The area above the horizontal blue line and to the left of the vertical blue line is now yellow, except for the red square in the top-left which remains unchanged. The area to the right of the vertical blue line and below the horizontal blue line is also yellow, except for the red square in the bottom-right which remains unchanged. The blue lines themselves remain blue. The bottom-left corner and the top-right corner (separated by the blue lines) remain black.
+
+example_3:
+  input: |
+    A 6x6 grid with a red square (2) in the top-right corner and another in the bottom-left corner. There are two separate blue (1) lines forming incomplete rectangles: one in the second row from the top, extending from the left edge to the second-to-last column, and another in the second row from the bottom, extending from the right edge to the second column. The rest of the grid is black (0).
+  output: |
+    The same 6x6 grid structure, but with yellow (4) filling all the enclosed spaces created by the blue lines and the grid edges. The entire grid is now yellow except for: the blue lines which remain unchanged, the red squares which remain unchanged, and the bottom row which remains black. The yellow fill extends to areas that were previously black but are now considered "enclosed" by the blue lines and grid edges.
+
+example_4:
+  input: |
+    A 10x10 grid with red squares (2) in the top-right and bottom-left corners. There are several blue (1) lines forming a complex pattern: two vertical parallel lines in the 4th and 5th columns from the left, extending from the top to the 4th row; a horizontal line in the 5th row from the top, extending from the left edge to the 6th column; a vertical line in the 7th column, extending from the 5th row to the bottom edge; and a horizontal line in the 9th column, extending from the top edge to the 4th row. The rest of the grid is black (0).
+  output: |
+    The same 10x10 grid structure, but with yellow (4) filling all the enclosed spaces created by the blue lines and the grid edges. The area between the parallel vertical lines in the top-left quadrant is now yellow. The area to the left of the vertical line in the 7th column and below the horizontal line in the 5th row is yellow, extending to the left edge of the grid. The area above the horizontal line in the 9th column and to the right of the vertical line in the 7th column is yellow, extending to the right edge of the grid. The blue lines and red squares remain unchanged. The bottom-right quadrant and the area between the parallel lines and the vertical line in the 7th column remain black.

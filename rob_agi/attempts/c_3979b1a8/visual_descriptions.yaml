@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 5x5 grid with a cross-like pattern. The center and arms of the cross are red (2), surrounded by sky blue (8). The corners of the grid are brown (9).
+  output: |
+    A 10x10 grid that appears to be an expanded version of the input. The original pattern is preserved in the top-left quadrant. The right side of the grid has a vertical stripe pattern of brown (9), red (2), sky blue (8), brown (9), red (2). The bottom of the grid has a horizontal stripe pattern of brown (9), red (2), sky blue (8), brown (9), red (2). The bottom-right quadrant is filled with a diagonal pattern, alternating between red (2) and sky blue (8).
+
+example_1:
+  input: |
+    A 5x5 grid with a cross-like pattern. The center and arms of the cross are gray (5), surrounded by green (3). The corners of the grid are red (2).
+  output: |
+    A 10x10 grid that appears to be an expanded version of the input. The original pattern is preserved in the top-left quadrant. The right side of the grid has a vertical stripe pattern of red (2), gray (5), green (3), red (2), gray (5). The bottom of the grid has a horizontal stripe pattern of red (2), gray (5), green (3), red (2), gray (5). The bottom-right quadrant is filled with a diagonal pattern, alternating between gray (5) and green (3).
+
+test_case_0:
+  input: |
+    A 5x5 grid with a cross-like pattern. The center and arms of the cross are yellow (4), surrounded by blue (1). The corners of the grid are orange (7).
+  output: |
+    This output is not provided in the test file, as it's a test case to be solved.

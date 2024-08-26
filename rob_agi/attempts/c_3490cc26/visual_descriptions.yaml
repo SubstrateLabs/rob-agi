@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    An 18x26 grid with mostly black (empty) space. There are four 2x2 sky blue squares positioned at different locations: one near the top left, two in the middle row (left and right sides), and one near the bottom right. There's also a single 2x2 red square near the bottom left.
+  output: |
+    The same 18x26 grid, but with orange rectangles connecting the sky blue squares. The top left square is connected to both middle squares with vertical orange lines. The bottom right square is connected to both middle squares with horizontal orange lines. The red square remains unchanged. The orange lines form a rough 'H' shape connecting all the sky blue squares.
+
+example_1:
+  input: |
+    A 28x28 grid with mostly black space. There are multiple 2x2 sky blue squares scattered around: one near top left, one in top middle, two in the middle left side, one in the center, two in the middle right side, one near bottom left, and one near bottom right. There's also a 2x2 red square near the top left.
+  output: |
+    The same 28x28 grid, but with orange rectangles connecting all the sky blue squares. The connections form a complex network, creating a shape reminiscent of a tree or a circuit diagram. The red square remains unchanged. The orange lines connect all sky blue squares, forming vertical and horizontal paths between them.
+
+example_2:
+  input: |
+    An 18x16 grid with mostly black space. There are three 2x2 sky blue squares: one on the left side, one in the middle, and one on the right side. There's also a 2x2 red square between the left and middle sky blue squares.
+  output: |
+    The same 18x16 grid, but with an orange rectangle connecting all three sky blue squares horizontally. The orange line passes through the red square, which remains unchanged. The orange connection forms a straight horizontal line linking all sky blue squares.
+
+test_case_0:
+  input: |
+    A 25x26 grid with mostly black space. There are multiple 2x2 sky blue squares scattered around: one near top left, one top middle, two on the left side (vertically aligned), two in the center (vertically aligned), two on the right side (horizontally aligned), one near bottom left, and one near bottom right. There's also a 2x2 red square near the top left.
+  output: |
+    The output grid is not provided for the test case.

@@ -1,0 +1,42 @@
+example_0:
+  input: |
+    The grid is 13x12. The top row is entirely sky blue (8). The bottom row is entirely green (3). The middle 10 rows are mostly black (0) with scattered blue dots (1). There are 7 blue dots in total, distributed seemingly randomly across the middle section.
+  output: |
+    The grid maintains its 13x12 size. The top and bottom rows remain unchanged (sky blue and green respectively). The middle section now has additional sky blue (8) and green (3) squares. Each blue dot from the input has been modified:
+    - The two blue dots in the second column now have a sky blue square directly above them.
+    - The blue dot in the fifth column has a sky blue square diagonally above-left.
+    - The blue dot in the sixth row now has a green square directly below it.
+    - The blue dot in the ninth column of the third row remains unchanged, but now has a sky blue square directly above it.
+    - The blue dot in the last column of the eighth row now has a green square directly below it.
+    - The blue dot in the ninth column of the ninth row remains unchanged.
+
+example_1:
+  input: |
+    The grid is 10x14. The top row is entirely red (2). The bottom row is entirely yellow (4). The middle 12 rows are mostly black (0) with scattered blue dots (1). There are 8 blue dots in total, distributed seemingly randomly across the middle section.
+  output: |
+    The grid maintains its 10x14 size. The top and bottom rows remain unchanged (red and yellow respectively). The middle section now has additional red (2) and yellow (4) squares. Each blue dot from the input has been modified:
+    - The blue dot in the second row now has a red square directly above it.
+    - The blue dot in the third row now has a red square diagonally above-left.
+    - The blue dot in the fifth row remains unchanged.
+    - The blue dot in the sixth row now has a red square diagonally above-left.
+    - The blue dot in the seventh row remains unchanged.
+    - The blue dot in the tenth row now has a yellow square directly below it.
+    - The blue dot in the eleventh row now has a yellow square diagonally below-right.
+    - The blue dot in the twelfth row now has a yellow square directly below it.
+
+example_2:
+  input: |
+    The grid is 10x12. The leftmost column is entirely green (3). The rightmost column is entirely yellow (4). The middle 8 columns are mostly black (0) with scattered blue dots (1). There are 5 blue dots in total, distributed seemingly randomly across the middle section.
+  output: |
+    The grid maintains its 10x12 size. The leftmost and rightmost columns remain unchanged (green and yellow respectively). The middle section now has additional green (3) and yellow (4) squares. Each blue dot from the input has been modified:
+    - The blue dot in the second row now has a yellow square directly to its right.
+    - The blue dot in the third row now has a green square directly to its left.
+    - The blue dot in the fifth row now has a green square diagonally above-left.
+    - The blue dot in the sixth row now has a yellow square diagonally above-right.
+    - The blue dot in the ninth row now has a yellow square directly to its right.
+
+test_case_0:
+  input: |
+    The grid is 10x12. The leftmost column is entirely green (3). The rightmost column is entirely yellow (4). The middle 8 columns are mostly black (0) with scattered blue dots (1). There are 5 blue dots in total, distributed seemingly randomly across the middle section.
+  output: |
+    The output grid is not provided for this test case.

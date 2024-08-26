@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 14x7 grid mostly filled with black (0). There's a single vertical gray (5) line in the middle of the grid, extending from the top to the 5th row. This gray line is in the 4th column from the left.
+  output: |
+    A 14x7 grid with a more complex pattern. The gray (5) vertical line from the input remains in the same position. To the left of this line, there's a large sky blue (8) triangular shape, with its base at the top of the grid and its point reaching down to the 11th row. To the right of the gray line, there's a smaller magenta (6) triangular shape in the top-right corner, extending down to the 3rd row. The rest of the grid remains black (0).
+
+example_1:
+  input: |
+    An 11x8 grid mostly filled with black (0). There's a single vertical gray (5) line in the 3rd column from the left, extending from the top to the 4th row.
+  output: |
+    An 11x8 grid with a pattern similar to example_0. The gray (5) vertical line remains in the same position. To the left of this line, there's a sky blue (8) triangular shape, with its base at the top of the grid and its point reaching down to the 8th row. To the right of the gray line, there's a small magenta (6) triangular shape in the top-right corner, extending down to the 2nd row. The rest of the grid remains black (0).
+
+example_2:
+  input: |
+    A 14x8 grid mostly filled with black (0). There's a single vertical gray (5) line in the 5th column from the left, extending from the top to the 7th row.
+  output: |
+    A 14x8 grid with a pattern similar to the previous examples. The gray (5) vertical line remains in the same position. To the left of this line, there's a large sky blue (8) triangular shape, with its base at the top of the grid and its point reaching down to the 13th row. To the right of the gray line, there's a magenta (6) triangular shape in the top-right corner, extending down to the 5th row. The rest of the grid remains black (0).
+
+test_case_0:
+  input: |
+    There is no separate test case provided in the given test file. All three cases (example_0, example_1, and example_2) serve as both examples and test cases.
+  output: |
+    As there is no separate test case, this field is not applicable.

@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 10x10 grid with a green T-shape in the top-center, surrounded by red lines. The green T is 3x3 squares, with the center of the top row being red. There are two horizontal red lines: one across the entire second row, and another across the entire seventh row. The rest of the grid is black (empty).
+  output: |
+    The same 10x10 grid, maintaining the green T-shape and red lines from the input. A blue structure has been added, forming a symmetrical pattern. The blue structure consists of a vertical line from the bottom of the green T to the bottom of the grid, with horizontal extensions at rows 5 and 8. These extensions form a shape reminiscent of a double-headed arrow or a capital I. The blue structure intersects with the lower red horizontal line.
+
+example_1:
+  input: |
+    A 15x12 grid with two green 3x3 squares, one in the top-left corner and one in the bottom-right corner. Each green square has a red center. There are two vertical red lines running the full height of the grid: one in the 4th column and one in the 10th column.
+  output: |
+    The same 15x12 grid, maintaining the green squares and red lines from the input. Blue structures have been added to connect the green squares. From each green square, blue lines extend horizontally to the nearest vertical red line. These blue lines then continue vertically along the red lines until they meet in the middle of the grid (row 8). At this meeting point, a horizontal blue line connects the two vertical red lines.
+
+example_2:
+  input: |
+    A 12x12 grid with a single green 3x3 square in the center (rows 6-8, columns 5-7). The green square has a red center. There is a vertical red line running through the center of the grid (column 5), extending from top to bottom.
+  output: |
+    The same 12x12 grid, maintaining the green square and red line from the input. A blue horizontal line has been added across the entire width of the grid, intersecting with the green square at its center (row 7). This blue line creates a symmetrical cross shape with the existing red vertical line.
+
+example_3:
+  input: |
+    A 16x14 grid with three green 3x3 squares, each with a red center. One is at the top (rows 3-5, columns 4-6), one at the bottom-right (rows 14-16, columns 10-12), and one slightly left of center (rows 6-8, columns 4-6). There are three horizontal red lines spanning the full width of the grid: in rows 4, 9, and 15.
+  output: |
+    The same 16x14 grid, maintaining the green squares and red lines from the input. Blue structures have been added to connect all green squares. Vertical blue lines extend from each green square to the nearest horizontal red lines. These blue lines then continue horizontally along the red lines, forming a network that connects all green squares. Additional vertical blue lines have been added in columns 5 and 11, creating a symmetrical pattern that resembles a tree-like structure or a circuit diagram.
+
+test_case_0:
+  input: |
+    This test case is not provided in the given test file. There is no separate test case distinct from the examples.
+  output: |
+    As there is no separate test case provided, there is no output to describe.

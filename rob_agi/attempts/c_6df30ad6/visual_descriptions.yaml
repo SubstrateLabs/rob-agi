@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 10x10 grid with various colored squares scattered throughout. The most prominent feature is a large gray (5) region in the center, roughly shaped like a cross or plus sign. This gray region is surrounded by empty black (0) space. There are also several colored squares around the edges: an orange (7) in the top-left corner, a magenta (6) in the top-right, two brown (9) squares in the right column, a magenta (6) and a brown (9) in the bottom-right quadrant, and another brown (9) in the bottom-left corner.
+  output: |
+    A 10x10 grid that appears to focus on the central region of the input. The gray cross-shaped area has been replaced with a magenta (6) region of the same shape and size. All other colored squares from the input have been removed, leaving the rest of the grid as black (0) empty space.
+
+example_1:
+  input: |
+    A 10x10 grid with a smaller gray (5) cross-shaped region in the center, occupying a 3x3 area. The rest of the grid is mostly empty black (0) space with a few colored squares scattered around: a brown (9) in the top-left, a yellow (4) in the top-right and bottom-left corners, a red (2) in the second row and bottom-right corner, and three more brown (9) squares in various locations.
+  output: |
+    A 10x10 grid where the central gray cross has been replaced by a brown (9) cross of the same size and shape. All other colored squares from the input have been removed, leaving the rest of the grid as black (0) empty space.
+
+example_2:
+  input: |
+    A 10x10 grid with a vertical gray (5) line running down the center column. This line is surrounded by empty black (0) space. The grid edges contain various colored squares: sky (8), yellow (4), and green (3) in the top row; sky (8) squares in the left and right columns; and yellow (4), sky (8), and green (3) squares in the bottom row.
+  output: |
+    A 10x10 grid where the central vertical gray line has been replaced by a yellow (4) line of the same length and position. All other colored squares from the input have been removed, leaving the rest of the grid as black (0) empty space.
+
+example_3:
+  input: |
+    A 10x10 grid with a horizontal gray (5) line in the center row, spanning four squares. The rest of the grid is mostly empty black (0) space with several colored squares scattered around: yellow (4) squares in the top-left and top-right corners, green (3) squares in the second row and bottom-right corner, magenta (6) squares in the third and seventh rows, and another yellow (4) square in the bottom-left corner.
+  output: |
+    A 10x10 grid where the central horizontal gray line has been replaced by a magenta (6) line of the same length and position. All other colored squares from the input have been removed, leaving the rest of the grid as black (0) empty space.
+
+example_4:
+  input: |
+    A 10x10 grid with a small gray (5) cross in the center, occupying a 2x2 area. The grid is mostly empty black (0) space with only three other colored squares: a yellow (4) in the second row, and two magenta (6) squares in the left column and near the bottom-right corner.
+  output: |
+    A 10x10 grid where the central small gray cross has been replaced by a yellow (4) cross of the same size and shape. All other colored squares from the input have been removed, leaving the rest of the grid as black (0) empty space.

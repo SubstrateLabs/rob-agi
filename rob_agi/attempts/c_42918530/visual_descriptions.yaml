@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    The grid is 19x13 in size. It consists of four 5x5 colored squares separated by black (0) borders. The squares are arranged in a 2x2 pattern. The top-left square is green (3), the top-right is sky blue (8), the bottom-left is yellow (4), and the bottom-right is orange (7). Each colored square has a distinct pattern within it. The green and sky blue squares have an 'X' pattern of their respective colors with black spaces. The yellow square has a 'T' shape, while the orange square has an inverted 'U' shape.
+  output: |
+    The grid maintains its 19x13 size and overall structure with four 5x5 squares separated by black borders. The colors and positions of the squares remain the same. The patterns within each square have been modified to achieve rotational symmetry. The green square now has a plus '+' shape. The sky blue square retains its 'X' pattern. The yellow square now has a symmetrical cross pattern. The orange square has changed to a symmetrical 'U' shape with additional colored cells in the corners.
+
+example_1:
+  input: |
+    The grid is 19x19 in size. It consists of nine 5x5 colored squares arranged in a 3x3 pattern, separated by black borders. The colors are: top row - red (2), yellow (4), sky blue (8); middle row - sky blue (8), green (3), blue (1); bottom row - red (2), blue (1), orange (7). Each square has a unique internal pattern, mostly consisting of border patterns or partial shapes.
+  output: |
+    The grid maintains its 19x19 size and overall structure with nine 5x5 squares. The colors and positions of the squares remain the same. The internal patterns of each square have been modified to achieve rotational symmetry. Notable changes include: the red squares now have a symmetrical cross pattern; the yellow square has a diamond shape; the sky blue squares have an 'X' pattern; the green square has a plus '+' shape; the blue squares have a symmetrical 'U' shape; and the orange square retains its original pattern but with slight modifications for symmetry.
+
+example_2:
+  input: |
+    The grid is 25x25 in size. It consists of sixteen 5x5 colored squares arranged in a 4x4 pattern, separated by black borders. The colors are varied and include red (2), magenta (6), sky blue (8), green (3), yellow (4), orange (7), blue (1), and gray (5). Each square has a unique internal pattern, mostly consisting of border patterns, partial shapes, or solid colors with a few cells of a different color.
+  output: |
+    The grid maintains its 25x25 size and overall structure with sixteen 5x5 squares. The colors and positions of the squares remain the same. The internal patterns of each square have been modified to achieve rotational symmetry. Notable changes include: squares that previously had asymmetrical patterns now have symmetrical ones; squares with partial shapes now have complete, rotationally symmetrical shapes; and squares that were mostly solid now have symmetrical patterns introduced.
+
+example_3:
+  input: |
+    The grid is 19x19 in size. It consists of nine 5x5 colored squares arranged in a 3x3 pattern, separated by black borders. The colors are: top row - green (3), green (3), red (2); middle row - red (2), sky blue (8), blue (1); bottom row - sky blue (8), red (2), blue (1). Each square has a unique internal pattern, mostly consisting of border patterns, partial shapes, or solid colors with a few cells of a different color.
+  output: |
+    The grid maintains its 19x19 size and overall structure with nine 5x5 squares. The colors and positions of the squares remain the same. The internal patterns of each square have been modified to achieve rotational symmetry. Notable changes include: the green squares now have a symmetrical cross pattern; the red squares have a symmetrical pattern with colored cells in the corners and center; the sky blue squares have an 'X' pattern; and the blue squares have a symmetrical pattern with colored cells in the corners and center.
+
+test_case_0:
+  input: |
+    The grid is 19x19 in size. It consists of nine 5x5 colored squares arranged in a 3x3 pattern, separated by black borders. The colors are: top row - green (3), green (3), red (2); middle row - red (2), sky blue (8), blue (1); bottom row - sky blue (8), red (2), blue (1). Each square has a unique internal pattern, mostly consisting of border patterns, partial shapes, or solid colors with a few cells of a different color.
+  output: |
+    The output grid is not provided for the test case.

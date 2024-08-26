@@ -1,0 +1,59 @@
+example_0:
+  input: |
+    A 16x16 grid with several distinct shapes:
+    1. A large 5x5 sky blue (8) square in the top-left corner.
+    2. A smaller 4x4 sky blue square in the middle-right, slightly offset from the center.
+    3. A tiny 2x2 blue (1) square in the middle-right, below the 4x4 sky blue square.
+    4. A small 2x2 red (2) square in the bottom-left.
+    5. A 3x3 red square in the bottom-right.
+    The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    A 3x3 grid summarizing the colors from the input:
+    1. Sky blue (8) in the top-left corner.
+    2. Red (2) in the middle-right.
+    3. Blue (1) in the bottom-right.
+    The rest is black (0).
+
+example_1:
+  input: |
+    A 16x16 grid with several distinct shapes and patterns:
+    1. A 4x4 sky blue (8) square in the top-left quadrant, slightly offset from the corner.
+    2. Three separate 3x3 red (2) squares: one in the top-right, one in the middle-left, and one larger 4x4 red square in the bottom-right.
+    3. A 2x2 yellow (4) square in the top-right corner.
+    4. Multiple green (3) shapes: a 2x2 square in the middle-left, a 3x3 square in the bottom-left quadrant, and two separate 2x2 squares in the bottom-left corner.
+    5. The rest of the grid is filled with black (0), considered as empty space.
+  output: |
+    A 4x4 grid summarizing the colors from the input:
+    1. Red (2) occupying the entire right column.
+    2. Green (3) in the middle-left.
+    3. Sky blue (8) in the bottom-left.
+    4. Yellow (4) in the bottom-right corner.
+    The rest is black (0).
+
+example_2:
+  input: |
+    A 16x16 grid with various shapes and patterns:
+    1. Multiple sky blue (8) shapes: two 2x2 squares in the top-right corner, and a 3x3 square below them.
+    2. Several blue (1) shapes: a 2x2 square in the top-left, a 3x3 square in the middle-left, a large 5x5 square occupying the bottom-right quadrant, and a 4x4 square in the middle-right.
+    3. Two red (2) shapes: a 3x3 square in the top-left quadrant and another 3x3 square in the bottom-right corner.
+    4. A 3x3 green (3) square in the middle of the grid.
+    5. The rest of the grid is filled with black (0), considered as empty space.
+  output: |
+    A 5x4 grid summarizing the colors from the input:
+    1. The entire left column is filled with blue (1).
+    2. The top-right corner (3x3) is filled with sky blue (8).
+    3. The bottom-right corner has red (2) in a 2x2 square.
+    4. Green (3) occupies a single cell in the bottom-right.
+    The rest is black (0).
+
+test_case_0:
+  input: |
+    This is the same as example_2, so the description is identical:
+    A 16x16 grid with various shapes and patterns:
+    1. Multiple sky blue (8) shapes: two 2x2 squares in the top-right corner, and a 3x3 square below them.
+    2. Several blue (1) shapes: a 2x2 square in the top-left, a 3x3 square in the middle-left, a large 5x5 square occupying the bottom-right quadrant, and a 4x4 square in the middle-right.
+    3. Two red (2) shapes: a 3x3 square in the top-left quadrant and another 3x3 square in the bottom-right corner.
+    4. A 3x3 green (3) square in the middle of the grid.
+    5. The rest of the grid is filled with black (0), considered as empty space.
+  output: |
+    The output is not provided for this test case, as it's meant to be solved.

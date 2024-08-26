@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The grid shows three 'E' shapes separated by black vertical lines. Each 'E' is made of red (2) squares. The top bar of each 'E' is full. The middle bar alternates between full and partial (missing the rightmost square). The bottom bar is the opposite of the middle bar: full when the middle is partial, and partial when the middle is full. This creates a checkerboard-like pattern both horizontally and vertically.
+  output: |
+    The output grid maintains the same overall structure of three 'E' shapes separated by black vertical lines. The key differences are in the middle and bottom bars of the 'E's. The pattern has been adjusted to create a more consistent checkerboard effect. Now, the middle bars alternate between full and partial from top to bottom, and the bottom bars are always the opposite of the middle bars in the same 'E'.
+
+example_1:
+  input: |
+    The grid displays four 'E' shapes separated by black vertical lines. Each 'E' is composed of red (2) squares. The top bar of each 'E' is consistently full. The middle and bottom bars show variations, creating an inconsistent pattern. Some 'E's have full middle bars and partial bottom bars, while others have partial middle bars and full bottom bars. The pattern doesn't follow a clear rule across the grid.
+  output: |
+    The output grid maintains the four 'E' shapes separated by black vertical lines. However, the pattern of the middle and bottom bars has been regularized. Now, the middle bars alternate between full and partial from left to right and top to bottom, creating a diagonal checkerboard effect. The bottom bars are always the opposite of the middle bars in the same 'E'. This creates a consistent, alternating pattern across the entire grid.
+
+example_2:
+  input: |
+    The grid shows four 'E' shapes separated by black vertical lines. Each 'E' is made of red (2) squares. The top bar of each 'E' is consistently full. The middle and bottom bars show variations, but the pattern is more consistent than in the previous example. The middle bars tend to alternate between full and partial, but there are some inconsistencies. The bottom bars generally follow an opposite pattern to the middle bars, but again with some irregularities.
+  output: |
+    The output grid maintains the four 'E' shapes separated by black vertical lines. The pattern of the middle and bottom bars has been fully regularized. The middle bars now consistently alternate between full and partial from left to right and top to bottom, creating a perfect diagonal checkerboard effect. The bottom bars are always the opposite of the middle bars in the same 'E'. This results in a completely consistent, alternating pattern across the entire grid.

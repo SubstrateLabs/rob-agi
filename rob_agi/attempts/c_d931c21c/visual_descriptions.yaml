@@ -1,0 +1,54 @@
+example_0:
+  input: |
+    An 8x8 grid with a blue (1) shape resembling an inverted 'U' or horseshoe. The shape is made up of blue squares along the top row from columns 3-5, and then extends down the sides to the bottom of row 5. The rest of the grid is filled with black (0) squares.
+  output: |
+    The blue horseshoe shape remains unchanged. The black squares adjacent to the blue shape have been transformed: those touching the outer edge of the blue shape have become red (2), while those inside the horseshoe have become green (3), except for one black square in the center. The bottom two rows remain entirely black.
+
+example_1:
+  input: |
+    A 9x10 grid with a blue (1) shape resembling a rectangle with an opening at the bottom. The shape starts at the second row and second column, extending 6 squares wide and 4 squares tall. The bottom row of this rectangle is incomplete, with the middle two squares being black (0). The rest of the grid is filled with black squares.
+  output: |
+    The grid remains exactly the same as the input. No transformations have occurred.
+
+example_2:
+  input: |
+    A 16x14 grid with multiple blue (1) shapes:
+    1. A large 'C' shape in the top-left quadrant.
+    2. A smaller backwards 'L' shape in the top-right quadrant.
+    3. A small 3x3 square with the center removed in the bottom-right quadrant.
+    4. A 5x5 square with its right side open in the bottom-left quadrant.
+    The rest of the grid is filled with black (0) squares.
+  output: |
+    The blue shapes remain unchanged. The black squares adjacent to blue shapes have been transformed:
+    1. Those touching the outer edges of blue shapes have become red (2).
+    2. Those enclosed by blue shapes or red squares have become green (3).
+    3. Black squares not adjacent to any colored squares remain black.
+    The transformations have created a border effect around all blue shapes and filled in most enclosed areas with green.
+
+example_3:
+  input: |
+    A 19x22 grid with multiple blue (1) shapes:
+    1. A large 'G' shape in the top-left quadrant.
+    2. A 5x5 square with its bottom-right corner open in the top-right quadrant.
+    3. A small 3x1 horizontal line in the top-center.
+    4. A 4x4 square in the bottom-left quadrant.
+    5. A 3x3 'L' shape in the center-right area.
+    The rest of the grid is filled with black (0) squares, except for a small 2x3 blue shape in the top-left corner.
+  output: |
+    The blue shapes remain unchanged. The black squares adjacent to blue shapes have been transformed:
+    1. Those touching the outer edges of blue shapes have become red (2).
+    2. Those enclosed by blue shapes or red squares have become green (3).
+    3. Black squares not adjacent to any colored squares remain black.
+    The transformations have created a border effect around all blue shapes and filled in most enclosed areas with green. The small 2x3 blue shape in the top-left corner now has a red border around it.
+
+test_case_0:
+  input: |
+    A 19x22 grid with multiple blue (1) shapes:
+    1. A large 'G' shape in the top-left quadrant.
+    2. A 5x5 square with its bottom-right corner open in the top-right quadrant.
+    3. A small 3x1 horizontal line in the top-center.
+    4. A 4x4 square in the bottom-left quadrant.
+    5. A 3x3 'L' shape in the center-right area.
+    The rest of the grid is filled with black (0) squares, except for a small 2x3 blue shape in the top-left corner.
+  output: |
+    The output is not provided for this test case.

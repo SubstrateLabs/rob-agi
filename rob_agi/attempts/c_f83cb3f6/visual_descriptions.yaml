@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 17x10 grid with a predominantly black (0) background. There's a horizontal sky blue (8) line spanning the entire width of the grid in the 9th row from the top. Gray (5) dots are scattered throughout the grid, with 10 gray dots in total. These dots appear to be randomly placed, with no clear pattern to their distribution.
+  output: |
+    A 17x10 grid with a predominantly black (0) background. The sky blue (8) line remains in the 9th row, unchanged from the input. The gray (5) dots have been redistributed. They are now concentrated in two rows: the row immediately above the blue line (7th row) and the row immediately below it (10th row). In the 7th row, there are 5 gray dots, while in the 10th row, there are 5 gray dots. The dots in each row are not evenly spaced but appear to maintain some spacing between them.
+
+example_1:
+  input: |
+    A 12x14 grid with a predominantly black (0) background. There's a vertical sky blue (8) line in the 6th column from the left, spanning almost the entire height of the grid (stopping one row short of the bottom). Blue (1) dots are scattered throughout the grid, with 9 blue dots in total. These dots appear to be randomly placed, with no clear pattern to their distribution.
+  output: |
+    A 12x14 grid with a predominantly black (0) background. The sky blue (8) vertical line remains in the 6th column, unchanged from the input. The blue (1) dots have been redistributed. They are now concentrated in the column immediately to the right of the sky blue line (7th column). There are 9 blue dots in this column, distributed from the top of the grid to about two-thirds of the way down. The dots are not evenly spaced but maintain some spacing between them.
+
+example_2:
+  input: |
+    A 15x10 grid with a predominantly black (0) background. There's a horizontal sky blue (8) line in the 8th row, but it's not continuous - it spans columns 1-3 and 6-9. Red (2) dots are scattered throughout the grid, with 10 red dots in total. These dots appear to be randomly placed, with no clear pattern to their distribution.
+  output: |
+    A 15x10 grid with a predominantly black (0) background. The sky blue (8) line remains in the 8th row, unchanged from the input. The red (2) dots have been redistributed. They are now concentrated in two rows: the row immediately above the blue line segments (7th row) and the row immediately below the leftmost blue line segment (9th row). In the 7th row, there are 6 red dots, while in the 9th row, there are 4 red dots. The dots in each row are not evenly spaced but appear to maintain some spacing between them.
+
+test_case_0:
+  input: |
+    A 15x10 grid with a predominantly black (0) background. There's a horizontal sky blue (8) line in the 8th row, but it's not continuous - it spans columns 1-3 and 6-9. Red (2) dots are scattered throughout the grid, with 10 red dots in total. These dots appear to be randomly placed, with no clear pattern to their distribution. This input is identical to the input of example_2.
+  output: |
+    The output is not provided for this test case.
