@@ -6,10 +6,11 @@ def solve_18419cfa(input_grid: ColoredGrid) -> ColoredGrid:
     Solve the 18419cfa challenge by expanding red (2) patterns within sky blue (8) regions.
     
     The function identifies connected sky blue regions, analyzes red patterns within them,
-    and expands these patterns based on their shape and available space. It creates a
-    symmetrical template from the red pattern, which is then repeated vertically to fill
-    the sky blue region. The expansion maintains symmetry and is contained within the
-    bounds of each sky blue region. Non-sky blue areas are preserved.
+    and expands these patterns vertically. It creates a vertically symmetrical template 
+    from the red pattern, which is then repeated to fill the sky blue region. The expansion 
+    maintains symmetry and is contained within the bounds of each sky blue region. 
+    Non-sky blue areas are preserved. The pattern is centered vertically if there's 
+    remaining space after repetitions.
     """
     grid = input_grid.deep_copy()
     sky_blue_regions = find_connected_regions(grid, 8)
@@ -68,10 +69,10 @@ def expand_region(grid: ColoredGrid, region: Set[Tuple[int, int]]):
                 if template[r][c] == 2 and (start_r + i * template_height + r, min_c + c) in region:
                     grid.set_cell(start_r + i * template_height + r, min_c + c, 2)
 
-    # Handle partial repetition at the bottom
-    remaining_rows = height - (repetitions * template_height)
-    if remaining_rows > 0:
-        for r in range(min(remaining_rows, template_height)):
+    # Handle partial repetition at the bottom if there's remaining space
+    if extra_space > 0:
+        remaining_rows = min(extra_space, template_height)
+        for r in range(remaining_rows):
             for c in range(width):
                 if template[r][c] == 2 and (start_r + repetitions * template_height + r, min_c + c) in region:
                     grid.set_cell(start_r + repetitions * template_height + r, min_c + c, 2)
@@ -86,7 +87,7 @@ def get_region_bounds(region: Set[Tuple[int, int]]) -> Tuple[int, int, int, int]
 def create_symmetrical_template(red_pixels: Set[Tuple[int, int]], min_r: int, min_c: int, max_r: int, max_c: int) -> List[List[int]]:
     height = max_r - min_r + 1
     width = max_c - min_c + 1
-    template = [[0 for _ in range(width)] for _ in range(height * 2)]
+    template = [[0 for _ in range(width)] for _ in range(height)]
     
     # Create the top half of the template
     for r, c in red_pixels:
@@ -94,12 +95,11 @@ def create_symmetrical_template(red_pixels: Set[Tuple[int, int]], min_r: int, mi
         template[r][c] = 2
     
     # Mirror the top half to create the bottom half
-    for r in range(height):
-        template[height * 2 - 1 - r] = template[r].copy()
+    mirrored_template = template[:] + template[::-1]
     
-    # If the template height is odd, add an extra row in the middle
+    # If the original height is odd, add an extra row in the middle
     if height % 2 == 1:
-        middle_row = [2 if any(template[height-1][c] == 2 or template[height][c] == 2 else 0 for c in range(width)]
-        template.insert(height, middle_row)
+        middle_row = [2 if template[height-1][c] == 2 or template[0][c] == 2 else 0 for c in range(width)]
+        mirrored_template.insert(height, middle_row)
     
-    return template
+    return mirrored_template
