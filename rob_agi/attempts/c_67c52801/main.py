@@ -82,13 +82,14 @@ def place_group(output_grid: ColoredGrid, group: List[Tuple[int, int, int]]):
                 return
 
 def can_place_group(grid: ColoredGrid, group: List[Tuple[int, int, int]], start_row: int, start_col: int, height: int, width: int) -> bool:
-    if start_row + height > grid.num_rows - 1 or start_col + width > grid.num_cols:
+    rows, cols = grid.get_dimensions()
+    if start_row + height > rows - 1 or start_col + width > cols:
         return False
     
-    for r in range(start_row, start_row + height):
-        for c in range(start_col, start_col + width):
-            if grid.values[r][c] != 0:
-                return False
+    for r, c, _ in group:
+        rel_r, rel_c = r - min(r for r, _, _ in group), c - min(c for _, c, _ in group)
+        if grid.values[start_row + rel_r][start_col + rel_c] != 0:
+            return False
     
     return True
 
