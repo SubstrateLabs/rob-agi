@@ -11,6 +11,7 @@ def solve_c074846d(input_grid: ColoredGrid) -> ColoredGrid:
     4. For a single red square, the new red square is placed in the first available
        position rotating clockwise from the original position.
     5. Ensures all transformations stay within the grid boundaries.
+    6. The new red line always starts from the gray square and extends outward.
     """
     rows, cols = input_grid.get_dimensions()
     new_grid = input_grid.deep_copy()
@@ -28,11 +29,11 @@ def solve_c074846d(input_grid: ColoredGrid) -> ColoredGrid:
     # Determine orientation and new red square positions
     if len(red_line) > 1:
         if red_line[0][0] == red_line[1][0]:  # Horizontal
-            new_red_squares = [(gray_pos[0], gray_pos[1] + i + 1) for i in range(len(red_line))]
+            new_red_squares = [(gray_pos[0] - i, gray_pos[1]) for i in range(1, len(red_line) + 1)]
         else:  # Vertical
-            new_red_squares = [(gray_pos[0] - i - 1, gray_pos[1]) for i in range(len(red_line))]
+            new_red_squares = [(gray_pos[0], gray_pos[1] - i) for i in range(1, len(red_line) + 1)]
     else:  # Single red square
-        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]  # Right, Down, Left, Up
+        directions = [(0, -1), (-1, 0), (0, 1), (1, 0)]  # Left, Up, Right, Down
         original_dir = (red_line[0][0] - gray_pos[0], red_line[0][1] - gray_pos[1])
         start_index = directions.index(original_dir)
         for i in range(4):
