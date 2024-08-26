@@ -13,7 +13,8 @@ def solve_f4081712(input_grid: ColoredGrid) -> ColoredGrid:
     2. Identify key colors based on frequency and significance in forming patterns.
     3. Determine color relationships and transitions.
     4. Generate an output grid that reflects these relationships and the essence of the input pattern.
-    5. Refine the output to balance color distribution and capture diagonal patterns if present.
+    5. Refine the output to balance color distribution and capture important structures.
+    6. Ensure the output maintains the key characteristics of the input, including edge patterns.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -25,7 +26,7 @@ def solve_f4081712(input_grid: ColoredGrid) -> ColoredGrid:
     key_colors = identify_key_colors(grid_analysis)
     color_relationships = determine_color_relationships(grid_analysis, key_colors)
     output_size = determine_output_size(grid_analysis)
-    output_values = generate_output_grid(key_colors, color_relationships, output_size)
+    output_values = generate_output_grid(key_colors, color_relationships, output_size, grid_analysis)
     output_values = refine_output(output_values, grid_analysis)
     return ColoredGrid(values=output_values)
 
@@ -37,7 +38,8 @@ def analyze_grid(grid: ColoredGrid) -> Dict:
         'full_freq': Counter(cell for row in grid.values for cell in row),
         'central_freq': Counter(cell for row in central_area for cell in row),
         'transitions': Counter(),
-        'diagonals': Counter()
+        'diagonals': Counter(),
+        'edge_colors': set(grid.values[0] + grid.values[-1] + [row[0] for row in grid.values] + [row[-1] for row in grid.values])
     }
     
     for i in range(rows):
@@ -52,31 +54,32 @@ def analyze_grid(grid: ColoredGrid) -> Dict:
     return analysis
 
 def identify_key_colors(analysis: Dict) -> List[int]:
-    combined_freq = analysis['full_freq'] + analysis['central_freq']
-    return [color for color, _ in combined_freq.most_common(6)]
+    combined_freq = analysis['central_freq'] + Counter({color: count // 2 for color, count in analysis['full_freq'].items()})
+    return [color for color, _ in combined_freq.most_common(8)]
 
 def determine_color_relationships(analysis: Dict, key_colors: List[int]) -> List[Tuple[int, int]]:
     relationships = analysis['transitions'] + analysis['diagonals']
-    return [pair for pair, _ in relationships.most_common(10) if pair[0] in key_colors and pair[1] in key_colors]
+    return [pair for pair, _ in relationships.most_common(15) if pair[0] in key_colors and pair[1] in key_colors]
 
 def determine_output_size(analysis: Dict) -> Tuple[int, int]:
     unique_colors = len(analysis['central_freq'])
-    size = max(3, min(8, unique_colors + 2))
+    size = max(5, min(10, unique_colors + 3))
     return (size, size)
 
-def generate_output_grid(key_colors: List[int], color_relationships: List[Tuple[int, int]], output_size: Tuple[int, int]) -> List[List[int]]:
+def generate_output_grid(key_colors: List[int], color_relationships: List[Tuple[int, int]], output_size: Tuple[int, int], analysis: Dict) -> List[List[int]]:
     rows, cols = output_size
     output = [[key_colors[0]] * cols for _ in range(rows)]
     
-    # Place second most common color
+    # Place edge colors
+    edge_colors = list(analysis['edge_colors'])
     for i in range(rows):
-        output[i][0] = output[i][-1] = key_colors[1]
+        output[i][0] = output[i][-1] = random.choice(edge_colors)
     for j in range(cols):
-        output[0][j] = output[-1][j] = key_colors[1]
+        output[0][j] = output[-1][j] = random.choice(edge_colors)
     
     # Place other colors based on relationships
     for color1, color2 in color_relationships:
-        for _ in range(2):  # Try to place each relationship twice
+        for _ in range(3):  # Try to place each relationship three times
             i, j = random.randint(1, rows-2), random.randint(1, cols-2)
             if output[i][j] == key_colors[0]:
                 output[i][j] = color1
@@ -95,24 +98,25 @@ def refine_output(output: List[List[int]], analysis: Dict) -> List[List[int]]:
     # Ensure all key colors are present
     for color in target_freq:
         if color not in current_freq:
-            i, j = random.randint(0, rows-1), random.randint(0, cols-1)
+            i, j = random.randint(1, rows-2), random.randint(1, cols-2)
             output[i][j] = color
             current_freq[color] += 1
     
     # Adjust frequencies
     total_cells = rows * cols
     for color, count in target_freq.items():
-        target = int((count / sum(target_freq.values())) * total_cells)
+        target = max(1, int((count / sum(target_freq.values())) * total_cells * 0.8))
         while current_freq[color] < target:
-            i, j = random.randint(0, rows-1), random.randint(0, cols-1)
+            i, j = random.randint(1, rows-2), random.randint(1, cols-2)
             if output[i][j] != color and current_freq[output[i][j]] > 1:
                 current_freq[output[i][j]] -= 1
                 output[i][j] = color
                 current_freq[color] += 1
     
     # Add diagonal patterns if present in input
-    if any(count > len(analysis['transitions']) / 10 for count in analysis['diagonals'].values()):
+    if any(count > len(analysis['transitions']) / 8 for count in analysis['diagonals'].values()):
         for i in range(min(rows, cols) - 1):
-            output[i][i] = output[i+1][i+1]
+            if random.random() < 0.7:  # 70% chance to create diagonal
+                output[i][i] = output[i+1][i+1]
     
     return output
