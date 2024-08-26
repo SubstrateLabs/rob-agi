@@ -5,7 +5,7 @@ def solve_c658a4bd(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid into a square output grid with nested color frames.
     
     The solution analyzes the input grid to identify distinct colored regions,
-    determines the order of colors from outside to inside based on their position,
+    determines the order of colors from outside to inside based on their position and size,
     and creates a new grid with concentric frames of these colors.
     
     The output grid size is determined by the number of distinct colors,
@@ -24,15 +24,18 @@ def solve_c658a4bd(input_grid: ColoredGrid) -> ColoredGrid:
                 max_y = max(r for r, _ in region)
                 regions.append({
                     'color': color,
-                    'bounding_box': (min_x, min_y, max_x, max_y)
+                    'bounding_box': (min_x, min_y, max_x, max_y),
+                    'size': len(region)
                 })
         return regions
 
     def order_colors(regions, grid_size):
-        def distance_from_edge(bbox):
-            return min(bbox[0], bbox[1], grid_size - bbox[2] - 1, grid_size - bbox[3] - 1)
+        def priority(region):
+            bbox = region['bounding_box']
+            distance_from_edge = min(bbox[0], bbox[1], grid_size - bbox[2] - 1, grid_size - bbox[3] - 1)
+            return (-distance_from_edge, -region['size'], bbox[0], bbox[1])
         
-        sorted_regions = sorted(regions, key=lambda r: (-distance_from_edge(r['bounding_box']), r['bounding_box'][:2]))
+        sorted_regions = sorted(regions, key=priority)
         return [r['color'] for r in sorted_regions]
 
     def create_output_grid(ordered_colors):
