@@ -10,7 +10,7 @@ def solve_94133066(input_grid: ColoredGrid) -> ColoredGrid:
        b) 9x9 (minimum size requirement)
     3. Fills the new grid with blue (1) as a starting point.
     4. Copies the pattern from the input grid to the center of the new grid.
-    5. Preserves the count of all colors (except black and blue) from the input grid.
+    5. Preserves the count of all colors (except black) from the input grid, including isolated colors.
     6. Ensures the outermost layer is entirely blue.
 
     Returns a new ColoredGrid object representing the transformed pattern with a blue border.
@@ -43,8 +43,8 @@ def solve_94133066(input_grid: ColoredGrid) -> ColoredGrid:
             if input_grid.values[r][c] != 0:
                 output_grid.values[r - min_row + pad_top][c - min_col + pad_left] = input_grid.values[r][c]
     
-    # Count colors in input grid
-    color_count = {i: input_grid.count_color(i) for i in range(10) if i != 0 and i != 1}
+    # Count colors in input grid (including blue)
+    color_count = {i: input_grid.count_color(i) for i in range(10) if i != 0}
     
     # Ensure color preservation
     for color, count in color_count.items():
