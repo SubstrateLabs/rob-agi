@@ -9,7 +9,7 @@ def solve_17cae0c1(input_grid: ColoredGrid) -> ColoredGrid:
     (or rightmost in case of a tie) is assigned a color based on its position:
     - If leftmost, it becomes magenta (6)
     - If in the middle, it becomes green (3)
-    - If rightmost, it becomes either blue (1) or green (3) depending on whether it's tied with the middle section
+    - If rightmost, it becomes blue (1)
     
     For the remaining two sections:
     - If to the left of the highest rank, assign brown (9) to the higher rank and yellow (4) to the lower rank
@@ -34,19 +34,16 @@ def solve_17cae0c1(input_grid: ColoredGrid) -> ColoredGrid:
     
     if highest_rank_index == 0:
         colors[0] = 6  # Magenta for leftmost
-        colors[1] = 3  # Green for middle
-        colors[2] = 1  # Blue for rightmost
+        colors[1] = 9  # Brown for middle
+        colors[2] = 4  # Yellow for rightmost
     elif highest_rank_index == 1:
         colors[0] = 9  # Brown for left of highest
         colors[1] = 3  # Green for middle highest
-        colors[2] = 1  # Blue for right of highest
+        colors[2] = 4  # Yellow for right of highest
     else:  # highest_rank_index == 2
         colors[0] = 9  # Brown for leftmost
-        colors[1] = 4  # Yellow for middle
-        if ranked_sections[0][1] == ranked_sections[1][1]:  # Check if tied with middle
-            colors[2] = 1  # Blue for rightmost if tied
-        else:
-            colors[2] = 3  # Green for rightmost if not tied
+        colors[1] = 1  # Blue for middle
+        colors[2] = 4  # Yellow for rightmost
 
     # Step 5: Create the output grid
     output_values = []
