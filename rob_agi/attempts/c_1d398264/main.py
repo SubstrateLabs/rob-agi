@@ -32,12 +32,10 @@ def solve_1d398264(input_grid: ColoredGrid) -> ColoredGrid:
             if (r, c) not in original_cells:
                 grid[r][c] = color
 
-    def expand_vertical(r: int, c: int, color: int) -> None:
-        for nr in range(r + 1, rows):
-            if (nr, c) not in original_cells:
-                grid[nr][c] = color
-            else:
-                break
+    def expand_vertical(r: int, c: int, dr: int, color: int) -> None:
+        while is_valid(r + dr, c) and grid[r + dr][c] == 0:
+            r += dr
+            grid[r][c] = color
 
     def expand_color(r: int, c: int, color: int) -> None:
         if color == 1:  # Blue
@@ -47,9 +45,8 @@ def solve_1d398264(input_grid: ColoredGrid) -> ColoredGrid:
             left = min(i for i in range(cols) if grid[r][i] == color)
             right = max(i for i in range(cols) if grid[r][i] == color)
             for col in [left, right]:
-                for row in range(rows):
-                    if (row, col) not in original_cells:
-                        grid[row][col] = color
+                expand_vertical(r, col, -1, color)
+                expand_vertical(r, col, 1, color)
         elif color == 3:  # Green
             expand_diagonal(r, c, -1, -1, color)
             expand_diagonal(r, c, 1, 1, color)
@@ -60,11 +57,11 @@ def solve_1d398264(input_grid: ColoredGrid) -> ColoredGrid:
         elif color == 7:  # Orange
             expand_diagonal(r, c, 1, 1, color)
         elif color == 8:  # Sky Blue
-            expand_vertical(r, c, color)
-            if r == rows - 1 or any(grid[r+1][i] == color for i in range(cols)):
-                for i in range(cols):
-                    if (rows-1, i) not in original_cells:
-                        grid[rows-1][i] = color
+            expand_vertical(r, c, 1, color)
+            bottom_row = max(r for r in range(rows) if color in grid[r])
+            for c in range(cols):
+                if (bottom_row, c) not in original_cells:
+                    grid[bottom_row][c] = color
 
     for r, c in sorted(original_cells):
         expand_color(r, c, grid[r][c])
