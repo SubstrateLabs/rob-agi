@@ -1,5 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Set, Optional
+from typing import List, Tuple, Set, Dict
 from collections import deque
 
 def solve_e681b708(input_grid: ColoredGrid) -> ColoredGrid:
@@ -7,10 +7,12 @@ def solve_e681b708(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid based on the following rules:
     1. Identifies the main structure (largest connected component of blue cells).
     2. Finds endpoints of the structure and their colors.
-    3. Creates a distance map from these endpoints.
-    4. Propagates colors from endpoints to scattered blue dots based on distance.
-    5. Merges adjacent transformed dots of the same color.
-    6. Maintains the integrity of the main structure and original colored endpoints.
+    3. Divides the grid into regions based on the main structure.
+    4. Assigns colors to regions in a specific order: red (2), green (3), sky blue (8).
+    5. Transforms scattered blue dots to the color of their region.
+    6. Merges adjacent transformed dots of the same color.
+    7. Handles special cases where endpoint colors influence nearby areas.
+    8. Maintains the integrity of the main structure and original colored endpoints.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -18,19 +20,16 @@ def solve_e681b708(input_grid: ColoredGrid) -> ColoredGrid:
     Returns:
     ColoredGrid: The transformed grid.
     """
-    rows, cols = input_grid.get_dimensions()
     main_structure = find_main_structure(input_grid)
     endpoints = find_endpoints(input_grid, main_structure)
-    reachability_map = create_reachability_map(input_grid, main_structure, endpoints)
+    regions = divide_into_regions(input_grid, main_structure)
+    region_colors = assign_colors_to_regions(regions, endpoints)
     
     output_grid = input_grid.deep_copy()
-    for r in range(rows):
-        for c in range(cols):
-            if input_grid.values[r][c] == 1 and (r, c) not in main_structure:
-                if reachability_map[r][c] is not None:
-                    output_grid.values[r][c] = reachability_map[r][c]
-    
+    transform_scattered_dots(output_grid, main_structure, region_colors)
+    handle_special_cases(output_grid, endpoints, main_structure)
     merge_adjacent_dots(output_grid, main_structure)
+    
     return output_grid
 
 def find_main_structure(grid: ColoredGrid) -> Set[Tuple[int, int]]:
@@ -68,48 +67,55 @@ def find_endpoints(grid: ColoredGrid, structure: Set[Tuple[int, int]]) -> List[T
             endpoints.append((r, c, grid.values[r][c]))
     return endpoints
 
-def create_distance_map(grid: ColoredGrid, structure: Set[Tuple[int, int]], endpoints: List[Tuple[int, int, int]]) -> List[List[List[Tuple[int, int]]]]:
+def divide_into_regions(grid: ColoredGrid, structure: Set[Tuple[int, int]]) -> Dict[int, Set[Tuple[int, int]]]:
     rows, cols = grid.get_dimensions()
-    distance_map = [[[] for _ in range(cols)] for _ in range(rows)]
+    regions = {}
+    region_id = 0
+    visited = set(structure)
     
-    for idx, (r, c, color) in enumerate(endpoints):
-        queue = deque([(r, c, 0)])
-        visited = set()
-        while queue:
-            cr, cc, dist = queue.popleft()
-            if (cr, cc) in visited or (cr, cc) in structure:
-                continue
-            visited.add((cr, cc))
-            distance_map[cr][cc].append((dist, idx))
-            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                nr, nc = cr + dr, cc + dc
-                if 0 <= nr < rows and 0 <= nc < cols and (nr, nc) not in structure:
-                    queue.append((nr, nc, dist + 1))
-    
-    return distance_map
-
-def propagate_colors(grid: ColoredGrid, structure: Set[Tuple[int, int]], distance_map: List[List[List[Tuple[int, int]]]], endpoints: List[Tuple[int, int, int]]) -> ColoredGrid:
-    rows, cols = grid.get_dimensions()
-    new_grid = grid.deep_copy()
+    def flood_fill(r: int, c: int, region: Set[Tuple[int, int]]):
+        if (r, c) in visited:
+            return
+        visited.add((r, c))
+        region.add((r, c))
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols and (nr, nc) not in structure:
+                flood_fill(nr, nc, region)
     
     for r in range(rows):
         for c in range(cols):
-            if (r, c) not in structure and grid.values[r][c] == 1:
-                if distance_map[r][c]:
-                    min_dist = min(dist for dist, _ in distance_map[r][c])
-                    closest_endpoints = [idx for dist, idx in distance_map[r][c] if dist == min_dist]
-                    if len(closest_endpoints) == 1:
-                        new_grid.values[r][c] = endpoints[closest_endpoints[0]][2]
-                    else:
-                        # Priority system: prefer non-blue colors, then lower color values
-                        colors = [endpoints[idx][2] for idx in closest_endpoints]
-                        non_blue_colors = [color for color in colors if color != 1]
-                        if non_blue_colors:
-                            new_grid.values[r][c] = min(non_blue_colors)
-                        else:
-                            new_grid.values[r][c] = min(colors)
+            if (r, c) not in visited:
+                new_region = set()
+                flood_fill(r, c, new_region)
+                regions[region_id] = new_region
+                region_id += 1
     
-    return new_grid
+    return regions
+
+def assign_colors_to_regions(regions: Dict[int, Set[Tuple[int, int]]], endpoints: List[Tuple[int, int, int]]) -> Dict[int, int]:
+    colors = [2, 3, 8]  # red, green, sky blue
+    region_colors = {}
+    for i, region_id in enumerate(regions.keys()):
+        region_colors[region_id] = colors[i % len(colors)]
+    return region_colors
+
+def transform_scattered_dots(grid: ColoredGrid, structure: Set[Tuple[int, int]], region_colors: Dict[int, int]):
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        for c in range(cols):
+            if grid.values[r][c] == 1 and (r, c) not in structure:
+                region_id = next(rid for rid, region in region_colors.items() if (r, c) in region)
+                grid.values[r][c] = region_colors[region_id]
+
+def handle_special_cases(grid: ColoredGrid, endpoints: List[Tuple[int, int, int]], structure: Set[Tuple[int, int]]):
+    rows, cols = grid.get_dimensions()
+    for er, ec, color in endpoints:
+        if color != 1:
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                nr, nc = er + dr, ec + dc
+                if 0 <= nr < rows and 0 <= nc < cols and (nr, nc) not in structure:
+                    grid.values[nr][nc] = color
 
 def merge_adjacent_dots(grid: ColoredGrid, structure: Set[Tuple[int, int]]):
     rows, cols = grid.get_dimensions()
@@ -128,11 +134,3 @@ def merge_adjacent_dots(grid: ColoredGrid, structure: Set[Tuple[int, int]]):
         for c in range(cols):
             if (r, c) not in visited and (r, c) not in structure and grid.values[r][c] != 1:
                 dfs_merge(r, c, grid.values[r][c])
-
-def solve_e681b708(input_grid: ColoredGrid) -> ColoredGrid:
-    main_structure = find_main_structure(input_grid)
-    endpoints = find_endpoints(input_grid, main_structure)
-    distance_map = create_distance_map(input_grid, main_structure, endpoints)
-    transformed_grid = propagate_colors(input_grid, main_structure, distance_map, endpoints)
-    merge_adjacent_dots(transformed_grid, main_structure)
-    return transformed_grid
