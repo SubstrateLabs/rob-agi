@@ -1,77 +1,51 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple
 
+from typing import List, Tuple, Set
+
 def solve_4ff4c9da(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by expanding and balancing sky blue (8) formations.
+    Transforms the input grid by mirroring sky blue (8) formations across both horizontal and vertical axes.
     
-    The function identifies existing sky blue formations, expands them where possible,
-    and adds new formations to create symmetry and balance across the grid. It respects
-    the existing pattern of vertical stripes and horizontal lines while making these changes.
+    The function identifies existing sky blue formations and creates exact mirrors of these formations
+    while preserving the underlying stripe pattern of the grid. It only replaces black (0) or blue (1) cells
+    when creating new formations, ensuring that the existing pattern is maintained.
     
     Steps:
     1. Identify all sky blue formations
-    2. Expand existing formations, preferably to 3x3 squares
-    3. Add new formations to create symmetry
-    4. Fine-tune the arrangement to achieve overall balance
+    2. Calculate mirror positions for each formation
+    3. Create mirrored formations where possible
+    4. Preserve the existing stripe pattern
     
     Returns a new ColoredGrid with the transformed pattern.
     """
     grid = input_grid.deep_copy()
     sky_blue_formations = find_sky_blue_formations(grid)
+    center_r, center_c = grid.get_dimensions()[0] // 2, grid.get_dimensions()[1] // 2
     
-    # Expand existing formations
     for formation in sky_blue_formations:
-        expand_formation(grid, formation)
-    
-    # Add new formations for symmetry
-    add_symmetric_formations(grid)
-    
-    # Fine-tune for balance
-    balance_formations(grid)
+        mirror_formation(grid, formation, center_r, center_c)
     
     return grid
 
-def find_sky_blue_formations(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
-    return grid.find_connected_regions(8)
+def find_sky_blue_formations(grid: ColoredGrid) -> List[Set[Tuple[int, int]]]:
+    return [set(formation) for formation in grid.find_connected_regions(8)]
 
-def expand_formation(grid: ColoredGrid, formation: List[Tuple[int, int]]):
+def mirror_formation(grid: ColoredGrid, formation: Set[Tuple[int, int]], center_r: int, center_c: int):
     rows, cols = grid.get_dimensions()
-    min_r = min(r for r, _ in formation)
-    max_r = max(r for r, _ in formation)
-    min_c = min(c for _, c in formation)
-    max_c = max(c for _, c in formation)
     
-    # Try to expand to a 3x3 square if possible
-    for r in range(max(0, min_r - 1), min(rows, max_r + 2)):
-        for c in range(max(0, min_c - 1), min(cols, max_c + 2)):
-            if grid.get_cell(r, c) in [0, 1]:  # Only expand into black or blue cells
-                grid.set_cell(r, c, 8)
-
-def add_symmetric_formations(grid: ColoredGrid):
-    rows, cols = grid.get_dimensions()
-    center_r, center_c = rows // 2, cols // 2
-    
-    # Check for potential symmetric positions
-    for r in range(rows):
-        for c in range(cols):
-            if grid.get_cell(r, c) == 8:
-                symmetric_r = 2 * center_r - r
-                symmetric_c = 2 * center_c - c
-                if 0 <= symmetric_r < rows and 0 <= symmetric_c < cols:
-                    if grid.get_cell(symmetric_r, symmetric_c) in [0, 1]:
-                        grid.set_cell(symmetric_r, symmetric_c, 8)
-
-def balance_formations(grid: ColoredGrid):
-    rows, cols = grid.get_dimensions()
-    for r in range(rows):
-        for c in range(cols):
-            if grid.get_cell(r, c) == 8:
-                # Ensure formations don't break vertical stripe pattern
-                if c > 0 and c < cols - 1:
-                    if grid.get_cell(r, c-1) == grid.get_cell(r, c+1) == 2:
-                        grid.set_cell(r, c, 2)
-                # Ensure formations don't break horizontal line pattern
-                if r > 0 and r < rows - 1:
-                    if grid.get_cell(r-1, c) == grid.get_cell(r+1, c) == 1:
-                        grid.set_cell(r, c, 1)
+    for r, c in formation:
+        # Mirror horizontally
+        mirror_h = (r, 2 * center_c - c)
+        if 0 <= mirror_h[1] < cols and grid.get_cell(*mirror_h) in [0, 1]:
+            grid.set_cell(*mirror_h, 8)
+        
+        # Mirror vertically
+        mirror_v = (2 * center_r - r, c)
+        if 0 <= mirror_v[0] < rows and grid.get_cell(*mirror_v) in [0, 1]:
+            grid.set_cell(*mirror_v, 8)
+        
+        # Mirror diagonally
+        mirror_d = (2 * center_r - r, 2 * center_c - c)
+        if 0 <= mirror_d[0] < rows and 0 <= mirror_d[1] < cols and grid.get_cell(*mirror_d) in [0, 1]:
+            grid.set_cell(*mirror_d, 8)
