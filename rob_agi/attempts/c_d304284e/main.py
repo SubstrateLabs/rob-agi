@@ -5,27 +5,27 @@ def solve_d304284e(input_grid: ColoredGrid) -> ColoredGrid:
     Solve the d304284e challenge by identifying the original pattern in the input grid,
     then replicating it across the grid. The replication alternates between the original color
     and magenta (6), with black (0) cells separating each repetition both horizontally and vertically.
-    The pattern starts from the top-left corner of the grid, and the original input is preserved.
-    Partial patterns are added at the right and bottom edges if there's remaining space.
+    The pattern starts from its original position, and subsequent repetitions are placed at fixed intervals.
+    The original input is preserved, and partial patterns are added at the right and bottom edges if there's remaining space.
     """
-    pattern, original_color = find_pattern(input_grid)
+    pattern, original_color, start_row, start_col = find_pattern(input_grid)
     if not pattern:
         return input_grid
 
-    new_grid = create_replicated_grid(input_grid, pattern, original_color)
+    new_grid = create_replicated_grid(input_grid, pattern, original_color, start_row, start_col)
     preserve_original_input(input_grid, new_grid)
 
     return ColoredGrid(values=new_grid)
 
 def find_pattern(grid: ColoredGrid):
-    """Find the first non-zero pattern in the grid."""
+    """Find the first non-zero pattern in the grid and return it along with its position."""
     for r in range(grid.num_rows):
         for c in range(grid.num_cols):
             if grid.values[r][c] != 0:
                 color = grid.values[r][c]
                 pattern = extract_pattern(grid, r, c, color)
-                return pattern, color
-    return None, 0
+                return pattern, color, r, c
+    return None, 0, 0, 0
 
 def extract_pattern(grid, start_row, start_col, color):
     pattern = []
@@ -40,14 +40,17 @@ def extract_pattern(grid, start_row, start_col, color):
         c = start_col
     return pattern
 
-def create_replicated_grid(grid: ColoredGrid, pattern, original_color):
+def create_replicated_grid(grid: ColoredGrid, pattern, original_color, start_row, start_col):
     new_grid = [[0 for _ in range(grid.num_cols)] for _ in range(grid.num_rows)]
     pattern_height, pattern_width = len(pattern), len(pattern[0])
+    horizontal_spacing = 8  # Fixed horizontal spacing between pattern starts
 
-    for r in range(0, grid.num_rows, pattern_height + 1):
-        for c in range(0, grid.num_cols, pattern_width + 1):
-            color = original_color if ((r // (pattern_height + 1)) + (c // (pattern_width + 1))) % 2 == 0 else 6
+    for r in range(start_row, grid.num_rows, pattern_height + 1):
+        col_index = 0
+        for c in range(start_col, grid.num_cols, horizontal_spacing):
+            color = original_color if col_index % 2 == 0 else 6
             stamp_pattern(new_grid, pattern, r, c, color)
+            col_index += 1
 
     return new_grid
 
