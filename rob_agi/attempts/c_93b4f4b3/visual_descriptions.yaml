@@ -1,27 +1,17 @@
 example_0:
   input: |
-    A 10x12 grid with a prominent blue (1) 'E' shape on the left side, spanning the full height of the grid. The 'E' shape is 6 columns wide. To the right of the 'E', there are three distinct colored regions:
-    1. A small 2x2 red (2) square in the top-right corner of the remaining space.
-    2. A green (3) region shaped like an inverted 'L' in the middle-right area.
-    3. A magenta (6) region shaped like a regular 'L' in the bottom-right area.
-    The rest of the grid is filled with black (0), creating empty space around these colored regions.
+    The input grid is 12x10. It contains a blue (1) frame on the left side, taking up 6 columns. This frame has a rectangular shape with some gaps in the middle. Inside this blue frame, there are three smaller colored rectangles: a red (2) 2x2 square in the top-right, a green (3) 4x2 rectangle in the middle-right, and a magenta (6) 4x2 rectangle in the bottom-right. The rest of the grid is filled with black (0), which can be considered as empty space.
   output: |
-    A 10x6 grid that appears to be a compressed version of the input. The blue (1) 'E' shape remains intact on the left side. The colored regions from the right side of the input have been moved and rearranged:
-    1. The red (2) 2x2 square is now at the bottom, just inside the right arm of the 'E'.
-    2. The green (3) inverted 'L' shape is now in the upper-right corner, fitting inside the top right of the 'E'.
-    3. The magenta (6) 'L' shape is now in the middle-right, also fitting inside the 'E'.
-    The overall effect is that all colored regions are now contained within the blue 'E' shape, with no black (empty) spaces remaining.
+    The output grid is 6x10. It's essentially a compressed version of the input, removing all the black (empty) space. The blue frame remains intact, now taking up the entire width of the grid. The colored rectangles from the input are now positioned inside the blue frame: the green (3) rectangle is at the top, the magenta (6) rectangle is in the middle, and the red (2) square is at the bottom. Each colored shape is surrounded by the blue frame.
 
 example_1:
   input: |
-    A 13x12 grid dominated by a gray (5) shape that resembles a stylized letter 'B' or perhaps a boot. This shape spans the full height of the grid and is 6 columns wide. Inside the 'loops' or 'cavities' of this gray shape, there are three distinct colored regions:
-    1. A blue (1) right triangle in the bottom-right corner.
-    2. A red (2) inverted 'L' shape in the middle-right area.
-    3. A green (3) shape in the top-right that looks like a sideways 'T' or a small cross.
-    The rest of the grid to the right of the gray shape is filled with black (0), creating empty space around these colored regions.
+    The input grid is 12x13. It features a gray (5) frame on the left side, occupying 6 columns. This frame has a more complex shape with various indentations and protrusions. Inside this gray frame, there are three colored shapes: a blue (1) inverted L-shape in the bottom-right, a red (2) triangle-like shape in the middle-right, and a green (3) rectangle in the top-right. The rest of the grid is black (0), representing empty space.
   output: |
-    A 13x6 grid that is a compressed and rearranged version of the input. The gray (5) 'B' or 'boot' shape remains intact on the left side. The colored regions from the right side of the input have been moved and rearranged:
-    1. The blue (1) right triangle is now at the bottom, fitting inside the lower 'cavity' of the gray shape.
-    2. The red (2) inverted 'L' shape is now in the middle, also fitting inside the lower 'cavity' of the gray shape.
-    3. The green (3) 'T' or cross shape is now at the top, fitting inside the upper 'cavity' of the gray shape.
-    All colored regions are now contained within the gray 'B' or 'boot' shape, with no black (empty) spaces remaining.
+    The output grid is 6x13. Like the previous example, it's a compressed version of the input with all black space removed. The gray frame remains intact and now spans the entire width. The colored shapes from the input are repositioned inside the gray frame: the green (3) rectangle is at the bottom, the red (2) triangle-like shape is in the middle, and the blue (1) inverted L-shape is at the top. Each colored shape is surrounded by the gray frame, maintaining its original form but in a new position.
+
+test_case_0:
+  input: |
+    There is no separate test case input provided in the given test file. The two examples (example_0 and example_1) serve as both examples and test cases.
+  output: |
+    As there is no separate test case input, there is no corresponding output to describe.

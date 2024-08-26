@@ -1,46 +1,23 @@
 example_0:
   input: |
-    A 10x10 grid with mostly black (empty) spaces. There are scattered colored squares:
-    - A blue square in the bottom left corner
-    - A red square in the top left corner
-    - A green square in the middle of the right edge
-    - Three yellow squares: one in the middle left, one in the middle right, and one near the bottom right
-    - Two more blue squares: one in the middle right and one in the bottom right corner
-    - Two more red squares: one in the middle and one near the bottom right
+    A 10x10 grid with scattered colored squares. The top-left corner is empty (black). There's a yellow (4) square in the top-right area. A red (2) square is in the bottom-left corner. Blue (1) squares are scattered, including one in the bottom-right corner. There are green (3) squares in the middle-right and bottom-right areas. The colored squares seem randomly distributed with no clear pattern.
   output: |
-    A 10x10 grid with a distinct pattern in the left side:
-    - A vertical blue line along the left edge, from top to bottom
-    - A vertical red line next to the blue line, starting from the third row and going to the bottom
-    - A vertical green line next to the red line, starting from the eighth row and going to the bottom
-    - A vertical yellow line next to the green line, starting from the fourth row and going to the bottom
-    The right side of the grid is entirely black (empty)
+    A 10x10 grid with a distinct pattern. The left side shows a vertical stack of colored squares, forming a kind of "bar chart" or "histogram". From left to right, there are columns of blue (1), red (2), green (3), and yellow (4). Each column starts from the bottom and extends upwards, with blue being the tallest (reaching the top), then red, green, and yellow in descending order. The right half of the grid is entirely black (empty).
 
 example_1:
   input: |
-    A 10x10 grid with scattered colored squares:
-    - Several green squares: two in the top right, one in the top left, one in the middle left, and one near the bottom right
-    - Several blue squares: one near the top left, one in the middle left, one near the bottom, and one in the bottom right corner
-    - Several red squares: two in the middle, one near the bottom left
-    - Several yellow squares: one in the top right, two in the middle right, and one near the bottom left
+    Another 10x10 grid with scattered colored squares. There's a cluster of green (3) squares in the top-right corner. Blue (1), red (2), and yellow (4) squares are distributed throughout the grid. There's a concentration of colored squares in the bottom-right quadrant. The top-left quadrant is mostly empty (black).
   output: |
-    A 10x10 grid with a distinct pattern in the left side:
-    - A vertical blue line along the left edge, from the third row to the bottom
-    - A vertical red line next to the blue line, starting from the fifth row and going to the bottom
-    - A vertical green line next to the red line, starting from the top and going to the bottom
-    - A vertical yellow line next to the green line, starting from the fifth row and going to the bottom
-    The right side of the grid is entirely black (empty)
+    A 10x10 grid with a similar "bar chart" pattern as in example_0. The left side shows vertical stacks of colored squares. From left to right: blue (1), red (2), green (3), and yellow (4). The blue column is the tallest, reaching the top, followed by red, green, and yellow in descending order. The right half of the grid is entirely black (empty). The green column starts slightly higher than in the previous example.
 
 example_2:
   input: |
-    A 10x10 grid with scattered colored squares:
-    - Three green squares: one in the middle left, one in the middle right, and one near the top right
-    - Two blue squares: one near the top left and one in the middle
-    - Two red squares: one near the bottom left and one in the middle right
-    - Four yellow squares: one in the top right, one in the middle left, one in the middle right, and one near the bottom right
+    A 10x10 grid with fewer colored squares compared to the previous examples. The colored squares are more evenly distributed across the grid. There's a yellow (4) square in the top-left corner. Green (3), blue (1), and red (2) squares are scattered throughout. The bottom-right quadrant has slightly more colored squares than the others.
   output: |
-    A 10x10 grid with a distinct pattern in the bottom left:
-    - A vertical blue line along the left edge, starting from the eighth row and going to the bottom
-    - A vertical red line next to the blue line, starting from the seventh row and going to the bottom
-    - A vertical green line next to the red line, starting from the seventh row and going to the bottom
-    - A vertical yellow line next to the green line, starting from the fifth row and going to the bottom
-    The top half and right side of the grid are entirely black (empty)
+    A 10x10 grid with the same "bar chart" pattern as in the previous examples, but shorter. The left side shows vertical stacks of colored squares. From left to right: blue (1), red (2), green (3), and yellow (4). The yellow column is the shortest, only occupying the bottom two rows. The other columns increase in height, with blue being the tallest but only reaching halfway up the grid. The entire top half and right half of the grid are black (empty).
+
+test_case_0:
+  input: |
+    A 10x10 grid with scattered colored squares. There's a concentration of colored squares in the top-left quadrant, including yellow (4), green (3), and blue (1). Red (2) squares are mostly in the bottom half. The bottom-right corner is empty (black). Overall, the distribution seems random with no clear pattern.
+  output: |
+    The output is not provided for the test case.

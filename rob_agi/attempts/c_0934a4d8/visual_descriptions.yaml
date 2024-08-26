@@ -1,29 +1,29 @@
 example_0:
   input: |
-    A 30x30 grid with a complex pattern. The dominant colors are blue (1), brown (9), and orange (7). There's a noticeable diagonal pattern from top-left to bottom-right, with alternating stripes of colors. The top-left corner starts with green (3), and the bottom-right corner ends with blue (1). There are scattered patches of magenta (6) and yellow (4) throughout. The pattern seems to have a repetitive nature but with some variations.
+    A 30x30 grid with a complex pattern. The dominant colors are blue (1), brown (9), and green (3). There's a distinct blue L-shape in the top-left corner. The center of the grid has a mix of colors, including magenta (6), orange (7), and yellow (4). The bottom-right corner has a pattern of alternating blue and brown squares. There are several isolated green squares scattered throughout.
   output: |
-    A much smaller 4x4 grid. The colors are green (3), blue (1), brown (9), and yellow (4). The top-left corner is green (3), and the bottom-right corner is yellow (4). The pattern is simpler and appears to be a condensed version of some elements from the input grid.
+    A smaller 4x4 grid. The top-left corner is green (3). The top-right and bottom-left corners are blue (1). The bottom-right corner is brown (9). This appears to be a simplified representation of the larger input grid, capturing key color positions.
 
 example_1:
   input: |
-    Another 30x30 grid with a different complex pattern. This grid has more variety in colors, including all colors from 1 to 9. There's a noticeable symmetry along the diagonal from top-left to bottom-right. The center of the grid (rows 15-16, columns 15-16) has a distinct pattern of alternating 2's and 7's. The corners of the grid have similar patterns: top-left and bottom-right corners have a 3-1-4 sequence, while top-right and bottom-left corners have a 9-9-3 sequence.
+    Another 30x30 grid with a different complex pattern. The dominant colors are green (3), blue (1), and yellow (4). There's a distinct pattern of sky blue (8) squares forming a large square in the bottom-right quadrant. The center has a mix of colors, including red (2) and gray (5). The top-left quadrant has a pattern of alternating green and blue squares.
   output: |
-    A 5x4 grid with a simpler pattern. The colors are green (3), blue (1), yellow (4), and red (2). The top row is [3,1,4,4,4] and the bottom row is [4,3,5,2,3]. There's a vertical symmetry in the middle column.
+    A 5x4 grid. The top row alternates between green (3) and yellow (4). The second row has blue (1) on the edges with yellow (4) in the center. The third row is mostly gray (5) with blue on the left edge. The bottom row is blue on the edges with sky blue (8) in the center. This seems to capture key color patterns from different regions of the input grid.
 
 example_2:
   input: |
-    A 30x30 grid with another complex pattern. This grid has a distinct central region (rows 9-22, columns 9-22) that stands out with more yellow (4) and gray (5) colors. The outer region has more brown (9), blue (1), and orange (7). There's a noticeable diagonal symmetry, with the top-right quadrant mirroring the bottom-left quadrant, and the top-left quadrant mirroring the bottom-right quadrant.
+    A 30x30 grid with yet another complex pattern. The dominant colors are green (3), blue (1), and brown (9). There's a distinct pattern of gray (5) squares forming a large square in the center. The corners have patterns of alternating colors, with green and blue in the top-left, brown and magenta (6) in the top-right, yellow (4) and orange (7) in the bottom-left, and blue and brown in the bottom-right.
   output: |
-    A 9x4 grid with a simpler pattern. The dominant colors are brown (9), orange (7), magenta (6), and yellow (4). The left column alternates between 9 and 6, while the right column alternates between 4 and 1. The middle two columns have a more varied pattern.
+    A 9x4 grid. The left column alternates between brown (9) and blue (1). The second column is mostly green (6) with some variation. The third column is mostly brown (9) with some variation. The right column alternates between yellow (4) and blue (1). This grid seems to capture color patterns from different regions of the input, particularly the corners and edges.
 
 example_3:
   input: |
-    A 30x30 grid with a complex pattern that has clear symmetry. The grid is divided into four quadrants, each 15x15. The top-left and bottom-right quadrants are identical, as are the top-right and bottom-left quadrants. Each quadrant has a distinct pattern, with the dominant colors being orange (7), magenta (6), and brown (9). There's a noticeable 8x8 sky blue (8) square in the center-right of the grid (rows 9-16, columns 23-30).
+    A 30x30 grid with a complex pattern. The dominant colors are orange (7), magenta (6), and brown (9). There's a distinct pattern of sky blue (8) squares forming a rectangle in the center-right area. The corners have patterns of alternating colors, with orange and magenta in most corners. The center has a mix of colors, including yellow (4) and green (3).
   output: |
-    A much smaller 3x7 grid. The pattern is simpler but still colorful. The top row is [3,7,4,4,4,4,7], the middle row is [6,7,7,9,9,7,7], and the bottom row is [7,6,9,7,7,9,6]. There's a symmetry between the left and right halves of the grid.
+    A 3x7 grid. The top row alternates between green (3) and orange (7), ending with yellow (4). The middle row is mostly magenta (6) with orange (7) on the edges. The bottom row is similar to the top but with brown (9) instead of green. This grid seems to capture key color patterns from different regions of the input, particularly the corners and center.
 
 test_case_0:
   input: |
-    A 30x30 grid with a complex pattern. The dominant colors are green (3), blue (1), and brown (9). There's a noticeable diagonal pattern from top-left to bottom-right, with alternating stripes of colors. The corners have distinct patterns: top-left is green (3), top-right is orange (7), bottom-left is blue (1), and bottom-right is brown (9). There are scattered patches of magenta (6) and yellow (4) throughout. The center of the grid (rows 14-17, columns 14-17) has a distinct pattern of alternating 5's and 2's.
+    A 30x30 grid with a complex pattern. The dominant colors are blue (1), brown (9), and red (2). There's a distinct pattern of sky blue (8) squares forming an L-shape in the bottom-right corner. The center has a mix of colors, including yellow (4) and gray (5). The top-left quadrant has a pattern of alternating blue and brown squares. There are several isolated red squares scattered throughout.
   output: |
     The output grid is not provided for the test case.

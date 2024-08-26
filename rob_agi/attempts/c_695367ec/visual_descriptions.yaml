@@ -1,35 +1,17 @@
 example_0:
   input: |
-    A 3x3 grid entirely filled with green (3) squares. This forms a solid green square with no variation or pattern within it.
+    A 3x3 grid entirely filled with green (3) squares. This forms a solid green square.
   output: |
-    A 15x15 grid with a symmetrical pattern. The grid is divided into a 3x3 arrangement of 5x5 squares. 
-    Separating lines: Thick green (3) lines, 3 squares wide, form a cross that divides the grid into 9 equal sections.
-    Within each 5x5 section: The entire area is filled with green (3), creating solid green squares.
-    Overall effect: A green cross with thick arms, separating 9 solid green squares. No black (0) squares are visible in this pattern.
+    A 15x15 grid with a pattern of green (3) lines forming a grid structure. The grid has three horizontal and three vertical green lines, evenly spaced. The spaces between the lines are filled with black (0) squares. This creates a 3x3 grid of larger black squares, each surrounded by green lines.
 
 example_1:
   input: |
-    A 2x2 grid entirely filled with sky blue (8) squares. This forms a small, solid sky blue square.
+    A 2x2 grid entirely filled with sky blue (8) squares. This forms a small solid sky blue square.
   output: |
-    A 15x15 grid with a repeating pattern. The grid is divided into a 3x3 arrangement of 5x5 squares.
-    Separating lines: Thin sky blue (8) lines, 1 square wide, form a cross that divides the grid into 9 equal sections.
-    Within each 5x5 section: A 2x2 sky blue square is centered, surrounded by black (0) squares.
-    Overall effect: A grid-like pattern of sky blue squares on a black background. The thin blue lines create a lattice structure, with larger blue squares at intersections and in the center of each section.
+    A 15x15 grid with a pattern of sky blue (8) lines forming a grid structure. The grid has five horizontal and five vertical sky blue lines, evenly spaced. The spaces between the lines are filled with black (0) squares. This creates a 5x5 grid of larger black squares, each surrounded by sky blue lines.
 
 example_2:
   input: |
-    A 4x4 grid entirely filled with red (2) squares. This forms a solid red square with no variation or pattern within it.
+    A 4x4 grid entirely filled with red (2) squares. This forms a solid red square.
   output: |
-    A 15x15 grid with a sparse, structured pattern. The grid is divided into a 3x3 arrangement of 5x5 squares.
-    Separating lines: Thin red (2) lines, 1 square wide, form a cross that divides the grid into 9 equal sections.
-    Within each 5x5 section: A single red (2) square is placed in the center, surrounded by black (0) squares.
-    Overall effect: A grid-like pattern of small red squares on a black background. The thin red lines create a lattice structure, with single red squares at the center of each section.
-
-test_case_0:
-  input: |
-    A 4x4 grid entirely filled with red (2) squares. This is identical to the input of example_2, forming a solid red square with no variation or pattern within it.
-  output: |
-    Expected 15x15 grid pattern (based on the observed transformation rule):
-    - 3x3 arrangement of 5x5 squares, separated by thin red (2) lines (1 square wide).
-    - Within each 5x5 section: A single red (2) square in the center, surrounded by black (0) squares.
-    - Overall effect: Sparse grid-like pattern of small red squares on a black background, identical to example_2's output.
+    A 15x15 grid with a pattern of red (2) lines forming a grid structure. The grid has three horizontal and three vertical red lines, evenly spaced. The spaces between the lines are filled with black (0) squares. This creates a 3x3 grid of larger black squares, each surrounded by red lines.

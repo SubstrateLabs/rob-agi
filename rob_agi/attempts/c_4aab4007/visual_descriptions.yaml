@@ -1,75 +1,23 @@
 example_0:
   input: |
-    Grid size: 28x28
-    Border: Top two rows and leftmost two columns are blue (1)
-    Frame: Single-cell wide yellow (4) border inside the blue border
-    Pattern type: Clockwise spiral
-    Colors used: 1-7 (excluding blue border and yellow frame)
-    Black regions: Multiple black (0) cells scattered throughout the spiral
-    Pattern start: Near top-left corner of the inner area
-    Notable: The spiral pattern is interrupted by black regions but maintains its sequence when resumed
-
+    The grid is 28x28. The top two rows and leftmost two columns are solid blue (1). The rest of the grid is primarily yellow (4), with a complex pattern inside. There's a 7x7 black (0) square in the center. Surrounding this square and in various other areas, there are spiraling patterns of colors 1-7 in sequence. These spirals appear to be interrupted or incomplete in some areas, particularly near the edges and corners of the yellow region.
   output: |
-    Grid size: Unchanged (28x28)
-    Border and frame: Preserved (blue border and yellow frame)
-    Pattern type: Complete clockwise spiral
-    Colors used: 1-7 (same as input, excluding blue border and yellow frame)
-    Black regions: All filled in, continuing the spiral pattern
-    Pattern consistency: Maintains the original sequence throughout the grid
+    The grid maintains the same 28x28 size and blue border. The yellow background remains, but the pattern inside has changed. The black square in the center is gone. The spiraling color pattern (1-7) now fills the entire yellow region without interruption, creating a continuous, complete spiral from the top-left of the yellow area to the bottom-right.
 
 example_1:
   input: |
-    Grid size: 28x28
-    Border: Top two rows and leftmost two columns are blue (1)
-    Frame: Single-cell wide yellow (4) border inside the blue border
-    Pattern type: Horizontal stripes
-    Colors used: 1-7 (excluding blue border and yellow frame)
-    Black regions: Multiple black (0) cells interrupting the striped pattern
-    Pattern start: Top-left corner of the inner area
-    Notable: Each row follows the same color sequence, interrupted by black cells
-
+    The grid is 28x28. As before, the top two rows and leftmost two columns are solid blue (1). The rest is yellow (4) background. There's a spiral pattern of colors 1, 3, 5, 7 repeating throughout the yellow area. This spiral is interrupted by several black (0) regions: a large L-shape on the right side, a smaller reversed L-shape on the left side, and a few scattered black squares in the center and top-left of the yellow region.
   output: |
-    Grid size: Unchanged (28x28)
-    Border and frame: Preserved (blue border and yellow frame)
-    Pattern type: Complete horizontal stripes
-    Colors used: 1-7 (same as input, excluding blue border and yellow frame)
-    Black regions: All filled in, continuing the horizontal striped pattern
-    Pattern consistency: Each row maintains the same color sequence without interruptions
+    The grid size and blue border remain the same. The yellow background is still present. The spiral pattern of colors 1, 3, 5, 7 now fills the entire yellow region without any interruptions. All black areas have been replaced with the continuing spiral pattern, creating a complete and unbroken spiral from the top-left to the bottom-right of the yellow area.
 
 example_2:
   input: |
-    Grid size: 28x28
-    Border: Top two rows and leftmost two columns are blue (1)
-    Frame: Single-cell wide yellow (4) border inside the blue border
-    Pattern type: Clockwise spiral
-    Colors used: 1-9 (excluding blue border and yellow frame)
-    Black regions: Multiple black (0) cells scattered throughout the spiral
-    Pattern start: Near top-left corner of the inner area
-    Notable: Uses more colors than previous examples, creating a more complex spiral pattern
-
+    The grid is 28x28 with the familiar blue (1) border. The yellow (4) background contains a more complex spiral pattern using colors 1-9 in sequence. This pattern is disrupted by several black (0) regions: a large inverted L-shape on the left side, smaller black areas in the top-right and bottom-left, and scattered black squares in various locations. The spiral seems to start from the top-left of the yellow region but becomes disjointed due to the black areas.
   output: |
-    Grid size: Unchanged (28x28)
-    Border and frame: Preserved (blue border and yellow frame)
-    Pattern type: Complete clockwise spiral
-    Colors used: 1-9 (same as input, excluding blue border and yellow frame)
-    Black regions: All filled in, continuing the spiral pattern
-    Pattern consistency: Maintains the original sequence throughout the grid, including the expanded color range
+    The grid size and blue border are unchanged. The yellow background remains. The spiral pattern of colors 1-9 now fills the entire yellow region without any interruptions. All black areas have been replaced with the continuing spiral pattern, creating a complete and unbroken spiral from the top-left to the bottom-right of the yellow area. The sequence of colors 1-9 repeats consistently throughout the spiral.
 
 test_case_0:
   input: |
-    Grid size: 28x28
-    Border: Top two rows and leftmost two columns are blue (1)
-    Frame: Single-cell wide yellow (4) border inside the blue border
-    Pattern type: Likely clockwise spiral (based on previous examples)
-    Colors used: 1-9 (excluding blue border and yellow frame)
-    Black regions: Multiple black (0) cells with unique distribution
-    Pattern start: To be determined from the grid
-    Notable: Different pattern and hole distribution compared to previous examples
-
+    The grid is 28x28 with the usual blue (1) border. The yellow (4) background contains a spiral pattern using colors 1-9 in sequence. This pattern is heavily disrupted by numerous black (0) regions scattered throughout the grid. There are large black areas in the center, top-right, bottom-left, and various other locations. The spiral pattern is visible in fragments between the black regions, starting from the top-left of the yellow area but becoming increasingly disjointed.
   output: |
-    Expected transformation (based on previous examples):
-    - Grid size should remain 28x28
-    - Blue border and yellow frame should be preserved
-    - Black regions should be filled to complete the clockwise spiral pattern
-    - Color sequence (1-9) should be maintained consistently throughout the grid
-    - The unique distribution of initial black cells may result in a different final pattern compared to previous examples, but the underlying spiral structure should be preserved
+    The expected output is not provided for the test case.

@@ -1,29 +1,29 @@
 example_0:
   input: |
-    An L-shaped blue object is present in the top-left corner of the grid. It consists of a vertical line of 4 blue squares with a horizontal extension of 3 squares at the top. There's a single green square (3) in the middle-right area of the grid, and a single sky blue square (8) in the bottom-left corner. The rest of the grid is filled with black (0), which can be considered empty space.
+    A blue L-shaped object is present in the top-left corner of the grid. It consists of a vertical line of 4 blue squares with a horizontal line of 3 blue squares attached at the top. There's a single green square (3) isolated in the middle-right area of the grid. A single sky blue square (8) is located at the bottom-left corner of the grid. The rest of the grid is filled with black (0), representing empty space.
   output: |
-    The original L-shaped blue object remains in the top-left corner. A new, rotated and mirrored version of this blue shape appears around the green square, with the green square at its core. Similarly, another rotated version of the blue shape appears around the sky blue square in the bottom-left, with the sky blue square at its core. These new shapes maintain the color of their respective core squares (green and sky blue).
+    The original blue L-shaped object remains in the top-left corner. A new, rotated green L-shaped object appears, mirroring the blue one but rotated 90 degrees clockwise. It's positioned so that its corner aligns with the original isolated green square. A new sky blue L-shaped object appears at the bottom-left, extending from the original single sky blue square. This new object is a mirror image of the original blue L-shape, flipped horizontally. The rest of the grid remains black (empty).
 
 example_1:
   input: |
-    A blue object resembling an irregular 'T' shape is present in the middle-left area of the grid. It consists of a horizontal line of 4 blue squares with a vertical extension of 3 squares above it, slightly off-center to the left. There's a single magenta square (6) near the top-right corner of the grid. The rest of the grid is filled with black (0), representing empty space.
+    A blue shape resembling an irregular 'T' or 'anchor' is present in the middle-left area of the grid. It consists of a horizontal line of 4 blue squares with a vertical line of 3 blue squares attached below the second square from the left. There's a single magenta square (6) isolated near the right edge of the grid, slightly above the middle. The rest of the grid is filled with black (0), representing empty space.
   output: |
-    The original blue 'T' shape remains unchanged. A new, rotated and slightly modified version of this blue shape appears around the magenta square, with the magenta square at its core. This new shape maintains the magenta color of its core square and extends towards the right and bottom edges of the grid.
+    The original blue 'T' or 'anchor' shape remains unchanged. A new magenta shape, identical to the blue one but rotated 90 degrees counterclockwise, appears on the right side of the grid. Its position is such that the end of its longer arm aligns with the original isolated magenta square. The rest of the grid remains black (empty).
 
 example_2:
   input: |
-    A blue object resembling a cross or plus sign is present in the top-left quadrant of the grid. It has a central vertical line of 5 blue squares with a horizontal line of 5 squares intersecting it at the middle. There's an additional blue square above the intersection point. A single red square (2) is located near the bottom-middle of the grid. The rest of the grid is filled with black (0), representing empty space.
+    A blue shape resembling a 'Y' or a tree is present in the top-left quadrant of the grid. It consists of a vertical line of 3 blue squares with two diagonal arms extending upwards and outwards from the top, each arm being 2 squares long. There's a single red square (2) isolated near the middle-bottom of the grid. The rest of the grid is filled with black (0), representing empty space.
   output: |
-    The original blue cross shape remains unchanged in the top-left quadrant. A new, rotated version of this blue shape appears around the red square, with the red square at its core. This new shape maintains the red color of its core square and is rotated 180 degrees compared to the original blue shape. It extends towards the bottom and left edges of the grid.
+    The original blue 'Y' or tree shape remains unchanged in the top-left quadrant. A new red shape, identical to the blue one but rotated 180 degrees (upside down), appears in the bottom half of the grid. Its position is such that the tip of its 'trunk' aligns with the original isolated red square. The rest of the grid remains black (empty).
 
 example_3:
   input: |
-    A blue object resembling an irregular 'U' shape is present in the top-left quadrant of the grid. It consists of two vertical lines of 3 blue squares connected by a horizontal line of 2 squares at the top. There's a single red square (2) near the top-right corner and a single sky blue square (8) in the middle-left area of the grid. The rest of the grid is filled with black (0), representing empty space.
+    A blue shape resembling an irregular 'U' or horseshoe is present in the top-left quadrant of the grid. It consists of two vertical lines of 3 blue squares each, connected by a horizontal line of 2 blue squares at the top. There's a single red square (2) isolated near the top-right corner of the grid. A single sky blue square (8) is located in the left-middle area of the grid. The rest of the grid is filled with black (0), representing empty space.
   output: |
-    The original blue 'U' shape remains unchanged in the top-left quadrant. A new, rotated and mirrored version of this blue shape appears around the red square, with the red square at its core. This new shape maintains the red color and extends towards the right edge of the grid. Another rotated version of the blue shape appears around the sky blue square, with the sky blue square at its core. This shape maintains the sky blue color and extends towards the bottom-left corner of the grid.
+    The original blue 'U' or horseshoe shape remains unchanged in the top-left quadrant. A new red shape, identical to the blue one but rotated 90 degrees clockwise, appears in the top-right quadrant. Its position is such that its open end aligns with the original isolated red square. A new sky blue shape, identical to the original blue shape but rotated 90 degrees counterclockwise, appears in the left-middle area of the grid. Its position is such that its top-right corner aligns with the original isolated sky blue square. The rest of the grid remains black (empty).
 
 test_case_0:
   input: |
-    The grid contains a blue object in the top-left quadrant. It resembles a sideways 'L' shape or a hockey stick. The shape consists of a horizontal line of 4 blue squares with a vertical extension of 2 squares at the right end. There's a single green square (3) near the middle-right of the grid, and a single sky blue square (8) in the bottom-left corner. The rest of the grid is filled with black (0), representing empty space.
+    The input grid for the test case is not provided in the given code snippet.
   output: |
-    The output grid is not provided for the test case.
+    The expected output grid for the test case is not provided in the given code snippet.

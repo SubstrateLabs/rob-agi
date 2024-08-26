@@ -1,23 +1,23 @@
 example_0:
   input: |
-    The grid contains three distinct shapes: a red (2) inverted L-shape in the top-left, a green (3) rectangular shape on the right side, and a blue (1) irregular shape in the bottom-center. The red shape has two sky-colored (8) dots inside it. The blue shape has three gray (5) dots inside it. The rest of the grid is filled with black (0), which can be considered as empty space.
+    The grid contains three distinct shapes: a red (2) inverted L-shape in the top-left, a green (3) rectangular shape on the right side, and a blue (1) irregular shape in the bottom-center. The red shape has two sky-colored (8) dots inside it. The green shape has one sky-colored dot. The blue shape has three gray (5) dots inside it. The shapes are surrounded by black (0) space.
   output: |
-    The overall structure of the shapes remains the same, but the interior of each shape has been filled. The red (2) inverted L-shape is now filled entirely with sky color (8). The green (3) rectangular shape remains unchanged. The blue (1) irregular shape is now completely filled with gray (5). The black (0) empty space surrounding the shapes remains unchanged.
+    The three shapes remain in their positions, but their interiors have been filled. The red inverted L-shape is now filled with sky color (8). The green rectangular shape remains unchanged. The blue irregular shape is now filled with gray (5). The overall structure and outlines of the shapes are preserved, but their internal spaces are completely filled with a single color.
 
 example_1:
   input: |
-    The grid contains multiple shapes: a red (2) irregular shape on the left side, a magenta (6) L-shape on the right side, and a yellow (4) irregular shape in the bottom-center. There are several sky-colored (8) and green (3) dots scattered throughout the grid, mostly within or near the shapes. The rest of the grid is filled with black (0) empty space.
+    The grid features four distinct shapes: a red (2) C-shape in the top-left, a magenta (6) shape on the right side, a yellow (4) irregular shape in the bottom-right, and a small green (3) dot in the top-right corner. The red shape contains three sky-colored (8) dots and two green (3) dots. The yellow shape has four sky-colored dots and one green dot. The shapes are surrounded by black (0) space.
   output: |
-    The overall structure of the shapes remains the same, but the interiors have been modified. The red (2) shape is now filled with green (3). The magenta (6) L-shape remains unchanged. The yellow (4) irregular shape is now filled with sky color (8). All previously scattered dots have been incorporated into the filled areas of their respective shapes. The black (0) empty space surrounding the shapes remains unchanged.
+    The shapes maintain their positions and outlines, but their interiors have been filled. The red C-shape is now filled with green (3). The magenta shape on the right side remains unchanged. The yellow irregular shape is now filled with sky color (8). The small green dot in the top-right corner has disappeared. The overall structure of the shapes is preserved, but their internal spaces are completely filled with a single color.
 
 example_2:
   input: |
-    The grid shows a large green (3) shape resembling a distorted figure-8 or hourglass. Within this shape are several sky-colored (8) and magenta (6) dots. The rest of the grid is filled with black (0) empty space.
+    The grid shows a large green (3) shape that resembles a distorted figure-8 or hourglass. Inside this shape are several sky-colored (8) and magenta (6) dots, as well as two red (2) dots. The shape is surrounded by black (0) space.
   output: |
-    The overall green (3) shape remains unchanged. However, the entire interior of the shape, including where the dots were previously, is now filled with magenta (6). The black (0) empty space surrounding the shape remains unchanged.
+    The green hourglass shape maintains its outline, but its interior is now completely filled with magenta (6). The original sky-colored, magenta, and red dots inside the shape have disappeared. The black space surrounding the shape remains unchanged.
 
 test_case_0:
   input: |
-    The grid contains three distinct shapes: a red (2) inverted L-shape in the top-left, a green (3) rectangular shape on the right side, and a blue (1) irregular shape in the bottom-center. The red shape has two sky-colored (8) dots inside it. The blue shape has three gray (5) dots inside it. The rest of the grid is filled with black (0), which can be considered as empty space.
+    The grid is the same as in example_0.
   output: |
-    The output grid is not provided for the test case.
+    The grid is the same as the output of example_0.

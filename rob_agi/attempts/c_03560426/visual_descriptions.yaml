@@ -1,68 +1,17 @@
 example_0:
   input: |
-    A 10x10 grid with mostly black (empty) space. In the bottom-right quadrant, there are four distinct shapes:
-    1. A blue L-shaped object (color 1) in the bottom-left, 3x3 in size (3 cells wide, 2 cells tall, with top-right cell missing).
-    2. A red square (color 2) above the blue L, 2x2 in size.
-    3. A green square (color 3) to the right of the red square, 2x2 in size.
-    4. A yellow vertical line (color 4) on the far right, 4 cells tall.
-    These shapes all touch the bottom edge of the grid and are separated by single columns of black space.
-    The shapes are arranged in order from left to right: blue, red, green, yellow.
+    The input grid is 10x10. The bottom-left corner contains a 3x3 blue (1) L-shaped object. To its right, there's a 2x2 red (2) square. Further right, there's a 2x2 green (3) square. In the rightmost column, there's a vertical yellow (4) line spanning the bottom 4 rows.
   output: |
-    A 10x10 grid where the shapes from the input have been rearranged and compacted towards the top-left corner:
-    1. The blue L-shape (color 1) is now in the top-left corner, maintaining its original orientation.
-    2. The red square (color 2) is placed directly to the right of the blue L, touching its right edge.
-    3. The green square (color 3) is below the red square, aligned with its left edge.
-    4. The yellow line (color 4) is now horizontal, placed below the green square and aligned with its left edge.
-    The shapes are tightly packed with no black space between them, forming a staircase pattern from top-left to bottom-right.
-    The order of the shapes from top to bottom is: blue, red, green, yellow (same as the left-to-right order in the input).
-    The rest of the grid is filled with black (empty) space.
+    The output grid is 10x10. The objects from the input have been rearranged and compacted towards the top-left corner. The blue L-shape is now in the top-left corner. The red square is directly below it, slightly overlapping. The green square is to the right of the red one, also slightly overlapping. The yellow line is now horizontal, positioned to the right of the green square and slightly overlapping it.
 
 example_1:
   input: |
-    A 10x10 grid with shapes concentrated in the bottom half:
-    1. A large sky blue square (color 8) in the bottom-left corner, 4x4 in size.
-    2. An orange square (color 7) to the right of the sky blue square, 2x2 in size.
-    3. A red rectangle (color 2) on the bottom-right corner, 3x2 in size (3 cells wide, 2 cells tall).
-    These shapes all touch the bottom edge of the grid and are separated by single columns of black space.
-    The shapes are arranged in order from left to right: sky blue, orange, red.
+    The input grid is 10x10. The bottom-left corner contains a 4x4 sky blue (8) square. To its right, there's a 2x2 orange (7) square. In the bottom-right corner, there's a 3x2 red (2) rectangle.
   output: |
-    A 10x10 grid where the shapes have been rearranged and moved towards the top-left corner:
-    1. The sky blue square (color 8) is now in the top-left corner, maintaining its 4x4 size.
-    2. The orange square (color 7) is placed directly below the bottom-right corner of the sky blue square.
-    3. The red rectangle (color 2) is positioned to the right of the orange square, maintaining its 3x2 size and orientation.
-    The shapes are compactly arranged with no black space between them, forming an L-like shape.
-    The order of the shapes from left to right and top to bottom is preserved: sky blue, orange, red.
-    The rest of the grid is filled with black (empty) space.
+    The output grid is 10x10. The objects have been rearranged and compacted towards the top-left corner. The sky blue square is now in the top-left corner. The orange square is positioned to its right and slightly below, partially overlapping. The red rectangle is placed to the right of the orange square, also slightly overlapping.
 
 example_2:
   input: |
-    A 10x10 grid with shapes concentrated on the bottom and right edges:
-    1. A yellow rectangle (color 4) in the bottom-left corner, 2x4 in size (2 cells tall, 4 cells wide).
-    2. A red vertical line (color 2) in the middle-right, 5 cells tall, touching the bottom edge.
-    3. A green square (color 3) in the bottom-right corner, 3x3 in size.
-    These shapes are separated by single columns or rows of black space.
-    The shapes are arranged in order from left to right: yellow, red, green.
+    The input grid is 10x10. There's a vertical red (2) line in the middle, spanning from row 5 to the bottom. In the bottom-left corner, there's a 4x2 yellow (4) rectangle. In the bottom-right corner, there's a 3x3 green (3) square.
   output: |
-    A 10x10 grid where the shapes have been rearranged and compacted towards the top-left corner:
-    1. The yellow rectangle (color 4) is now in the top-left corner, rotated to be 4x2 in size (4 cells tall, 2 cells wide).
-    2. The red vertical line (color 2) is placed directly to the right of the yellow rectangle, maintaining its 5-cell height and touching the top edge.
-    3. The green square (color 3) is positioned below the red line, aligned with its left edge and maintaining its 3x3 size.
-    The shapes are tightly packed with no black space between them, forming a rough L-shape.
-    The order of the shapes from left to right is preserved: yellow, red, green.
-    The rest of the grid is filled with black (empty) space.
-
-test_case_0:
-  input: |
-    A 10x10 grid with shapes concentrated in the bottom half:
-    1. A sky blue square (color 8) in the bottom-left corner, 3x3 in size.
-    2. A red square (color 2) to the right of the sky blue square, 2x2 in size.
-    3. A green vertical line (color 3) to the right of the red square, 3 cells tall.
-    4. A yellow L-shape (color 4) in the bottom-right corner, 3x3 in size (3 cells wide, 2 cells tall, with top-right cell missing).
-    These shapes all touch the bottom edge of the grid and are separated by single columns of black space.
-    The shapes are arranged in order from left to right: sky blue, red, green, yellow.
-  output: |
-    The output grid is not provided for this test case. Based on the patterns observed in the examples, we would expect:
-    1. The shapes to be rearranged and compacted towards the top-left corner.
-    2. The original left-to-right order of the shapes to be preserved.
-    3. Shapes to be rotated only if necessary to achieve a more compact arrangement.
-    4. No black space between the shapes in the final arrangement.
+    The output grid is 10x10. The objects have been rearranged and compacted towards the top-left corner. The yellow rectangle is now in the top-left corner. The red vertical line has been rotated to horizontal and placed directly below the yellow rectangle, slightly overlapping. The green square is positioned to the right of the red line, also slightly overlapping.

@@ -1,87 +1,52 @@
 example_0:
   input: |
-    A 22x16 grid with a black (0) background. Key features:
-    1. Leftmost column (column 0): Empty, all black (0).
-    2. Top row (row 1): Four colored squares from left to right:
-       - Red (2) at column 2
-       - Sky blue (8) at column 5
-       - Green (3) at column 8
-       - Sky blue (8) at column 12
-    3. Main shape: A red (2) "T" shape in the middle-left (rows 8-10, columns 1-3):
-       - Horizontal line: 3 squares wide at the top (row 8)
-       - Vertical line: 3 squares tall, centered (column 2)
-    Note: The leftmost column is empty, and the main shape is the largest connected non-zero region.
+    A 22x16 grid mostly filled with black (empty space). There are four colored squares scattered across the second row: a red (2) square, a sky (8) square, a green (3) square, and another sky (8) square. In the lower part of the grid (rows 9-11), there's a distinctive red shape. It looks like a sideways 'T' or a hammer, made up of five red (2) squares.
   output: |
-    The 22x16 grid retains its black (0) background and all original elements. New features:
-    1. The original red (2) "T" shape remains unchanged.
-    2. Three new "T" shapes appear to the right of the original, all identical in size and orientation:
-       - Sky blue (8) "T" shape (rows 8-10, columns 6-8)
-       - Green (3) "T" shape (rows 8-10, columns 11-13)
-       - Sky blue (8) "T" shape (rows 8-10, columns 16-18)
-    3. The new shapes maintain vertical alignment with the original shape.
-    4. The replication order matches the color sequence in the top row.
-    5. Replication stops before reaching the grid's right edge.
+    The grid maintains its 22x16 size and mostly black background. The four colored squares in the second row remain unchanged. The key difference is in the lower part of the grid. The original red 'T' shape has been replicated four times across the grid, maintaining its original position and adding three new identical shapes to its right. These new shapes are in sky (8), green (3), and sky (8) colors, corresponding to the colors of the scattered squares in the second row. The replicated shapes are evenly spaced with one column of black space between them.
 
 example_1:
   input: |
-    A 17x23 grid with a black (0) background. Key features:
-    1. Leftmost column (column 0): Four colored squares from top to bottom:
-       - Red (2) at row 1
-       - Yellow (4) at row 3
-       - Yellow (4) at row 6
-       - Green (3) at row 11
-    2. Main shape: A red (2) plus sign in the top-right quadrant (rows 2-4, columns 9-11):
-       - Horizontal line: 3 squares wide at the center (row 3)
-       - Vertical line: 3 squares tall, centered (column 10)
-    Note: The main shape is the largest connected non-zero region.
+    A 17x23 grid, mostly black. There are several scattered colored squares:
+    - A red (2) square in the second row, first column
+    - A yellow (4) square in the fourth row, first column
+    - Another yellow (4) square in the seventh row, first column
+    - A green (3) square in the twelfth row, first column
+    In the upper right quadrant, there's a small red shape that looks like an upside-down 'L' or a small chair. It's made of five red (2) squares.
   output: |
-    The 17x23 grid retains its black (0) background and all original elements. New features:
-    1. The original red (2) plus sign remains unchanged.
-    2. Three new plus signs appear below the original, all identical in size and shape:
-       - Yellow (4) plus sign (rows 6-8, columns 9-11)
-       - Yellow (4) plus sign (rows 11-13, columns 9-11)
-       - Green (3) plus sign (rows 19-21, columns 9-11)
-    3. The new shapes maintain horizontal alignment with the original shape.
-    4. The replication order and colors match the sequence in the leftmost column.
-    5. Replication stops before reaching the grid's bottom edge.
+    The grid maintains its 17x23 size and mostly black background. The scattered colored squares in the first column remain unchanged. The key difference is the replication of the red 'L' shape:
+    - The original red shape remains in its position.
+    - A yellow version of the shape appears below it, aligned with the first yellow square.
+    - Another yellow version appears even lower, aligned with the second yellow square.
+    - A green version appears at the bottom, aligned with the green square.
+    All replicated shapes maintain the same orientation and size as the original, and are vertically aligned with their corresponding color squares in the first column.
 
 example_2:
   input: |
-    A 14x23 grid with a black (0) background. Key features:
-    1. Leftmost column (column 1): Four colored squares from top to bottom:
-       - Sky blue (8) at row 10
-       - Green (3) at row 15
-       - Green (3) at row 18
-       - Red (2) at row 21
-    2. Main shape: A red (2) inverted "L" in the bottom-right quadrant (rows 18-20, columns 7-9):
-       - Horizontal line: 3 squares wide at the bottom (row 20)
-       - Vertical line: 3 squares tall, right-aligned (column 9)
-    Note: The main shape is the largest connected non-zero region, and column 0 is empty.
+    A 14x23 grid, mostly black. There are several scattered colored squares:
+    - A sky (8) square in the 11th row, third column
+    - A green (3) square in the 16th row, third column
+    - Another green (3) square in the 19th row, third column
+    - A red (2) square in the 22nd row, third column
+    In the lower right quadrant, there's a red shape that looks like a backwards 'C' or a partial square. It's made of seven red (2) squares, occupying a 3x3 area with the middle-right square missing.
   output: |
-    The 14x23 grid retains its black (0) background and all original elements. New features:
-    1. The original red (2) inverted "L" shape remains unchanged.
-    2. Three new inverted "L" shapes appear above the original, all identical in size and orientation:
-       - Sky blue (8) inverted "L" (rows 1-3, columns 7-9)
-       - Green (3) inverted "L" (rows 8-10, columns 7-9)
-       - Green (3) inverted "L" (rows 13-15, columns 7-9)
-    3. The new shapes maintain vertical alignment with the original shape.
-    4. The replication order and colors match the sequence in the leftmost non-empty column (column 1).
-    5. Replication stops before reaching the grid's top edge.
+    The grid maintains its 14x23 size and mostly black background. The scattered colored squares in the third column remain unchanged. The key difference is the replication of the red 'C' shape:
+    - A sky (8) version of the shape appears at the top of the grid, aligned with the sky square.
+    - The original red shape remains in its position.
+    - Two green versions of the shape appear, aligned with the two green squares.
+    All replicated shapes maintain the same orientation and size as the original, and are vertically aligned with their corresponding color squares in the third column.
 
 test_case_0:
   input: |
-    A 14x23 grid with a black (0) background. Key features:
-    1. Leftmost column (column 1): Four colored squares from top to bottom:
-       - Sky blue (8) at row 10
-       - Green (3) at row 15
-       - Green (3) at row 18
-       - Red (2) at row 21
-    2. Main shape: A red (2) inverted "L" in the bottom-right quadrant (rows 18-20, columns 7-9):
-       - Horizontal line: 3 squares wide at the bottom (row 20)
-       - Vertical line: 3 squares tall, right-aligned (column 9)
-    Note: The main shape is the largest connected non-zero region, and column 0 is empty.
+    A 14x23 grid, mostly black. There are several scattered colored squares:
+    - A sky (8) square in the 11th row, third column
+    - A green (3) square in the 16th row, third column
+    - Another green (3) square in the 19th row, third column
+    - A red (2) square in the 22nd row, third column
+    In the lower right quadrant, there's a red shape that looks like a backwards 'C' or a partial square. It's made of seven red (2) squares, occupying a 3x3 area with the middle-right square missing.
   output: |
-    The output is not provided for the test case. Based on the pattern observed in previous examples, 
-    we would expect the solution to replicate the main shape vertically upwards, using colors from 
-    the leftmost non-empty column, while maintaining horizontal alignment and avoiding overlap with 
-    existing elements or grid boundaries.
+    Based on the pattern observed in the previous examples, we would expect:
+    The grid to maintain its 14x23 size and mostly black background. The scattered colored squares in the third column should remain unchanged. The red 'C' shape should be replicated for each colored square in the third column:
+    - A sky (8) version of the shape should appear at the top of the grid, aligned with the sky square.
+    - Two green versions of the shape should appear, aligned with the two green squares.
+    - The original red shape should remain in its position.
+    All replicated shapes should maintain the same orientation and size as the original, and be vertically aligned with their corresponding color squares in the third column.

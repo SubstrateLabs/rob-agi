@@ -75,7 +75,7 @@ remote_pip_deps = [
     "git+https://github.com/SubstrateLabs/rob-agi.git@673d3e5",
     "numpy",
 ]
-max_tries_per_challenge = 5
+max_tries_per_challenge = 3
 
 all_challenges = list(challenges.values())
 random.shuffle(all_challenges)
@@ -928,7 +928,7 @@ async def main():
     # distill_research()
 
     for i in range(1):
-        await solve_loop(max_concurrent=8)
+        await solve_loop(max_concurrent=20)
     # await solve_loop(max_concurrent=4, max_challenges=8)
 
 

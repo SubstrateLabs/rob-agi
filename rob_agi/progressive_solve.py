@@ -142,7 +142,7 @@ class Solver:
             modify_coder.run(update_prompt)
         return modifications
 
-    def get_visual_descriptions(self, overwrite: bool = True) -> str:
+    def get_visual_descriptions(self, overwrite: bool = False) -> str:
         target_file = self.file_paths["visual_descriptions"]
         if not overwrite and target_file.exists():
             return self.parse_descriptions()
