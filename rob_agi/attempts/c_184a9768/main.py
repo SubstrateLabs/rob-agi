@@ -2,17 +2,21 @@ from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Dict
 from collections import deque
 
+from collections import deque
+from typing import List, Tuple, Dict
+
 def solve_184a9768(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by applying the following steps:
-    1. Identifies the largest contiguous region and expands it to its bounding box
-    2. Places other color regions within the largest region, maintaining their relative positions
+    1. Identifies primary color regions (Blue, Red, Yellow) and expands them
+    2. Places secondary color regions within primary regions, maintaining relative positions
     3. Processes sky blue (8) regions specially, placing them near yellow (4) if possible
     4. Removes isolated cells and gray (5) cells
     5. Fills in surrounded empty cells
-    6. Ensures all cells outside the largest region's bounding box are empty (0)
+    6. Ensures all cells outside the main color regions are empty (0)
     
-    The transformation reorganizes color regions while preserving their general shapes and relationships.
+    The transformation reorganizes color regions while preserving their general shapes and relationships,
+    following a color hierarchy of Blue > Red > Yellow > Others.
     """
     rows, cols = input_grid.get_dimensions()
     output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
@@ -21,6 +25,7 @@ def solve_184a9768(input_grid: ColoredGrid) -> ColoredGrid:
         return [(r+dr, c+dc) for dr, dc in [(-1,0), (1,0), (0,-1), (0,1)]
                 if 0 <= r+dr < rows and 0 <= c+dc < cols]
 
+    def find_connected_regions() -> Dict[int, List[List[Tuple[int, int]]]]:
         regions = {color: [] for color in range(1, 10)}
         visited = set()
         for r in range(rows):
@@ -51,30 +56,35 @@ def solve_184a9768(input_grid: ColoredGrid) -> ColoredGrid:
         for r, c in region:
             grid.values[r][c] = color
 
-    def can_place_region(region: List[Tuple[int, int]], start_r: int, start_c: int, grid: ColoredGrid) -> bool:
-        for r, c in region:
-            new_r, new_c = r - region[0][0] + start_r, c - region[0][1] + start_c
-            if new_r < 0 or new_r >= rows or new_c < 0 or new_c >= cols or grid.values[new_r][new_c] != 0:
-                return False
-        return True
+    def expand_region(region: List[Tuple[int, int]], color: int, grid: ColoredGrid):
+        min_r, min_c, max_r, max_c = get_bounding_box(region)
+        for r in range(min_r, max_r + 1):
+            for c in range(min_c, max_c + 1):
+                grid.values[r][c] = color
 
     def place_region(region: List[Tuple[int, int]], color: int, bbox: Tuple[int, int, int, int], grid: ColoredGrid) -> bool:
         min_r, min_c, max_r, max_c = bbox
-        for start_r in range(min_r, max_r + 1):
-            for start_c in range(min_c, max_c + 1):
-                if can_place_region(region, start_r, start_c, grid):
+        region_bbox = get_bounding_box(region)
+        region_height = region_bbox[2] - region_bbox[0] + 1
+        region_width = region_bbox[3] - region_bbox[1] + 1
+        
+        for start_r in range(min_r, max_r - region_height + 2):
+            for start_c in range(min_c, max_c - region_width + 2):
+                if all(grid.values[start_r + r - region_bbox[0]][start_c + c - region_bbox[1]] == 0 
+                       for r, c in region):
                     for r, c in region:
-                        new_r, new_c = r - region[0][0] + start_r, c - region[0][1] + start_c
-                        grid.values[new_r][new_c] = color
+                        grid.values[start_r + r - region_bbox[0]][start_c + c - region_bbox[1]] = color
                     return True
         return False
 
-    def process_sky_blue(region: List[Tuple[int, int]], bbox: Tuple[int, int, int, int], grid: ColoredGrid):
-        if place_region(region, 8, bbox, grid):
-            for r, c in region:
-                for nr, nc in get_neighbors(r, c):
-                    if grid.values[nr][nc] == 0:
-                        grid.values[nr][nc] = 4
+    def process_sky_blue(regions: List[List[Tuple[int, int]]], bbox: Tuple[int, int, int, int], grid: ColoredGrid):
+        for region in regions:
+            if place_region(region, 8, bbox, grid):
+                min_r, min_c, max_r, max_c = get_bounding_box(region)
+                for r in range(min_r - 1, max_r + 2):
+                    for c in range(min_c - 1, max_c + 2):
+                        if 0 <= r < rows and 0 <= c < cols and grid.values[r][c] == 0:
+                            grid.values[r][c] = 4
 
     def remove_isolated_cells(grid: ColoredGrid):
         for r in range(rows):
@@ -95,6 +105,42 @@ def solve_184a9768(input_grid: ColoredGrid) -> ColoredGrid:
 
     # Find all connected regions
     all_regions = find_connected_regions()
+
+    # Process primary colors
+    primary_colors = [1, 2, 4]  # Blue, Red, Yellow
+    main_bbox = (0, 0, rows - 1, cols - 1)
+    for color in primary_colors:
+        if color in all_regions:
+            largest_region = max(all_regions[color], key=len)
+            expand_region(largest_region, color, output_grid)
+            main_bbox = get_bounding_box(largest_region)
+            break
+
+    # Process secondary colors
+    secondary_colors = [3, 6, 7, 9]  # Green, Magenta, Orange, Brown
+    for color in secondary_colors:
+        if color in all_regions:
+            for region in sorted(all_regions[color], key=len, reverse=True):
+                place_region(region, color, main_bbox, output_grid)
+
+    # Process sky blue specially
+    if 8 in all_regions:
+        process_sky_blue(all_regions[8], main_bbox, output_grid)
+
+    # Remove isolated cells and fill surrounded cells
+    remove_isolated_cells(output_grid)
+    fill_surrounded_cells(output_grid)
+    fill_surrounded_cells(output_grid)  # Second pass for thoroughness
+
+    # Final cleanup
+    for r in range(rows):
+        for c in range(cols):
+            if output_grid.values[r][c] == 5:  # Remove gray cells
+                output_grid.values[r][c] = 0
+            if r < main_bbox[0] or r > main_bbox[2] or c < main_bbox[1] or c > main_bbox[3]:
+                output_grid.values[r][c] = 0  # Ensure cells outside main region are empty
+
+    return output_grid
 
     # Find the largest region of any color
     largest_region = max((region for color_regions in all_regions.values() for region in color_regions), key=len)
