@@ -9,12 +9,11 @@ def solve_12eac192(input_grid: ColoredGrid) -> ColoredGrid:
     continuous, and snake-like, while preserving much of the original grid structure.
 
     1. Identifies blue cells and chooses a starting point near edges or corners.
-    2. Uses a modified BFS to create a green path, prioritizing blue > gray > sky > black cells.
-    3. Favors continuing in the current direction and reaching towards edges and corners.
-    4. Limits path complexity and length to maintain simplicity.
-    5. Connects remaining blue cells if they are close to the main path.
-    6. Ensures the final green path is continuous and orange (7) cells remain unchanged.
-    7. Maintains the overall structure of the original grid.
+    2. Creates a green path connecting blue cells, prioritizing corners and edges.
+    3. Incorporates gray and sky cells when convenient.
+    4. Ensures the path is continuous and simple, avoiding unnecessary complexity.
+    5. Preserves orange (7) cells and maintains the overall structure of the original grid.
+    6. Adapts behavior based on grid size, with more complete coverage for smaller grids.
 
     Args:
         input_grid (ColoredGrid): The input grid to be transformed.
@@ -29,67 +28,56 @@ def solve_12eac192(input_grid: ColoredGrid) -> ColoredGrid:
         return [(r+dr, c+dc) for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)] if is_valid_cell(r+dr, c+dc)]
 
     def get_cell_priority(color: int) -> int:
-        return {1: 3, 5: 2, 8: 1, 0: 0}.get(color, -1)
+        return {1: 4, 5: 3, 8: 2, 0: 1}.get(color, 0)
 
-    def bfs(start: Tuple[int, int]) -> List[Tuple[int, int]]:
-        queue = deque([start])
-        path = []
-        visited = set()
-        current_direction = None
-        complexity = 0
-        max_complexity = min(rows, cols) * 2
+    def create_path(start: Tuple[int, int]) -> List[Tuple[int, int]]:
+        path = [start]
+        visited = set([start])
+        current = start
+        corners = set([(0, 0), (0, cols-1), (rows-1, 0), (rows-1, cols-1)])
 
-        while queue and complexity < max_complexity:
-            r, c = queue.popleft()
-            if (r, c) in visited:
-                continue
-            visited.add((r, c))
-            path.append((r, c))
-
-            neighbors = get_neighbors(r, c)
-            neighbors.sort(key=lambda x: (
-                -get_cell_priority(grid[x[0]][x[1]]),
-                0 if current_direction and (x[0]-r, x[1]-c) == current_direction else 1,
-                -(x[0] in (0, rows-1) or x[1] in (0, cols-1))
-            ))
-
-            for nr, nc in neighbors:
-                if (nr, nc) not in visited and grid[nr][nc] != 7:
-                    queue.append((nr, nc))
-                    if current_direction and (nr-r, nc-c) != current_direction:
-                        complexity += 1
-                    current_direction = (nr-r, nc-c)
-                    break
+        while len(path) < rows * cols // 2 and (corners or blue_cells - visited):
+            neighbors = get_neighbors(*current)
+            next_cell = max(
+                neighbors,
+                key=lambda x: (
+                    x in corners,
+                    x in blue_cells,
+                    get_cell_priority(grid[x[0]][x[1]]),
+                    x not in visited
+                )
+            )
+            if next_cell in visited:
+                break
+            path.append(next_cell)
+            visited.add(next_cell)
+            current = next_cell
+            corners.discard(next_cell)
 
         return path
 
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
+    blue_cells = set((r, c) for r in range(rows) for c in range(cols) if grid[r][c] == 1)
 
-    blue_cells = [(r, c) for r in range(rows) for c in range(cols) if grid[r][c] == 1]
     if not blue_cells:
         return grid
 
-    # Choose starting point
-    start = max(blue_cells, key=lambda x: (x[0] in (0, rows-1) or x[1] in (0, cols-1), 
-                                           sum(1 for nr, nc in get_neighbors(*x) if grid[nr][nc] not in [1, 7])))
+    start = min(blue_cells, key=lambda x: (-(x[0] in (0, rows-1) or x[1] in (0, cols-1)), x[0], x[1]))
+    path = create_path(start)
 
-    # Create main path
-    main_path = bfs(start)
-
-    # Convert main path to green
-    for r, c in main_path:
-        if grid[r][c] in [0, 1, 5, 8]:
+    for r, c in path:
+        if grid[r][c] != 7:  # Preserve orange cells
             grid.set_cell(r, c, 3)
 
-    # Connect remaining blue cells
-    for br, bc in blue_cells:
-        if grid[br][bc] == 1:
-            nearest_green = min((abs(br-r) + abs(bc-c), (r, c)) for r, c in main_path if grid[r][c] == 3)
-            if nearest_green[0] <= 3:
+    # For small grids, ensure all blue cells are connected
+    if rows * cols <= 25:
+        for br, bc in blue_cells:
+            if grid[br][bc] == 1:
+                nearest_green = min((abs(br-r) + abs(bc-c), (r, c)) for r, c in path if grid[r][c] == 3)
                 r, c = nearest_green[1]
                 while (r, c) != (br, bc):
-                    if grid[r][c] in [0, 1, 5, 8]:
+                    if grid[r][c] not in [3, 7]:
                         grid.set_cell(r, c, 3)
                     r += 1 if br > r else -1 if br < r else 0
                     c += 1 if bc > c else -1 if bc < c else 0
