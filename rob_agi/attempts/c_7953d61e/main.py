@@ -16,7 +16,7 @@ def solve_7953d61e(input_grid: ColoredGrid) -> ColoredGrid:
     1. Copy the input to the top-left quadrant
     2. Apply horizontal flip to the top-right quadrant
     3. Apply vertical flip to the bottom-left quadrant
-    4. Apply 90-degree clockwise rotation to the bottom-right quadrant
+    4. Apply 90-degree clockwise rotation followed by a horizontal flip to the bottom-right quadrant
     """
     input_values = input_grid.values
     new_grid = [[0 for _ in range(8)] for _ in range(8)]
@@ -38,10 +38,11 @@ def solve_7953d61e(input_grid: ColoredGrid) -> ColoredGrid:
         for j in range(4):
             new_grid[i+4][j] = flipped[i][j]
 
-    # Bottom-right quadrant (90-degree clockwise rotation)
+    # Bottom-right quadrant (90-degree clockwise rotation + horizontal flip)
     rotated = rotate_90_clockwise(input_values)
+    flipped = horizontal_flip(rotated)
     for i in range(4):
         for j in range(4):
-            new_grid[i+4][j+4] = rotated[i][j]
+            new_grid[i+4][j+4] = flipped[i][j]
 
     return ColoredGrid(values=new_grid)
