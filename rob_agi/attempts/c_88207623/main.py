@@ -12,9 +12,10 @@ def solve_88207623(input_grid: ColoredGrid) -> ColoredGrid:
     4. Expands unique color pixels to form territories around their associated yellow shapes.
     5. Preserves original yellow shapes, red borders, and unique color pixel positions.
     
-    The expansion fills available black space in all directions, stopping at existing colors,
-    other expanded territories, or grid edges. Closer unique color pixels to a yellow shape
-    take precedence in expansion over more distant ones.
+    The expansion fills available black space in all directions (including diagonals),
+    stopping at existing colors, other expanded territories, or grid edges.
+    Closer unique color pixels to a yellow shape take precedence in expansion over more distant ones.
+    Multiple unique colors can be associated with a single yellow shape.
     """
     def find_yellow_shapes_and_borders(grid: ColoredGrid) -> List[Tuple[Set[Tuple[int, int]], Set[Tuple[int, int]]]]:
         shapes = []
@@ -83,10 +84,13 @@ def solve_88207623(input_grid: ColoredGrid) -> ColoredGrid:
             visited.add((r, c))
             expanded.add((r, c))
 
-            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                nr, nc = r + dr, c + dc
-                if 0 <= nr < rows and 0 <= nc < cols:
-                    queue.append((nr, nc))
+            for dr in [-1, 0, 1]:
+                for dc in [-1, 0, 1]:
+                    if dr == 0 and dc == 0:
+                        continue
+                    nr, nc = r + dr, c + dc
+                    if 0 <= nr < rows and 0 <= nc < cols:
+                        queue.append((nr, nc))
 
     # Main solving process
     result_grid = input_grid.deep_copy()
@@ -101,9 +105,11 @@ def solve_88207623(input_grid: ColoredGrid) -> ColoredGrid:
 
     expanded = set()
     for shape_index, pixels in pixel_shape_mapping.items():
+        shape_expanded = set()
         for (r, c, color), _ in pixels:
-            if (r, c) not in expanded:
-                expand_territory(result_grid, (r, c), color, expanded, shape_set)
+            if (r, c) not in expanded and (r, c) not in shape_expanded:
+                expand_territory(result_grid, (r, c), color, shape_expanded, shape_set)
+        expanded.update(shape_expanded)
 
     # Preserve original shapes, borders, and unique color pixels
     for r in range(input_grid.num_rows):
