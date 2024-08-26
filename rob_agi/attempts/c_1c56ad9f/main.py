@@ -15,7 +15,7 @@ def solve_1c56ad9f(input_grid: ColoredGrid) -> ColoredGrid:
        c. Allow slight modifications to top and bottom rows.
        d. Create outward bulges on left and right edges where space permits.
     3. Maintain vertical and horizontal connectivity within shapes.
-    4. Preserve shape integrity and handle potential overlaps.
+    4. Preserve internal structure of shapes (e.g., holes, lines).
     5. Retain the original background (black/0 areas).
     This creates a dynamic, wave-like effect on the shapes while preserving their overall structure and connectivity.
     """
@@ -72,12 +72,13 @@ def process_shape(grid: ColoredGrid, shape: Tuple[int, int, int, int, int, Set[T
     for row, col in shape_points:
         shift = wave_function(row - center_row, col - center_col, height, width)
         new_col = col + shift
-        if min_col <= new_col <= max_col:
+        if min_col - 1 <= new_col <= max_col + 1:  # Allow slight outward expansion
             new_points[(row, col)] = (row, new_col)
     
-    # Apply shifts
+    # Apply shifts while preserving internal structure
+    internal_structure = find_internal_structure(grid, shape)
     for old, new in new_points.items():
-        if grid.values[new[0]][new[1]] == 0:  # Only move if the new position is empty
+        if grid.values[new[0]][new[1]] == 0 and not conflicts_with_internal_structure(new, internal_structure):
             grid.values[new[0]][new[1]] = color
             if old != new:
                 grid.values[old[0]][old[1]] = 0
@@ -85,19 +86,38 @@ def process_shape(grid: ColoredGrid, shape: Tuple[int, int, int, int, int, Set[T
 def wave_function(dy: float, dx: float, height: int, width: int) -> int:
     """Calculate the horizontal shift based on the point's position within the shape."""
     vertical_factor = 1 - abs(2 * dy / height)
-    horizontal_factor = math.cos(2 * math.pi * dx / width)
-    shift = int(round(2 * vertical_factor * horizontal_factor))
-    return max(-2, min(2, shift))  # Limit the shift to a maximum of 2 in either direction
+    horizontal_factor = math.sin(2 * math.pi * dx / width)
+    shift = int(round(3 * vertical_factor * horizontal_factor))
+    return max(-3, min(3, shift))  # Allow slightly larger shifts
+
+def find_internal_structure(grid: ColoredGrid, shape: Tuple[int, int, int, int, int, Set[Tuple[int, int]]]) -> Set[Tuple[int, int]]:
+    """Identify internal structure (holes, lines) within a shape."""
+    min_row, max_row, min_col, max_col, color, shape_points = shape
+    internal_structure = set()
+    for row in range(min_row, max_row + 1):
+        for col in range(min_col, max_col + 1):
+            if (row, col) not in shape_points and is_internal_point(row, col, shape_points):
+                internal_structure.add((row, col))
+    return internal_structure
+
+def is_internal_point(row: int, col: int, shape_points: Set[Tuple[int, int]]) -> bool:
+    """Check if a point is internal to the shape."""
+    return all((row + dr, col + dc) in shape_points for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)])
+
+def conflicts_with_internal_structure(point: Tuple[int, int], internal_structure: Set[Tuple[int, int]]) -> bool:
+    """Check if a point conflicts with the internal structure."""
+    return point in internal_structure or any(abs(point[0] - i[0]) + abs(point[1] - i[1]) <= 1 for i in internal_structure)
 
 def maintain_connectivity(grid: ColoredGrid, shapes: List[Tuple[int, int, int, int, int, Set[Tuple[int, int]]]]):
     """Ensure shapes remain connected after transformation."""
     for shape in shapes:
         min_row, max_row, min_col, max_col, color, _ = shape
-        for row in range(min_row, max_row + 1):
-            for col in range(min_col, max_col + 1):
-                if grid.values[row][col] == color:
-                    neighbors = [(row-1, col), (row+1, col), (row, col-1), (row, col+1)]
-                    for nr, nc in neighbors:
-                        if min_row <= nr <= max_row and min_col <= nc <= max_col and grid.values[nr][nc] == 0:
-                            if any(grid.values[r][c] == color for r, c in [(nr-1, nc), (nr+1, nc), (nr, nc-1), (nr, nc+1)] if (r, c) != (row, col)):
-                                grid.values[nr][nc] = color
+        for row in range(min_row - 1, max_row + 2):
+            for col in range(min_col - 1, max_col + 2):
+                if 0 <= row < grid.num_rows and 0 <= col < grid.num_cols:
+                    if grid.values[row][col] == color:
+                        neighbors = [(row-1, col), (row+1, col), (row, col-1), (row, col+1)]
+                        for nr, nc in neighbors:
+                            if 0 <= nr < grid.num_rows and 0 <= nc < grid.num_cols and grid.values[nr][nc] == 0:
+                                if any(grid.values[r][c] == color for r, c in [(nr-1, nc), (nr+1, nc), (nr, nc-1), (nr, nc+1)] if (r, c) != (row, col)):
+                                    grid.values[nr][nc] = color
