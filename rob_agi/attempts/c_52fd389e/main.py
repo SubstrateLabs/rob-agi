@@ -1,17 +1,17 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Set
+from collections import deque
 
 def solve_52fd389e(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transform the input grid based on yellow regions and sky blue area:
     1. Identify yellow (4) regions and their properties.
     2. Process each yellow region:
-       - If it contains non-yellow, non-sky blue colors, create a border with the smallest such color.
-       - Border size is 1 for regions in top-left quadrant, 3 otherwise.
-       - If it contains only yellow or sky blue, mark for replacement by sky blue.
-    3. Apply borders to yellow regions.
-    4. Create a sky blue (8) region starting from (0,0), filling black areas and marked regions.
-    5. Ensure yellow region integrity and no black cells remain.
+       - If it contains sky blue (8), mark for replacement.
+       - Otherwise, create a border with the smallest non-yellow color found.
+       - Border size is 1 for small regions (<=4x4) in top-left quadrant, 3 otherwise.
+    3. Apply borders to yellow regions or replace with sky blue.
+    4. Fill all remaining black (0) areas with sky blue (8).
     """
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
@@ -22,16 +22,14 @@ def solve_52fd389e(input_grid: ColoredGrid) -> ColoredGrid:
     def get_neighbors(r: int, c: int) -> List[Tuple[int, int]]:
         return [(r+dr, c+dc) for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)] if is_valid(r+dr, c+dc)]
 
-    def flood_fill(r: int, c: int, color: int) -> List[Tuple[int, int]]:
-        region = []
-        stack = [(r, c)]
-        visited = set()
-        while stack:
-            curr_r, curr_c = stack.pop()
-            if (curr_r, curr_c) not in visited and grid.get_cell(curr_r, curr_c) == color:
-                region.append((curr_r, curr_c))
-                visited.add((curr_r, curr_c))
-                stack.extend(get_neighbors(curr_r, curr_c))
+    def flood_fill(r: int, c: int, color: int) -> Set[Tuple[int, int]]:
+        region = set()
+        queue = deque([(r, c)])
+        while queue:
+            curr_r, curr_c = queue.popleft()
+            if (curr_r, curr_c) not in region and grid.get_cell(curr_r, curr_c) == color:
+                region.add((curr_r, curr_c))
+                queue.extend(get_neighbors(curr_r, curr_c))
         return region
 
     def find_yellow_regions():
@@ -41,10 +39,8 @@ def solve_52fd389e(input_grid: ColoredGrid) -> ColoredGrid:
             for c in range(cols):
                 if (r, c) not in visited and grid.get_cell(r, c) == 4:
                     region = flood_fill(r, c, 4)
-                    min_r = min(r for r, _ in region)
-                    min_c = min(c for _, c in region)
-                    max_r = max(r for r, _ in region)
-                    max_c = max(c for _, c in region)
+                    min_r, min_c = min(region)
+                    max_r, max_c = max(region)
                     internal_colors = set()
                     for rr, cc in region:
                         for nr, nc in get_neighbors(rr, cc):
@@ -53,7 +49,8 @@ def solve_52fd389e(input_grid: ColoredGrid) -> ColoredGrid:
                     yellow_regions.append({
                         'region': region,
                         'bounds': (min_r, min_c, max_r, max_c),
-                        'internal_colors': internal_colors
+                        'internal_colors': internal_colors,
+                        'size': len(region)
                     })
                     visited.update(region)
         return yellow_regions
@@ -63,19 +60,24 @@ def solve_52fd389e(input_grid: ColoredGrid) -> ColoredGrid:
             min_r, min_c, max_r, max_c = region_info['bounds']
             internal_colors = region_info['internal_colors']
             
-            if 8 in internal_colors or not internal_colors:
+            if 8 in internal_colors:
                 region_info['replace'] = True
             else:
-                border_color = min(internal_colors)
-                border_size = 1 if min_r < rows // 2 and min_c < cols // 2 else 3
+                border_color = min(internal_colors) if internal_colors else 8
+                is_small_top_left = (max_r - min_r <= 4 and max_c - min_c <= 4 and
+                                     min_r < rows // 2 and min_c < cols // 2)
+                border_size = 1 if is_small_top_left else 3
                 region_info['border'] = {
                     'color': border_color,
                     'size': border_size
                 }
 
-    def apply_borders(yellow_regions):
+    def apply_transformations(yellow_regions):
         for region_info in yellow_regions:
-            if 'border' in region_info:
+            if region_info.get('replace', False):
+                for r, c in region_info['region']:
+                    grid.set_cell(r, c, 8)
+            elif 'border' in region_info:
                 min_r, min_c, max_r, max_c = region_info['bounds']
                 color = region_info['border']['color']
                 size = region_info['border']['size']
@@ -84,23 +86,15 @@ def solve_52fd389e(input_grid: ColoredGrid) -> ColoredGrid:
                         if grid.get_cell(r, c) == 0:
                             grid.set_cell(r, c, color)
 
-    def create_sky_blue_region():
-        stack = [(0, 0)]
-        while stack:
-            r, c = stack.pop()
-            if is_valid(r, c) and grid.get_cell(r, c) in [0, 8]:
-                grid.set_cell(r, c, 8)
-                stack.extend(get_neighbors(r, c))
+    def fill_remaining_space():
+        for r in range(rows):
+            for c in range(cols):
+                if grid.get_cell(r, c) == 0:
+                    grid.set_cell(r, c, 8)
 
     yellow_regions = find_yellow_regions()
     process_yellow_regions(yellow_regions)
-    apply_borders(yellow_regions)
-    create_sky_blue_region()
-
-    # Final cleanup
-    for r in range(rows):
-        for c in range(cols):
-            if grid.get_cell(r, c) == 0:
-                grid.set_cell(r, c, 8)
+    apply_transformations(yellow_regions)
+    fill_remaining_space()
 
     return grid
