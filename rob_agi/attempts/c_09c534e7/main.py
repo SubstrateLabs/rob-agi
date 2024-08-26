@@ -177,14 +177,33 @@ def apply_general_progression(grid: ColoredGrid, color_sequence: List[int]):
     pass
 
 def balance_colors(grid: ColoredGrid):
-    # Implementation to balance color distribution
-    # This is a placeholder and needs to be implemented
-    pass
+    color_counts = {i: 0 for i in range(1, 10)}
+    total_colored_cells = 0
+    
+    for row in grid.values:
+        for cell in row:
+            if cell != 0:
+                color_counts[cell] += 1
+                total_colored_cells += 1
+    
+    target_count = total_colored_cells // len(color_counts)
+    
+    for r in range(grid.num_rows):
+        for c in range(grid.num_cols):
+            if grid.values[r][c] != 0:
+                current_color = grid.values[r][c]
+                if color_counts[current_color] > target_count:
+                    new_color = min(color_counts, key=color_counts.get)
+                    if new_color > current_color:
+                        grid.values[r][c] = new_color
+                        color_counts[current_color] -= 1
+                        color_counts[new_color] += 1
 
 def preserve_structure(output_grid: ColoredGrid, input_grid: ColoredGrid):
-    # Implementation to preserve overall structure
-    # This is a placeholder and needs to be implemented
-    pass
+    for r in range(input_grid.num_rows):
+        for c in range(input_grid.num_cols):
+            if input_grid.values[r][c] != 0 and output_grid.values[r][c] == 0:
+                output_grid.values[r][c] = input_grid.values[r][c]
 
 def refine_borders(grid: ColoredGrid):
     # Implementation to refine borders of shapes
