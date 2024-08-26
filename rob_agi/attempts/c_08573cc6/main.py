@@ -7,12 +7,10 @@ def solve_08573cc6(input_grid: ColoredGrid) -> ColoredGrid:
     The solution follows these steps:
     1. Analyze the input grid to determine dimensions, colors, and single colored square position.
     2. Calculate the pattern dimensions and position based on grid size.
-    3. Create an outer rectangle using the main color (top-left of input) for top/bottom/left and side color for right.
-    4. Create inner rectangles, alternating colors for left side and using side color for right side.
-    5. Incorporate the single colored square, preserving its position.
-    6. Fill the space between rectangles with the main color.
-    7. Ensure some empty space around the edges of the grid.
-    8. Adjust the pattern for visual balance and symmetry.
+    3. Create nested rectangles using the main color for top/bottom and alternating colors for sides.
+    4. Incorporate the single colored square, preserving its relative position.
+    5. Fill the inner spaces with the main color.
+    6. Ensure some empty space around the edges of the grid.
     
     This pattern adapts to different grid sizes and single square positions while maintaining a consistent structure.
     """
@@ -34,11 +32,12 @@ def solve_08573cc6(input_grid: ColoredGrid) -> ColoredGrid:
     new_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
     
     # Determine pattern size and position
-    start_row, start_col = 2, 1
+    start_row, start_col = 2, 2
     end_row, end_col = rows - 3, cols - 3
     
     # Draw rectangles
-    for offset in range(0, (end_row - start_row) // 2 + 1):
+    num_rectangles = min(3, (end_row - start_row) // 2)
+    for offset in range(num_rectangles):
         top = start_row + offset
         bottom = end_row - offset
         left = start_col + offset
@@ -51,18 +50,20 @@ def solve_08573cc6(input_grid: ColoredGrid) -> ColoredGrid:
             new_grid.values[top][c] = main_color
             new_grid.values[bottom][c] = main_color
     
-    # Fill space between rectangles
+    # Fill inner space
     for r in range(start_row, end_row + 1):
-        for c in range(start_col + 1, end_col):
+        for c in range(start_col, end_col + 1):
             if new_grid.values[r][c] == 0:
                 new_grid.values[r][c] = main_color
     
     # Incorporate the single colored square
     if single_square:
         sr, sc, color = single_square
-        new_grid.values[sr][sc] = color
+        relative_r = (sr - start_row) * (bottom - top) // (rows - 4) + top
+        relative_c = (sc - start_col) * (right - left) // (cols - 4) + left
+        new_grid.values[relative_r][relative_c] = color
         for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            nr, nc = sr + dr, sc + dc
+            nr, nc = relative_r + dr, relative_c + dc
             if start_row <= nr <= end_row and start_col <= nc <= end_col:
                 new_grid.values[nr][nc] = main_color
     
