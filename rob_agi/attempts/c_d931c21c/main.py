@@ -4,7 +4,7 @@ from typing import List, Tuple, Set
 def solve_d931c21c(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid based on the following rules:
-    1. Identifies fully closed shapes formed by blue (1) cells.
+    1. Identifies closed shapes formed by blue (1) cells, including those touching grid edges.
     2. For each identified closed shape:
        - Transforms adjacent black (0) cells outside the shape to red (2).
        - Transforms all black cells inside the shape to green (3).
@@ -29,33 +29,37 @@ def solve_d931c21c(input_grid: ColoredGrid) -> ColoredGrid:
     def trace_shape(start_row: int, start_col: int) -> Set[Tuple[int, int]]:
         shape = set()
         stack = [(start_row, start_col)]
+        edge_touching = False
 
         while stack:
             r, c = stack.pop()
             if (r, c) not in shape:
                 shape.add((r, c))
+                if r == 0 or r == rows - 1 or c == 0 or c == cols - 1:
+                    edge_touching = True
                 neighbors = get_neighbors(r, c)
                 for nr, nc in neighbors:
                     if new_grid.get_cell(nr, nc) == 1 and (nr, nc) not in shape:  # Blue
                         stack.append((nr, nc))
 
-        # Check if the shape is fully closed
+        return shape if edge_touching or is_closed_shape(shape) else set()
+
+    def is_closed_shape(shape: Set[Tuple[int, int]]) -> bool:
         for r, c in shape:
             neighbors = get_neighbors(r, c)
             for nr, nc in neighbors:
-                if (nr, nc) not in shape and new_grid.get_cell(nr, nc) != 1:
-                    return set()  # Not a closed shape
+                if (nr, nc) not in shape and new_grid.get_cell(nr, nc) == 0:  # Black
+                    return False
+        return True
 
-        return shape
-
-    def flood_fill(start_row: int, start_col: int, shape: Set[Tuple[int, int]]) -> None:
+    def flood_fill(start_row: int, start_col: int, shape: Set[Tuple[int, int]], color: int) -> None:
         queue = [(start_row, start_col)]
         filled = set()
         while queue:
             r, c = queue.pop(0)
             if (r, c) not in filled and (r, c) not in shape:
                 if new_grid.get_cell(r, c) == 0:  # Black
-                    new_grid.set_cell(r, c, 3)  # Green
+                    new_grid.set_cell(r, c, color)
                     nonlocal changes_made
                     changes_made = True
                 filled.add((r, c))
@@ -78,6 +82,6 @@ def solve_d931c21c(input_grid: ColoredGrid) -> ColoredGrid:
                                     new_grid.set_cell(nr, nc, 2)  # Red
                                     changes_made = True
                                 elif new_grid.get_cell(nr, nc) != 2:  # Not blue or red
-                                    flood_fill(nr, nc, shape)
+                                    flood_fill(nr, nc, shape, 3)  # Green
 
     return new_grid if changes_made else input_grid
