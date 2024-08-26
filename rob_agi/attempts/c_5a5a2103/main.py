@@ -14,6 +14,7 @@ def solve_5a5a2103(input_grid: ColoredGrid) -> ColoredGrid:
        c. Applies this pattern across all sections in the entire row, respecting dividing lines.
        d. If no color is found, leaves the row unchanged.
     4. Preserves the original dividing lines in the output.
+    5. Maintains the original colors in sections where no pattern is applied.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -51,7 +52,8 @@ def solve_5a5a2103(input_grid: ColoredGrid) -> ColoredGrid:
                 continue
             for row in range(row_start, row_end):
                 for col in range(section_start, section_end):
-                    grid[row][col] = pattern[(row - row_start) % 4][(col - section_start) % 4]
+                    if grid[row][col] != dividing_color:
+                        grid[row][col] = pattern[(row - row_start) % 4][(col - section_start) % 4]
     
     def restore_dividing_lines(grid: List[List[int]], dividing_color: int, 
                                h_lines: List[int], v_lines: List[int]) -> None:
