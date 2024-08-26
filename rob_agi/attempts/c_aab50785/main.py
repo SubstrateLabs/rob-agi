@@ -56,12 +56,10 @@ def is_valid_region(grid: ColoredGrid, top: int, left: int, bottom: int, right: 
     """Check if a region is valid according to the criteria."""
     # Check if bordered by 8's on exactly two sides
     sides_with_eights = 0
-    top_has_eight = any(grid.get_cell(top-1, c) == 8 for c in range(left, right+1) if top > 0)
-    bottom_has_eight = any(grid.get_cell(bottom+1, c) == 8 for c in range(left, right+1) if bottom < grid.num_rows - 1)
-    left_has_eight = any(grid.get_cell(r, left-1) == 8 for r in range(top, bottom+1) if left > 0)
-    right_has_eight = any(grid.get_cell(r, right+1) == 8 for r in range(top, bottom+1) if right < grid.num_cols - 1)
-    
-    sides_with_eights = sum([top_has_eight, bottom_has_eight, left_has_eight, right_has_eight])
+    sides_with_eights += has_eight_on_side(grid, top-1, left, right, 'horizontal') if top > 0 else 0
+    sides_with_eights += has_eight_on_side(grid, bottom+1, left, right, 'horizontal') if bottom < grid.num_rows - 1 else 0
+    sides_with_eights += has_eight_on_side(grid, left-1, top, bottom, 'vertical') if left > 0 else 0
+    sides_with_eights += has_eight_on_side(grid, right+1, top, bottom, 'vertical') if right < grid.num_cols - 1 else 0
     
     if sides_with_eights != 2:
         return False
@@ -73,3 +71,10 @@ def is_valid_region(grid: ColoredGrid, top: int, left: int, bottom: int, right: 
                 return False
     
     return True
+
+def has_eight_on_side(grid: ColoredGrid, index: int, start: int, end: int, direction: str) -> bool:
+    """Check if a side of the rectangle is bordered by at least one 8."""
+    if direction == 'horizontal':
+        return any(grid.get_cell(index, c) == 8 for c in range(start, end+1))
+    else:  # vertical
+        return any(grid.get_cell(r, index) == 8 for r in range(start, end+1))
