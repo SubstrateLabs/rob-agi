@@ -5,12 +5,12 @@ def solve_34b99a2b(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the 5x9 input grid into a 5x4 output grid based on the following steps:
     1. Splits the input into left and right halves, analyzing sky (8) and gray (5) regions.
-    2. Divides each half into quadrants and calculates color density.
-    3. Marks quadrants with high density and fills corresponding areas in the output grid.
-    4. Applies flow rules to connect marked quadrants.
-    5. Emphasizes the bottom row based on high-density bottom quadrants.
-    6. Ensures vertical consistency in columns with multiple red cells.
-    7. Removes isolated red cells and makes final adjustments to the bottom row.
+    2. Identifies vertical and diagonal lines in each half.
+    3. Translates identified patterns to the output grid.
+    4. Applies smoothing rules to connect nearby red cells.
+    5. Ensures vertical consistency in columns with multiple red cells.
+    6. Processes the bottom row based on input density.
+    7. Makes final adjustments to remove isolated cells and balance the bottom row.
     """
     left_half, right_half = split_grid(input_grid)
     output = [[0 for _ in range(4)] for _ in range(5)]
@@ -18,9 +18,9 @@ def solve_34b99a2b(input_grid: ColoredGrid) -> ColoredGrid:
     process_half(left_half, output, 0, 2, 8)
     process_half(right_half, output, 2, 4, 5)
     
-    apply_flow_rules(output)
-    apply_bottom_emphasis(left_half, right_half, output)
+    apply_smoothing_rules(output)
     ensure_vertical_consistency(output)
+    process_bottom_row(left_half, right_half, output)
     remove_isolated_cells(output)
     adjust_bottom_row(output)
     
@@ -32,43 +32,45 @@ def split_grid(grid: ColoredGrid) -> Tuple[List[List[int]], List[List[int]]]:
     return left_half, right_half
 
 def process_half(half: List[List[int]], output: List[List[int]], start_col: int, end_col: int, color: int):
-    quadrants = [
-        (0, 0), (0, 2), (2, 0), (2, 2)
-    ]
-    for top, left in quadrants:
-        if calculate_density(half, top, left, color) > 0.3:
-            fill_output_quadrant(output, top, start_col + (left // 2), 2)
+    vertical_lines = identify_vertical_lines(half, color)
+    diagonal_lines = identify_diagonal_lines(half, color)
+    
+    for col in vertical_lines:
+        output_col = start_col + (col // 2)
+        for r in range(5):
+            output[r][output_col] = 2
+    
+    for start_r, start_c in diagonal_lines:
+        output_r = start_r
+        output_c = start_col + (start_c // 2)
+        while output_r < 5 and output_c < end_col:
+            output[output_r][output_c] = 2
+            output_r += 1
+            output_c += 1
 
-def calculate_density(grid: List[List[int]], top: int, left: int, color: int) -> float:
-    count = sum(1 for r in range(top, top+3) for c in range(left, left+2) if grid[r][c] == color)
-    return count / 6
+def identify_vertical_lines(half: List[List[int]], color: int) -> List[int]:
+    return [c for c in range(4) if sum(1 for r in range(5) if half[r][c] == color) >= 2]
 
-def fill_output_quadrant(output: List[List[int]], top: int, left: int, size: int):
-    for r in range(top, top+size):
-        for c in range(left, left+size):
-            output[r][c] = 2
+def identify_diagonal_lines(half: List[List[int]], color: int) -> List[Tuple[int, int]]:
+    diagonals = []
+    for r in range(4):
+        for c in range(3):
+            if half[r][c] == color and half[r+1][c+1] == color:
+                diagonals.append((r, c))
+    return diagonals
 
-def apply_flow_rules(output: List[List[int]]):
-    # Horizontal flow
-    for r in range(5):
-        if output[r][0] == 2 and output[r][2] == 2:
-            output[r][1] = 2
-    # Vertical flow
+def apply_smoothing_rules(output: List[List[int]]):
+    # Vertical smoothing
     for c in range(4):
-        for r in range(4):
-            if output[r][c] == 2 and output[r+1][c] == 2:
-                output[r][c] = output[r+1][c] = 2
-    # Diagonal flow
+        for r in range(1, 4):
+            if output[r-1][c] == 2 and output[r+1][c] == 2:
+                output[r][c] = 2
+    
+    # Diagonal smoothing
     for r in range(4):
         for c in range(3):
             if output[r][c] == 2 and output[r+1][c+1] == 2:
                 output[r][c+1] = output[r+1][c] = 2
-
-def apply_bottom_emphasis(left_half: List[List[int]], right_half: List[List[int]], output: List[List[int]]):
-    if calculate_density(left_half, 2, 0, 8) > 0.5:
-        output[4][0] = output[4][1] = 2
-    if calculate_density(right_half, 2, 0, 5) > 0.5:
-        output[4][2] = output[4][3] = 2
 
 def ensure_vertical_consistency(output: List[List[int]]):
     for c in range(4):
@@ -76,11 +78,20 @@ def ensure_vertical_consistency(output: List[List[int]]):
             for r in range(5):
                 output[r][c] = 2
 
+def process_bottom_row(left_half: List[List[int]], right_half: List[List[int]], output: List[List[int]]):
+    left_density = sum(1 for r in range(2, 5) for c in range(4) if left_half[r][c] == 8) / 12
+    right_density = sum(1 for r in range(2, 5) for c in range(4) if right_half[r][c] == 5) / 12
+    
+    if left_density > 0.5:
+        output[4][0] = output[4][1] = 2
+    if right_density > 0.5:
+        output[4][2] = output[4][3] = 2
+
 def remove_isolated_cells(output: List[List[int]]):
     for r in range(5):
         for c in range(4):
             if output[r][c] == 2:
-                neighbors = sum(1 for dr, dc in [(0,1),(1,0),(0,-1),(-1,0)]
+                neighbors = sum(1 for dr, dc in [(0,1),(1,0),(0,-1),(-1,0),(1,1),(-1,-1),(1,-1),(-1,1)]
                                 if 0 <= r+dr < 5 and 0 <= c+dc < 4 and output[r+dr][c+dc] == 2)
                 if neighbors == 0:
                     output[r][c] = 0
