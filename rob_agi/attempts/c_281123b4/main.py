@@ -5,32 +5,40 @@ from typing import List, Tuple
 def solve_281123b4(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms a 19x4 input grid into a 4x4 output grid through a multi-step process:
-    1. Section division: Divides each row into 4 sections, ignoring the green (3) separator column.
-    2. Color analysis: Analyzes color frequencies in each section, prioritizing brown (9) and yellow (4).
-    3. Pattern recognition: Identifies color patterns within and across sections.
-    4. Output construction: Builds a 4x4 grid based on color priorities and patterns.
-    5. Refinement: Adjusts the output to create balanced and symmetric patterns where possible.
-    The final 4x4 grid is then returned, reflecting the most prominent colors and patterns from the input.
+    1. Section division: Divides each row into 4 sections, ignoring the green (3) separator columns.
+    2. Color analysis: Analyzes color frequencies in each section and globally, prioritizing brown (9) and yellow (4).
+    3. Pattern recognition: Identifies color patterns within sections, across sections, and diagonally.
+    4. Output construction: Builds a 4x4 grid based on color priorities, patterns, and global color distribution.
+    5. Refinement: Adjusts the output to create balanced, symmetric patterns and preserve key characteristics of the input.
+    The final 4x4 grid reflects the most prominent colors and patterns from the input while maintaining coherence.
     """
     rows, cols = input_grid.get_dimensions()
     if rows != 4 or cols != 19:
         raise ValueError("Input grid must be 19x4")
 
-    def analyze_section(section: List[int]) -> Tuple[int, int]:
+    def analyze_section(section: List[int]) -> Tuple[int, int, Counter]:
         color_counts = Counter(color for color in section if color != 0 and color != 3)
         if not color_counts:
-            return 0, 0
+            return 0, 0, color_counts
         primary = max(color_counts.items(), key=lambda x: (x[1], x[0]))[0]
         secondary = max((c for c in color_counts if c != primary), default=0, key=lambda x: (color_counts[x], x))
-        return primary, secondary
+        return primary, secondary, color_counts
 
     # Section analysis
     sections = []
+    global_counts = Counter()
     for row in input_grid.values:
         row_sections = [row[0:5], row[5:10], row[10:15], row[15:19]]
-        sections.append([analyze_section(section) for section in row_sections])
+        row_analysis = [analyze_section(section) for section in row_sections]
+        sections.append(row_analysis)
+        for _, _, counts in row_analysis:
+            global_counts.update(counts)
 
-    # Pattern recognition and output construction
+    # Global color ranking
+    color_weights = {9: 3, 4: 2, 8: 1, 5: 1}  # Brown, Yellow, Sky, Gray
+    global_ranking = sorted(global_counts.items(), key=lambda x: (color_weights.get(x[0], 0), x[1]), reverse=True)
+
+    # Output construction
     output = [[0 for _ in range(4)] for _ in range(4)]
     for col in range(4):
         column_colors = [sections[row][col] for row in range(4)]
@@ -42,16 +50,37 @@ def solve_281123b4(input_grid: ColoredGrid) -> ColoredGrid:
             alt_color = max(set(secondary_colors), key=secondary_colors.count) if secondary_colors else 0
             
             for row in range(4):
-                if row % 2 == 0:
+                if row == 0 or row == 2:
                     output[row][col] = main_color
                 else:
                     output[row][col] = alt_color if alt_color != 0 else main_color
 
-    # Refinement
+    # Pattern enhancement and refinement
     for row in range(4):
-        row_colors = [c for c in output[row] if c != 0]
-        if len(set(row_colors)) == 1 and 0 in output[row]:
-            fill_color = max(set(output[row]) - {0})
-            output[row] = [fill_color if c == 0 else c for c in output[row]]
+        row_colors = Counter(output[row])
+        if len(row_colors) == 1:
+            # Introduce variation based on global ranking
+            for alt_color, _ in global_ranking:
+                if alt_color not in row_colors:
+                    output[row][1] = alt_color  # Change second column for variation
+                    break
+
+    # Ensure all prominent colors are represented
+    prominent_colors = [color for color, _ in global_ranking[:4]]
+    for color in prominent_colors:
+        if all(color not in row for row in output):
+            # Find a suitable position to introduce the color
+            for r in range(4):
+                if len(set(output[r])) > 2:  # If row has more than 2 colors, we can replace one
+                    least_common = min(set(output[r]), key=lambda x: global_counts[x])
+                    output[r][output[r].index(least_common)] = color
+                    break
+
+    # Final balance check
+    for col in range(4):
+        col_colors = [output[r][col] for r in range(4)]
+        if len(set(col_colors)) == 1:
+            # Introduce variation in the column
+            output[1][col] = prominent_colors[1] if prominent_colors[1] != col_colors[0] else prominent_colors[2]
 
     return ColoredGrid(values=output)
