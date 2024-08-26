@@ -19,6 +19,10 @@ def solve_67b4a34d(input_grid: ColoredGrid) -> ColoredGrid:
     the corresponding cell in the output grid. In case of ties, the color with
     the lower numeric value is chosen.
     
+    If multiple colors have the same highest frequency in a section, the solution
+    chooses the color that appears first in the section when read from left to right,
+    top to bottom.
+    
     Args:
     input_grid (ColoredGrid): A 16x16 input grid
     
@@ -34,7 +38,11 @@ def solve_67b4a34d(input_grid: ColoredGrid) -> ColoredGrid:
         output_row = []
         for j in range(0, 16, 4):
             section = [row[j:j+4] for row in input_grid.values[i:i+4]]
-            output_row.append(get_most_frequent_color(section))
+            flat_section = [color for row in section for color in row]
+            color_counts = Counter(flat_section)
+            max_count = max(color_counts.values())
+            most_frequent_colors = [color for color, count in color_counts.items() if count == max_count]
+            output_row.append(min(most_frequent_colors, key=flat_section.index))
         output_values.append(output_row)
     
     return ColoredGrid(values=output_values)
