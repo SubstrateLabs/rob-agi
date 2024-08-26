@@ -5,46 +5,47 @@ def solve_9b2a60aa(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the grid transformation challenge by replicating the largest non-zero shape
     in the input grid. The replication is done vertically by default, or horizontally
-    if the shape touches the bottom of the grid. The colors and positions for replication
+    if the shape is at the bottom of the grid. The colors and positions for replication
     are determined by non-zero values in the leftmost column. The original shape and
     single cells remain unchanged. Replication stops if it would exceed grid boundaries
     or overlap with existing non-zero cells.
     """
-    # Find the largest shape
     original_shape = find_largest_shape(input_grid)
     if not original_shape:
         return input_grid  # No shape to replicate
 
-    # Determine replication direction
     direction = get_replication_direction(original_shape, input_grid.get_dimensions())
-
-    # Get replication colors and positions
     replication_info = get_replication_colors_and_positions(input_grid)
-
-    # Create output grid
     output_grid = input_grid.deep_copy()
 
-    # Calculate bounding box of the original shape
-    min_row = min(r for r, _ in original_shape)
-    max_row = max(r for r, _ in original_shape)
-    min_col = min(c for _, c in original_shape)
-    max_col = max(c for _, c in original_shape)
-    shape_height = max_row - min_row + 1
-    shape_width = max_col - min_col + 1
+    shape_bounds = get_shape_bounds(original_shape)
+    shape_height = shape_bounds[2] - shape_bounds[0] + 1
+    shape_width = shape_bounds[3] - shape_bounds[1] + 1
 
-    # Perform replication
     for color, position in replication_info:
         if direction == 'horizontal':
-            start_row = max_row
-            start_col = position
-        else:
-            start_row = position
+            start_row = shape_bounds[2]
             start_col = input_grid.num_cols - shape_width
-
-        if can_place_shape(output_grid, original_shape, (start_row, start_col)):
-            place_shape(output_grid, original_shape, (start_row, start_col), color)
+            while start_col >= 0:
+                if can_place_shape(output_grid, original_shape, (start_row, start_col)):
+                    place_shape(output_grid, original_shape, (start_row, start_col), color)
+                start_col -= shape_width
+        else:
+            start_row = 0
+            start_col = input_grid.num_cols - shape_width
+            while start_row + shape_height <= input_grid.num_rows:
+                if can_place_shape(output_grid, original_shape, (start_row, start_col)):
+                    place_shape(output_grid, original_shape, (start_row, start_col), color)
+                start_row += shape_height
 
     return output_grid
+
+def get_shape_bounds(shape: List[Tuple[int, int]]) -> Tuple[int, int, int, int]:
+    min_row = min(r for r, _ in shape)
+    max_row = max(r for r, _ in shape)
+    min_col = min(c for _, c in shape)
+    max_col = max(c for _, c in shape)
+    return (min_row, min_col, max_row, max_col)
 
 def find_largest_shape(grid: ColoredGrid) -> List[Tuple[int, int]]:
     largest_shape = []
