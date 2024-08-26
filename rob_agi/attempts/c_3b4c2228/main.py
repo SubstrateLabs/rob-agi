@@ -3,15 +3,14 @@ from typing import Tuple
 
 def solve_3b4c2228(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid into a 3x3 output grid based on the presence and position of 2x2 squares.
+    Transforms the input grid into a 3x3 output grid based on the presence of 2x2 squares in quadrants.
     
     The transformation follows these rules:
     1. If any quadrant contains a 2x2 square of the same non-black color, set output[0][0] to blue (1).
-    2. If the top-left and bottom-right quadrants both contain 2x2 squares, or if the top-right and bottom-left
-       quadrants both contain 2x2 squares, set output[1][1] to blue (1). This is independent of other quadrants.
-    3. If all quadrants contain 2x2 squares, set output[2][2] to blue (1).
+    2. If exactly 2 quadrants contain 2x2 squares, set output[1][1] to blue (1).
+    3. If all 4 quadrants contain 2x2 squares, set both output[1][1] and output[2][2] to blue (1).
     
-    The input grid is divided into four quadrants, and the presence of 2x2 squares in these quadrants 
+    The input grid is divided into four quadrants, and the number of quadrants with 2x2 squares 
     determines the pattern in the output grid.
     """
     height, width = input_grid.get_dimensions()
@@ -35,14 +34,15 @@ def solve_3b4c2228(input_grid: ColoredGrid) -> ColoredGrid:
     ]
 
     has_square = [has_2x2_square(quad) for quad in quadrants]
+    square_count = sum(has_square)
 
-    if any(has_square):
+    if square_count > 0:
         output_grid[0][0] = 1
 
-    if (has_square[0] and has_square[3]) or (has_square[1] and has_square[2]):
+    if square_count == 2 or square_count == 4:
         output_grid[1][1] = 1
 
-    if all(has_square):
+    if square_count == 4:
         output_grid[2][2] = 1
 
     return ColoredGrid(values=output_grid)
