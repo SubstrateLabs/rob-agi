@@ -7,8 +7,8 @@ def solve_72207abc(input_grid: ColoredGrid) -> ColoredGrid:
     The pattern:
     1. Extracts the initial sequence from the middle row, including non-zero elements and the first zero after them.
     2. Repeats this sequence across the row with increasing spacing between repetitions.
-    3. The spacing starts at 1 and increases by 1 after each non-zero element in the sequence.
-    4. The spacing resets to 1 when the sequence restarts.
+    3. The spacing starts at 0 and increases by 1 after each non-zero element in the sequence.
+    4. The spacing resets to 0 when the sequence restarts.
     5. The top and bottom rows remain unchanged (all zeros).
     
     Args:
@@ -20,12 +20,8 @@ def solve_72207abc(input_grid: ColoredGrid) -> ColoredGrid:
     # Extract the initial sequence
     initial_sequence = []
     for color in input_grid.values[1]:  # Middle row
-        if color != 0 or not initial_sequence:
-            initial_sequence.append(color)
-        elif initial_sequence[-1] != 0:
-            initial_sequence.append(0)
-            break
-        else:
+        initial_sequence.append(color)
+        if color == 0 and initial_sequence[-2:] != [0, 0]:  # Stop after first zero following non-zero
             break
     
     # Create a new grid
@@ -34,7 +30,7 @@ def solve_72207abc(input_grid: ColoredGrid) -> ColoredGrid:
     # Fill the middle row
     current_position = 0
     width = len(input_grid.values[1])
-    spacing = 1
+    spacing = 0
     sequence_index = 0
     
     while current_position < width:
@@ -42,7 +38,7 @@ def solve_72207abc(input_grid: ColoredGrid) -> ColoredGrid:
         new_grid.values[1][current_position] = initial_sequence[sequence_index]
         current_position += 1
         
-        # Add zeros for spacing only after non-zero elements
+        # Add zeros for spacing after non-zero elements
         if initial_sequence[sequence_index] != 0:
             for _ in range(spacing):
                 if current_position < width:
@@ -57,6 +53,6 @@ def solve_72207abc(input_grid: ColoredGrid) -> ColoredGrid:
         # Reset if we've used all elements in the sequence
         if sequence_index == len(initial_sequence):
             sequence_index = 0
-            spacing = 1
+            spacing = 0
     
     return new_grid
