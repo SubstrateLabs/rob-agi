@@ -10,13 +10,15 @@ def solve_d5c634a2(input_grid: ColoredGrid) -> ColoredGrid:
        - Checks the middle third vertically for any red squares. If found, sets output[third][3] to blue (1).
        - Checks the right third vertically for any red squares. If found, sets output[third][5] to blue (1).
     3. All other cells in the output remain black (0).
-    4. The middle row of the output is always kept black (0) unless explicitly set by the rules above.
+    4. The middle row of the output is always kept black (0) regardless of the rules above.
     """
     input_height, input_width = input_grid.get_dimensions()
     third_height = -(-input_height // 3)  # Ceiling division
     output = [[0 for _ in range(6)] for _ in range(3)]
 
     for third in range(3):
+        if third == 1:  # Skip processing for the middle third
+            continue
         start_row = third * third_height
         end_row = min((third + 1) * third_height, input_height)
         mid_col = input_width // 2
@@ -39,9 +41,6 @@ def solve_d5c634a2(input_grid: ColoredGrid) -> ColoredGrid:
         right_start = 2 * input_width // 3
         if has_any_red(input_grid, start_row, end_row, right_start, input_width):
             output[third][5] = 1
-
-    # Ensure middle row is always black unless explicitly set
-    output[1] = [0 if val == 0 else val for val in output[1]]
 
     return ColoredGrid(values=output)
 
