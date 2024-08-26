@@ -11,7 +11,7 @@ def solve_e9b4f6fc(input_grid: ColoredGrid) -> ColoredGrid:
     2. Identifying the border color (most frequent on the edges)
     3. Ordering interior colors based on their frequency in the extracted region
     4. Transforming colors: border color remains unchanged, interior colors mapped from 1 to n-1
-    5. Adjusting the shape by removing unnecessary border-colored rows/columns
+    5. Preserving the shape and border of the extracted region
     """
     # Step 1: Identify and extract the main colored region
     main_region = find_largest_region(input_grid)
@@ -27,11 +27,8 @@ def solve_e9b4f6fc(input_grid: ColoredGrid) -> ColoredGrid:
     # Step 4: Create color transformation mapping
     color_map = create_color_map(ordered_colors, border_color)
     
-    # Step 5: Transform colors
-    transformed_grid = transform_colors(extracted_grid, color_map)
-    
-    # Step 6: Adjust shape (remove unnecessary border-colored rows/columns)
-    final_grid = adjust_shape(transformed_grid, border_color)
+    # Step 5: Transform colors while preserving shape and border
+    final_grid = transform_colors_preserve_shape(extracted_grid, color_map, border_color)
     
     return final_grid
 
@@ -90,17 +87,16 @@ def create_color_map(ordered_colors: List[int], border_color: int) -> Dict[int, 
         color_map[old_color] = new_color
     return color_map
 
-def transform_colors(grid: ColoredGrid, color_map: Dict[int, int]) -> ColoredGrid:
+def transform_colors_preserve_shape(grid: ColoredGrid, color_map: Dict[int, int], border_color: int) -> ColoredGrid:
     rows, cols = grid.get_dimensions()
-    new_values = [[color_map[grid.get_cell(r, c)] for c in range(cols)] for r in range(rows)]
-    return ColoredGrid(values=new_values)
-
-def adjust_shape(grid: ColoredGrid, border_color: int) -> ColoredGrid:
-    rows, cols = grid.get_dimensions()
-    top = next(r for r in range(rows) if any(grid.get_cell(r, c) != border_color for c in range(cols)))
-    bottom = next(r for r in range(rows-1, -1, -1) if any(grid.get_cell(r, c) != border_color for c in range(cols)))
-    left = next(c for c in range(cols) if any(grid.get_cell(r, c) != border_color for r in range(rows)))
-    right = next(c for c in range(cols-1, -1, -1) if any(grid.get_cell(r, c) != border_color for r in range(rows)))
-    
-    new_values = [row[left:right+1] for row in grid.values[top:bottom+1]]
+    new_values = []
+    for r in range(rows):
+        new_row = []
+        for c in range(cols):
+            cell = grid.get_cell(r, c)
+            if cell == border_color:
+                new_row.append(border_color)
+            else:
+                new_row.append(color_map[cell])
+        new_values.append(new_row)
     return ColoredGrid(values=new_values)
