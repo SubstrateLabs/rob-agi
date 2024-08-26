@@ -2,55 +2,39 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_64a7c07e(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the grid transformation challenge by shifting non-black shapes towards the center.
+    Solve the grid transformation challenge by shifting non-black shapes horizontally towards the center.
     
-    The function calculates the center of mass of non-black pixels, determines the target center,
-    and shifts all non-black pixels to balance the composition while keeping shapes intact and
-    within grid boundaries.
+    The function finds the leftmost and rightmost non-black pixels, calculates the target position
+    for the leftmost pixel, and shifts all non-black pixels horizontally to center the composition
+    while keeping shapes intact and within grid boundaries. Vertical positions are maintained.
     """
     height, width = input_grid.get_dimensions()
     
-    # Calculate current center of mass
-    total_x, total_y, count = 0, 0, 0
-    for y, row in enumerate(input_grid.values):
-        for x, color in enumerate(row):
-            if color != 0:
-                total_x += x
-                total_y += y
-                count += 1
+    # Find leftmost and rightmost non-black pixels
+    left_x, right_x = width, -1
+    for y in range(height):
+        for x in range(width):
+            if input_grid.values[y][x] != 0:
+                left_x = min(left_x, x)
+                right_x = max(right_x, x)
     
-    if count == 0:
-        return input_grid  # No non-black pixels, return original grid
+    if left_x == width:  # No non-black pixels found
+        return input_grid
     
-    current_center = (total_x / count, total_y / count)
+    # Calculate target position and shift
+    target_x = width // 2
+    shift = target_x - left_x
     
-    # Determine target center
-    target_center = (width / 2 - 0.5, height / 2 - 0.5)
-    
-    # Calculate shift
-    shift_x = round(target_center[0] - current_center[0])
-    shift_y = round(target_center[1] - current_center[1])
-    
-    # Adjust shift to keep shapes within grid
-    min_x, max_x, min_y, max_y = width, 0, height, 0
-    for y, row in enumerate(input_grid.values):
-        for x, color in enumerate(row):
-            if color != 0:
-                min_x = min(min_x, x)
-                max_x = max(max_x, x)
-                min_y = min(min_y, y)
-                max_y = max(max_y, y)
-    
-    shift_x = max(-min_x, min(width - 1 - max_x, shift_x))
-    shift_y = max(-min_y, min(height - 1 - max_y, shift_y))
+    # Adjust shift if it would push pixels out of bounds
+    if right_x + shift >= width:
+        shift = width - 1 - right_x
     
     # Create new grid and apply shift
     new_grid = ColoredGrid(values=[[0 for _ in range(width)] for _ in range(height)])
-    for y, row in enumerate(input_grid.values):
-        for x, color in enumerate(row):
-            if color != 0:
-                new_x, new_y = x + shift_x, y + shift_y
-                if 0 <= new_x < width and 0 <= new_y < height:
-                    new_grid.values[new_y][new_x] = color
+    for y in range(height):
+        for x in range(width):
+            if input_grid.values[y][x] != 0:
+                new_x = x + shift
+                new_grid.values[y][new_x] = input_grid.values[y][x]
     
     return new_grid
