@@ -6,8 +6,9 @@ def solve_695367ec(input_grid: ColoredGrid) -> ColoredGrid:
     1. Create a 3x3 grid of 5x5 squares.
     2. Draw separating lines using the input color. Line width is 3 for 3x3 inputs, 1 for others.
     3. In each 5x5 square:
+       - For 3x3 inputs: Fill the entire 5x5 square with the input color.
        - For 1x1 or 2x2 inputs: Center the input pattern.
-       - For 3x3, 4x4, or 5x5 inputs: Place a single cell of the input color in the center.
+       - For 4x4 or 5x5 inputs: Place a single cell of the input color in the center.
     4. Fill the rest of the grid with black (0).
     """
     output_grid = [[0 for _ in range(15)] for _ in range(15)]
@@ -30,17 +31,22 @@ def solve_695367ec(input_grid: ColoredGrid) -> ColoredGrid:
     # Process each 5x5 square
     for row in range(3):
         for col in range(3):
-            start_row = row * 5 + line_width
-            start_col = col * 5 + line_width
+            start_row = row * 5
+            start_col = col * 5
 
-            if max(input_height, input_width) <= 2:
+            if input_height == 3 and input_width == 3:
+                # Fill the entire 5x5 square for 3x3 inputs
+                for i in range(5):
+                    for j in range(5):
+                        output_grid[start_row + i][start_col + j] = color
+            elif max(input_height, input_width) <= 2:
                 # Center the input pattern for 1x1 or 2x2 inputs
                 offset = (5 - max(input_height, input_width)) // 2
                 for i in range(input_height):
                     for j in range(input_width):
                         output_grid[start_row + offset + i][start_col + offset + j] = input_grid.values[i][j]
             else:
-                # Place a single cell of the input color in the center for 3x3, 4x4, or 5x5 inputs
+                # Place a single cell of the input color in the center for 4x4 or 5x5 inputs
                 output_grid[start_row + 2][start_col + 2] = color
 
     return ColoredGrid(values=output_grid)
