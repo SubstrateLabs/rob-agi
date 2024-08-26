@@ -16,23 +16,20 @@ def solve_c92b942c(input_grid: ColoredGrid) -> ColoredGrid:
     output_rows, output_cols = input_rows * 3, input_cols * 3
     output_grid = ColoredGrid(values=[[0 for _ in range(output_cols)] for _ in range(output_rows)])
 
-    # Apply global blue grid
+    def is_green_corner(r, c):
+        return ((r // 3 + c // 3) % 2 == 0) and (r % 3 == 0 or r % 3 == 2) and (c % 3 == 0 or c % 3 == 2)
+
     for r in range(output_rows):
         for c in range(output_cols):
+            # Apply global blue grid
             if r % 3 == 0 or c % 3 == 0:
                 output_grid.set_cell(r, c, 1)
-
-    # Apply green corners in checkerboard pattern
-    for r in range(0, output_rows, 3):
-        for c in range(0, output_cols, 3):
-            if ((r // 3 + c // 3) % 2 == 0):
-                for corner_r, corner_c in [(r, c), (r, c+2), (r+2, c), (r+2, c+2)]:
-                    if output_grid.get_cell(corner_r, corner_c) == 0:
-                        output_grid.set_cell(corner_r, corner_c, 3)
-
-    # Process each input cell and repeat the pattern
-    for r in range(output_rows):
-        for c in range(output_cols):
+            
+            # Apply green corners
+            if is_green_corner(r, c):
+                output_grid.set_cell(r, c, 3)
+            
+            # Process input cells
             input_r, input_c = r // 3 % input_rows, c // 3 % input_cols
             color = input_grid.get_cell(input_r, input_c)
             if color != 0:
