@@ -28,7 +28,7 @@ def solve_5d2a5c43(input_grid: ColoredGrid) -> ColoredGrid:
     # Sort candidates by column, then by row
     candidates.sort(key=lambda x: (x[1], x[0]))
 
-    # Select black square positions
+    # Place black squares
     black_positions = []
     for col in range(4):
         col_candidates = [pos for pos in candidates if pos[1] == col]
@@ -36,23 +36,32 @@ def solve_5d2a5c43(input_grid: ColoredGrid) -> ColoredGrid:
             black_positions.append(col_candidates[0])
             candidates = [pos for pos in candidates if pos != col_candidates[0]]
 
-    # Add additional black squares
-    while len(black_positions) < 6:
-        for row in range(rows):
-            row_count = sum(1 for pos in black_positions if pos[0] == row)
-            if row_count < 2:
-                available_cols = [c for c in range(4) if not any(pos[1] == c for pos in black_positions if pos[0] == row)]
-                if available_cols:
-                    black_positions.append((row, available_cols[0]))
-                    if len(black_positions) == 6:
-                        break
-
-    # Ensure each row has at least one black square
+    # Ensure each row has at least one black square and no more than two
     for row in range(rows):
-        if not any(pos[0] == row for pos in black_positions):
+        row_blacks = [pos for pos in black_positions if pos[0] == row]
+        if not row_blacks:
             available_cols = [c for c in range(4) if not any(pos[1] == c for pos in black_positions)]
             if available_cols:
-                black_positions.append((row, available_cols[0]))
+                new_pos = (row, available_cols[0])
+                black_positions.append(new_pos)
+                candidates = [pos for pos in candidates if pos != new_pos]
+        elif len(row_blacks) == 1 and len(black_positions) < 6:
+            available_cols = [c for c in range(4) if c != row_blacks[0][1] and not any(pos[1] == c for pos in black_positions)]
+            if available_cols:
+                new_pos = (row, available_cols[0])
+                black_positions.append(new_pos)
+                candidates = [pos for pos in candidates if pos != new_pos]
+
+    # If we still don't have 6 black squares, add more
+    while len(black_positions) < 6:
+        for row in range(rows):
+            if sum(1 for pos in black_positions if pos[0] == row) < 2:
+                available_cols = [c for c in range(4) if not any(pos == (row, c) for pos in black_positions)]
+                if available_cols:
+                    new_pos = (row, available_cols[0])
+                    black_positions.append(new_pos)
+                    if len(black_positions) == 6:
+                        break
 
     # Apply black squares to the output grid
     for r, c in black_positions:
