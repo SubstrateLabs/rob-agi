@@ -5,42 +5,49 @@ from collections import deque
 def solve_184a9768(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by applying the following steps:
-    1. Analyzes the input grid to identify color regions and their sizes
-    2. Creates a main structure based on the dominant color (usually blue)
-    3. Processes other colors in order of their significance
-    4. Places color regions as rectangles within the main structure or as separate regions
-    5. Optimizes placements to maximize space usage and maintain relative positions
-    6. Handles multiple regions of the same color if necessary
-    7. Cleans up the grid by removing isolated cells and ensuring rectangular regions
-    8. Creates a black border around the entire grid
-    
-    The transformation reorganizes color regions while preserving their general shapes and relationships,
-    following a color hierarchy typically of Blue > Red > Yellow > Others, but adaptable based on input.
+    1. Analyzes the input grid to identify color regions, their sizes, and positions
+    2. Establishes a color hierarchy based on the total cell count of each color
+    3. Creates a main structure based on the dominant color (usually blue or red)
+    4. Processes secondary colors, placing them within or adjacent to the main structure
+    5. Handles remaining colors, maintaining their relative positions
+    6. Optimizes the layout to fit color regions efficiently within the grid
+    7. Removes gray dots and ensures all regions are rectangular and continuous
+    8. Creates a black border around the entire structure
+
+    The transformation simplifies and structures the input while preserving color relationships,
+    relative positions, and approximate proportions of color regions.
     """
     rows, cols = input_grid.get_dimensions()
     output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
 
-    def get_neighbors(r: int, c: int) -> List[Tuple[int, int]]:
-        return [(r+dr, c+dc) for dr, dc in [(-1,0), (1,0), (0,-1), (0,1)]
-                if 0 <= r+dr < rows and 0 <= c+dc < cols]
+    def count_colors() -> Dict[int, int]:
+        color_counts = {}
+        for row in input_grid.values:
+            for cell in row:
+                if cell != 0:
+                    color_counts[cell] = color_counts.get(cell, 0) + 1
+        return color_counts
 
-    def find_connected_regions() -> Dict[int, List[List[Tuple[int, int]]]]:
-        regions = {color: [] for color in range(1, 10)}
+    def find_largest_region(color: int) -> List[Tuple[int, int]]:
         visited = set()
+        largest_region = []
         for r in range(rows):
             for c in range(cols):
-                color = input_grid.values[r][c]
-                if color != 0 and (r, c) not in visited:
+                if input_grid.values[r][c] == color and (r, c) not in visited:
                     region = []
-                    queue = deque([(r, c)])
-                    while queue:
-                        curr_r, curr_c = queue.popleft()
+                    stack = [(r, c)]
+                    while stack:
+                        curr_r, curr_c = stack.pop()
                         if (curr_r, curr_c) not in visited and input_grid.values[curr_r][curr_c] == color:
                             visited.add((curr_r, curr_c))
                             region.append((curr_r, curr_c))
-                            queue.extend(get_neighbors(curr_r, curr_c))
-                    regions[color].append(region)
-        return regions
+                            for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                                nr, nc = curr_r + dr, curr_c + dc
+                                if 0 <= nr < rows and 0 <= nc < cols:
+                                    stack.append((nr, nc))
+                    if len(region) > len(largest_region):
+                        largest_region = region
+        return largest_region
 
     def get_bounding_box(region: List[Tuple[int, int]]) -> Tuple[int, int, int, int]:
         if not region:
@@ -51,126 +58,57 @@ def solve_184a9768(input_grid: ColoredGrid) -> ColoredGrid:
         max_c = max(c for _, c in region)
         return (min_r, min_c, max_r, max_c)
 
-    def fill_region(region: List[Tuple[int, int]], color: int, grid: ColoredGrid):
-        for r, c in region:
-            grid.values[r][c] = color
+    def create_rectangle(color: int, top: int, left: int, bottom: int, right: int):
+        for r in range(top, bottom + 1):
+            for c in range(left, right + 1):
+                output_grid.values[r][c] = color
 
-    def expand_region(region: List[Tuple[int, int]], color: int, grid: ColoredGrid):
-        min_r, min_c, max_r, max_c = get_bounding_box(region)
-        for r in range(min_r, max_r + 1):
-            for c in range(min_c, max_c + 1):
-                grid.values[r][c] = color
+    # Count colors and establish hierarchy
+    color_counts = count_colors()
+    color_hierarchy = sorted(color_counts.keys(), key=lambda x: color_counts[x], reverse=True)
 
-    def place_region(region: List[Tuple[int, int]], color: int, bbox: Tuple[int, int, int, int], grid: ColoredGrid) -> bool:
-        min_r, min_c, max_r, max_c = bbox
-        region_bbox = get_bounding_box(region)
-        region_height = region_bbox[2] - region_bbox[0] + 1
-        region_width = region_bbox[3] - region_bbox[1] + 1
-        
-        for start_r in range(min_r, max_r - region_height + 2):
-            for start_c in range(min_c, max_c - region_width + 2):
-                if all(grid.values[start_r + r - region_bbox[0]][start_c + c - region_bbox[1]] == 0 
-                       for r, c in region):
-                    for r, c in region:
-                        grid.values[start_r + r - region_bbox[0]][start_c + c - region_bbox[1]] = color
-                    return True
-        return False
-
-    def process_sky_blue(regions: List[List[Tuple[int, int]]], bbox: Tuple[int, int, int, int], grid: ColoredGrid):
-        for region in regions:
-            if place_region(region, 8, bbox, grid):
-                min_r, min_c, max_r, max_c = get_bounding_box(region)
-                for r in range(min_r - 1, max_r + 2):
-                    for c in range(min_c - 1, max_c + 2):
-                        if 0 <= r < rows and 0 <= c < cols and grid.values[r][c] == 0:
-                            grid.values[r][c] = 4
-
-    def remove_isolated_cells(grid: ColoredGrid):
-        for r in range(rows):
-            for c in range(cols):
-                if grid.values[r][c] not in [0, 8]:
-                    neighbors = get_neighbors(r, c)
-                    if all(grid.values[nr][nc] != grid.values[r][c] for nr, nc in neighbors):
-                        grid.values[r][c] = 0
-
-    def fill_surrounded_cells(grid: ColoredGrid):
-        for r in range(rows):
-            for c in range(cols):
-                if grid.values[r][c] == 0:
-                    neighbors = get_neighbors(r, c)
-                    neighbor_colors = [grid.values[nr][nc] for nr, nc in neighbors if grid.values[nr][nc] != 0]
-                    if neighbor_colors and all(color == neighbor_colors[0] for color in neighbor_colors):
-                        grid.values[r][c] = neighbor_colors[0]
-
-    # Find all connected regions
-    all_regions = find_connected_regions()
-
-    # Process primary colors
-    primary_colors = [1, 2, 4]  # Blue, Red, Yellow
-    main_bbox = (0, 0, rows - 1, cols - 1)
-    for color in primary_colors:
-        if color in all_regions:
-            largest_region = max(all_regions[color], key=len)
-            expand_region(largest_region, color, output_grid)
-            main_bbox = get_bounding_box(largest_region)
-            break
+    # Create main structure
+    main_color = color_hierarchy[0]
+    main_region = find_largest_region(main_color)
+    main_bbox = get_bounding_box(main_region)
+    create_rectangle(main_color, *main_bbox)
 
     # Process secondary colors
-    secondary_colors = [3, 6, 7, 9]  # Green, Magenta, Orange, Brown
-    for color in secondary_colors:
-        if color in all_regions:
-            for region in sorted(all_regions[color], key=len, reverse=True):
-                place_region(region, color, main_bbox, output_grid)
-
-    # Process sky blue specially
-    if 8 in all_regions:
-        process_sky_blue(all_regions[8], main_bbox, output_grid)
-
-    # Remove isolated cells and fill surrounded cells
-    remove_isolated_cells(output_grid)
-    fill_surrounded_cells(output_grid)
-    fill_surrounded_cells(output_grid)  # Second pass for thoroughness
-
-    # Final cleanup
-    for r in range(rows):
-        for c in range(cols):
-            if output_grid.values[r][c] == 5:  # Remove gray cells
-                output_grid.values[r][c] = 0
-            if r < main_bbox[0] or r > main_bbox[2] or c < main_bbox[1] or c > main_bbox[3]:
-                output_grid.values[r][c] = 0  # Ensure cells outside main region are empty
-
-    return output_grid
-
-    # Find the largest region of any color
-    largest_region = max((region for color_regions in all_regions.values() for region in color_regions), key=len)
-    largest_color = input_grid.values[largest_region[0][0]][largest_region[0][1]]
-    largest_bbox = get_bounding_box(largest_region)
-
-    # Fill the largest region in the output grid
-    fill_region(largest_region, largest_color, output_grid)
-
-    # Process other colors in order: Red (2), Yellow (4), Sky Blue (8), Green (3), Magenta (6), Orange (7), Brown (9)
-    color_order = [2, 4, 8, 3, 6, 7, 9]
-    for color in color_order:
-        if color in all_regions:
-            for region in sorted(all_regions[color], key=len, reverse=True):
-                if color == 8:
-                    process_sky_blue(region, largest_bbox, output_grid)
-                else:
-                    place_region(region, color, largest_bbox, output_grid)
-
-    # Clean up the grid
-    remove_isolated_cells(output_grid)
-
-    # Fill surrounded cells (two passes)
-    fill_surrounded_cells(output_grid)
-    fill_surrounded_cells(output_grid)
-
-    # Ensure all cells outside the largest region's bounding box are empty
-    min_r, min_c, max_r, max_c = largest_bbox
-    for r in range(rows):
-        for c in range(cols):
-            if r < min_r or r > max_r or c < min_c or c > max_c:
-                output_grid.values[r][c] = 0
+    for color in color_hierarchy[1:]:
+        if color == 5:  # Skip gray
+            continue
+        region = find_largest_region(color)
+        if not region:
+            continue
+        bbox = get_bounding_box(region)
+        relative_position = (
+            (bbox[0] + bbox[2]) // 2 - (main_bbox[0] + main_bbox[2]) // 2,
+            (bbox[1] + bbox[3]) // 2 - (main_bbox[1] + main_bbox[3]) // 2
+        )
+        
+        # Determine placement
+        if color == 8:  # Sky blue
+            top = (main_bbox[0] + main_bbox[2]) // 2 - 1
+            left = (main_bbox[1] + main_bbox[3]) // 2 - 1
+            create_rectangle(color, top, left, top + 1, left + 1)
+        elif all(abs(x) < (main_bbox[2] - main_bbox[0]) // 4 for x in relative_position):
+            # Place inside main structure
+            height = min(bbox[2] - bbox[0] + 1, (main_bbox[2] - main_bbox[0]) // 2)
+            width = min(bbox[3] - bbox[1] + 1, (main_bbox[3] - main_bbox[1]) // 2)
+            top = main_bbox[0] + (main_bbox[2] - main_bbox[0] - height) // 2
+            left = main_bbox[1] + (main_bbox[3] - main_bbox[1] - width) // 2
+            create_rectangle(color, top, left, top + height - 1, left + width - 1)
+        else:
+            # Place adjacent to main structure
+            if abs(relative_position[0]) > abs(relative_position[1]):
+                # Place above or below
+                top = main_bbox[0] - 2 if relative_position[0] < 0 else main_bbox[2] + 2
+                left = (main_bbox[1] + main_bbox[3]) // 2 - (bbox[3] - bbox[1]) // 2
+                create_rectangle(color, top, left, top + 1, left + (bbox[3] - bbox[1]))
+            else:
+                # Place left or right
+                top = (main_bbox[0] + main_bbox[2]) // 2 - (bbox[2] - bbox[0]) // 2
+                left = main_bbox[1] - 2 if relative_position[1] < 0 else main_bbox[3] + 2
+                create_rectangle(color, top, left, top + (bbox[2] - bbox[0]), left + 1)
 
     return output_grid
