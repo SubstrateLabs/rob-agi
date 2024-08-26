@@ -1,0 +1,59 @@
+example_0:
+  input: |
+    The input grid is 18x17 in size. There are two distinct shapes visible:
+    1. A red (2) square outline, 4x4 in size, located near the top-left corner of the grid (starting at row 2, column 2).
+    2. A vertical blue (1) line, 4 pixels tall, at the far right edge of the grid (column 16, rows 2-5).
+    The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The output grid maintains the same 18x17 size, but the shapes have been modified:
+    1. The red (2) square outline has been replicated multiple times, forming a pattern:
+       - The original square remains in its position.
+       - Two more identical squares appear below it, creating a vertical column of three squares.
+       - This column of squares is then repeated to the right, forming a 2x3 grid of red square outlines.
+       - A final row of red pixels extends across the top of this pattern, connecting all the squares.
+    2. The blue vertical line from the input is no longer present.
+    The rest of the grid remains black (0) or empty.
+
+example_1:
+  input: |
+    The input grid is 22x19 in size. There are three distinct shapes visible:
+    1. A horizontal blue (1) line, 4 pixels wide, at the top of the grid (row 0, columns 8-11).
+    2. A sky blue (8) square outline, 4x4 in size, located in the center of the grid (starting at row 8, column 8).
+    3. Another sky blue (8) square outline, 4x4 in size, located near the bottom-left corner (starting at row 14, column 2).
+    4. A vertical blue (1) line, 4 pixels tall, at the far right edge of the grid (column 18, rows 8-11).
+    5. A horizontal blue (1) line, 4 pixels wide, at the bottom of the grid (row 21, columns 2-5).
+    The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The output grid maintains the same 22x19 size, but the shapes have been significantly modified:
+    1. The sky blue (8) square outline in the center has been replicated multiple times, forming a pattern:
+       - The original square remains in its position.
+       - It's expanded horizontally to form a row of 4 identical squares.
+       - This row is then repeated vertically, forming a 2x4 grid of sky blue square outlines.
+       - A final row of sky blue pixels extends across the top and bottom of this pattern, connecting all the squares.
+    2. The sky blue square near the bottom-left has been expanded vertically, forming a column of 4 identical squares.
+    3. All blue (1) lines from the input have disappeared.
+    The rest of the grid remains black (0) or empty.
+
+example_2:
+  input: |
+    The input grid is 22x22 in size. There are three distinct shapes visible:
+    1. A horizontal blue (1) line, 4 pixels wide, at the top of the grid (row 0, columns 6-9).
+    2. A vertical blue (1) line, 4 pixels tall, at the left edge of the grid (column 0, rows 5-8).
+    3. A green (3) square outline, 4x4 in size, located near the top-left corner (starting at row 5, column 6).
+    4. Another green (3) square outline, 4x4 in size, located near the bottom-right corner (starting at row 11, column 12).
+    5. A vertical blue (1) line, 4 pixels tall, at the right edge of the grid (column 21, rows 11-14).
+    6. A horizontal blue (1) line, 4 pixels wide, at the bottom of the grid (row 21, columns 12-15).
+    The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The output grid maintains the same 22x22 size, but the shapes have been significantly modified:
+    1. The green (3) square outline near the top-left has been replicated multiple times, forming a pattern:
+       - The original square remains in its position.
+       - It's expanded horizontally to form a row of 3 identical squares.
+       - This row is then repeated vertically, forming a 2x3 grid of green square outlines.
+       - A final row of green pixels extends across the top and bottom of this pattern, connecting all the squares.
+    2. The green square near the bottom-right has been expanded in a similar manner:
+       - It forms a 2x3 grid of green square outlines.
+       - A row of green pixels connects the tops and bottoms of these squares.
+       - Additionally, this pattern extends further to the right, adding an extra column of green pixels.
+    3. All blue (1) lines from the input have disappeared.
+    The rest of the grid remains black (0) or empty.
