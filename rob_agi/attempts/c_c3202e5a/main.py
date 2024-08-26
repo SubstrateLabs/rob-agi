@@ -9,7 +9,7 @@ def solve_c3202e5a(input_grid: ColoredGrid) -> ColoredGrid:
     2. Determines the section layout and calculates section size.
     3. Identifies the focus color by analyzing color distribution within sections.
     4. Analyzes the focus color's placement patterns across all sections.
-    5. Generates an output grid with dimensions matching the section layout.
+    5. Generates an output grid with dimensions matching the number of sections.
     6. Translates the focus color pattern into a representative shape in the output grid.
 
     The transformation simplifies complex input patterns into a representative geometric shape,
@@ -22,10 +22,10 @@ def solve_c3202e5a(input_grid: ColoredGrid) -> ColoredGrid:
     ColoredGrid: The simplified output grid representing the essence of the input pattern.
     """
     dividing_color = find_dividing_lines(input_grid)
-    section_width, section_height = get_section_size(input_grid, dividing_color)
+    section_layout = get_section_layout(input_grid, dividing_color)
     focus_color = get_focus_color(input_grid, dividing_color)
     
-    section_patterns = analyze_section_patterns(input_grid, dividing_color, focus_color, section_width, section_height)
+    section_patterns = analyze_section_patterns(input_grid, dividing_color, focus_color, section_layout)
     
     output_values = generate_output_pattern(section_patterns, focus_color)
 
@@ -80,8 +80,7 @@ def analyze_section_patterns(grid: ColoredGrid, dividing_color: int, focus_color
 
 def generate_output_pattern(section_patterns: List[List[int]], focus_color: int) -> List[List[int]]:
     """Generates the output pattern based on the section patterns."""
-    output_size = len(section_patterns)
-    output = [[0 for _ in range(output_size)] for _ in range(output_size)]
+    output = [[0 for _ in range(len(section_patterns[0]))] for _ in range(len(section_patterns))]
     max_count = max(max(row) for row in section_patterns)
     threshold = max_count // 2
 
