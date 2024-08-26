@@ -1,21 +1,21 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Set
 
 def solve_e5c44e8f(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transform the input grid by adding a green 'E' pattern based on the following rules:
-    1. Find the initial green (3) square.
-    2. Determine the leftmost valid column for the 'E'.
-    3. Create the vertical line of the 'E'.
+    Transform the input grid by adding a green 'E' pattern based on the following steps:
+    1. Find the initial green (3) cell.
+    2. Determine the potential 'E' shape boundaries considering grid edges and red cells.
+    3. Create the vertical line of the 'E' from the initial green cell.
     4. Create the top, middle, and bottom horizontal lines of the 'E'.
     5. Ensure the 'E' touches at least two edges of the grid.
-    6. Optimize the 'E' shape.
-    7. Clean up the 'E' shape.
-    8. Preserve all red (2) squares.
-    9. Ensure all green squares are connected.
+    6. Optimize the 'E' shape by expanding it where possible.
+    7. Connect any disconnected parts of the 'E'.
+    8. Clean up the 'E' shape by removing unnecessary green cells.
+    9. Verify that all red cells are preserved and the 'E' is connected.
 
-    The function adapts to various initial conditions and red square placements
-    to create the largest possible 'E' pattern that satisfies the challenge requirements.
+    The function adapts to various initial conditions and red cell placements
+    to create the largest possible 'E' pattern that satisfies all challenge requirements.
     """
     output_grid = input_grid.deep_copy()
     initial_green = find_initial_green(output_grid)
