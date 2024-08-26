@@ -13,6 +13,7 @@ def solve_5a5a2103(input_grid: ColoredGrid) -> ColoredGrid:
        c. Applies this pattern across the entire row, respecting dividing lines.
        d. If no color is found, leaves the row unchanged.
     3. Preserves the original dividing lines in the output.
+    4. Applies the pattern to all subsections in each row, even if they originally contained different colors.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -35,12 +36,12 @@ def solve_5a5a2103(input_grid: ColoredGrid) -> ColoredGrid:
             [color, 0, 0, color]
         ]
     
-    def apply_pattern(grid: List[List[int]], pattern: List[List[int]], start_row: int,
+    def apply_pattern(grid: List[List[int]], pattern: List[List[int]], start_row: int, end_row: int,
                       divider_color: int, vertical_lines: List[int]) -> None:
-        for i in range(4):
+        for row in range(start_row, end_row):
             for col in range(len(grid[0])):
-                if col not in vertical_lines and grid[start_row + i][col] != divider_color:
-                    grid[start_row + i][col] = pattern[i][col % 4]
+                if col not in vertical_lines and grid[row][col] != divider_color:
+                    grid[row][col] = pattern[(row - start_row) % 4][col % 4]
     
     # Find dividing lines
     divider_color, horizontal_lines, vertical_lines = find_dividing_lines(input_grid.values)
@@ -60,7 +61,7 @@ def solve_5a5a2103(input_grid: ColoredGrid) -> ColoredGrid:
             pattern = generate_pattern(section_color)
             
             # Apply the pattern across the row
-            for row in range(section_start, min(section_start + 4, len(new_grid))):
-                apply_pattern(new_grid, pattern, row, divider_color, vertical_lines)
+            section_end = min(section_start + 4, len(new_grid))
+            apply_pattern(new_grid, pattern, section_start, section_end, divider_color, vertical_lines)
     
     return ColoredGrid(values=new_grid)
