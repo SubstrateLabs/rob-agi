@@ -1,19 +1,22 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple
+import random
 
 def solve_a04b2602(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transform the input grid by applying blue patterns to green regions.
+    Transform the input grid by applying complex blue patterns to green regions.
     
     The transformation follows these steps:
     1. Identify contiguous green (3) regions.
     2. For each green region:
        a. Find red (2) dots within the region.
-       b. Create blue (1) patterns around red dots, typically 3x3 squares.
-       c. Expand and connect blue patterns within the green area.
-       d. Preserve some green cells, especially near edges.
-    3. Handle small green regions and edge cases.
-    4. Preserve original red dots and black areas outside green regions.
+       b. Create initial blue (1) patterns around red dots.
+       c. Expand blue patterns organically within the green area.
+       d. Connect blue areas in larger regions.
+       e. Preserve some green cells, especially near edges and as islands.
+    3. Handle small green regions differently.
+    4. Preserve original red dots and areas outside green regions.
+    5. Fine-tune the balance between blue and green areas.
     
     Returns a new ColoredGrid with the transformed pattern.
     """
@@ -23,8 +26,11 @@ def solve_a04b2602(input_grid: ColoredGrid) -> ColoredGrid:
     def is_valid(r: int, c: int) -> bool:
         return 0 <= r < rows and 0 <= c < cols
 
-    def get_neighbors(r: int, c: int) -> List[Tuple[int, int]]:
-        return [(r+dr, c+dc) for dr, dc in [(0,1),(1,0),(0,-1),(-1,0)] if is_valid(r+dr, c+dc)]
+    def get_neighbors(r: int, c: int, diagonal: bool = False) -> List[Tuple[int, int]]:
+        directions = [(0,1),(1,0),(0,-1),(-1,0)]
+        if diagonal:
+            directions += [(1,1),(1,-1),(-1,1),(-1,-1)]
+        return [(r+dr, c+dc) for dr, dc in directions if is_valid(r+dr, c+dc)]
 
     def find_green_regions() -> List[List[Tuple[int, int]]]:
         visited = set()
@@ -45,15 +51,59 @@ def solve_a04b2602(input_grid: ColoredGrid) -> ColoredGrid:
 
     def create_blue_pattern(region: List[Tuple[int, int]]):
         red_dots = [(r, c) for r, c in region if input_grid.get_cell(r, c) == 2]
+        region_size = len(region)
+        blue_cells = set()
+
+        # Initialize blue patterns around red dots
         for r, c in red_dots:
-            for dr in range(-1, 2):
-                for dc in range(-1, 2):
-                    nr, nc = r + dr, c + dc
-                    if (nr, nc) in region and (dr != 0 or dc != 0):
-                        output_grid.set_cell(nr, nc, 1)  # Set to blue
+            neighbors = get_neighbors(r, c, diagonal=True)
+            for nr, nc in neighbors:
+                if (nr, nc) in region and input_grid.get_cell(nr, nc) != 2:
+                    output_grid.set_cell(nr, nc, 1)
+                    blue_cells.add((nr, nc))
+
+        # Expand blue patterns
+        expansion_iterations = min(5, region_size // 10)
+        for _ in range(expansion_iterations):
+            new_blue_cells = set()
+            for r, c in blue_cells:
+                neighbors = get_neighbors(r, c)
+                for nr, nc in neighbors:
+                    if (nr, nc) in region and (nr, nc) not in blue_cells and random.random() < 0.7:
+                        new_blue_cells.add((nr, nc))
+            blue_cells.update(new_blue_cells)
+            for r, c in new_blue_cells:
+                if input_grid.get_cell(r, c) != 2:
+                    output_grid.set_cell(r, c, 1)
+
+        # Preserve some green areas
+        green_preservation_rate = max(0.2, 1 - (region_size / 100))
+        for r, c in region:
+            if (r, c) not in blue_cells and random.random() < green_preservation_rate:
+                output_grid.set_cell(r, c, 3)
+
+        # Connect blue areas in larger regions
+        if region_size > 50:
+            for _ in range(region_size // 20):
+                r, c = random.choice(list(blue_cells))
+                direction = random.choice([(0,1),(1,0),(0,-1),(-1,0)])
+                for _ in range(3):
+                    r, c = r + direction[0], c + direction[1]
+                    if (r, c) in region and input_grid.get_cell(r, c) != 2:
+                        output_grid.set_cell(r, c, 1)
+                        blue_cells.add((r, c))
 
     green_regions = find_green_regions()
     for region in green_regions:
-        create_blue_pattern(region)
+        if len(region) < 25:  # Handle small regions differently
+            red_dots = [(r, c) for r, c in region if input_grid.get_cell(r, c) == 2]
+            if red_dots:
+                r, c = red_dots[0]
+                neighbors = get_neighbors(r, c)
+                for nr, nc in neighbors:
+                    if (nr, nc) in region and input_grid.get_cell(nr, nc) != 2:
+                        output_grid.set_cell(nr, nc, 1)
+        else:
+            create_blue_pattern(region)
 
     return output_grid
