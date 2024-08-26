@@ -7,13 +7,13 @@ def solve_4acc7107(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by applying the following steps:
     1. Analyzes the input grid and groups cells by color
     2. Processes each color group:
-       - Maintains the original width and structure of the color group
-       - Vertically flips the group while consolidating disconnected parts
+       - Maintains the original width of the color group
+       - Consolidates disconnected parts vertically
     3. Places processed color groups in a new grid:
        - Preserves the left-to-right order of colors
        - Ensures all color groups touch the bottom of the grid
        - Creates a "skyline" effect by removing vertical gaps
-    4. Consolidates any remaining disconnected parts of the same color
+    4. Performs a final consolidation to remove any remaining gaps
     
     The transformation maintains the width of each color group, preserves left-to-right order,
     and ensures no empty rows between colored cells of the same group.
@@ -38,13 +38,16 @@ def solve_4acc7107(input_grid: ColoredGrid) -> ColoredGrid:
     
     for color, group in sorted(color_groups.items(), key=lambda x: x[1]['left']):
         width = group['right'] - group['left'] + 1
-        sorted_cells = sorted(group['cells'], key=lambda x: (x[1], -x[0]))  # Sort by column, then reverse row
+        sorted_cells = sorted(group['cells'], key=lambda x: x[1])  # Sort by column
         
-        for i, (_, c) in enumerate(sorted_cells):
-            new_c = current_col + (c - group['left'])
-            new_r = rows - 1 - (i % width)
-            if 0 <= new_r < rows and 0 <= new_c < cols:
-                new_grid[new_r][new_c] = color
+        new_col = current_col
+        for c in range(group['left'], group['right'] + 1):
+            column_cells = [cell for cell in sorted_cells if cell[1] == c]
+            for i, (_, _) in enumerate(column_cells):
+                new_r = rows - 1 - i
+                if 0 <= new_r < rows and 0 <= new_col < cols:
+                    new_grid[new_r][new_col] = color
+            new_col += 1
         
         current_col += width
     
