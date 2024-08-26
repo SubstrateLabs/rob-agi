@@ -161,8 +161,8 @@ def solve_2f0c5170(input_grid: ColoredGrid) -> ColoredGrid:
         
         for r, c in region:
             color = grid.get_cell(r, c)
+            pattern.set_cell(r - min_r, c - min_c, color)
             if color != 0:
-                pattern.set_cell(r - min_r, c - min_c, color)
                 non_black_cells += 1
                 unique_colors.add(color)
                 max_distance = max(max_distance, r - min_r, c - min_c)
@@ -187,8 +187,7 @@ def solve_2f0c5170(input_grid: ColoredGrid) -> ColoredGrid:
         for r in range(pattern_rows):
             for c in range(pattern_cols):
                 color = pattern.get_cell(r, c)
-                if color != 0:
-                    centered.set_cell(r + vertical_padding, c + horizontal_padding, color)
+                centered.set_cell(r + vertical_padding, c + horizontal_padding, color)
         
         return centered
 
