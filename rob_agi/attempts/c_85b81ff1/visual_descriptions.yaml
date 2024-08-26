@@ -1,23 +1,69 @@
 example_0:
   input: |
-    The grid consists of a pattern of magenta (6) and black (0) squares. The magenta squares form a series of vertical lines, creating a striped pattern. The black squares appear as gaps between these magenta lines. Some magenta squares are isolated, appearing as single cells surrounded by black. The overall effect is like a barcode or fence-like structure with occasional breaks.
+    The grid consists of magenta (6) and black (0) cells arranged in a 13x14 pattern. Vertical magenta lines dominate, with black gaps creating a barcode-like structure. Key observations:
+    1. The top and bottom rows are solid magenta, except for regular black gaps.
+    2. Some columns have continuous magenta lines from top to bottom.
+    3. Other columns have breaks in the magenta lines, with isolated magenta cells.
+    4. The second row from the top has more black cells than other rows.
+    5. The rightmost column alternates between magenta and black cells.
   output: |
-    The output grid maintains the same basic structure of magenta (6) vertical lines separated by black (0) gaps. However, some of the isolated magenta squares have been connected to form continuous vertical lines. Specifically, in columns where there were breaks in the magenta lines, these breaks have been filled in to create uninterrupted vertical stripes. The rightmost column, which had alternating magenta and black squares, now has more continuous magenta sections.
+    The output maintains the 13x14 grid of magenta (6) and black (0) cells, with several key changes:
+    1. The top and bottom rows remain unchanged.
+    2. The second row from the top is now entirely black.
+    3. Many isolated magenta cells have been connected, forming longer vertical lines.
+    4. In columns with breaks, magenta cells often "bridge" gaps if there are magenta cells above and below.
+    5. The rightmost column now has longer continuous magenta sections.
+    6. Odd-numbered rows (3rd, 5th, etc.) tend to have more magenta cells than in the input.
 
 example_1:
   input: |
-    This grid follows a similar pattern to the previous example, but uses orange (7) instead of magenta. It consists of vertical orange stripes separated by black (0) gaps. Some orange squares are isolated, creating breaks in the vertical lines. The overall pattern resembles a barcode or fence-like structure with occasional interruptions.
+    This 13x14 grid uses orange (7) and black (0) cells, following a similar pattern to example_0:
+    1. Vertical orange lines dominate, separated by black gaps.
+    2. The top and bottom rows are mostly orange with regular black interruptions.
+    3. Some columns have unbroken orange lines, while others have isolated orange cells.
+    4. The second row from the top has more black cells than other rows.
+    5. The rightmost column alternates between orange and black.
   output: |
-    The output maintains the basic structure of orange (7) vertical lines separated by black (0) gaps. However, many of the isolated orange squares have been connected to form more continuous vertical lines. Breaks in the orange lines have been filled in several columns, creating longer uninterrupted stripes. The rightmost column, which had alternating orange and black squares, now has more continuous orange sections.
+    The transformed 13x14 grid of orange (7) and black (0) cells shows these changes:
+    1. Top and bottom rows are preserved.
+    2. The second row is now entirely black.
+    3. Isolated orange cells are often connected, forming longer vertical lines.
+    4. Orange cells tend to "bridge" gaps in columns if orange cells exist above and below.
+    5. The rightmost column now has more continuous orange sections.
+    6. Odd-numbered rows (3rd, 5th, etc.) generally have more orange cells than in the input.
 
 example_2:
   input: |
-    This grid uses blue (1) and black (0) squares to create a pattern similar to the previous examples. Vertical blue lines are separated by black gaps, forming a striped or barcode-like pattern. Some blue squares are isolated, creating breaks in the vertical lines. The rightmost column alternates between blue and black squares.
+    This 13x14 grid uses blue (1) and black (0) cells, with a pattern similar to previous examples:
+    1. Vertical blue lines are the primary feature, separated by black gaps.
+    2. Top and bottom rows are mostly blue with regular black interruptions.
+    3. Some columns have continuous blue lines, others have isolated blue cells.
+    4. The second row from the top has more black cells than other rows.
+    5. The rightmost column alternates between blue and black.
   output: |
-    The output preserves the overall structure of blue (1) vertical lines separated by black (0) gaps. However, many of the isolated blue squares have been connected to form more continuous vertical lines. Breaks in the blue lines have been filled in several columns, resulting in longer uninterrupted stripes. The rightmost column, which previously alternated between blue and black, now has more continuous blue sections.
+    The transformed 13x14 grid of blue (1) and black (0) cells exhibits these changes:
+    1. Top and bottom rows remain the same.
+    2. The second row is now completely black.
+    3. Many isolated blue cells are connected, creating longer vertical lines.
+    4. Blue cells often "bridge" gaps in columns when blue cells are present above and below.
+    5. The rightmost column now has longer continuous blue sections.
+    6. Odd-numbered rows (3rd, 5th, etc.) tend to have more blue cells compared to the input.
 
 example_3:
   input: |
-    This grid also uses blue (1) and black (0) squares, creating a pattern similar to the previous examples. Vertical blue lines are separated by black gaps, forming a striped or barcode-like pattern. Some blue squares are isolated, particularly in the right half of the grid, creating breaks in the vertical lines. The rightmost column consists mostly of isolated blue squares separated by black.
+    This 13x14 grid also uses blue (1) and black (0) cells, but with some distinct features:
+    1. Vertical blue lines are prominent, separated by black gaps.
+    2. Top and bottom rows are mostly blue with regular black interruptions.
+    3. The left half of the grid has more continuous blue lines.
+    4. The right half has more isolated blue cells and breaks in the vertical lines.
+    5. The second row from the top has more black cells than other rows.
+    6. The rightmost column is mostly isolated blue cells separated by black.
   output: |
-    The output maintains the basic structure of blue (1) vertical lines separated by black (0) gaps. However, many of the isolated blue squares have been connected to form more continuous vertical lines. Breaks in the blue lines have been filled in several columns, especially in the right half of the grid, creating longer uninterrupted stripes. The rightmost column, which previously had mostly isolated blue squares, now has more continuous blue sections.
+    The transformed 13x14 grid of blue (1) and black (0) cells shows these key changes:
+    1. Top and bottom rows are unchanged.
+    2. The second row is now entirely black.
+    3. Many isolated blue cells are connected, especially in the right half of the grid.
+    4. Blue cells tend to "bridge" gaps in columns when blue cells are present above and below.
+    5. The rightmost column now has more continuous blue sections.
+    6. Odd-numbered rows (3rd, 5th, etc.) generally have more blue cells than in the input.
+    7. The left half of the grid remains largely unchanged, while the right half shows more connections.
