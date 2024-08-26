@@ -1,12 +1,13 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple
+from itertools import combinations
 
 def solve_d2acf2cb(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid based on the following rules:
     1. Identifies yellow (4) squares and their positions.
-    2. For rows with yellow squares at both ends:
-       - Replaces squares between yellows with alternating orange (7) and sky blue (8).
+    2. For pairs of yellow squares in the same row or column:
+       - Replaces squares between yellows with alternating sky blue (8) and orange (7).
     3. Preserves existing structures and yellow squares.
     4. Ensures no orange or sky blue squares are touching horizontally or vertically.
 
@@ -19,15 +20,21 @@ def solve_d2acf2cb(input_grid: ColoredGrid) -> ColoredGrid:
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
 
-    # Find rows with yellow squares at both ends
-    for r in range(rows):
-        row_yellows = [c for c in range(cols) if output_grid.values[r][c] == 4]
-        if len(row_yellows) == 2:
-            start, end = row_yellows
-            for c in range(start + 1, end):
-                output_grid.values[r][c] = 7 if (c - start) % 2 else 8
+    # Find all yellow squares
+    yellow_squares = [(r, c) for r in range(rows) for c in range(cols) if output_grid.values[r][c] == 4]
 
-    # Adjust for color adjacency
+    # Process pairs of yellow squares
+    for (r1, c1), (r2, c2) in combinations(yellow_squares, 2):
+        if r1 == r2:  # Same row
+            start, end = min(c1, c2), max(c1, c2)
+            for c in range(start + 1, end):
+                output_grid.values[r1][c] = 8 if (c - start) % 2 == 1 else 7
+        elif c1 == c2:  # Same column
+            start, end = min(r1, r2), max(r1, r2)
+            for r in range(start + 1, end):
+                output_grid.values[r][c1] = 8 if (r - start) % 2 == 1 else 7
+
+    # Clean up existing patterns and resolve adjacencies
     for r in range(rows):
         for c in range(cols):
             if output_grid.values[r][c] in [7, 8]:
