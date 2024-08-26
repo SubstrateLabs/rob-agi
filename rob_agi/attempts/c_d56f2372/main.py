@@ -3,7 +3,7 @@ from typing import List, Tuple, Set
 
 def solve_d56f2372(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the challenge by finding the first complete, non-edge-touching shape in the input grid.
+    Solves the challenge by finding the topmost, then leftmost, complete non-edge-touching shape in the input grid.
     
     1. Scans the grid from top to bottom, left to right.
     2. Identifies the first complete shape (not touching edges and all pixels connected).
@@ -17,15 +17,25 @@ def solve_d56f2372(input_grid: ColoredGrid) -> ColoredGrid:
         ColoredGrid: A new grid containing only the extracted shape or a 1x1 grid with value 0.
     """
     visited = set()
+    valid_shape = None
+    valid_shape_top = float('inf')
+    valid_shape_left = float('inf')
 
     for y in range(input_grid.num_rows):
         for x in range(input_grid.num_cols):
             if (x, y) not in visited and input_grid.values[y][x] != 0:
                 shape_pixels = flood_fill(input_grid, x, y, input_grid.values[y][x])
                 if is_shape_complete(shape_pixels, (input_grid.num_rows, input_grid.num_cols)):
-                    return extract_shape(shape_pixels, input_grid)
+                    shape_top = min(y for _, y in shape_pixels)
+                    shape_left = min(x for x, _ in shape_pixels)
+                    if shape_top < valid_shape_top or (shape_top == valid_shape_top and shape_left < valid_shape_left):
+                        valid_shape = shape_pixels
+                        valid_shape_top = shape_top
+                        valid_shape_left = shape_left
                 visited.update(shape_pixels)
 
+    if valid_shape:
+        return extract_shape(valid_shape, input_grid)
     return ColoredGrid(values=[[0]])
 
 def flood_fill(grid: ColoredGrid, start_x: int, start_y: int, color: int) -> Set[Tuple[int, int]]:
