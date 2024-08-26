@@ -34,13 +34,13 @@ def identify_seed_patterns(grid: ColoredGrid) -> List[Dict]:
         for c in range(cols):
             if (r == 0 or r == rows-1 or c == 0 or c == cols-1) and grid.get_cell(r, c) != 0:
                 if r == 0:
-                    patterns.append({'edge': 'top', 'pattern': get_pattern(grid, r, c, 0, 1), 'row': r, 'col': c})
+                    patterns.append({'edge': 'top', 'pattern': get_pattern(grid, r, c, 1, 0), 'row': r, 'col': c})
                 elif r == rows-1:
-                    patterns.append({'edge': 'bottom', 'pattern': get_pattern(grid, r, c, 0, -1), 'row': r, 'col': c})
+                    patterns.append({'edge': 'bottom', 'pattern': get_pattern(grid, r, c, -1, 0), 'row': r, 'col': c})
                 elif c == 0:
-                    patterns.append({'edge': 'left', 'pattern': get_pattern(grid, r, c, 1, 0), 'row': r, 'col': c})
+                    patterns.append({'edge': 'left', 'pattern': get_pattern(grid, r, c, 0, 1), 'row': r, 'col': c})
                 elif c == cols-1:
-                    patterns.append({'edge': 'right', 'pattern': get_pattern(grid, r, c, -1, 0), 'row': r, 'col': c})
+                    patterns.append({'edge': 'right', 'pattern': get_pattern(grid, r, c, 0, -1), 'row': r, 'col': c})
     
     return sorted(patterns, key=lambda x: len(x['pattern']), reverse=True)
 
@@ -58,23 +58,21 @@ def expand_pattern(grid: ColoredGrid, seed: Dict):
     pattern = seed['pattern']
     
     if seed['edge'] in ['top', 'bottom']:
-        start_row = 0 if seed['edge'] == 'top' else rows - 1
-        end_row = rows if seed['edge'] == 'top' else -1
-        step = 1 if seed['edge'] == 'top' else -1
-        for r in range(start_row, end_row, step):
-            if all(grid.get_cell(r, seed['col'] + i) == 0 for i in range(len(pattern))):
-                for i, color in enumerate(pattern):
-                    grid.set_cell(r, seed['col'] + i, color)
+        start_col = seed['col']
+        end_col = cols
+        for c in range(start_col, end_col):
+            if all(grid.get_cell(r, c) == 0 for r in range(rows)):
+                for r in range(rows):
+                    grid.set_cell(r, c, pattern[r % len(pattern)])
             else:
                 break
     else:  # left or right
-        start_col = 0 if seed['edge'] == 'left' else cols - 1
-        end_col = cols if seed['edge'] == 'left' else -1
-        step = 1 if seed['edge'] == 'left' else -1
-        for c in range(start_col, end_col, step):
-            if all(grid.get_cell(seed['row'] + i, c) == 0 for i in range(len(pattern))):
-                for i, color in enumerate(pattern):
-                    grid.set_cell(seed['row'] + i, c, color)
+        start_row = seed['row']
+        end_row = rows
+        for r in range(start_row, end_row):
+            if all(grid.get_cell(r, c) == 0 for c in range(cols)):
+                for c in range(cols):
+                    grid.set_cell(r, c, pattern[c % len(pattern)])
             else:
                 break
 
