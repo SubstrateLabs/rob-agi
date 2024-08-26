@@ -6,13 +6,15 @@ def solve_2697da3f(input_grid: ColoredGrid) -> ColoredGrid:
     Transform the input grid into a larger, symmetrical pattern.
     
     The transformation involves:
-    1. Analyzing the input pattern to extract its essence.
+    1. Analyzing the input pattern to extract its core.
     2. Creating a larger output grid of size (2n-1) x (2n-1) where n is the max dimension.
-    3. Expanding the core pattern while maintaining its key characteristics.
-    4. Applying rotational symmetry to create a complex, symmetrical design.
-    5. Extending the pattern to touch all edges if the original input touched any edge.
-    6. Refining the pattern to ensure consistency and symmetry.
-    7. Verifying perfect rotational symmetry and edge-touching in the final output.
+    3. Quadrupling the core pattern with rotations to create a complex, symmetrical design.
+    4. Enhancing symmetry and complexity by filling gaps and ensuring pattern flow.
+    5. Creating a central void.
+    6. Extending the pattern to touch all edges if the original input touched any edge.
+    7. Refining the pattern to ensure consistency and symmetry.
+    8. Ensuring corner cells are black.
+    9. Making final adjustments for perfect rotational symmetry.
     """
     def analyze_input(grid: ColoredGrid) -> dict:
         rows, cols = grid.get_dimensions()
@@ -120,19 +122,98 @@ def solve_2697da3f(input_grid: ColoredGrid) -> ColoredGrid:
                     grid[r][c] = max(set(neighbors), key=neighbors.count)
 
     def solve_2697da3f(input_grid: ColoredGrid) -> ColoredGrid:
+        # 1. Analyze the input grid
         input_analysis = analyze_input(input_grid)
         core_pattern = extract_core_pattern(input_grid)
-    
+
+        # 2. Determine the output grid size
         max_dim = max(input_grid.get_dimensions())
         output_size = max_dim * 2 - 1
-    
-        expanded_pattern = expand_pattern(core_pattern, output_size)
-        symmetrical_pattern = apply_rotational_symmetry(expanded_pattern)
-    
-        extend_to_edges(symmetrical_pattern, input_analysis)
-        refine_pattern(symmetrical_pattern)
-    
-        # Ensure corners are black
-        symmetrical_pattern[0][0] = symmetrical_pattern[0][-1] = symmetrical_pattern[-1][0] = symmetrical_pattern[-1][-1] = 0
-    
-        return ColoredGrid(values=symmetrical_pattern)
+
+        # 3. Extract and prepare the core pattern
+        scaled_core = scale_core_pattern(core_pattern, output_size // 2)
+
+        # 4. Create the quadrupled pattern
+        output_grid = create_quadrupled_pattern(scaled_core, output_size)
+
+        # 5. Enhance symmetry and complexity
+        enhance_symmetry(output_grid)
+
+        # 6. Create central void
+        create_central_void(output_grid)
+
+        # 7. Extend to edges if necessary
+        if any(input_analysis['edge_touches'].values()):
+            extend_to_edges(output_grid)
+
+        # 8. Refine the pattern
+        refine_pattern(output_grid)
+
+        # 9. Ensure corner cells are black
+        set_corner_cells_black(output_grid)
+
+        # 10. Final adjustments
+        final_adjustments(output_grid)
+
+        # 11. Create and return the final ColoredGrid
+        return ColoredGrid(values=output_grid)
+def scale_core_pattern(core_pattern: List[List[int]], target_size: int) -> List[List[int]]:
+    scale_factor = max(1, target_size // max(len(core_pattern), len(core_pattern[0])))
+    return [[cell for cell in row for _ in range(scale_factor)] for row in core_pattern for _ in range(scale_factor)]
+
+def create_quadrupled_pattern(core: List[List[int]], output_size: int) -> List[List[int]]:
+    output = [[0 for _ in range(output_size)] for _ in range(output_size)]
+    core_size = len(core)
+    for r in range(core_size):
+        for c in range(core_size):
+            # Top-left quadrant
+            output[r][c] = core[r][c]
+            # Top-right quadrant
+            output[r][output_size-1-c] = core[r][c]
+            # Bottom-left quadrant
+            output[output_size-1-r][c] = core[r][c]
+            # Bottom-right quadrant
+            output[output_size-1-r][output_size-1-c] = core[r][c]
+    return output
+
+def enhance_symmetry(grid: List[List[int]]) -> None:
+    size = len(grid)
+    for r in range(size):
+        for c in range(size):
+            if grid[r][c] != 0:
+                grid[size-1-r][c] = grid[r][size-1-c] = grid[size-1-r][size-1-c] = grid[r][c]
+
+def create_central_void(grid: List[List[int]]) -> None:
+    size = len(grid)
+    void_size = 3 if size < 15 else 5
+    start = (size - void_size) // 2
+    for r in range(start, start + void_size):
+        for c in range(start, start + void_size):
+            grid[r][c] = 0
+
+def extend_to_edges(grid: List[List[int]]) -> None:
+    size = len(grid)
+    for i in range(size):
+        if grid[i][0] == 0:
+            grid[i][0] = grid[i][size//2]
+        if grid[i][size-1] == 0:
+            grid[i][size-1] = grid[i][size//2]
+        if grid[0][i] == 0:
+            grid[0][i] = grid[size//2][i]
+        if grid[size-1][i] == 0:
+            grid[size-1][i] = grid[size//2][i]
+
+def set_corner_cells_black(grid: List[List[int]]) -> None:
+    size = len(grid)
+    grid[0][0] = grid[0][size-1] = grid[size-1][0] = grid[size-1][size-1] = 0
+
+def final_adjustments(grid: List[List[int]]) -> None:
+    size = len(grid)
+    for r in range(1, size - 1):
+        for c in range(1, size - 1):
+            neighbors = [
+                grid[r-1][c], grid[r+1][c],
+                grid[r][c-1], grid[r][c+1]
+            ]
+            if grid[r][c] == 0 and all(n != 0 for n in neighbors):
+                grid[r][c] = max(set(neighbors), key=neighbors.count)
