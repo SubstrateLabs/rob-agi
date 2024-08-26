@@ -3,13 +3,13 @@ from rob_agi.colored_grid import ColoredGrid
 def solve_762cd429(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by expanding a 2x2 color cluster in the bottom-left corner
-    into a larger pattern that fills most of the grid, leaving a 1-cell black border.
+    into a larger pattern that fills most of the grid.
     
     1. Extracts the 2x2 color cluster from the bottom-left corner.
-    2. Calculates the size of each expanded square based on the smaller grid dimension.
-    3. Creates an expanded 2x2 pattern, repeating the top-left color in the top-right.
-    4. Fills the bottom-right area of a new grid with the expanded pattern.
-    5. Ensures a 1-cell black border around the pattern.
+    2. Determines the expansion factor (2x2 for smaller grids, 4x4 for larger grids).
+    3. Calculates the size of each expanded square based on the smaller grid dimension.
+    4. Creates an expanded pattern based on the original 2x2 cluster.
+    5. Fills the new grid with the expanded pattern, maintaining the original grid size.
     
     Returns a new ColoredGrid with the transformed pattern.
     """
@@ -22,35 +22,35 @@ def solve_762cd429(input_grid: ColoredGrid) -> ColoredGrid:
         [input_values[-1][-2], input_values[-1][-1]]
     ]
     
-    # Calculate square size
-    square_size = (min(width, height) - 2) // 2
+    # Determine expansion factor
+    expansion_factor = 4 if min(height, width) > 14 else 2
     
-    # Create expanded 2x2 pattern
-    expanded_pattern = [
-        [cluster[0][0], cluster[0][1]],
-        [cluster[1][0], cluster[1][1]]
-    ]
+    # Calculate square size
+    square_size = min(width, height) // expansion_factor
     
     # Create new grid
     new_grid = [[0 for _ in range(width)] for _ in range(height)]
     
     # Calculate starting position
-    start_row = height - (2 * square_size) - 1
-    start_col = width - (2 * square_size) - 1
+    start_row = height - (expansion_factor * square_size)
+    start_col = width - (expansion_factor * square_size)
     
-    # Fill bottom-right area with expanded pattern
-    for i in range(2):
-        for j in range(2):
-            color = expanded_pattern[i][j]
+    # Fill the grid with the expanded pattern
+    for i in range(expansion_factor):
+        for j in range(expansion_factor):
+            if i < 2 and j < 2:
+                color = cluster[i][j]
+            elif i < 2:
+                color = cluster[i][1]
+            elif j < 2:
+                color = cluster[1][j]
+            else:
+                color = cluster[0][0]
+            
             for row in range(square_size):
                 for col in range(square_size):
                     new_row = start_row + (i * square_size) + row
                     new_col = start_col + (j * square_size) + col
                     new_grid[new_row][new_col] = color
-    
-    # Special case: repeat top-left color in top-right
-    for row in range(start_row, start_row + square_size):
-        for col in range(start_col + square_size, start_col + 2 * square_size):
-            new_grid[row][col] = expanded_pattern[0][0]
     
     return ColoredGrid(values=new_grid)
