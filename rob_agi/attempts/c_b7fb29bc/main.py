@@ -6,10 +6,11 @@ def solve_b7fb29bc(input_grid: ColoredGrid) -> ColoredGrid:
     
     The pattern consists of:
     1. A yellow (4) border just inside the green (3) border
-    2. Alternating vertical stripes of red (2) and yellow (4) in the interior
+    2. A complex flow pattern of red (2) and yellow (4) in the interior
     3. A rightmost column of yellow (4)
     4. Preservation of any original green (3) cells within the border
     5. Special handling for small interiors and edge cases
+    6. A gradual transition from more red on the left to more yellow on the right
     """
     # Step 1: Identify the green border
     rows, cols = input_grid.get_dimensions()
@@ -27,15 +28,23 @@ def solve_b7fb29bc(input_grid: ColoredGrid) -> ColoredGrid:
     inner_height = inner_bottom - inner_top + 1
     inner_width = inner_right - inner_left + 1
 
-    # Step 4: Fill the interior
+    # Step 4: Fill the interior with the complex pattern
     for r in range(inner_top, inner_bottom + 1):
         for c in range(inner_left, inner_right + 1):
-            if c == inner_right:
-                result.set_cell(r, c, 4)  # Rightmost column is always yellow
-            elif (c - inner_left) % 2 == 0:
-                result.set_cell(r, c, 2)  # Red
+            if r == inner_top or r == inner_bottom or c == inner_left or c == inner_right:
+                result.set_cell(r, c, 4)  # Yellow border
+            elif c == inner_right - 1:
+                result.set_cell(r, c, 4)  # Second rightmost column is yellow
             else:
-                result.set_cell(r, c, 4)  # Yellow
+                # Complex flow pattern
+                column_index = c - inner_left
+                row_index = r - inner_top
+                if column_index < inner_width // 3:
+                    result.set_cell(r, c, 2 if column_index % 2 == 0 else 4)
+                elif column_index < 2 * inner_width // 3:
+                    result.set_cell(r, c, 2 if (column_index + row_index) % 3 == 0 else 4)
+                else:
+                    result.set_cell(r, c, 2 if (column_index + row_index) % 4 == 0 else 4)
 
     # Step 5: Handle small interiors
     if inner_width <= 3 or inner_height <= 3:
@@ -48,11 +57,5 @@ def solve_b7fb29bc(input_grid: ColoredGrid) -> ColoredGrid:
         for c in range(left, right + 1):
             if input_grid.get_cell(r, c) == 3:
                 result.set_cell(r, c, 3)
-
-    # Step 7: Final check
-    for r in range(top, bottom + 1):
-        for c in range(left, right + 1):
-            if result.get_cell(r, c) == 0:
-                result.set_cell(r, c, 4)
 
     return result
