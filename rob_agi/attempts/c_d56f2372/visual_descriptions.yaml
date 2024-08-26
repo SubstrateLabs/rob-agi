@@ -1,46 +1,46 @@
 example_0:
   input: |
-    A 21x16 grid with mostly black (empty) space. There are four distinct colored shapes:
-    1. A sky blue (8) shape in the top left, resembling a cross or plus sign.
-    2. A red (2) shape in the top right, looking like an irregular T or hammer.
-    3. An orange (7) shape in the middle-right, resembling a distorted H or two connected rectangles.
-    4. A magenta (6) shape in the bottom right, looking like an irregular cross or plus sign.
-    Each shape is surrounded by black space and doesn't touch the others.
+    A 21x16 grid with mostly black (0) background. Four distinct colored shapes are present:
+    1. Sky blue (8) shape in the top-left quadrant: A complete cross or plus sign, not touching any edges.
+    2. Red (2) shape in the top-right quadrant: An irregular T or hammer, touching the top edge.
+    3. Orange (7) shape in the middle-right: A distorted H or two connected rectangles, not touching any edges.
+    4. Magenta (6) shape in the bottom-right: An irregular cross, touching the bottom edge.
+    All shapes are separated by black space and do not touch each other.
   output: |
-    A 4x5 grid containing only the sky blue (8) shape from the input, centered and complete. It clearly shows a cross or plus sign made of sky blue squares on a black background.
+    A 4x5 grid showing only the sky blue (8) cross shape from the input. This shape is complete, centered, and surrounded by black (0) background, demonstrating it was the first non-edge-touching shape encountered.
 
 example_1:
   input: |
-    A 22x17 grid with mostly black (empty) space. There are five distinct colored shapes:
-    1. A red (2) shape in the top left, resembling a heart or strawberry.
-    2. A green (3) shape in the middle right, looking like a distorted star or flower.
-    3. A yellow (4) shape on the left side, resembling a vertical rectangle with protrusions.
-    4. A blue (1) shape in the bottom center, looking like a diamond or kite.
-    5. A single sky blue (8) pixel in the top right corner.
-    Each shape is surrounded by black space and doesn't touch the others.
+    A 22x17 grid with a black (0) background. Five distinct colored shapes are visible:
+    1. Red (2) shape in the top-left: A heart or strawberry, touching the top edge.
+    2. Green (3) shape in the middle-right: A distorted star or flower, not touching any edges.
+    3. Yellow (4) shape on the left side: A vertical rectangle with protrusions, touching the left edge.
+    4. Blue (1) shape in the bottom-center: A diamond or kite, not touching any edges.
+    5. A single sky blue (8) pixel in the top-right corner, touching the top and right edges.
+    All shapes are separated by black space.
   output: |
-    A 6x7 grid containing only the blue (1) shape from the input, centered and complete. It clearly shows a diamond or kite shape made of blue squares on a black background.
+    A 6x7 grid containing only the blue (1) diamond or kite shape from the input. This shape is complete, centered, and surrounded by black (0) background, indicating it was the first non-edge-touching shape encountered.
 
 example_2:
   input: |
-    A 21x19 grid with mostly black (empty) space. There are five distinct colored shapes:
-    1. A magenta (6) shape in the top left, resembling an irregular T or hammer.
-    2. A green (3) shape in the top right, looking like a distorted star or flower.
-    3. A blue (1) shape in the middle, resembling a butterfly or bow tie.
-    4. An orange (7) shape in the middle right, looking like a small L or corner.
-    5. A yellow (4) shape at the bottom, resembling a goblet or chalice.
-    Each shape is surrounded by black space and doesn't touch the others.
+    A 21x19 grid with a black (0) background. Five distinct colored shapes are present:
+    1. Magenta (6) shape in the top-left: An irregular T or hammer, not touching any edges.
+    2. Green (3) shape in the top-right: A distorted star or flower, touching the top edge.
+    3. Blue (1) shape in the middle: A butterfly or bow tie, touching the left edge.
+    4. Orange (7) shape in the middle-right: A small L or corner, not touching any edges but very close to the right edge.
+    5. Yellow (4) shape at the bottom: A goblet or chalice, touching the bottom edge.
+    All shapes are separated by black space.
   output: |
-    A 3x5 grid containing only the magenta (6) shape from the input, centered and complete. It clearly shows an irregular T or hammer shape made of magenta squares on a black background.
+    A 3x5 grid showing only the magenta (6) irregular T or hammer shape from the input. This shape is complete, centered, and surrounded by black (0) background, demonstrating it was the first non-edge-touching shape encountered.
 
 test_case_0:
   input: |
-    A 21x19 grid with mostly black (empty) space. There are five distinct colored shapes:
-    1. A magenta (6) shape in the top left, resembling an irregular T or hammer.
-    2. A green (3) shape in the top right, looking like a distorted star or flower.
-    3. A blue (1) shape in the middle, resembling a butterfly or bow tie.
-    4. An orange (7) shape in the middle right, looking like a small L or corner.
-    5. A yellow (4) shape at the bottom, resembling a goblet or chalice.
-    Each shape is surrounded by black space and doesn't touch the others.
+    A 21x19 grid with a black (0) background. Five distinct colored shapes are visible:
+    1. Magenta (6) shape in the top-left: An irregular T or hammer, not touching any edges.
+    2. Green (3) shape in the top-right: A distorted star or flower, touching the top edge.
+    3. Blue (1) shape in the middle: A butterfly or bow tie, touching the left edge.
+    4. Orange (7) shape in the middle-right: A small L or corner, not touching any edges but very close to the right edge.
+    5. Yellow (4) shape at the bottom: A goblet or chalice, touching the bottom edge.
+    All shapes are separated by black space.
   output: |
-    The output is not provided for this test case.
+    The output is not provided for this test case, but based on the problem description, it should be a grid containing only the magenta (6) shape, as it's the first complete, non-edge-touching shape encountered when scanning from top-left to bottom-right.
