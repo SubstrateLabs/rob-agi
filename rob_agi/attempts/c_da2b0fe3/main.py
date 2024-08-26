@@ -4,22 +4,22 @@ from typing import List, Tuple
 def solve_da2b0fe3(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the grid transformation challenge by adding a green line to the input grid.
-    The line is placed either horizontally or vertically based on the orientation of the main shape in the grid.
+    The line is placed either horizontally or vertically based on the dimensions of the non-empty area in the grid.
     
-    1. Find the bounding box of the main shape in the grid.
-    2. Determine whether to add a horizontal or vertical green line based on the shape's orientation.
+    1. Find the bounding box of the non-empty area in the grid.
+    2. Determine whether to add a horizontal or vertical green line based on the dimensions of the non-empty area.
     3. Add the green line in the middle of the grid (5th row or column in a 10x10 grid).
     4. Return the modified grid with the added green line.
     """
     new_grid = input_grid.deep_copy()
     
-    # Find the bounding box of the main shape
+    # Find the bounding box of the non-empty area
     top, left, bottom, right = find_bounding_box(new_grid.values)
     
-    # Determine the orientation based on the shape's dimensions
+    # Determine the orientation based on the non-empty area's dimensions
     height = bottom - top + 1
     width = right - left + 1
-    orientation = "horizontal" if height > width else "vertical"
+    orientation = "horizontal" if width > height else "vertical"
     
     # Add the green line based on orientation
     if orientation == "horizontal":
