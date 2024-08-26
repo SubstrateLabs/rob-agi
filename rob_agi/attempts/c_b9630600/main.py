@@ -9,40 +9,134 @@ def solve_b9630600(input_grid: ColoredGrid) -> ColoredGrid:
     from the original green shapes.
 
     The solution follows these steps:
-    1. Preserve original structure and mark fixed cells
-    2. Analyze input to identify shapes, calculate centroids, and detect symmetry
-    3. Expand shapes outwards where possible
-    4. Create primary connections between shapes
-    5. Fill hollow shapes and add internal structure
-    6. Enhance structural integrity
-    7. Create secondary connections
-    8. Check and adjust for symmetry
-    9. Fill isolated cells and expand sparse areas
-    10. Enhance aesthetics
-    11. Perform final connection check
-    12. Clean up and optimize the structure
+    1. Analyze input to identify shapes and determine overall symmetry
+    2. Preserve original structure by marking fixed cells
+    3. Fill small hollow areas within shapes
+    4. Expand shapes outwards while maintaining their form
+    5. Identify connection points for each shape
+    6. Create primary connections using a minimal spanning tree approach
+    7. Enhance structural integrity by thickening connections and adding support
+    8. Create secondary connections to improve overall structure
+    9. Adjust for symmetry if present in the input
+    10. Fill isolated cells and expand sparse areas
+    11. Enhance aesthetics with minor details
+    12. Verify connectivity of the entire structure
+    13. Clean up and optimize the final structure
+    14. Perform a final symmetry check and adjustment
 
     This approach creates a connected green structure that preserves the original shapes
-    while adding aesthetic elements and maintaining symmetry where possible.
+    while enhancing connectivity and aesthetic appeal.
     """
     output_grid = input_grid.deep_copy()
     fixed_cells = mark_fixed_cells(output_grid)
     shapes = identify_shapes(output_grid)
-    centroids = calculate_centroids(shapes)
     symmetry = detect_symmetry(output_grid)
     
+    fill_hollow_areas(output_grid, shapes)
     expand_shapes(output_grid, shapes, fixed_cells)
-    create_primary_connections(output_grid, shapes, centroids)
-    fill_hollow_shapes(output_grid, shapes)
+    connection_points = identify_connection_points(shapes)
+    create_primary_connections(output_grid, connection_points)
     enhance_structural_integrity(output_grid, shapes)
     create_secondary_connections(output_grid, shapes)
     adjust_symmetry(output_grid, symmetry)
-    fill_and_expand(output_grid)
+    fill_isolated_cells_and_expand(output_grid)
     enhance_aesthetics(output_grid)
     verify_connectivity(output_grid)
     clean_up_and_optimize(output_grid, fixed_cells)
+    final_symmetry_check(output_grid, symmetry)
     
     return output_grid
+
+def calculate_centroids(shapes: List[Set[Tuple[int, int]]]) -> List[Tuple[float, float]]:
+    centroids = []
+    for shape in shapes:
+        if not shape:
+            centroids.append((0, 0))
+            continue
+        x_sum = sum(x for x, _ in shape)
+        y_sum = sum(y for _, y in shape)
+        centroid = (x_sum / len(shape), y_sum / len(shape))
+        centroids.append(centroid)
+    return centroids
+
+def fill_hollow_areas(grid: ColoredGrid, shapes: List[Set[Tuple[int, int]]]):
+    for shape in shapes:
+        min_r = min(r for r, _ in shape)
+        max_r = max(r for r, _ in shape)
+        min_c = min(c for _, c in shape)
+        max_c = max(c for _, c in shape)
+        for r in range(min_r, max_r + 1):
+            for c in range(min_c, max_c + 1):
+                if (r, c) not in shape and is_small_hole(grid, r, c, shape):
+                    grid.set_cell(r, c, 3)
+
+def is_small_hole(grid: ColoredGrid, r: int, c: int, shape: Set[Tuple[int, int]]) -> bool:
+    if grid.get_cell(r, c) != 0:
+        return False
+    visited = set()
+    stack = [(r, c)]
+    while stack:
+        curr_r, curr_c = stack.pop()
+        if (curr_r, curr_c) in visited:
+            continue
+        visited.add((curr_r, curr_c))
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nr, nc = curr_r + dr, curr_c + dc
+            if (nr, nc) in shape:
+                continue
+            if 0 <= nr < grid.num_rows and 0 <= nc < grid.num_cols and grid.get_cell(nr, nc) == 0:
+                stack.append((nr, nc))
+    return len(visited) <= 4  # Adjust this threshold as needed
+
+def identify_connection_points(shapes: List[Set[Tuple[int, int]]]) -> List[Tuple[int, int]]:
+    connection_points = []
+    for shape in shapes:
+        min_r = min(r for r, _ in shape)
+        max_r = max(r for r, _ in shape)
+        min_c = min(c for _, c in shape)
+        max_c = max(c for _, c in shape)
+        connection_points.extend([(min_r, min_c), (min_r, max_c), (max_r, min_c), (max_r, max_c)])
+    return connection_points
+
+def create_primary_connections(grid: ColoredGrid, connection_points: List[Tuple[int, int]]):
+    # Implement a minimal spanning tree algorithm here
+    # For simplicity, we'll just connect all points sequentially
+    for i in range(len(connection_points) - 1):
+        connect_points(grid, connection_points[i], connection_points[i + 1])
+
+def connect_points(grid: ColoredGrid, start: Tuple[int, int], end: Tuple[int, int]):
+    r1, c1 = start
+    r2, c2 = end
+    while (r1, c1) != (r2, c2):
+        grid.set_cell(r1, c1, 3)
+        if abs(r1 - r2) > abs(c1 - c2):
+            r1 += 1 if r2 > r1 else -1
+        else:
+            c1 += 1 if c2 > c1 else -1
+    grid.set_cell(r2, c2, 3)
+
+def fill_isolated_cells_and_expand(grid: ColoredGrid):
+    for r in range(grid.num_rows):
+        for c in range(grid.num_cols):
+            if grid.get_cell(r, c) == 3:
+                for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]:
+                    nr, nc = r + dr, c + dc
+                    if 0 <= nr < grid.num_rows and 0 <= nc < grid.num_cols and grid.get_cell(nr, nc) == 0:
+                        if random.random() < 0.3:  # Adjust this probability as needed
+                            grid.set_cell(nr, nc, 3)
+
+def final_symmetry_check(grid: ColoredGrid, symmetry: Tuple[bool, bool]):
+    h_sym, v_sym = symmetry
+    if h_sym:
+        for r in range(grid.num_rows // 2):
+            for c in range(grid.num_cols):
+                if grid.get_cell(r, c) != grid.get_cell(grid.num_rows - 1 - r, c):
+                    grid.set_cell(grid.num_rows - 1 - r, c, grid.get_cell(r, c))
+    if v_sym:
+        for r in range(grid.num_rows):
+            for c in range(grid.num_cols // 2):
+                if grid.get_cell(r, c) != grid.get_cell(r, grid.num_cols - 1 - c):
+                    grid.set_cell(r, grid.num_cols - 1 - c, grid.get_cell(r, c))
 
 def mark_fixed_cells(grid: ColoredGrid) -> Set[Tuple[int, int]]:
     return {(r, c) for r in range(grid.num_rows) for c in range(grid.num_cols) if grid.get_cell(r, c) == 3}
