@@ -1,6 +1,10 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple
 
+COMPLEXITY_THRESHOLD = 0.8
+GEOMETRIC_THRESHOLD = 1.2
+FORM_BONUS = 0.5
+
 def solve_009d5c81(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by changing the color of the larger shape (color 8)
@@ -9,8 +13,11 @@ def solve_009d5c81(input_grid: ColoredGrid) -> ColoredGrid:
 
     The new color of the larger shape is determined as follows:
     - Orange (7) if the shape is complex (high perimeter-to-area ratio)
-    - Red (2) if the shape has more straight lines and right angles
+    - Red (2) if the shape has more straight lines, right angles, and grid-like patterns
     - Green (3) if the shape has more curved or organic features
+
+    The function analyzes the shape's complexity, geometric features, and organic features
+    to make this determination.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed
@@ -18,44 +25,81 @@ def solve_009d5c81(input_grid: ColoredGrid) -> ColoredGrid:
     Returns:
     ColoredGrid: The transformed output grid
     """
-    rows, cols = input_grid.get_dimensions()
-    output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
-
-    # Extract the larger shape (color 8)
-    larger_shape = input_grid.find_connected_regions(8)[0]
-
-    # Analyze the larger shape
-    complexity = analyze_complexity(larger_shape)
-    mechanical_score = analyze_mechanical_features(larger_shape)
-    natural_score = analyze_natural_features(larger_shape)
-
-    # Determine the new color
-    if complexity > 0.8:  # Adjusted threshold for complexity
-        new_color = 7  # Orange
-    elif mechanical_score > natural_score:
-        new_color = 2  # Red
-    else:
-        new_color = 3  # Green
-
-    # Transform the grid
-    for r, c in larger_shape:
+    shape = input_grid.find_connected_regions(8)[0]
+    analysis_results = analyze_shape(input_grid, shape)
+    new_color = determine_color(*analysis_results)
+    
+    output_grid = ColoredGrid(values=[[0 for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
+    for r, c in shape:
         output_grid.values[r][c] = new_color
-
+    
     return output_grid
 
-def analyze_complexity(shape: List[Tuple[int, int]]) -> float:
+def analyze_shape(grid: ColoredGrid, shape: List[Tuple[int, int]]):
+    complexity = calculate_complexity(shape)
+    straight_score = count_straight_elements(shape)
+    curve_score = count_curved_elements(shape)
+    grid_score = detect_grid_pattern(shape)
+    symmetry_score = measure_symmetry(grid, shape)
+    form = identify_form(shape)
+    
+    return complexity, straight_score, curve_score, grid_score, symmetry_score, form
+
+def determine_color(complexity, straight_score, curve_score, grid_score, symmetry_score, form):
+    if complexity > COMPLEXITY_THRESHOLD:
+        return 7  # Orange
+    
+    geometric_score = straight_score + grid_score + symmetry_score
+    organic_score = curve_score
+    
+    if form in ['face', 'natural']:
+        organic_score += FORM_BONUS
+    elif form in ['geometric', 'grid']:
+        geometric_score += FORM_BONUS
+    
+    if geometric_score > organic_score * GEOMETRIC_THRESHOLD:
+        return 2  # Red
+    else:
+        return 3  # Green
+
+def calculate_complexity(shape: List[Tuple[int, int]]) -> float:
     perimeter = calculate_perimeter(shape)
     area = len(shape)
     return perimeter / (area ** 0.5)  # Normalized complexity measure
 
-def analyze_mechanical_features(shape: List[Tuple[int, int]]) -> float:
+def count_straight_elements(shape: List[Tuple[int, int]]) -> float:
     straight_lines = sum(1 for r, c in shape if sum((r+1, c) in shape, (r-1, c) in shape, (r, c+1) in shape, (r, c-1) in shape) == 2)
     right_angles = count_right_angles(shape)
     return (straight_lines + right_angles) / len(shape)
 
-def analyze_natural_features(shape: List[Tuple[int, int]]) -> float:
+def count_curved_elements(shape: List[Tuple[int, int]]) -> float:
     curves = sum(1 for r, c in shape if sum((r+1, c) in shape, (r-1, c) in shape, (r, c+1) in shape, (r, c-1) in shape) > 2)
     return curves / len(shape)
+
+def detect_grid_pattern(shape: List[Tuple[int, int]]) -> float:
+    # Simplified grid pattern detection
+    grid_score = 0
+    for r, c in shape:
+        if all((r+i, c+j) in shape for i, j in [(0,0), (0,1), (1,0), (1,1)]):
+            grid_score += 1
+    return grid_score / len(shape)
+
+def measure_symmetry(grid: ColoredGrid, shape: List[Tuple[int, int]]) -> float:
+    rows, cols = grid.num_rows, grid.num_cols
+    horizontal_symmetry = sum(1 for r, c in shape if (rows-1-r, c) in shape)
+    vertical_symmetry = sum(1 for r, c in shape if (r, cols-1-c) in shape)
+    return (horizontal_symmetry + vertical_symmetry) / (2 * len(shape))
+
+def identify_form(shape: List[Tuple[int, int]]) -> str:
+    # Simplified form identification
+    if len(shape) < 10:
+        return 'small'
+    elif detect_grid_pattern(shape) > 0.3:
+        return 'grid'
+    elif measure_symmetry(ColoredGrid(values=[[]]), shape) > 0.7:
+        return 'geometric'
+    else:
+        return 'natural'
 
 def count_right_angles(shape: List[Tuple[int, int]]) -> int:
     right_angles = 0
@@ -66,54 +110,6 @@ def count_right_angles(shape: List[Tuple[int, int]]) -> int:
             if sum((nr, nc) in shape for nr, nc in diagonal_neighbors) == 1:
                 right_angles += 1
     return right_angles
-
-def analyze_mechanical_features(grid: ColoredGrid, shape: List[Tuple[int, int]]) -> float:
-    lines = grid.detect_lines()
-    straight_lines = sum(1 for line in lines if len(line[1]) > 3)
-    right_angles = count_right_angles(shape)
-    symmetry = measure_symmetry(grid, shape)
-    return straight_lines + right_angles + symmetry
-
-def analyze_natural_features(grid: ColoredGrid, shape: List[Tuple[int, int]]) -> float:
-    curves = count_curves(grid, shape)
-    irregularity = measure_irregularity(shape)
-    return curves + irregularity
-
-def analyze_complexity(grid: ColoredGrid, shape: List[Tuple[int, int]]) -> float:
-    perimeter = calculate_perimeter(shape)
-    area = len(shape)
-    return perimeter / (area ** 0.5)  # Normalized complexity measure
-
-def count_right_angles(shape: List[Tuple[int, int]]) -> int:
-    # Simplified right angle detection
-    right_angles = 0
-    for r, c in shape:
-        neighbors = [(r+1, c), (r-1, c), (r, c+1), (r, c-1)]
-        if sum((nr, nc) in shape for nr, nc in neighbors) == 2:
-            right_angles += 1
-    return right_angles
-
-def measure_symmetry(grid: ColoredGrid, shape: List[Tuple[int, int]]) -> float:
-    # Simplified symmetry measure
-    rows, cols = grid.get_dimensions()
-    horizontal_symmetry = sum(1 for r, c in shape if (rows-1-r, c) in shape)
-    vertical_symmetry = sum(1 for r, c in shape if (r, cols-1-c) in shape)
-    return (horizontal_symmetry + vertical_symmetry) / len(shape)
-
-def count_curves(grid: ColoredGrid, shape: List[Tuple[int, int]]) -> int:
-    # Simplified curve detection
-    curves = 0
-    for r, c in shape:
-        neighbors = [(r+1, c), (r-1, c), (r, c+1), (r, c-1)]
-        if 2 < sum((nr, nc) in shape for nr, nc in neighbors) < 4:
-            curves += 1
-    return curves
-
-def measure_irregularity(shape: List[Tuple[int, int]]) -> float:
-    # Measure irregularity by comparing perimeter to area
-    perimeter = calculate_perimeter(shape)
-    area = len(shape)
-    return perimeter / (area ** 0.5)  # Higher value indicates more irregularity
 
 def calculate_perimeter(shape: List[Tuple[int, int]]) -> int:
     perimeter = 0
