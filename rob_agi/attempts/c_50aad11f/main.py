@@ -42,14 +42,14 @@ def solve_50aad11f(input_grid: ColoredGrid) -> ColoredGrid:
         rows, cols = input_grid.get_dimensions()
         for region in regions:
             indicator = 0  # Default color (black) if no indicator found
-            min_x = max(0, min(x for x, _ in region) - 1)
-            max_x = min(rows - 1, max(x for x, _ in region) + 1)
-            min_y = max(0, min(y for _, y in region) - 1)
-            max_y = min(cols - 1, max(y for _, y in region) + 1)
+            min_r = max(0, min(r for r, _ in region) - 1)
+            max_r = min(rows - 1, max(r for r, _ in region) + 1)
+            min_c = max(0, min(c for _, c in region) - 1)
+            max_c = min(cols - 1, max(c for _, c in region) + 1)
             
-            for x in range(min_x, max_x + 1):
-                for y in range(min_y, max_y + 1):
-                    cell_color = input_grid.get_cell(x, y)
+            for r in range(min_r, max_r + 1):
+                for c in range(min_c, max_c + 1):
+                    cell_color = input_grid.get_cell(r, c)
                     if cell_color not in [0, 6]:
                         indicator = cell_color
                         break
@@ -80,7 +80,7 @@ def solve_50aad11f(input_grid: ColoredGrid) -> ColoredGrid:
         if len(compressed_shape) < len(set(c for _, c in shape)):
             # If we lost horizontal information, use a different compression method
             columns = set(c for _, c in shape)
-            compressed_shape = set((r % max_height, c) for r, c in shape if c in columns)
+            compressed_shape = set((r % max_height, c - min_c) for r, c in shape if c in columns)
         
         return sorted(compressed_shape)
 
