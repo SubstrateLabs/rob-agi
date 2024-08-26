@@ -6,15 +6,17 @@ def solve_bf699163(input_grid: ColoredGrid) -> Optional[ColoredGrid]:
     Solves the bf699163 challenge by finding the most central valid 3x3 pattern in the input grid.
 
     A valid pattern is a 3x3 subgrid with a gray (5) center and all surrounding cells
-    of the same non-gray color. The most central pattern is determined by its proximity
-    to the center of the entire grid. If multiple patterns are equally central,
-    the one with the lowest color value is chosen.
+    of the same non-gray color. The pattern is chosen based on:
+    1. Centrality: proximity to the center of the entire grid.
+    2. Color value: lower color values are preferred.
+
+    The function balances these criteria to select the optimal pattern.
 
     Args:
     input_grid (ColoredGrid): The input grid to analyze.
 
     Returns:
-    ColoredGrid: A 3x3 grid representing the most central valid pattern,
+    ColoredGrid: A 3x3 grid representing the optimal valid pattern,
                  or None if no valid pattern is found.
     """
     def is_valid_pattern(grid: ColoredGrid, row: int, col: int) -> bool:
@@ -51,12 +53,13 @@ def solve_bf699163(input_grid: ColoredGrid) -> Optional[ColoredGrid]:
     if not valid_patterns:
         return None
 
-    # Sort valid patterns by centrality (ascending) and then by color (ascending)
-    sorted_patterns = sorted(valid_patterns, key=lambda x: (x[3], x[2]))
+    # Sort valid patterns by a combined score of centrality and color
+    # Multiply centrality by 10 to give it more weight than color
+    sorted_patterns = sorted(valid_patterns, key=lambda x: (x[3] * 10 + x[2]))
     
-    # Select the most central pattern (with lowest color in case of tie)
-    most_central = sorted_patterns[0]
-    color = most_central[2]
+    # Select the optimal pattern
+    optimal_pattern = sorted_patterns[0]
+    color = optimal_pattern[2]
 
     return ColoredGrid(values=[
         [color, color, color],
