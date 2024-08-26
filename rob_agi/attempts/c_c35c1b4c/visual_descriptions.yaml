@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid contains a large blue (1) shape in the center, resembling a rounded rectangle or oval. This shape is surrounded by various other colors, primarily magenta (6) and sky (8), with some black (0) spaces. The blue shape is not perfectly symmetrical and has some irregularities, especially on its right side where it's interrupted by sky (8) and magenta (6) colors.
+  output: |
+    The output grid is very similar to the input, but the blue (1) shape in the center has been slightly expanded and regularized. The right side of the blue shape, which was irregular in the input, has been filled in to create a more symmetrical and complete form. The expansion is subtle, only affecting a few cells on the right side and bottom of the shape.
+
+example_1:
+  input: |
+    The grid features a large green (3) shape that dominates the center and lower half of the grid. This shape is irregular and has some gaps or intrusions, particularly on its right side. The green shape is surrounded by various other colors, including brown (9), orange (7), and black (0). There's a notable cluster of brown (9) in the lower right corner.
+  output: |
+    The output grid shows the green (3) shape significantly expanded and regularized. The shape now occupies almost the entire lower two-thirds of the grid. The gaps and intrusions on the right side have been filled in with green, creating a more solid and cohesive shape. The expansion respects the boundaries of other significant color clusters, such as the brown (9) area in the lower right corner.
+
+example_2:
+  input: |
+    The grid contains a red (2) shape that spans across the middle of the grid horizontally. This red shape is irregular, with some gaps and intrusions, particularly in its center and upper portions. The rest of the grid is filled with various other colors, including yellow (4), blue (1), and black (0). There's a notable solid red line at the bottom of the grid.
+  output: |
+    The output grid shows the red (2) shape expanded and regularized. The gaps and intrusions in the center and upper portions of the red shape have been filled in, creating a more solid and cohesive form. The expansion is subtle, only affecting a few cells, primarily in the center of the shape. The solid red line at the bottom of the grid remains unchanged.
+
+test_case_0:
+  input: |
+    The grid contains a large blue (1) shape in the center, resembling a rounded rectangle or oval. This shape is surrounded by various other colors, primarily magenta (6) and sky (8), with some black (0) spaces. The blue shape is not perfectly symmetrical and has some irregularities, especially on its right side where it's interrupted by sky (8) and magenta (6) colors.
+  output: |
+    The output grid is not provided for the test case, as it is meant to be solved by the implementation.
