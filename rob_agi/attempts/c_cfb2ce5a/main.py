@@ -167,23 +167,37 @@ def solve_cfb2ce5a(input_grid: ColoredGrid) -> ColoredGrid:
     target_frequencies = calculate_target_frequencies(initial_frequencies)
     pattern_templates = {color: create_pattern_template(color, pattern) for color, pattern in color_patterns.items()}
 
-    for _ in range(3):  # Perform multiple iterations of expansion
-        for color in colors:
-            preserve_original_pattern(color)
-            expand_pattern(color, pattern_templates[color])
-            handle_boundary_interaction(color, target_frequencies)
-        
-        fill_empty_spaces(target_frequencies)
-        enhance_connectivity()
-        adjust_symmetry()
+    def expand_color(color):
+        positions = get_color_positions(color)
+        new_positions = []
+        for r, c in positions:
+            for dr, dc in pattern_templates[color]:
+                nr, nc = r + dr, c + dc
+                if 1 <= nr < rows - 1 and 1 <= nc < cols - 1 and grid.values[nr][nc] == 0:
+                    grid.values[nr][nc] = color
+                    new_positions.append((nr, nc))
+        return new_positions
+
+    def fill_empty_spaces():
+        empty_cells = [(r, c) for r in range(1, rows - 1) for c in range(1, cols - 1) if grid.values[r][c] == 0]
+        for r, c in empty_cells:
+            neighbors = [grid.values[r+dr][c+dc] for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)] if 0 < r+dr < rows-1 and 0 < c+dc < cols-1]
+            non_zero_neighbors = [color for color in neighbors if color != 0]
+            if non_zero_neighbors:
+                grid.values[r][c] = max(set(non_zero_neighbors), key=non_zero_neighbors.count)
+            else:
+                grid.values[r][c] = random.choice(colors)
+
+    for _ in range(5):  # Perform multiple iterations of expansion
+        for color in sorted(colors, key=lambda x: -initial_frequencies[x]):
+            expand_color(color)
+        fill_empty_spaces()
         maintain_border()
 
     # Final adjustments
     for color in colors:
         preserve_original_pattern(color)
-    fill_empty_spaces(target_frequencies)
-    enhance_connectivity()
-    adjust_symmetry()
+    fill_empty_spaces()
     maintain_border()
 
     return grid
