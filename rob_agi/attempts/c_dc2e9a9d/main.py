@@ -2,17 +2,6 @@ from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Set, Dict
 
 def solve_dc2e9a9d(input_grid: ColoredGrid) -> ColoredGrid:
-    """
-    Transforms the input grid by applying the following steps:
-    1. Identifies and categorizes all green (3) shapes by size (large, medium, small).
-    2. Mirrors large green shapes with blue (1) shapes, with modifications if needed.
-    3. Adds sky blue (8) shapes inspired by large and medium green shapes in empty areas.
-    4. Processes medium and small green shapes, either mirroring, incorporating into patterns, or leaving unchanged.
-    5. Fills the center with a small sky blue shape if empty.
-    6. Ensures overall balance and symmetry by adding smaller blue or sky blue shapes to underrepresented areas.
-    7. Maintains at least one cell gap between shapes and removes isolated cells.
-    8. Performs a final check to ensure the transformation enhances the original design while respecting its core patterns.
-    """
     output_grid = input_grid.deep_copy()
     shapes = categorize_shapes(input_grid)
     occupied_cells = set((r, c) for r, row in enumerate(input_grid.values) for c, val in enumerate(row) if val != 0)
@@ -21,11 +10,10 @@ def solve_dc2e9a9d(input_grid: ColoredGrid) -> ColoredGrid:
     
     process_large_shapes(output_grid, shapes['large'], center_r, center_c, occupied_cells)
     add_sky_blue_shapes(output_grid, shapes['large'] + shapes['medium'], center_r, center_c, occupied_cells)
-    process_smaller_shapes(output_grid, shapes['medium'] + shapes['small'], center_r, center_c, occupied_cells)
+    process_medium_and_small_shapes(output_grid, shapes['medium'], shapes['small'], center_r, center_c, occupied_cells)
     
-    balance_composition(output_grid, occupied_cells)
     fill_center(output_grid, occupied_cells)
-    ensure_symmetry(output_grid, occupied_cells)
+    balance_and_ensure_symmetry(output_grid, occupied_cells)
     cleanup(output_grid, occupied_cells)
     final_check(output_grid, input_grid)
     
