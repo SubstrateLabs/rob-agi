@@ -1,26 +1,32 @@
 from rob_agi.colored_grid import ColoredGrid
 import copy
+from collections import deque
 
 def create_propagation_plan(grid, start_row, start_col, color):
-    plan = {(start_row, start_col): 0}
+    plan = {}
     rows, cols = len(grid), len(grid[0])
+    queue = deque([(start_row, start_col, 0)])
     
-    def propagate(row, col, distance):
+    while queue:
+        row, col, distance = queue.popleft()
         if distance > 4 or row < 0 or row >= rows or col < 0 or col >= cols:
-            return
+            continue
         if grid[row][col] not in [0, 5] and (row, col) != (start_row, start_col):
-            return
-        if (row, col) not in plan or plan[(row, col)] > distance:
-            plan[(row, col)] = distance
+            continue
+        if (row, col) in plan and plan[(row, col)] <= distance:
+            continue
+        
+        plan[(row, col)] = distance
         new_distance = 0 if grid[row][col] == 5 else distance + 1
+        
         if color == 2:  # Red
-            for dr, dc in [(-1, -1), (0, -1), (1, -1)]:
-                propagate(row + dr, col + dc, new_distance)
+            directions = [(-1, -1), (0, -1), (1, -1)]
         else:  # Yellow
-            for dr, dc in [(-1, 1), (0, 1), (1, 1)]:
-                propagate(row + dr, col + dc, new_distance)
+            directions = [(-1, 1), (0, 1), (1, 1)]
+        
+        for dr, dc in directions:
+            queue.append((row + dr, col + dc, new_distance))
     
-    propagate(start_row, start_col, 0)
     return plan
 
 def apply_propagation_plan(grid, plan, color):
@@ -49,7 +55,7 @@ def solve_212895b5(input_grid: ColoredGrid) -> ColoredGrid:
     """
     grid = copy.deepcopy(input_grid.values)
     gray_squares = [(r, c) for r in range(len(grid)) for c in range(len(grid[0])) if grid[r][c] == 5]
-    gray_squares.sort(key=lambda x: (-x[0] - x[1], -x[0]))
+    gray_squares.sort(key=lambda x: (-x[0], -x[1]))
     
     for row, col in gray_squares:
         red_plan = create_propagation_plan(grid, row, col, 2)
