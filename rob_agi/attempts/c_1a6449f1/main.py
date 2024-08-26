@@ -5,62 +5,85 @@ from collections import defaultdict
 def solve_1a6449f1(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Extracts a significant subgrid from the input grid based on the following steps:
-    1. Identify the most significant shapes/patterns in the grid.
-    2. For each significant shape, find potential subgrids that capture key features.
-    3. Score each potential subgrid based on size, shape capture, and position.
-    4. Select and return the subgrid with the highest score.
+    1. Analyze the input grid for color frequencies and patterns.
+    2. Determine the output size based on the input dimensions.
+    3. Define a search area in the bottom-right quadrant of the input grid.
+    4. Generate candidate subgrids within the search area.
+    5. Score each candidate based on color diversity, representation, and structural elements.
+    6. Select and refine the best-scoring subgrid.
+    7. Return the extracted subgrid as the output.
     """
+    input_analysis = analyze_input_grid(input_grid)
+    output_size = determine_output_size(input_grid.get_dimensions())
+    search_area = define_search_area(input_grid, output_size)
+    candidates = generate_candidates(input_grid, search_area, output_size)
+    
+    best_subgrid = max(candidates, key=lambda subgrid: score_subgrid(subgrid, input_analysis))
+    refined_subgrid = refine_subgrid(input_grid, best_subgrid, search_area)
+    
+    return refined_subgrid
+
+def analyze_input_grid(input_grid: ColoredGrid) -> Dict:
     rows, cols = input_grid.get_dimensions()
     color_frequencies = input_grid.get_color_frequencies()
-    sorted_colors = sorted(color_frequencies.items(), key=lambda x: x[1], reverse=True)
+    total_cells = rows * cols
+    color_ratios = {color: count / total_cells for color, count in color_frequencies.items()}
     
-    best_subgrid = None
-    best_score = -1
+    return {
+        "dimensions": (rows, cols),
+        "color_frequencies": color_frequencies,
+        "color_ratios": color_ratios
+    }
 
-    for color, _ in sorted_colors:
-        if color == 0:  # Skip black
-            continue
-        
-        regions = find_connected_regions(input_grid, color)
-        for region in regions:
-            subgrid = find_best_subgrid(input_grid, region, color)
-            if subgrid:
-                score = score_subgrid(subgrid, input_grid, color)
-                if score > best_score:
-                    best_score = score
-                    best_subgrid = subgrid
+def determine_output_size(input_dimensions: Tuple[int, int]) -> Tuple[int, int]:
+    rows, cols = input_dimensions
+    output_rows = max(3, min(10, rows // 2))
+    output_cols = max(3, min(10, cols // 2))
+    return (output_rows, output_cols)
 
-    return best_subgrid if best_subgrid else ColoredGrid(values=[[0]])
-
-def find_connected_regions(grid: ColoredGrid, color: int) -> List[List[Tuple[int, int]]]:
-    return grid.find_connected_regions(color)
-
-def find_best_subgrid(grid: ColoredGrid, region: List[Tuple[int, int]], color: int) -> ColoredGrid:
-    min_row = min(r for r, _ in region)
-    max_row = max(r for r, _ in region)
-    min_col = min(c for _, c in region)
-    max_col = max(c for _, c in region)
+def define_search_area(input_grid: ColoredGrid, output_size: Tuple[int, int]) -> Tuple[int, int, int, int]:
+    rows, cols = input_grid.get_dimensions()
+    output_rows, output_cols = output_size
     
-    best_subgrid = None
-    best_ratio = 0
+    start_row = max(0, rows - output_rows * 2)
+    start_col = max(0, cols - output_cols * 2)
     
-    for top in range(min_row, max_row + 1):
-        for left in range(min_col, max_col + 1):
-            for bottom in range(top, max_row + 1):
-                for right in range(left, max_col + 1):
-                    subgrid = grid.extract_subgrid(top, left, bottom-top+1, right-left+1)
-                    ratio = sum(row.count(color) for row in subgrid.values) / ((bottom-top+1) * (right-left+1))
-                    if ratio > best_ratio:
-                        best_ratio = ratio
-                        best_subgrid = subgrid
+    return (start_row, start_col, rows, cols)
+
+def generate_candidates(input_grid: ColoredGrid, search_area: Tuple[int, int, int, int], output_size: Tuple[int, int]) -> List[ColoredGrid]:
+    start_row, start_col, end_row, end_col = search_area
+    output_rows, output_cols = output_size
+    
+    candidates = []
+    for row in range(start_row, end_row - output_rows + 1):
+        for col in range(start_col, end_col - output_cols + 1):
+            subgrid = input_grid.extract_subgrid(row, col, output_rows, output_cols)
+            candidates.append(subgrid)
+    
+    return candidates
+
+def score_subgrid(subgrid: ColoredGrid, input_analysis: Dict) -> float:
+    subgrid_analysis = analyze_input_grid(subgrid)
+    color_diversity = len(subgrid_analysis["color_frequencies"])
+    color_representation = sum(min(subgrid_analysis["color_ratios"].get(color, 0), ratio) 
+                               for color, ratio in input_analysis["color_ratios"].items())
+    non_black_density = 1 - subgrid_analysis["color_ratios"].get(0, 0)
+    
+    return color_diversity * color_representation * non_black_density
+
+def refine_subgrid(input_grid: ColoredGrid, selected_subgrid: ColoredGrid, search_area: Tuple[int, int, int, int]) -> ColoredGrid:
+    start_row, start_col, end_row, end_col = search_area
+    subgrid_rows, subgrid_cols = selected_subgrid.get_dimensions()
+    
+    best_subgrid = selected_subgrid
+    best_score = score_subgrid(selected_subgrid, analyze_input_grid(input_grid))
+    
+    for row in range(start_row, end_row - subgrid_rows + 1):
+        for col in range(start_col, end_col - subgrid_cols + 1):
+            current_subgrid = input_grid.extract_subgrid(row, col, subgrid_rows, subgrid_cols)
+            current_score = score_subgrid(current_subgrid, analyze_input_grid(input_grid))
+            if current_score > best_score:
+                best_score = current_score
+                best_subgrid = current_subgrid
     
     return best_subgrid
-
-def score_subgrid(subgrid: ColoredGrid, original_grid: ColoredGrid, color: int) -> float:
-    subgrid_rows, subgrid_cols = subgrid.get_dimensions()
-    original_rows, original_cols = original_grid.get_dimensions()
-    
-    size_score = (subgrid_rows * subgrid_cols) / (original_rows * original_cols)
-    color_ratio = sum(row.count(color) for row in subgrid.values) / (subgrid_rows * subgrid_cols)
-    
-    return size_score * color_ratio
