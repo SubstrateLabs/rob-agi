@@ -5,10 +5,12 @@ def solve_42a15761(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms a grid of 'E' shapes by fixing inconsistencies in the middle and bottom bars.
     The transformation follows these rules:
     1. Top bars and vertical segments of 'E's are always full.
-    2. Middle bars alternate between full and partial (missing the rightmost square) based on the 'E' index in each column.
-    3. Bottom bars are the opposite of middle bars: full when the middle bar is partial, and partial when the middle bar is full.
-    4. The pattern alternates vertically for each column, creating a consistent pattern of full and partial bars.
-    5. Black vertical separating lines remain unchanged.
+    2. Middle and bottom bars alternate between full and partial (missing the rightmost square).
+    3. The pattern alternates both vertically within columns and horizontally across columns.
+    4. The alternation is based on the sum of the E's column index and vertical index.
+    5. If this sum is even, the middle bar is full and the bottom bar is partial.
+    6. If this sum is odd, the middle bar is partial and the bottom bar is full.
+    7. Black vertical separating lines remain unchanged.
     """
     rows, cols = input_grid.get_dimensions()
     new_grid = input_grid.deep_copy()
@@ -35,14 +37,15 @@ def solve_42a15761(input_grid: ColoredGrid) -> ColoredGrid:
                 new_grid.values[r][e_start:e_start+3] = [2, 2, 2] if r == e_top else [2, 0, 2]
             
             # Determine middle and bottom bar pattern
-            is_odd_e = (e + 1) % 2 == 1
+            position_sum = col + e
+            is_even = position_sum % 2 == 0
             
             # Fix middle bar
             middle_row = e_top + e_height // 2
-            new_grid.values[middle_row][e_start:e_start+3] = [2, 2, 2] if is_odd_e else [2, 2, 0]
+            new_grid.values[middle_row][e_start:e_start+3] = [2, 2, 2] if is_even else [2, 2, 0]
             
             # Fix bottom bar
             bottom_row = e_top + e_height - 1
-            new_grid.values[bottom_row][e_start:e_start+3] = [2, 2, 0] if is_odd_e else [2, 2, 2]
+            new_grid.values[bottom_row][e_start:e_start+3] = [2, 2, 0] if is_even else [2, 2, 2]
 
     return new_grid
