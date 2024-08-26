@@ -2,7 +2,7 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_1c0d0a4b(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transform the input grid by marking the inner boundaries of sky blue (8) regions with red (2).
+    Transform the input grid by creating an inner diagonal skeleton of sky blue (8) regions with red (2).
     
     This function applies the following rules:
     1. Black cells (0) diagonally adjacent to sky blue cells (8) become red (2),
@@ -10,11 +10,14 @@ def solve_1c0d0a4b(input_grid: ColoredGrid) -> ColoredGrid:
     2. All sky blue cells (8) become black (0) in the output.
     3. All other cells remain black (0).
     
+    The transformation creates a "skeleton" of the original sky blue regions,
+    marking their inner diagonal boundaries with red.
+    
     Args:
     input_grid (ColoredGrid): The input grid containing sky blue regions on a black background.
     
     Returns:
-    ColoredGrid: A new grid with red markings at the inner diagonal boundaries of sky blue regions.
+    ColoredGrid: A new grid with red markings representing the inner diagonal skeleton of the original sky blue regions.
     """
     rows, cols = input_grid.get_dimensions()
     output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
