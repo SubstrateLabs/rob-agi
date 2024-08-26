@@ -9,11 +9,11 @@ def solve_e74e1818(input_grid: ColoredGrid) -> ColoredGrid:
     The solution involves the following steps:
     1. Identify distinct shapes in the grid
     2. Analyze each shape's characteristics (weight distribution, bounds, position)
-    3. Determine if each shape should be flipped based on its position and balance
+    3. Determine if each shape should be flipped based on its position relative to the grid center
     4. Flip the shapes that improve the overall composition
-    5. Reconstruct the grid with the flipped shapes while maintaining vertical order
+    5. Reconstruct the grid with the flipped shapes while maintaining vertical order and horizontal positions
     
-    This function improves vertical symmetry and balance of the image while maintaining
+    This function improves vertical symmetry and balance of the image while preserving
     the vertical ordering and horizontal positions of shapes.
     """
     shapes = identify_shapes(input_grid)
@@ -41,26 +41,27 @@ def identify_shapes(grid: ColoredGrid) -> Dict[int, List[Tuple[int, int]]]:
                             if 0 <= nr < grid.num_rows and 0 <= nc < grid.num_cols:
                                 stack.append((nr, nc))
                 
-                shapes[color] = shape
+                if color not in shapes:
+                    shapes[color] = []
+                shapes[color].append(shape)
     
     return shapes
 
-def determine_flips(shapes: Dict[int, List[Tuple[int, int]]], grid_height: int) -> Dict[int, bool]:
+def determine_flips(shapes: Dict[int, List[List[Tuple[int, int]]]], grid_height: int) -> Dict[int, List[bool]]:
     flipped_shapes = {}
-    for color, shape in shapes.items():
-        min_r = min(r for r, _ in shape)
-        max_r = max(r for r, _ in shape)
-        shape_center = (min_r + max_r) / 2
-        grid_center = grid_height / 2
-        
-        weight_distribution = sum(1 for r, _ in shape if r > shape_center) / len(shape)
-        
-        if shape_center < grid_center and weight_distribution < 0.5:
-            flipped_shapes[color] = True
-        elif shape_center > grid_center and weight_distribution > 0.5:
-            flipped_shapes[color] = True
-        else:
-            flipped_shapes[color] = False
+    grid_center = grid_height / 2
+    
+    for color, color_shapes in shapes.items():
+        flipped_shapes[color] = []
+        for shape in color_shapes:
+            min_r = min(r for r, _ in shape)
+            max_r = max(r for r, _ in shape)
+            shape_center = (min_r + max_r) / 2
+            
+            if shape_center < grid_center:
+                flipped_shapes[color].append(True)
+            else:
+                flipped_shapes[color].append(False)
     
     return flipped_shapes
 
@@ -69,18 +70,15 @@ def flip_shape_vertically(shape: List[Tuple[int, int]]) -> List[Tuple[int, int]]
     max_r = max(r for r, _ in shape)
     return [(max_r - (r - min_r), c) for r, c in shape]
 
-def reconstruct_grid(shapes: Dict[int, List[Tuple[int, int]]], flipped_shapes: Dict[int, bool], original_grid: ColoredGrid) -> ColoredGrid:
+def reconstruct_grid(shapes: Dict[int, List[List[Tuple[int, int]]]], flipped_shapes: Dict[int, List[bool]], original_grid: ColoredGrid) -> ColoredGrid:
     new_grid = [[0 for _ in range(original_grid.num_cols)] for _ in range(original_grid.num_rows)]
     
-    for color, shape in shapes.items():
-        if flipped_shapes[color]:
-            shape = flip_shape_vertically(shape)
-        
-        min_r = min(r for r, _ in shape)
-        min_c = min(c for _, c in shape)
-        
-        for r, c in shape:
-            new_r = r - min_r
-            new_grid[new_r][c] = color
+    for color, color_shapes in shapes.items():
+        for shape, should_flip in zip(color_shapes, flipped_shapes[color]):
+            if should_flip:
+                shape = flip_shape_vertically(shape)
+            
+            for r, c in shape:
+                new_grid[r][c] = color
     
     return ColoredGrid(values=new_grid)
