@@ -46,7 +46,7 @@ def solve_604001fa(input_grid: ColoredGrid) -> ColoredGrid:
     rows, cols = grid.get_dimensions()
     for r in range(rows):
         for c in range(cols):
-            if grid.values[r][c] not in color_cycle:
+            if grid.values[r][c] not in color_cycle and grid.values[r][c] != 0:
                 grid.values[r][c] = 0
     
     return grid
