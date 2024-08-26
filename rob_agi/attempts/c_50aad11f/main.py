@@ -84,7 +84,7 @@ def solve_50aad11f(input_grid: ColoredGrid) -> ColoredGrid:
 
     magenta_regions = find_magenta_regions()
     if not magenta_regions:
-        return ColoredGrid(values=[[0] for _ in range(4)])
+        return ColoredGrid(values=[[0] * 4 for _ in range(4)])
 
     color_indicators = find_color_indicators(magenta_regions)
     colored_regions = list(zip(color_indicators, magenta_regions))
@@ -92,7 +92,7 @@ def solve_50aad11f(input_grid: ColoredGrid) -> ColoredGrid:
     max_height = 4
     total_width = sum(max(c for _, c in region) - min(c for _, c in region) + 1 for _, region in colored_regions) + len(colored_regions) - 1
 
-    output_grid = ColoredGrid(values=[[0 for _ in range(max(1, total_width))] for _ in range(max_height)])
+    output_grid = ColoredGrid(values=[[0 for _ in range(max(4, total_width))] for _ in range(max_height)])
 
     current_col = 0
     for color, region in colored_regions:
@@ -103,8 +103,13 @@ def solve_50aad11f(input_grid: ColoredGrid) -> ColoredGrid:
         current_col += width + 1
 
     # Remove trailing black columns
-    while output_grid.get_dimensions()[1] > 1 and all(output_grid.get_cell(r, -1) == 0 for r in range(max_height)):
+    while output_grid.get_dimensions()[1] > 4 and all(output_grid.get_cell(r, -1) == 0 for r in range(max_height)):
         for row in output_grid.values:
             row.pop()
+
+    # Ensure minimum width of 4
+    while output_grid.get_dimensions()[1] < 4:
+        for row in output_grid.values:
+            row.append(0)
 
     return output_grid
