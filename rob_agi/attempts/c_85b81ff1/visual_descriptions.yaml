@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid consists of a pattern of magenta (6) and black (0) squares. The magenta squares form a series of vertical lines, creating a striped pattern. The black squares appear as gaps between these magenta lines. Some magenta squares are isolated, appearing as single cells surrounded by black. The overall effect is like a barcode or fence-like structure with occasional breaks.
+  output: |
+    The output grid maintains the same basic structure of magenta (6) vertical lines separated by black (0) gaps. However, some of the isolated magenta squares have been connected to form continuous vertical lines. Specifically, in columns where there were breaks in the magenta lines, these breaks have been filled in to create uninterrupted vertical stripes. The rightmost column, which had alternating magenta and black squares, now has more continuous magenta sections.
+
+example_1:
+  input: |
+    This grid follows a similar pattern to the previous example, but uses orange (7) instead of magenta. It consists of vertical orange stripes separated by black (0) gaps. Some orange squares are isolated, creating breaks in the vertical lines. The overall pattern resembles a barcode or fence-like structure with occasional interruptions.
+  output: |
+    The output maintains the basic structure of orange (7) vertical lines separated by black (0) gaps. However, many of the isolated orange squares have been connected to form more continuous vertical lines. Breaks in the orange lines have been filled in several columns, creating longer uninterrupted stripes. The rightmost column, which had alternating orange and black squares, now has more continuous orange sections.
+
+example_2:
+  input: |
+    This grid uses blue (1) and black (0) squares to create a pattern similar to the previous examples. Vertical blue lines are separated by black gaps, forming a striped or barcode-like pattern. Some blue squares are isolated, creating breaks in the vertical lines. The rightmost column alternates between blue and black squares.
+  output: |
+    The output preserves the overall structure of blue (1) vertical lines separated by black (0) gaps. However, many of the isolated blue squares have been connected to form more continuous vertical lines. Breaks in the blue lines have been filled in several columns, resulting in longer uninterrupted stripes. The rightmost column, which previously alternated between blue and black, now has more continuous blue sections.
+
+example_3:
+  input: |
+    This grid also uses blue (1) and black (0) squares, creating a pattern similar to the previous examples. Vertical blue lines are separated by black gaps, forming a striped or barcode-like pattern. Some blue squares are isolated, particularly in the right half of the grid, creating breaks in the vertical lines. The rightmost column consists mostly of isolated blue squares separated by black.
+  output: |
+    The output maintains the basic structure of blue (1) vertical lines separated by black (0) gaps. However, many of the isolated blue squares have been connected to form more continuous vertical lines. Breaks in the blue lines have been filled in several columns, especially in the right half of the grid, creating longer uninterrupted stripes. The rightmost column, which previously had mostly isolated blue squares, now has more continuous blue sections.
