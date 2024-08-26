@@ -3,14 +3,14 @@ from typing import List, Tuple
 
 def solve_0607ce86(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by identifying and regularizing patterns in three vertical sections.
-    
-    1. Identifies three vertical sections separated by black columns.
-    2. Extracts a 4-row pattern from the first section, ignoring black rows.
-    3. Creates an output grid with the pattern repeated three times in each section.
-    4. Ensures consistent black rows between pattern repetitions and sections.
+    Transforms the input grid by extracting a pattern from the leftmost section and applying it uniformly across three vertical sections.
+
+    1. Extracts a 5-row pattern from the leftmost section.
+    2. Creates a template pattern from the extracted section.
+    3. Applies the pattern to three vertical sections in the output grid.
+    4. Maintains black separating columns and rows.
     5. Cleans up the grid by setting all areas outside the main patterns to black (0).
-    
+
     Returns a new grid with regularized and aligned patterns across all three sections.
     """
     rows, cols = input_grid.get_dimensions()
@@ -40,29 +40,28 @@ def find_vertical_sections(grid: ColoredGrid) -> List[Tuple[int, int]]:
         sections.append((start, cols))
     return sections[:3]  # Ensure we only return three sections
 
-def extract_pattern(grid: ColoredGrid, start: int, end: int) -> ColoredGrid:
-    """Extracts a 4-row pattern from the section, ignoring black rows."""
-    pattern_rows = []
-    row = 1  # Start from the second row to skip the top black row
-    while len(pattern_rows) < 4 and row < grid.num_rows:
-        if any(grid.get_cell(row, col) != 0 for col in range(start, end)):
-            pattern_rows.append([grid.get_cell(row, col) for col in range(start, end)])
-        row += 1
-    return ColoredGrid(values=pattern_rows)
+def extract_pattern(grid: ColoredGrid, start: int, end: int) -> List[List[int]]:
+    """Extracts a 5-row pattern from the section, repeating if necessary."""
+    pattern = []
+    for col in range(start, end):
+        column_pattern = []
+        for row in range(1, grid.num_rows):  # Start from row 1 to skip the top black row
+            if len(column_pattern) == 5:
+                break
+            if grid.get_cell(row, col) != 0:
+                column_pattern.append(grid.get_cell(row, col))
+        while len(column_pattern) < 5:
+            column_pattern += column_pattern[:5-len(column_pattern)]
+        pattern.append(column_pattern)
+    return pattern
 
-def apply_pattern(output_grid: ColoredGrid, pattern: ColoredGrid, start: int, end: int):
+def apply_pattern(output_grid: ColoredGrid, pattern: List[List[int]], start: int, end: int):
     """Applies the pattern three times in the section with proper spacing."""
-    pattern_height = pattern.num_rows
-    section_width = end - start
-    
     for i in range(3):
         top = 1 + i * 5  # Start from row 1 and repeat every 5 rows
-        for row in range(pattern_height):
-            for col in range(section_width):
-                if col < pattern.num_cols:
-                    output_grid.set_cell(top + row, start + col, pattern.get_cell(row, col))
-                else:
-                    output_grid.set_cell(top + row, start + col, pattern.get_cell(row, -1))  # Repeat last column
+        for col in range(start, end):
+            for row in range(5):
+                output_grid.set_cell(top + row, col, pattern[col-start][row])
 
 def clean_up_grid(output_grid: ColoredGrid, sections: List[Tuple[int, int]]):
     """Ensures black rows and columns are in place."""
@@ -74,7 +73,7 @@ def clean_up_grid(output_grid: ColoredGrid, sections: List[Tuple[int, int]]):
         output_grid.set_cell(rows - 1, col, 0)
     
     # Set separating rows to black
-    for row in [5, 10, 15]:
+    for row in [6, 11, 16]:
         for col in range(cols):
             output_grid.set_cell(row, col, 0)
     
