@@ -4,31 +4,29 @@ from typing import List, Tuple
 def solve_da2b0fe3(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the grid transformation challenge by adding a green line to the input grid.
-    The line is placed either horizontally or vertically based on the symmetry of the shape in the grid.
+    The line is placed either horizontally or vertically based on the orientation of the main shape in the grid.
     
-    1. Analyze the input grid to find the main shape and its symmetry.
-    2. Determine whether to add a horizontal or vertical green line.
+    1. Find the bounding box of the main shape in the grid.
+    2. Determine whether to add a horizontal or vertical green line based on the shape's orientation.
     3. Add the green line in the middle of the grid (5th row or column in a 10x10 grid).
     4. Return the modified grid with the added green line.
     """
-    rows, cols = input_grid.get_dimensions()
     new_grid = input_grid.deep_copy()
     
     # Find the bounding box of the main shape
     top, left, bottom, right = find_bounding_box(new_grid.values)
     
-    # Determine if the shape has vertical or horizontal symmetry
-    vertical_symmetry = check_vertical_symmetry(new_grid.values, left, right)
-    horizontal_symmetry = check_horizontal_symmetry(new_grid.values, top, bottom)
+    # Determine the orientation based on the shape's dimensions
+    height = bottom - top + 1
+    width = right - left + 1
+    orientation = "horizontal" if height > width else "vertical"
     
-    # Add the green line based on symmetry
-    if vertical_symmetry and not horizontal_symmetry:
-        # Add horizontal green line
-        for c in range(cols):
+    # Add the green line based on orientation
+    if orientation == "horizontal":
+        for c in range(len(new_grid.values[0])):
             new_grid.values[4][c] = 3
     else:
-        # Add vertical green line (default case, including when both symmetries exist)
-        for r in range(rows):
+        for r in range(len(new_grid.values)):
             new_grid.values[r][4] = 3
     
     return new_grid
@@ -47,11 +45,3 @@ def find_bounding_box(grid: List[List[int]]) -> Tuple[int, int, int, int]:
                 right = max(right, c)
     
     return top, left, bottom, right
-
-def check_vertical_symmetry(grid: List[List[int]], left: int, right: int) -> bool:
-    mid = (left + right) // 2
-    return all(grid[r][c] == grid[r][right - (c - left)] for r in range(len(grid)) for c in range(left, mid + 1))
-
-def check_horizontal_symmetry(grid: List[List[int]], top: int, bottom: int) -> bool:
-    mid = (top + bottom) // 2
-    return all(grid[r][c] == grid[bottom - (r - top)][c] for r in range(top, mid + 1) for c in range(len(grid[0])))
