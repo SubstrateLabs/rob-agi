@@ -5,29 +5,28 @@ import math
 def solve_0a2355a6(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the grid transformation challenge by identifying distinct shapes,
-    analyzing their properties, and assigning colors based on a comprehensive scoring system.
+    analyzing their properties, and assigning colors based on shape characteristics and relationships.
     
     1. Identify distinct contiguous shapes of sky blue (8) in the input grid using flood-fill.
-    2. Analyze shapes for size, complexity, centrality, and orientation.
-    3. Categorize shapes based on their geometric properties.
-    4. Score shapes using a comprehensive system considering multiple factors.
-    5. Assign colors to shapes based on their scores and categories, ensuring consistency and visual distinction.
-    6. Handle small shapes by either merging them or ensuring they receive distinct colors.
-    7. Create and return a new grid with transformed colors, maintaining black (0) as empty space.
+    2. Analyze shapes for size, form, and relative position.
+    3. Categorize shapes based on their geometric properties and relationships.
+    4. Assign colors to shapes based on their categories and relative importance, ensuring consistency across the grid.
+    5. Handle nested shapes and maintain proper color relationships.
+    6. Create and return a new grid with transformed colors, maintaining black (0) as empty space.
     
     The function ensures consistent color assignment based on shape properties and their relationships,
-    handling various grid sizes and shape configurations while maintaining visual clarity.
+    prioritizing larger and more complex shapes while maintaining visual clarity and pattern consistency.
     """
     # Step 1: Identify distinct shapes
     shapes = find_contiguous_shapes(input_grid)
     
-    # Step 2 & 3: Analyze shapes, categorize them, and score them
-    analyzed_shapes = analyze_shapes(shapes, input_grid)
+    # Step 2 & 3: Analyze and categorize shapes
+    analyzed_shapes = analyze_and_categorize_shapes(shapes, input_grid)
     
-    # Step 4 & 5: Assign colors to shapes
+    # Step 4: Assign colors to shapes
     colored_shapes = assign_colors_to_shapes(analyzed_shapes)
     
-    # Step 6: Create output grid
+    # Step 5 & 6: Create output grid
     output_grid = create_output_grid(input_grid, colored_shapes)
     
     return output_grid
@@ -58,10 +57,9 @@ def find_contiguous_shapes(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
     
     return shapes
 
-def analyze_shapes(shapes: List[List[Tuple[int, int]]], grid: ColoredGrid) -> List[Dict]:
+def analyze_and_categorize_shapes(shapes: List[List[Tuple[int, int]]], grid: ColoredGrid) -> List[Dict]:
     analyzed_shapes = []
     rows, cols = grid.get_dimensions()
-    total_area = rows * cols
     
     for shape in shapes:
         size = len(shape)
@@ -70,45 +68,27 @@ def analyze_shapes(shapes: List[List[Tuple[int, int]]], grid: ColoredGrid) -> Li
         max_r = max(r for r, _ in shape)
         max_c = max(c for _, c in shape)
         
-        # Calculate complexity (perimeter-to-area ratio)
-        perimeter = sum(1 for r, c in shape if any((r+dr, c+dc) not in shape for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]))
-        complexity = perimeter / size
-        
-        # Calculate centrality
-        center_r, center_c = sum(r for r, _ in shape) / size, sum(c for _, c in shape) / size
-        centrality = 1 - (abs(center_r - rows/2) / (rows/2) + abs(center_c - cols/2) / (cols/2)) / 2
-        
-        # Calculate orientation
+        # Calculate form
         width = max_c - min_c + 1
         height = max_r - min_r + 1
-        orientation = "vertical" if height > width else "horizontal" if width > height else "square"
+        form = categorize_shape(shape, min_r, min_c, max_r, max_c)
         
-        # Categorize shape
-        category = categorize_shape(shape, min_r, min_c, max_r, max_c)
+        # Check if the shape contains a hole
+        has_hole = any(grid.get_cell(r, c) == 0 for r in range(min_r, max_r+1) for c in range(min_c, max_c+1) if (r, c) not in shape)
         
-        # Calculate relative size
-        relative_size = size / total_area
-        
-        # Calculate score
-        score = (
-            size * 0.3 +
-            complexity * 0.2 +
-            centrality * 0.2 +
-            relative_size * 0.3
-        )
+        # Calculate position (top, middle, bottom)
+        position = "top" if max_r < rows / 3 else "bottom" if min_r > 2 * rows / 3 else "middle"
         
         analyzed_shapes.append({
             "shape": shape,
             "size": size,
-            "complexity": complexity,
-            "centrality": centrality,
-            "orientation": orientation,
-            "category": category,
-            "relative_size": relative_size,
-            "score": score
+            "form": form,
+            "has_hole": has_hole,
+            "position": position,
+            "bounding_box": (min_r, min_c, max_r, max_c)
         })
     
-    return sorted(analyzed_shapes, key=lambda x: x["score"], reverse=True)
+    return sorted(analyzed_shapes, key=lambda x: (-x["size"], x["form"], x["position"]))
 
 def categorize_shape(shape: List[Tuple[int, int]], min_r: int, min_c: int, max_r: int, max_c: int) -> str:
     width = max_c - min_c + 1
@@ -130,24 +110,38 @@ def categorize_shape(shape: List[Tuple[int, int]], min_r: int, min_c: int, max_r
         return "rectangle"
 
 def assign_colors_to_shapes(analyzed_shapes: List[Dict]) -> List[Tuple[List[Tuple[int, int]], int]]:
-    colors = [1, 2, 3, 4]
+    colors = [1, 2, 3]
     colored_shapes = []
-    color_counts = {1: 0, 2: 0, 3: 0, 4: 0}
-    category_colors = {}
+    used_colors = set()
+    form_colors = {}
     
     for shape_info in analyzed_shapes:
         shape = shape_info["shape"]
-        category = shape_info["category"]
+        form = shape_info["form"]
         
-        if category in category_colors:
-            color = category_colors[category]
+        if form in form_colors:
+            color = form_colors[form]
         else:
-            # Assign a new color based on the least used color
-            color = min(colors, key=lambda c: color_counts[c])
-            category_colors[category] = color
+            # Assign a new color based on the shape's characteristics
+            if shape_info["has_hole"] or shape_info["form"] in ["square", "near_square"]:
+                color = 1  # Blue for shapes with holes or square-like shapes
+            elif shape_info["position"] == "bottom" or shape_info["form"] in ["wide_rectangle", "tall_rectangle"]:
+                color = 3  # Green for shapes at the bottom or elongated rectangles
+            else:
+                color = 2  # Red for other shapes
+            
+            form_colors[form] = color
         
         colored_shapes.append((shape, color))
-        color_counts[color] += 1
+        used_colors.add(color)
+    
+    # Ensure all three colors are used if there are enough shapes
+    if len(colored_shapes) >= 3 and len(used_colors) < 3:
+        for unused_color in set(colors) - used_colors:
+            for i, (shape, color) in enumerate(colored_shapes):
+                if color != unused_color:
+                    colored_shapes[i] = (shape, unused_color)
+                    break
     
     return colored_shapes
 
