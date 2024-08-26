@@ -1,14 +1,16 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple
+from collections import deque
 
 def solve_a57f2f04(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by applying a checkerboard pattern to distinct regions.
     
-    The function identifies non-black, non-border colored regions in the input grid
-    and replaces them with a checkerboard pattern of the same color. The pattern is
-    2x2 for all colors except green (3), which uses a 3x3 pattern. Black regions and
-    the sky blue (8) border remain unchanged.
+    The function identifies non-border regions in the input grid and replaces them
+    with a checkerboard pattern. For non-black regions, it uses the existing color.
+    For black regions, it searches for the nearest non-black, non-border color and
+    uses that for the checkerboard. The pattern is 2x2 for all colors except green (3),
+    which uses a 3x3 pattern. The sky blue (8) border remains unchanged.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -17,14 +19,12 @@ def solve_a57f2f04(input_grid: ColoredGrid) -> ColoredGrid:
     ColoredGrid: The transformed output grid.
     """
     output_grid = input_grid.deep_copy()
+    regions = find_regions(input_grid)
     
-    for top, left, height, width in find_regions(input_grid):
-        region = input_grid.extract_subgrid(top, left, height, width)
-        colors = set(cell for row in region.values for cell in row) - {0, 8}
-        
-        if colors:
-            color = next(iter(colors))  # Choose any non-black, non-border color
-            size = 3 if color == 3 else 2  # 3x3 for green (3), 2x2 for others
+    for top, left, height, width in regions:
+        color = determine_color(input_grid, top, left, height, width)
+        if color is not None:
+            size = 3 if color == 3 else 2
             pattern = generate_checkerboard(color, size, height, width)
             
             for i in range(height):
@@ -67,6 +67,39 @@ def find_regions(grid: ColoredGrid) -> List[Tuple[int, int, int, int]]:
                 regions.append((top, left, bottom - top + 1, right - left + 1))
     
     return regions
+
+def determine_color(grid: ColoredGrid, top: int, left: int, height: int, width: int) -> int:
+    """
+    Determines the color for a region, searching for the nearest non-black, non-border color if necessary.
+    
+    Args:
+    grid (ColoredGrid): The input grid.
+    top, left, height, width: The region's coordinates and dimensions.
+    
+    Returns:
+    int: The determined color for the region.
+    """
+    colors = set(grid.values[r][c] for r in range(top, top + height) for c in range(left, left + width)) - {0, 8}
+    if colors:
+        return next(iter(colors))
+    
+    # Search for nearest non-black, non-border color
+    rows, cols = grid.get_dimensions()
+    queue = deque([(r, c) for r in range(top, top + height) for c in range(left, left + width)])
+    visited = set(queue)
+    
+    while queue:
+        r, c = queue.popleft()
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols and (nr, nc) not in visited:
+                visited.add((nr, nc))
+                color = grid.values[nr][nc]
+                if color not in {0, 8}:
+                    return color
+                queue.append((nr, nc))
+    
+    return None  # This should never happen if the grid is valid
 
 def generate_checkerboard(color: int, size: int, height: int, width: int) -> List[List[int]]:
     """
