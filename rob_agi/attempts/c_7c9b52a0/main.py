@@ -9,9 +9,13 @@ def solve_7c9b52a0(input_grid: ColoredGrid) -> ColoredGrid:
     1. Identifies the background color (most common color on the border)
     2. Extracts distinct regions of non-background colors using flood fill
     3. Sorts regions by color and original position
-    4. Creates a new compact grid by placing regions in sorted order
+    4. Creates a new compact grid by placing regions in sorted order, maintaining relative positions
     5. Optimizes the compact grid by removing background-only rows and columns
     6. Returns the new compact grid
+
+    The function preserves the shapes of regions, maintains color order, attempts to keep
+    relative positioning of regions, aims for maximum compactness, and works consistently
+    regardless of the background color or the colors of the regions.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed
@@ -63,26 +67,39 @@ def solve_7c9b52a0(input_grid: ColoredGrid) -> ColoredGrid:
         sorted_regions = sorted(regions, key=lambda x: (x[0], x[2]))
         compact_grid = [[bg_color]]
 
-        for color, shape, _ in sorted_regions:
+        for color, shape, original_pos in sorted_regions:
             placed = False
             while not placed:
-                for r in range(len(compact_grid)):
-                    for c in range(len(compact_grid[0])):
-                        if can_place_region(compact_grid, r, c, shape, bg_color):
-                            place_region(compact_grid, r, c, shape, color)
-                            placed = True
-                            break
-                    if placed:
-                        break
-                if not placed:
+                best_position = find_best_position(compact_grid, shape, original_pos, bg_color)
+                if best_position:
+                    r, c = best_position
+                    place_region(compact_grid, r, c, shape, color)
+                    placed = True
+                else:
                     compact_grid = expand_grid(compact_grid, bg_color)
 
         return compact_grid
 
+    def find_best_position(grid: List[List[int]], shape: List[Tuple[int, int]], original_pos: Tuple[int, int], bg_color: int) -> Optional[Tuple[int, int]]:
+        rows, cols = len(grid), len(grid[0])
+        best_pos = None
+        min_distance = float('inf')
+        
+        for r in range(rows):
+            for c in range(cols):
+                if can_place_region(grid, r, c, shape, bg_color):
+                    distance = abs(r - original_pos[0]) + abs(c - original_pos[1])
+                    if distance < min_distance:
+                        min_distance = distance
+                        best_pos = (r, c)
+        
+        return best_pos
+
     def can_place_region(grid: List[List[int]], r: int, c: int, shape: List[Tuple[int, int]], bg_color: int) -> bool:
+        rows, cols = len(grid), len(grid[0])
         for dr, dc in shape:
             nr, nc = r + dr, c + dc
-            if nr < 0 or nr >= len(grid) or nc < 0 or nc >= len(grid[0]) or grid[nr][nc] != bg_color:
+            if nr < 0 or nr >= rows or nc < 0 or nc >= cols or grid[nr][nc] != bg_color:
                 return False
         return True
 
@@ -92,7 +109,9 @@ def solve_7c9b52a0(input_grid: ColoredGrid) -> ColoredGrid:
 
     def expand_grid(grid: List[List[int]], bg_color: int) -> List[List[int]]:
         rows, cols = len(grid), len(grid[0])
-        new_grid = [[bg_color for _ in range(cols + 1)] for _ in range(rows + 1)]
+        new_rows = rows + 1
+        new_cols = cols + 1
+        new_grid = [[bg_color for _ in range(new_cols)] for _ in range(new_rows)]
         for r in range(rows):
             for c in range(cols):
                 new_grid[r][c] = grid[r][c]
