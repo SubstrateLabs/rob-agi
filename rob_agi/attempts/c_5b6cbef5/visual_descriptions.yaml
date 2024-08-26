@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 4x4 grid with a red (2) frame around the edges, except for the bottom-left corner which is black (0). The interior of the frame is filled with black (0), except for the top-right corner which is red (2).
+  output: |
+    A 16x16 grid that appears to be an expanded version of the input. The original 4x4 pattern is replicated in the center and each corner of the larger grid. The spaces between these replications are filled with black (0), creating a symmetrical pattern. The overall effect is a larger, more intricate version of the original red frame pattern.
+
+example_1:
+  input: |
+    A 4x4 grid that is mostly black (0) with a few blue (1) squares. There's a blue square in the top-right corner, two blue squares in the middle of the second row, and a blue square in the bottom-right corner.
+  output: |
+    A 16x16 grid that expands the input pattern. The original 4x4 pattern is visible in the center and corners of the larger grid. The blue squares from the original pattern are preserved in these locations, while the rest of the grid is filled with black (0). This creates a sparse, symmetrical pattern of blue squares on a predominantly black background.
+
+example_2:
+  input: |
+    A 4x4 grid with a mix of black (0) and yellow (4) squares. The top row is all black, the second row is all yellow, the third row has yellow on the edges and black in the middle, and the bottom row has yellow on the left half and black on the right half.
+  output: |
+    A 16x16 grid that expands the input pattern. The original 4x4 pattern is replicated in the center-left, center-right, and bottom-left quadrants of the larger grid. The top-left quadrant is entirely black. The spaces between these replications are filled with black, creating a complex pattern of yellow stripes and blocks on a black background.
+
+example_3:
+  input: |
+    A 4x4 grid with a pattern of green (3) and black (0) squares. The left and right columns are mostly green with a black square in the third row. The middle two columns are mostly black with green squares in the top and bottom rows.
+  output: |
+    A 16x16 grid that expands the input pattern. The original 4x4 pattern is replicated in the top-left, top-right, and bottom-left quadrants of the larger grid. The bottom-right quadrant is mostly black with some green squares matching the pattern of the original input. The overall effect is a symmetrical, larger version of the original pattern with more intricate details.
+
+example_4:
+  input: |
+    A 4x4 grid with a pattern of blue (1) and black (0) squares. The left column is all blue, the top row alternates blue-black-blue-black, the second row has blue in the first two squares and black in the last two, the third row is all blue, and the bottom row has blue in the first and last squares with black in between.
+  output: |
+    A 16x16 grid that expands the input pattern. The original 4x4 pattern is replicated in all four quadrants of the larger grid. The center of the grid (where the quadrants meet) creates a more complex pattern of blue and black squares. The overall effect is a symmetrical, larger version of the original pattern with additional intricacy in the center.
