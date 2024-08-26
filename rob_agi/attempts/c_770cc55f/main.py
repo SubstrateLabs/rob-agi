@@ -41,8 +41,8 @@ def solve_770cc55f(input_grid: ColoredGrid) -> ColoredGrid:
     end_row = rows - 1  # Just above the bottom of the grid
     
     for row in range(start_row, end_row):
-        output_grid[row][left_col] = 4
-        output_grid[row][right_col] = 4
+        output_grid.set_cell(row, left_col, 4)
+        output_grid.set_cell(row, right_col, 4)
     
     return output_grid
 
