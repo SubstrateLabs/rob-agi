@@ -5,20 +5,21 @@ import heapq
 def solve_96a8c0cd(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the grid transformation challenge by creating a minimal tree-like structure
-    of red (2) cells connecting all non-black colored cells. The algorithm follows these steps:
+    of red (2) cells connecting all non-black colored cells and extending to the grid edges.
 
+    The algorithm follows these steps:
     1. Analyze the input grid to find all colored cells.
     2. Create a new grid, copying all non-black colored cells from the input.
-    3. Implement Prim's algorithm to create a minimal spanning tree connecting all colored cells.
-    4. Optimize the red structure by removing unnecessary red cells.
-    5. Extend the red structure to the grid edges when necessary.
-    6. Perform a final verification.
+    3. Implement a modified Prim's algorithm to create a minimal spanning tree connecting all colored cells.
+    4. Extend the red structure to the nearest grid edges.
+    5. Optimize the red structure by removing unnecessary red cells.
+    6. Perform a final verification and edge extension.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
 
     Returns:
-    ColoredGrid: The transformed grid with the minimal red network connecting colored cells.
+    ColoredGrid: The transformed grid with the minimal red network connecting colored cells and extending to edges.
     """
     rows, cols = input_grid.get_dimensions()
     grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
@@ -35,7 +36,7 @@ def solve_96a8c0cd(input_grid: ColoredGrid) -> ColoredGrid:
     for r, c in colored_cells:
         grid.set_cell(r, c, input_grid.get_cell(r, c))
 
-    # Step 3: Implement Prim's algorithm
+    # Step 3: Implement modified Prim's algorithm
     def manhattan_distance(cell1: Tuple[int, int], cell2: Tuple[int, int]) -> int:
         return abs(cell1[0] - cell2[0]) + abs(cell1[1] - cell2[1])
 
@@ -46,49 +47,72 @@ def solve_96a8c0cd(input_grid: ColoredGrid) -> ColoredGrid:
     start = colored_cells[0]
     visited = set([start])
     edges = [(manhattan_distance(start, neighbor), start, neighbor)
-             for neighbor in get_neighbors(*start)]
+             for neighbor in colored_cells[1:]]
     heapq.heapify(edges)
 
     while edges:
-        _, parent, current = heapq.heappop(edges)
+        dist, parent, current = heapq.heappop(edges)
         if current not in visited:
             visited.add(current)
-            if not is_colored(*current):
-                grid.set_cell(*current, 2)  # Set to red
-            for neighbor in get_neighbors(*current):
+            path = []
+            r, c = current
+            while (r, c) != parent:
+                if r < parent[0]: r += 1
+                elif r > parent[0]: r -= 1
+                elif c < parent[1]: c += 1
+                elif c > parent[1]: c -= 1
+                path.append((r, c))
+            for r, c in path[:-1]:
+                if grid.get_cell(r, c) == 0:
+                    grid.set_cell(r, c, 2)  # Set to red
+            for neighbor in colored_cells:
                 if neighbor not in visited:
                     heapq.heappush(edges, (manhattan_distance(current, neighbor), current, neighbor))
 
-    # Step 4: Optimize the red structure
+    # Step 4: Extend to nearest edges
+    def nearest_edge(r: int, c: int) -> Tuple[int, int]:
+        edges = [(0, c), (r, 0), (rows-1, c), (r, cols-1)]
+        return min(edges, key=lambda e: manhattan_distance((r, c), e))
+
+    for r in range(rows):
+        for c in range(cols):
+            if grid.get_cell(r, c) > 0:
+                edge_r, edge_c = nearest_edge(r, c)
+                while (r, c) != (edge_r, edge_c):
+                    if r < edge_r: r += 1
+                    elif r > edge_r: r -= 1
+                    elif c < edge_c: c += 1
+                    elif c > edge_c: c -= 1
+                    if grid.get_cell(r, c) == 0:
+                        grid.set_cell(r, c, 2)
+
+    # Step 5: Optimize the red structure
     def is_critical(r: int, c: int) -> bool:
         if grid.get_cell(r, c) != 2:
             return False
         neighbors = [grid.get_cell(*n) for n in get_neighbors(r, c)]
-        return sum(1 for n in neighbors if n > 0) > 2
+        return sum(1 for n in neighbors if n > 0) > 2 or (r, c) in [(0, c), (r, 0), (rows-1, c), (r, cols-1)]
 
     for r in range(rows):
         for c in range(cols):
             if grid.get_cell(r, c) == 2 and not is_critical(r, c):
                 grid.set_cell(r, c, 0)
 
-    # Step 5: Extend to edges
-    for r, c in colored_cells:
-        if r == 0 or r == rows - 1 or c == 0 or c == cols - 1:
-            if r > 0 and grid.get_cell(r-1, c) == 2:
-                for rr in range(r-1, -1, -1):
-                    grid.set_cell(rr, c, 2)
-            if r < rows - 1 and grid.get_cell(r+1, c) == 2:
-                for rr in range(r+1, rows):
-                    grid.set_cell(rr, c, 2)
-            if c > 0 and grid.get_cell(r, c-1) == 2:
-                for cc in range(c-1, -1, -1):
-                    grid.set_cell(r, cc, 2)
-            if c < cols - 1 and grid.get_cell(r, c+1) == 2:
-                for cc in range(c+1, cols):
-                    grid.set_cell(r, cc, 2)
+    # Step 6: Final verification and edge extension
+    for r in range(rows):
+        for c in range(cols):
+            if grid.get_cell(r, c) > 0:
+                if r == 0 or r == rows-1 or c == 0 or c == cols-1:
+                    continue
+                if any(grid.get_cell(*n) == 2 for n in get_neighbors(r, c)):
+                    edge_r, edge_c = nearest_edge(r, c)
+                    while (r, c) != (edge_r, edge_c):
+                        if r < edge_r: r += 1
+                        elif r > edge_r: r -= 1
+                        elif c < edge_c: c += 1
+                        elif c > edge_c: c -= 1
+                        grid.set_cell(r, c, 2)
 
-    # Step 6: Final verification
-    for r, c in colored_cells:
-        assert grid.get_cell(r, c) == input_grid.get_cell(r, c), "Original colored cell not preserved"
+    assert all(grid.get_cell(r, c) == input_grid.get_cell(r, c) for r, c in colored_cells), "Original colored cells not preserved"
 
     return grid
