@@ -1,45 +1,38 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List, Tuple, Set
 
 color_sequence = {1: 2, 2: 4, 4: 8, 8: 1}
 
-def find_expandable_patterns(grid: ColoredGrid) -> List[Tuple[int, int, int]]:
-    patterns = []
+def find_expandable_cells(grid: ColoredGrid, unchangeable: Set[Tuple[int, int]]) -> List[Tuple[int, int, int]]:
+    expandable = []
     rows, cols = grid.get_dimensions()
-    for r in range(1, rows - 1):
-        for c in range(1, cols - 1):
-            color = grid.values[r][c]
-            if color in color_sequence:
-                if all(grid.values[r+dr][c+dc] == color for dr in [-1, 0, 1] for dc in [-1, 0, 1]):
-                    patterns.append((r, c, color))
-    return patterns
+    for r in range(rows):
+        for c in range(cols):
+            if (r, c) not in unchangeable and grid.values[r][c] in color_sequence:
+                expandable.append((r, c, grid.values[r][c]))
+    return expandable
 
-def expand_pattern(grid: ColoredGrid, row: int, col: int, color: int) -> None:
+def expand_cell(grid: ColoredGrid, row: int, col: int, color: int, unchangeable: Set[Tuple[int, int]]) -> None:
     next_color = color_sequence[color]
-    for r in range(row-2, row+3):
-        for c in range(col-2, col+3):
-            if 0 <= r < len(grid.values) and 0 <= c < len(grid.values[0]):
-                if abs(r-row) == 2 or abs(c-col) == 2:
+    rows, cols = grid.get_dimensions()
+    for dr in [-1, 0, 1]:
+        for dc in [-1, 0, 1]:
+            r, c = row + dr, col + dc
+            if 0 <= r < rows and 0 <= c < cols and (r, c) not in unchangeable:
+                if grid.values[r][c] == 0:
                     grid.values[r][c] = color
-                else:
-                    grid.values[r][c] = next_color
-
-def combine_adjacent_patterns(grid: ColoredGrid) -> None:
-    # This function is complex and would require additional helper functions
-    # It should identify adjacent 5x5 patterns and merge them while preserving
-    # the relative positions of colors
-    pass  # Placeholder for now
+    grid.values[row][col] = next_color
 
 def solve_3ed85e70(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the grid transformation challenge by expanding color patterns.
     
     The solution works as follows:
-    1. Identify 3x3 or 2x2 color patterns in the grid.
-    2. Expand these patterns into 5x5 patterns, with the original color on the edges
-       and the next color in the sequence in the center.
-    3. Combine adjacent expanded patterns.
-    4. Repeat until no more changes can be made.
+    1. Identify cells with colors in the sequence (1, 2, 4, 8) that are not in the unchangeable area.
+    2. For each identified cell:
+       a. Change surrounding black (0) cells to the current color.
+       b. Change the center cell to the next color in the sequence.
+    3. Repeat until no more changes can be made.
     
     Color sequence: 1 (blue) -> 2 (red) -> 4 (yellow) -> 8 (sky) -> 1 (blue)
     """
@@ -49,13 +42,10 @@ def solve_3ed85e70(input_grid: ColoredGrid) -> ColoredGrid:
     
     while True:
         original = grid.deep_copy()
-        patterns = find_expandable_patterns(grid)
+        expandable_cells = find_expandable_cells(grid, unchangeable)
         
-        for row, col, color in patterns:
-            if (row, col) not in unchangeable:
-                expand_pattern(grid, row, col, color)
-        
-        combine_adjacent_patterns(grid)
+        for row, col, color in expandable_cells:
+            expand_cell(grid, row, col, color, unchangeable)
         
         if grid.values == original.values:
             break
