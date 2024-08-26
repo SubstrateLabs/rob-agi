@@ -11,6 +11,8 @@ def solve_c97c0139(input_grid: ColoredGrid) -> ColoredGrid:
     3. Combine all fields and apply them to the grid, setting non-red cells to sky blue.
     
     This approach works for both horizontal and vertical red lines of varying lengths.
+    The diamond shape is centered on the red line and extends outwards, with its size
+    determined by the length of the red line.
     """
     def find_red_lines(grid: ColoredGrid) -> List[Tuple[int, int, int, int]]:
         lines = []
@@ -24,36 +26,39 @@ def solve_c97c0139(input_grid: ColoredGrid) -> ColoredGrid:
                         lines[-1] = (lines[-1][0], lines[-1][1], r, c)
         return lines
 
-    def generate_field(line: Tuple[int, int, int, int], rows: int, cols: int) -> Set[Tuple[int, int]]:
-        field = set()
+    def generate_diamond(line: Tuple[int, int, int, int], rows: int, cols: int) -> Set[Tuple[int, int]]:
+        diamond = set()
         start_r, start_c, end_r, end_c = line
         is_horizontal = start_r == end_r
         line_length = max(end_c - start_c, end_r - start_r) + 1
-        max_distance = (line_length + 1) // 2
+        diamond_size = line_length
 
-        for r in range(max(0, start_r - max_distance), min(rows, end_r + max_distance + 1)):
-            for c in range(max(0, start_c - max_distance), min(cols, end_c + max_distance + 1)):
+        center_r = (start_r + end_r) // 2
+        center_c = (start_c + end_c) // 2
+
+        for r in range(max(0, center_r - diamond_size), min(rows, center_r + diamond_size + 1)):
+            for c in range(max(0, center_c - diamond_size), min(cols, center_c + diamond_size + 1)):
                 if is_horizontal:
-                    distance = abs(r - start_r) + min(abs(c - start_c), abs(c - end_c))
+                    distance = abs(r - center_r) + min(abs(c - start_c), abs(c - end_c))
                 else:
-                    distance = abs(c - start_c) + min(abs(r - start_r), abs(r - end_r))
-                if distance < max_distance:
-                    field.add((r, c))
+                    distance = abs(c - center_c) + min(abs(r - start_r), abs(r - end_r))
+                if distance < diamond_size:
+                    diamond.add((r, c))
 
-        return field
+        return diamond
 
     # Find red lines
     red_lines = find_red_lines(input_grid)
 
-    # Generate and combine fields
+    # Generate and combine diamonds
     rows, cols = input_grid.get_dimensions()
-    combined_field = set()
+    combined_diamond = set()
     for line in red_lines:
-        combined_field.update(generate_field(line, rows, cols))
+        combined_diamond.update(generate_diamond(line, rows, cols))
 
     # Create output grid
     output_grid = input_grid.deep_copy()
-    for r, c in combined_field:
+    for r, c in combined_diamond:
         if output_grid.get_cell(r, c) != 2:  # If not red
             output_grid.set_cell(r, c, 8)  # Set to sky blue
 
