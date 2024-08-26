@@ -17,7 +17,9 @@ def solve_1c56ad9f(input_grid: ColoredGrid) -> ColoredGrid:
     3. Maintain vertical and horizontal connectivity within shapes.
     4. Preserve internal structure of shapes (e.g., holes, lines).
     5. Retain the original background (black/0 areas).
-    This creates a dynamic, wave-like effect on the shapes while preserving their overall structure and connectivity.
+    6. Ensure consistent application of the wave-like effect across different colors and shape sizes.
+    7. Handle edge cases to prevent out-of-bounds errors and maintain shape integrity.
+    This creates a dynamic, wave-like effect on the shapes while preserving their overall structure, connectivity, and internal features.
     """
     result = input_grid.deep_copy()
     shapes = find_shapes(input_grid)
@@ -112,12 +114,13 @@ def maintain_connectivity(grid: ColoredGrid, shapes: List[Tuple[int, int, int, i
     """Ensure shapes remain connected after transformation."""
     for shape in shapes:
         min_row, max_row, min_col, max_col, color, _ = shape
-        for row in range(min_row - 1, max_row + 2):
-            for col in range(min_col - 1, max_col + 2):
-                if 0 <= row < grid.num_rows and 0 <= col < grid.num_cols:
-                    if grid.values[row][col] == color:
-                        neighbors = [(row-1, col), (row+1, col), (row, col-1), (row, col+1)]
-                        for nr, nc in neighbors:
-                            if 0 <= nr < grid.num_rows and 0 <= nc < grid.num_cols and grid.values[nr][nc] == 0:
-                                if any(grid.values[r][c] == color for r, c in [(nr-1, nc), (nr+1, nc), (nr, nc-1), (nr, nc+1)] if (r, c) != (row, col)):
+        for row in range(max(0, min_row - 1), min(grid.num_rows, max_row + 2)):
+            for col in range(max(0, min_col - 1), min(grid.num_cols, max_col + 2)):
+                if grid.values[row][col] == color:
+                    neighbors = [(row-1, col), (row+1, col), (row, col-1), (row, col+1)]
+                    for nr, nc in neighbors:
+                        if 0 <= nr < grid.num_rows and 0 <= nc < grid.num_cols:
+                            if grid.values[nr][nc] == 0:
+                                if any(0 <= r < grid.num_rows and 0 <= c < grid.num_cols and grid.values[r][c] == color 
+                                       for r, c in [(nr-1, nc), (nr+1, nc), (nr, nc-1), (nr, nc+1)] if (r, c) != (row, col)):
                                     grid.values[nr][nc] = color
