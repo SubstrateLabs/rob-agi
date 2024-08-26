@@ -10,12 +10,12 @@ def solve_a3f84088(input_grid: ColoredGrid) -> ColoredGrid:
     2. Creates nested frames of alternating colors (red and gray) moving inward.
     3. Handles the center area based on the remaining space size:
        - For 3x3 or smaller center, fills it with the appropriate pattern.
-       - For larger centers, continues the alternating pattern.
+       - For 4x4 or 5x5 centers, applies a specific pattern.
     4. Returns the transformed grid.
 
     The pattern consists of the original outer gray outline, followed by
     alternating red and gray frames moving inward, with each frame being
-    separated by a one-cell gap.
+    separated by a one-cell gap of the previous color.
     """
     new_grid = input_grid.deep_copy()
     top, left, bottom, right = find_outer_boundary(new_grid)
@@ -23,24 +23,15 @@ def solve_a3f84088(input_grid: ColoredGrid) -> ColoredGrid:
     current_color = 2  # Start with red for the first inner frame
     previous_color = 5  # Gray
 
-    while bottom - top > 2 and right - left > 2:
+    while bottom - top > 4 and right - left > 4:
         # Draw current color frame
-        draw_outline(new_grid, top, left, bottom, right, current_color)
+        draw_outline(new_grid, top+1, left+1, bottom-1, right-1, current_color)
         
         # Shrink the working area
-        top += 1
-        left += 1
-        bottom -= 1
-        right -= 1
-
-        # Fill the gap with the previous color
-        fill_area(new_grid, top, left, bottom, right, previous_color)
-
-        # Shrink again for the next frame
-        top += 1
-        left += 1
-        bottom -= 1
-        right -= 1
+        top += 2
+        left += 2
+        bottom -= 2
+        right -= 2
 
         # Swap colors
         current_color, previous_color = previous_color, current_color
@@ -52,11 +43,12 @@ def solve_a3f84088(input_grid: ColoredGrid) -> ColoredGrid:
         fill_area(new_grid, top, left, bottom, right, current_color)
         if center_height == 3 and center_width == 3:
             new_grid.values[top+1][left+1] = previous_color
-    elif center_height <= 5 and center_width <= 5:
+    elif center_height == 4 and center_width == 4:
+        fill_area(new_grid, top, left, bottom, right, current_color)
+    elif center_height == 5 and center_width == 5:
         draw_outline(new_grid, top, left, bottom, right, current_color)
         fill_area(new_grid, top+1, left+1, bottom-1, right-1, previous_color)
-        if center_height == 5 and center_width == 5:
-            new_grid.values[top+2][left+2] = current_color
+        new_grid.values[top+2][left+2] = current_color
     
     return new_grid
 
