@@ -9,7 +9,7 @@ def solve_8e2edd66(input_grid: ColoredGrid) -> ColoredGrid:
     2. For 9 (brown):
        - Add horizontal and vertical connections between adjacent 9's.
        - Fill L-shaped patterns.
-       - Add diagonal connections in the bottom-right direction.
+       - Add diagonal connections in both bottom-right and top-left directions.
     3. For 8 (sky blue):
        - Add diagonal connections between adjacent 8's in both directions.
        - Connect non-adjacent 8's with minimal paths, maintaining symmetry.
@@ -52,6 +52,9 @@ def solve_8e2edd66(input_grid: ColoredGrid) -> ColoredGrid:
                     # Diagonal connection (bottom-right)
                     if i < 2 and j < 2 and input_grid.values[i+1][j+1] == 9:
                         output_values[i*3+2][j*3+2] = 9
+                    # Diagonal connection (top-left)
+                    if i > 0 and j > 0 and input_grid.values[i-1][j-1] == 9:
+                        output_values[i*3][j*3] = 9
 
     def process_8s():
         eight_positions = [(i, j) for i in range(3) for j in range(3) if input_grid.values[i][j] == 8]
@@ -71,8 +74,15 @@ def solve_8e2edd66(input_grid: ColoredGrid) -> ColoredGrid:
             for idx, (i1, j1) in enumerate(eight_positions):
                 for i2, j2 in eight_positions[idx+1:]:
                     if abs(i1-i2) + abs(j1-j2) > 1:  # Not adjacent
+                        # Calculate the middle point
                         mid_i, mid_j = (i1+i2)//2, (j1+j2)//2
-                        output_values[mid_i*3+1][mid_j*3+1] = 8
+                        # Connect through the edges of subgrids
+                        if i1 != i2 and j1 != j2:  # Diagonal
+                            output_values[mid_i*3+1][mid_j*3+1] = 8
+                        elif i1 == i2:  # Same row
+                            output_values[i1*3+1][min(j1,j2)*3+2] = 8
+                        else:  # Same column
+                            output_values[min(i1,i2)*3+2][j1*3+1] = 8
 
     def process_7s():
         corners = [input_grid.values[0][0], input_grid.values[0][2], input_grid.values[2][0], input_grid.values[2][2]]
