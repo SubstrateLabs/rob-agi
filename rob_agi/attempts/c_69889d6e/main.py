@@ -4,12 +4,12 @@ def solve_69889d6e(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by creating a red "staircase" pattern from bottom to top-right,
     starting from the position of the first red square found in the bottom row.
-    The pattern is a 2-cell thick diagonal line that reaches either the top or right side of the grid.
+    The pattern is a 2-cell thick diagonal line that reaches the top-right corner of the grid.
     Non-black cells from the input are preserved, potentially overriding parts of the red staircase.
 
     1. Find the starting column of the red square in the bottom row.
     2. Initialize a new grid filled with black.
-    3. Generate the 2-cell thick staircase moving diagonally up and right.
+    3. Generate the 2-cell thick staircase moving diagonally up and right to the top-right corner.
     4. Preserve all non-black cells from the input.
     5. Return the transformed grid.
     """
@@ -36,6 +36,12 @@ def solve_69889d6e(input_grid: ColoredGrid) -> ColoredGrid:
             output_grid.set_cell(row, col + 1, 2)
         row -= 1
         col += 1
+
+    # Ensure the staircase reaches the top-right corner
+    for r in range(row + 1):
+        output_grid.set_cell(r, cols - 1, 2)
+        if cols > 1:
+            output_grid.set_cell(r, cols - 2, 2)
 
     # Preserve non-black cells from the input
     for row in range(rows):
