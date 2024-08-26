@@ -3,12 +3,11 @@ from typing import List, Tuple
 
 def solve_6df30ad6(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by finding the largest gray region and replacing it with the highest-valued non-gray, non-black color that appears exactly once.
+    Transforms the input grid by finding the largest gray region and replacing it with the highest-valued non-gray, non-black color.
     
     1. Finds the largest connected region of gray (5) in the input grid.
-    2. Identifies the highest-valued color that is not gray (5) or black (0) and appears exactly once in the input grid.
+    2. Identifies the highest-valued color that is not gray (5) or black (0) in the input grid.
     3. Creates a new grid with the largest gray region filled with the identified color.
-    4. If no color appears exactly once, uses yellow (4) as the default color.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -46,14 +45,9 @@ def find_largest_gray_region(grid: ColoredGrid) -> List[Tuple[int, int]]:
     return largest_region
 
 def find_replacement_color(grid: ColoredGrid) -> int:
-    color_frequency = {}
+    max_color = 0
     for row in grid.values:
         for cell in row:
-            if cell not in [0, 5]:
-                color_frequency[cell] = color_frequency.get(cell, 0) + 1
-    
-    unique_colors = [color for color, freq in color_frequency.items() if freq == 1]
-    if unique_colors:
-        return max(unique_colors)
-    
-    return 4  # Default to yellow (4) if no color appears exactly once
+            if cell not in [0, 5] and cell > max_color:
+                max_color = cell
+    return max_color
