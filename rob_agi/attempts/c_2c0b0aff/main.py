@@ -1,6 +1,6 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Dict
-from collections import defaultdict
+from typing import List, Tuple, Set
+from collections import deque
 
 def solve_2c0b0aff(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -8,11 +8,10 @@ def solve_2c0b0aff(input_grid: ColoredGrid) -> ColoredGrid:
     
     The function performs the following steps:
     1. Identifies non-black regions in the input grid
-    2. Generates pattern candidates of various sizes
-    3. Scores each pattern candidate based on its occurrence in the input grid
-    4. Selects the best pattern that explains all non-black regions
-    5. Optimizes the pattern to ensure it's the smallest repeating unit
-    6. Returns the optimized pattern as a compact ColoredGrid
+    2. Extracts the largest connected non-black region
+    3. Finds the smallest repeating pattern within this region
+    4. Optimizes the pattern by removing any redundant parts
+    5. Returns the optimized pattern as a compact ColoredGrid
     
     Args:
     input_grid (ColoredGrid): The input grid containing partial pattern information
@@ -21,71 +20,77 @@ def solve_2c0b0aff(input_grid: ColoredGrid) -> ColoredGrid:
     ColoredGrid: A compact grid containing the extracted fundamental repeating pattern
     """
     # Step 1: Identify non-black regions
-    non_black_cells = [(r, c) for r in range(input_grid.num_rows) for c in range(input_grid.num_cols) if input_grid.get_cell(r, c) != 0]
+    non_black_cells = find_non_black_cells(input_grid)
     
     if not non_black_cells:
         return ColoredGrid(values=[[]])
     
-    # Step 2 & 3: Generate and score pattern candidates
-    best_pattern, best_score = find_best_pattern(input_grid, non_black_cells)
+    # Step 2: Extract largest connected region
+    largest_region = find_largest_connected_region(input_grid, non_black_cells)
     
-    # Step 4 & 5: Optimize the pattern
-    optimized_pattern = optimize_pattern(best_pattern)
+    # Step 3 & 4: Find and optimize the pattern
+    pattern = find_smallest_repeating_pattern(input_grid, largest_region)
     
-    # Step 6: Return the optimized pattern
-    return optimized_pattern
+    # Step 5: Return the optimized pattern
+    return pattern
 
-def find_best_pattern(grid: ColoredGrid, non_black_cells: List[Tuple[int, int]]) -> Tuple[ColoredGrid, int]:
-    min_r = min(r for r, _ in non_black_cells)
-    min_c = min(c for _, c in non_black_cells)
-    max_r = max(r for r, _ in non_black_cells)
-    max_c = max(c for _, c in non_black_cells)
-    
-    best_pattern = None
-    best_score = -1
-    
-    for height in range(1, max_r - min_r + 2):
-        for width in range(1, max_c - min_c + 2):
-            for start_r in range(min_r, max_r - height + 2):
-                for start_c in range(min_c, max_c - width + 2):
-                    pattern = grid.extract_subgrid(start_r, start_c, height, width)
-                    score = score_pattern(grid, pattern)
-                    if score > best_score or (score == best_score and pattern.num_rows * pattern.num_cols < best_pattern.num_rows * best_pattern.num_cols):
-                        best_pattern = pattern
-                        best_score = score
-    
-    return best_pattern, best_score
+def find_non_black_cells(grid: ColoredGrid) -> Set[Tuple[int, int]]:
+    return {(r, c) for r in range(grid.num_rows) for c in range(grid.num_cols) if grid.get_cell(r, c) != 0}
 
-def score_pattern(grid: ColoredGrid, pattern: ColoredGrid) -> int:
-    score = 0
-    rows, cols = grid.get_dimensions()
+def find_largest_connected_region(grid: ColoredGrid, non_black_cells: Set[Tuple[int, int]]) -> Set[Tuple[int, int]]:
+    largest_region = set()
+    for cell in non_black_cells:
+        if cell not in largest_region:
+            region = bfs_region(grid, cell)
+            if len(region) > len(largest_region):
+                largest_region = region
+    return largest_region
+
+def bfs_region(grid: ColoredGrid, start: Tuple[int, int]) -> Set[Tuple[int, int]]:
+    queue = deque([start])
+    region = set()
+    while queue:
+        r, c = queue.popleft()
+        if (r, c) not in region and grid.get_cell(r, c) != 0:
+            region.add((r, c))
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < grid.num_rows and 0 <= nc < grid.num_cols:
+                    queue.append((nr, nc))
+    return region
+
+def find_smallest_repeating_pattern(grid: ColoredGrid, region: Set[Tuple[int, int]]) -> ColoredGrid:
+    min_r = min(r for r, _ in region)
+    min_c = min(c for _, c in region)
+    max_r = max(r for r, _ in region)
+    max_c = max(c for _, c in region)
+    
+    height = max_r - min_r + 1
+    width = max_c - min_c + 1
+    
+    for pattern_height in range(1, height + 1):
+        for pattern_width in range(1, width + 1):
+            pattern = grid.extract_subgrid(min_r, min_c, pattern_height, pattern_width)
+            if is_valid_pattern(grid, pattern, region):
+                return optimize_pattern(pattern)
+    
+    # If no pattern found, return the entire region
+    return grid.extract_subgrid(min_r, min_c, height, width)
+
+def is_valid_pattern(grid: ColoredGrid, pattern: ColoredGrid, region: Set[Tuple[int, int]]) -> bool:
     p_rows, p_cols = pattern.get_dimensions()
-    
-    for r in range(rows - p_rows + 1):
-        for c in range(cols - p_cols + 1):
-            match_score = sum(
-                grid.get_cell(r+i, c+j) == pattern.get_cell(i, j)
-                for i in range(p_rows)
-                for j in range(p_cols)
-                if grid.get_cell(r+i, c+j) != 0 or pattern.get_cell(i, j) != 0
-            )
-            score += match_score / (p_rows * p_cols)
-    
-    return score
+    for r, c in region:
+        if grid.get_cell(r, c) != pattern.get_cell(r % p_rows, c % p_cols):
+            return False
+    return True
 
 def optimize_pattern(pattern: ColoredGrid) -> ColoredGrid:
     rows, cols = pattern.get_dimensions()
     
-    # Check if pattern can be reduced horizontally
-    for width in range(1, cols):
-        if cols % width == 0:
-            if all(pattern.get_cell(r, c) == pattern.get_cell(r, c % width) for r in range(rows) for c in range(cols)):
-                return optimize_pattern(pattern.extract_subgrid(0, 0, rows, width))
+    # Remove black rows and columns from the edges
+    top = next(r for r in range(rows) if any(pattern.get_cell(r, c) != 0 for c in range(cols)))
+    bottom = next(r for r in range(rows - 1, -1, -1) if any(pattern.get_cell(r, c) != 0 for c in range(cols)))
+    left = next(c for c in range(cols) if any(pattern.get_cell(r, c) != 0 for r in range(rows)))
+    right = next(c for c in range(cols - 1, -1, -1) if any(pattern.get_cell(r, c) != 0 for r in range(rows)))
     
-    # Check if pattern can be reduced vertically
-    for height in range(1, rows):
-        if rows % height == 0:
-            if all(pattern.get_cell(r, c) == pattern.get_cell(r % height, c) for r in range(rows) for c in range(cols)):
-                return optimize_pattern(pattern.extract_subgrid(0, 0, height, cols))
-    
-    return pattern
+    return pattern.extract_subgrid(top, left, bottom - top + 1, right - left + 1)
