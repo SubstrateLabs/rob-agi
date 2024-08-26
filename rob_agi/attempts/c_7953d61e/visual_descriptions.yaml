@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 4x4 grid with a distinct pattern. The corners are yellow (4), creating a frame-like effect. Inside this frame, there's a diagonal line of brown (9) squares from top-left to bottom-right. The remaining squares are filled with blue (1) and magenta (6), alternating in a checkerboard-like pattern.
+  output: |
+    An 8x8 grid that appears to be an expanded version of the input. The original 4x4 grid is replicated four times to create this larger grid. The pattern is maintained, with yellow corners, brown diagonals, and alternating blue and magenta squares. The replication creates a symmetrical, kaleidoscope-like effect.
+
+example_1:
+  input: |
+    A 4x4 grid with a mix of colors. The top row alternates magenta (6) and red (2). The second row is mostly magenta with gray (5) in the right half. The third row is predominantly blue (1) with a red square at the end. The bottom row has gray, blue, red, and blue squares.
+  output: |
+    An 8x8 grid that expands on the input. The original 4x4 grid is replicated and transformed. The top-left quadrant is the original grid. The top-right quadrant appears to be a horizontal flip of the original. The bottom-left quadrant looks like a vertical flip of the original. The bottom-right quadrant seems to be both horizontally and vertically flipped.
+
+example_2:
+  input: |
+    A 4x4 grid with a distinct pattern. The top row alternates magenta (6) and orange (7). The second row is similar but starts with orange. The third row has brown (9) on the left, then blue (1) and magenta. The bottom row is similar to the third but ends with blue instead of magenta.
+  output: |
+    An 8x8 grid that expands the input pattern. The original 4x4 grid is in the top-left quadrant. The top-right quadrant appears to be a horizontal flip of the original. The bottom-left quadrant looks like a vertical flip of the original. The bottom-right quadrant seems to be both horizontally and vertically flipped from the original.
+
+example_3:
+  input: |
+    A 4x4 grid with a mix of colors. The top row alternates yellow (4), brown (9), blue (1), and sky (8). The second row follows a similar pattern but starts with sky. The third row has yellow, sky, sky, and blue. The bottom row is mostly blue with a sky square at the end.
+  output: |
+    An 8x8 grid that expands the input pattern. The original 4x4 grid is in the top-left quadrant. The top-right quadrant appears to be a horizontal flip of the original. The bottom-left quadrant looks like a vertical flip of the original. The bottom-right quadrant seems to be both horizontally and vertically flipped from the original.
+
+example_4:
+  input: |
+    A 4x4 grid with a mix of colors. The top row alternates blue (1) and red (2). The second row is mostly magenta (6) with orange (7) in the third column. The third row has orange, magenta, red, and blue. The bottom row alternates blue and magenta with red in the third column.
+  output: |
+    An 8x8 grid that expands the input pattern. The original 4x4 grid is in the top-left quadrant. The top-right quadrant appears to be a horizontal flip of the original. The bottom-left quadrant looks like a vertical flip of the original. The bottom-right quadrant seems to be both horizontally and vertically flipped from the original.
