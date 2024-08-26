@@ -6,12 +6,13 @@ def solve_aa300dc3(input_grid: ColoredGrid) -> ColoredGrid:
     Solve the aa300dc3 challenge by creating a path of 8 sky blue squares
     through the black region of the grid, avoiding obstacles.
 
-    1. Identify potential starting points adjacent to the border
-    2. For each starting point, use a depth-first search to find paths of exactly 8 steps
-    3. Prioritize diagonal moves but allow occasional horizontal or vertical moves
-    4. Evaluate paths based on diagonality, proximity to border, and obstacle avoidance
-    5. Place 8 sky blue squares along the best found path
-    6. Return the modified grid or the original if no valid path is found
+    1. Identify all black cells adjacent to the border as potential start/end points
+    2. For each starting point, use depth-first search to find paths of exactly 8 steps
+    3. Allow both diagonal and orthogonal moves through black cells
+    4. Ensure the path ends at a border cell
+    5. Evaluate paths based on diagonal moves, obstacle avoidance, and space utilization
+    6. Place 8 sky blue squares along the best found path
+    7. Return the modified grid or the original if no valid path is found
     """
     rows, cols = input_grid.get_dimensions()
     output_grid = input_grid.deep_copy()
@@ -29,8 +30,8 @@ def solve_aa300dc3(input_grid: ColoredGrid) -> ColoredGrid:
 
     def evaluate_path(path):
         diagonality = sum(1 for i in range(len(path)-1) if abs(path[i][0]-path[i+1][0]) == abs(path[i][1]-path[i+1][1]))
-        border_proximity = sum(1 for r, c in path if is_border(r, c))
-        return diagonality + border_proximity
+        space_utilization = len(set((r//2, c//2) for r, c in path))  # Count unique quadrants used
+        return diagonality + space_utilization
 
     def dfs(r, c, path, visited):
         if len(path) == 8:
@@ -47,15 +48,16 @@ def solve_aa300dc3(input_grid: ColoredGrid) -> ColoredGrid:
     best_path = None
     best_score = -1
 
-    for r in range(rows):
-        for c in range(cols):
-            if input_grid.get_cell(r, c) == 0 and is_border(r, c):
-                paths = dfs(r, c, [(r, c)], {(r, c)})
-                for path in paths:
-                    score = evaluate_path(path)
-                    if score > best_score:
-                        best_path = path
-                        best_score = score
+    border_cells = [(r, c) for r in range(rows) for c in range(cols) 
+                    if is_border(r, c) and input_grid.get_cell(r, c) == 0]
+
+    for r, c in border_cells:
+        paths = dfs(r, c, [(r, c)], {(r, c)})
+        for path in paths:
+            score = evaluate_path(path)
+            if score > best_score:
+                best_path = path
+                best_score = score
 
     if best_path:
         for r, c in best_path:
