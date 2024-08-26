@@ -34,4 +34,9 @@ def solve_b1fc8b8e(input_grid: ColoredGrid) -> ColoredGrid:
                 for c in range(2):
                     output_grid[output_top + r][output_left + c] = 8
 
+    # Ensure the center cross is always black (0)
+    for i in range(5):
+        output_grid[2][i] = 0  # Center row
+        output_grid[i][2] = 0  # Center column
+
     return ColoredGrid(values=output_grid)
