@@ -5,9 +5,9 @@ def solve_42a15761(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms a grid of 'E' shapes by fixing inconsistencies in the middle and bottom bars.
     The transformation follows these rules:
     1. Top bars and vertical segments of 'E's are always full.
-    2. Middle bars alternate between full and partial (missing the rightmost square) within each column and across columns.
-    3. Bottom bars are the opposite of middle bars: full when the middle bar is partial, and partial (missing the rightmost square) when the middle bar is full.
-    4. The pattern of middle bars alternates between columns: odd columns start with a full middle bar, even columns start with a partial middle bar.
+    2. Middle bars alternate between full and partial (missing the rightmost square) based on the sum of column and 'E' indices.
+    3. Bottom bars are the opposite of middle bars: full when the middle bar is partial, and partial when the middle bar is full.
+    4. The pattern alternates both horizontally and vertically, creating a checkerboard-like pattern of full and partial bars.
     5. Black vertical separating lines remain unchanged.
     """
     rows, cols = input_grid.get_dimensions()
@@ -26,7 +26,6 @@ def solve_42a15761(input_grid: ColoredGrid) -> ColoredGrid:
     num_columns = get_num_columns()
     
     for col in range(num_columns):
-        start_full = col % 2 == 0  # Odd columns (0-indexed) start with full middle bar
         for e in range(rows // e_height):
             e_start = col * 4
             e_top = e * e_height
@@ -35,9 +34,11 @@ def solve_42a15761(input_grid: ColoredGrid) -> ColoredGrid:
             for r in range(e_top, e_top + e_height):
                 new_grid.values[r][e_start:e_start+3] = [2, 2, 2] if r == e_top else [2, 0, 2]
             
+            # Determine middle and bottom bar pattern
+            is_full_middle = (col + e) % 2 == 0
+            
             # Fix middle bar
             middle_row = e_top + e_height // 2
-            is_full_middle = start_full if e % 2 == 0 else not start_full
             new_grid.values[middle_row][e_start:e_start+3] = [2, 2, 2] if is_full_middle else [2, 2, 0]
             
             # Fix bottom bar
