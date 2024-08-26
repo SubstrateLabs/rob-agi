@@ -6,9 +6,9 @@ def solve_27a77e38(input_grid: ColoredGrid) -> ColoredGrid:
     
     The solution involves the following steps:
     1. Find the middle column of the grid.
-    2. Get the color from the top row at the middle column.
+    2. Get the color from the top-left corner of the grid.
     3. Change the color of the cell in the bottom row at the middle column
-       to match the color from the top row.
+       to match the color from the top-left corner.
     
     Args:
         input_grid (ColoredGrid): The input grid to be modified.
@@ -22,8 +22,8 @@ def solve_27a77e38(input_grid: ColoredGrid) -> ColoredGrid:
     # Find the middle column
     middle_col = (num_cols - 1) // 2
     
-    # Get the color to use from the top row
-    color_to_use = input_grid.values[0][middle_col]
+    # Get the color to use from the top-left corner
+    color_to_use = input_grid.values[0][0]
     
     # Create a deep copy of the input grid
     new_grid = input_grid.deep_copy()
