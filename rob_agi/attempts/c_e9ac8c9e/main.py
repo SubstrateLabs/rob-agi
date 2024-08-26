@@ -5,11 +5,11 @@ def solve_e9ac8c9e(input_grid: ColoredGrid) -> ColoredGrid:
     Transform the input grid by replacing a gray area with an expanded arrangement of surrounding colors.
     
     1. Locate the gray (5) area in the input.
-    2. Identify the four colored squares around the gray area.
+    2. Identify the four colored squares in the quadrants around the gray area.
     3. Create a new grid where the gray area is replaced by an expanded formation of the surrounding colors,
        each color occupying a quarter of the space previously taken by the gray area.
-    4. The new formation is centered on the original gray area.
-    5. Clear the original positions of the surrounding colors.
+    4. The new formation is placed exactly where the gray area was.
+    5. Clear the original positions of the surrounding colors and any remaining gray cells.
     
     The gray area is removed in the output, and the surrounding colored squares are expanded
     to fill the space in a compact, symmetrical arrangement.
@@ -24,8 +24,8 @@ def solve_e9ac8c9e(input_grid: ColoredGrid) -> ColoredGrid:
     output = input_grid.deep_copy()
     
     # Calculate the new block dimensions
-    block_height = gray_height // 2
-    block_width = gray_width // 2
+    block_height = (gray_height + 1) // 2
+    block_width = (gray_width + 1) // 2
     
     # Fill the new formation
     for i in range(2):
@@ -33,7 +33,8 @@ def solve_e9ac8c9e(input_grid: ColoredGrid) -> ColoredGrid:
             color = colors[i * 2 + j]
             for r in range(block_height):
                 for c in range(block_width):
-                    output.values[gray_top + i * block_height + r][gray_left + j * block_width + c] = color
+                    if gray_top + i * block_height + r < output.num_rows and gray_left + j * block_width + c < output.num_cols:
+                        output.values[gray_top + i * block_height + r][gray_left + j * block_width + c] = color
     
     # Clear original color positions and any remaining gray cells
     for r in range(input_grid.num_rows):
@@ -58,31 +59,26 @@ def find_gray_area(grid: ColoredGrid) -> tuple:
 
 def find_colors(grid: ColoredGrid, top: int, left: int, height: int, width: int) -> list:
     colors = [0, 0, 0, 0]  # TL, TR, BL, BR
-    mid_height = height // 2
-    mid_width = width // 2
+    mid_row = top + height // 2
+    mid_col = left + width // 2
     
-    # Check corners first, then midpoints if corner is black
-    positions = [
-        (top - 1, left - 1, 0),  # Top-left
-        (top - 1, left + width, 1),  # Top-right
-        (top + height, left - 1, 2),  # Bottom-left
-        (top + height, left + width, 3),  # Bottom-right
+    # Define quadrant boundaries
+    quadrants = [
+        (0, top, 0, left, mid_row, mid_col),  # Top-left
+        (1, top, mid_col, left + width, mid_row),  # Top-right
+        (2, mid_row, 0, left, top + height, mid_col),  # Bottom-left
+        (3, mid_row, mid_col, left + width, top + height)  # Bottom-right
     ]
     
-    for r, c, index in positions:
-        if 0 <= r < grid.num_rows and 0 <= c < grid.num_cols:
-            color = grid.values[r][c]
-            if color != 0:
-                colors[index] = color
-            else:
-                # Check midpoint
-                if index == 0:  # Top-left
-                    colors[index] = grid.values[top - 1][left + mid_width]
-                elif index == 1:  # Top-right
-                    colors[index] = grid.values[top + mid_height][left + width]
-                elif index == 2:  # Bottom-left
-                    colors[index] = grid.values[top + height][left + mid_width]
-                else:  # Bottom-right
-                    colors[index] = grid.values[top + mid_height][left - 1]
+    for index, start_row, start_col, end_col, end_row, mid_col in quadrants:
+        for r in range(start_row, end_row):
+            for c in range(start_col, end_col):
+                if 0 <= r < grid.num_rows and 0 <= c < grid.num_cols:
+                    color = grid.values[r][c]
+                    if color != 0 and color != 5:
+                        colors[index] = color
+                        break
+            if colors[index] != 0:
+                break
     
     return colors
