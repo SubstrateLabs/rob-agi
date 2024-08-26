@@ -7,47 +7,36 @@ def solve_f5c89df1(input_grid: ColoredGrid) -> ColoredGrid:
     and creating an idealized, symmetrical version of it.
     
     1. Analyze the input shape to determine its key characteristics.
-    2. Design a new symmetrical shape based on the input's structure.
-    3. Size and position the new shape within the grid.
-    4. Create the output grid with the new shape.
+    2. Create a 5x5 idealized pattern based on the input structure.
+    3. Position the new pattern within a 13x13 grid.
+    4. Adjust the pattern to maintain symmetry and essence of the original.
     
-    The transformation aims to preserve the general structure and proportions
-    of the input while creating a more symmetrical and centered output.
+    The transformation preserves the general structure of the input
+    while creating a more symmetrical and centered 5x5 pattern within the output.
     
-    Returns a new grid with the transformed pattern.
+    Returns a new 13x13 grid with the transformed pattern.
     """
     # Step 1: Analyze input shape
-    sky_blue_regions = input_grid.find_connected_regions(8)
-    if not sky_blue_regions:
-        return input_grid  # No transformation needed
+    sky_blue_coords = [(r, c) for r in range(13) for c in range(13) if input_grid.get_cell(r, c) == 8]
+    if not sky_blue_coords:
+        return ColoredGrid(values=[[0 for _ in range(13)] for _ in range(13)])
     
-    largest_region = max(sky_blue_regions, key=len)
-    min_r = min(r for r, _ in largest_region)
-    max_r = max(r for r, _ in largest_region)
-    min_c = min(c for _, c in largest_region)
-    max_c = max(c for _, c in largest_region)
+    min_r, max_r = min(r for r, _ in sky_blue_coords), max(r for r, _ in sky_blue_coords)
+    min_c, max_c = min(c for _, c in sky_blue_coords), max(c for _, c in sky_blue_coords)
     
-    height = max_r - min_r + 1
-    width = max_c - min_c + 1
+    # Step 2: Create 5x5 idealized pattern
+    pattern = [[0 for _ in range(5)] for _ in range(5)]
+    pattern[0][2] = pattern[2][0] = pattern[2][4] = pattern[4][2] = 8  # Corners
+    pattern[1][1] = pattern[1][3] = pattern[3][1] = pattern[3][3] = 8  # Inner corners
+    pattern[2][2] = 8  # Center
     
-    # Step 2: Design new shape
-    new_height = min(max(height, 5), 9)
-    new_width = min(max(width, 5), 9)
-    
-    new_shape = set()
-    for r in range(new_height):
-        for c in range(new_width):
-            if (r == 0 or r == new_height - 1 or c == 0 or c == new_width - 1 or
-                r == new_height // 2 or c == new_width // 2):
-                new_shape.add((r, c))
-    
-    # Step 3: Position new shape
-    top_row = 2
-    left_col = (13 - new_width) // 2
-    
-    # Step 4: Create output grid
+    # Step 3 & 4: Position pattern and create output grid
     output_grid = ColoredGrid(values=[[0 for _ in range(13)] for _ in range(13)])
-    for r, c in new_shape:
-        output_grid.set_cell(top_row + r, left_col + c, 8)
+    start_row, start_col = 4, 4  # Center the 5x5 pattern in the 13x13 grid
+    
+    for r in range(5):
+        for c in range(5):
+            if pattern[r][c] == 8:
+                output_grid.set_cell(start_row + r, start_col + c, 8)
     
     return output_grid
