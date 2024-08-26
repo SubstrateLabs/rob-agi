@@ -1,44 +1,53 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 def solve_d4c90558(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the d4c90558 challenge by extracting the largest rectangular region for each color.
+    Solve the d4c90558 challenge by extracting the largest square region for each color.
     
-    The function scans the input grid, identifies the largest contiguous rectangular region
+    The function scans the input grid, identifies the largest contiguous square region
     for each unique color (excluding black and gray), reduces each region to a single row,
     and arranges these rows in the order of their first appearance in the input grid.
+    All rows are padded to have the same length as the largest square found.
     
     Args:
     input_grid (ColoredGrid): The input grid to process.
     
     Returns:
-    ColoredGrid: A new grid where each row represents the largest region of a unique color.
+    ColoredGrid: A new grid where each row represents the largest square region of a unique color,
+                 padded to ensure all rows have the same length.
     """
-    def find_largest_region(start_r: int, start_c: int, color: int) -> Tuple[int, int, int]:
-        max_width = 0
-        max_height = 0
-        for c in range(start_c, cols):
-            if input_grid.get_cell(start_r, c) not in [color, 5]:
+    def find_largest_square(row: int, col: int, color: int) -> int:
+        max_size = 0
+        size = 0
+        while True:
+            size += 1
+            if row + size > rows or col + size > cols:
                 break
-            max_width += 1
-        for r in range(start_r, rows):
-            if all(input_grid.get_cell(r, c) in [color, 5] for c in range(start_c, start_c + max_width)):
-                max_height += 1
-            else:
+            if any(input_grid.get_cell(r, c) not in [color, 5] 
+                   for r in range(row, row + size) 
+                   for c in range(col, col + size)):
                 break
-        return max_width, max_height, color
+            max_size = size
+        return max_size
 
     rows, cols = input_grid.get_dimensions()
-    processed_colors = set()
-    extracted_regions = []
+    color_sizes: Dict[int, int] = {}
+    color_order: List[int] = []
 
     for r in range(rows):
         for c in range(cols):
             color = input_grid.get_cell(r, c)
-            if color not in [0, 5] and color not in processed_colors:
-                width, height, color = find_largest_region(r, c, color)
-                extracted_regions.append([color] * width)
-                processed_colors.add(color)
+            if color not in [0, 5] and color not in color_sizes:
+                size = find_largest_square(r, c, color)
+                color_sizes[color] = size
+                color_order.append(color)
 
-    return ColoredGrid(values=extracted_regions)
+    max_size = max(color_sizes.values()) if color_sizes else 0
+    output_rows = []
+    for color in color_order:
+        size = color_sizes[color]
+        row = [color] * size + [0] * (max_size - size)
+        output_rows.append(row)
+
+    return ColoredGrid(values=output_rows)
