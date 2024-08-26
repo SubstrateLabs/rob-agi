@@ -16,19 +16,19 @@ def find_red_lines(grid: ColoredGrid) -> List[Tuple[int, int, int, int]]:
 def calculate_extension(line_length: int) -> int:
     return max(1, min(line_length // 2, (line_length - 1) // 2))
 
-def is_within_diamond(row: int, col: int, line: Tuple[int, int, int, int], extension: int) -> bool:
+def is_within_diamond(row: int, col: int, line: Tuple[int, int, int, int], extension: int, center_r: float, center_c: float) -> bool:
     start_r, start_c, end_r, end_c = line
-    line_center_r, line_center_c = (start_r + end_r) / 2, (start_c + end_c) / 2
     
     if start_r == end_r:  # Horizontal line
         dist_to_line = abs(row - start_r)
-        dist_to_center = abs(col - line_center_c)
+        dist_to_center = abs(col - center_c)
+        line_length = abs(end_c - start_c) + 1
     else:  # Vertical line
         dist_to_line = abs(col - start_c)
-        dist_to_center = abs(row - line_center_r)
+        dist_to_center = abs(row - center_r)
+        line_length = abs(end_r - start_r) + 1
     
-    line_length = max(abs(end_r - start_r), abs(end_c - start_c)) + 1
-    max_dist = extension * (1 - dist_to_center / (line_length / 2 + extension))
+    max_dist = extension * (1 - dist_to_center / ((line_length - 1) / 2))
     
     return dist_to_line <= max_dist
 
@@ -61,9 +61,11 @@ def solve_c97c0139(input_grid: ColoredGrid) -> ColoredGrid:
         min_col = max(0, min(start_c, end_c) - extension)
         max_col = min(cols - 1, max(start_c, end_c) + extension)
 
+        center_r, center_c = (start_r + end_r) / 2, (start_c + end_c) / 2
+
         for r in range(min_row, max_row + 1):
             for c in range(min_col, max_col + 1):
-                if output_grid.get_cell(r, c) != 2 and is_within_diamond(r, c, line, extension):
+                if output_grid.get_cell(r, c) != 2 and is_within_diamond(r, c, line, extension, center_r, center_c):
                     output_grid.set_cell(r, c, 8)
 
     return output_grid
