@@ -1,0 +1,49 @@
+example_0:
+  input: |
+    A 6x6 grid with mostly black (0) squares. There are four yellow (4) squares positioned as follows:
+    - Top left corner (0,0)
+    - Third row, second column (2,1)
+    - Fourth row, fifth column (3,4)
+    - Bottom right corner (5,5)
+    These yellow squares form a rough diagonal pattern from top-left to bottom-right.
+  output: |
+    A 12x12 grid that appears to be an expanded version of the input. The yellow squares from the input are present, but now spaced further apart:
+    - Top left corner (0,1)
+    - Third row, second column (2,1)
+    - Sixth row, fifth column (5,4)
+    - Bottom right corner (11,10)
+    New green (3) horizontal lines have been added between each pair of yellow squares, spanning the full width of the grid. These lines appear in rows 1, 4, 7, and 10.
+
+example_1:
+  input: |
+    A 3x3 grid with mostly black (0) squares. There are two sky blue (8) squares positioned as follows:
+    - Top middle (0,1)
+    - Bottom middle (2,1)
+    These form a vertical line in the center column.
+  output: |
+    A 6x6 grid that appears to be an expanded version of the input. The sky blue squares from the input are present, but now spaced further apart:
+    - Top row, second column (0,1)
+    - Fifth row, fifth column (4,4)
+    A new green (3) horizontal line has been added between the two sky blue squares, spanning the full width of the grid. This line appears in the second row.
+
+example_2:
+  input: |
+    A 7x7 grid with mostly black (0) squares. There are two orange (7) squares positioned as follows:
+    - Third row, third column (2,2)
+    - Third row from bottom, third column from right (4,4)
+    These form a diagonal line from top-left to bottom-right, but are closer to the center of the grid.
+  output: |
+    A 14x14 grid that appears to be an expanded version of the input. The orange squares from the input are present, but now spaced further apart:
+    - Third row, third column (2,2)
+    - Tenth row, tenth column (9,9)
+    Two new green (3) horizontal lines have been added, one above and one below the diagonal formed by the orange squares. These lines span the full width of the grid and appear in rows 1 and 8.
+
+test_case_0:
+  input: |
+    A 7x7 grid with mostly black (0) squares. There are two orange (7) squares positioned as follows:
+    - Third row, third column (2,2)
+    - Third row from bottom, third column from right (4,4)
+    These form a diagonal line from top-left to bottom-right, but are closer to the center of the grid.
+    This input is identical to the input of example_2.
+  output: |
+    The output is not provided for this test case, as it is meant to be solved based on the pattern observed in the examples.
