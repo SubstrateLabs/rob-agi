@@ -6,7 +6,7 @@ def solve_17b80ad2(input_grid: ColoredGrid) -> ColoredGrid:
     1. Process each column independently.
     2. Identify all non-zero colors in the column, preserving their vertical order.
     3. Fill the column from top to bottom:
-       - Start with the first color and fill downwards until reaching the next color's position or the bottom.
+       - Start with the first color and fill downwards until reaching the next color's position.
        - Continue with subsequent colors, filling their respective sections.
        - If all colors are used before reaching the bottom, continue with the last color.
     4. Columns without any colored dots remain entirely black (0).
@@ -24,10 +24,16 @@ def solve_17b80ad2(input_grid: ColoredGrid) -> ColoredGrid:
             continue  # Skip columns with no colors
         
         # Fill the column
-        color_index = 0
-        for row in range(height):
-            if color_index < len(colors) - 1 and row >= colors[color_index + 1][0]:
-                color_index += 1
-            new_grid.values[row][col] = colors[color_index][1]
+        start_row = 0
+        for i, (row, color) in enumerate(colors):
+            # Fill from start_row to current row with the current color
+            for r in range(start_row, row):
+                new_grid.values[r][col] = color
+            start_row = row
+        
+        # Fill from the last color to the bottom of the grid
+        last_color = colors[-1][1]
+        for r in range(start_row, height):
+            new_grid.values[r][col] = last_color
 
     return new_grid
