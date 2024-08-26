@@ -1,10 +1,7 @@
 from rob_agi.colored_grid import ColoredGrid
 from collections import Counter
 from typing import List, Tuple, Dict
-import random
-
-from typing import List, Tuple, Dict
-from collections import Counter
+import numpy as np
 
 def solve_f4081712(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -15,8 +12,9 @@ def solve_f4081712(input_grid: ColoredGrid) -> ColoredGrid:
     1. Analyze the entire input grid, focusing on the central area and key patterns.
     2. Identify the most significant colors and their relationships.
     3. Determine the appropriate output size based on the complexity of the input.
-    4. Generate a smaller output grid that preserves the essence of the input pattern.
-    5. Ensure the output maintains key color relationships and relative positions.
+    4. Extract the core pattern from the central area of the input grid.
+    5. Generate a smaller output grid that preserves the essence of the input pattern.
+    6. Ensure the output maintains key color relationships and relative positions.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -27,7 +25,8 @@ def solve_f4081712(input_grid: ColoredGrid) -> ColoredGrid:
     analysis = analyze_grid(input_grid)
     key_colors = identify_key_colors(analysis)
     output_size = determine_output_size(analysis)
-    output_values = generate_output_grid(key_colors, output_size, analysis)
+    core_pattern = extract_core_pattern(input_grid, analysis)
+    output_values = generate_output_grid(core_pattern, key_colors, output_size, analysis)
     return ColoredGrid(values=output_values)
 
 def analyze_grid(grid: ColoredGrid) -> Dict:
@@ -52,37 +51,76 @@ def analyze_grid(grid: ColoredGrid) -> Dict:
 
 def identify_key_colors(analysis: Dict) -> List[int]:
     combined_freq = analysis['central_freq'] + Counter({color: count // 2 for color, count in analysis['full_freq'].items()})
-    return [color for color, _ in combined_freq.most_common(5)]  # Reduced to top 5 colors
+    return [color for color, _ in combined_freq.most_common(6)]  # Increased to top 6 colors
 
 def determine_output_size(analysis: Dict) -> Tuple[int, int]:
     unique_colors = len(analysis['central_freq'])
-    size = max(3, min(5, unique_colors + 1))  # Adjusted to produce smaller outputs
+    size = max(4, min(6, unique_colors))  # Adjusted to produce slightly larger outputs
     return (size, size)
 
-def generate_output_grid(key_colors: List[int], output_size: Tuple[int, int], analysis: Dict) -> List[List[int]]:
+def extract_core_pattern(grid: ColoredGrid, analysis: Dict) -> List[List[int]]:
+    rows, cols = len(grid.values), len(grid.values[0])
+    central_area = [row[cols//4:3*cols//4] for row in grid.values[rows//4:3*rows//4]]
+    
+    # Convert to numpy array for easier manipulation
+    central_array = np.array(central_area)
+    
+    # Find the most common color in the central area
+    most_common_color = max(analysis['central_freq'], key=analysis['central_freq'].get)
+    
+    # Create a binary mask of the most common color
+    mask = (central_array == most_common_color)
+    
+    # Find the largest contiguous area of the most common color
+    labeled_array, num_features = np.zeros_like(mask), 0
+    for i in range(mask.shape[0]):
+        for j in range(mask.shape[1]):
+            if mask[i, j] and labeled_array[i, j] == 0:
+                num_features += 1
+                stack = [(i, j)]
+                while stack:
+                    x, y = stack.pop()
+                    if 0 <= x < mask.shape[0] and 0 <= y < mask.shape[1] and mask[x, y] and labeled_array[x, y] == 0:
+                        labeled_array[x, y] = num_features
+                        stack.extend([(x-1, y), (x+1, y), (x, y-1), (x, y+1)])
+    
+    # Find the largest labeled area
+    largest_label = max(range(1, num_features + 1), key=lambda x: np.sum(labeled_array == x))
+    largest_area_mask = (labeled_array == largest_label)
+    
+    # Extract the bounding box of the largest area
+    rows, cols = np.where(largest_area_mask)
+    top, bottom, left, right = rows.min(), rows.max(), cols.min(), cols.max()
+    
+    # Extract the core pattern
+    core_pattern = central_array[top:bottom+1, left:right+1].tolist()
+    
+    return core_pattern
+
+def generate_output_grid(core_pattern: List[List[int]], key_colors: List[int], output_size: Tuple[int, int], analysis: Dict) -> List[List[int]]:
     rows, cols = output_size
     output = [[0] * cols for _ in range(rows)]
     
-    # Place key colors
-    for i, color in enumerate(key_colors):
-        r, c = i % rows, i % cols
-        output[r][c] = color
+    # Scale the core pattern to fit the output size
+    scale_factor = min(rows / len(core_pattern), cols / len(core_pattern[0]))
+    scaled_pattern = [[core_pattern[int(i/scale_factor)][int(j/scale_factor)] 
+                       for j in range(cols)] for i in range(rows)]
     
-    # Fill remaining cells based on transitions
+    # Place the scaled pattern in the output grid
     for r in range(rows):
         for c in range(cols):
-            if output[r][c] == 0:
-                neighbors = [output[r-1][c] if r > 0 else None,
-                             output[r][c-1] if c > 0 else None]
-                neighbors = [n for n in neighbors if n is not None]
-                if neighbors:
-                    possible_colors = [color2 for (color1, color2), _ in analysis['transitions'].most_common()
-                                       if color1 in neighbors]
-                    if possible_colors:
-                        output[r][c] = possible_colors[0]
-                    else:
-                        output[r][c] = key_colors[0]
-                else:
-                    output[r][c] = key_colors[0]
+            output[r][c] = scaled_pattern[r][c]
+    
+    # Ensure all key colors are present
+    for color in key_colors:
+        if color not in [cell for row in output for cell in row]:
+            # Find a suitable position to place the missing color
+            for r in range(rows):
+                for c in range(cols):
+                    if output[r][c] not in key_colors:
+                        output[r][c] = color
+                        break
+                if color in [cell for row in output for cell in row]:
+                    break
     
     return output
