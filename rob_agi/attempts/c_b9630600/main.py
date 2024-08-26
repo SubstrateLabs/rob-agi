@@ -2,6 +2,7 @@ from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Set, Dict
 import math
 import random
+import heapq
 
 def solve_b9630600(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -31,6 +32,98 @@ def solve_b9630600(input_grid: ColoredGrid) -> ColoredGrid:
     fixed_cells = mark_fixed_cells(output_grid)
     shapes = identify_shapes(output_grid)
     symmetry = detect_symmetry(output_grid)
+    
+    fill_hollow_areas(output_grid, shapes)
+    expand_shapes(output_grid, shapes, fixed_cells)
+    connection_points = identify_connection_points(shapes)
+    create_primary_connections(output_grid, connection_points)
+    enhance_structural_integrity(output_grid, shapes)
+    create_secondary_connections(output_grid, shapes)
+    adjust_symmetry(output_grid, symmetry)
+    fill_isolated_cells_and_expand(output_grid)
+    enhance_aesthetics(output_grid)
+    verify_connectivity(output_grid)
+    clean_up_and_optimize(output_grid, fixed_cells)
+    final_symmetry_check(output_grid, symmetry)
+    
+    return output_grid
+
+def detect_symmetry(grid: ColoredGrid) -> Tuple[bool, bool]:
+    """Detect horizontal and vertical symmetry in the grid."""
+    h_sym = all(grid.values[r] == grid.values[-r-1] for r in range(grid.num_rows // 2))
+    v_sym = all(grid.values[r][c] == grid.values[r][-c-1] for r in range(grid.num_rows) for c in range(grid.num_cols // 2))
+    return h_sym, v_sym
+
+def expand_shapes(grid: ColoredGrid, shapes: List[Set[Tuple[int, int]]], fixed_cells: Set[Tuple[int, int]]):
+    for shape in shapes:
+        new_cells = set()
+        for r, c in shape:
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < grid.num_rows and 0 <= nc < grid.num_cols:
+                    if (nr, nc) not in fixed_cells and grid.get_cell(nr, nc) == 0:
+                        new_cells.add((nr, nc))
+        for nr, nc in new_cells:
+            grid.set_cell(nr, nc, 3)
+
+def enhance_structural_integrity(grid: ColoredGrid, shapes: List[Set[Tuple[int, int]]]):
+    for shape in shapes:
+        if len(shape) > 10:  # Only add internal struts to larger shapes
+            centroid = calculate_centroid(shape)
+            corners = find_corners(shape)
+            for corner in corners:
+                connect_points(grid, corner, centroid)
+
+def create_secondary_connections(grid: ColoredGrid, shapes: List[Set[Tuple[int, int]]]):
+    all_points = [point for shape in shapes for point in shape]
+    for i, point1 in enumerate(all_points):
+        for point2 in all_points[i+1:]:
+            if random.random() < 0.1:  # 10% chance to create a secondary connection
+                connect_points(grid, point1, point2)
+
+def adjust_symmetry(grid: ColoredGrid, symmetry: Tuple[bool, bool]):
+    h_sym, v_sym = symmetry
+    if h_sym:
+        for r in range(grid.num_rows // 2):
+            for c in range(grid.num_cols):
+                if grid.get_cell(r, c) != grid.get_cell(grid.num_rows - 1 - r, c):
+                    grid.set_cell(grid.num_rows - 1 - r, c, grid.get_cell(r, c))
+    if v_sym:
+        for r in range(grid.num_rows):
+            for c in range(grid.num_cols // 2):
+                if grid.get_cell(r, c) != grid.get_cell(r, grid.num_cols - 1 - c):
+                    grid.set_cell(r, grid.num_cols - 1 - c, grid.get_cell(r, c))
+
+def enhance_aesthetics(grid: ColoredGrid):
+    for r in range(grid.num_rows):
+        for c in range(grid.num_cols):
+            if grid.get_cell(r, c) == 3:
+                for dr, dc in [(1, 1), (1, -1), (-1, 1), (-1, -1)]:
+                    nr, nc = r + dr, c + dc
+                    if 0 <= nr < grid.num_rows and 0 <= nc < grid.num_cols:
+                        if random.random() < 0.1:  # 10% chance to add aesthetic detail
+                            grid.set_cell(nr, nc, 3)
+
+def clean_up_and_optimize(grid: ColoredGrid, fixed_cells: Set[Tuple[int, int]]):
+    for r in range(grid.num_rows):
+        for c in range(grid.num_cols):
+            if grid.get_cell(r, c) == 3 and (r, c) not in fixed_cells:
+                neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                                if 0 <= r + dr < grid.num_rows and 0 <= c + dc < grid.num_cols and grid.get_cell(r + dr, c + dc) == 3)
+                if neighbors <= 1:
+                    grid.set_cell(r, c, 0)
+
+def calculate_centroid(shape: Set[Tuple[int, int]]) -> Tuple[int, int]:
+    x_sum = sum(x for x, _ in shape)
+    y_sum = sum(y for _, y in shape)
+    return x_sum // len(shape), y_sum // len(shape)
+
+def find_corners(shape: Set[Tuple[int, int]]) -> List[Tuple[int, int]]:
+    min_r = min(r for r, _ in shape)
+    max_r = max(r for r, _ in shape)
+    min_c = min(c for _, c in shape)
+    max_c = max(c for _, c in shape)
+    return [(min_r, min_c), (min_r, max_c), (max_r, min_c), (max_r, max_c)]
     
     fill_hollow_areas(output_grid, shapes)
     expand_shapes(output_grid, shapes, fixed_cells)
