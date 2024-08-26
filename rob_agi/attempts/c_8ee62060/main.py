@@ -10,8 +10,9 @@ def solve_8ee62060(input_grid: ColoredGrid) -> ColoredGrid:
     3. The overall dimensions of the grid remain unchanged.
     
     The transformation is achieved by:
-    - Identifying the start of the diagonal pattern.
-    - Moving along the diagonal, rotating each group of elements.
+    - Identifying the start of the diagonal pattern (top-left or top-right).
+    - Determining the size of the pattern element.
+    - Moving along the diagonal, rotating each pattern element.
     - Placing the rotated elements in their new positions.
     """
     rows, cols = input_grid.get_dimensions()
@@ -27,26 +28,29 @@ def solve_8ee62060(input_grid: ColoredGrid) -> ColoredGrid:
         if start_row != 0 or start_col != 0:
             break
     
-    # Determine the step size of the pattern
-    step_size = 1
-    while start_row + step_size < rows and start_col + step_size < cols:
-        if input_grid.values[start_row + step_size][start_col + step_size] != 0:
-            break
-        step_size += 1
+    # Determine the pattern element size and step direction
+    pattern_width = pattern_height = 1
+    while start_col + pattern_width < cols and input_grid.values[start_row][start_col + pattern_width] != 0:
+        pattern_width += 1
+    while start_row + pattern_height < rows and input_grid.values[start_row + pattern_height][start_col] != 0:
+        pattern_height += 1
+    
+    step_size = max(pattern_width, pattern_height)
+    step_direction = 1 if start_col < cols // 2 else -1
     
     # Rotate the pattern
     current_row, current_col = start_row, start_col
-    new_row, new_col = rows - 1, start_col
+    new_row, new_col = rows - 1, start_col if step_direction == 1 else cols - pattern_width
     
-    while current_row < rows and current_col < cols:
-        for i in range(step_size):
-            for j in range(step_size):
-                if current_row + i < rows and current_col + j < cols:
-                    new_grid.values[new_row - j][new_col + i] = input_grid.values[current_row + i][current_col + j]
+    while 0 <= current_row < rows and 0 <= current_col < cols:
+        for i in range(pattern_height):
+            for j in range(pattern_width):
+                if current_row + i < rows and 0 <= current_col + j * step_direction < cols:
+                    new_grid.values[new_row - j][new_col + i * step_direction] = input_grid.values[current_row + i][current_col + j * step_direction]
         
         current_row += step_size
-        current_col += step_size
+        current_col += step_size * step_direction
         new_row -= step_size
-        new_col += step_size
+        new_col += step_size * step_direction
     
     return new_grid
