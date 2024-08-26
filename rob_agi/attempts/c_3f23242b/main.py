@@ -5,82 +5,67 @@ def solve_3f23242b(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by adding a pattern around each green (3) cell.
     The pattern consists of a 5x5 gray (5) frame, surrounded by red (2) borders on three sides,
     and a sky blue (8) line extending to the grid edges. The pattern orientation
-    (horizontal or vertical) is determined based on the green cell's position relative to the grid center.
-    Red borders are extended until they reach a non-black cell or the grid edge.
+    (horizontal or vertical) is determined based on the green cell's position in the top or bottom half of the grid.
+    Red borders are extended to the grid edge in the direction away from the sky blue line.
     Colors are applied with the priority: Green > Sky blue > Red > Gray > Black.
     """
     grid = input_grid.deep_copy()
     height, width = grid.get_dimensions()
 
-    def draw_pattern(center_row, center_col, is_horizontal):
-        # Draw sky blue line
+    def color_priority(color):
+        return {3: 4, 8: 3, 2: 2, 5: 1, 0: 0}.get(color, 0)
+
+    def set_color(row, col, color):
+        if 0 <= row < height and 0 <= col < width:
+            if color_priority(color) > color_priority(grid.values[row][col]):
+                grid.values[row][col] = color
+
+    def draw_sky_blue_line(row, col, is_horizontal):
         if is_horizontal:
-            for col in range(width):
-                if grid.values[center_row][col] != 3:
-                    grid.values[center_row][col] = 8
-        else:
-            for row in range(height):
-                if grid.values[row][center_col] != 3:
-                    grid.values[row][center_col] = 8
-
-        # Draw 5x5 gray frame
-        for i in range(max(0, center_row - 2), min(height, center_row + 3)):
-            for j in range(max(0, center_col - 2), min(width, center_col + 3)):
-                if grid.values[i][j] == 0:
-                    grid.values[i][j] = 5
-
-        # Draw initial red border
-        if is_horizontal:
-            for i in range(max(0, center_row - 2), min(height, center_row + 3)):
-                if i != center_row:
-                    if grid.values[i][max(0, center_col - 2)] == 0:
-                        grid.values[i][max(0, center_col - 2)] = 2
-                    if grid.values[i][min(width - 1, center_col + 2)] == 0:
-                        grid.values[i][min(width - 1, center_col + 2)] = 2
-            for j in range(max(0, center_col - 2), min(width, center_col + 3)):
-                if grid.values[min(height - 1, center_row + 2)][j] == 0:
-                    grid.values[min(height - 1, center_row + 2)][j] = 2
-        else:
-            for j in range(max(0, center_col - 2), min(width, center_col + 3)):
-                if j != center_col:
-                    if grid.values[max(0, center_row - 2)][j] == 0:
-                        grid.values[max(0, center_row - 2)][j] = 2
-                    if grid.values[min(height - 1, center_row + 2)][j] == 0:
-                        grid.values[min(height - 1, center_row + 2)][j] = 2
-            for i in range(max(0, center_row - 2), min(height, center_row + 3)):
-                if grid.values[i][min(width - 1, center_col + 2)] == 0:
-                    grid.values[i][min(width - 1, center_col + 2)] = 2
-
-    def extend_red_borders():
-        def extend_border(r, c, dr, dc):
-            while 0 <= r < height and 0 <= c < width:
-                if grid.values[r][c] != 0:
-                    if grid.values[r][c] == 2:
-                        r += dr
-                        c += dc
-                    else:
-                        break
-                else:
-                    grid.values[r][c] = 2
-                    break
-
-        for r in range(height):
             for c in range(width):
-                if grid.values[r][c] == 2:
-                    extend_border(r+1, c, 1, 0)  # Down
-                    extend_border(r-1, c, -1, 0)  # Up
-                    extend_border(r, c+1, 0, 1)  # Right
-                    extend_border(r, c-1, 0, -1)  # Left
+                set_color(row, c, 8)
+        else:
+            for r in range(height):
+                set_color(r, col, 8)
+
+    def create_gray_frame(row, col):
+        for i in range(row - 2, row + 3):
+            for j in range(col - 2, col + 3):
+                set_color(i, j, 5)
+
+    def add_red_borders(row, col, is_horizontal):
+        if is_horizontal:
+            for i in range(row - 2, row + 3):
+                set_color(i, col - 2, 2)
+                set_color(i, col + 2, 2)
+            for j in range(col - 2, col + 3):
+                set_color(row - 2, j, 2)
+            for i in range(row - 2, -1, -1):
+                set_color(i, col - 2, 2)
+                set_color(i, col + 2, 2)
+        else:
+            for j in range(col - 2, col + 3):
+                set_color(row - 2, j, 2)
+                set_color(row + 2, j, 2)
+            for i in range(row - 2, row + 3):
+                set_color(i, col - 2, 2)
+            for j in range(col - 2, -1, -1):
+                set_color(row - 2, j, 2)
+                set_color(row + 2, j, 2)
 
     # Find green cells and apply pattern
     for row in range(height):
         for col in range(width):
             if grid.values[row][col] == 3:
-                # Determine orientation based on position relative to grid center
-                is_horizontal = col >= width // 2
-                draw_pattern(row, col, is_horizontal)
+                is_horizontal = row < height // 2
+                draw_sky_blue_line(row, col, is_horizontal)
+                create_gray_frame(row, col)
+                add_red_borders(row, col, is_horizontal)
 
-    # Extend red borders
-    extend_red_borders()
+    # Restore green cells
+    for row in range(height):
+        for col in range(width):
+            if input_grid.values[row][col] == 3:
+                grid.values[row][col] = 3
 
     return grid
