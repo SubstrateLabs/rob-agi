@@ -9,7 +9,8 @@ def solve_93b4f4b3(input_grid: ColoredGrid) -> ColoredGrid:
     2. Identifies and extracts shapes from the right side of the input grid.
     3. Inverts the extracted shapes vertically.
     4. Places inverted shapes in empty spaces within the border, maintaining their relative horizontal position.
-    5. Fills any remaining empty space with the border color.
+    5. Sorts shapes from top to bottom based on their original position.
+    6. Fills any remaining empty space with the border color.
     
     Returns the transformed ColoredGrid.
     """
@@ -35,14 +36,14 @@ def solve_93b4f4b3(input_grid: ColoredGrid) -> ColoredGrid:
         min_c, max_c = min(c for _, c in shape), max(c for _, c in shape)
         height, width = max_r - min_r + 1, max_c - min_c + 1
         right_distance = cols - max_c - 1
-        inverted_shape = [((rows - 1 - r + min_r, c - min_c), color) for r, c in shape]
-        processed_shapes.append((inverted_shape, height, width, right_distance))
+        inverted_shape = [((rows - 1 - r, c - min_c), color) for r, c in shape]
+        processed_shapes.append((inverted_shape, height, width, right_distance, min_r))
     
     # Sort shapes by their original vertical position (top to bottom)
-    processed_shapes.sort(key=lambda x: min(r for (r, _), _ in x[0]))
+    processed_shapes.sort(key=lambda x: x[4])
     
     # Place shapes in empty spaces
-    for shape, height, width, right_distance in processed_shapes:
+    for shape, height, width, right_distance, _ in processed_shapes:
         placed = False
         for r in range(rows - height + 1):
             if placed:
@@ -50,7 +51,7 @@ def solve_93b4f4b3(input_grid: ColoredGrid) -> ColoredGrid:
             c = 5 - right_distance - width + 1
             if c < 1:
                 c = 1
-            if all(output_grid.values[r+dr][c+dc] == 0 for (dr, dc), _ in shape):
+            if all(0 <= r+dr < rows and 0 <= c+dc < 6 and output_grid.values[r+dr][c+dc] == 0 for (dr, dc), _ in shape):
                 for (dr, dc), color in shape:
                     output_grid.values[r+dr][c+dc] = color
                 placed = True
