@@ -13,6 +13,7 @@ def solve_d4c90558(input_grid: ColoredGrid) -> ColoredGrid:
     leftmost position. Gray (5) is treated as a continuation of the current color when
     calculating contiguous widths, but is excluded from the output. The function ensures
     that the output grid's width is exactly the largest contiguous width found for any color.
+    Colors with a max width of 1 are excluded from the output.
     
     Args:
     input_grid (ColoredGrid): The input grid to process.
@@ -45,6 +46,10 @@ def solve_d4c90558(input_grid: ColoredGrid) -> ColoredGrid:
                 if width > current_max_width:
                     color_info[color] = (top, left, width)
                 max_contiguous_width = max(max_contiguous_width, width)
+
+    # Filter out colors with max width of 1 and update color_order
+    color_info = {color: info for color, info in color_info.items() if info[2] > 1}
+    color_order = [color for color in color_order if color in color_info]
 
     # Sort colors based on their topmost occurrence, then leftmost
     color_order.sort(key=lambda x: (color_info[x][0], color_info[x][1]))
