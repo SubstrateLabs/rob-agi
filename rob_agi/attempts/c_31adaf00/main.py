@@ -8,11 +8,10 @@ def solve_31adaf00(input_grid: ColoredGrid) -> ColoredGrid:
     
     The algorithm works as follows:
     1. Analyzes the input grid to count gray squares and calculate the target number of blue squares.
-    2. Creates a list of potential rectangular regions for blue square placement.
-    3. Scores each potential region based on proximity to gray squares, position, and contribution to symmetry.
-    4. Iteratively places blue regions, starting with the highest-scoring ones.
-    5. Fine-tunes the placement to reach the exact target number of blue squares.
-    6. Performs a final balance check and makes minor adjustments if needed.
+    2. Creates a heatmap to identify optimal areas for blue square placement.
+    3. Places blue squares in phases, starting with larger blocks and then filling in with smaller ones.
+    4. Performs balance checks and adjustments to ensure the correct number of blue squares.
+    5. Makes final adjustments for visual balance and symmetry.
     
     Returns a new grid with added blue squares while preserving the original gray squares and maintaining visual balance.
     """
@@ -21,8 +20,8 @@ def solve_31adaf00(input_grid: ColoredGrid) -> ColoredGrid:
     gray_count = count_color(input_grid, 5)
     target_blue = (rows * cols - gray_count) // 2
     
-    potential_regions = get_potential_regions(input_grid)
-    blue_count = place_blue_regions(output_grid, potential_regions, target_blue)
+    heatmap = create_heatmap(input_grid)
+    blue_count = grow_blue_regions(output_grid, heatmap, target_blue)
     
     if blue_count < target_blue:
         blue_count = fill_remaining_squares(output_grid, blue_count, target_blue)
@@ -39,11 +38,12 @@ def create_heatmap(grid: ColoredGrid) -> List[List[int]]:
     
     for r in range(rows):
         for c in range(cols):
-            if grid.values[r][c] == 0:
-                for dr in [-1, 0, 1]:
-                    for dc in [-1, 0, 1]:
+            if grid.values[r][c] == 5:  # Gray square
+                for dr in [-2, -1, 0, 1, 2]:
+                    for dc in [-2, -1, 0, 1, 2]:
                         if 0 <= r+dr < rows and 0 <= c+dc < cols:
-                            heatmap[r+dr][c+dc] += 1
+                            distance = abs(dr) + abs(dc)
+                            heatmap[r+dr][c+dc] += max(0, 3 - distance)
     
     return heatmap
 
@@ -59,24 +59,17 @@ def grow_blue_regions(grid: ColoredGrid, heatmap: List[List[int]], target: int) 
         if (start_r, start_c) in visited:
             break
         
-        queue = [(start_r, start_c)]
-        region_size = 0
-        
-        while queue and blue_count + region_size < target:
-            r, c = queue.pop(0)
-            if grid.values[r][c] != 0 or (r, c) in visited:
-                continue
-            
-            grid.values[r][c] = 1
-            region_size += 1
-            visited.add((r, c))
-            
-            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                nr, nc = r + dr, c + dc
-                if 0 <= nr < rows and 0 <= nc < cols and grid.values[nr][nc] == 0:
-                    queue.append((nr, nc))
-        
-        blue_count += region_size
+        region_sizes = [(3, 3), (2, 2), (2, 3), (3, 2)]
+        for height, width in region_sizes:
+            if is_valid_blue_area(grid, start_r, start_c, width, height) and blue_count + width * height <= target:
+                fill_area(grid, start_r, start_c, width, height, 1)
+                blue_count += width * height
+                for r in range(start_r, start_r + height):
+                    for c in range(start_c, start_c + width):
+                        visited.add((r, c))
+                break
+        else:
+            visited.add((start_r, start_c))
     
     return blue_count
 
@@ -84,15 +77,24 @@ def fill_remaining_squares(grid: ColoredGrid, blue_count: int, target: int) -> i
     rows, cols = grid.get_dimensions()
     center_r, center_c = rows // 2, cols // 2
     cells = [(r, c) for r in range(rows) for c in range(cols)]
-    cells.sort(key=lambda pos: abs(pos[0] - center_r) + abs(pos[1] - center_c))
+    cells.sort(key=lambda pos: (abs(pos[0] - center_r) + abs(pos[1] - center_c), -count_adjacent_blue(grid, pos[0], pos[1])))
     
     for r, c in cells:
         if blue_count >= target:
             return blue_count
-        if grid.values[r][c] == 0 and not is_isolated(grid, r, c):
+        if grid.values[r][c] == 0:
             grid.values[r][c] = 1
             blue_count += 1
     return blue_count
+
+def count_adjacent_blue(grid: ColoredGrid, r: int, c: int) -> int:
+    rows, cols = grid.get_dimensions()
+    count = 0
+    for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+        nr, nc = r + dr, c + dc
+        if 0 <= nr < rows and 0 <= nc < cols and grid.values[nr][nc] == 1:
+            count += 1
+    return count
 
 def is_isolated(grid: ColoredGrid, r: int, c: int) -> bool:
     rows, cols = grid.get_dimensions()
@@ -201,13 +203,14 @@ def distribute_remaining_blue(grid: ColoredGrid, blue_count: int, target_blue: i
 
 def remove_excess_blue(grid: ColoredGrid, blue_count: int, target_blue: int) -> None:
     rows, cols = grid.get_dimensions()
-    for r in range(rows-1, -1, -1):
-        for c in range(cols-1, -1, -1) if r % 2 == 0 else range(cols):
-            if blue_count <= target_blue:
-                return
-            if grid.values[r][c] == 1:
-                grid.values[r][c] = 0
-                blue_count -= 1
+    blue_cells = [(r, c) for r in range(rows) for c in range(cols) if grid.values[r][c] == 1]
+    blue_cells.sort(key=lambda pos: -count_adjacent_blue(grid, pos[0], pos[1]))
+    
+    for r, c in blue_cells:
+        if blue_count <= target_blue:
+            return
+        grid.values[r][c] = 0
+        blue_count -= 1
 def get_potential_regions(grid: ColoredGrid) -> List[Tuple[float, Tuple[int, int, int, int]]]:
     rows, cols = grid.get_dimensions()
     potential_regions = []
