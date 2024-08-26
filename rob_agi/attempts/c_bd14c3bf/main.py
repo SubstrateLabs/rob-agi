@@ -1,59 +1,65 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List, Tuple, Set
 
 def solve_bd14c3bf(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the grid transformation challenge by changing blue shapes with thin sections to red,
-    while preserving blue shapes that are at least two cells wide throughout. The function
-    identifies connected blue regions, checks for thin sections, and changes the color of
-    shapes with thin sections to red. Original red shapes and black cells remain unchanged.
+    Solves the grid transformation challenge by changing blue shapes with vulnerable sections to red,
+    while preserving blue shapes that are robust. A blue cell is considered vulnerable if it has fewer
+    than two blue neighbors in its 8-cell neighborhood (including diagonals). If any cell in a connected
+    blue region is vulnerable, the entire region is changed to red. Original red shapes and black cells
+    remain unchanged.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
     
     Returns:
-    ColoredGrid: The transformed grid with blue shapes containing thin sections changed to red.
+    ColoredGrid: The transformed grid with vulnerable blue shapes changed to red.
     """
     output_grid = input_grid.deep_copy()
-    blue_regions = find_blue_regions(output_grid)
-    
-    for region in blue_regions:
-        if has_thin_section(output_grid, region):
-            for r, c in region:
-                output_grid.set_cell(r, c, 2)  # Change to red
-    
+    vulnerable_cells = find_vulnerable_blue_regions(output_grid)
+    regions_to_change = set()
+
+    for cell in vulnerable_cells:
+        if cell not in regions_to_change:
+            connected_region = get_connected_region(output_grid, cell)
+            regions_to_change.update(connected_region)
+
+    for row in range(output_grid.get_dimensions()[0]):
+        for col in range(output_grid.get_dimensions()[1]):
+            if (row, col) in regions_to_change and output_grid.get_cell(row, col) == 1:
+                output_grid.set_cell(row, col, 2)
+
     return output_grid
 
-def find_blue_regions(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
+def find_vulnerable_blue_regions(grid: ColoredGrid) -> Set[Tuple[int, int]]:
     rows, cols = grid.get_dimensions()
-    visited = set()
-    regions = []
-
-    def dfs(r, c):
-        if (r, c) in visited or grid.get_cell(r, c) != 1:
-            return []
-        visited.add((r, c))
-        region = [(r, c)]
-        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            nr, nc = r + dr, c + dc
-            if 0 <= nr < rows and 0 <= nc < cols:
-                region.extend(dfs(nr, nc))
-        return region
+    vulnerable_cells = set()
 
     for r in range(rows):
         for c in range(cols):
-            if grid.get_cell(r, c) == 1 and (r, c) not in visited:
-                regions.append(dfs(r, c))
+            if grid.get_cell(r, c) == 1:
+                blue_neighbors = sum(
+                    1 for dr in [-1, 0, 1] for dc in [-1, 0, 1]
+                    if (dr != 0 or dc != 0) and 0 <= r + dr < rows and 0 <= c + dc < cols
+                    and grid.get_cell(r + dr, c + dc) == 1
+                )
+                if blue_neighbors < 2:
+                    vulnerable_cells.add((r, c))
 
-    return regions
+    return vulnerable_cells
 
-def has_thin_section(grid: ColoredGrid, region: List[Tuple[int, int]]) -> bool:
-    region_set = set(region)
-    for r, c in region:
-        adjacent_blue = sum(
-            1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
-            if (r + dr, c + dc) in region_set
-        )
-        if adjacent_blue < 2:
-            return True
-    return False
+def get_connected_region(grid: ColoredGrid, start: Tuple[int, int]) -> Set[Tuple[int, int]]:
+    rows, cols = grid.get_dimensions()
+    connected_region = set()
+    stack = [start]
+
+    while stack:
+        r, c = stack.pop()
+        if (r, c) not in connected_region and grid.get_cell(r, c) == 1:
+            connected_region.add((r, c))
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < rows and 0 <= nc < cols:
+                    stack.append((nr, nc))
+
+    return connected_region
