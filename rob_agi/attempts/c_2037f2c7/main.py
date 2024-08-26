@@ -1,65 +1,104 @@
 from rob_agi.colored_grid import ColoredGrid
+from typing import List, Tuple
 
 def solve_2037f2c7(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid into a simplified, abstract representation.
     
-    1. Analyzes the input grid for shape characteristics, complexity, and distribution.
-    2. Creates a small output grid (3x7) with sky blue (8) and black (0) squares.
-    3. Represents the main features of the input shapes using a simple pattern.
-    4. Ensures the rightmost column is filled with 8s.
-    5. Maintains symmetry in the top and bottom rows.
-    6. Places more 8s in the middle row to represent the core of the shapes.
-    7. Balances the overall composition while maintaining the essence of the input.
+    1. Detects and analyzes shapes in the input grid.
+    2. Plans the output grid layout based on the number and characteristics of shapes.
+    3. Generates an abstract representation of each shape.
+    4. Balances the overall composition and ensures key features are represented.
+    5. Returns a ColoredGrid object with the simplified representation.
     """
-    shape_info = analyze_grid(input_grid)
-    output_grid = create_base_grid()
-    output_grid = generate_pattern(output_grid, shape_info)
-    output_grid = balance_composition(output_grid, shape_info)
+    shapes = detect_shapes(input_grid)
+    output_size = plan_output_grid(shapes)
+    output_grid = create_base_grid(output_size)
+    output_grid = generate_abstract_representation(output_grid, shapes)
+    output_grid = balance_composition(output_grid)
     
     return ColoredGrid(values=output_grid)
 
-def analyze_grid(grid: ColoredGrid) -> dict:
+def detect_shapes(grid: ColoredGrid) -> List[dict]:
     rows, cols = grid.get_dimensions()
-    non_zero_cells = sum(1 for r in range(rows) for c in range(cols) if grid.get_cell(r, c) != 0)
-    density = non_zero_cells / (rows * cols)
-    
-    left_density = sum(1 for r in range(rows) for c in range(cols//2) if grid.get_cell(r, c) != 0) / (rows * cols//2)
-    right_density = sum(1 for r in range(rows) for c in range(cols//2, cols) if grid.get_cell(r, c) != 0) / (rows * cols//2)
-    
-    return {
-        'density': density,
-        'left_heavy': left_density > right_density,
-        'complexity': density > 0.2
-    }
+    visited = set()
+    shapes = []
 
-def create_base_grid() -> list[list[int]]:
-    return [[0 for _ in range(7)] for _ in range(3)]
+    def flood_fill(r: int, c: int) -> Tuple[List[Tuple[int, int]], Tuple[int, int, int, int]]:
+        queue = [(r, c)]
+        shape = []
+        color = grid.get_cell(r, c)
+        min_r, min_c, max_r, max_c = r, c, r, c
 
-def generate_pattern(grid: list[list[int]], shape_info: dict) -> list[list[int]]:
-    # Ensure rightmost column is filled with 8s
-    for row in grid:
-        row[-1] = 8
-    
-    # Set symmetrical pattern for top and bottom rows
-    grid[0][0] = grid[0][-1] = grid[2][0] = grid[2][-1] = 8
-    
-    # Generate main pattern in middle row
-    if shape_info['left_heavy']:
-        grid[1][0:3] = [8, 8, 0]
-    else:
-        grid[1][-4:-1] = [0, 8, 8]
-    
-    # Add complexity to middle row
-    if shape_info['complexity']:
-        grid[1][2:5] = [0, 0, 0]
-    
+        while queue:
+            curr_r, curr_c = queue.pop(0)
+            if (curr_r, curr_c) in visited or grid.get_cell(curr_r, curr_c) != color:
+                continue
+
+            visited.add((curr_r, curr_c))
+            shape.append((curr_r, curr_c))
+            min_r, min_c = min(min_r, curr_r), min(min_c, curr_c)
+            max_r, max_c = max(max_r, curr_r), max(max_c, curr_c)
+
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                nr, nc = curr_r + dr, curr_c + dc
+                if 0 <= nr < rows and 0 <= nc < cols:
+                    queue.append((nr, nc))
+
+        return shape, (min_r, min_c, max_r, max_c)
+
+    for r in range(rows):
+        for c in range(cols):
+            if (r, c) not in visited and grid.get_cell(r, c) != 0:
+                shape, bbox = flood_fill(r, c)
+                if shape:
+                    height = bbox[2] - bbox[0] + 1
+                    width = bbox[3] - bbox[1] + 1
+                    shapes.append({
+                        'cells': shape,
+                        'bbox': bbox,
+                        'aspect_ratio': height / width,
+                        'density': len(shape) / (height * width),
+                        'centroid': (sum(x[0] for x in shape) / len(shape), sum(x[1] for x in shape) / len(shape))
+                    })
+
+    return shapes
+
+def plan_output_grid(shapes: List[dict]) -> Tuple[int, int]:
+    num_shapes = len(shapes)
+    width = num_shapes + 1
+    height = 4 if any(shape['aspect_ratio'] > 1.5 for shape in shapes) else 3
+    return height, width
+
+def create_base_grid(size: Tuple[int, int]) -> List[List[int]]:
+    return [[0 for _ in range(size[1])] for _ in range(size[0])]
+
+def generate_abstract_representation(grid: List[List[int]], shapes: List[dict]) -> List[List[int]]:
+    for i, shape in enumerate(shapes):
+        col = i + 1
+        if shape['aspect_ratio'] > 1.5:  # Vertical shape
+            grid[0][col] = grid[1][col] = grid[2][col] = 8
+            if len(grid) > 3:
+                grid[3][col] = 8
+        else:  # Horizontal or square shape
+            grid[1][col] = grid[2][col] = 8
+            if shape['density'] > 0.5:
+                grid[0][col] = 8
+
     return grid
 
-def balance_composition(grid: list[list[int]], shape_info: dict) -> list[list[int]]:
-    total_8s = sum(row.count(8) for row in grid)
-    if total_8s < 8:
-        grid[1][3] = 8
-    elif total_8s > 10:
-        grid[1][1] = grid[1][5] = 0
+def balance_composition(grid: List[List[int]]) -> List[List[int]]:
+    # Ensure rightmost column has at least one 8
+    if all(row[-1] == 0 for row in grid):
+        grid[len(grid) // 2][-1] = 8
+
+    # Balance middle rows
+    middle_rows = grid[1:-1] if len(grid) > 3 else [grid[1]]
+    for row in middle_rows:
+        if sum(row) < 2:
+            for i in range(1, len(row) - 1):
+                if row[i-1] == 0 and row[i+1] == 0:
+                    row[i] = 8
+                    break
+
     return grid

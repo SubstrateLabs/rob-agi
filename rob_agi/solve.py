@@ -893,6 +893,17 @@ async def bootstrap_solved():
         attempt(c, prev_solution=previous_solution)
 
 
+def distill_solved():
+    all_solves = []
+    for gp in all_challenges:
+        challenge_id = gp.id
+        solver = Solver(gp)
+        solved, latest_plan, total_attempts = read_meta_file(solver.challenge_root)
+        if solved and latest_plan:
+            all_solves.append({"id": challenge_id, "latest_plan": latest_plan})
+    print(all_solves)
+
+
 async def main():
     # ensure_db()
     # id = "1f876c06"
@@ -926,9 +937,10 @@ async def main():
     # research_loop(prev_event=last)
 
     # distill_research()
+    distill_solved()
 
-    for i in range(1):
-        await solve_loop(max_concurrent=20)
+    # for i in range(1):
+    #     await solve_loop(max_concurrent=20)
     # await solve_loop(max_concurrent=4, max_challenges=8)
 
 

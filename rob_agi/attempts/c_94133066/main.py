@@ -7,11 +7,12 @@ def solve_94133066(input_grid: ColoredGrid) -> ColoredGrid:
     1. Finds the bounding box of all non-black cells in the input grid.
     2. Creates a new grid with dimensions that are the larger of:
        a) Pattern dimensions + 2 (for the border)
-       b) 9x9 (minimum size requirement)
+       b) 10x10 (minimum size requirement)
     3. Fills the new grid with blue (1) as a starting point.
     4. Copies the pattern from the input grid to the center of the new grid.
-    5. Preserves the count of all colors (except black) from the input grid, including isolated colors.
+    5. Preserves the count and relative positions of all colors (except black) from the input grid.
     6. Ensures the outermost layer is entirely blue.
+    7. Places isolated colors in specific corners if they're not part of the main pattern.
 
     Returns a new ColoredGrid object representing the transformed pattern with a blue border.
     """
@@ -27,8 +28,8 @@ def solve_94133066(input_grid: ColoredGrid) -> ColoredGrid:
     # Calculate new grid dimensions
     pattern_height = max_row - min_row + 1
     pattern_width = max_col - min_col + 1
-    output_height = max(pattern_height + 2, 9)  # Ensure minimum size of 9x9
-    output_width = max(pattern_width + 2, 9)
+    output_height = max(pattern_height + 2, 10)  # Ensure minimum size of 10x10
+    output_width = max(pattern_width + 2, 10)
     
     # Create new grid filled with blue
     output_grid = ColoredGrid(values=[[1 for _ in range(output_width)] for _ in range(output_height)])
@@ -43,19 +44,31 @@ def solve_94133066(input_grid: ColoredGrid) -> ColoredGrid:
             if input_grid.values[r][c] != 0:
                 output_grid.values[r - min_row + pad_top][c - min_col + pad_left] = input_grid.values[r][c]
     
-    # Count colors in input grid (including blue)
-    color_count = {i: input_grid.count_color(i) for i in range(10) if i != 0}
+    # Count colors in input grid (excluding black)
+    color_count = {i: input_grid.count_color(i) for i in range(1, 10)}
     
-    # Ensure color preservation
+    # Find isolated colors
+    isolated_colors = []
     for color, count in color_count.items():
-        while output_grid.count_color(color) < count:
-            for r in range(1, output_height - 1):
-                for c in range(1, output_width - 1):
-                    if output_grid.values[r][c] == 1:
-                        output_grid.values[r][c] = color
+        if count == 1 and output_grid.count_color(color) == 0:
+            isolated_colors.append(color)
+    
+    # Place isolated colors in specific corners
+    corners = [(1, 1), (1, output_width-2), (output_height-2, 1), (output_height-2, output_width-2)]
+    for color, (r, c) in zip(isolated_colors, corners):
+        output_grid.values[r][c] = color
+    
+    # Ensure color preservation for non-isolated colors
+    for color, count in color_count.items():
+        if color not in isolated_colors:
+            while output_grid.count_color(color) < count:
+                for r in range(1, output_height - 1):
+                    for c in range(1, output_width - 1):
+                        if output_grid.values[r][c] == 1:
+                            output_grid.values[r][c] = color
+                            break
+                    if output_grid.count_color(color) == count:
                         break
-                if output_grid.count_color(color) == count:
-                    break
     
     # Ensure border integrity
     for r in range(output_height):
