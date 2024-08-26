@@ -64,7 +64,7 @@ def solve_9b4c17c4(input_grid: ColoredGrid) -> ColoredGrid:
                 for r, c in region:
                     output_grid.values[r][c] = input_grid.values[r][start_col]  # Restore original background
                     output_grid.values[r][c + offset] = 2
-                new_start = new_start - 1  # Move to the next available position
+                new_start = new_start - region_width - 1  # Move to the next available position, leaving a gap
         else:
             new_start = start_col
             for region in regions:
@@ -73,7 +73,7 @@ def solve_9b4c17c4(input_grid: ColoredGrid) -> ColoredGrid:
                 for r, c in region:
                     output_grid.values[r][c] = input_grid.values[r][start_col]  # Restore original background
                     output_grid.values[r][c + offset] = 2
-                new_start = new_start + region_width  # Move to the next available position
+                new_start = new_start + region_width + 1  # Move to the next available position, leaving a gap
 
     vertical_zones = find_vertical_zones()
     for color, start_col, end_col in vertical_zones:
