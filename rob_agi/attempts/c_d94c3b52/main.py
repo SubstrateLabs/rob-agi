@@ -4,17 +4,19 @@ from typing import List, Tuple, Optional
 def solve_d94c3b52(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the grid transformation challenge by applying the following steps:
-    1. Identifies and expands sky blue (8) squares to 3x3 if present.
-    2. Moves the sky blue area to a new position based on grid quadrants.
-    3. Creates an alternation template based on the grid structure.
-    4. Identifies significant patterns to preserve.
-    5. Applies color transformations:
+    1. Analyzes the input grid to identify sky blue areas and significant patterns.
+    2. Expands sky blue (8) areas to 3x3 if present, or creates one if absent.
+    3. Moves the sky blue area to a new position based on grid quadrants.
+    4. Creates an alternation template of blue (1) and orange (7).
+    5. Identifies and preserves significant patterns.
+    6. Applies color transformations:
        - Preserves sky blue (8) squares in their new position.
        - Alternates between blue (1) and orange (7) for other colored squares.
        - Maintains significant patterns while potentially changing their colors.
-    6. Ensures black (0) squares remain unchanged.
-    7. Balances novelty and familiarity in the transformed grid.
-    8. Handles edge cases and adjusts transformation based on input patterns.
+    7. Ensures black (0) squares remain unchanged.
+    8. Balances novelty and familiarity in the transformed grid.
+    9. Handles edge cases and adjusts transformation based on input patterns.
+    10. Validates the transformation to ensure sufficient change and key feature presence.
     """
     new_grid = input_grid.deep_copy()
     sky_blue_pos = find_sky_blue(new_grid)
@@ -32,51 +34,65 @@ def solve_d94c3b52(input_grid: ColoredGrid) -> ColoredGrid:
     
     return new_grid
 
-def find_sky_blue(grid: ColoredGrid) -> Optional[Tuple[int, int]]:
+def find_sky_blue(grid: ColoredGrid) -> List[Tuple[int, int]]:
+    sky_blue_cells = []
     for r in range(grid.num_rows):
         for c in range(grid.num_cols):
             if grid.values[r][c] == 8:
-                return r, c
-    return None
+                sky_blue_cells.append((r, c))
+    return sky_blue_cells
 
-def expand_sky_blue(grid: ColoredGrid, pos: Tuple[int, int]) -> ColoredGrid:
-    r, c = pos
-    for dr in range(-1, 2):
-        for dc in range(-1, 2):
-            nr, nc = r + dr, c + dc
-            if 0 <= nr < grid.num_rows and 0 <= nc < grid.num_cols:
-                grid.values[nr][nc] = 8
-    return grid
+def expand_sky_blue(grid: ColoredGrid, sky_blue_cells: List[Tuple[int, int]]) -> ColoredGrid:
+    if not sky_blue_cells:
+        # Create a new sky blue area if none exists
+        r, c = grid.num_rows // 2, grid.num_cols // 2
+        sky_blue_cells = [(r, c)]
 
-def move_sky_blue(grid: ColoredGrid, old_pos: Tuple[int, int]) -> Tuple[int, int]:
-    r, c = old_pos
+    new_sky_blue_area = set()
+    for r, c in sky_blue_cells:
+        for dr in range(-1, 2):
+            for dc in range(-1, 2):
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < grid.num_rows and 0 <= nc < grid.num_cols:
+                    new_sky_blue_area.add((nr, nc))
+    
+    for r, c in new_sky_blue_area:
+        grid.values[r][c] = 8
+    
+    return grid, list(new_sky_blue_area)
+
+def move_sky_blue(grid: ColoredGrid, sky_blue_area: List[Tuple[int, int]]) -> Tuple[int, int]:
     rows, cols = grid.num_rows, grid.num_cols
+    center_r, center_c = sum(r for r, _ in sky_blue_area) // len(sky_blue_area), sum(c for _, c in sky_blue_area) // len(sky_blue_area)
     
-    # Calculate new position based on grid quadrants
-    if r < rows // 2 and c < cols // 2:  # Top-left quadrant
-        new_r, new_c = r, cols - 1 - c
-    elif r < rows // 2 and c >= cols // 2:  # Top-right quadrant
-        new_r, new_c = rows - 1 - r, c
-    elif r >= rows // 2 and c < cols // 2:  # Bottom-left quadrant
-        new_r, new_c = rows - 1 - r, c
+    # Determine the target quadrant
+    if center_r < rows // 2 and center_c < cols // 2:  # Top-left quadrant
+        target_r, target_c = center_r, cols - 1 - center_c
+    elif center_r < rows // 2 and center_c >= cols // 2:  # Top-right quadrant
+        target_r, target_c = rows - 1 - center_r, center_c
+    elif center_r >= rows // 2 and center_c < cols // 2:  # Bottom-left quadrant
+        target_r, target_c = rows - 1 - center_r, center_c
     else:  # Bottom-right quadrant
-        new_r, new_c = r, cols - 1 - c
+        target_r, target_c = center_r, cols - 1 - center_c
     
-    # Move the 3x3 sky blue square
-    for dr in range(-1, 2):
-        for dc in range(-1, 2):
-            if 0 <= new_r + dr < rows and 0 <= new_c + dc < cols:
-                grid.values[new_r + dr][new_c + dc] = 8
-            if (r + dr, c + dc) != (new_r + dr, new_c + dc) and 0 <= r + dr < rows and 0 <= c + dc < cols:
-                grid.values[r + dr][c + dc] = 0  # Clear the old position
+    # Move the sky blue area
+    offset_r, offset_c = target_r - center_r, target_c - center_c
+    new_sky_blue_area = [(r + offset_r, c + offset_c) for r, c in sky_blue_area]
     
-    return new_r, new_c
+    # Clear old position and set new position
+    for r, c in sky_blue_area:
+        grid.values[r][c] = 0
+    for r, c in new_sky_blue_area:
+        if 0 <= r < rows and 0 <= c < cols:
+            grid.values[r][c] = 8
+    
+    return target_r, target_c
 
-def create_alternation_template(grid: ColoredGrid, sky_blue_pos: Optional[Tuple[int, int]]) -> List[List[int]]:
+def create_alternation_template(grid: ColoredGrid, sky_blue_pos: Tuple[int, int]) -> List[List[int]]:
     template = [[0 for _ in range(grid.num_cols)] for _ in range(grid.num_rows)]
     for r in range(grid.num_rows):
         for c in range(grid.num_cols):
-            if sky_blue_pos and abs(r - sky_blue_pos[0]) <= 1 and abs(c - sky_blue_pos[1]) <= 1:
+            if abs(r - sky_blue_pos[0]) <= 1 and abs(c - sky_blue_pos[1]) <= 1:
                 template[r][c] = 8  # Sky blue area
             elif (r + c) % 2 == 0:
                 template[r][c] = 1  # Blue
@@ -84,32 +100,36 @@ def create_alternation_template(grid: ColoredGrid, sky_blue_pos: Optional[Tuple[
                 template[r][c] = 7  # Orange
     return template
 
-def find_preserved_patterns(grid: ColoredGrid) -> List[Tuple[int, int, int]]:
+def find_preserved_patterns(grid: ColoredGrid) -> List[Tuple[int, int, int, int]]:
     patterns = []
     visited = set()
     for r in range(grid.num_rows):
         for c in range(grid.num_cols):
             if (r, c) not in visited and grid.values[r][c] != 0:
                 color = grid.values[r][c]
-                size = get_pattern_size(grid, r, c, color, visited)
-                if size >= 3:
-                    patterns.append((r, c, color))
+                pattern = get_pattern(grid, r, c, color, visited)
+                if len(pattern) >= 3:
+                    min_r = min(r for r, _ in pattern)
+                    min_c = min(c for _, c in pattern)
+                    max_r = max(r for r, _ in pattern)
+                    max_c = max(c for _, c in pattern)
+                    patterns.append((min_r, min_c, max_r, max_c))
     return patterns
 
-def get_pattern_size(grid: ColoredGrid, r: int, c: int, color: int, visited: set) -> int:
+def get_pattern(grid: ColoredGrid, r: int, c: int, color: int, visited: set) -> List[Tuple[int, int]]:
     if (r, c) in visited or r < 0 or r >= grid.num_rows or c < 0 or c >= grid.num_cols or grid.values[r][c] != color:
-        return 0
+        return []
     visited.add((r, c))
-    size = 1
+    pattern = [(r, c)]
     for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-        size += get_pattern_size(grid, r + dr, c + dc, color, visited)
-    return size
+        pattern.extend(get_pattern(grid, r + dr, c + dc, color, visited))
+    return pattern
 
-def apply_color_transformation(input_grid: ColoredGrid, new_grid: ColoredGrid, template: List[List[int]], sky_blue_pos: Optional[Tuple[int, int]], preserved_patterns: List[Tuple[int, int, int]]) -> ColoredGrid:
+def apply_color_transformation(input_grid: ColoredGrid, new_grid: ColoredGrid, template: List[List[int]], sky_blue_pos: Tuple[int, int], preserved_patterns: List[Tuple[int, int, int, int]]) -> ColoredGrid:
     for r in range(new_grid.num_rows):
         for c in range(new_grid.num_cols):
             if input_grid.values[r][c] != 0:  # Non-black cell in input
-                if sky_blue_pos and abs(r - sky_blue_pos[0]) <= 1 and abs(c - sky_blue_pos[1]) <= 1:
+                if abs(r - sky_blue_pos[0]) <= 1 and abs(c - sky_blue_pos[1]) <= 1:
                     new_grid.values[r][c] = 8  # Sky blue area
                 elif is_preserved_pattern(r, c, preserved_patterns):
                     new_grid.values[r][c] = input_grid.values[r][c]  # Preserve original pattern
@@ -119,27 +139,38 @@ def apply_color_transformation(input_grid: ColoredGrid, new_grid: ColoredGrid, t
                 new_grid.values[r][c] = 0  # Keep black cells black
     return new_grid
 
-def is_preserved_pattern(r: int, c: int, preserved_patterns: List[Tuple[int, int, int]]) -> bool:
-    return any(abs(r - pr) < 3 and abs(c - pc) < 3 for pr, pc, _ in preserved_patterns)
+def is_preserved_pattern(r: int, c: int, preserved_patterns: List[Tuple[int, int, int, int]]) -> bool:
+    return any(min_r <= r <= max_r and min_c <= c <= max_c for min_r, min_c, max_r, max_c in preserved_patterns)
+
 def balance_novelty_and_familiarity(input_grid: ColoredGrid, new_grid: ColoredGrid) -> ColoredGrid:
     rows, cols = input_grid.num_rows, input_grid.num_cols
-    for r in range(rows):
-        for c in range(cols):
-            if input_grid.values[r][c] != 0 and new_grid.values[r][c] != 8:
-                # Preserve larger patterns
-                if is_part_of_large_pattern(input_grid, r, c):
-                    new_grid.values[r][c] = input_grid.values[r][c]
-                # Ensure some color changes for novelty
-                elif (r + c) % 2 == 0 and new_grid.values[r][c] == input_grid.values[r][c]:
-                    new_grid.values[r][c] = 7 if input_grid.values[r][c] == 1 else 1
+    changes = sum(1 for r in range(rows) for c in range(cols) if input_grid.values[r][c] != new_grid.values[r][c])
+    change_percentage = changes / (rows * cols)
+    
+    if change_percentage < 0.3:  # Too little change
+        for r in range(rows):
+            for c in range(cols):
+                if input_grid.values[r][c] != 0 and new_grid.values[r][c] != 8:
+                    if random.random() < 0.3:
+                        new_grid.values[r][c] = 7 if input_grid.values[r][c] == 1 else 1
+    elif change_percentage > 0.7:  # Too much change
+        for r in range(rows):
+            for c in range(cols):
+                if input_grid.values[r][c] != 0 and new_grid.values[r][c] != 8:
+                    if random.random() < 0.3:
+                        new_grid.values[r][c] = input_grid.values[r][c]
+    
     return new_grid
 
-def is_part_of_large_pattern(grid: ColoredGrid, r: int, c: int) -> bool:
-    color = grid.values[r][c]
-    count = 0
-    for dr in [-1, 0, 1]:
-        for dc in [-1, 0, 1]:
-            if 0 <= r + dr < grid.num_rows and 0 <= c + dc < grid.num_cols:
-                if grid.values[r + dr][c + dc] == color:
-                    count += 1
-    return count >= 5  # Consider it a large pattern if 5 or more connected cells
+def validate_transformation(input_grid: ColoredGrid, output_grid: ColoredGrid) -> bool:
+    rows, cols = input_grid.num_rows, input_grid.num_cols
+    changes = sum(1 for r in range(rows) for c in range(cols) if input_grid.values[r][c] != output_grid.values[r][c])
+    change_percentage = changes / (rows * cols)
+    
+    sky_blue_input = find_sky_blue(input_grid)
+    sky_blue_output = find_sky_blue(output_grid)
+    
+    return (0.3 <= change_percentage <= 0.7 and
+            len(sky_blue_output) >= len(sky_blue_input) and
+            all(output_grid.values[r][c] == 0 for r, c in sky_blue_input) and
+            all(input_grid.values[r][c] == 0 for r, c in sky_blue_output))
