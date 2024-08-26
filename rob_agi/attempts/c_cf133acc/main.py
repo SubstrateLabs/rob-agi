@@ -8,10 +8,10 @@ def solve_cf133acc(input_grid: ColoredGrid) -> ColoredGrid:
     1. Create a deep copy of the input grid.
     2. For each column, scan from bottom to top.
     3. Use a stack to keep track of non-black colors encountered.
-    4. Fill all cells above with the top color on the stack.
+    4. Fill cells above with the top color on the stack, stopping at black cells.
     5. Add new non-black colors to the stack when encountered.
     
-    This function preserves original color positions, extends colors upwards,
+    This function preserves original color positions, extends colors upwards until a black cell,
     maintains the order of colors when stacked, and works for grids of size 1x1 to 30x30.
     """
     result = input_grid.deep_copy()
@@ -20,9 +20,10 @@ def solve_cf133acc(input_grid: ColoredGrid) -> ColoredGrid:
     for col in range(cols):
         color_stack = []
         for row in range(rows - 1, -1, -1):
-            if result.values[row][col] != 0:
-                color_stack.append(result.values[row][col])
-            if color_stack:
+            current_color = result.values[row][col]
+            if current_color != 0:
+                color_stack.append(current_color)
+            elif color_stack:
                 result.values[row][col] = color_stack[-1]
     
     return result
