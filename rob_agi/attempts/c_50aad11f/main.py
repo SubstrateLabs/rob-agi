@@ -4,13 +4,15 @@ from typing import List, Tuple
 def solve_50aad11f(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by identifying magenta shapes, assigning them colors
-    based on single-pixel color indicators, and arranging them in a new grid.
+    based on single-pixel color indicators in clockwise order, and arranging them
+    in a new grid.
     
     1. Identifies connected magenta regions in the input grid.
-    2. Finds single-pixel color indicators.
+    2. Finds single-pixel color indicators in clockwise order.
     3. Assigns colors to magenta regions based on the indicators.
     4. Creates a new grid with the colored shapes arranged horizontally.
-    5. Optimizes the grid size by removing trailing black columns.
+    5. Compresses shapes vertically if needed to fit in 4 rows.
+    6. Optimizes the grid size by removing trailing black columns.
     
     Returns a new ColoredGrid with the transformed arrangement.
     """
@@ -35,17 +37,20 @@ def solve_50aad11f(input_grid: ColoredGrid) -> ColoredGrid:
                     region = flood_fill((r, c), 6)
                     regions.append(region)
                     visited.update(region)
-        return sorted(regions, key=lambda x: (x[0][0], x[0][1]))
+        return sorted(regions, key=lambda x: (min(c for _, c in x), min(r for r, _ in x)))
 
     def find_color_indicators() -> List[Tuple[int, int, int]]:
         indicators = []
         rows, cols = input_grid.get_dimensions()
-        for r in range(rows):
-            for c in range(cols):
-                color = input_grid.get_cell(r, c)
-                if color not in [0, 6]:
-                    indicators.append((color, r, c))
-        return sorted(indicators, key=lambda x: (x[1], x[2]))
+        # Top row
+        indicators.extend((input_grid.get_cell(0, c), 0, c) for c in range(cols) if input_grid.get_cell(0, c) not in [0, 6])
+        # Right column
+        indicators.extend((input_grid.get_cell(r, cols-1), r, cols-1) for r in range(1, rows) if input_grid.get_cell(r, cols-1) not in [0, 6])
+        # Bottom row
+        indicators.extend((input_grid.get_cell(rows-1, c), rows-1, c) for c in range(cols-2, -1, -1) if input_grid.get_cell(rows-1, c) not in [0, 6])
+        # Left column
+        indicators.extend((input_grid.get_cell(r, 0), r, 0) for r in range(rows-2, 0, -1) if input_grid.get_cell(r, 0) not in [0, 6])
+        return indicators
 
     def assign_colors(regions: List[List[Tuple[int, int]]], indicators: List[Tuple[int, int, int]]) -> List[Tuple[int, List[Tuple[int, int]]]]:
         colored_regions = []
@@ -53,6 +58,22 @@ def solve_50aad11f(input_grid: ColoredGrid) -> ColoredGrid:
             color = indicators[i % len(indicators)][0]
             colored_regions.append((color, region))
         return colored_regions
+
+    def compress_shape(shape: List[Tuple[int, int]], max_height: int) -> List[Tuple[int, int]]:
+        min_r = min(r for r, _ in shape)
+        max_r = max(r for r, _ in shape)
+        min_c = min(c for _, c in shape)
+        height = max_r - min_r + 1
+        if height <= max_height:
+            return [(r - min_r, c - min_c) for r, c in shape]
+        
+        compression_ratio = max_height / height
+        compressed_shape = []
+        for r, c in shape:
+            new_r = int((r - min_r) * compression_ratio)
+            if new_r < max_height:
+                compressed_shape.append((new_r, c - min_c))
+        return compressed_shape
 
     magenta_regions = find_magenta_regions()
     color_indicators = find_color_indicators()
@@ -65,11 +86,11 @@ def solve_50aad11f(input_grid: ColoredGrid) -> ColoredGrid:
 
     current_col = 0
     for color, region in colored_regions:
-        min_row = min(r for r, _ in region)
-        min_col = min(c for _, c in region)
-        for r, c in region:
-            output_grid.set_cell(r - min_row, current_col + c - min_col, color)
-        current_col += max(c for _, c in region) - min_col + 2
+        compressed_region = compress_shape(region, max_height)
+        width = max(c for _, c in compressed_region) + 1
+        for r, c in compressed_region:
+            output_grid.set_cell(r, current_col + c, color)
+        current_col += width + 1
 
     # Remove trailing black columns
     while all(output_grid.get_cell(r, -1) == 0 for r in range(max_height)):
