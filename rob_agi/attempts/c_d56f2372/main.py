@@ -6,10 +6,9 @@ def solve_d56f2372(input_grid: ColoredGrid) -> ColoredGrid:
     Solves the challenge by finding the first complete, non-edge-touching shape in the input grid.
     
     1. Scans the grid from top to bottom, left to right.
-    2. Identifies all complete shapes (not touching edges and all pixels connected).
-    3. Sorts shapes based on their top-left pixel position.
-    4. Extracts the first shape into a new grid, maintaining its relative position and original color.
-    5. If no complete shape is found, returns a 1x1 grid with value 0.
+    2. Identifies the first complete shape (not touching edges and all pixels connected).
+    3. Extracts the shape into a new grid, maintaining its relative position and original color.
+    4. If no complete shape is found, returns a 1x1 grid with value 0.
     
     Args:
         input_grid (ColoredGrid): The input grid to process.
@@ -17,7 +16,6 @@ def solve_d56f2372(input_grid: ColoredGrid) -> ColoredGrid:
     Returns:
         ColoredGrid: A new grid containing only the extracted shape or a 1x1 grid with value 0.
     """
-    complete_shapes = []
     visited = set()
 
     for y in range(input_grid.num_rows):
@@ -25,14 +23,10 @@ def solve_d56f2372(input_grid: ColoredGrid) -> ColoredGrid:
             if (x, y) not in visited and input_grid.values[y][x] != 0:
                 shape_pixels = flood_fill(input_grid, x, y, input_grid.values[y][x])
                 if is_shape_complete(shape_pixels, (input_grid.num_rows, input_grid.num_cols)):
-                    complete_shapes.append(shape_pixels)
+                    return extract_shape(shape_pixels, input_grid)
                 visited.update(shape_pixels)
 
-    if not complete_shapes:
-        return ColoredGrid(values=[[0]])
-
-    complete_shapes.sort(key=lambda shape: min((x, y) for x, y in shape))
-    return extract_shape(complete_shapes[0], input_grid)
+    return ColoredGrid(values=[[0]])
 
 def flood_fill(grid: ColoredGrid, start_x: int, start_y: int, color: int) -> Set[Tuple[int, int]]:
     stack = [(start_x, start_y)]
