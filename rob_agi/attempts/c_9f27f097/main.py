@@ -5,35 +5,81 @@ def solve_9f27f097(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the grid transformation challenge by identifying a source region with diverse colors,
     finding a target region (usually single-color), and copying the source to the target
-    with an appropriate transformation (180-degree rotation, vertical flip, or no change).
+    with a 180-degree rotation.
     
     1. Identify the border color
-    2. Find the source region (most color-diverse non-border region)
-    3. Find the target region (single-color region, or largest contiguous area)
-    4. Determine and apply the appropriate transformation
+    2. Find the source region (5x5 corner with the most diverse colors)
+    3. Find the target region (opposite corner to the source)
+    4. Apply 180-degree rotation from source to target
     5. Copy the transformed source region to the target region
     """
     # Step 1: Identify border color
     border_color = identify_border_color(input_grid)
     
     # Step 2: Find source region
-    source_region = find_most_diverse_region(input_grid, border_color)
+    source_corner = find_most_diverse_corner(input_grid, border_color)
     
     # Step 3: Find target region
-    target_region = find_target_region(input_grid, border_color, len(source_region))
+    target_corner = get_opposite_corner(source_corner)
     
-    # Step 4 & 5: Determine transformation, apply it, and copy
+    # Step 4 & 5: Apply 180-degree rotation and copy
     output_grid = input_grid.deep_copy()
-    if source_region and target_region:
-        source_bounds = get_region_bounds(source_region)
-        target_bounds = get_region_bounds(target_region)
-        transformation = determine_transformation(input_grid, source_region, target_region)
-        
-        for sy, sx in source_region:
-            ty, tx = transform(sy, sx, source_bounds, target_bounds, transformation)
-            output_grid.values[ty][tx] = input_grid.values[sy][sx]
+    copy_with_rotation(input_grid, output_grid, source_corner, target_corner)
     
     return output_grid
+
+def identify_border_color(grid: ColoredGrid) -> int:
+    rows, cols = grid.get_dimensions()
+    border_cells = (
+        [(0, c) for c in range(cols)] +
+        [(rows-1, c) for c in range(cols)] +
+        [(r, 0) for r in range(1, rows-1)] +
+        [(r, cols-1) for r in range(1, rows-1)]
+    )
+    return max(set(grid.values[r][c] for r, c in border_cells), key=lambda color: sum(grid.values[r][c] == color for r, c in border_cells))
+
+def find_most_diverse_corner(grid: ColoredGrid, border_color: int) -> str:
+    corners = {
+        'top_left': [(r, c) for r in range(1, 6) for c in range(1, 6)],
+        'top_right': [(r, c) for r in range(1, 6) for c in range(6, 11)],
+        'bottom_left': [(r, c) for r in range(6, 11) for c in range(1, 6)],
+        'bottom_right': [(r, c) for r in range(6, 11) for c in range(6, 11)]
+    }
+    
+    max_diversity = 0
+    most_diverse_corner = ''
+    
+    for corner, cells in corners.items():
+        unique_colors = len(set(grid.values[r][c] for r, c in cells if grid.values[r][c] != border_color))
+        if unique_colors > max_diversity:
+            max_diversity = unique_colors
+            most_diverse_corner = corner
+    
+    return most_diverse_corner
+
+def get_opposite_corner(corner: str) -> str:
+    opposites = {
+        'top_left': 'bottom_right',
+        'top_right': 'bottom_left',
+        'bottom_left': 'top_right',
+        'bottom_right': 'top_left'
+    }
+    return opposites[corner]
+
+def copy_with_rotation(input_grid: ColoredGrid, output_grid: ColoredGrid, source_corner: str, target_corner: str):
+    corners = {
+        'top_left': (1, 1),
+        'top_right': (1, 6),
+        'bottom_left': (6, 1),
+        'bottom_right': (6, 6)
+    }
+    
+    sr, sc = corners[source_corner]
+    tr, tc = corners[target_corner]
+    
+    for i in range(5):
+        for j in range(5):
+            output_grid.values[tr+4-i][tc+4-j] = input_grid.values[sr+i][sc+j]
 
 def identify_border_color(grid: ColoredGrid) -> int:
     rows, cols = grid.get_dimensions()
