@@ -29,8 +29,8 @@ def solve_b7999b51(input_grid: ColoredGrid) -> ColoredGrid:
     color_info: Dict[int, Dict[str, int]] = {}
     rows, cols = input_grid.get_dimensions()
     
-    for c in range(cols):
-        for r in range(rows):
+    for r in range(rows):
+        for c in range(cols):
             color = input_grid.values[r][c]
             if color != 0:  # Non-black color
                 if color not in color_info:
