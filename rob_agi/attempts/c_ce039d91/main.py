@@ -3,17 +3,18 @@ from typing import List, Tuple
 
 def solve_ce039d91(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms a grid by changing some gray (5) cells to blue (1) based on their connectivity.
+    Transforms a grid by changing some gray (5) cells to blue (1) based on their structural importance.
     
     The solution works as follows:
-    1. Find all connected regions of gray (5) cells.
-    2. For each region, calculate a connectivity score for each cell.
-    3. Determine a threshold score for each region.
-    4. Transform cells to blue (1) if their score is above the threshold.
-    5. Handle special cases for small regions and linear shapes.
+    1. Identify all gray (5) cells and create a map of the grid's structure.
+    2. Calculate a structural importance score for each gray cell based on adjacency and position.
+    3. Identify key structural elements like junction points and shape-defining cells.
+    4. Transform cells to blue (1) if their structural importance is below a threshold.
+    5. Handle special cases like linear shapes, 2x2 squares, and implicit structures.
+    6. Perform consistency checks and fine-tune the transformation.
     
-    This approach identifies the "core" of each shape while allowing for 
-    adjustments to handle various patterns observed in the examples.
+    This approach considers both local and global patterns, allowing for context-dependent 
+    transformations while maintaining the overall structure and logic of the original pattern.
     """
     def find_connected_regions(grid: List[List[int]], color: int) -> List[List[Tuple[int, int]]]:
         rows, cols = len(grid), len(grid[0])
