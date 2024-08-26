@@ -8,7 +8,7 @@ def solve_c1990cce(input_grid: ColoredGrid) -> ColoredGrid:
     1. Copy the input row to the first row of the output grid.
     2. Create a red diamond by expanding diagonally from the center red square to all sides.
     3. Fill in a blue checkerboard pattern within the red diamond, starting from the row
-       below the top point of the diamond and continuing to the bottom of the grid.
+       below the top point of the diamond and continuing to the bottom half of the grid.
     4. The rest of the grid remains black (empty space).
 
     Args:
@@ -33,11 +33,11 @@ def solve_c1990cce(input_grid: ColoredGrid) -> ColoredGrid:
         output_grid.values[row][right] = 2
     
     # Step 4: Create the blue checkerboard pattern within the red diamond
-    for row in range(1, grid_size):
-        left = max(0, center - row + 1)
-        right = min(grid_size - 1, center + row - 1)
-        for col in range(left, right + 1):
-            if (row + col) % 2 == 1 and output_grid.values[row][col] == 0:
+    for row in range(center + 1, grid_size):
+        left = max(0, center - (grid_size - 1 - row))
+        right = min(grid_size - 1, center + (grid_size - 1 - row))
+        for col in range(left + 1, right):
+            if (row + col) % 2 == 1:
                 output_grid.values[row][col] = 1
     
     return output_grid
