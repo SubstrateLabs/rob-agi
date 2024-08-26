@@ -1,4 +1,82 @@
 from rob_agi.colored_grid import ColoredGrid
+from typing import List, Tuple
 
 def solve_2c737e39(input_grid: ColoredGrid) -> ColoredGrid:
-    pass
+    """
+    Solve the grid transformation challenge by identifying the main pattern,
+    creating a balanced duplicate, and removing isolated gray squares.
+
+    1. Identify the main pattern using flood-fill from the top-left.
+    2. Calculate the balanced position for the duplicate.
+    3. Create the duplicate pattern, potentially omitting the gray square.
+    4. Remove isolated gray squares.
+    5. Adjust the duplicate if it's out of bounds.
+
+    Args:
+    input_grid (ColoredGrid): The input grid to transform.
+
+    Returns:
+    ColoredGrid: The transformed grid with the duplicated pattern.
+    """
+    def flood_fill(grid: List[List[int]], start: Tuple[int, int]) -> List[Tuple[int, int]]:
+        rows, cols = len(grid), len(grid[0])
+        color = grid[start[0]][start[1]]
+        if color == 0:
+            return []
+        
+        pattern = []
+        stack = [start]
+        visited = set()
+
+        while stack:
+            r, c = stack.pop()
+            if (r, c) not in visited and 0 <= r < rows and 0 <= c < cols and grid[r][c] == color:
+                visited.add((r, c))
+                pattern.append((r, c))
+                for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                    stack.append((r + dr, c + dc))
+        
+        return pattern
+
+    def find_pattern(grid: List[List[int]]) -> List[Tuple[int, int, int]]:
+        pattern = []
+        for r in range(len(grid)):
+            for c in range(len(grid[0])):
+                if grid[r][c] != 0 and not any((x, y, grid[r][c]) in pattern for x, y in flood_fill(grid, (r, c))):
+                    pattern.extend((x, y, grid[r][c]) for x, y in flood_fill(grid, (r, c)))
+        return pattern
+
+    def calculate_center_of_mass(pattern: List[Tuple[int, int, int]]) -> Tuple[float, float]:
+        if not pattern:
+            return (0, 0)
+        return sum(r for r, _, _ in pattern) / len(pattern), sum(c for _, c, _ in pattern) / len(pattern)
+
+    def find_balanced_position(grid: List[List[int]], pattern: List[Tuple[int, int, int]]) -> Tuple[int, int]:
+        rows, cols = len(grid), len(grid[0])
+        com_r, com_c = calculate_center_of_mass(pattern)
+        grid_center_r, grid_center_c = rows / 2, cols / 2
+        shift_r = int(grid_center_r - com_r)
+        shift_c = int(grid_center_c - com_c)
+        return shift_r, shift_c
+
+    input_values = input_grid.values
+    pattern = find_pattern(input_values)
+    shift_r, shift_c = find_balanced_position(input_values, pattern)
+
+    output_grid = input_grid.deep_copy()
+    output_values = output_grid.values
+
+    # Create duplicate pattern
+    for r, c, color in pattern:
+        if color != 5 or any(x == 5 for _, _, x in pattern):
+            new_r, new_c = r + shift_r, c + shift_c
+            if 0 <= new_r < len(output_values) and 0 <= new_c < len(output_values[0]):
+                output_values[new_r][new_c] = color
+
+    # Remove isolated gray squares
+    for r in range(len(output_values)):
+        for c in range(len(output_values[0])):
+            if output_values[r][c] == 5 and not any((r, c, 5) in pattern for pattern in [pattern, [(x + shift_r, y + shift_c, z) for x, y, z in pattern]]):
+                output_values[r][c] = 0
+
+    return output_grid
