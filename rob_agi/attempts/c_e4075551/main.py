@@ -3,50 +3,55 @@ from typing import List, Tuple
 
 def solve_e4075551(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid into an 'H' shaped pattern based on the colors present.
+    Transforms the input grid into a rectangular frame pattern based on the colors present.
     
-    1. Identifies colored squares in the input grid
-    2. Assigns colors to different parts of the 'H' shape
-    3. Draws the 'H' shape with assigned colors
-    4. Fills the frame with gray
+    1. Identifies unique non-black colors in the input grid
+    2. Determines frame dimensions based on the number of unique colors
+    3. Assigns colors to different parts of the frame
+    4. Draws the frame with assigned colors
+    5. Fills the frame interior with gray
+    6. Draws a red center line
     
     Returns a new ColoredGrid with the transformed pattern.
     """
     rows, cols = input_grid.get_dimensions()
     output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
     
-    colored_squares = find_colored_squares(input_grid)
-    sorted_colors = sort_colors(colored_squares)
-    color_assignments = assign_colors(sorted_colors)
+    unique_colors = find_unique_colors(input_grid)
+    frame_width = len(unique_colors) + 4
+    color_assignments = assign_colors(unique_colors)
     
     # Draw horizontal lines
-    draw_line(output_grid, 2, 2, 2, 13, color_assignments['top'])
-    draw_line(output_grid, 13, 2, 13, 13, color_assignments['bottom'])
+    draw_line(output_grid, 1, 2, 1, frame_width + 1, color_assignments['top'])
+    draw_line(output_grid, 13, 2, 13, frame_width + 1, color_assignments['bottom'])
     
     # Draw vertical lines
-    draw_line(output_grid, 3, 2, 12, 2, color_assignments['left'])
-    draw_line(output_grid, 3, 13, 12, 13, color_assignments['right'])
+    draw_line(output_grid, 2, 2, 12, 2, color_assignments['left'])
+    draw_line(output_grid, 2, frame_width + 1, 12, frame_width + 1, color_assignments['right'])
     
-    # Set center
-    output_grid.set_cell(6, 6, 2)  # Red center
+    # Fill frame interior
+    fill_frame(output_grid, frame_width)
     
-    # Fill frame
-    fill_frame(output_grid)
+    # Draw center line
+    draw_line(output_grid, 7, 3, 7, frame_width, 2)  # Red center line
     
     return output_grid
 
-def find_colored_squares(grid: ColoredGrid) -> List[Tuple[int, int, int]]:
-    return [(grid.get_cell(r, c), r, c) for r in range(grid.num_rows) for c in range(grid.num_cols) if grid.get_cell(r, c) != 0]
+def find_unique_colors(grid: ColoredGrid) -> List[int]:
+    unique_colors = set()
+    for r in range(grid.num_rows):
+        for c in range(grid.num_cols):
+            color = grid.get_cell(r, c)
+            if color != 0 and color != 2:
+                unique_colors.add(color)
+    return sorted(list(unique_colors))
 
-def sort_colors(colored_squares: List[Tuple[int, int, int]]) -> List[int]:
-    return sorted(set(color for color, _, _ in colored_squares))
-
-def assign_colors(sorted_colors: List[int]) -> dict:
+def assign_colors(unique_colors: List[int]) -> dict:
     return {
-        'top': sorted_colors[2],
-        'left': sorted_colors[1],
-        'right': sorted_colors[3],
-        'bottom': sorted_colors[4]
+        'top': unique_colors[-1],
+        'bottom': unique_colors[-2],
+        'left': unique_colors[0],
+        'right': unique_colors[1] if len(unique_colors) > 1 else unique_colors[0]
     }
 
 def draw_line(grid: ColoredGrid, start_row: int, start_col: int, end_row: int, end_col: int, color: int):
@@ -54,8 +59,8 @@ def draw_line(grid: ColoredGrid, start_row: int, start_col: int, end_row: int, e
         for c in range(start_col, end_col + 1):
             grid.set_cell(r, c, color)
 
-def fill_frame(grid: ColoredGrid):
-    for r in range(3, 13):
-        for c in range(3, 13):
+def fill_frame(grid: ColoredGrid, frame_width: int):
+    for r in range(2, 13):
+        for c in range(3, frame_width + 1):
             if grid.get_cell(r, c) == 0:
                 grid.set_cell(r, c, 5)  # Gray
