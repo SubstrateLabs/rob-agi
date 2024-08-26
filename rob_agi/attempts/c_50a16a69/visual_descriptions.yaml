@@ -1,23 +1,17 @@
 example_0:
   input: |
-    An 8x8 grid with a checkerboard pattern of gray (5) and red (2) squares in the top-left 7x7 section. The rightmost column and bottom row are entirely blue (1).
+    An 8x8 grid with a checkerboard pattern of gray (5) and red (2) squares. The pattern is consistent except for the rightmost column and bottom row, which are entirely blue (1).
   output: |
-    An 8x8 grid with a perfect checkerboard pattern of gray (5) and red (2) squares covering the entire grid, including the areas that were originally blue.
+    An 8x8 grid with a perfect checkerboard pattern of gray (5) and red (2) squares. The pattern starts with red in the top-left corner and alternates throughout the entire grid.
 
 example_1:
   input: |
-    A 20x20 grid. The top-left 11x11 section contains a checkerboard pattern of green (3) and magenta (6). The rest of the grid is filled with sky blue (8) squares.
+    A 20x20 grid divided into two distinct regions. The top-left region (11x11) contains a repeating pattern of magenta (6), green (3), gray (5), and orange (7). The rest of the grid is filled with sky blue (8), forming an L-shape around the patterned region.
   output: |
-    A 20x20 grid filled entirely with a perfect checkerboard pattern of green (3) and magenta (6) squares, extending the pattern to cover the areas that were originally sky blue.
+    A 20x20 grid filled entirely with a repeating pattern of green (3), gray (5), orange (7), and magenta (6). The pattern repeats in both horizontal and vertical directions, creating a consistent texture across the entire grid.
 
 example_2:
   input: |
-    A 9x9 grid. The top-left 8x8 section contains a checkerboard pattern of orange (7) and green (3). The rightmost column and bottom row are entirely yellow (4).
+    A 9x9 grid with a repeating pattern of orange (7), magenta (6), and green (3) in the first 8 columns. The rightmost column and bottom row are filled with yellow (4), creating an L-shape border.
   output: |
-    A 9x9 grid filled entirely with a perfect checkerboard pattern of orange (7) and green (3) squares, extending the pattern to cover the areas that were originally yellow.
-
-test_case_0:
-  input: |
-    A 6x6 grid. The top-left 5x5 section contains a checkerboard pattern of sky blue (8) and magenta (6) squares. The rightmost column and bottom row are entirely green (3).
-  output: |
-    A 6x6 grid filled entirely with a perfect checkerboard pattern of sky blue (8) and magenta (6) squares, extending the pattern to cover the areas that were originally green.
+    A 9x9 grid filled with a repeating pattern of magenta (6), green (3), and orange (7). The pattern is consistent across the entire grid, including the areas that were previously yellow in the input.

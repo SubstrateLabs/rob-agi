@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 6x6 grid with a diagonal pattern of colored squares. The pattern starts in the top-left corner with a yellow (4) square, followed by a blue (1) square below and to the right. The pattern continues with red (2) and green (3) squares, forming a diagonal line from top-left to bottom-right. The rest of the grid is filled with black (0) squares, which can be considered empty space.
+  output: |
+    A 12x12 grid that appears to be an expanded version of the input grid. The original 6x6 pattern is preserved in the top-left corner, and the diagonal pattern continues, repeating the yellow-blue-red-green sequence. The pattern extends to fill the entire 12x12 grid, maintaining the same diagonal orientation. The empty black (0) spaces are also expanded proportionally.
+
+example_1:
+  input: |
+    A 5x5 grid with a pattern of gray (5) and red (2) squares. The pattern forms two 2x2 blocks in opposite corners: one in the top-left and one in the middle-right. Each block consists of alternating gray and red squares in a checkerboard pattern. The bottom-right corner has a single red (2) square. The rest of the grid is filled with black (0) squares.
+  output: |
+    A 10x10 grid that expands on the input pattern. The original 5x5 pattern is preserved in the top-left corner. The pattern of 2x2 blocks of alternating gray and red squares is repeated, forming a diagonal line from top-left to bottom-right. There are now four complete 2x2 blocks and a single red square in the bottom-right corner. The black (0) spaces are also expanded proportionally, maintaining the overall structure of the pattern.
+
+example_2:
+  input: |
+    An 8x8 grid with a diagonal pattern of blue (1) and magenta (6) squares. The pattern forms a line starting from the bottom-left corner, moving up and to the right, alternating between magenta and blue squares. Each colored square is separated by one black (0) square both vertically and horizontally. The rest of the grid is filled with black squares.
+  output: |
+    A 16x16 grid that expands the input pattern. The original 8x8 pattern is preserved in the top-left corner. The diagonal line of alternating magenta and blue squares is extended, maintaining the same spacing (one black square between each colored square). The line now spans the entire 16x16 grid, starting from the bottom-left corner and ending in the top-right corner. The black (0) spaces are expanded proportionally, preserving the overall structure and spacing of the pattern.

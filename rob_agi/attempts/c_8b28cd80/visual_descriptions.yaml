@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 3x3 grid with a single yellow (4) square in the center. The rest of the grid is black (0).
+  output: |
+    A 9x9 grid with a yellow (4) border around the entire grid. Inside this border is a 7-segment display style number "0" drawn in yellow (4). The segments of the "0" are thick, taking up 2 squares in width. The interior and exterior of the "0" are filled with black (0).
+
+example_1:
+  input: |
+    A 3x3 grid with a single gray (5) square in the top-left corner. The rest of the grid is black (0).
+  output: |
+    A 9x9 grid with a gray (5) border on the left, top, and right sides. The bottom border is incomplete, with only the corners filled. Inside this border is a 7-segment display style number "2" drawn in gray (5). The segments of the "2" are thick, taking up 2 squares in width. The interior and exterior of the "2" are filled with black (0). There are additional gray (5) lines extending from the right side of the "2" to the right border.
+
+example_2:
+  input: |
+    A 3x3 grid with a single green (3) square in the top-center position. The rest of the grid is black (0).
+  output: |
+    A 9x9 grid with a green (3) border around the entire grid. Inside this border is a 7-segment display style number "1" drawn in green (3). The segments of the "1" are thick, taking up 2 squares in width. The "1" is positioned on the left side of the grid. There are additional horizontal green (3) lines extending across the entire width of the grid: one at the top, one in the middle, and one at the bottom.
+
+example_3:
+  input: |
+    A 3x3 grid with a single sky blue (8) square in the middle-right position. The rest of the grid is black (0).
+  output: |
+    A 9x9 grid with a sky blue (8) border around the entire grid. Inside this border is a 7-segment display style number "6" drawn in sky blue (8). The segments of the "6" are thick, taking up 2 squares in width. The interior and exterior of the "6" are filled with black (0). There is an additional sky blue (8) line extending from the bottom-right of the "6" to the bottom-right corner of the grid.
+
+example_4:
+  input: |
+    A 3x3 grid with a single orange (7) square in the top-right corner. The rest of the grid is black (0).
+  output: |
+    A 9x9 grid with an orange (7) border on the left, top, and right sides. The bottom border is incomplete, with only the corners filled. Inside this border is a 7-segment display style number "3" drawn in orange (7). The segments of the "3" are thick, taking up 2 squares in width. The interior and exterior of the "3" are filled with black (0). There are additional orange (7) horizontal lines extending across the entire width of the grid: one at the top, one in the middle, and one at the bottom.

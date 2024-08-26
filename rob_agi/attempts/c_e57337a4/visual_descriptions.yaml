@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 15x15 grid predominantly filled with brown (9) squares. There is a single black (0) square located near the top-right corner of the grid, specifically at position (2, 12). The rest of the grid is entirely brown, creating a uniform background with one distinct black point.
+  output: |
+    A small 3x3 grid. The top-right corner contains a black (0) square, mirroring the position of the black square in the input grid. The rest of this smaller grid is filled with brown (9) squares, maintaining the background color from the input.
+
+example_1:
+  input: |
+    A 15x15 grid predominantly filled with sky blue (8) squares. There are two black (0) squares in this grid. The first is located near the top-left corner at position (2, 1), and the second is in the middle-left area at position (7, 7). The rest of the grid is uniformly sky blue.
+  output: |
+    A small 3x3 grid. The top-left corner contains a black (0) square, corresponding to the first black square in the input. The middle square of the grid also contains a black (0) square, corresponding to the second black square in the input. The remaining squares are filled with sky blue (8), maintaining the background color from the input.
+
+example_2:
+  input: |
+    A 15x15 grid predominantly filled with orange (7) squares. There are three black (0) squares in this grid. Two are located in the top row: one at position (2, 3) and another at (2, 11). The third black square is in the lower part of the grid at position (9, 2). The rest of the grid is uniformly orange.
+  output: |
+    A small 3x3 grid. The top row contains two black (0) squares in the left and right positions, corresponding to the two black squares in the top of the input grid. There is another black (0) square in the bottom-left corner, corresponding to the lower black square in the input. The remaining squares are filled with orange (7), maintaining the background color from the input.
+
+test_case_0:
+  input: |
+    A 15x15 grid predominantly filled with brown (9) squares. There is a single black (0) square located near the top-right corner of the grid, specifically at position (2, 12). The rest of the grid is entirely brown, creating a uniform background with one distinct black point.
+  output: |
+    A small 3x3 grid. The description of the output is not provided in the test case, as this is the grid that needs to be determined based on the pattern observed in the examples.

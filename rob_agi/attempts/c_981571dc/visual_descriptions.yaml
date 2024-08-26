@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid is 30x30. There's a large black (0) rectangular area in the center, roughly 7x12 in size. This black area is surrounded by various colored squares forming a frame-like structure. The top-left and bottom-right corners have similar patterns of colors (6, 7, 3, 1, 2). The top-right and bottom-left corners also share similarities (5, 7, 1, 2). The sides of the frame have repeating patterns of colors, with some variations.
+  output: |
+    The grid maintains its 30x30 size. The large black rectangular area in the center has been filled with various colors, matching the patterns of the surrounding frame. The frame itself remains largely unchanged. The filled area now appears to be a continuation or reflection of the patterns seen in the frame, creating a complete, symmetrical design.
+
+example_1:
+  input: |
+    The grid is 30x30. There's a T-shaped black (0) area in the center, with the vertical part being about 7 squares wide and the horizontal part about 5 squares tall. The rest of the grid is filled with various colors forming complex patterns. Notable features include symmetrical patterns in the corners and along the edges, with repeating color sequences.
+  output: |
+    The grid remains 30x30. The T-shaped black area has been filled in with colors that match and continue the patterns of the surrounding areas. The overall design now appears complete and symmetrical, with no black spaces remaining. The patterns in the corners and along the edges remain unchanged.
+
+example_2:
+  input: |
+    The grid is 30x30. There's an irregular black (0) shape in the center, resembling an inverted 'L' or a backwards '7'. The rest of the grid is filled with various colors forming complex patterns. There are symmetrical elements in the corners and along the edges, with repeating color sequences.
+  output: |
+    The grid stays 30x30. The irregular black shape in the center has been filled in with colors that match and continue the patterns of the surrounding areas. The design now appears complete and symmetrical, with no black spaces remaining. The patterns in the corners and along the edges are preserved.
+
+example_3:
+  input: |
+    The grid is 30x30. There's a cross-shaped black (0) area in the center, with both the vertical and horizontal parts being about 6 squares wide. The rest of the grid is filled with various colors forming complex patterns. There are symmetrical elements in the corners and along the edges, with repeating color sequences.
+  output: |
+    The grid maintains its 30x30 size. The cross-shaped black area in the center has been filled with colors that match and continue the patterns of the surrounding areas. The overall design now appears complete and symmetrical, with no black spaces remaining. The patterns in the corners and along the edges remain unchanged.

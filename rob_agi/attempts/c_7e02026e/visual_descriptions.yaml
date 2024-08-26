@@ -1,0 +1,28 @@
+example_0:
+  input: |
+    A 12x12 grid predominantly composed of sky blue (8) and black (0) squares. The black squares form irregular shapes and patterns throughout the grid. There are no clear geometric shapes or consistent patterns visible. The distribution of black and sky blue squares appears random, with some areas having more concentration of one color than others.
+  output: |
+    The grid maintains its 12x12 size and most of its original structure. The key difference is the introduction of green (3) squares in two distinct L-shaped patterns. The first L-shape is in the top-left quadrant, spanning from (0,4) to (2,4) vertically and then (1,4) to (1,6) horizontally. The second L-shape is in the bottom-right quadrant, starting at (9,6) and extending to (11,6) vertically, then from (10,5) to (10,7) horizontally. These green L-shapes replace what were previously black squares, while all other squares remain unchanged.
+
+example_1:
+  input: |
+    Another 12x12 grid, again primarily composed of sky blue (8) and black (0) squares. The distribution seems more structured than the previous example, with more continuous areas of sky blue. There are several isolated black squares and some small clusters of black squares scattered throughout the grid. The bottom-left and top-right corners have larger concentrations of black squares.
+  output: |
+    The grid maintains its 12x12 size and most of its original structure. The significant change is the introduction of a large, inverted L-shaped pattern of green (3) squares in the bottom-right quadrant. This green shape starts at (8,5), extends down to (11,5), and then spans right from (10,5) to (10,7). The green squares replace what were previously black squares. All other squares in the grid remain unchanged, preserving the original pattern of sky blue and black squares elsewhere.
+
+example_2:
+  input: |
+    A 12x12 grid with a more complex pattern of sky blue (8) and black (0) squares. The top half of the grid is predominantly sky blue with scattered black squares. The bottom half has more black squares, forming irregular shapes and patterns. There's a notable diagonal line of sky blue squares from the top-left to the bottom-right, interrupted by black squares in a few places.
+  output: |
+    The 12x12 grid maintains its overall structure, but with significant changes due to the introduction of green (3) squares. There are four distinct green shapes:
+    1. An L-shape in the top-right corner, starting at (0,9) and extending to (3,9) vertically, then from (1,8) to (1,10) horizontally.
+    2. A small L-shape on the left side, from (4,1) to (6,1) vertically and (5,0) to (5,2) horizontally.
+    3. An inverted L-shape in the bottom-left, from (7,3) to (10,3) vertically and (8,2) to (8,4) horizontally.
+    4. A small L-shape in the center-right, from (10,3) to (11,3) vertically and (10,2) to (10,4) horizontally.
+    These green shapes replace what were previously black squares. The rest of the grid remains unchanged, preserving the original pattern of sky blue and black squares.
+
+test_case_0:
+  input: |
+    A 12x12 grid composed of sky blue (8) and black (0) squares. The pattern appears more structured than previous examples. There's a clear border of sky blue squares around the entire grid. Inside this border, there are various shapes and patterns formed by black squares. Notable features include a large black square in the center-left, a diagonal line of black squares from top-left to bottom-right, and several isolated black squares scattered throughout.
+  output: |
+    As this is a test case, no output grid is provided. The task would be to apply the pattern observed in the previous examples to transform this input grid.

@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A large green rectangular region dominates the center of the grid, spanning from row 2 to row 9 and column 3 to column 14. This green area is surrounded by black (empty) space. Several red dots are scattered within and around the green region. There's a smaller green rectangular region in the bottom right, from row 14 to row 19 and column 8 to column 17. This region also contains a few red dots. The rest of the grid is mostly black with a few isolated red dots.
+  output: |
+    The large green region in the center has been partially transformed. Blue patterns have emerged, primarily around the locations where red dots were in the input. These blue patterns form small clusters or shapes, often surrounding the original red dots. The smaller green region in the bottom right has undergone a similar transformation, with blue patterns emerging around the original red dot locations. The black areas and isolated red dots outside the green regions remain unchanged.
+
+example_1:
+  input: |
+    Two main green rectangular regions are visible. The first spans from row 2 to row 11 and column 2 to column 10. The second occupies the right side of the grid from row 1 to row 19 and column 15 to column 19. Both green areas contain several red dots scattered throughout. The rest of the grid is mostly black (empty) with a few isolated red dots.
+  output: |
+    Both green regions have been partially transformed with blue patterns. In the left green region, blue clusters have formed around the original red dot locations, creating intricate patterns. The right green region shows a similar transformation, with blue patterns emerging around the red dots. The patterns seem more pronounced near the edges of the green areas. The black areas and isolated red dots outside the green regions remain largely unchanged.
+
+example_2:
+  input: |
+    Two small green rectangular regions are present. The first is in the top-left, from row 2 to row 5 and column 1 to column 4. The second is larger, located in the center-right, from row 3 to row 7 and column 9 to column 14. Both green areas contain one or more red dots. The rest of the grid is mostly black with a few isolated red dots scattered around.
+  output: |
+    Both green regions have been partially transformed. The top-left green area now has a blue pattern in its right half, surrounding the original red dot. The center-right green area has been more extensively transformed, with blue patterns forming around the original red dot locations, particularly in the upper part of this region. The black areas and isolated red dots outside the green regions remain unchanged.
+
+test_case_0:
+  input: |
+    The input grid for the test case is not provided in the given code.
+  output: |
+    The output grid for the test case is not provided in the given code, as this is an unsolved test case.

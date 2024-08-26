@@ -1,0 +1,35 @@
+example_0:
+  input: |
+    A 9x9 grid predominantly filled with yellow (4) squares. There are two blue (1) dots: one in the third row, second column, and another in the eighth row, seventh column. The rest of the grid is entirely yellow.
+  output: |
+    A 9x9 grid with a yellow (4) background. A diagonal blue (1) line connects the two blue dots from the input. The line starts at the top-left blue dot (3rd row, 2nd column) and ends at the bottom-right blue dot (8th row, 7th column). The line is made up of 6 blue squares, creating a diagonal path across the yellow background.
+
+example_1:
+  input: |
+    An 11x8 grid with a sky blue (8) background. There are three colored dots: a blue (1) dot in the second row, seventh column; a magenta (6) dot in the fourth row, fifth column; and another blue (1) dot in the seventh row, second column.
+  output: |
+    An 11x8 grid with a sky blue (8) background. Two zigzag lines connect the three dots from the input. A blue (1) line starts from the top-right blue dot, zigzags down to the magenta dot, then continues to the bottom-left blue dot. A magenta (6) line starts from the top-left corner, zigzags to the magenta dot, then continues to the bottom-right corner. The lines intersect at the magenta dot in the middle.
+
+example_2:
+  input: |
+    A 12x9 grid with a yellow (4) background. There are three colored dots: two blue (1) dots, one in the second row, eighth column, and another in the eighth row, second column; and one magenta (6) dot in the seventh row, eighth column.
+  output: |
+    A 12x9 grid with a yellow (4) background. A diagonal blue (1) line connects the two blue dots from the input. The line starts at the top-right blue dot (2nd row, 8th column) and ends at the bottom-left blue dot (8th row, 2nd column). The magenta (6) dot remains in its original position (7th row, 8th column) without any lines connected to it.
+
+example_3:
+  input: |
+    A 15x12 grid with a gray (5) background. There are five colored dots: two blue (1) dots in the fourth row, second column and the tenth row, eighth column; and three magenta (6) dots in the third row, tenth column; sixth row, fourth column; and the fourteenth row, fifth column.
+  output: |
+    A 15x12 grid with a gray (5) background. Two zigzag lines connect all five dots from the input. A blue (1) line starts from the top-left blue dot, zigzags through all three magenta dots, and ends at the bottom-right blue dot. A magenta (6) line starts from the top-right corner, zigzags through all three magenta dots, and ends at the bottom-left corner. The lines intersect at the magenta dots.
+
+example_4:
+  input: |
+    A 16x15 grid with a sky blue (8) background. There are seven colored dots: four blue (1) dots in positions (3,3), (4,13), (12,12), and (15,4); and three magenta (6) dots in positions (2,9), (10,10), and (15,14).
+  output: |
+    A 16x15 grid with a sky blue (8) background. Two zigzag lines connect all seven dots from the input. A blue (1) line connects all four blue dots in a zigzag pattern, starting from the top-left blue dot and ending at the bottom-left blue dot. A magenta (6) line connects all three magenta dots in a zigzag pattern, starting from the top magenta dot and ending at the bottom-right magenta dot. The lines do not intersect each other.
+
+test_case_0:
+  input: |
+    A 16x15 grid with a sky blue (8) background. There are seven colored dots: four blue (1) dots in positions (3,3), (4,13), (12,12), and (15,4); and three magenta (6) dots in positions (2,9), (10,10), and (15,14).
+  output: |
+    The output grid is not provided for this test case.

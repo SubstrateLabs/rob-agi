@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 7x7 grid with a blue (1) rectangular frame. The frame is one unit thick and has a one-unit gap at the top-left and bottom-right corners. The interior of the frame is filled with black (0), creating a hollow rectangle. The frame is surrounded by black (0) on all sides.
+  output: |
+    The same 7x7 grid structure as the input, but with the bottom half of the blue frame transformed to red (2). The top half remains blue (1). The black interior and exterior remain unchanged.
+
+example_1:
+  input: |
+    A 9x8 grid featuring a blue (1) rectangular frame in the bottom-right corner. The frame is 6x5 in size, one unit thick, with a one-unit gap at the top-left corner. The frame is surrounded by black (0) on all sides and filled with black (0) in its interior.
+  output: |
+    The same 9x8 grid structure as the input, but with the bottom half of the blue frame transformed to red (2). The top half remains blue (1). The black interior and exterior remain unchanged.
+
+example_2:
+  input: |
+    A 9x9 grid with a blue (1) hourglass or X-shaped pattern. The pattern consists of a 5x5 frame with additional blue squares at the top-middle and bottom-middle of the grid. The interior of the hourglass is filled with black (0), and the entire pattern is surrounded by black (0).
+  output: |
+    The same 9x9 grid structure as the input, but with the bottom half of the blue hourglass pattern transformed to red (2). The transformation occurs from the middle row downwards, including the bottom-middle square. The top half remains blue (1). The black interior and exterior remain unchanged.

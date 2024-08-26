@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 9x9 grid mostly filled with black (0). There's a sky blue (8) shape in the top-left quadrant that resembles an inverted 'L' or a small hook. This shape is made up of 7 sky blue squares. There are also two isolated yellow (4) squares - one in the middle-right area and another in the bottom-left quadrant.
+  output: |
+    A smaller 3x6 grid. The top and bottom rows are identical, consisting of alternating black (0) and sky blue (8) squares. The middle row is entirely sky blue (8). The overall effect is a rectangular frame or border made of sky blue, with black spaces in the corners.
+
+example_1:
+  input: |
+    A 9x9 grid mostly filled with black (0). There's a small cluster of sky blue (8) squares in the bottom-left quadrant, forming a shape that resembles a small 'L' or a corner. This shape is made up of 5 sky blue squares. There's also an isolated yellow (4) square near the center of the grid.
+  output: |
+    A small 3x3 grid. It contains a sky blue (8) 'L' shape in the bottom-left corner, identical to the one in the input grid. The rest of the grid is black (0).
+
+example_2:
+  input: |
+    A 9x9 grid mostly filled with black (0). There's a horizontal line of three sky blue (8) squares in the upper-middle part of the grid. There are also three isolated yellow (4) squares scattered across the grid - one in the top-right area, one in the middle-right, and one in the bottom-left quadrant.
+  output: |
+    A 3x9 grid. The top and bottom rows are identical, consisting of alternating black (0) and sky blue (8) squares. The middle row is entirely sky blue (8). The overall effect is a long rectangular frame or border made of sky blue, with black spaces in the corners.
+
+example_3:
+  input: |
+    A 9x9 grid mostly filled with black (0). There's a 2x2 square of sky blue (8) in the top-left corner. There are also three isolated yellow (4) squares forming a diagonal line from top-left to bottom-right of the grid.
+  output: |
+    A 3x9 grid. It consists of three rows that follow a pattern. The top and bottom rows are identical, alternating between black (0) and sky blue (8) squares, starting and ending with black. The middle row alternates between sky blue (8) and black (0) squares, starting and ending with sky blue. The overall effect is a series of three connected sky blue squares forming a zigzag pattern that repeats three times across the grid.
+
+example_4:
+  input: |
+    A 9x9 grid mostly filled with black (0). There's an 'L' shaped cluster of sky blue (8) squares in the top-left corner, made up of 5 squares. There are also four isolated yellow (4) squares scattered across the grid - one in the top-middle, one in the middle-right, one in the bottom-left, and one in the bottom-right area.
+  output: |
+    A 3x12 grid. It consists of three rows that follow a pattern. The top and bottom rows are identical, alternating between black (0) and sky blue (8) squares, starting and ending with black. The middle row alternates between sky blue (8) and black (0) squares, starting and ending with sky blue. The overall effect is a series of four connected sky blue squares forming a zigzag pattern that repeats three times across the grid.

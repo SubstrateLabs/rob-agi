@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid is 21x21. It consists of a repeating pattern of vertical stripes. The stripes are 3 cells wide and alternate between black-blue-red and black-blue-black. There are 7 complete sets of these stripes. Horizontal lines of red (2) appear every 4 rows. In the 5th row from the top, there's a small sky blue (8) square in the 17th column. In the 6th row, this expands to a 3x1 horizontal line of sky blue. In the 7th row, it returns to a single sky blue square.
+  output: |
+    The grid maintains its 21x21 size and overall stripe pattern. The key difference is that the sky blue (8) elements have been mirrored to the left side of the grid. Now in the 5th row, there are two single sky blue squares - one in the 6th column and one in the 17th column. In the 6th row, there are now two 3x1 horizontal lines of sky blue - one from columns 5-7 and another from columns 16-18. The 7th row mirrors the 5th, with single sky blue squares in columns 6 and 17.
+
+example_1:
+  input: |
+    The grid is 23x23. It has a complex pattern of vertical stripes and horizontal lines. The background consists of alternating stripes of black-red-blue and black-red-black, each 3 cells wide. Horizontal blue (1) lines appear every 3 rows. There are also thicker horizontal red (2) lines every 6 rows. In the 7th row, there's a 2x1 sky blue (8) rectangle in columns 9-10. In the 9th and 10th rows, there's a single sky blue cell in the 17th column.
+  output: |
+    The 23x23 grid maintains its overall stripe and line pattern. The key changes are in the sky blue (8) elements. The 2x1 sky blue rectangle in the 7th row is now mirrored, appearing in both columns 9-10 and columns 15-16. In the 9th and 10th rows, the single sky blue cell is now mirrored, appearing in both the 7th and 17th columns. Additionally, in the 17th row, a new 2x1 sky blue rectangle appears in columns 9-10, mirroring the one in the 7th row.
+
+example_2:
+  input: |
+    The grid is 17x17. It has a complex pattern of vertical stripes and horizontal lines. The background consists of alternating stripes of black-blue-red and black-blue-black, each 2 cells wide. Horizontal blue (1) lines appear every 4 rows. There are also thicker horizontal red (2) lines every 5 rows. In the 5th row, there's a sky blue (8) cell in the 6th column, surrounded by blue (1) cells. In the 6th row, there's a 3x1 horizontal line of sky blue cells in columns 5-7. In the 9th and 10th rows, there's a 3x2 rectangle of sky blue cells in the leftmost columns.
+  output: |
+    The 17x17 grid maintains its overall stripe and line pattern. The key changes are in the sky blue (8) elements. The single sky blue cell in the 5th row is now mirrored, appearing in both the 6th and 10th columns. The 3x1 horizontal line of sky blue cells in the 6th row is now mirrored, appearing in both columns 5-7 and 11-13. The 3x2 rectangle of sky blue cells in the 9th and 10th rows is now mirrored, appearing in both the leftmost and rightmost columns. Additionally, in the 15th row, a new 3x1 horizontal line of sky blue cells appears in columns 1-3, mirroring the one in the 6th row.
+
+test_case_0:
+  input: |
+    The grid is 17x17. It has a complex pattern of vertical stripes and horizontal lines. The background consists of alternating stripes of black-blue-red and black-blue-black, each 2 cells wide. Horizontal blue (1) lines appear every 4 rows. There are also thicker horizontal red (2) lines every 5 rows. In the 5th row, there's a sky blue (8) cell in the 6th column, surrounded by blue (1) cells. In the 6th row, there's a 3x1 horizontal line of sky blue cells in columns 5-7. In the 9th and 10th rows, there's a 3x2 rectangle of sky blue cells in the leftmost columns.
+  output: |
+    The output grid is not provided for this test case.

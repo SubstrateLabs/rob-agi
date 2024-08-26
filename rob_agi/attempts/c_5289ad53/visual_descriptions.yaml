@@ -1,0 +1,45 @@
+example_0:
+  input: |
+    A 10x19 grid predominantly filled with sky blue (8). There are several green (3) lines or segments:
+    - A horizontal line at the top, spanning 6 squares
+    - A horizontal line in the middle, spanning 8 squares
+    - A short horizontal line at the bottom right, spanning 4 squares
+    - A short horizontal line in the middle left, spanning 3 squares
+    There's also a short red (2) horizontal line in the upper right, spanning 4 squares.
+  output: |
+    A small 2x3 grid. The top row is all green (3). The bottom row has red (2) in the middle, flanked by green (3) on the left and black (0) on the right.
+
+example_1:
+  input: |
+    A 10x10 grid predominantly filled with gray (5). There are several colored segments:
+    - A green (3) horizontal line at the top, spanning 4 squares
+    - Two red (2) segments: a short 2-square horizontal line in the middle left, and a 3-square horizontal line in the middle right
+    - A green (3) horizontal line at the bottom, spanning 4 squares
+  output: |
+    A small 2x3 grid. The top row has green (3) twice, followed by red (2). The bottom row has red (2) followed by two black (0) squares.
+
+example_2:
+  input: |
+    A 10x14 grid predominantly filled with blue (1). There are several colored segments:
+    - Two green (3) horizontal lines: one near the top spanning 4 squares, and one at the bottom spanning 4 squares
+    - Two red (2) horizontal lines: one in the middle spanning 3 squares, and one near the bottom spanning 5 squares
+    - A short green (3) horizontal line on the left side, spanning 3 squares
+  output: |
+    A small 2x3 grid. The top row is all green (3). The bottom row has red (2) twice, followed by black (0).
+
+example_3:
+  input: |
+    A 13x15 grid predominantly filled with sky blue (8). There are several red (2) and green (3) segments:
+    - Three red (2) horizontal lines: one near the top spanning 4 squares, one at the bottom spanning 3 squares, and one near the bottom spanning 4 squares
+    - Two green (3) horizontal lines: one in the middle spanning 5 squares, and one near the middle spanning 6 squares
+    - One red (2) horizontal line at the bottom right, spanning 5 squares
+  output: |
+    A small 2x3 grid. The top row has green (3) twice, followed by red (2). The bottom row is all red (2).
+
+test_case_0:
+  input: |
+    A 13x15 grid predominantly filled with sky blue (8). There are several red (2) and green (3) segments:
+    - Four red (2) horizontal lines: one near the top spanning 4 squares, one at the bottom left spanning 3 squares, one near the bottom spanning 4 squares, and one at the bottom right spanning 5 squares
+    - Two green (3) horizontal lines: one in the middle spanning 5 squares, and one near the middle spanning 6 squares
+  output: |
+    Not provided in the test case.

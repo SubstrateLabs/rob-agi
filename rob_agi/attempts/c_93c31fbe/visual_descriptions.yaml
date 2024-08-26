@@ -1,94 +1,45 @@
 example_0:
   input: |
-    A 25x25 grid with mostly black (empty) space. There are several distinct elements:
-    1. Four yellow 2x2 squares in the corners of the grid (top-left, top-right, bottom-left, bottom-right).
-    2. A pattern of blue dots and small blue shapes scattered across the grid:
-       - Two horizontal blue dots in the top-left quadrant
-       - A small L-shaped blue pattern in the top-right quadrant
-       - A single blue dot in the middle-right of the grid
-       - Two vertical blue dots in the bottom-right quadrant
-       - A cluster of blue dots forming a rough diamond shape in the center-left of the grid
-    3. Red elements:
-       - Two 2x2 red squares in the top-center of the grid
-       - Two 2x2 red squares in the bottom-center of the grid
-       - Single red dots adjacent to some of these red squares
+    A 25x23 grid with mostly black (0) background. There are several distinct elements:
+    1. Two pairs of red (2) 2x2 squares in the top-right and bottom-right corners.
+    2. Two pairs of red 2x2 squares in the middle-left and middle-right of the grid.
+    3. Several blue (1) pixels scattered throughout the grid, some in small clusters, others isolated.
+    4. Some blue 2x2 squares, particularly in the top-left quadrant.
   output: |
-    The 25x25 grid maintains the same overall structure as the input, with some key changes:
-    1. The four yellow 2x2 squares in the corners remain unchanged.
-    2. The blue elements have been significantly modified:
-       - The scattered blue dots and shapes have been connected to form more cohesive patterns
-       - A symmetrical blue pattern has emerged in the top half of the grid, resembling a stylized bird or butterfly
-       - The central cluster has been extended into a more defined shape
-       - New blue connections have been added, creating lines and shapes that weren't present in the input
-    3. The red elements (2x2 squares and adjacent dots) remain unchanged
-    Overall, the output grid shows a more structured and symmetrical arrangement of blue elements, while maintaining the positions of yellow and red elements.
+    The same 25x23 grid, with the following changes:
+    1. The red (2) squares remain unchanged.
+    2. The blue (1) pixels have been rearranged and expanded into more structured patterns:
+       - A symmetrical pattern in the top-left quadrant with 2x2 blue squares as anchors.
+       - A central vertical line of blue pixels.
+       - Symmetrical patterns in the middle and bottom of the grid.
+    3. All blue pixels are now connected, forming a single continuous shape.
+    4. The overall arrangement of blue pixels appears more balanced and symmetrical.
 
 example_1:
   input: |
-    A 23x23 grid with mostly black (empty) space. The grid contains:
-    1. Six sky-blue (color 8) 2x2 squares arranged in three pairs:
-       - Top-left and top-right
-       - Middle-left and middle-right
-       - Bottom-left and bottom-right
-    2. Blue dots and small shapes scattered across the grid:
-       - A small L-shape in the top-left quadrant
-       - Two separate dots in the top-right quadrant
-       - A cluster of dots forming a rough T-shape in the center
-       - A single dot in the bottom-left quadrant
-       - Two dots forming a diagonal line in the bottom-right quadrant
-    3. Green elements:
-       - Two 2x2 green squares in the center-top of the grid
-       - Two 2x2 green squares in the center-bottom of the grid
+    A 23x22 grid with a black (0) background and several elements:
+    1. Multiple sky blue (8) 2x2 squares scattered around the edges of the grid.
+    2. Several blue (1) pixels distributed across the grid, some in small clusters, others isolated.
+    3. Some sky blue rectangular shapes (2x3 or 3x2) near the edges.
   output: |
-    The 23x23 grid maintains the same overall structure, with significant changes to the blue elements:
-    1. The six sky-blue 2x2 squares remain unchanged in their positions.
-    2. The blue elements have been transformed:
-       - The scattered blue dots and shapes are now connected, forming a more cohesive pattern
-       - A symmetrical blue pattern has emerged, resembling a stylized face or mask
-       - The central T-shape has been extended and connected to other blue elements
-       - New blue connections have been added, creating lines and shapes that weren't present in the input
-    3. The green 2x2 squares remain unchanged in their positions
-    The output grid shows a more structured and symmetrical arrangement of blue elements, while maintaining the positions of sky-blue and green elements.
+    The same 23x22 grid, with the following changes:
+    1. The sky blue (8) squares and rectangles remain unchanged.
+    2. The blue (1) pixels have been rearranged and expanded into more structured patterns:
+       - Symmetrical patterns formed around the sky blue squares.
+       - A more connected and continuous blue shape across the grid.
+    3. All blue pixels are now connected, forming a single continuous shape.
+    4. The overall arrangement of blue pixels appears more balanced and symmetrical.
 
 example_2:
   input: |
-    A 21x21 grid with mostly black (empty) space. The grid contains:
-    1. Eight green 2x2 squares arranged in four pairs:
-       - Top-left and top-right
-       - Upper-middle left and right
-       - Lower-middle left and right
-       - Bottom-left and bottom-right
-    2. Blue dots and small shapes scattered across the grid:
-       - A small L-shape in the top-left quadrant
-       - A cluster of dots forming a rough cross shape in the center
-       - A single dot in the bottom-right quadrant
-       - Two separate dots in the middle-right of the grid
-    3. A single red dot near the center-left of the grid
+    A 21x20 grid with a black (0) background and several elements:
+    1. Green (3) 2x2 squares in the corners and along the edges.
+    2. Blue (1) pixels scattered throughout the grid, some in small clusters, others isolated.
   output: |
-    The 21x21 grid maintains the same overall structure, with significant changes to the blue elements:
-    1. The eight green 2x2 squares remain unchanged in their positions.
-    2. The blue elements have been transformed:
-       - The scattered blue dots and shapes are now connected, forming a more cohesive pattern
-       - A symmetrical blue pattern has emerged, resembling a stylized tree or plant
-       - The central cross shape has been extended and connected to other blue elements
-       - New blue connections have been added, creating lines and shapes that weren't present in the input
-    3. The single red dot remains unchanged in its position
-    The output grid shows a more structured and symmetrical arrangement of blue elements, while maintaining the positions of green squares and the red dot.
-
-test_case_0:
-  input: |
-    A 28x25 grid with mostly black (empty) space. The grid contains:
-    1. Twelve yellow 2x2 squares arranged in six pairs:
-       - Top-left and top-right
-       - Upper-middle left and right
-       - Middle-left and middle-right
-       - Lower-middle left and right
-       - Bottom-left and bottom-right
-       - An additional pair in the center-right
-    2. Blue dots and small shapes scattered across the grid:
-       - Various single dots and small clusters throughout the grid
-       - A larger cluster forming a rough X-shape in the center-left
-    3. A single blue dot in the top-left corner
-    4. Two red dots in the top-right quadrant
-  output: |
-    The output grid is not provided for the test case, as it is meant to be solved based on the pattern observed in the examples.
+    The same 21x20 grid, with the following changes:
+    1. The green (3) squares remain unchanged.
+    2. The blue (1) pixels have been rearranged and expanded into more structured patterns:
+       - Symmetrical patterns formed around and between the green squares.
+       - A more connected and continuous blue shape across the grid.
+    3. All blue pixels are now connected, forming a single continuous shape.
+    4. The overall arrangement of blue pixels appears more balanced and symmetrical, with some 2x2 blue squares formed as part of the pattern.

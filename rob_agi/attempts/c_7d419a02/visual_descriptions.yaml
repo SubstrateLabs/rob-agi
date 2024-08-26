@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The input grid is a 19x12 rectangular pattern. It consists of sky blue (8) regions separated by black (0) lines. The overall structure resembles a series of interconnected sky blue rectangles or "rooms". There are two magenta (6) squares in the center, forming a small 2x2 square. The black lines form a maze-like structure, with some sky blue regions connected and others separated. The edges of the grid are all black, forming a border.
+  output: |
+    The output grid maintains the same 19x12 structure and overall pattern as the input. However, many of the sky blue (8) regions have been transformed to yellow (4). The transformation appears to affect larger sky blue regions, particularly those near the edges of the grid. Smaller or more central sky blue regions tend to remain unchanged. The black (0) lines and the magenta (6) squares in the center remain in their original positions and colors. The pattern of yellow and remaining sky blue regions creates a more varied and intricate visual structure.
+
+example_1:
+  input: |
+    The input is a 14x16 grid with a distinctive pattern. It consists of large sky blue (8) rectangular regions separated by black (0) horizontal lines. These regions vary in height but span the full width of the grid, except for the leftmost and rightmost columns which are black. There are occasional black squares within the sky blue regions, creating small interruptions. In the center, there's a 2x2 magenta (6) square embedded in one of the sky blue regions.
+  output: |
+    The output maintains the 14x16 structure of the input but with significant color changes. Many of the large sky blue (8) regions have been transformed to yellow (4), particularly those near the top and bottom of the grid. The central regions, including the area around the magenta (6) square, remain sky blue. The black (0) horizontal lines and border remain unchanged. The pattern of yellow and sky blue creates a more segmented appearance, with yellow dominating the edges and sky blue more prevalent in the center.
+
+example_2:
+  input: |
+    This is a 22x16 grid with a complex pattern. It consists of numerous sky blue (8) rectangles separated by thin black (0) lines, creating a grid-like structure. The rectangles are mostly 2x2 in size, but some are interrupted by black squares, creating variations. There's a 2x2 magenta (6) square near the center. The entire pattern is bordered by a black edge. The overall effect is of a highly structured, repetitive pattern with occasional interruptions.
+  output: |
+    The output maintains the 22x16 structure and basic layout of the input, but with significant color changes. Many of the sky blue (8) rectangles have been transformed to yellow (4), especially those near the edges and corners of the grid. The central area and some scattered regions remain sky blue. The black (0) lines and squares that separate the colored regions remain unchanged, as does the magenta (6) square near the center. The result is a more varied color pattern, with yellow dominating the periphery and sky blue more prevalent in the center, creating a sense of depth or focus towards the middle of the grid.
+
+test_case_0:
+  input: |
+    This test case is not provided in the given code snippet. There is no information about a test case input or output in the shared test file.
+  output: |
+    As there is no test case provided in the given code, there is no output to describe.

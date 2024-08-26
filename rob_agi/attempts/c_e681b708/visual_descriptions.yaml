@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid is 27x23. There's a prominent T-shaped structure made of blue (1) squares. The vertical part of the T runs down the center of the grid, while the horizontal part is near the top. The ends of the T are marked with different colors: magenta (6) on the left, red (2) in the center, and green (3) on the right. There's another horizontal blue line near the bottom, with green (3) squares at both ends. The rest of the grid is mostly black (0), with scattered blue (1) dots throughout.
+  output: |
+    The T-shaped structure remains unchanged. The scattered blue dots have been transformed: those above the horizontal part of the T are now red (2), those to the left of the vertical part are now green (3), and those to the right are now yellow (4). The dots below the bottom horizontal line have become sky blue (8). The endpoints of the T and the bottom line remain the same colors as in the input.
+
+example_1:
+  input: |
+    The grid is 22x24. There's a large cross or plus sign made of blue (1) squares, with the vertical line slightly off-center to the left. The ends of this cross are marked with different colors: green (3) at the top and bottom, red (2) at the intersection, and sky blue (8) at the right end. There's another vertical blue line on the far right side of the grid, also ending in sky blue (8) at the bottom. The rest of the grid is mostly black (0), with scattered blue (1) dots throughout.
+  output: |
+    The cross structure and the right-side vertical line remain unchanged. The scattered blue dots have been transformed based on their position relative to the cross: those above the horizontal line are now red (2), those to the left of the left vertical line are now green (3), those between the two vertical lines are now yellow (4), and those to the right of the right vertical line are now sky blue (8). The endpoints of the cross and the right-side line remain the same colors as in the input.
+
+example_2:
+  input: |
+    The grid is 20x22. There's an inverted T-shaped structure made of blue (1) squares, with the vertical part running down the left side of the grid and the horizontal part near the bottom. The ends of this structure are marked with different colors: sky blue (8) at the top, red (2) at the intersection, and green (3) at the right end. There's another horizontal blue line at the very bottom of the grid, ending in red (2) on the right. The rest of the grid is mostly black (0), with scattered blue (1) dots throughout.
+  output: |
+    The inverted T-shaped structure and the bottom horizontal line remain unchanged. The scattered blue dots have been transformed based on their position relative to the T: those to the left of the vertical line are now sky blue (8), those above the horizontal part of the T are now red (2), and those to the right of the vertical line and above the bottom horizontal line are now green (3). The dots below the bottom horizontal line have not changed color. The endpoints of the T and the bottom line remain the same colors as in the input.
+
+test_case_0:
+  input: |
+    The grid is 20x22. There's an inverted L-shaped structure made of blue (1) squares, with the vertical part running down the left side of the grid and the horizontal part near the bottom. The ends of this structure are marked with different colors: sky blue (8) at the top, red (2) at the intersection, and green (3) at the right end. There's another horizontal blue line at the very bottom of the grid, ending in red (2) on the right. The rest of the grid is mostly black (0), with scattered blue (1) dots throughout.
+  output: |
+    The description for the output is not provided in the test case, as it's meant to be solved.

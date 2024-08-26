@@ -1,0 +1,37 @@
+example_0:
+  input: |
+    A 2x2 grid with black squares in the top row and bottom-left, and an orange square in the bottom-right.
+  output: |
+    A 6x6 grid with a checkerboard-like pattern. The top-left, middle-left, and bottom-left 2x2 sections mirror the input grid. The top-right, middle-right, and bottom-right 2x2 sections are rotated versions of the input grid, with the orange square moving clockwise in each section.
+
+example_1:
+  input: |
+    A 3x3 grid with black squares everywhere except for a magenta square in the bottom-left corner and another in the middle-right position.
+  output: |
+    A 9x9 grid that appears to be a 3x3 tiling of the input grid, but with some modifications. The top-left corner of each 3x3 section alternates between black and red. The magenta squares from the input are preserved in their relative positions within each 3x3 section.
+
+example_2:
+  input: |
+    A 5x5 grid mostly filled with black squares. There are two sky blue squares in the second column, in the second and third rows from the top.
+  output: |
+    A 15x15 grid that seems to be a 3x3 tiling of a modified version of the input grid. The modifications include: 
+    1. Red squares added to the top-left corner of each 5x5 section.
+    2. The sky blue squares are preserved in their relative positions within each 5x5 section.
+    3. The second row of each 5x5 section now starts with a red square instead of a black one.
+
+example_3:
+  input: |
+    A 4x4 grid mostly filled with black squares. There's a gray square in the third column of the second row, and another gray square in the second column of the bottom row.
+  output: |
+    A 12x12 grid that appears to be a 3x3 tiling of a modified version of the input grid. The modifications include:
+    1. Red squares added in a diagonal pattern, starting from the second column of the first row in each 4x4 section.
+    2. The gray squares are preserved in their relative positions within each 4x4 section.
+
+example_4:
+  input: |
+    A 4x4 grid mostly filled with black squares. There's a single blue square in the top-left corner.
+  output: |
+    A 12x12 grid that seems to be a 3x3 tiling of a modified version of the input grid. The modifications include:
+    1. Red squares added in the fourth column of the third row in each 4x4 section.
+    2. The blue square is preserved in its relative position (top-left corner) within each 4x4 section.
+    3. The pattern of red squares forms a diagonal line when looking at the entire 12x12 grid.

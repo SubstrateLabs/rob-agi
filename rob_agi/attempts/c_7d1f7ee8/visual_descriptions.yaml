@@ -1,0 +1,27 @@
+example_0:
+  input: |
+    A complex grid with multiple shapes and colors. The grid is 27x23 in size. The background is mostly black (0). There's a large sky blue (8) rectangular frame near the top-left, with a yellow (4) rectangular shape inside it. Inside the yellow rectangle, there's a small green (3) square. To the right of the blue frame, there's an orange (7) L-shaped structure. Inside this orange structure, there's a blue (1) rectangular shape with a hollow center. Below the main blue frame, there's another yellow (4) rectangular shape. The shapes are not filled, only their outlines are visible.
+
+  output: |
+    The grid maintains its 27x23 size and overall structure, but the shapes are now filled in with their respective colors. The sky blue (8) rectangular frame is filled, as well as the yellow (4) rectangles inside it and below it. The small green (3) square inside the upper yellow rectangle is now filled. The orange (7) L-shaped structure is filled, and the blue (1) rectangle inside it is also filled, maintaining its hollow center. The black (0) background remains unchanged.
+
+example_1:
+  input: |
+    A 28x22 grid with multiple nested rectangular shapes. The outermost shape is a red (2) rectangle that frames most of the grid. Inside this, there's a yellow (4) rectangle, and within that, a blue (1) rectangle with a hollow center. To the right of these nested rectangles, there are three smaller shapes: a blue (1) rectangle at the top, a magenta (6) square in the middle, and a green (3) square at the bottom. All shapes are outlines, not filled.
+
+  output: |
+    The 28x22 grid maintains its overall structure, but now all the shapes are filled with their respective colors. The large red (2) rectangle is filled, as well as the yellow (4) rectangle inside it. The blue (1) rectangle within the yellow one is filled but maintains its hollow center. The three smaller shapes to the right - blue (1) rectangle, magenta (6) square, and green (3) square - are all filled in. The black (0) background remains unchanged.
+
+example_2:
+  input: |
+    An 18x12 grid with a blue (1) rectangular frame that encompasses most of the grid. Inside this frame, there's a red (2) rectangular shape taking up much of the space. Within the red rectangle, there's a small sky blue (8) square near the center. In the top-right corner of the blue frame, there's a green (3) rectangular shape. All shapes are outlines, not filled.
+
+  output: |
+    The 18x12 grid maintains its structure, but now all shapes are filled with their respective colors. The blue (1) rectangular frame is filled, as well as the red (2) rectangle inside it. The small sky blue (8) square within the red rectangle is filled. The green (3) rectangular shape in the top-right corner of the blue frame is also filled. The black (0) background remains unchanged.
+
+test_case_0:
+  input: |
+    An 18x12 grid with multiple nested rectangular shapes. The outermost shape is a blue (1) rectangle that frames most of the grid. Inside this, there's a red (2) rectangle taking up a large portion of the space. Within the red rectangle, there are two sky blue (8) squares side by side near the center. In the top-right corner of the blue frame, there's a green (3) rectangular shape. All shapes are outlines, not filled.
+
+  output: |
+    The output grid is not provided for the test case.

@@ -1,0 +1,47 @@
+example_0:
+  input: |
+    A 7x7 grid with various colors scattered throughout. There's a prominent vertical blue line in the second column from the right. The top-left corner has a yellow square. There are several blue squares forming a partial frame around the edges, with gaps. Red and magenta squares appear once each. An orange square is in the bottom-right corner. The center of the grid is mostly black (empty).
+  output: |
+    A 3x3 grid with a distinctive "C" shape made of sky blue (8) squares. The "C" opens towards the right. The rest of the grid is black (empty).
+
+example_1:
+  input: |
+    A 7x7 grid with red squares forming a partial frame around the edges, with gaps. There are two yellow squares in the top-left corner. A single blue square appears in the third row. Brown squares are present in the fourth and fifth rows. A gray square is in the top-right corner, and an orange square is in the bottom-right corner.
+  output: |
+    A 3x3 grid with a horizontal stripe of sky blue (8) squares in the middle row. The top and bottom rows are entirely black (empty).
+
+example_2:
+  input: |
+    A 7x7 grid with green squares forming a partial frame around the edges, with some gaps. Yellow squares appear in the top-left, top-right, and bottom-left corners. There's a vertical blue line in the second column from the right, similar to example_0. A red square is in the bottom-right corner. The center of the grid contains some scattered colors.
+  output: |
+    A 3x3 grid with an inverted "L" shape made of sky blue (8) squares. The inverted "L" occupies the top row and left column. The rest of the grid is black (empty).
+
+example_3:
+  input: |
+    A 7x7 grid with blue squares forming a partial frame on the left side and top. There's a vertical line of blue squares in the third column from the right. Brown squares appear twice. An orange square is in the top-right corner, and another is in the bottom-left. A yellow square is in the fourth row, first column. A gray square is in the bottom-right corner.
+  output: |
+    A 3x3 grid with a "C" shape made of sky blue (8) squares, identical to the output of example_0. The "C" opens towards the right. The rest of the grid is black (empty).
+
+example_4:
+  input: |
+    A 7x7 grid with green squares forming a partial frame around the edges, with some gaps. There's a vertical blue line in the second column from the right, similar to examples 0 and 2. Yellow squares appear in the top-right and center. Brown squares are present in the center and bottom-left. A gray square is in the top-right corner, and an orange square is in the fourth row, first column.
+  output: |
+    A 3x3 grid with an inverted "L" shape made of sky blue (8) squares, identical to the output of example_2. The inverted "L" occupies the top row and left column. The rest of the grid is black (empty).
+
+example_5:
+  input: |
+    A 7x7 grid with red squares forming a partial frame around the edges, with gaps. There are two yellow squares in the center. Brown squares appear three times. A gray square is in the top-right corner, and an orange square is in the top-left corner. Blue and magenta squares are also present.
+  output: |
+    A 3x3 grid with a horizontal stripe of sky blue (8) squares in the middle row, identical to the output of example_1. The top and bottom rows are entirely black (empty).
+
+example_6:
+  input: |
+    A 7x7 grid with red squares forming a partial frame around the edges, with some gaps. There's a vertical line of red squares in the third column from the left. Yellow squares appear in the center and bottom-left. A brown square is in the second row, fourth column. Gray squares are in the top-right and bottom-left corners. An orange square is in the fourth row, fifth column.
+  output: |
+    A 3x3 grid with a horizontal stripe of sky blue (8) squares in the middle row, identical to the outputs of examples 1 and 5. The top and bottom rows are entirely black (empty).
+
+test_case_0:
+  input: |
+    A 7x7 grid with blue squares forming a partial frame on the left side and bottom. There's a vertical line of blue squares in the third column from the right. Brown squares appear twice. An orange square is in the top-right corner. Yellow squares are in the top-left and bottom-right corners. A gray square is in the top-left corner, second row.
+  output: |
+    The output is not provided for this test case.

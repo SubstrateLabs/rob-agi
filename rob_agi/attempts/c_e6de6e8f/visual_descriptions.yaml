@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 2x12 grid. The top row contains four red (2) squares at positions 0, 4, 6, and 8, with black (0) squares in between. The bottom row is similar but with additional red squares at positions 1 and 9, creating a more dense pattern of red squares.
+  output: |
+    An 8x7 grid. It shows a tree-like structure made of red (2) squares, starting from a single green (3) square at the top center. The "trunk" of the tree extends straight down the center column for 6 rows. Two "branches" extend to the right from the trunk at rows 2 and 3, each one square long. The rest of the grid is filled with black (0) squares.
+
+example_1:
+  input: |
+    A 2x12 grid. The top row has five red (2) squares at positions 1, 3, 6, 9, and 11, with black (0) squares in between. The bottom row is denser, with red squares at positions 0, 1, 3, 4, 6, 7, 9, and 11.
+  output: |
+    An 8x7 grid. It shows a tree-like structure made of red (2) squares, starting from a single green (3) square at the top center. The "trunk" extends down the center for 3 rows, then shifts one square to the right for the remaining 5 rows. Two "branches" extend to the left from the trunk at rows 2 and 3, each one square long. The rest of the grid is filled with black (0) squares.
+
+example_2:
+  input: |
+    A 2x12 grid. The top row has five red (2) squares at positions 0, 3, 6, 9, and 11, with black (0) squares in between. The bottom row is denser, with red squares at positions 0, 1, 3, 4, 6, 7, 9, and 11.
+  output: |
+    An 8x7 grid. It shows a tree-like structure made of red (2) squares, starting from a single green (3) square at the top center. The "trunk" starts in the center and diagonally moves to the right, ending at the rightmost column in the bottom row. Four "branches" extend to the left from this diagonal trunk, each one square long, at rows 2, 3, 4, and 5. The rest of the grid is filled with black (0) squares.

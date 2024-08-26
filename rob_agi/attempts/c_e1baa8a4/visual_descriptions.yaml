@@ -1,0 +1,72 @@
+example_0:
+  input: |
+    The input grid is a 13x15 rectangle. It consists of four distinct rectangular regions:
+    1. A 9x4 rectangle of red (2) in the top-left corner.
+    2. A 9x11 rectangle of sky blue (8) occupying the entire right side of the grid.
+    3. A 4x4 rectangle of green (3) in the bottom-left corner.
+    4. A 4x11 rectangle of gray (5) occupying the bottom-right corner.
+    The overall effect is a large L-shaped region of sky blue, with red above and to the left of green and gray regions.
+  output: |
+    The output is a much smaller 2x2 grid. It appears to be a simplified representation of the input:
+    1. The top-left cell is red (2), corresponding to the red region in the input.
+    2. The top-right cell is sky blue (8), corresponding to the large sky blue region.
+    3. The bottom-left cell is green (3), corresponding to the green region.
+    4. The bottom-right cell is gray (5), corresponding to the gray region.
+
+example_1:
+  input: |
+    The input is a 12x14 grid divided into three vertical sections:
+    1. The leftmost section is 5 columns wide. It has yellow (4) in the top 4 rows and blue (1) in the bottom 8 rows.
+    2. The middle section is 3 columns wide. It has gray (5) in the top 4 rows and green (3) in the bottom 8 rows.
+    3. The rightmost section is 6 columns wide, entirely filled with red (2).
+    The overall effect is three distinct vertical bands, with the left two bands having a color change partway down.
+  output: |
+    The output is a 2x3 grid that seems to summarize the input:
+    1. The top row shows yellow (4), gray (5), and red (2) from left to right.
+    2. The bottom row shows blue (1), green (3), and red (2) from left to right.
+    This appears to capture the colors and their vertical arrangement from the input.
+
+example_2:
+  input: |
+    The input is a 15x14 grid divided into three horizontal sections:
+    1. The top section is 5 rows high. From left to right, it contains blue (1) for 3 columns, red (2) for 5 columns, and sky blue (8) for 6 columns.
+    2. The middle section is a single row (row 6). It has gray (5) for 3 columns, magenta (6) for 5 columns, and green (3) for 6 columns.
+    3. The bottom section is 9 rows high. It has the same color pattern as the middle row: gray (5), magenta (6), and green (3).
+    The overall effect is three distinct horizontal bands, with the top band having a different color scheme than the bottom two.
+  output: |
+    The output is a 2x3 grid that summarizes the input:
+    1. The top row shows blue (1), red (2), and sky blue (8) from left to right.
+    2. The bottom row shows gray (5), magenta (6), and green (3) from left to right.
+    This captures the colors and their horizontal arrangement from the input, with the top row representing the top section and the bottom row representing the middle and bottom sections.
+
+example_3:
+  input: |
+    The input is a 15x15 grid divided into four sections:
+    1. Top-left (4x3): sky blue (8)
+    2. Top-middle (4x5): orange (7)
+    3. Top-right (4x4): brown (9), followed by a 4x3 section of sky blue (8)
+    4. Middle (5x15): From left to right - green (3), blue (1), magenta (6), yellow (4)
+    5. Bottom (6x15): From left to right - red (2), yellow (4), blue (1), gray (5)
+    Each section is a distinct rectangular region with a solid color, creating a complex pattern of color blocks.
+  output: |
+    The output is a 3x4 grid that appears to summarize the input:
+    1. Top row: sky blue (8), orange (7), brown (9), sky blue (8)
+    2. Middle row: green (3), blue (1), magenta (6), yellow (4)
+    3. Bottom row: red (2), yellow (4), blue (1), gray (5)
+    This grid captures the color arrangement of each section in the input, preserving their relative positions but condensing them into a smaller representation.
+
+test_case_0:
+  input: |
+    The input is a 15x15 grid divided into several rectangular regions:
+    1. Top-left (5x5): red (2)
+    2. Top-middle (5x5): yellow (4)
+    3. Top-right (5x5): green (3)
+    4. Middle-left (5x5): blue (1)
+    5. Middle-middle (5x5): magenta (6)
+    6. Middle-right (5x5): orange (7)
+    7. Bottom-left (5x5): brown (9)
+    8. Bottom-middle (5x5): sky blue (8)
+    9. Bottom-right (5x5): gray (5)
+    The grid is perfectly divided into nine 5x5 squares, each filled with a different color, creating a colorful checkerboard-like pattern.
+  output: |
+    The output is not provided for this test case.

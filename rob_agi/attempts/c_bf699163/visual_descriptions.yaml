@@ -1,0 +1,26 @@
+example_0:
+  input: |
+    A 17x16 grid predominantly filled with gray (5). There are five distinct 3x3 patterns of different colors:
+    1. Top-left: A sky blue (8) pattern with gray center
+    2. Top-right: A red (2) pattern with gray center
+    3. Middle-left: A green (3) pattern with gray center
+    4. Middle-right: An orange (7) pattern, but incomplete (missing bottom-right corner)
+    5. Bottom-left: A magenta (6) pattern with gray center
+    Additionally, there's a blue (1) pattern in the bottom-right quadrant.
+    The orange pattern is notably different as it's incomplete and extends beyond the 3x3 area.
+  output: |
+    A 3x3 grid showing the blue (1) pattern with a gray (5) center.
+
+example_1:
+  input: |
+    An 18x17 grid predominantly filled with gray (5). There are seven distinct patterns:
+    1. Top-left: A blue (1) 3x3 pattern with gray center
+    2. Middle-left: A green (3) 3x3 pattern with gray center
+    3. Bottom-right: A sky blue (8) 3x3 pattern with gray center
+    4. Middle-right: A red (2) 3x3 pattern with gray center
+    5. Center: A yellow (4) 3x3 pattern with gray center
+    6. An orange (7) pattern that's more complex, forming an irregular shape across the left and bottom edges
+    7. A single column of orange (7) on the right side, not forming a complete pattern
+    The yellow pattern is notably in the center of the grid.
+  output: |
+    A 3x3 grid showing the yellow (4) pattern with a gray (5) center.

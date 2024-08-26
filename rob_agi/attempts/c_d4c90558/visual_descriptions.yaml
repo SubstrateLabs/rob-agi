@@ -1,0 +1,41 @@
+example_0:
+  input: |
+    The input grid is 25x25. The main features are:
+    1. A large sky blue (8) rectangular frame in the top-left quadrant, 12 squares wide and 10 squares tall.
+    2. Inside this frame, there's a smaller blue (1) rectangle in the right side, 6 squares wide and 5 squares tall.
+    3. An orange (7) rectangular frame in the bottom-right quadrant, 19 squares wide and 12 squares tall.
+    4. Both frames have scattered gray (5) dots inside them.
+    5. The rest of the grid is filled with black (0), which can be considered as empty space.
+  output: |
+    The output grid is 3x8. It consists of three rows:
+    1. Top row: Two blue (1) squares followed by six black (0) squares.
+    2. Middle row: Eight sky blue (8) squares.
+    3. Bottom row: Eight orange (7) squares.
+
+example_1:
+  input: |
+    The input grid is 20x20. The main features are:
+    1. A large magenta (6) rectangular frame in the top half, 12 squares wide and 9 squares tall.
+    2. A red (2) rectangular frame in the bottom-left quadrant, 10 squares wide and 8 squares tall.
+    3. Both frames have scattered gray (5) dots inside them.
+    4. The rest of the grid is filled with black (0), which can be considered as empty space.
+  output: |
+    The output grid is 2x4. It consists of two rows:
+    1. Top row: Four red (2) squares.
+    2. Bottom row: Four magenta (6) squares.
+
+example_2:
+  input: |
+    The input grid is 20x20. The main features are:
+    1. A green (3) rectangular frame in the top-left quadrant, 9 squares wide and 7 squares tall.
+    2. A sky blue (8) square frame next to it, 5 squares wide and 6 squares tall.
+    3. A red (2) rectangular frame in the bottom-left quadrant, 9 squares wide and 9 squares tall.
+    4. A yellow (4) rectangular frame in the bottom-right quadrant, 9 squares wide and 9 squares tall.
+    5. All frames have scattered gray (5) dots inside them.
+    6. The rest of the grid is filled with black (0), which can be considered as empty space.
+  output: |
+    The output grid is 4x6. It consists of four rows:
+    1. Top row: Five sky blue (8) squares followed by one black (0) square.
+    2. Second row: Six green (3) squares.
+    3. Third row: Five red (2) squares followed by one black (0) square.
+    4. Bottom row: Six yellow (4) squares.

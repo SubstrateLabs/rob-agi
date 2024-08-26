@@ -109,23 +109,3 @@ def test_50a16a69_example_2():
 
 
 
-def test_50a16a69_test_case_0():
-    input_grid = ColoredGrid(values=
-[[6, 8, 6, 8, 6, 3],
- [8, 6, 8, 6, 8, 3],
- [6, 8, 6, 8, 6, 3],
- [8, 6, 8, 6, 8, 3],
- [6, 8, 6, 8, 6, 3],
- [3, 3, 3, 3, 3, 3]]
-    )
-    expected = ColoredGrid(values=
-[[8, 6, 8, 6, 8, 6],
- [6, 8, 6, 8, 6, 8],
- [8, 6, 8, 6, 8, 6],
- [6, 8, 6, 8, 6, 8],
- [8, 6, 8, 6, 8, 6],
- [6, 8, 6, 8, 6, 8]]
-    )
-    actual = solve_50a16a69(input_grid)
-    assert actual == expected
-

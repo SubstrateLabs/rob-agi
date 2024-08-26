@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 27x27 grid with a complex pattern. The dominant colors are gray (5), blue (1), and green (3). There's a large black (0) cross-shaped area in the center, dividing the grid into four quadrants. Each quadrant has a repeating pattern of colored stripes. The top-left and bottom-right quadrants are identical, as are the top-right and bottom-left quadrants. The stripes in each quadrant alternate between vertical and horizontal orientation. There are also some smaller black areas within the colored regions.
+  output: |
+    The same 27x27 grid, but the black cross-shaped area in the center has been filled in with the colored pattern, completing the overall design. The pattern now covers the entire grid without interruption. The repeating stripe pattern is consistent across the whole grid, with vertical and horizontal orientations alternating in a regular manner. There are no black (empty) spaces remaining.
+
+example_1:
+  input: |
+    A 27x27 grid with a complex, colorful pattern. The dominant colors are orange (7), blue (1), green (3), and gray (5). The pattern consists of repeating vertical stripes of varying widths. There's a large black cross-shaped area in the center, similar to the previous example, but with some additional black spaces scattered throughout the grid, particularly in the bottom-right quadrant. The pattern in each quadrant is slightly different, creating an asymmetrical overall design.
+  output: |
+    The same 27x27 grid, but all black (empty) spaces have been filled in with the colored pattern, completing the design. The repeating vertical stripe pattern now covers the entire grid without interruption. The pattern is consistent across the whole grid, with no variation between quadrants. The result is a symmetrical, uniform design of vertical stripes in orange, blue, green, and gray.
+
+example_2:
+  input: |
+    A 27x27 grid with a distinct pattern of alternating colors. The dominant colors are orange (7), blue (1), green (3), and gray (5). The pattern consists of horizontal stripes of single-unit thickness, creating a repeating sequence. There are several black (empty) areas scattered throughout the grid, breaking up the pattern. These black areas are of various sizes and shapes, including some larger rectangular sections and smaller, irregular shapes.
+  output: |
+    The same 27x27 grid, but all black (empty) spaces have been filled in with the colored pattern, completing the design. The horizontal stripe pattern now covers the entire grid without interruption. The pattern is consistent across the whole grid, with a repeating sequence of orange, blue, green, gray, orange, blue, green, gray, and so on. Each stripe is one unit thick, and the pattern continues uniformly across all rows.
+
+test_case_0:
+  input: |
+    A 27x27 grid with a pattern similar to the previous examples. The dominant colors are orange (7), blue (1), green (3), and gray (5). The pattern consists of alternating horizontal stripes, each one unit thick. There are several black (empty) areas scattered throughout the grid, breaking up the pattern. These black areas are of various sizes and shapes, including some larger rectangular sections and smaller, irregular shapes. The pattern is more complete in some areas of the grid than others.
+  output: |
+    The output grid is not provided for the test case, as it is meant to be solved based on the pattern observed in the previous examples.

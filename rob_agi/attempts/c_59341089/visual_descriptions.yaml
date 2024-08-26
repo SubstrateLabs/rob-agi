@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 3x3 grid with a pattern of orange (7) and gray (5) squares. The corners are orange, while the center and middle edges are gray, forming a cross-like pattern.
+  output: |
+    A 3x12 grid that appears to be an expanded version of the input. The pattern is repeated four times horizontally, with each repetition separated by a single column that mirrors the leftmost column of the original pattern. The result is a symmetrical, elongated version of the input pattern.
+
+example_1:
+  input: |
+    A 3x3 grid with orange (7), gray (5), and sky blue (8) squares. The top row is orange-orange-sky, while the bottom two rows are identical with gray-sky-sky pattern.
+  output: |
+    A 3x12 grid that expands the input pattern. The top row alternates between the original orange-orange-sky pattern and its mirror image. The bottom two rows repeat the gray-sky-sky pattern four times, creating a consistent block of sky blue in the center with gray edges.
+
+example_2:
+  input: |
+    A 3x3 grid with sky blue (8), gray (5), and orange (7) squares. The top row is all sky blue, the middle row is gray-gray-orange, and the bottom row is gray-orange-sky.
+  output: |
+    A 3x12 grid that expands the input. The top row is entirely sky blue. The middle row alternates between the gray-gray-orange pattern and its mirror image. The bottom row follows a similar alternating pattern with gray-orange-sky and its mirror.
+
+example_3:
+  input: |
+    A 3x3 grid with sky blue (8), orange (7), and gray (5) squares. The top row is sky-sky-orange, the middle row is orange-gray-gray, and the bottom row is gray-orange-sky.
+  output: |
+    A 3x12 grid that expands the input. The top row alternates between the sky-sky-orange pattern and its mirror. The middle row alternates between the orange-gray-gray pattern and its mirror. The bottom row follows the same alternating pattern with gray-orange-sky and its mirror.

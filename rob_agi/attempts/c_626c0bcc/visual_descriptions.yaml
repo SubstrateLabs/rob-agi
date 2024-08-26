@@ -1,0 +1,36 @@
+example_0:
+  input: |
+    A sky blue (8) shape resembling an upside-down 'T' or a cross is present in the center of the grid. The shape is surrounded by black (0) space. The top of the 'T' spans the entire width of the central portion, while the stem extends downwards, creating a symmetrical pattern.
+  output: |
+    The upside-down 'T' shape is now divided into four distinct colored regions:
+    1. The top-left and bottom-right sections are colored blue (1).
+    2. The top-right section is colored yellow (4).
+    3. The bottom-left section is colored green (3).
+    4. The center of the 'T' is colored red (2).
+    The black (0) space surrounding the shape remains unchanged.
+
+example_1:
+  input: |
+    Two sky blue (8) shapes resembling backwards 'L's or hockey sticks are present. One is in the top-left corner, and the other is mirrored in the bottom-right corner. They are separated by a column of black (0) space in the middle. The shapes are surrounded by black (0) space on their outer edges.
+  output: |
+    The two 'L' shapes are now divided into colored sections:
+    1. The top-left 'L' is split into three colors:
+       - The top part is red (2)
+       - The vertical part is blue (1)
+       - The bottom-right corner is yellow (4)
+    2. The bottom-right 'L' is split into three colors:
+       - The right part is blue (1)
+       - The bottom part is green (3)
+       - The top-left corner is yellow (4)
+    The black (0) space separating and surrounding the shapes remains unchanged.
+
+example_2:
+  input: |
+    A sky blue (8) shape resembling a thick, irregular 'L' or a boot print is present in the top-left corner of the grid. The shape extends to the right edge of the grid at its top, and down to the fourth row on the left side. The rest of the grid is filled with black (0) space.
+  output: |
+    The 'L' or boot print shape is now divided into four distinct colored regions:
+    1. The top-left corner (2x2 square) is colored blue (1).
+    2. The top-right section is colored yellow (4).
+    3. The bottom-left section is colored green (3).
+    4. The bottom-right section of the shape is colored red (2).
+    The black (0) space surrounding the shape remains unchanged.

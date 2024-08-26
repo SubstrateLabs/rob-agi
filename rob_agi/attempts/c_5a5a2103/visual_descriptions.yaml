@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The grid is 14x14. There are three distinct sections separated by horizontal sky blue (8) lines at rows 5 and 10. Each section is 4 rows tall. The leftmost column and the 5th and 10th columns are also sky blue, creating vertical dividers. In the top section, there's a 2x2 red (2) square in the top-left corner of the first subsection, and a larger irregular gray (5) shape in the second subsection. The middle section has a 2x2 green (3) square in the top-left corner of the first subsection. The bottom section has a 2x2 blue (1) square in the top-left corner of the first subsection. The rest of the grid is filled with black (0).
+  output: |
+    The grid maintains its 14x14 size and the sky blue (8) dividing lines. However, the content within each section has changed. Each section now contains a repeating 4x4 pattern based on the color found in the top-left corner of the first subsection of the input. The top section has a red (2) pattern, the middle section has a green (3) pattern, and the bottom section has a blue (1) pattern. These patterns are repeated across each row in their respective sections, respecting the vertical dividers. The pattern for each color is: a 2x2 square in the top-left, a single square below it in the second row, a full row in the third row, and a single square in the top-left of the fourth row.
+
+example_1:
+  input: |
+    The grid is 19x19. There are four distinct sections separated by horizontal green (3) lines at rows 5, 10, and 15. Each section is 4 rows tall, except the last which is 3 rows. The entire leftmost column and columns 5, 10, and 15 are also green, creating vertical dividers. In the top section, there's a 2x2 yellow (4) square in the top-left corner of the first subsection. The second section has a 2x2 red (2) square in the top-left corner of the first subsection. The third section has a 2x2 sky blue (8) square in the top-left corner of the first subsection. The bottom section has a 2x2 blue (1) square in the top-left corner of the first subsection, and an irregular magenta (6) shape in the second subsection. The rest of the grid is filled with black (0).
+  output: |
+    The grid maintains its 19x19 size and the green (3) dividing lines. The content within each section has changed, following a similar pattern to the previous example. Each section now contains a repeating 4x4 pattern based on the color found in the top-left corner of the first subsection of the input. The top section has a yellow (4) pattern, the second section has a red (2) pattern, the third section has a sky blue (8) pattern, and the bottom section has a blue (1) pattern. These patterns are repeated across each row in their respective sections, respecting the vertical dividers. The pattern for each color is the same as in the previous example: a 2x2 square in the top-left, a single square below it in the second row, a full row in the third row, and a single square in the top-left of the fourth row. The magenta shape in the input's bottom section is not preserved in the output.
+
+test_case_0:
+  input: |
+    This test case is identical to example_1, so the description is the same as the input description for example_1.
+  output: |
+    As this is a test case, no output grid is provided. Based on the pattern observed in the examples, we would expect the output to be similar to the output description for example_1, with the 4x4 patterns for yellow, red, sky blue, and blue repeated in their respective sections.

@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 5x5 grid with a vertical gray line on the left edge, and a vertical green-blue alternating line on the right edge. The rest of the grid is filled with black (empty space).
+  output: |
+    A 5x5 grid with the vertical lines from the input moved to the center. The gray line is now in the middle column, and the green-blue alternating line is now in the column to its right. The rest of the grid is filled with black (empty space).
+
+example_1:
+  input: |
+    A 7x7 grid with three vertical lines: a gray line on the left edge, a brown line in the second-to-last column, and a sky blue line on the right edge. The rest of the grid is filled with black (empty space).
+  output: |
+    A 7x7 grid where the three vertical lines from the input have been moved to the center. The gray line is now in the middle column, the brown line is to its right, and the sky blue line is to the right of the brown line. The pattern of colors in each line remains the same. The rest of the grid is filled with black (empty space).
+
+example_2:
+  input: |
+    A 9x7 grid with four vertical lines: a gray line on the left edge (only in the top two rows), a brown line in the fifth column, a magenta line in the sixth column, and an orange line on the right edge. The rest of the grid is filled with black (empty space).
+  output: |
+    A 9x7 grid where the four vertical lines from the input have been moved to the center and rearranged. The lines are now in the order: brown, magenta, orange, gray (from left to right), all centered in the grid. The pattern of colors in each line remains the same, including the gray line only appearing in the top two rows. The rest of the grid is filled with black (empty space).
+
+example_3:
+  input: |
+    A 12x8 grid with three vertical lines: a gray line on the left edge (only in the top four rows), a red line in the second-to-last column, and a green line on the right edge. The rest of the grid is filled with black (empty space).
+  output: |
+    A 12x8 grid where the three vertical lines from the input have been moved to the center and slightly rearranged. The red and green lines are now adjacent in the center (red on the left, green on the right), and the gray line (still only in the top four rows) is to their left. The rest of the grid is filled with black (empty space).
+
+example_4:
+  input: |
+    A 14x6 grid with four vertical lines: a gray line on the left edge (only in the top row), a red line in the fourth column, a sky blue line in the fifth column, and a yellow line on the right edge. The rest of the grid is filled with black (empty space).
+  output: |
+    A 14x6 grid where the four vertical lines from the input have been moved to the center and rearranged. The lines are now in the order: red, sky blue, yellow, gray (from left to right), all centered in the grid. The pattern of colors in each line remains the same, including the gray line only appearing in the top row. The rest of the grid is filled with black (empty space).

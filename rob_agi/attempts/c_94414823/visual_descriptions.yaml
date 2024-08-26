@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 10x10 grid with a gray (5) frame forming a 6x6 square in the center. The frame is one cell thick. Inside the frame is empty space (black, 0). Outside the frame is mostly empty space, except for two colored squares: a yellow (4) square in the top-left corner of the grid, and a sky blue (8) square in the top-right corner of the grid.
+  output: |
+    The grid maintains its 10x10 size and gray frame. The two colored squares outside the frame remain unchanged. Inside the frame, the previously empty space is now filled with a 2x2 repeating pattern of yellow (4) and sky blue (8) squares. The pattern forms four 2x2 quadrants: top-left and bottom-right are yellow, while top-right and bottom-left are sky blue.
+
+example_1:
+  input: |
+    A 10x10 grid with a gray (5) frame forming a 6x6 square in the center, similar to example_0. Inside the frame is empty space (black, 0). Outside the frame is mostly empty space, except for two colored squares: a magenta (6) square in the top-right corner of the grid, and an orange (7) square in the bottom-right corner of the grid.
+  output: |
+    The grid maintains its 10x10 size and gray frame. The two colored squares outside the frame remain unchanged. Inside the frame, the previously empty space is now filled with a 2x2 repeating pattern of orange (7) and magenta (6) squares. The pattern forms four 2x2 quadrants: top-left and bottom-right are orange, while top-right and bottom-left are magenta.
+
+example_2:
+  input: |
+    A 10x10 grid with a gray (5) frame forming a 6x6 square in the center, similar to previous examples. Inside the frame is empty space (black, 0). Outside the frame is mostly empty space, except for two colored squares: a green (3) square in the top-left corner of the grid, and a red (2) square in the bottom-left corner of the grid.
+  output: |
+    The grid maintains its 10x10 size and gray frame. The two colored squares outside the frame remain unchanged. Inside the frame, the previously empty space is now filled with a 2x2 repeating pattern of green (3) and red (2) squares. The pattern forms four 2x2 quadrants: top-left and bottom-right are green, while top-right and bottom-left are red.

@@ -1,0 +1,47 @@
+example_0:
+  input: |
+    A 26x24 grid predominantly filled with sky blue (8) squares. There are scattered black (0) squares, which appear more frequently in certain rows, giving a somewhat striped appearance. Other colors are present in smaller quantities:
+    - Blue (1), red (2), and green (3) appear in various locations, often isolated.
+    - There's a small cluster of yellow (4) squares near the center-right.
+    - A few gray (3) squares are scattered throughout.
+    - One magenta (6) square is visible.
+    The overall impression is of a sky-like background with various colored elements distributed across it.
+  output: |
+    A single red (2) square. This is a dramatic reduction from the complex input grid to a single-color, single-cell output.
+
+example_1:
+  input: |
+    A 22x22 grid with a dominant pattern of red (2) squares. The red forms a lattice-like structure throughout the grid. Within this red structure, there are several features:
+    - Black (0) squares form paths or channels through the red, often in straight lines.
+    - Various other colors appear in smaller quantities:
+      - Blue (1), green (3), and yellow (4) form small clusters or appear individually.
+      - Orange (7) squares appear in a few locations, often near the edges.
+      - Sky blue (8) and magenta (6) squares are present but less frequent.
+    The overall impression is of a red network with black channels and colorful nodes or intersections.
+  output: |
+    A single green (3) square. Again, this is a significant simplification from the complex input to a single-color, single-cell output.
+
+example_2:
+  input: |
+    A 22x20 grid dominated by gray (5) squares. The gray forms a solid background with some features:
+    - Black (0) squares create paths or openings in the gray, often appearing in the top and bottom rows.
+    - Sky blue (8) squares form a distinctive pattern:
+      - There are three separate clusters of sky blue, each forming a cross or plus sign shape.
+      - These clusters are surrounded by gray.
+    - A small group of yellow (4) squares appears near the center, always adjacent to sky blue.
+    - A few green (3) squares are present, often near the yellow squares.
+    The overall impression is of a gray field with structured sky blue patterns and a few accent colors.
+  output: |
+    A single sky blue (8) square. This continues the pattern of reducing a complex input to a single-color, single-cell output.
+
+test_case_0:
+  input: |
+    A 22x22 grid dominated by gray (5) squares. The gray forms a solid background with several notable features:
+    - Black (0) squares create paths or openings in the gray, primarily in the top and bottom rows.
+    - Sky blue (8) squares form three distinct cross or plus sign shapes, similar to the previous example.
+    - Yellow (4) squares appear adjacent to the sky blue crosses in the center and bottom right.
+    - A few green (3) squares are present, often near the yellow squares.
+    - One red (2) square is visible.
+    The overall structure is very similar to example_2, with a gray background and organized sky blue patterns.
+  output: |
+    The output is not provided in the test case, but based on the pattern observed in the examples, it's likely to be a single-cell, single-color output.

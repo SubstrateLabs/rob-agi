@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 13x13 grid predominantly filled with blue (1) squares. There are scattered black (0) squares throughout, creating a sparse pattern. The black squares are more concentrated in the center and lower-right areas of the grid. The top-left and bottom-left corners are mostly blue with a few black squares.
+  output: |
+    The grid maintains its 13x13 size and overall blue (1) background. However, a meandering path of sky blue (8) squares has been introduced. This path starts from the center-right edge, moves towards the center, then branches out. It forms a loose, organic shape that connects some of the areas where black squares were previously present. Some black squares remain unchanged, particularly in the corners and edges.
+
+example_1:
+  input: |
+    Another 13x13 grid with a blue (1) background and scattered black (0) squares. The black squares are more evenly distributed compared to the previous example, with slightly higher concentrations in the top-right and bottom-left corners. There's a noticeable cluster of black squares in the top-left corner.
+  output: |
+    The 13x13 grid retains its blue (1) background. A sky blue (8) path has been introduced, starting from the top-left corner where the cluster of black squares was. It meanders down and to the right, forming branches and connecting areas where black squares were previously present. The path is more extensive than in the previous example, reaching multiple edges of the grid. Some black squares remain unchanged, particularly in areas not touched by the sky blue path.
+
+example_2:
+  input: |
+    A 13x13 grid with a blue (1) background and scattered black (0) squares. The black squares are less frequent than in the previous examples. There's a notable concentration of black squares in the center-left area of the grid, forming a rough vertical line. The corners have fewer black squares compared to the previous examples.
+  output: |
+    The 13x13 grid maintains its blue (1) background. A sky blue (8) path has been introduced, starting from the left edge where the concentration of black squares was. It forms a meandering pattern that moves towards the right and bottom of the grid, with several branches. The path connects areas where black squares were previously present, including some near the edges and corners. Some black squares remain unchanged, particularly in areas not touched by the sky blue path.
+
+test_case_0:
+  input: |
+    A 13x13 grid with a blue (1) background and scattered black (0) squares. The distribution of black squares is relatively even, with no strong concentrations in any particular area. There are slightly more black squares in the bottom-right quadrant compared to the others.
+  output: |
+    The output grid is not provided for the test case.

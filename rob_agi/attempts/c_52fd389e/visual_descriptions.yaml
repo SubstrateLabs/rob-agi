@@ -1,0 +1,41 @@
+example_0:
+  input: |
+    The input grid is 25x25. There are two distinct yellow (4) regions. The first is in the top-left quadrant, roughly 6x6 in size. It contains two red (2) squares within it. The second yellow region is in the bottom-right quadrant, roughly 8x6 in size. It contains three blue (1) squares within it. The rest of the grid is black (0).
+  output: |
+    The output grid maintains the two yellow regions from the input, but with significant changes:
+    1. The top-left yellow region is now surrounded by a 2-cell thick border of red (2).
+    2. The bottom-right yellow region is surrounded by a 3-cell thick border of blue (1).
+    3. All remaining black space has been filled with sky blue (8).
+
+example_1:
+  input: |
+    The input grid is 25x25. There are two yellow (4) regions:
+    1. A small 3x3 region in the top-left quadrant, containing one green (3) square.
+    2. A larger 7x6 region in the center-right area, containing three red (2) squares.
+    The rest of the grid is black (0).
+  output: |
+    The output grid shows transformations of the yellow regions:
+    1. The small yellow region in the top-left is now surrounded by a 1-cell thick border of green (3).
+    2. The larger yellow region in the center-right is surrounded by a 3-cell thick border of red (2).
+    3. All remaining black space has been filled with sky blue (8).
+
+example_2:
+  input: |
+    The input grid is 25x25. There are two yellow (4) regions:
+    1. A 4x4 region in the top-left quadrant, containing one blue (1) square.
+    2. A larger 8x8 region in the center-right area, containing four sky blue (8) squares scattered within it.
+    The rest of the grid is black (0).
+  output: |
+    The output grid shows significant changes:
+    1. The small yellow region in the top-left is now surrounded by a 1-cell thick border of blue (1).
+    2. The larger yellow region in the center-right has been completely replaced by sky blue (8), expanding slightly beyond its original boundaries.
+    3. All remaining black space has been filled with sky blue (8).
+
+test_case_0:
+  input: |
+    The input grid is 25x25. There are two yellow (4) regions:
+    1. A small 3x3 region in the top-left quadrant, containing one red (2) square.
+    2. A larger 10x8 region spanning the bottom-right quadrant, containing five sky blue (8) squares scattered within it.
+    The rest of the grid is black (0).
+  output: |
+    The output is not provided for the test case.

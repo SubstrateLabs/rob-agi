@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The input grid shows two distinct C-shaped objects made of red (2) squares. The first C is in the top-left quadrant, spanning rows 2-4 and columns 2-4. It has a gray (5) square in its center. The second C is in the bottom-right quadrant, spanning rows 10-12 and columns 11-13. It also has a gray (5) square, but this one is positioned on the right side of the C. The rest of the grid is filled with black (0) squares, representing empty space.
+  output: |
+    The output grid maintains the two C-shaped red objects in their original positions. However, the space between them is now filled with yellow (4) squares, creating a rectangular yellow area that connects the two C shapes. This yellow area extends from the bottom of the upper C to the top of the lower C, and from the left edge of the upper C to the right edge of the lower C. The gray squares inside the C shapes remain unchanged. The rest of the grid outside this connected structure remains black (0).
+
+example_1:
+  input: |
+    This grid also features two C-shaped objects made of red (2) squares, but in different positions. The first C is in the top-right quadrant, spanning rows 3-5 and columns 9-11. It has a gray (5) square in its center. The second C is in the bottom-left quadrant, spanning rows 10-12 and columns 1-3. This C has its gray (5) square on the left side. The rest of the grid is filled with black (0) squares.
+  output: |
+    The output grid keeps the two C-shaped red objects in their original positions. A yellow (4) area is added, connecting the two C shapes. This yellow area extends horizontally from the left edge of the bottom-left C to the right edge of the top-right C, and vertically from the bottom of the top-right C to the top of the bottom-left C. The yellow area also fills in the open part of the top-right C. The gray squares inside the C shapes remain unchanged. The rest of the grid outside this connected structure stays black (0).
+
+example_2:
+  input: |
+    This grid shows two C-shaped objects made of red (2) squares positioned at opposite corners. The first C is in the top-left corner, spanning rows 1-3 and columns 1-3. It has a gray (5) square in its center. The second C is in the bottom-right corner, spanning rows 13-15 and columns 9-11. This C has its gray (5) square on the right side. The rest of the grid is filled with black (0) squares.
+  output: |
+    The output grid maintains the two C-shaped red objects in their original positions. A large yellow (4) area is added, connecting the two C shapes. This yellow area covers most of the grid, extending from the right and bottom edges of the top-left C to the left and top edges of the bottom-right C. The yellow area also fills in the open part of the bottom-right C. The gray squares inside the C shapes remain unchanged. Only the corners and edges of the grid that are not part of the C shapes or the connecting yellow area remain black (0).
+
+test_case_0:
+  input: |
+    The input grid for the test case shows two C-shaped objects made of red (2) squares. The first C is in the top-left quadrant, spanning rows 2-4 and columns 2-4. It has a gray (5) square in its center. The second C is in the bottom-right quadrant, spanning rows 12-14 and columns 12-14. This C has its gray (5) square on the right side. The rest of the grid is filled with black (0) squares.
+  output: |
+    The output grid is not provided for the test case, as this is the puzzle to be solved based on the pattern observed in the previous examples.

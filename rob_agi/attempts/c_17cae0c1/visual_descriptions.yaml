@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    The input grid is 3x9. It contains a large gray (5) 'C' shape on the left side, occupying the first three columns and wrapping around the top, left, and bottom. The rest of the grid is filled with black (0), except for a single gray (5) square in the middle of the right side.
+  output: |
+    The output grid is also 3x9. It's divided into three equal vertical sections of 3x3 squares. The left section is entirely green (3), the middle section is entirely yellow (4), and the right section is entirely brown (9).
+
+example_1:
+  input: |
+    The input grid is 3x9. It contains a gray (5) 'C' shape on the right side, occupying the last three columns and wrapping around the top, right, and bottom. There's also a single gray (5) square in the middle of the left side. The rest of the grid is filled with black (0).
+  output: |
+    The output grid is 3x9, divided into three equal vertical sections of 3x3 squares. The left section is entirely brown (9), the middle section is entirely blue (1), and the right section is entirely yellow (4).
+
+example_2:
+  input: |
+    The input grid is 3x9. It contains two gray (5) 'C' shapes. One on the left side occupying the first three columns, and another on the right side occupying the last three columns. Both wrap around the top, sides, and bottom. The middle three columns are mostly black (0), except for a single gray (5) square in the center.
+  output: |
+    The output grid is 3x9, divided into three equal vertical sections of 3x3 squares. The left section is entirely magenta (6), the middle section is entirely green (3), and the right section is entirely blue (1).
+
+example_3:
+  input: |
+    The input grid is 3x9. It contains a gray (5) 'C' shape on the right side, occupying the last three columns and wrapping around the top, right, and bottom. There's also a single gray (5) square in the middle of the left side. The rest of the grid is filled with black (0).
+  output: |
+    The output grid is 3x9, divided into three equal vertical sections of 3x3 squares. The left section is entirely yellow (4), the middle section is entirely magenta (6), and the right section is entirely green (3).
+
+test_case_0:
+  input: |
+    The input grid is 3x9. It contains a gray (5) 'C' shape on the left side, occupying the first three columns and wrapping around the top, left, and bottom. The rest of the grid is filled with black (0), except for a single gray (5) square in the middle of the right side.
+  output: |
+    The output is not provided for this test case.

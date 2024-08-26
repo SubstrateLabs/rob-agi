@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 19x19 grid predominantly filled with yellow (4) squares. There's a large, roughly rectangular black (0) region in the center, spanning about 5x9 squares. This black region is surrounded by yellow squares, creating a frame-like effect. Gray (5) squares are scattered throughout, often appearing in small clusters or as single squares. There are a few isolated black squares outside the main black region.
+  output: |
+    The grid is largely identical to the input, with one crucial difference: the large black region in the center has been partially filled. A sky blue (8) rectangle, approximately 3x5 squares, has been placed in the center of the black region. This sky blue rectangle is surrounded by black squares on all sides, maintaining the overall shape of the original black region.
+
+example_1:
+  input: |
+    A 15x15 grid with a mix of red (2) and black (0) squares. The red squares form an intricate, interconnected pattern across the grid. There's a notable concentration of black squares in the center, forming a rough 5x5 area, though it's not a perfect square. Red squares create various shapes and lines throughout the grid, with some isolated black squares scattered around.
+  output: |
+    The grid is mostly identical to the input, with one significant change: in the center of the grid, where there was previously a concentration of black squares, a small sky blue (8) square (2x2) has been inserted. This sky blue square is positioned slightly off-center within the black region, towards the top-left. The surrounding pattern of red and black squares remains unchanged.
+
+example_2:
+  input: |
+    A 16x16 grid composed of green (3) and black (0) squares. The green squares form a complex, interconnected pattern across the grid. There's a notable concentration of black squares in the bottom-right quadrant, forming an irregular shape approximately 6x6 squares in size. The rest of the grid has a mix of green shapes and lines, with some isolated black squares.
+  output: |
+    The grid is largely the same as the input, with one major alteration: in the bottom-right quadrant, where there was previously a concentration of black squares, a sky blue (8) rectangle (4x4) has been inserted. This sky blue rectangle fills a significant portion of the previously black area, leaving only a border of black squares around it. The rest of the green and black pattern across the grid remains unchanged.
+
+test_case_0:
+  input: |
+    A 16x16 grid with a mix of green (3) and black (0) squares. The green squares form an intricate, interconnected pattern across the grid. There's a notable concentration of black squares in the bottom-right quadrant, forming an irregular shape approximately 6x6 squares in size. The rest of the grid has a mix of green shapes and lines, with some isolated black squares. This input is identical to the input of example_2.
+  output: |
+    The output is not provided for this test case.

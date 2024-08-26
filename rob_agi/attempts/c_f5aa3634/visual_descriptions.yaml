@@ -1,0 +1,62 @@
+example_0:
+  input: |
+    A 13x10 grid with a distinct pattern in the top-left corner. The pattern consists of a 4x3 subgrid:
+    - Top row: black, black, gray, sky, sky
+    - Middle row: black, green, gray, green, sky
+    - Bottom row: black, black, green, green, black
+    The rest of the grid is mostly black with a few scattered colored elements:
+    - An orange and red pattern in the middle-right
+    - A small green-gray-red pattern in the bottom-left
+    - Another instance of the top-left pattern in the bottom-right corner
+  output: |
+    A 4x3 grid that exactly matches the top-left pattern from the input:
+    - Top row: black, gray, sky, sky
+    - Middle row: green, gray, green, sky
+    - Bottom row: black, green, green, black
+
+example_1:
+  input: |
+    A 13x15 grid with several distinct patterns:
+    1. Top-left corner (3x4):
+       - Row 1: black, black, blue, blue
+       - Row 2: black, red, red, sky
+       - Row 3: black, green, red, sky
+    2. Middle-left (3x3):
+       - Row 1: black, black, sky
+       - Row 2: black, sky, sky
+       - Row 3: black, gray, gray
+    3. Bottom-right corner (4x5):
+       - Row 1: black, black, sky, black, black
+       - Row 2: black, black, sky, sky, black
+       - Row 3: black, sky, sky, sky, black
+       - Row 4: black, gray, gray, gray, black
+    The rest of the grid is mostly black with a few scattered blue, red, and yellow elements.
+  output: |
+    A 3x3 grid that matches the middle-left pattern from the input:
+    - Row 1: black, sky, black
+    - Row 2: sky, sky, sky
+    - Row 3: gray, gray, gray
+
+example_2:
+  input: |
+    A 15x15 grid with several distinct patterns:
+    1. Top-left corner (3x4):
+       - Row 1: black, black, red, sky
+       - Row 2: black, black, sky, red
+       - Row 3: black, sky, sky, black
+    2. Top-right corner (4x3):
+       - Row 1: black, gray, brown
+       - Row 2: orange, orange, gray, brown
+       - Row 3: black, gray, orange
+    3. Middle (3x3):
+       - Magenta pattern forming an inverted L-shape
+    4. Bottom-left corner (3x3):
+       - Yellow-green cross pattern
+    5. Bottom-right corner (4x3):
+       - Exact copy of the top-right corner pattern
+    The rest of the grid is mostly black.
+  output: |
+    A 4x3 grid that matches the top-right corner pattern from the input:
+    - Row 1: black, black, gray, brown
+    - Row 2: orange, orange, gray, brown
+    - Row 3: black, gray, orange, black

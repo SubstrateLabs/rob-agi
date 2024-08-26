@@ -1,0 +1,105 @@
+example_0:
+  input: |
+    A 10x10 grid mostly filled with black (0). There are two colored squares:
+    - A blue square (1) at row 4, column 3
+    - A red square (2) at row 7, column 5
+    These colored squares appear isolated in the black space.
+  output: |
+    A 10x10 grid mostly filled with black (0). The colored squares from the input have expanded:
+    - The blue square (1) has moved up and right, now at row 3, column 5
+    - The red square (2) has expanded left, now at row 7, columns 1 and 5
+    Gray squares (5) have been added:
+    - A vertical line of 2 gray squares connects the blue square downwards
+    - A horizontal line of 3 gray squares connects the two red squares
+    This creates a loose L-shape pattern in the grid.
+
+example_1:
+  input: |
+    A 10x10 grid mostly filled with black (0). There are two colored squares:
+    - A green square (3) at row 2, column 3
+    - A blue square (1) at row 5, column 6
+    These colored squares appear isolated in the black space.
+  output: |
+    A 10x10 grid mostly filled with black (0). The colored squares from the input have expanded:
+    - The green square (3) remains at row 2, column 3, but now has a vertical line of 2 gray squares (5) below it
+    - The blue square (1) has expanded diagonally up and right, now at row 4, column 8
+    Gray squares (5) have been added:
+    - A vertical line connects the green square to its copy at row 5, column 3
+    - A horizontal line connects the blue square to its original position
+    This creates a loose Z-shape pattern in the grid.
+
+example_2:
+  input: |
+    A 10x10 grid mostly filled with black (0). There are two colored squares:
+    - A green square (3) at row 2, column 4
+    - A red square (2) at row 4, column 6
+    These colored squares appear isolated in the black space.
+  output: |
+    A 10x10 grid mostly filled with black (0). The colored squares from the input have expanded:
+    - The green square (3) remains at row 2, column 4, but now has a vertical line of 3 gray squares (5) below it
+    - The red square (2) has expanded horizontally, now at row 4, columns 2 and 6
+    Gray (5) and yellow (4) squares have been added:
+    - A horizontal line of gray squares connects the two red squares
+    - A yellow square is at row 4, column 4, forming a bridge between the vertical green line and the horizontal red line
+    - A diagonal line of yellow squares extends from the center, going down and left
+    This creates a complex pattern with vertical, horizontal, and diagonal elements.
+
+example_3:
+  input: |
+    An 11x11 grid mostly filled with black (0). There are three colored squares:
+    - A red square (2) at row 4, column 5
+    - A magenta square (6) at row 6, column 3
+    - A blue square (1) at row 9, column 7
+    These colored squares appear isolated in the black space.
+  output: |
+    An 11x11 grid mostly filled with black (0). The colored squares from the input have expanded:
+    - The magenta square (6) has moved up to row 0, column 3, and is replicated at its original position
+    - The red square (2) has expanded horizontally, now at row 4, columns 1 and 5
+    - The blue square (1) has expanded diagonally up and right, now at row 8, column 9
+    Gray (5) and yellow (4) squares have been added:
+    - A vertical line of gray squares connects the two magenta squares
+    - A horizontal line of gray squares connects the two red squares
+    - A yellow square is at row 4, column 3, forming a bridge between the vertical magenta line and the horizontal red line
+    - A diagonal line of yellow squares extends from this bridge, going down and left
+    This creates a complex pattern with vertical, horizontal, and diagonal elements.
+
+example_4:
+  input: |
+    An 11x11 grid mostly filled with black (0). There are three colored squares:
+    - A blue square (1) at row 2, column 3
+    - A red square (2) at row 4, column 5
+    - A green square (3) at row 5, column 7
+    These colored squares appear isolated in the black space.
+  output: |
+    An 11x11 grid mostly filled with black (0). The colored squares from the input have expanded:
+    - The blue square (1) has moved right, now at row 1, column 5, and is connected to its original position by gray squares
+    - The red square (2) has expanded horizontally, now at row 4, columns 1 and 5
+    - The green square (3) remains at row 5, column 7, but now has a vertical line of 3 gray squares (5) below it
+    Gray squares (5) have been added:
+    - Horizontal lines connect the expanded colored squares
+    - A vertical line connects the blue square to its original position
+    - A vertical line extends below the green square
+    This creates a pattern with distinct horizontal and vertical elements.
+
+example_5:
+  input: |
+    A 9x9 grid mostly filled with black (0). There is one colored square:
+    - A magenta square (6) at row 7, column 3
+    This colored square appears isolated in the black space.
+  output: |
+    A 9x9 grid mostly filled with black (0). The magenta square has expanded:
+    - One magenta square (6) remains at row 7, column 3
+    - Another magenta square (6) has been added at row 1, column 3
+    Gray squares (5) have been added:
+    - A vertical line of 5 gray squares connects the two magenta squares
+    This creates a simple vertical line pattern with magenta endpoints.
+
+test_case_0:
+  input: |
+    An 11x11 grid mostly filled with black (0). There are three colored squares:
+    - A blue square (1) at row 2, column 3
+    - A red square (2) at row 4, column 5
+    - A green square (3) at row 5, column 7
+    These colored squares appear isolated in the black space.
+  output: |
+    The output grid is not provided for this test case.

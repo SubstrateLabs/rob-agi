@@ -1,0 +1,73 @@
+example_0:
+  input: |
+    An 18x17 grid with scattered colored squares. Notable features:
+    - A 3x3 square of sky blue (8) in the center-left, rows 5-7, columns 6-8
+    - A 3x3 square of orange (7) in the bottom-right, rows 11-13, columns 13-15
+    - Single orange (7) squares in the top-left and bottom-right corners
+    - Several brown (9) squares scattered around
+    - A few red (2) squares in the bottom half
+    - Single blue (1) and yellow (4) squares in the middle rows
+    - A gray (5) square in the left column
+    - Mostly empty (black) space
+  output: |
+    The 18x17 grid is transformed with new features:
+    - Two vertical lines: sky blue (8) in column 7, orange (7) in column 13
+    - Two horizontal lines: sky blue (8) in row 5, orange (7) in row 11
+    - The original 3x3 squares of sky blue and orange are preserved
+    - All other original colored squares are preserved
+    - The vertical and horizontal lines only overwrite black (empty) spaces or lower-numbered colors
+
+example_1:
+  input: |
+    A 14x13 grid with scattered colored squares. Notable features:
+    - A 3x3 square of yellow (4) in the center, rows 5-7, columns 5-7
+    - Several brown (9) squares scattered around the edges
+    - A few magenta (6) squares in the middle rows
+    - Single squares of various colors (blue, red, green, orange, sky blue) scattered throughout
+    - Mostly empty (black) space
+  output: |
+    The 14x13 grid is transformed with new features:
+    - A vertical yellow (4) line in column 6
+    - A horizontal yellow (4) line in row 6
+    - The original 3x3 yellow square is preserved
+    - All other original colored squares are preserved
+    - The vertical and horizontal lines only overwrite black (empty) spaces or lower-numbered colors
+
+example_2:
+  input: |
+    An 18x18 grid with scattered colored squares. Notable features:
+    - A 3x3 square of green (3) in the center-left, rows 8-10, columns 3-5
+    - A 3x3 square of red (2) in the top-right, rows 4-6, columns 11-13
+    - Several sky blue (8) squares scattered around
+    - A few orange (7) and magenta (6) squares
+    - Single squares of various colors scattered throughout
+    - Mostly empty (black) space
+  output: |
+    The 18x18 grid is transformed with new features:
+    - A vertical green (3) line in column 4
+    - A vertical red (2) line in column 11
+    - A horizontal green (3) line in row 8
+    - The original 3x3 squares of green and red are preserved
+    - All other original colored squares are preserved
+    - The vertical and horizontal lines only overwrite black (empty) spaces or lower-numbered colors
+
+example_3:
+  input: |
+    An 18x18 grid with scattered colored squares. Notable features:
+    - A 3x3 square of sky blue (8) in the top-right, rows 2-4, columns 11-13
+    - A 3x3 square of magenta (6) in the center, rows 9-11, columns 3-5
+    - A 3x3 square of green (3) in the bottom-right, rows 15-17, columns 15-17
+    - Several yellow (4) squares scattered around
+    - A few orange (7) and blue (1) squares
+    - Single squares of various colors scattered throughout
+    - Mostly empty (black) space
+  output: |
+    The 18x18 grid is transformed with new features:
+    - A vertical magenta (6) line in column 4
+    - A vertical sky blue (8) line in column 12
+    - A horizontal sky blue (8) line in row 3
+    - A horizontal magenta (6) line in row 10
+    - A horizontal green (3) line in row 15
+    - The original 3x3 squares of sky blue, magenta, and green are preserved
+    - All other original colored squares are preserved
+    - The vertical and horizontal lines only overwrite black (empty) spaces or lower-numbered colors

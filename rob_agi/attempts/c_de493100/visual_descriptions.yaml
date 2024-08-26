@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 30x30 grid with a complex pattern. The dominant colors are sky blue (8) and brown (9), forming large irregular shapes. There's a distinctive magenta (6) shape that resembles a sideways 'U' or horseshoe in the top-left quadrant. Red (2) and blue (1) dots are scattered throughout, often appearing in pairs. Yellow (4) forms small clusters, particularly near the edges. Green (3) appears in small amounts, often adjacent to magenta areas. Gray (5) is minimal, appearing in a few spots.
+  output: |
+    A much smaller 6x8 grid. The pattern is simpler but retains some elements from the input. The dominant colors are still sky blue (8) and brown (9), forming larger blocks. Yellow (4) is more prominent, forming a distinct shape on the left side. There's a single red (2) dot in the top-left corner. The magenta (6) is reduced to two small areas. Green (3) appears in two spots on the right edge.
+
+example_1:
+  input: |
+    A 30x30 grid with a complex, somewhat symmetrical pattern. The dominant colors are sky blue (8) and brown (9), forming large, intricate shapes that seem to mirror each other vertically. There's a distinctive red (2) pattern in the center that looks like two back-to-back 'C' shapes. Gray (5) forms small clusters throughout. Green (3) appears in small amounts, often at the edges of blue areas. Yellow (4) forms small clusters, particularly near the center. Magenta (6) appears in larger blocks, especially near the top and bottom edges.
+  output: |
+    A much smaller 5x7 grid. The pattern is significantly simplified but retains some elements from the input. The dominant colors are still sky blue (8) and brown (9), forming larger blocks. Gray (5) is more prominent, forming a distinct vertical line in the center. There's a single red (2) dot in the top-left corner. Green (3) appears in two spots on the left edge. Magenta (6) is reduced to a small area in the bottom-right corner.
+
+example_2:
+  input: |
+    A 30x30 grid with a complex pattern dominated by sky blue (8) and brown (9). There's a distinctive orange (7) shape that looks like a large 'L' in the bottom-right quadrant. The top-left quadrant has a complex pattern of red (2), blue (1), and magenta (6). Yellow (4) forms small clusters throughout. Green (3) appears in small amounts, often adjacent to magenta areas. Gray (5) forms small clusters, particularly near the center.
+  output: |
+    A much smaller 10x10 grid. The pattern is simplified but retains some elements from the input. The dominant colors are still sky blue (8) and brown (9), forming larger blocks. Magenta (6) is more prominent, forming distinct shapes on the left and right sides. There's a pattern of alternating colors (2, 6, 9, 8) in the center rows. Yellow (4) appears in small amounts near the edges. Green (3) is minimal, appearing in only two spots.
+
+example_3:
+  input: |
+    A 30x30 grid with a complex pattern dominated by sky blue (8) and brown (9). There's a distinctive orange (7) shape that looks like a small square in the center-right area. The pattern seems to have some symmetry, with similar shapes mirrored vertically. Red (2) and blue (1) form small clusters throughout. Yellow (4) and gray (5) appear in small amounts, often near the edges of blue and brown areas. Green (3) is minimal, appearing in only a few spots.
+  output: |
+    A much smaller 4x4 grid. The pattern is greatly simplified. The dominant colors are blue (1), red (2), and green (3), each occupying one quadrant of the grid. Brown (9) fills the remaining quadrant. This output seems to be a significant abstraction of the input, focusing on the four most prominent colors in a simplified arrangement.
+
+test_case_0:
+  input: |
+    A 30x30 grid with a complex pattern dominated by sky blue (8) and brown (9). There's a distinctive orange (7) shape that looks like a large rectangle in the bottom-right quadrant. The top-left quadrant has a complex pattern of red (2), blue (1), and magenta (6). Yellow (4) forms small clusters throughout. Green (3) appears in small amounts, often adjacent to magenta areas. Gray (5) forms small clusters, particularly near the center.
+  output: |
+    The output grid is not provided for this test case.

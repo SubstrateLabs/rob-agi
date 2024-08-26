@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 13x13 grid with mostly black (0) squares. In the center, there's a small 3x3 pattern. The pattern consists of sky blue (8) squares forming a cross shape, with red (2) squares at the corners and a green (3) square in the very center.
+  output: |
+    A 13x13 grid with mostly black (0) squares. The central pattern has expanded and transformed. Now there's a larger sky blue (8) pattern resembling a diamond or X shape. The pattern is 5x5, with sky blue squares forming the edges of the diamond and black squares filling the interior and exterior.
+
+example_1:
+  input: |
+    A 13x13 grid with mostly black (0) squares. In the center, there's a larger pattern. It resembles a flower or star shape made of sky blue (8) squares. The shape has four petals or points, with a green (3) square in the center. There are two red (2) squares on opposite sides of the pattern, slightly separated from the main shape.
+  output: |
+    A 13x13 grid with mostly black (0) squares. The central pattern has expanded and transformed. Now there's a larger sky blue (8) pattern resembling a more complex flower or star shape. The pattern is symmetrical, with eight points or petals. The center is now black (0), and the overall shape is more spread out, covering a larger area of the grid.
+
+example_2:
+  input: |
+    A 13x13 grid with mostly black (0) squares. In the lower half of the grid, there's a pattern resembling a stylized face or mask. It's made primarily of sky blue (8) squares forming a rectangular shape with two "eyes". There's a red (2) square above the shape, a green (3) square in the center of the lower part, and another sky blue square above the main shape, possibly representing a hat or hair.
+  output: |
+    A 13x13 grid with mostly black (0) squares. The pattern has moved upwards and transformed. Now there's a symmetrical shape resembling a more abstract face or mask. It's still made primarily of sky blue (8) squares, but the shape is more compact and regular. It forms a rectangle with two "eyes" represented by black (0) squares in the center. The shape is topped by a single sky blue square, like a small hat or hair tuft.
+
+test_case_0:
+  input: |
+    A 13x13 grid with mostly black (0) squares. There's no visible pattern or shape in this input grid. It appears to be completely filled with black (0) squares.
+  output: |
+    The output for this test case is not provided in the test file.

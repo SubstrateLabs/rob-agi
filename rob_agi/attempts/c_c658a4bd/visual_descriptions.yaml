@@ -1,0 +1,41 @@
+example_0:
+  input: |
+    A 13x13 grid with several distinct colored regions:
+    - A black (0) border surrounding the entire grid
+    - A sky blue (8) L-shaped region in the top-left corner
+    - A green (3) rectangular region in the top-right corner
+    - A red (2) T-shaped region extending from the middle to the bottom
+    - A small yellow (4) square in the bottom-left corner
+    The rest of the grid is filled with black (0)
+  output: |
+    An 8x8 grid with concentric square frames of different colors:
+    - Outermost frame is red (2)
+    - Next inner frame is sky blue (8)
+    - Then a green (3) frame
+    - Innermost 2x2 square is yellow (4)
+    The pattern forms a series of nested squares, each color forming a complete frame around the inner colors
+
+example_1:
+  input: |
+    A 16x16 grid with several distinct colored regions:
+    - A black (0) background covering most of the grid
+    - A yellow (4) square in the top-left quadrant
+    - A blue (1) small square in the top-right area
+    - A single red (2) pixel in the top-left area
+    - A sky blue (8) rectangular region in the middle-left side
+    - A green (3) U-shaped region in the bottom-right quadrant
+    These colored regions are surrounded by or embedded in black space
+  output: |
+    A 9x9 grid with concentric square frames of different colors:
+    - Outermost frame is green (3)
+    - Next inner frame is sky blue (8)
+    - Then a yellow (4) frame
+    - Then a blue (1) frame
+    - Center pixel is red (2)
+    Similar to the previous example, this forms nested squares with each color forming a complete frame around the inner colors
+
+test_case_0:
+  input: |
+    There is no test case provided in the given test file. The file only contains two examples (example_0 and example_1) with both input and expected output.
+  output: |
+    There is no test case provided in the given test file. The file only contains two examples (example_0 and example_1) with both input and expected output.

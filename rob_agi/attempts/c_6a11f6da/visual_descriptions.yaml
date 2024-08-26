@@ -1,0 +1,64 @@
+example_0:
+  input: |
+    The input grid is 15x5 in size. It consists of three distinct sections, each 5x5:
+    1. Top section (blue, black): A blue 'L' shape on the left side, with some additional blue squares forming a partial frame on the right and bottom.
+    2. Middle section (sky blue, black): An inverted 'V' shape made of sky blue, with additional sky blue squares at the bottom corners.
+    3. Bottom section (magenta, black): A complex pattern of magenta squares, forming partial frames and diagonal lines.
+  output: |
+    The output grid is 5x5. It combines elements from all three sections of the input:
+    - Blue squares form a partial frame on the left and bottom edges.
+    - Sky blue squares occupy two corners (top-right and bottom-left) and one center square.
+    - Magenta squares fill most of the remaining space, forming a rough 'X' shape.
+    - Two black squares remain, one at the top-center and one at the center-left.
+
+example_1:
+  input: |
+    The input grid is 15x5 in size, divided into three 5x5 sections:
+    1. Top section (blue, black): Scattered blue squares, forming a rough diagonal from top-left to bottom-right.
+    2. Middle section (sky blue, black): A 'U' shape made of sky blue squares in the center, with one additional sky blue square in the top-right corner.
+    3. Bottom section (magenta, black): Magenta squares forming an incomplete frame with an additional square in the center.
+  output: |
+    The output grid is 5x5. It combines elements from all three input sections:
+    - Blue squares occupy three corners and one center-right position.
+    - Sky blue squares are in the top-center and center-right positions.
+    - Magenta squares form a partial frame on the left side and top-right corner.
+    - Two black squares remain in the center and center-top positions.
+
+example_2:
+  input: |
+    The input grid is 15x5, divided into three 5x5 sections:
+    1. Top section (blue, black): Blue squares forming a dense pattern, mostly concentrated on the left side and top.
+    2. Middle section (sky blue, black): Sky blue squares forming a dense pattern, mostly filling the grid except for a few black squares.
+    3. Bottom section (magenta, black): Magenta squares forming a complex pattern with a concentration on the bottom and right side.
+  output: |
+    The output grid is 5x5. It combines elements from all three input sections:
+    - Blue squares occupy three corners and one center-left position.
+    - Sky blue squares are in two positions: center-right and bottom-center.
+    - Magenta squares form a horizontal line across the center and fill two additional positions.
+    - One black square remains in the top-center position.
+
+example_3:
+  input: |
+    The input grid is 15x5, divided into three 5x5 sections:
+    1. Top section (blue, black): Blue squares forming a dense pattern, mostly on the right side with a single blue square on the left.
+    2. Middle section (sky blue, black): Sky blue squares scattered sparsely, forming no clear pattern.
+    3. Bottom section (magenta, black): Magenta squares forming a partial frame on the top and right side, with additional squares in the center.
+  output: |
+    The output grid is 5x5. It combines elements from all three input sections:
+    - Blue squares form a partial 'L' shape on the right side.
+    - Sky blue squares occupy two corners (top-right and bottom-left).
+    - Magenta squares form a partial frame on the left side and top.
+    - Three black squares remain, forming an 'L' shape in the top-left corner.
+
+example_4:
+  input: |
+    The input grid is 15x5, divided into three 5x5 sections:
+    1. Top section (blue, black): Blue squares forming a dense pattern on the left side and top-right corner.
+    2. Middle section (sky blue, black): Sky blue squares forming two clusters, one in the top-left corner and one in the bottom-right corner.
+    3. Bottom section (magenta, black): Magenta squares forming a dense pattern, mostly concentrated on the bottom half of the grid.
+  output: |
+    The output grid is 5x5. It combines elements from all three input sections:
+    - Blue squares form an 'L' shape in the center of the grid.
+    - Sky blue squares occupy the top-right corner and one position on the left side.
+    - Magenta squares fill most of the remaining space, forming a frame around the edges.
+    - Two black squares remain, one in the top-center and one in the center-left positions.

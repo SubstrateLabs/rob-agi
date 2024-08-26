@@ -1,56 +1,29 @@
 example_0:
   input: |
-    A 10x10 grid with mostly black (0) background. There are several gray (5) cells forming distinct shapes:
-    - A single gray cell in the top-left quadrant
-    - Two single gray cells in the top-right quadrant
-    - A large 'T' shape in the center, made of gray cells
-    - Two small clusters of gray cells in the bottom-left quadrant
+    The grid contains a shape resembling an abstract letter 'F' made of gray (5) cells. The 'F' shape is not solid, but rather outlined. The vertical line of the 'F' is on the right side, with two horizontal lines extending to the left - one at the top and one in the middle. There's an additional gray cell at the top left corner of the grid, disconnected from the main shape. The rest of the grid is filled with black (0) cells, representing empty space.
   output: |
-    The grid maintains its 10x10 size and black background. The changes are:
-    - The large 'T' shape in the center has been transformed from gray (5) to blue (1)
-    - One of the small clusters in the bottom-left quadrant has changed from gray to blue
-    - All other gray cells remain unchanged
+    The output grid maintains the overall structure of the 'F' shape, but with some modifications. The outline of the 'F' is now partially blue (1) and partially gray (5). The horizontal lines of the 'F' have been completely changed to blue, while the vertical line remains gray. The disconnected gray cell at the top left corner remains unchanged. The rest of the grid is still filled with black (0) cells.
 
 example_1:
   input: |
-    A 10x10 grid with mostly black (0) background. Gray (5) cells form several distinct shapes:
-    - A 2x2 square in the top-center
-    - An irregular shape resembling a thick 'L' or boot in the center-left
-    - A single cell on each far edge of the grid (left and right) in the middle row
-    - Three separate clusters in the bottom half, including a 2x2 square
+    The grid contains multiple gray (5) shapes and patterns. There's a 2x2 square of gray cells in the top center. Below it, there's a wider gray shape resembling an upside-down 'T'. On the bottom left, there's a pattern that looks like stairs or a zigzag made of gray cells. Two isolated gray cells appear on the left and right edges of the grid, midway down. The rest of the grid is filled with black (0) cells.
   output: |
-    The 10x10 grid maintains its black background. Changes to gray cells:
-    - The 2x2 square in the top-center is now blue (1)
-    - The thick 'L' shape is mostly blue, with one gray cell remaining
-    - The single cells on the far edges are now blue
-    - In the bottom half, the 2x2 square remains gray, one cluster is now blue, and one is partially blue
+    The output grid maintains the overall structure of the shapes, but with some cells changed from gray (5) to blue (1). The 2x2 square at the top is now entirely blue. The upside-down 'T' shape is mostly blue, except for the cell at the bottom of its stem. The stair/zigzag pattern on the bottom left is now partially blue and partially gray. The isolated cells on the left and right edges remain gray. Some additional gray cells in the bottom left corner remain unchanged. The rest of the grid is still filled with black (0) cells.
 
 example_2:
   input: |
-    A 10x10 grid with black (0) background. Gray (5) cells form various patterns:
-    - Several single cells scattered around the edges
-    - A horizontal line of four cells in the top-left quadrant
-    - Two 2x2 squares in the bottom-right quadrant
-    - An 'L' shape in the bottom-left corner
-    - A few small clusters elsewhere
+    The grid contains various gray (5) patterns and isolated cells. There's a horizontal line of four gray cells in the center. Above it, there are two 2x2 squares of gray cells. Below the line, there are two vertical pairs of gray cells. Several isolated gray cells are scattered around the grid, including some along the edges. The rest of the grid is filled with black (0) cells.
   output: |
-    The 10x10 grid keeps its black background. Changes to gray cells:
-    - Most single cells on the edges have turned blue (1)
-    - The horizontal line of four cells is now blue
-    - One 2x2 square in the bottom-right is blue, the other partially blue
-    - The 'L' shape in the bottom-left is now blue
-    - Some small clusters have turned blue, others remain gray
+    The output grid maintains the overall structure of the patterns, but with many gray (5) cells changed to blue (1). The horizontal line in the center is now entirely blue. The two 2x2 squares above it are also blue. The vertical pairs below the line are partially blue and partially gray. Most of the isolated gray cells have been changed to blue, except for a few that remain gray, particularly those that form part of larger structures or are at the edges of the grid. The rest of the grid remains filled with black (0) cells.
 
 example_3:
   input: |
-    A 10x10 grid with black (0) background. Gray (5) cells form a scattered pattern:
-    - Several single cells along the edges and corners
-    - Two 2x2 squares in the top-center
-    - A few small clusters and single cells throughout the grid
-    - No large connected shapes
+    The grid contains a scattered pattern of gray (5) cells. There are several pairs of adjacent gray cells, including horizontal, vertical, and diagonal pairs. There are also some isolated gray cells. The pattern is roughly symmetrical along the diagonal from top-left to bottom-right. The rest of the grid is filled with black (0) cells.
   output: |
-    The 10x10 grid maintains its black background. Changes to gray cells:
-    - Most single cells along the edges and corners have turned blue (1)
-    - Both 2x2 squares in the top-center are now blue
-    - Some small clusters have turned blue, while others remain gray
-    - Overall, more isolated gray cells have become blue, while some in clusters remain gray
+    The output grid maintains the overall structure of the pattern, but many gray (5) cells have been changed to blue (1). Most of the isolated gray cells and cells that were part of pairs have been changed to blue. However, some gray cells remain, particularly those that form part of larger structures or are at key points in the pattern. The symmetry along the diagonal is largely maintained in the transformation. The rest of the grid remains filled with black (0) cells.
+
+test_case_0:
+  input: |
+    The grid contains a complex pattern of gray (5) cells. There's a large 'X' shape made of gray cells in the center of the grid. Around this 'X', there are several isolated gray cells and small clusters of gray cells. There's a notable 2x2 square of gray cells in the top-left quadrant. The pattern is not perfectly symmetrical, but it has a balanced feel to it. The rest of the grid is filled with black (0) cells.
+  output: |
+    As this is a test case, no output grid is provided. The transformation pattern observed in the examples would likely be applied to this input grid, changing some gray cells to blue while maintaining the overall structure of the pattern.

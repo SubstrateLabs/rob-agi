@@ -1,0 +1,50 @@
+example_0:
+  input: |
+    A 13x12 grid with several distinct shapes and a horizontal line:
+    - A blue (1) L-shape in the top-left corner
+    - A red (2) vertical line running through the center
+    - A green (3) reversed L-shape in the top-right corner
+    - A yellow (4) diamond shape in the bottom-left quadrant
+    - A gray (5) diagonal line in the bottom-right quadrant
+    - A red (2) horizontal line across the entire 4th row
+  output: |
+    A 6x6 grid containing the same shapes as the input, but without the horizontal and vertical lines:
+    - The blue L-shape is in the top-left corner
+    - The green reversed L-shape is in the top-right corner
+    - The yellow diamond is in the bottom-left quadrant
+    - The gray diagonal line is in the bottom-right quadrant
+    All shapes maintain their relative positions and sizes
+
+example_1:
+  input: |
+    A 15x13 grid with several shapes and a vertical line:
+    - A blue (1) vertical line running through the center
+    - A red (2) shape resembling a sideways 'T' in the top-left quadrant
+    - A green (3) small cluster in the top-right quadrant
+    - A gray (5) shape resembling an upside-down 'T' in the bottom-left quadrant
+    - Two sky blue (8) dots forming a diagonal in the bottom-right quadrant
+    - A blue (1) horizontal line across the entire 10th row
+  output: |
+    A 6x6 grid containing the same shapes as the input, but without the vertical and horizontal lines:
+    - The red sideways 'T' shape is in the top-left quadrant
+    - The green cluster is in the top-right quadrant
+    - The gray upside-down 'T' shape is in the bottom-left quadrant
+    - The two sky blue dots forming a diagonal are in the bottom-right quadrant
+    All shapes maintain their relative positions and sizes
+
+example_2:
+  input: |
+    A 16x12 grid with several shapes and a vertical line:
+    - A green (3) vertical line running through the center
+    - A red (2) shape resembling a 'C' in the top-left quadrant
+    - A blue (1) small L-shape in the top-right quadrant
+    - A yellow (4) shape resembling a sideways 'T' in the bottom-left quadrant
+    - A gray (5) shape resembling a rotated 'L' in the bottom-right quadrant
+    - A green (3) horizontal line across the entire 5th row
+  output: |
+    A 6x6 grid containing the same shapes as the input, but without the vertical and horizontal lines:
+    - The red 'C' shape is in the top-left quadrant
+    - The blue L-shape is in the top-right quadrant
+    - The yellow sideways 'T' shape is in the bottom-left quadrant
+    - The gray rotated 'L' shape is in the bottom-right quadrant
+    All shapes maintain their relative positions and sizes

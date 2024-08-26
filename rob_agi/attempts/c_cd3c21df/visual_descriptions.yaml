@@ -1,0 +1,40 @@
+example_0:
+  input: |
+    An 11x11 grid with mostly black (empty) space. There are several distinct shapes:
+    1. A vertical gray line of 5 squares starting from the top left corner.
+    2. A vertical yellow line of 3 squares in the middle-right area.
+    3. A vertical red line of 4 squares in the bottom-right corner.
+    4. A horizontal gray line of 5 squares at the bottom, slightly offset to the right.
+    The shapes form a rough L-shape pattern overall.
+  output: |
+    A small 4x1 grid containing only red squares. It's a vertical red line.
+
+example_1:
+  input: |
+    A 12x12 grid with mostly black (empty) space. There are several distinct patterns:
+    1. In the top-left quadrant, there's a 2x2 pattern of alternating sky and red squares.
+    2. In the top-right, there's a horizontal magenta line of 3 squares.
+    3. In the middle-right, the same 2x2 sky-red pattern appears again.
+    4. In the bottom-left, the horizontal magenta line of 3 squares appears again.
+    5. In the center-bottom, there's a 2x2 square of orange.
+    The overall layout forms a rough diamond shape with the patterns at the corners.
+  output: |
+    A 2x2 grid of orange squares, matching the orange square found in the input grid.
+
+example_2:
+  input: |
+    A 13x13 grid with mostly black (empty) space. There are several distinct patterns:
+    1. In the top-left, there's a horizontal magenta line of 3 squares with one square below the middle.
+    2. In the top-right, there's a 3x2 pattern of red squares with a green square in the center.
+    3. In the middle-right, there's a 3x3 pattern with red corners and blue center, forming a cross shape.
+    4. In the bottom-left, the 3x2 red-green pattern appears again.
+    5. In the bottom-right, the magenta pattern from the top-left appears again, rotated 180 degrees.
+    The patterns form a rough X shape across the grid.
+  output: |
+    A 3x2 grid with a red-blue-red pattern. The top row is all red, and the bottom row is red-blue-red.
+
+test_case_0:
+  input: |
+    The input for the test case is not provided in the given code.
+  output: |
+    The expected output for the test case is not provided in the given code.

@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 7x5 grid mostly filled with black (0). There's a single yellow (4) square in the middle of the second-to-last row. The bottom row is entirely red (2), forming a solid line.
+  output: |
+    A 7x5 grid with the same red (2) line at the bottom. The yellow (4) squares now form a symmetrical 'V' shape. The top point of the 'V' is in the same position as the original yellow square, with two yellow squares on either side forming the arms of the 'V', reaching up to the edges of the grid.
+
+example_1:
+  input: |
+    A 10x6 grid mostly filled with black (0). There are two yellow (4) squares: one in the third row, second column, and another in the fourth row, fifth column. The sixth row is entirely red (2), forming a solid line across the middle of the grid.
+  output: |
+    A 10x6 grid with the same red (2) line in the sixth row. The yellow (4) squares now form a diagonal line from the top-left to the middle-right, intersecting with the red line. There are five yellow squares in total, forming a stepped diagonal pattern.
+
+example_2:
+  input: |
+    A 12x8 grid mostly filled with black (0). There are five yellow (4) squares scattered across the grid: top row second column, second row sixth column, fifth row third column, eighth row fifth column, and eleventh row fourth column. The tenth row is entirely red (2), forming a solid line near the bottom of the grid.
+  output: |
+    A 12x8 grid with the same red (2) line in the tenth row. The yellow (4) squares now form a more complex pattern. There's a diagonal line of yellow squares from top-left to middle-right above the red line, and two additional yellow squares below the red line. The pattern resembles a stylized lightning bolt or a jagged line that's broken by the red line.
+
+example_3:
+  input: |
+    A 6x3 grid mostly filled with black (0). There's a single yellow (4) square in the middle of the second row. The fifth row is entirely red (2), forming a solid line near the bottom of the grid.
+  output: |
+    A 6x3 grid with the same red (2) line in the fifth row. The yellow (4) square has moved down one row, now appearing in the middle of the third row, just above the red line.
+
+test_case_0:
+  input: |
+    A 6x3 grid mostly filled with black (0). There's a single yellow (4) square in the middle of the second row. The fifth row is entirely red (2), forming a solid line near the bottom of the grid.
+  output: |
+    The output is not provided for this test case.

@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid contains two distinct sky blue (8) shapes. The first shape is in the upper-left quadrant, resembling an irregular L or boot shape. It starts from the top edge, extends down, and then juts out to the right. The second shape is in the lower-right quadrant, forming a roughly rectangular block with a small protrusion on the bottom-right corner. The rest of the grid is filled with black (0), representing empty space.
+  output: |
+    The output grid maintains the same sky blue (8) shapes as the input, but now each shape is outlined with red (2). The red outline follows the contours of the blue shapes, including their corners and edges. The outline is placed immediately adjacent to the blue cells, creating a border around each shape. The red outline does not extend into the black space beyond the immediate vicinity of the blue shapes. The rest of the grid remains black (0).
+
+example_1:
+  input: |
+    This grid contains multiple sky blue (8) shapes and patterns. In the top-left, there's a complex interconnected shape resembling a tree or branching structure. It spans from the left edge to about the middle of the grid. In the bottom-right quadrant, there's a horizontal line of four blue cells. Just above this line, there are two separate single blue cells. The rest of the grid is black (0).
+  output: |
+    The output grid preserves the sky blue (8) shapes from the input, but now each distinct blue shape or pattern is outlined with red (2). The complex branching structure in the top-left is completely surrounded by a red outline, following its intricate shape. The horizontal line of four blue cells in the bottom-right is outlined in red, including its ends. Each of the two single blue cells above this line has its own individual red outline. The red outlines are placed immediately adjacent to the blue cells, creating a border around each shape or individual cell. The rest of the grid remains black (0).
+
+example_2:
+  input: |
+    This grid contains a single, connected sky blue (8) shape in the center. The shape resembles a cross or plus sign with an additional blue cell diagonally adjacent to the bottom of the cross. There's also an isolated single blue cell to the left of the main shape. The rest of the grid is black (0).
+  output: |
+    The output grid maintains the sky blue (8) shape from the input, but now it's outlined with red (2). The red outline follows the contours of the blue cross shape, including its corners and the diagonally adjacent cell. The isolated single blue cell to the left of the main shape has its own separate red outline. The red outlines are placed immediately adjacent to the blue cells, creating a border around each shape or individual cell. The rest of the grid remains black (0).
+
+test_case_0:
+  input: |
+    The input grid for the test case is not provided in the given code snippet.
+  output: |
+    The expected output grid for the test case is not provided in the given code snippet.

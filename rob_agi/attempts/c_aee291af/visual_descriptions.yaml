@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 16x16 grid predominantly filled with blue (1). There are several sky blue (8) regions scattered throughout, forming irregular shapes. Within these sky blue regions, there are small red (2) areas, typically 2x2 in size. The red areas are always surrounded by sky blue. The overall impression is of a blue background with sky blue "clouds" containing red "cores".
+  output: |
+    A 4x4 grid forming a perfect square outline in sky blue (8). The outline is one unit thick. Inside this outline, there are two red (2) squares positioned diagonally from each other. The remaining two squares inside the outline are sky blue, completing the 2x2 inner area.
+
+example_1:
+  input: |
+    Another 16x16 grid, again mostly blue (1). Sky blue (8) regions are present but more scattered and irregular than in the previous example. Red (2) areas are still present within the sky blue regions, but their arrangement varies. Some red areas are 2x2, while others form different shapes. The sky blue regions sometimes form partial or complete outlines around empty spaces.
+  output: |
+    A 4x4 grid similar to the previous output, but with a slight difference. The outer square outline is still sky blue (8) and one unit thick. Inside, there are again two red (2) squares, but this time they are adjacent rather than diagonal. The remaining two squares inside the outline are sky blue.
+
+example_2:
+  input: |
+    An 18x18 grid, predominantly blue (1). There are multiple sky blue (8) regions, some forming partial or complete outlines. Within these regions, there are red (2) areas, often in 2x2 squares but sometimes in other configurations. The sky blue regions are more interconnected in this example, sometimes forming larger, more complex shapes.
+  output: |
+    A 5x5 grid with a sky blue (8) outline that is one unit thick. Inside this outline is a 3x3 area. The corners of this inner area are red (2), forming a diagonal cross pattern. The remaining five squares (center and midpoints of each side) are sky blue, completing the inner area.
+
+test_case_0:
+  input: |
+    An 18x18 grid similar to the previous examples. It's predominantly blue (1) with scattered sky blue (8) regions. These regions often form partial or complete outlines. Within the sky blue areas, there are red (2) squares, typically in 2x2 configurations but sometimes in other patterns. The sky blue regions are irregularly shaped and distributed across the grid.
+  output: |
+    Not provided in the test case.

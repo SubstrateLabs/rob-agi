@@ -1,0 +1,46 @@
+example_0:
+  input: |
+    A 10x10 grid with mostly black (empty) spaces. There are scattered colored squares:
+    - A blue square in the bottom left corner
+    - A red square in the top left corner
+    - A green square in the middle of the right edge
+    - Three yellow squares: one in the middle left, one in the middle right, and one near the bottom right
+    - Two more blue squares: one in the middle right and one in the bottom right corner
+    - Two more red squares: one in the middle and one near the bottom right
+  output: |
+    A 10x10 grid with a distinct pattern in the left side:
+    - A vertical blue line along the left edge, from top to bottom
+    - A vertical red line next to the blue line, starting from the third row and going to the bottom
+    - A vertical green line next to the red line, starting from the eighth row and going to the bottom
+    - A vertical yellow line next to the green line, starting from the fourth row and going to the bottom
+    The right side of the grid is entirely black (empty)
+
+example_1:
+  input: |
+    A 10x10 grid with scattered colored squares:
+    - Several green squares: two in the top right, one in the top left, one in the middle left, and one near the bottom right
+    - Several blue squares: one near the top left, one in the middle left, one near the bottom, and one in the bottom right corner
+    - Several red squares: two in the middle, one near the bottom left
+    - Several yellow squares: one in the top right, two in the middle right, and one near the bottom left
+  output: |
+    A 10x10 grid with a distinct pattern in the left side:
+    - A vertical blue line along the left edge, from the third row to the bottom
+    - A vertical red line next to the blue line, starting from the fifth row and going to the bottom
+    - A vertical green line next to the red line, starting from the top and going to the bottom
+    - A vertical yellow line next to the green line, starting from the fifth row and going to the bottom
+    The right side of the grid is entirely black (empty)
+
+example_2:
+  input: |
+    A 10x10 grid with scattered colored squares:
+    - Three green squares: one in the middle left, one in the middle right, and one near the top right
+    - Two blue squares: one near the top left and one in the middle
+    - Two red squares: one near the bottom left and one in the middle right
+    - Four yellow squares: one in the top right, one in the middle left, one in the middle right, and one near the bottom right
+  output: |
+    A 10x10 grid with a distinct pattern in the bottom left:
+    - A vertical blue line along the left edge, starting from the eighth row and going to the bottom
+    - A vertical red line next to the blue line, starting from the seventh row and going to the bottom
+    - A vertical green line next to the red line, starting from the seventh row and going to the bottom
+    - A vertical yellow line next to the green line, starting from the fifth row and going to the bottom
+    The top half and right side of the grid are entirely black (empty)

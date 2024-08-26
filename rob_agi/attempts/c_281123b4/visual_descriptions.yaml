@@ -1,0 +1,95 @@
+example_0:
+  input: |
+    A 19x4 grid with four distinct sections separated by green (3) columns. From left to right:
+    1. Sky blue (8) dominant, with some black (0) spaces.
+    2. Gray (5) dominant, with some black (0) spaces.
+    3. Brown (9) dominant, with some black (0) spaces.
+    4. Yellow (4) dominant, with some black (0) spaces.
+    Each section has a unique pattern of its dominant color and black.
+  output: |
+    A 4x4 grid showcasing a mix of colors from the input:
+    - Brown (9) is most prominent, forming a rough L-shape.
+    - Sky blue (8) appears in two corners.
+    - Yellow (4) forms a diagonal line.
+    - Gray (5) appears once.
+    The pattern seems to balance the colors from the input sections.
+
+example_1:
+  input: |
+    A 19x4 grid with four sections divided by green (3) columns. From left to right:
+    1. Sky blue (8) dominant, with some black (0) spaces.
+    2. Gray (5) present, but less dominant, with more black (0) spaces.
+    3. Brown (9) present, but scattered, with many black (0) spaces.
+    4. Yellow (4) present, but scattered, with many black (0) spaces.
+    Each section has a unique distribution of its colors and black.
+  output: |
+    A 4x4 grid showing:
+    - Brown (9) forms a C-shape around the edges.
+    - Yellow (4) forms a partial diagonal.
+    - Sky blue (8) appears twice in the bottom row.
+    - Gray (5) appears once.
+    The pattern balances colors from the input while creating a structured layout.
+
+example_2:
+  input: |
+    A 19x4 grid with four sections separated by green (3) columns. From left to right:
+    1. Sky blue (8) dominant, with some black (0) spaces.
+    2. Gray (5) dominant, with some black (0) spaces.
+    3. Brown (9) present, but scattered, with many black (0) spaces.
+    4. Yellow (4) present, but scattered, with many black (0) spaces.
+    Each section has a unique pattern of color distribution.
+  output: |
+    A 4x4 grid displaying:
+    - Brown (9) forms an inverted L-shape.
+    - Yellow (4) appears in a diagonal and one corner.
+    - Sky blue (8) is in two corners.
+    - Gray (5) and black (0) each appear once.
+    The pattern creates a balanced distribution of colors from the input.
+
+example_3:
+  input: |
+    A 19x4 grid with four sections divided by green (3) columns. From left to right:
+    1. Sky blue (8) dominant, with some black (0) spaces.
+    2. Gray (5) present, but less dominant, with many black (0) spaces.
+    3. Brown (9) present, but scattered, with many black (0) spaces.
+    4. Yellow (4) present, but scattered, with many black (0) spaces.
+    Each section has a unique distribution of its colors and black.
+  output: |
+    A 4x4 grid showing:
+    - Brown (9) forms an inverted L-shape.
+    - Sky blue (8) appears twice.
+    - Yellow (4) forms a partial row.
+    - Black (0) appears twice.
+    The pattern balances colors from the input while creating a structured layout.
+
+example_4:
+  input: |
+    A 19x4 grid with four sections separated by green (3) columns. From left to right:
+    1. Sky blue (8) present, but less dominant, with many black (0) spaces.
+    2. Gray (5) present, but scattered, with many black (0) spaces.
+    3. Brown (9) present, but scattered, with many black (0) spaces.
+    4. Yellow (4) present, but scattered, with many black (0) spaces.
+    Each section has a sparse distribution of its colors among black spaces.
+  output: |
+    A 4x4 grid displaying:
+    - Brown (9) forms a partial diagonal.
+    - Yellow (4) appears in multiple positions.
+    - Sky blue (8) appears once.
+    - Gray (5) forms the bottom-right corner.
+    The pattern creates a balanced distribution of colors from the input, with more emphasis on brown and yellow.
+
+example_5:
+  input: |
+    A 19x4 grid with four sections divided by green (3) columns. From left to right:
+    1. Sky blue (8) dominant, with some black (0) spaces.
+    2. Gray (5) present, but less dominant, with many black (0) spaces.
+    3. Brown (9) dominant, with some black (0) spaces.
+    4. Yellow (4) present, but scattered, with many black (0) spaces.
+    Each section has a unique distribution of its colors and black.
+  output: |
+    A 4x4 grid showing:
+    - Brown (9) forms a C-shape around the edges.
+    - Sky blue (8) appears twice.
+    - Yellow (4) and gray (5) each appear once.
+    - Black (0) appears twice.
+    The pattern balances colors from the input while creating a structured layout, with emphasis on brown.

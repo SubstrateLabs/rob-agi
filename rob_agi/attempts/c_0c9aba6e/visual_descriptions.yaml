@@ -1,0 +1,44 @@
+example_0:
+  input: |
+    The input grid is 13x4 in size. It can be divided into three distinct sections:
+    1. Top section (rows 1-6): Primarily composed of red (2) and black (0) squares. There's a pattern of red squares scattered throughout, with some forming small clusters or lines.
+    2. Middle section (row 7): A solid line of orange (7) squares spanning the entire width.
+    3. Bottom section (rows 8-13): Dominated by magenta (6) squares with some black (0) squares interspersed. There are several solid magenta lines and some patterns of magenta squares.
+  output: |
+    The output grid is 6x4 in size, significantly smaller than the input. It contains only sky blue (8) and black (0) squares. The pattern appears to be an inverse or negative of some part of the input grid, with sky blue squares replacing some of the previously colored squares, and black squares filling the rest.
+
+example_1:
+  input: |
+    The input grid is 13x4 in size, similar to the previous example. It also has three distinct sections:
+    1. Top section (rows 1-6): Composed of red (2) and black (0) squares. The red squares form a more complex pattern than in the previous example, with more diagonal arrangements.
+    2. Middle section (row 7): A solid line of orange (7) squares spanning the entire width, identical to the previous example.
+    3. Bottom section (rows 8-13): Primarily magenta (6) squares with black (0) squares. The pattern is less dense than in the previous example, with more black spaces.
+  output: |
+    The output grid is 6x4 in size, containing only sky blue (8) and black (0) squares. The pattern seems to be derived from the input, but transformed. There are fewer sky blue squares compared to the previous example, and they form a different pattern.
+
+example_2:
+  input: |
+    The input grid is 13x4 in size, maintaining the structure of the previous examples:
+    1. Top section (rows 1-6): Red (2) and black (0) squares. The pattern of red squares is different from the previous examples, with more isolated red squares.
+    2. Middle section (row 7): The consistent orange (7) line across the width.
+    3. Bottom section (rows 8-13): Magenta (6) and black (0) squares. The magenta squares form a different pattern, with more vertical lines and clusters.
+  output: |
+    The output grid is 6x4 in size, composed of sky blue (8) and black (0) squares. The pattern of sky blue squares is unique compared to the previous examples, with more diagonal arrangements and a different distribution of colors.
+
+example_3:
+  input: |
+    The input grid is 13x4 in size, following the same structure:
+    1. Top section (rows 1-6): Red (2) and black (0) squares. The red squares form yet another distinct pattern, with more clusters in the upper left.
+    2. Middle section (row 7): The consistent orange (7) line.
+    3. Bottom section (rows 8-13): Magenta (6) and black (0) squares. This section has more solid magenta lines and fewer black squares compared to some previous examples.
+  output: |
+    The output grid is 6x4 in size, with sky blue (8) and black (0) squares. The pattern of sky blue squares is different from all previous examples, with more squares concentrated in the lower right corner and a unique overall distribution.
+
+test_case_0:
+  input: |
+    The input grid is 13x4 in size, maintaining the three-section structure seen in all previous examples:
+    1. Top section (rows 1-6): Red (2) and black (0) squares. The pattern of red squares is unique, with more squares on the left side and fewer on the right.
+    2. Middle section (row 7): The consistent orange (7) line spanning the width.
+    3. Bottom section (rows 8-13): Magenta (6) and black (0) squares. The pattern here is also unique, with more magenta squares on the right side and in the lower rows.
+  output: |
+    The output grid is not provided for this test case, as it is meant to be solved based on the pattern observed in the previous examples.

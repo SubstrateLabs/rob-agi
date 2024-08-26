@@ -1,0 +1,41 @@
+example_0:
+  input: |
+    A 3x3 grid with two distinct regions. The top row is entirely blue (1), while the bottom two rows form an inverted U-shape of magenta (6) surrounding a single blue (1) cell in the center bottom.
+  output: |
+    A 6x6 grid that appears to be an expanded version of the input. The top third (2 rows) is entirely blue (1). The bottom two-thirds (4 rows) maintain the inverted U-shape of magenta (6), but now it surrounds a 2x2 blue (1) region in the center bottom.
+
+example_1:
+  input: |
+    A 3x3 grid with three distinct color regions. The top-left corner is yellow (4), the top-right and middle-right cells are orange (7), and the remaining cells form an L-shape of sky blue (8).
+  output: |
+    A 9x9 grid that appears to be an expanded version of the input. Each cell from the original grid has been expanded into a 3x3 block of the same color. The yellow (4) region now occupies the top-left 3x3 area, the orange (7) region forms an inverted L-shape in the top-right and extends down the right side, and the sky blue (8) region maintains its L-shape but is now much larger, occupying most of the bottom and left side of the grid.
+
+example_2:
+  input: |
+    A 3x3 grid with each cell a different color. The top row is yellow (4), red (2), sky blue (8). The middle row is red (2), red (2), gray (5). The bottom row is sky blue (8), gray (5), yellow (4).
+  output: |
+    A 12x12 grid that appears to be an expanded version of the input. Each cell from the original grid has been expanded into a 4x4 block of the same color. The result is a checkerboard-like pattern of 4x4 colored squares, maintaining the relative positions of the colors from the input grid but on a larger scale.
+
+example_3:
+  input: |
+    A 3x3 grid entirely filled with sky blue (8). All cells are the same color.
+  output: |
+    The output is identical to the input: a 3x3 grid entirely filled with sky blue (8). No expansion or change has occurred.
+
+example_4:
+  input: |
+    A 3x3 grid entirely filled with green (3). All cells are the same color.
+  output: |
+    The output is identical to the input: a 3x3 grid entirely filled with green (3). No expansion or change has occurred.
+
+example_5:
+  input: |
+    A 3x3 grid with two distinct color regions. The left column is green (3), while the rest of the grid (a 3x2 rectangle on the right) is magenta (6).
+  output: |
+    A 6x6 grid that appears to be an expanded version of the input. The left third (2 columns) is entirely green (3), while the right two-thirds (4 columns) is entirely magenta (6). Each original cell seems to have been expanded into a 2x2 block of the same color.
+
+example_6:
+  input: |
+    A 3x3 grid with a complex pattern of red (2) and yellow (4). The top row is red (2), red (2), yellow (4). The middle row is entirely yellow (4). The bottom row is red (2), yellow (4), red (2).
+  output: |
+    A 6x6 grid that appears to be an expanded version of the input. Each cell from the original grid has been expanded into a 2x2 block of the same color. The result maintains the pattern from the input but on a larger scale, with 2x2 blocks of red (2) and yellow (4) in the same relative positions.

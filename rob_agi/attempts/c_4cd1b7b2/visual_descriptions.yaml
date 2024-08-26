@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 4x4 grid with a mix of colors. The top-left corner is blue (1). There's a diagonal line of black squares (0) from top-left to bottom-right. The remaining squares are filled with green (3), yellow (4), and red (2) in no apparent pattern.
+  output: |
+    A 4x4 grid with all squares filled. The diagonal from top-left to bottom-right now contains the numbers 1, 4, 4, 2 in that order. Each row and column contains exactly one of each color: blue (1), red (2), green (3), and yellow (4).
+
+example_1:
+  input: |
+    A 4x4 grid with yellow (4) in the top-left corner. There are black squares (0) scattered throughout: two in the second row, one in the third row, and one in the last row. The remaining squares are filled with blue (1), red (2), and green (3) in no clear pattern.
+  output: |
+    A 4x4 grid with all squares filled. Each row and column contains exactly one of each color: blue (1), red (2), green (3), and yellow (4). The yellow square (4) remains in the top-left corner.
+
+example_2:
+  input: |
+    A 4x4 grid with green (3) in the top-left corner. The second row is mostly black (0), with only a blue (1) in the leftmost position. There are two more black squares in the third row and bottom-right corner. The remaining squares are filled with red (2), yellow (4), and blue (1).
+  output: |
+    A 4x4 grid with all squares filled. Each row and column contains exactly one of each color: blue (1), red (2), green (3), and yellow (4). The green square (3) remains in the top-left corner.

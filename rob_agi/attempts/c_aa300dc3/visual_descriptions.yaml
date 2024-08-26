@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 10x10 grid with a gray (5) border surrounding a mostly black (0) interior. The black area has irregular gray protrusions and islands, creating a complex shape. The gray border is one cell thick on all sides.
+  output: |
+    Identical to the input, but with a diagonal line of sky blue (8) squares cutting through the black area. The line starts at the top-left corner of the black region and ends at the bottom-right corner, consisting of exactly 8 sky blue squares placed diagonally. The line avoids gray areas, weaving through the black space.
+
+example_1:
+  input: |
+    A 10x10 grid with a gray (5) border and a mostly black (0) interior. The black area has more gray protrusions and islands compared to the previous example, creating a more complex shape. The gray border is one cell thick on all sides.
+  output: |
+    Similar to the input, but with a diagonal line of sky blue (8) squares cutting through the black area. The line starts near the top-right corner of the black region and ends near the bottom-left corner, consisting of exactly 8 sky blue squares placed diagonally. The line avoids gray areas, weaving through the black space in a slightly different pattern than the previous example.
+
+example_2:
+  input: |
+    A 10x10 grid with a gray (5) border and a large black (0) interior. The black area has fewer gray protrusions compared to the previous examples, but still contains some gray islands and irregular shapes. The gray border is one cell thick on all sides.
+  output: |
+    Identical to the input, but with a diagonal line of sky blue (8) squares cutting through the black area. The line starts at the top-left corner of the black region and ends at the bottom-right corner, consisting of exactly 8 sky blue squares placed diagonally. The line avoids gray areas, weaving through the black space in a relatively straight diagonal path.
+
+example_3:
+  input: |
+    A 10x10 grid with a gray (5) border and a black (0) interior. The black area has more complex gray protrusions and islands, including two large gray rectangles in the bottom-right quadrant. The gray border is one cell thick on all sides.
+  output: |
+    Similar to the input, but with a diagonal line of sky blue (8) squares cutting through the black area. The line starts near the top-left corner of the black region and ends near the bottom-right corner, consisting of exactly 8 sky blue squares placed diagonally. The line avoids gray areas, weaving through the black space and curving around the gray rectangles in the bottom-right.

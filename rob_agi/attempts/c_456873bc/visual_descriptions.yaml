@@ -1,41 +1,23 @@
 example_0:
   input: |
-    The grid contains a pattern of red (2) shapes that resemble stylized trees or arrows pointing upwards. These shapes are arranged in three columns, with five shapes in total. The shapes are made of connected red squares. The top of the grid has three complete shapes, while the bottom has two complete shapes. The middle section of the grid is filled with a large green (3) rectangle spanning the entire width. The rest of the grid is filled with black (0) squares, representing empty space.
+    The grid is 19x19. The top half contains three red (2) "F" shapes, each consisting of a vertical line with two horizontal lines extending to the right. These shapes are evenly spaced across the top. The middle of the grid (rows 5-9) is filled with green (3). The bottom half mirrors the top, but with the "F" shapes inverted and progressively fewer of them (3, then 2, then 1) as we move down the grid.
   output: |
-    The output grid maintains the overall structure of the input, but with several key changes:
-    1. The green (3) rectangle in the middle has been completely removed and replaced with black (0) squares.
-    2. The red (2) shapes remain largely intact, but some of their intersections have been replaced with sky blue (8) squares.
-    3. The top row now has three sky blue (8) squares at the tips of the red shapes.
-    4. In the lower half, there are additional sky blue (8) squares at intersections within the red shapes.
-    5. The bottom row also has sky blue (8) squares at the base of the red shapes.
-    The overall effect is that the red shapes now appear to have highlighted connection points in sky blue.
+    The grid maintains its 19x19 size. The green area is completely removed. The red "F" shapes remain, but now some cells are changed to sky blue (8). These sky blue cells appear at the top-left corner of each "F" shape, both in the upper and lower halves of the grid. The pattern of "F" shapes is preserved, including the decreasing number in the lower half.
 
 example_1:
   input: |
-    The grid contains three distinct sections:
-    1. Left section: Three red (2) shapes resembling stylized trees or arrows pointing upwards. These shapes are made of connected red squares and are arranged in a triangular pattern.
-    2. Middle section: A column of empty black (0) squares.
-    3. Right section: A solid green (3) rectangle occupying the rightmost three columns of the grid.
-    The rest of the grid is filled with black (0) squares, representing empty space.
+    The grid is 11x11. The left side contains three red (2) shapes resembling backwards "E"s or combs, stacked vertically with spaces between them. The right third of the grid (last 3 columns) is filled with green (3).
   output: |
-    The output grid shows significant changes:
-    1. The green (3) rectangle on the right has been completely removed and replaced with black (0) squares.
-    2. The three red (2) shapes on the left remain largely intact, but their intersections have been replaced with sky blue (8) squares.
-    3. Two new red (2) shapes have appeared in the bottom right corner, mirroring the pattern of the top left shapes.
-    4. Sky blue (8) squares now appear at the tips and intersections of all red shapes, including the new ones in the bottom right.
-    The overall effect is a symmetrical pattern of red shapes with sky blue connection points, spread across the entire grid.
+    The grid maintains its 11x11 size. The green area is completely removed. The red shapes remain, but are now mirrored on the right side of the grid, creating a symmetrical pattern. Sky blue (8) cells are added at specific points: the top-left and bottom-right corners of the topmost shapes, and the top-right and bottom-left corners of the bottommost shapes.
 
 example_2:
   input: |
-    The grid contains three distinct sections:
-    1. Left section: Three red (2) shapes resembling stylized trees or arrows pointing upwards. These shapes are made of connected red squares and are arranged in a triangular pattern.
-    2. Middle section: A column of empty black (0) squares, followed by three more red (2) shapes similar to those on the left, but slightly offset.
-    3. Right section: A solid green (3) rectangle occupying the rightmost three columns of the grid.
-    The rest of the grid is filled with black (0) squares, representing empty space.
+    The grid is 11x11. It contains red (2) shapes that resemble partial or broken "E"s. These shapes are scattered across the grid: three on the left side (top, middle, bottom), one in the center, and three on the right side (top, middle, bottom). The right third of the grid (last 3 columns) is filled with green (3).
   output: |
-    The output grid shows several changes:
-    1. The green (3) rectangle on the right has been completely removed and replaced with black (0) squares.
-    2. All red (2) shapes remain in their original positions, but their intersections and tips have been replaced with sky blue (8) squares.
-    3. New red (2) shapes have appeared in the previously empty right side of the grid, mirroring the pattern of the left side shapes.
-    4. Sky blue (8) squares now appear at the tips and intersections of all red shapes, including the new ones on the right.
-    The overall effect is a symmetrical pattern of red shapes with sky blue connection points, spread across the entire grid, with the middle column of shapes remaining unchanged.
+    The grid maintains its 11x11 size. The green area is completely removed. The red shapes remain in their positions, but the pattern is now made symmetrical. The shapes on the right side mirror those on the left. Sky blue (8) cells are added at specific points: the top-left and bottom-right corners of the shapes on the left side, and the top-right and bottom-left corners of the shapes on the right side.
+
+test_case_0:
+  input: |
+    This is the same as example_2, so the description is identical. The grid is 11x11. It contains red (2) shapes that resemble partial or broken "E"s. These shapes are scattered across the grid: three on the left side (top, middle, bottom), one in the center, and three on the right side (top, middle, bottom). The right third of the grid (last 3 columns) is filled with green (3).
+  output: |
+    As this is a test case, no output is provided. Based on the pattern observed in the examples, we would expect the green area to be removed, the red shapes to be made symmetrical, and sky blue (8) cells to be added at specific corner points of the outermost shapes.

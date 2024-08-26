@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 3x3 grid with a brown (9) frame on the top and left sides, and a black (0) strip in the middle. The bottom right corner is also black.
+  output: |
+    A 6x6 grid that appears to be an expanded version of the input. The brown frame now forms a complete border around the grid, with black spaces filling the interior. The black strip from the input is now a cross shape dividing the grid into four quadrants.
+
+example_1:
+  input: |
+    A 3x3 grid with green (3) squares forming an 'L' shape along the top and left sides. The center and bottom-right squares are black (0).
+  output: |
+    A 6x6 grid that seems to be an expanded version of the input. The green 'L' shape is now repeated in all four corners, creating a symmetrical pattern. Black squares fill the spaces between the green shapes, forming a cross in the center and diagonal lines connecting the corners.
+
+example_2:
+  input: |
+    A 3x3 grid with a green (3) top row, black (0) middle row except for the right column which is green, and the bottom row alternating between green, black, and black.
+  output: |
+    A 6x6 grid that appears to be an expanded version of the input. The green areas have been extended to form a frame around the entire grid, with black spaces filling most of the interior. There's a pattern of green squares protruding into the black area from each side of the frame.
+
+example_3:
+  input: |
+    A 3x3 grid with sky blue (8) squares in the top-left corner and along the left side. The rest of the squares are black (0).
+  output: |
+    A 6x6 grid that seems to be an expanded version of the input. The sky blue squares now form an 'L' shape in the top-left corner, which is mirrored in the bottom-right corner. The remaining corners have smaller sky blue 'L' shapes. Black squares fill the spaces between, creating a zigzag pattern through the center of the grid.
+
+example_4:
+  input: |
+    A 3x3 grid with orange (7) squares in the top row except for the left corner which is black (0). The middle row is all black, and the bottom row has orange squares on the left and middle with a black square on the right.
+  output: |
+    A 6x6 grid that appears to be an expanded version of the input. The orange squares now form a frame around the entire grid, with black spaces filling most of the interior. There's a pattern of black squares protruding into the orange frame from each corner, creating a cross-like shape in the center.

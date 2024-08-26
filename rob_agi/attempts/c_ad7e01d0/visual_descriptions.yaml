@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 3x3 grid with a gray (5) L-shape along the left side and bottom. The top-right corner is blue (1), and the middle-right is red (2). The center is black (0).
+  output: |
+    A 9x9 grid. The original 3x3 pattern is repeated in the top-left, middle-left, and bottom-left corners. The bottom row is entirely gray (5). The right two-thirds of the grid is mostly black (0), except for the bottom-right 3x3 area which repeats the original pattern.
+
+example_1:
+  input: |
+    A 3x3 grid with a vertical gray (5) line in the center. The left and right columns alternate between red (2) and blue (1), with black (0) in the middle row.
+  output: |
+    A 9x9 grid. The original 3x3 pattern is repeated in the center, forming a 3x3 block of the original pattern. The rest of the grid is black (0).
+
+example_2:
+  input: |
+    A 4x4 grid with a complex pattern. The top-left corner is black (0), followed by gray (5), black (0), and green (3) in the top row. The second row is gray (5), gray (5), red (2), black (0). The third row is black (0), red (2), gray (5), gray (5). The bottom row is green (3), black (0), gray (5), black (0).
+  output: |
+    A 16x16 grid. The original 4x4 pattern is repeated in the top-left, top-right, bottom-left, and bottom-right corners. The center 8x8 area is mostly black (0), except for a 4x4 repetition of the original pattern in its center.
+
+example_3:
+  input: |
+    A 4x4 grid with a gray (5) border. The interior 2x2 square has red (2) and green (3) in the top row, and green (3) and green (3) in the bottom row.
+  output: |
+    A 16x16 grid. The original 4x4 pattern is repeated in all four corners and in the center. The spaces between these repetitions are filled with black (0), creating a cross-like shape of black squares.
+
+test_case_0:
+  input: |
+    This test case is not provided in the given code snippet.
+  output: |
+    This test case is not provided in the given code snippet.

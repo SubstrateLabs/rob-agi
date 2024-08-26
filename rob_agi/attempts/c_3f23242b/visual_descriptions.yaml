@@ -1,0 +1,37 @@
+example_0:
+  input: |
+    A 16x16 grid mostly filled with black (0). There are two green (3) squares:
+    1. One at position (4, 11) - near the top right quadrant.
+    2. Another at position (10, 3) - in the bottom left quadrant.
+    These green squares appear to be isolated with no other colored squares around them.
+  output: |
+    The 16x16 grid now contains complex patterns around the two original green squares:
+    1. For the green square at (4, 11):
+       - A 5x5 gray (5) frame surrounds it.
+       - Red (2) borders on three sides of this frame (left, right, bottom).
+       - A horizontal sky blue (8) line extends from the frame to both edges of the grid.
+       - The red border extends to the right edge of the grid below the sky blue line.
+    2. For the green square at (10, 3):
+       - A similar 5x5 gray frame surrounds it.
+       - Red borders on three sides (left, right, top).
+       - A vertical sky blue line extends from the frame to both edges of the grid.
+       - The red border extends to the bottom edge of the grid to the right of the sky blue line.
+    The rest of the grid remains black (0).
+
+example_1:
+  input: |
+    A 10x10 grid mostly filled with black (0). There is a single green (3) square at position (4, 4), which is near the center of the grid.
+  output: |
+    The 10x10 grid now contains a pattern around the original green square:
+    - A 5x5 gray (5) frame surrounds the green square.
+    - Red (2) borders on three sides of this frame (left, right, bottom).
+    - A horizontal sky blue (8) line extends from the frame to both edges of the grid.
+    - The red border extends to the right edge of the grid below the sky blue line.
+    The rest of the grid remains black (0).
+    The pattern is similar to the first example, but only appears once due to there being only one green square in the input.
+
+test_case_0:
+  input: |
+    There is no test case provided in the given test file. The file only contains two examples (example_0 and example_1) and no additional test cases.
+  output: |
+    As there is no test case provided, there is no output to describe.

@@ -1,0 +1,40 @@
+example_0:
+  input: |
+    A 3x3 grid with a 2x2 yellow square in the top-left corner. The rest of the grid is black.
+  output: |
+    A 3x3 grid with a 2x2 yellow square in the top-left corner. The rest of the grid is filled with gray, including the bottom-right cell of the original yellow square.
+
+example_1:
+  input: |
+    An 8x8 grid mostly filled with black. There are two green regions:
+    1. A horizontal line of 4 green cells in the second row, starting from the third column.
+    2. Two green cells in the fifth row, starting from the second column.
+  output: |
+    An 8x8 grid mostly filled with gray. The original green regions remain unchanged:
+    1. A horizontal line of 4 green cells in the second row, starting from the second column.
+    2. Two green cells in the fifth row, starting from the first column.
+    All cells below and to the right of the green regions are filled with gray.
+
+example_2:
+  input: |
+    A 7x7 grid with three orange regions:
+    1. A horizontal line of 4 orange cells in the top row, starting from the left.
+    2. A horizontal line of 3 orange cells in the third row, starting from the third column.
+    3. A horizontal line of 5 orange cells in the fifth row, starting from the second column.
+    The rest of the grid is black.
+  output: |
+    A 7x7 grid with the original orange regions preserved:
+    1. A horizontal line of 4 orange cells in the top row, starting from the left.
+    2. A horizontal line of 3 orange cells in the third row, starting from the third column.
+    3. A horizontal line of 5 orange cells in the fifth row, starting from the second column.
+    All cells below and to the right of each orange region are filled with gray. The remaining cells are also filled with gray.
+
+test_case_0:
+  input: |
+    A 7x7 grid with three orange regions:
+    1. A horizontal line of 4 orange cells in the top row, starting from the left.
+    2. A horizontal line of 3 orange cells in the third row, starting from the third column.
+    3. A horizontal line of 5 orange cells in the fifth row, starting from the second column.
+    The rest of the grid is black.
+  output: |
+    Not provided in the test case.

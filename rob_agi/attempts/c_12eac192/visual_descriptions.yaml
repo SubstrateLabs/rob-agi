@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    An 8x7 grid with a mix of colors. Blue (1) cells appear in several locations: top-left corner, middle-right, and a cluster in the center. Sky (8) cells form a diagonal pattern from top-left to bottom-right. Gray (5) cells appear in the top-right quadrant. Orange (7) cells are present in the top-right corner and middle-left. The rest is filled with black (0) cells, creating empty spaces.
+  output: |
+    The grid maintains its 8x7 structure. The most significant change is the introduction of green (3) cells forming a continuous path. This path connects all the previously blue cells, creating a snake-like pattern. The path incorporates some gray and sky cells along its route. Orange and remaining sky cells are unchanged. The overall structure and positioning of non-path elements remain largely the same as the input.
+
+example_1:
+  input: |
+    A 9x8 grid with diverse color distribution. Blue (1) cells form a cluster in the top-right corner and appear isolated in the bottom-left corner. Sky (8) cells create a scattered pattern throughout the grid, with concentrations in the bottom-right corner. Orange (7) cells form two distinct horizontal lines in the middle and bottom of the grid. Gray (5) cells appear in two locations. The rest is filled with black (0) cells.
+  output: |
+    The 9x8 structure is preserved. A green (3) path is introduced, connecting most of the blue cells. This path starts from the top-left, weaves through the grid, and ends at the bottom-right. It incorporates some sky and gray cells along its route. Most blue cells in the top-right cluster remain unchanged. Orange lines and most sky cell patterns are preserved. The overall distribution of colors remains similar to the input, with the green path being the major addition.
+
+example_2:
+  input: |
+    A 5x8 grid with distinct color patterns. Blue (1) cells form a small cluster in the top-left corner and a larger cluster in the bottom-right corner. Orange (7) cells create a prominent horizontal line in the middle of the grid. Sky (8) cells appear in the top-left and middle-left areas. Gray (5) cells are present in the top-right and bottom-left corners. The remaining cells are black (0).
+  output: |
+    The 5x8 grid structure is maintained. A green (3) path is introduced, connecting all blue cells. This path starts from the top-left, travels along the top edge, down the right side, and then connects to the bottom-right cluster. It incorporates some sky cells along its route. The orange horizontal line remains unchanged. Most sky and gray cells retain their positions. The overall color distribution is similar to the input, with the green path being the significant addition.
+
+example_3:
+  input: |
+    A small 3x3 grid with minimal color variety. Blue (1) cells occupy the top-left corner and the cell below it. An orange (7) horizontal line fills the bottom row. A single gray (5) cell is in the top-right corner. The remaining cells are black (0).
+  output: |
+    The 3x3 structure is preserved. A simple green (3) path is introduced, connecting the two blue cells and extending to the top-right corner, replacing the gray cell. The orange horizontal line at the bottom remains unchanged. The middle cell stays black. This transformation represents the most basic application of the pattern seen in larger grids.
+
+test_case_0:
+  input: |
+    This test case is not provided in the given test file. There is no additional input grid to describe.
+  output: |
+    As there is no test case provided in the given test file, there is no output grid to describe.

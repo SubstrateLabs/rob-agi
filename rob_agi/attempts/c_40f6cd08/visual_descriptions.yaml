@@ -1,0 +1,35 @@
+example_0:
+  input: |
+    The grid is 30x30. There's a large green (3) rectangular frame in the top-left quadrant, spanning from (2,2) to (18,12). Inside this frame is a yellow (4) rectangle from (4,4) to (16,10). Within the yellow area is a blue (1) rectangle from (6,6) to (14,8), and inside that is a sky blue (8) rectangle from (8,8) to (12,12). The rest of the grid is black (0). In the bottom-right quadrant, there's another green rectangle from (14,15) to (28,24).
+  output: |
+    The grid layout is similar to the input, but the bottom-right green rectangle has been transformed. It now contains a yellow rectangle inside it, which in turn contains a blue rectangle, which contains a smaller sky blue rectangle. This mirrors the pattern seen in the top-left quadrant of both the input and output. The top-left quadrant remains unchanged.
+
+example_1:
+  input: |
+    The grid is 30x30. In the top-left quadrant, there's a red (2) rectangle from (2,2) to (13,11). Inside this is a yellow (4) rectangle from (5,5) to (11,10). Within the yellow area is a blue (1) rectangle from (7,7) to (9,10). There's a sky blue (8) rectangle from (3,6) to (10,7), partially overlapping the yellow area. A magenta (6) shape forms an inverted 'L' along the top and left edges of the red rectangle. In the bottom-right quadrant, there's another red rectangle from (14,19) to (28,28).
+  output: |
+    The layout is similar to the input, but the bottom-right red rectangle has been transformed. It now contains a yellow rectangle, which contains a blue rectangle. A sky blue rectangle partially overlaps the yellow area, and a magenta inverted 'L' shape borders the top and left of the red rectangle. This mirrors the pattern seen in the top-left quadrant of both the input and output. The top-left quadrant remains unchanged.
+
+example_2:
+  input: |
+    The grid is 30x30. In the top-left quadrant, there's a sky blue (8) rectangle from (3,3) to (14,11). Inside this is a yellow (4) rectangle from (5,5) to (11,9). Within the yellow area is a red (2) rectangle from (6,6) to (10,8). In the top-right quadrant, there's another sky blue rectangle from (19,5) to (28,11). In the bottom-left quadrant, there's a large sky blue rectangle from (2,17) to (18,27).
+  output: |
+    The layout is similar to the input, but both the top-right and bottom-left sky blue rectangles have been transformed. They now contain yellow rectangles, which in turn contain red rectangles. This mirrors the pattern seen in the top-left quadrant of both the input and output. The top-left quadrant remains unchanged.
+
+test_case_0:
+  input: |
+    The grid is 30x30. In the top-left quadrant, there's a green (3) rectangular frame from (2,2) to (18,12). Inside this frame is a yellow (4) rectangle from (4,4) to (16,10). Within the yellow area is a blue (1) rectangle from (6,6) to (14,8), and inside that is a sky blue (8) rectangle from (8,8) to (12,12). The rest of the grid is black (0). In the bottom-right quadrant, there's another green rectangle from (14,15) to (28,24).
+  output: |
+    The expected output is not provided for this test case.
+
+test_case_1:
+  input: |
+    The grid is 30x30. In the top-left quadrant, there's a red (2) rectangle from (2,2) to (13,11). Inside this is a yellow (4) rectangle from (5,5) to (11,10). Within the yellow area is a blue (1) rectangle from (7,7) to (9,10). There's a sky blue (8) rectangle from (3,6) to (10,7), partially overlapping the yellow area. A magenta (6) shape forms an inverted 'L' along the top and left edges of the red rectangle. In the bottom-right quadrant, there's another red rectangle from (14,19) to (28,28).
+  output: |
+    The expected output is not provided for this test case.
+
+test_case_2:
+  input: |
+    The grid is 30x30. In the top-left quadrant, there's a sky blue (8) rectangle from (3,3) to (14,11). Inside this is a yellow (4) rectangle from (5,5) to (11,9). Within the yellow area is a red (2) rectangle from (6,6) to (10,8). In the top-right quadrant, there's another sky blue rectangle from (19,5) to (28,11). In the bottom-left quadrant, there's a large sky blue rectangle from (2,17) to (18,27).
+  output: |
+    The expected output is not provided for this test case.

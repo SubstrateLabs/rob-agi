@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid contains four distinct shapes on a black background. In the top-left, there's a 3x3 yellow square with a black center. In the top-right, there's a 3x3 red square with a black center. In the middle-left, there's a 4x4 green square with a 2x2 black center. In the bottom-right, there's a 3x3 green square with a black center. At the bottom-left, there's a 4x4 sky blue shape that looks like an upside-down 'U' or a square with its bottom side missing.
+  output: |
+    The grid layout remains the same, but the centers of the shapes have been filled. The 3x3 yellow and red squares now have gray centers. The 4x4 green square now has an orange 2x2 center. The 3x3 green square at the bottom-right now has a gray center. The sky blue 'U' shape now has an orange 2x2 center in its hollow area.
+
+example_1:
+  input: |
+    The grid shows a single 3x3 sky blue square with a black center, positioned in the top-left corner of a 6x6 black grid.
+  output: |
+    The grid remains mostly the same, but the black center of the sky blue square has been filled with gray, creating a solid 3x3 sky blue square with a gray center.
+
+example_2:
+  input: |
+    The grid displays a yellow shape that resembles an inverted 'U' or a square missing its right side. It's positioned in the top-left corner of a 6x6 black grid. The shape is 3x4 in size.
+  output: |
+    The grid layout remains the same, but the hollow part of the yellow 'U' shape has been filled with orange, creating two orange squares within the yellow outline.
+
+example_3:
+  input: |
+    The grid contains multiple shapes on a black background. In the top-left, there's a 4x4 yellow square with a 2x2 black center. To its right, there's a 4x4 green shape that looks like a square with its right side missing. Below it, there's another 3x3 green square with a black center. In the bottom-right, there's a 4x4 red square with a 2x2 black center. To its left, there's a 3x3 green square with a black center. In the bottom-left, there's another 3x3 green square with a black center.
+  output: |
+    The grid layout remains the same, but the centers of the shapes have been filled. The 4x4 yellow square now has an orange 2x2 center. The 4x4 green 'C' shape now has two orange squares filling its open side. The 3x3 green squares all now have gray centers. The 4x4 red square now has an orange 2x2 center.

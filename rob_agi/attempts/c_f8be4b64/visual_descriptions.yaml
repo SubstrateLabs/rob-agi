@@ -1,0 +1,64 @@
+example_0:
+  input: |
+    A 30x30 grid mostly filled with black (0). There are three distinct green (3) cross-shaped patterns:
+    1. Top-left: A small green cross centered at (3,5) with a red (2) center.
+    2. Middle-right: A small green cross centered at (4,20) with a magenta (6) center.
+    3. Bottom-right: A small green cross centered at (22,22) with a sky (8) center.
+    There's also an isolated green dot at (18,13).
+  output: |
+    The 30x30 grid now has three vertical lines and three horizontal lines, each corresponding to one of the crosses from the input:
+    1. A red (2) vertical line at column 5, extending from row 0 to 30.
+    2. A magenta (6) vertical line at column 20, extending from row 0 to 30.
+    3. A sky (8) vertical line at column 22, extending from row 0 to 30.
+    4. A red (2) horizontal line at row 3, extending from column 0 to 30.
+    5. A magenta (6) horizontal line at row 4, extending from column 0 to 30.
+    6. A sky (8) horizontal line at row 22, extending from column 0 to 30.
+    The original green crosses are preserved. The isolated green dot is now part of the magenta horizontal line.
+
+example_1:
+  input: |
+    A 10x10 grid with three distinct green cross patterns:
+    1. Top-left: A green cross centered at (2,2) with a gray (5) center.
+    2. Middle-right: A green cross centered at (3,8) with a magenta (6) center.
+    3. Bottom-middle: A green cross centered at (6,5) with a sky (8) center.
+  output: |
+    The 10x10 grid now has three vertical lines and three horizontal lines, each corresponding to one of the crosses from the input:
+    1. A gray (5) vertical line at column 2, extending from row 0 to 10.
+    2. A sky (8) vertical line at column 5, extending from row 0 to 10.
+    3. A magenta (6) vertical line at column 8, extending from row 0 to 10.
+    4. A gray (5) horizontal line at row 2, extending from column 0 to 10.
+    5. A magenta (6) horizontal line at row 3, extending from column 0 to 10.
+    6. A sky (8) horizontal line at row 6, extending from column 0 to 10.
+    The original green crosses are preserved.
+
+example_2:
+  input: |
+    An 18x18 grid with four distinct green cross patterns:
+    1. Top-left: A green cross centered at (2,3) with no colored center.
+    2. Middle-left: A green cross centered at (7,13) with a gray (5) center.
+    3. Middle-right: A green cross centered at (11,7) with a magenta (6) center.
+    4. Bottom-right: A green cross centered at (15,14) with a yellow (4) center.
+  output: |
+    The 18x18 grid now has four vertical lines and four horizontal lines, each corresponding to one of the crosses from the input:
+    1. A gray (5) vertical line at column 3, extending from row 0 to 18.
+    2. A magenta (6) vertical line at column 7, extending from row 0 to 18.
+    3. A gray (5) vertical line at column 13, extending from row 0 to 18.
+    4. A yellow (4) vertical line at column 14, extending from row 0 to 18.
+    5. A gray (5) horizontal line at row 2, extending from column 0 to 18.
+    6. A magenta (6) horizontal line at row 7, extending from column 0 to 18.
+    7. A gray (5) horizontal line at row 11, extending from column 0 to 18.
+    8. A yellow (4) horizontal line at row 15, extending from column 0 to 18.
+    The original green crosses are preserved.
+
+example_3:
+  input: |
+    A 13x13 grid with two distinct green cross patterns:
+    1. Top-left: A green cross centered at (3,3) with a red (2) center.
+    2. Bottom-right: A green cross centered at (9,8) with no colored center.
+  output: |
+    The 13x13 grid now has two vertical lines and two horizontal lines, each corresponding to one of the crosses from the input:
+    1. A red (2) vertical line at column 3, extending from row 0 to 13.
+    2. A red (2) vertical line at column 8, extending from row 0 to 13.
+    3. A red (2) horizontal line at row 3, extending from column 0 to 13.
+    4. A red (2) horizontal line at row 9, extending from column 0 to 13.
+    The original green crosses are preserved.

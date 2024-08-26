@@ -1,0 +1,48 @@
+example_0:
+  input: |
+    The grid is 22x19 in size. There are three distinct regions visible:
+    1. In the top-left quadrant, there's a sky blue (8) shape resembling a simplified face or mask. It has two large "eye" areas and a "mouth" area, all filled with sky blue.
+    2. In the middle-left, there's another sky blue shape, more circular or blob-like, with a small black space in the center.
+    3. In the bottom-left, there's a third sky blue shape, similar to the first but inverted, with "eyes" and "mouth" areas.
+    4. The entire right side of the grid is filled with a gray (5) rectangular region, taking up about 1/3 of the total width. This gray area has three colored squares within it:
+       - A red (2) square near the top
+       - A green (3) square in the middle
+       - A yellow (4) square near the bottom
+    The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The grid maintains the same 22x19 size and overall structure, but with key changes:
+    1. The top-left "face" shape is now colored red (2) instead of sky blue.
+    2. The middle-left circular shape is now colored green (3) instead of sky blue.
+    3. The bottom-left inverted "face" shape is now colored yellow (4) instead of sky blue.
+    4. The gray (5) rectangular region on the right side remains unchanged, including the positions of the colored squares within it (red, green, yellow).
+    The black (0) empty space remains the same throughout the grid.
+
+example_1:
+  input: |
+    The grid is 20x14 in size. It contains several distinct elements:
+    1. A gray (5) rectangular region on the left side, taking up about 1/3 of the total width. This gray area contains four colored squares:
+       - A red (2) square at the top
+       - A yellow (4) square in the upper middle
+       - A magenta (6) square in the lower middle
+       - A green (3) square at the bottom
+    2. Four separate blue (1) shapes scattered across the right side of the grid:
+       - A small inverted 'T' shape near the top
+       - A cross or 'plus' shape in the upper middle
+       - A small 2x2 square in the bottom middle
+       - A larger 'T' shape at the bottom right
+    The rest of the grid is filled with black (0), representing empty space.
+  output: |
+    The grid maintains the same 20x14 size and overall structure, but with these changes:
+    1. The gray (5) rectangular region on the left side remains unchanged, including the positions of the colored squares within it (red, yellow, magenta, green).
+    2. The four blue shapes on the right side have changed colors:
+       - The small inverted 'T' shape near the top is now red (2)
+       - The cross or 'plus' shape in the upper middle is now yellow (4)
+       - The small 2x2 square in the bottom middle is now magenta (6)
+       - The larger 'T' shape at the bottom right is now green (3)
+    The black (0) empty space remains the same throughout the grid.
+
+test_case_0:
+  input: |
+    The input for the test case is not provided in the given test file.
+  output: |
+    The output for the test case is not provided in the given test file, as it is meant to be solved based on the pattern observed in the examples.

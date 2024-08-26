@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 3x3 grid with three distinct colors. The top row is yellow-yellow-magenta (4-4-6), the middle row is all green (3-3-3), and the bottom row is magenta-magenta-yellow (6-6-4). This forms a simple pattern with symmetry along the vertical axis.
+  output: |
+    A 9x9 grid that appears to be an expanded version of the input. The central 3x3 area (rows 4-6, columns 4-6) is identical to the input grid. This pattern is repeated in the corners, forming a 3x3 arrangement of the original pattern. The remaining spaces are filled with black (0), creating a frame around the colored areas. The result is a symmetrical pattern with the original design repeated 9 times in a 3x3 layout, surrounded by black space.
+
+example_1:
+  input: |
+    A 3x3 grid with a pattern of red, yellow, and green (2-4-3). The left column is all red (2), while the other two columns alternate colors. The middle column goes yellow-green-yellow (4-3-4) from top to bottom, and the right column goes green-yellow-yellow (3-4-4).
+  output: |
+    A 9x9 grid that expands on the input pattern. The left 3 columns exactly replicate the input grid. This pattern is then repeated two more times to the right, filling the first 9 rows and 3 columns. The remaining 6 columns on the right side are filled with black (0). The result is a vertically striped pattern on the left side of the grid, with the right side completely black.
+
+example_2:
+  input: |
+    A 3x3 grid with three distinct patterns in each row. The top row is all blue (1-1-1), the middle row is magenta-red-red (6-2-2), and the bottom row is red-red-magenta (2-2-6). This creates a symmetrical pattern with magenta corners in the bottom-left and top-right of the colored area.
+  output: |
+    A 9x9 grid that expands the input horizontally. The top 3 rows replicate the input pattern three times, creating a 3x9 area that mirrors the original 3x3 input. The remaining 6 rows below are filled with black (0). The result is a horizontally striped pattern in the top third of the grid, with the bottom two-thirds completely black.
+
+example_3:
+  input: |
+    A 3x3 grid with a repeating pattern. The left column is all green (3-3-3), while the other two columns alternate between blue and magenta. The middle column goes blue-magenta-blue (1-6-1) from top to bottom, and the right column goes magenta-blue-magenta (6-1-6). This creates a symmetrical pattern with reflection across the horizontal axis.
+  output: |
+    A 9x9 grid that expands the input vertically. The left 3 columns exactly replicate the input grid three times, creating a 9x3 area that mirrors the original 3x3 input vertically. The remaining 6 columns on the right are filled with black (0). The result is a vertically repeating pattern on the left side of the grid, with the right two-thirds completely black.
+
+test_case_0:
+  input: |
+    This test case is not provided in the given code snippet.
+  output: |
+    This test case is not provided in the given code snippet.
