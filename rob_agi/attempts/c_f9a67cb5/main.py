@@ -6,77 +6,52 @@ def solve_f9a67cb5(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the grid transformation challenge by creating a minimal red structure that connects all blue squares.
     
-    1. Analyze the grid to identify blue regions and potential backbone placements.
-    2. Evaluate multiple backbone positions to find the most efficient placement.
-    3. Create the red structure by placing the backbone and connecting all blue regions.
-    4. Handle the initial red square (if present) by connecting it to the structure.
-    5. Optimize the red structure by removing unnecessary red squares.
-    6. Validate the final structure to ensure all blue squares are connected.
+    1. Analyze the grid to identify blue segments and their coordinates.
+    2. Determine the optimal vertical backbone position.
+    3. Create the vertical backbone connecting all blue segments.
+    4. Connect isolated blue segments to the backbone.
+    5. Handle the initial red square (if present) by connecting it to the structure.
+    6. Optimize the red structure by removing unnecessary red squares.
+    7. Validate the final structure to ensure all blue squares are connected.
     
     Returns a new grid with the minimal red structure added while preserving all blue squares.
     """
     rows, cols = input_grid.get_dimensions()
     output_grid = input_grid.deep_copy()
-    blue_regions = input_grid.find_connected_regions(8)
     
-    def evaluate_backbone(is_vertical: bool, position: int) -> int:
-        red_count = 0
-        for r in range(rows):
-            for c in range(cols):
-                if (is_vertical and c == position) or (not is_vertical and r == position):
-                    if output_grid.values[r][c] != 8:
-                        red_count += 1
-        
-        for region in blue_regions:
-            if not any((is_vertical and c == position) or (not is_vertical and r == position) for r, c in region):
-                red_count += min(abs(position - (c if is_vertical else r)) for r, c in region)
-        
-        return red_count
+    # Find all blue squares
+    blue_squares = [(r, c) for r in range(rows) for c in range(cols) if input_grid.values[r][c] == 8]
     
-    # Evaluate backbone placements
-    vertical_backbones = [(True, c, evaluate_backbone(True, c)) for c in range(cols)]
-    horizontal_backbones = [(False, r, evaluate_backbone(False, r)) for r in range(rows)]
-    is_vertical, backbone_pos, _ = min(vertical_backbones + horizontal_backbones, key=lambda x: x[2])
+    # Determine optimal backbone position
+    backbone_pos = min(range(cols), key=lambda c: sum(abs(c - bc) for _, bc in blue_squares))
     
-    # Place the backbone
+    # Create vertical backbone
     for r in range(rows):
-        for c in range(cols):
-            if (is_vertical and c == backbone_pos) or (not is_vertical and r == backbone_pos):
-                if output_grid.values[r][c] != 8:
-                    output_grid.values[r][c] = 2
+        if any(bc == backbone_pos for _, bc in blue_squares):
+            if output_grid.values[r][backbone_pos] != 8:
+                output_grid.values[r][backbone_pos] = 2
     
-    # Connect blue regions to the backbone
-    for region in blue_regions:
-        if not any(output_grid.values[r][c] == 2 for r, c in region):
-            target = min(region, key=lambda pos: abs(pos[1 if is_vertical else 0] - backbone_pos))
-            r, c = target
-            while (is_vertical and c != backbone_pos) or (not is_vertical and r != backbone_pos):
-                if is_vertical:
-                    c += 1 if c < backbone_pos else -1
-                else:
-                    r += 1 if r < backbone_pos else -1
-                if output_grid.values[r][c] != 8:
-                    output_grid.values[r][c] = 2
+    # Connect blue segments to backbone
+    for r, c in blue_squares:
+        if c != backbone_pos:
+            for cc in range(min(c, backbone_pos), max(c, backbone_pos) + 1):
+                if output_grid.values[r][cc] != 8:
+                    output_grid.values[r][cc] = 2
     
     # Connect initial red square if present
     initial_red = next(((r, c) for r in range(rows) for c in range(cols) if input_grid.values[r][c] == 2), None)
     if initial_red:
         r, c = initial_red
-        target = min(((nr, nc) for nr in range(rows) for nc in range(cols) if output_grid.values[nr][nc] == 2), 
-                     key=lambda pos: abs(pos[0] - r) + abs(pos[1] - c))
-        while (r, c) != target:
-            if r < target[0]:
-                r += 1
-            elif r > target[0]:
-                r -= 1
-            elif c < target[1]:
-                c += 1
-            elif c > target[1]:
-                c -= 1
+        while c != backbone_pos:
+            c += 1 if c < backbone_pos else -1
             if output_grid.values[r][c] != 8:
                 output_grid.values[r][c] = 2
+        while output_grid.values[r][backbone_pos] != 2:
+            r += 1
+            if output_grid.values[r][backbone_pos] != 8:
+                output_grid.values[r][backbone_pos] = 2
     
-    # Optimize the red structure
+    # Optimize red structure
     def is_connected(grid: ColoredGrid) -> bool:
         start = next((r, c) for r in range(rows) for c in range(cols) if grid.values[r][c] in {2, 8})
         queue = deque([start])
