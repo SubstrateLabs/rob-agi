@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid contains several distinct shapes and patterns. In the top-left corner, there's a red (2) L-shaped pattern. Throughout the grid, there are multiple blue (1) shapes: a U-shape in the top-right, an inverted T-shape in the middle-right, a cross shape in the center, a square with a hole in the bottom-left, and two rectangles in the bottom-right. The rest of the grid is filled with black (0), which can be considered as empty space.
+  output: |
+    The output grid maintains most of the original patterns but with some key changes. The red (2) L-shape in the top-left remains unchanged. However, several of the blue (1) shapes have been transformed to red (2): the U-shape in the top-right, the cross shape in the center, and one of the rectangles in the bottom-right. The inverted T-shape in the middle-right, the square with a hole in the bottom-left, and one rectangle in the bottom-right remain blue (1). The black (0) spaces remain unchanged.
+
+example_1:
+  input: |
+    The grid features several distinct shapes and patterns. In the top-left, there's a red (2) U-shape. Throughout the grid, there are multiple blue (1) shapes: a small U-shape in the top-right, a large rectangle spanning the middle of the grid, a C-shape in the center-right, and an irregular shape in the bottom-right corner. There's also a blue (1) line connecting two shapes in the left side of the grid. The rest is filled with black (0), representing empty space.
+  output: |
+    The output grid maintains the overall structure but with significant color changes. The red (2) U-shape in the top-left remains unchanged. The blue (1) U-shape in the top-right has been changed to red (2). The large blue rectangle in the middle has been transformed to red (2). The blue C-shape in the center-right remains blue. The connecting line on the left side has changed from blue to red. The irregular shape in the bottom-right corner remains blue. All black (0) spaces remain unchanged.
+
+example_2:
+  input: |
+    The grid contains multiple shapes and patterns. In the top-left, there's a red (2) U-shape. Throughout the grid, there are several blue (1) shapes: a small U-shape in the top-right, two squares with holes in the center-left, a cross shape in the center, a square in the center-right, and an irregular shape in the bottom-right. There's also a large blue square outline in the bottom-left corner. The rest is filled with black (0), representing empty space.
+  output: |
+    The output grid maintains the overall structure with some color changes. The red (2) U-shape in the top-left remains unchanged. The blue (1) U-shape in the top-right has been changed to red (2). The two squares with holes in the center-left remain blue. The cross shape in the center has been changed to red (2). The square in the center-right has been changed to red (2). The large square outline in the bottom-left has been changed from blue to red. The irregular shape in the bottom-right remains blue. All black (0) spaces remain unchanged.
+
+test_case_0:
+  input: |
+    The grid contains multiple shapes and patterns. In the top-left, there's a red (2) U-shape. Throughout the grid, there are several blue (1) shapes: a small U-shape in the top-right, a large rectangle spanning the middle of the grid, two squares with holes on the left side, a cross shape in the center-right, and an irregular shape in the bottom-right. There's also a large blue square outline in the bottom-left corner. The rest is filled with black (0), representing empty space.
+  output: |
+    The output is not provided for this test case.
