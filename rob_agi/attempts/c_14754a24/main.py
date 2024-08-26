@@ -6,16 +6,15 @@ def solve_14754a24(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the grid transformation challenge by creating optimal L-shaped patterns around yellow squares.
     
-    1. Scans the grid to identify all yellow (4) squares.
-    2. Creates a deep copy of the input grid to modify.
+    1. Creates a deep copy of the input grid to modify.
+    2. Identifies all yellow (4) squares in the grid.
     3. Generates and scores all possible L-shapes for each yellow square.
-    4. Optimizes L-shape selection using a priority queue based on scores.
-    5. Applies selected L-shapes, converting them to red (2).
-    6. Performs multiple optimization passes to improve L-shapes and handle edge cases.
-    7. Verifies that all red squares form valid L-shapes associated with yellow squares.
-    8. Extends L-shapes to maximize coverage while maintaining validity.
-    9. Connects nearby L-shapes and fills gaps to create larger patterns.
-    10. Performs a final validation to ensure all red squares are part of valid L-shapes.
+    4. Applies L-shapes using a priority queue based on scores.
+    5. Connects nearby L-shapes and fills gaps to create larger patterns.
+    6. Handles isolated yellow squares with partial L-shapes.
+    7. Optimizes coverage by extending existing red regions.
+    8. Performs multiple optimization passes to improve the solution.
+    9. Validates the final grid to ensure all red squares are part of valid L-shapes.
     
     Returns a new ColoredGrid with the transformed values.
     """
@@ -27,8 +26,8 @@ def solve_14754a24(input_grid: ColoredGrid) -> ColoredGrid:
     
     def get_possible_l_shapes(r: int, c: int) -> List[List[Tuple[int, int]]]:
         shapes = []
-        for length1 in range(2, 6):  # First arm of L-shape
-            for length2 in range(2, 6):  # Second arm of L-shape
+        for length1 in range(2, 7):  # First arm of L-shape
+            for length2 in range(2, 7):  # Second arm of L-shape
                 for dr1, dc1 in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
                     for dr2, dc2 in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
                         if (dr1, dc1) != (dr2, dc2) and (dr1, dc1) != (-dr2, -dc2):
@@ -96,13 +95,13 @@ def solve_14754a24(input_grid: ColoredGrid) -> ColoredGrid:
                                if 0 <= r+dr < rows and 0 <= c+dc < cols):
                         valid = False
                         grid.values[r][c] = 0  # Remove invalid red square
-                else:
+                elif grid.values[r][c] in [0, 5]:
                     # Try to extend L-shapes
                     red_neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
                                         if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 2)
                     yellow_neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
                                            if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 4)
-                    if red_neighbors >= 1 and yellow_neighbors >= 1 and grid.values[r][c] in [0, 5]:
+                    if red_neighbors >= 1 and yellow_neighbors >= 1:
                         grid.values[r][c] = 2  # Extend L-shape
         return valid
 
@@ -120,12 +119,30 @@ def solve_14754a24(input_grid: ColoredGrid) -> ColoredGrid:
                         if yellow_nearby:
                             grid.values[r][c] = 2  # Connect nearby L-shapes
     
+    def handle_isolated_yellows() -> None:
+        for r in range(rows):
+            for c in range(cols):
+                if grid.values[r][c] == 4:
+                    red_neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                                        if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 2)
+                    if red_neighbors == 0:
+                        # Create a partial L-shape
+                        for dr1, dc1 in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                            for dr2, dc2 in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                                if (dr1, dc1) != (dr2, dc2) and (dr1, dc1) != (-dr2, -dc2):
+                                    if (0 <= r+dr1 < rows and 0 <= c+dc1 < cols and grid.values[r+dr1][c+dc1] in [0, 5] and
+                                        0 <= r+dr2 < rows and 0 <= c+dc2 < cols and grid.values[r+dr2][c+dc2] in [0, 5]):
+                                        grid.values[r+dr1][c+dc1] = 2
+                                        grid.values[r+dr2][c+dc2] = 2
+                                        return  # Only create one partial L-shape per isolated yellow
+    
     process_yellow_squares()
     optimize_pattern()
     
-    for _ in range(3):  # Multiple optimization passes
+    for _ in range(5):  # Multiple optimization passes
         verify_and_extend_l_shapes()
         connect_nearby_l_shapes()
+        handle_isolated_yellows()
         optimize_pattern()
     
     if verify_and_extend_l_shapes():
