@@ -5,51 +5,53 @@ def solve_5b6cbef5(input_grid: ColoredGrid) -> ColoredGrid:
     Transform a 4x4 input grid into a 16x16 output grid by expanding the pattern.
     
     The solution involves the following steps:
-    1. Create a new 16x16 grid filled with zeros (black)
-    2. Copy the 4x4 input pattern to all four corners of the 16x16 grid
-    3. Fill the edges between the corners by extending the pattern for 4 cells and leaving 4 cells empty
-    4. Fill the center 8x8 area with extensions of the corner patterns
-    5. Ensure symmetry in the center area
+    1. Create an 8x8 expanded pattern from the 4x4 input
+    2. Use the 8x8 pattern to fill a 16x16 grid:
+       - Place the 8x8 pattern in the center
+       - Copy appropriate sections to the corners and edges
     
     This process creates a larger pattern that preserves the input's structure
     while expanding it across the 16x16 grid, maintaining symmetry and proper spacing.
     """
-    # Initialize a new 16x16 ColoredGrid
-    new_grid = ColoredGrid(values=[[0 for _ in range(16)] for _ in range(16)])
-    
-    # Copy input to corners
-    for i in range(4):
-        for j in range(4):
-            value = input_grid.values[i][j]
-            new_grid.values[i][j] = value
-            new_grid.values[i][j+12] = value
-            new_grid.values[i+12][j] = value
-            new_grid.values[i+12][j+12] = value
-    
-    # Fill edge sections
-    for i in range(4):
-        for j in range(4, 8):
-            new_grid.values[i][j] = input_grid.values[i][j-4]
-            new_grid.values[i+12][j] = input_grid.values[i][j-4]
-    for i in range(4, 8):
-        for j in range(4):
-            new_grid.values[i][j] = input_grid.values[i-4][j]
-            new_grid.values[i][j+12] = input_grid.values[i-4][j]
-    
-    # Fill center section
-    for i in range(4, 8):
-        for j in range(4, 8):
-            new_grid.values[i][j] = input_grid.values[i-2][j-2]
-            new_grid.values[i][j+4] = input_grid.values[i-2][j-4]
-            new_grid.values[i+4][j] = input_grid.values[i-4][j-2]
-            new_grid.values[i+4][j+4] = input_grid.values[i-4][j-4]
-    
-    # Ensure symmetry in center section
-    for i in range(4, 12):
-        for j in range(4, 12):
-            if new_grid.values[i][j] != 0:
-                new_grid.values[15-i][j] = new_grid.values[i][j]
-                new_grid.values[i][15-j] = new_grid.values[i][j]
-                new_grid.values[15-i][15-j] = new_grid.values[i][j]
-    
-    return new_grid
+    def create_8x8_pattern(input_grid):
+        pattern = [[0 for _ in range(8)] for _ in range(8)]
+        for i in range(4):
+            for j in range(4):
+                r, c = i * 2, j * 2
+                pattern[r][c] = input_grid.values[i][j]
+                if input_grid.values[i][j] != 0:
+                    if i < 3 and input_grid.values[i+1][j] != 0:
+                        pattern[r+1][c] = input_grid.values[i][j]
+                    if j < 3 and input_grid.values[i][j+1] != 0:
+                        pattern[r][c+1] = input_grid.values[i][j]
+                    if i < 3 and j < 3 and input_grid.values[i+1][j+1] != 0:
+                        pattern[r+1][c+1] = input_grid.values[i][j]
+        return pattern
+
+    def fill_16x16_grid(pattern):
+        grid = [[0 for _ in range(16)] for _ in range(16)]
+        # Fill center
+        for i in range(8):
+            for j in range(8):
+                grid[i+4][j+4] = pattern[i][j]
+        # Fill corners
+        for i in range(4):
+            for j in range(4):
+                grid[i][j] = pattern[i][j]
+                grid[i][j+12] = pattern[i][j+4]
+                grid[i+12][j] = pattern[i+4][j]
+                grid[i+12][j+12] = pattern[i+4][j+4]
+        # Fill edges
+        for i in range(8):
+            for j in range(4):
+                grid[i+4][j] = pattern[i][j]
+                grid[i+4][j+12] = pattern[i][j+4]
+        for i in range(4):
+            for j in range(8):
+                grid[i][j+4] = pattern[i][j]
+                grid[i+12][j+4] = pattern[i+4][j]
+        return grid
+
+    pattern_8x8 = create_8x8_pattern(input_grid)
+    output_grid = fill_16x16_grid(pattern_8x8)
+    return ColoredGrid(values=output_grid)
