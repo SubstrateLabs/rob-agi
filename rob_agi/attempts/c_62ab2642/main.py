@@ -50,18 +50,19 @@ def solve_62ab2642(input_grid: ColoredGrid) -> ColoredGrid:
 
     # Identify and fill isolated black areas
     def is_surrounded_by_gray(x, y):
+        if output_grid.values[y][x] != 0:
+            return False
         for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
             nx, ny = x + dx, y + dy
             if 0 <= nx < cols and 0 <= ny < rows:
-                if output_grid.values[ny][nx] != 5:
+                if output_grid.values[ny][nx] not in [5, 7]:
                     return False
-            else:
-                continue  # Edge of grid counts as gray
+            # Edge of grid counts as gray
         return True
 
     for y in range(rows):
         for x in range(cols):
-            if output_grid.values[y][x] == 0 and is_surrounded_by_gray(x, y):
+            if is_surrounded_by_gray(x, y):
                 flood_fill(x, y, 0, 7)
 
     return output_grid
