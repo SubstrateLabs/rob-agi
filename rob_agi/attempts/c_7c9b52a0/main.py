@@ -1,22 +1,23 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List, Tuple, Set
+from collections import deque
 
 def solve_7c9b52a0(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by extracting and compacting non-background elements.
+    Transforms the input grid by extracting distinct regions and rearranging them in a compact form.
 
     1. Identifies the background color (most common color on the border)
-    2. Extracts all non-background elements, including black (0)
-    3. Creates a new compact grid containing only non-background elements
-    4. Preserves relative positions, relationships, and shapes between elements
-    5. Removes rows and columns that are entirely background color
+    2. Extracts distinct regions of non-background colors using flood fill
+    3. Sorts regions by color and original position
+    4. Creates a new compact grid by placing regions in sorted order
+    5. Optimizes the compact grid by removing background-only rows and columns
     6. Returns the new compact grid
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed
 
     Returns:
-    ColoredGrid: A new compact grid containing only non-background elements
+    ColoredGrid: A new compact grid containing rearranged non-background regions
     """
     def find_background_color(grid: ColoredGrid) -> int:
         rows, cols = grid.get_dimensions()
@@ -27,45 +28,85 @@ def solve_7c9b52a0(input_grid: ColoredGrid) -> ColoredGrid:
         )
         return max(set(border), key=border.count)
 
-    def extract_non_background_elements(grid: ColoredGrid, bg_color: int) -> List[Tuple[int, int, int]]:
+    def extract_regions(grid: ColoredGrid, bg_color: int) -> List[Tuple[int, List[Tuple[int, int]], Tuple[int, int]]]:
         rows, cols = grid.get_dimensions()
-        elements = []
+        visited = set()
+        regions = []
+
+        def bfs(r: int, c: int, color: int) -> List[Tuple[int, int]]:
+            queue = deque([(r, c)])
+            region = []
+            while queue:
+                curr_r, curr_c = queue.popleft()
+                if (curr_r, curr_c) not in visited and grid.values[curr_r][curr_c] == color:
+                    visited.add((curr_r, curr_c))
+                    region.append((curr_r - r, curr_c - c))
+                    for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                        nr, nc = curr_r + dr, curr_c + dc
+                        if 0 <= nr < rows and 0 <= nc < cols:
+                            queue.append((nr, nc))
+            return region
+
         for r in range(rows):
             for c in range(cols):
-                if grid.values[r][c] != bg_color:
-                    elements.append((grid.values[r][c], r, c))
-        return elements
+                if (r, c) not in visited and grid.values[r][c] != bg_color:
+                    color = grid.values[r][c]
+                    region = bfs(r, c, color)
+                    regions.append((color, region, (r, c)))
 
-    def create_compact_grid(elements: List[Tuple[int, int, int]], bg_color: int) -> List[List[int]]:
-        if not elements:
+        return regions
+
+    def create_compact_grid(regions: List[Tuple[int, List[Tuple[int, int]], Tuple[int, int]]], bg_color: int) -> List[List[int]]:
+        if not regions:
             return [[]]
-        
-        min_row = min(elem[1] for elem in elements)
-        min_col = min(elem[2] for elem in elements)
-        max_row = max(elem[1] for elem in elements)
-        max_col = max(elem[2] for elem in elements)
-        
-        # Initialize grid with background color
-        grid = [[bg_color for _ in range(max_col - min_col + 1)] for _ in range(max_row - min_row + 1)]
-        
-        for color, r, c in elements:
-            grid[r - min_row][c - min_col] = color
-        
-        return grid
+
+        sorted_regions = sorted(regions, key=lambda x: (x[0], x[2]))
+        compact_grid = [[bg_color]]
+
+        for color, shape, _ in sorted_regions:
+            placed = False
+            while not placed:
+                for r in range(len(compact_grid)):
+                    for c in range(len(compact_grid[0])):
+                        if can_place_region(compact_grid, r, c, shape, bg_color):
+                            place_region(compact_grid, r, c, shape, color)
+                            placed = True
+                            break
+                    if placed:
+                        break
+                if not placed:
+                    compact_grid = expand_grid(compact_grid, bg_color)
+
+        return compact_grid
+
+    def can_place_region(grid: List[List[int]], r: int, c: int, shape: List[Tuple[int, int]], bg_color: int) -> bool:
+        for dr, dc in shape:
+            nr, nc = r + dr, c + dc
+            if nr < 0 or nr >= len(grid) or nc < 0 or nc >= len(grid[0]) or grid[nr][nc] != bg_color:
+                return False
+        return True
+
+    def place_region(grid: List[List[int]], r: int, c: int, shape: List[Tuple[int, int]], color: int) -> None:
+        for dr, dc in shape:
+            grid[r + dr][c + dc] = color
+
+    def expand_grid(grid: List[List[int]], bg_color: int) -> List[List[int]]:
+        rows, cols = len(grid), len(grid[0])
+        new_grid = [[bg_color for _ in range(cols + 1)] for _ in range(rows + 1)]
+        for r in range(rows):
+            for c in range(cols):
+                new_grid[r][c] = grid[r][c]
+        return new_grid
 
     def remove_background_rows_and_columns(grid: List[List[int]], bg_color: int) -> List[List[int]]:
-        # Remove background rows
         grid = [row for row in grid if any(cell != bg_color for cell in row)]
-        
-        # Remove background columns
         cols_to_keep = [col for col in range(len(grid[0])) if any(row[col] != bg_color for row in grid)]
         grid = [[row[col] for col in cols_to_keep] for row in grid]
-        
         return grid
 
     bg_color = find_background_color(input_grid)
-    non_bg_elements = extract_non_background_elements(input_grid, bg_color)
-    compact_grid = create_compact_grid(non_bg_elements, bg_color)
+    regions = extract_regions(input_grid, bg_color)
+    compact_grid = create_compact_grid(regions, bg_color)
     final_grid = remove_background_rows_and_columns(compact_grid, bg_color)
 
     return ColoredGrid(values=final_grid)
