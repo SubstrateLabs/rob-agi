@@ -7,11 +7,11 @@ def solve_b7fb29bc(input_grid: ColoredGrid) -> ColoredGrid:
     The pattern consists of:
     1. A yellow (4) border just inside the green (3) border
     2. A complex pattern of red (2) and yellow (4) in the interior
-    3. A gradient from more red in the top-left to more yellow in the bottom-right
-    4. Preservation of any original green (3) cells within the border
-    5. Special handling for small interiors
-    6. The bottom row is always red (2), except in small interiors
-    7. Alternating columns of red and yellow in the top rows
+    3. Alternating columns of red and yellow in the top rows
+    4. A gradient from more red in the top-left to more yellow in the bottom-right
+    5. The bottom row is always red (2), except for the yellow border
+    6. Preservation of any original green (3) cells within the border
+    7. Special handling for small interiors
     """
     # Step 1: Identify the green border
     rows, cols = input_grid.get_dimensions()
@@ -36,16 +36,12 @@ def solve_b7fb29bc(input_grid: ColoredGrid) -> ColoredGrid:
                 result.set_cell(r, c, 4)  # Yellow border
             elif r == inner_bottom:
                 result.set_cell(r, c, 2)  # Bottom row is red
-            else:
-                # Create a gradient pattern
-                x = (c - inner_left) / (inner_width - 1)
-                y = (r - inner_top) / (inner_height - 1)
-                if y < 0.5:  # Top half
-                    result.set_cell(r, c, 2 if c % 2 == 0 else 4)  # Alternating red and yellow
-                elif x < 0.5:  # Bottom-left quadrant
-                    result.set_cell(r, c, 2)  # Red
-                else:  # Bottom-right quadrant
-                    result.set_cell(r, c, 4)  # Yellow
+            elif r - inner_top < inner_height // 2:  # Top half
+                result.set_cell(r, c, 2 if c % 2 == 0 else 4)  # Alternating red and yellow
+            elif c - inner_left < inner_width // 2:  # Bottom-left quadrant
+                result.set_cell(r, c, 2)  # Red
+            else:  # Bottom-right quadrant
+                result.set_cell(r, c, 4)  # Yellow
 
     # Step 5: Handle small interiors
     if inner_width <= 3 or inner_height <= 3:
