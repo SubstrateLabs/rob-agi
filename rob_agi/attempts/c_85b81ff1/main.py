@@ -7,8 +7,7 @@ def solve_85b81ff1(input_grid: ColoredGrid) -> ColoredGrid:
     2. For each non-black column:
        a. Keep the top row unchanged.
        b. For the second row:
-          - If it was originally colored and there are no colored cells below, set it to black (0).
-          - Otherwise, keep its original color.
+          - If it was originally colored, set it to black (0).
        c. For rows 3 to second-to-last:
           - If the cell was originally colored, keep it colored.
           - If the cell was originally black (0):
@@ -34,7 +33,7 @@ def solve_85b81ff1(input_grid: ColoredGrid) -> ColoredGrid:
             continue  # Skip entirely black columns
 
         # Process second row
-        if input_grid.get_cell(1, col) != 0 and not has_colored_cells_below(1, col):
+        if input_grid.get_cell(1, col) != 0:
             output_grid.set_cell(1, col, 0)
 
         # Process middle rows
@@ -44,7 +43,7 @@ def solve_85b81ff1(input_grid: ColoredGrid) -> ColoredGrid:
 
             if current_cell != 0:
                 output_grid.set_cell(row, col, current_cell)
-            elif current_cell == 0 and cell_above != 0:
+            elif cell_above != 0:
                 if has_colored_cells_below(row, col) or not has_colored_cells_below(row + 1, col):
                     output_grid.set_cell(row, col, fill_color)
 
