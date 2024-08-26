@@ -4,39 +4,39 @@ from typing import List, Tuple
 def solve_184a9768(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by applying the following steps:
-    1. Processes each color (except sky blue) by expanding the largest region to its bounding box
-    2. Processes sky blue (8) regions specially, filling empty spaces with yellow (4)
-    3. Removes isolated cells and gray (5) cells
-    4. Fills in surrounded empty cells
+    1. Finds the largest contiguous region of any color and expands it to its bounding box
+    2. Places other color regions (except sky blue and gray) within the largest region
+    3. Processes sky blue (8) regions specially, surrounding them with yellow (4) where possible
+    4. Removes isolated cells and gray (5) cells
+    5. Fills in surrounded empty cells
+    6. Ensures all cells outside the largest region's bounding box are empty (0)
     
-    The transformation processes colors in order of their first appearance, with sky blue (8) processed last.
+    The transformation maintains the shapes of color regions while reorganizing them within the grid.
     """
-    output_grid = input_grid.deep_copy()
-    rows, cols = output_grid.get_dimensions()
+    rows, cols = input_grid.get_dimensions()
+    output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
 
     def get_neighbors(r: int, c: int) -> List[Tuple[int, int]]:
         return [(r+dr, c+dc) for dr, dc in [(-1,0), (1,0), (0,-1), (0,1)]
                 if 0 <= r+dr < rows and 0 <= c+dc < cols]
 
-    def find_connected_regions(color: int) -> List[List[Tuple[int, int]]]:
-        regions = []
+    def find_connected_regions() -> Dict[int, List[List[Tuple[int, int]]]]:
+        regions = {color: [] for color in range(1, 10)}
         visited = set()
         for r in range(rows):
             for c in range(cols):
-                if output_grid.values[r][c] == color and (r, c) not in visited:
+                color = input_grid.values[r][c]
+                if color != 0 and (r, c) not in visited:
                     region = []
                     stack = [(r, c)]
                     while stack:
                         curr_r, curr_c = stack.pop()
-                        if (curr_r, curr_c) not in visited and output_grid.values[curr_r][curr_c] == color:
+                        if (curr_r, curr_c) not in visited and input_grid.values[curr_r][curr_c] == color:
                             visited.add((curr_r, curr_c))
                             region.append((curr_r, curr_c))
                             stack.extend(get_neighbors(curr_r, curr_c))
-                    regions.append(region)
+                    regions[color].append(region)
         return regions
-
-    def get_largest_region(regions: List[List[Tuple[int, int]]]) -> List[Tuple[int, int]]:
-        return max(regions, key=len) if regions else []
 
     def get_bounding_box(region: List[Tuple[int, int]]) -> Tuple[int, int, int, int]:
         if not region:
@@ -47,28 +47,34 @@ def solve_184a9768(input_grid: ColoredGrid) -> ColoredGrid:
         max_c = max(c for _, c in region)
         return (min_r, min_c, max_r, max_c)
 
-    def fill_bounding_box(color: int, bbox: Tuple[int, int, int, int]):
-        min_r, min_c, max_r, max_c = bbox
-        for r in range(min_r, max_r + 1):
-            for c in range(min_c, max_c + 1):
-                output_grid.values[r][c] = color
+    def fill_region(region: List[Tuple[int, int]], color: int):
+        for r, c in region:
+            output_grid.values[r][c] = color
 
-    def process_color(color: int):
-        regions = find_connected_regions(color)
-        largest_region = get_largest_region(regions)
-        bbox = get_bounding_box(largest_region)
-        fill_bounding_box(color, bbox)
+    def can_place_region(region: List[Tuple[int, int]], start_r: int, start_c: int) -> bool:
+        for r, c in region:
+            new_r, new_c = r - region[0][0] + start_r, c - region[0][1] + start_c
+            if new_r < 0 or new_r >= rows or new_c < 0 or new_c >= cols or output_grid.values[new_r][new_c] != 0:
+                return False
+        return True
 
-    def process_sky_blue():
-        regions = find_connected_regions(8)
-        largest_region = get_largest_region(regions)
-        min_r, min_c, max_r, max_c = get_bounding_box(largest_region)
-        for r in range(min_r, max_r + 1):
-            for c in range(min_c, max_c + 1):
-                if output_grid.values[r][c] == 0:
-                    output_grid.values[r][c] = 4
-                elif output_grid.values[r][c] != 8:
-                    output_grid.values[r][c] = 8
+    def place_region(region: List[Tuple[int, int]], color: int):
+        min_r, min_c, max_r, max_c = largest_bbox
+        for start_r in range(min_r, max_r + 1):
+            for start_c in range(min_c, max_c + 1):
+                if can_place_region(region, start_r, start_c):
+                    for r, c in region:
+                        new_r, new_c = r - region[0][0] + start_r, c - region[0][1] + start_c
+                        output_grid.values[new_r][new_c] = color
+                    return True
+        return False
+
+    def process_sky_blue(region: List[Tuple[int, int]]):
+        if place_region(region, 8):
+            for r, c in region:
+                for nr, nc in get_neighbors(r, c):
+                    if output_grid.values[nr][nc] == 0:
+                        output_grid.values[nr][nc] = 4
 
     def remove_isolated_cells():
         for r in range(rows):
@@ -77,12 +83,6 @@ def solve_184a9768(input_grid: ColoredGrid) -> ColoredGrid:
                     neighbors = get_neighbors(r, c)
                     if all(output_grid.values[nr][nc] != output_grid.values[r][c] for nr, nc in neighbors):
                         output_grid.values[r][c] = 0
-
-    def remove_gray_cells():
-        for r in range(rows):
-            for c in range(cols):
-                if output_grid.values[r][c] == 5:
-                    output_grid.values[r][c] = 0
 
     def fill_surrounded_cells():
         for r in range(rows):
@@ -93,23 +93,40 @@ def solve_184a9768(input_grid: ColoredGrid) -> ColoredGrid:
                     if neighbor_colors and all(color == neighbor_colors[0] for color in neighbor_colors):
                         output_grid.values[r][c] = neighbor_colors[0]
 
-    def get_color_order() -> List[int]:
-        color_order = []
-        for r in range(rows):
-            for c in range(cols):
-                color = input_grid.values[r][c]
-                if color not in [0, 8, 5] and color not in color_order:
-                    color_order.append(color)
-        return color_order
+    # Find all connected regions
+    all_regions = find_connected_regions()
 
-    colors = get_color_order()
-    for color in colors:
-        process_color(color)
-    
-    process_sky_blue()
+    # Find the largest region of any color
+    largest_region = max((region for color_regions in all_regions.values() for region in color_regions), key=len)
+    largest_color = input_grid.values[largest_region[0][0]][largest_region[0][1]]
+    largest_bbox = get_bounding_box(largest_region)
+
+    # Fill the largest region in the output grid
+    fill_region(largest_region, largest_color)
+
+    # Process other colors (except sky blue and gray)
+    for color, regions in all_regions.items():
+        if color not in [5, 8]:  # Skip gray and sky blue
+            for region in sorted(regions, key=len, reverse=True):
+                if region != largest_region:
+                    place_region(region, color)
+
+    # Process sky blue regions
+    for region in sorted(all_regions[8], key=len, reverse=True):
+        process_sky_blue(region)
+
+    # Clean up the grid
     remove_isolated_cells()
-    remove_gray_cells()
+
+    # Fill surrounded cells (two passes)
     fill_surrounded_cells()
-    fill_surrounded_cells()  # Second pass to ensure completeness
+    fill_surrounded_cells()
+
+    # Ensure all cells outside the largest region's bounding box are empty
+    min_r, min_c, max_r, max_c = largest_bbox
+    for r in range(rows):
+        for c in range(cols):
+            if r < min_r or r > max_r or c < min_c or c > max_c:
+                output_grid.values[r][c] = 0
 
     return output_grid
