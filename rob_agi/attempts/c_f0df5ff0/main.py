@@ -9,11 +9,12 @@ def solve_f0df5ff0(input_grid: ColoredGrid) -> ColoredGrid:
     minimal branching. It connects significant black areas, touches grid edges when appropriate,
     and maintains the original structure of colored regions.
 
-    1. Identify large black regions and use them as start/end points.
-    2. Use A* pathfinding to connect these regions with a blue path.
-    3. Add minimal branches to connect isolated black cells.
-    4. Optimize the path to ensure it's mostly one cell thick.
-    5. Make final adjustments for edge connections and isolated regions.
+    1. Analyze the input grid and create a heat map of black cell density.
+    2. Generate a skeleton structure connecting high-density black areas.
+    3. Refine the path using a modified A* algorithm.
+    4. Add complexity and balance with branches and loops.
+    5. Optimize path thickness and create deliberate loops.
+    6. Connect isolated black cells and make final refinements.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -22,32 +23,30 @@ def solve_f0df5ff0(input_grid: ColoredGrid) -> ColoredGrid:
         return [(r+dr, c+dc) for dr, dc in [(0,1), (1,0), (0,-1), (-1,0)]
                 if 0 <= r+dr < rows and 0 <= c+dc < cols]
 
-    def find_large_black_regions():
-        visited = set()
-        regions = []
+    def create_heat_map():
+        heat_map = [[0 for _ in range(cols)] for _ in range(rows)]
         for r in range(rows):
             for c in range(cols):
-                if output_grid.get_cell(r, c) == 0 and (r, c) not in visited:
-                    region = []
-                    stack = [(r, c)]
-                    while stack:
-                        curr_r, curr_c = stack.pop()
-                        if (curr_r, curr_c) not in visited:
-                            visited.add((curr_r, curr_c))
-                            region.append((curr_r, curr_c))
-                            for nr, nc in get_neighbors(curr_r, curr_c):
-                                if output_grid.get_cell(nr, nc) == 0:
-                                    stack.append((nr, nc))
-                    if len(region) > 3:  # Consider regions larger than 3 cells as "large"
-                        regions.append(region)
-        return regions
+                if output_grid.get_cell(r, c) == 0:
+                    for nr, nc in get_neighbors(r, c):
+                        heat_map[nr][nc] += 1
+        return heat_map
+
+    def generate_skeleton(heat_map):
+        threshold = max(max(row) for row in heat_map) // 2
+        skeleton = set()
+        for r in range(rows):
+            for c in range(cols):
+                if heat_map[r][c] >= threshold:
+                    skeleton.add((r, c))
+        return skeleton
 
     def manhattan_distance(a, b):
         return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
-    def a_star(start, goal):
+    def a_star(start, goal, skeleton):
         def heuristic(node):
-            return manhattan_distance(node, goal)
+            return manhattan_distance(node, goal) - (5 if node in skeleton else 0)
 
         open_set = [(0, start)]
         came_from = {}
@@ -76,45 +75,45 @@ def solve_f0df5ff0(input_grid: ColoredGrid) -> ColoredGrid:
 
         return None
 
-    large_regions = find_large_black_regions()
+    heat_map = create_heat_map()
+    skeleton = generate_skeleton(heat_map)
 
-    if len(large_regions) >= 2:
-        start_region = large_regions[0]
-        end_region = max(large_regions[1:], key=lambda r: manhattan_distance(r[0], start_region[0]))
-        path = a_star(start_region[0], end_region[0])
+    # Connect skeleton points
+    skeleton_points = list(skeleton)
+    for i in range(len(skeleton_points) - 1):
+        start = skeleton_points[i]
+        end = skeleton_points[i + 1]
+        path = a_star(start, end, skeleton)
         if path:
             for r, c in path:
                 output_grid.set_cell(r, c, 1)
 
-    # Connect remaining large regions
-    for region in large_regions[2:]:
-        closest_blue = min((r, c) for r in range(rows) for c in range(cols) if output_grid.get_cell(r, c) == 1,
-                           key=lambda p: min(manhattan_distance(p, cell) for cell in region))
-        path = a_star(region[0], closest_blue)
-        if path:
-            for r, c in path:
-                output_grid.set_cell(r, c, 1)
-
-    # Add minimal branches to isolated black cells
+    # Add complexity and balance
     for r in range(rows):
         for c in range(cols):
-            if output_grid.get_cell(r, c) == 0:
-                closest_blue = min((br, bc) for br in range(rows) for bc in range(cols) if output_grid.get_cell(br, bc) == 1,
+            if output_grid.get_cell(r, c) == 0 and heat_map[r][c] > 0:
+                closest_blue = min((br, bc) for br in range(rows) for bc in range(cols) 
+                                   if output_grid.get_cell(br, bc) == 1,
                                    key=lambda p: manhattan_distance(p, (r, c)))
-                if manhattan_distance((r, c), closest_blue) <= 3:  # Only connect very close black cells
-                    path = a_star((r, c), closest_blue)
+                if manhattan_distance((r, c), closest_blue) <= 5:
+                    path = a_star((r, c), closest_blue, skeleton)
                     if path:
                         for pr, pc in path:
                             output_grid.set_cell(pr, pc, 1)
 
-    # Optimize path thickness
+    # Optimize path thickness and create loops
     for r in range(rows):
         for c in range(cols):
             if output_grid.get_cell(r, c) == 1:
                 blue_neighbors = sum(1 for nr, nc in get_neighbors(r, c) if output_grid.get_cell(nr, nc) == 1)
                 if blue_neighbors > 2:
                     non_blue_neighbors = [n for n in get_neighbors(r, c) if output_grid.get_cell(*n) != 1]
-                    if non_blue_neighbors:
+                    if non_blue_neighbors and heat_map[r][c] < 2:
                         output_grid.set_cell(r, c, output_grid.get_cell(*non_blue_neighbors[0]))
+                elif blue_neighbors == 1 and heat_map[r][c] > 1:
+                    for nr, nc in get_neighbors(r, c):
+                        if output_grid.get_cell(nr, nc) == 0:
+                            output_grid.set_cell(nr, nc, 1)
+                            break
 
     return output_grid
