@@ -31,9 +31,11 @@ def expand_around_yellow(grid: ColoredGrid, row: int, col: int):
                     grid.values[i][j] = 2  # Change to red
 
 def choose_empty_corner(grid: ColoredGrid, corners: List[Tuple[int, int]]) -> Tuple[int, int]:
-    valid_corners = [c for c in corners if 0 <= c[0] < grid.num_rows and 0 <= c[1] < grid.num_cols]
-    empty_corners = [c for c in valid_corners if grid.values[c[0]][c[1]] == 0]
-    return empty_corners[0] if empty_corners else valid_corners[0]
+    for corner in corners:
+        if 0 <= corner[0] < grid.num_rows and 0 <= corner[1] < grid.num_cols:
+            if grid.values[corner[0]][corner[1]] == 0:
+                return corner
+    return corners[0]  # Default to top-left if no empty corner found
 
 def connect_expansions(grid: ColoredGrid):
     for r in range(grid.num_rows):
