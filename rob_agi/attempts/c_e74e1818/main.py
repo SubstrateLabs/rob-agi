@@ -55,44 +55,24 @@ def identify_shapes(grid: ColoredGrid) -> Dict[int, List[Tuple[int, int]]]:
     
     return shapes
 
-def calculate_grid_metrics(grid: ColoredGrid, shapes: Dict[int, List[Tuple[int, int]]]) -> Dict:
-    center_of_mass = calculate_center_of_mass(grid)
-    symmetry = calculate_vertical_symmetry(grid)
-    weight_distribution = calculate_weight_distribution(shapes)
+def calculate_shape_metrics(shape: List[Tuple[int, int]]) -> Dict:
+    min_r = min(r for r, _ in shape)
+    max_r = max(r for r, _ in shape)
+    center_of_mass = sum(r for r, _ in shape) / len(shape)
+    weight_distribution = sum(1 for r, _ in shape if r > (min_r + max_r) / 2) / len(shape)
     
     return {
         "center_of_mass": center_of_mass,
-        "symmetry": symmetry,
-        "weight_distribution": weight_distribution
+        "weight_distribution": weight_distribution,
+        "height": max_r - min_r + 1
     }
 
-def calculate_center_of_mass(grid: ColoredGrid) -> Tuple[float, float]:
-    total_mass = sum(sum(row) for row in grid.values)
-    if total_mass == 0:
-        return grid.num_rows / 2, grid.num_cols / 2
-    
-    row_sum = sum(r * sum(row) for r, row in enumerate(grid.values))
-    col_sum = sum(c * grid.values[r][c] for r in range(grid.num_rows) for c in range(grid.num_cols))
-    
-    return row_sum / total_mass, col_sum / total_mass
-
-def calculate_vertical_symmetry(grid: ColoredGrid) -> float:
-    symmetry_score = 0
-    for r in range(grid.num_rows):
-        for c in range(grid.num_cols // 2):
-            if grid.values[r][c] == grid.values[r][-(c+1)]:
-                symmetry_score += 1
-    return symmetry_score / (grid.num_rows * grid.num_cols // 2)
-
-def calculate_weight_distribution(shapes: Dict[int, List[Tuple[int, int]]]) -> float:
-    total_score = 0
-    for shape in shapes.values():
-        min_r = min(r for r, _ in shape)
-        max_r = max(r for r, _ in shape)
-        mid_r = (min_r + max_r) / 2
-        lower_half = sum(1 for r, _ in shape if r > mid_r)
-        total_score += lower_half / len(shape)
-    return total_score / len(shapes)
+def is_better_shape_configuration(new_metrics: Dict, original_metrics: Dict) -> bool:
+    if new_metrics["weight_distribution"] > original_metrics["weight_distribution"]:
+        return True
+    elif new_metrics["weight_distribution"] == original_metrics["weight_distribution"]:
+        return new_metrics["center_of_mass"] < original_metrics["center_of_mass"]
+    return False
 
 def flip_shape_vertically(shape: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
     min_r = min(r for r, _ in shape)
