@@ -19,12 +19,17 @@ def solve_5ffb2104(input_grid: ColoredGrid) -> ColoredGrid:
     rows, cols = input_grid.get_dimensions()
     new_grid = [[0 for _ in range(cols)] for _ in range(rows)]
 
-    for row in range(rows):
-        new_col = cols - 1  # Start placing elements from the rightmost column
-        for col in range(cols - 1, -1, -1):  # Iterate from right to left
+    for col in range(cols):
+        new_row = rows - 1  # Start placing elements from the bottom row
+        for row in range(rows - 1, -1, -1):  # Iterate from bottom to top
             if input_grid.values[row][col] != 0:
-                # Place the non-zero element in the rightmost available position
-                new_grid[row][new_col] = input_grid.values[row][col]
-                new_col -= 1  # Move the placement pointer left
+                # Place the non-zero element in the bottommost available position
+                new_grid[new_row][col] = input_grid.values[row][col]
+                new_row -= 1  # Move the placement pointer up
+
+    # Compact each row to the right
+    for row in range(rows):
+        non_zero = [val for val in new_grid[row] if val != 0]
+        new_grid[row] = [0] * (cols - len(non_zero)) + non_zero
 
     return ColoredGrid(values=new_grid)
