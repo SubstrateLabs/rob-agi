@@ -5,7 +5,7 @@ def solve_e9ac8c9e(input_grid: ColoredGrid) -> ColoredGrid:
     Transform the input grid by replacing a gray area with an expanded arrangement of surrounding colors.
     
     1. Locate the gray (5) area in the input grid.
-    2. Identify the four colored squares in the quadrants around the gray area, searching outward from each corner.
+    2. Identify the four colored squares in the corners around the gray area, searching outward diagonally.
     3. Create a new grid where the gray area is replaced by an expanded formation of the surrounding colors,
        each color occupying a quarter of the space previously taken by the gray area.
     4. The new formation is always placed in the center of the grid, regardless of the original gray area's position.
@@ -25,23 +25,30 @@ def solve_e9ac8c9e(input_grid: ColoredGrid) -> ColoredGrid:
     # Create the output grid filled with black (0)
     output = ColoredGrid(values=[[0 for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
     
-    # Calculate the new block dimensions
-    block_height = (gray_height + 1) // 2
-    block_width = (gray_width + 1) // 2
-    
     # Calculate the center position for the new formation
     center_row = input_grid.num_rows // 2
     center_col = input_grid.num_cols // 2
     new_top = center_row - gray_height // 2
     new_left = center_col - gray_width // 2
     
+    # Calculate the dimensions for each color block
+    top_height = (gray_height + 1) // 2
+    bottom_height = gray_height - top_height
+    left_width = (gray_width + 1) // 2
+    right_width = gray_width - left_width
+    
     # Fill the new formation
-    for i in range(2):
-        for j in range(2):
-            color = colors[i * 2 + j]
-            for r in range(block_height):
-                for c in range(block_width):
-                    output.values[new_top + i * block_height + r][new_left + j * block_width + c] = color
+    color_positions = [
+        (new_top, new_left, top_height, left_width),
+        (new_top, new_left + left_width, top_height, right_width),
+        (new_top + top_height, new_left, bottom_height, left_width),
+        (new_top + top_height, new_left + left_width, bottom_height, right_width)
+    ]
+    
+    for color, (r, c, h, w) in zip(colors, color_positions):
+        for i in range(h):
+            for j in range(w):
+                output.values[r + i][c + j] = color
     
     return output
 
