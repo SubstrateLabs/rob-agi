@@ -3,14 +3,15 @@ from typing import List, Tuple
 
 def solve_95a58926(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by identifying and preserving vertical gray lines,
-    modifying horizontal gray lines to include a secondary color at intersections,
-    and removing any stray secondary color cells that aren't at intersections.
+    Transforms the input grid by identifying vertical gray lines and horizontal gray rows,
+    extending horizontal gray lines to full width, and marking intersections with a secondary color.
 
-    1. Analyzes the input grid to find the secondary color and positions of gray lines.
-    2. Creates a new grid with vertical gray lines copied from the input.
-    3. Processes horizontal gray lines, marking intersections with the secondary color.
-    4. Removes any secondary color cells that aren't at valid intersections.
+    1. Identifies the secondary color (non-black, non-gray).
+    2. Locates vertical gray line segments.
+    3. Identifies rows containing any gray cells.
+    4. Creates a new grid with full-width horizontal gray lines.
+    5. Adds vertical gray line segments.
+    6. Marks intersections of horizontal and vertical gray lines with the secondary color.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -20,23 +21,25 @@ def solve_95a58926(input_grid: ColoredGrid) -> ColoredGrid:
     """
     rows, cols = input_grid.get_dimensions()
     secondary_color = find_secondary_color(input_grid)
-    vertical_lines = find_vertical_lines(input_grid)
-    horizontal_lines = find_horizontal_lines(input_grid, secondary_color)
+    vertical_segments = find_vertical_segments(input_grid)
+    horizontal_rows = find_horizontal_rows(input_grid)
 
     new_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
 
-    # Copy vertical gray lines
-    for col in vertical_lines:
-        for row in range(rows):
-            new_grid.values[row][col] = input_grid.values[row][col]
+    # Fill horizontal gray lines
+    for row in horizontal_rows:
+        new_grid.values[row] = [5] * cols
 
-    # Process horizontal gray lines
-    for row in horizontal_lines:
-        for col in range(cols):
-            if col in vertical_lines:
+    # Fill vertical gray segments
+    for col, start, end in vertical_segments:
+        for row in range(start, end + 1):
+            new_grid.values[row][col] = 5
+
+    # Mark intersections
+    for row in horizontal_rows:
+        for col, start, end in vertical_segments:
+            if start <= row <= end:
                 new_grid.values[row][col] = secondary_color
-            else:
-                new_grid.values[row][col] = 5  # gray
 
     return new_grid
 
@@ -47,10 +50,21 @@ def find_secondary_color(grid: ColoredGrid) -> int:
                 return cell
     return 0  # default to black if no secondary color found
 
-def find_vertical_lines(grid: ColoredGrid) -> List[int]:
+def find_vertical_segments(grid: ColoredGrid) -> List[Tuple[int, int, int]]:
     rows, cols = grid.get_dimensions()
-    return [col for col in range(cols) if all(grid.values[row][col] == 5 for row in range(rows))]
+    segments = []
+    for col in range(cols):
+        start = None
+        for row in range(rows):
+            if grid.values[row][col] == 5:
+                if start is None:
+                    start = row
+            elif start is not None:
+                segments.append((col, start, row - 1))
+                start = None
+        if start is not None:
+            segments.append((col, start, rows - 1))
+    return segments
 
-def find_horizontal_lines(grid: ColoredGrid, secondary_color: int) -> List[int]:
-    rows, cols = grid.get_dimensions()
-    return [row for row in range(rows) if all(grid.values[row][col] in [5, secondary_color] for col in range(cols))]
+def find_horizontal_rows(grid: ColoredGrid) -> List[int]:
+    return [row for row, row_values in enumerate(grid.values) if 5 in row_values]
