@@ -4,18 +4,18 @@ from typing import List, Tuple, Optional, Set
 def solve_e5c44e8f(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transform the input grid by adding a green 'E' pattern based on the following steps:
-    1. Find the initial green (3) cell.
+    1. Analyze the input grid to find the initial green cell and identify red cells.
     2. Determine the potential 'E' shape boundaries considering grid edges and red cells.
-    3. Create the vertical line of the 'E' from the initial green cell.
-    4. Create the top, middle, and bottom horizontal lines of the 'E'.
-    5. Ensure the 'E' touches at least two edges of the grid.
-    6. Optimize the 'E' shape by expanding it where possible.
-    7. Connect any disconnected parts of the 'E'.
-    8. Clean up the 'E' shape by removing unnecessary green cells.
-    9. Verify that all red cells are preserved and the 'E' is connected.
+    3. Create the vertical line of the 'E' from the leftmost available column.
+    4. Create the top, middle, and bottom horizontal lines of the 'E', avoiding red cells.
+    5. Ensure the 'E' touches at least two edges of the grid by extending lines if necessary.
+    6. Optimize the 'E' shape by expanding it where possible, ensuring connectivity.
+    7. Clean up the 'E' shape by removing unnecessary green cells and isolated parts.
+    8. Verify that all red cells are preserved, the 'E' is connected, and touches at least two edges.
 
     The function adapts to various initial conditions and red cell placements
-    to create the largest possible 'E' pattern that satisfies all challenge requirements.
+    to create the largest possible 'E' pattern that satisfies all challenge requirements,
+    including asymmetrical or irregular 'E' shapes when necessary.
     """
     output_grid = input_grid.deep_copy()
     initial_green = find_initial_green(output_grid)
@@ -82,14 +82,15 @@ def ensure_two_edge_contact(grid: ColoredGrid, left_col: int):
         any(grid.get_cell(0, c) == 3 for c in range(cols)),
         any(grid.get_cell(rows-1, c) == 3 for c in range(cols)),
         any(grid.get_cell(r, 0) == 3 for r in range(rows)),
-        any(grid.get_cell(r, cols-1) == 3 for c in range(rows))
+        any(grid.get_cell(r, cols-1) == 3 for r in range(rows))
     ])
     
     if edges_touched < 2:
         # Extend top line to right edge
+        top_row = min(r for r in range(rows) if grid.get_cell(r, left_col) == 3)
         for c in range(cols-1, left_col, -1):
-            if grid.get_cell(0, c) == 0:
-                grid.set_cell(0, c, 3)
+            if grid.get_cell(top_row, c) == 0:
+                grid.set_cell(top_row, c, 3)
         
         # Extend bottom horizontal line to right edge
         bottom_row = max(r for r in range(rows) if grid.get_cell(r, left_col) == 3)
