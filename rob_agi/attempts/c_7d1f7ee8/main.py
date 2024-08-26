@@ -9,10 +9,11 @@ def solve_7d1f7ee8(input_grid: ColoredGrid) -> ColoredGrid:
     1. Identifies distinct color regions in the grid.
     2. Processes regions from outermost to innermost.
     3. For each region:
-       - If enclosed by another color, changes to that color.
-       - If not enclosed, fills interior with its own color.
+       - If it's a frame, fills its interior with its own color.
+       - If it's a solid shape, preserves it.
+       - If enclosed by another color, changes to that color if it's not a solid shape.
     4. Recursively processes sub-regions within each region.
-    5. Preserves unenclosed black (0) areas.
+    5. Preserves unenclosed black (0) areas and shapes touching the grid border.
     
     Args:
         input_grid (ColoredGrid): The input grid to be transformed.
@@ -61,9 +62,18 @@ def solve_7d1f7ee8(input_grid: ColoredGrid) -> ColoredGrid:
                         return False, 0
         return enclosing_color is not None, enclosing_color
     
+    def is_solid_shape(boundary: Set[Tuple[int, int]], interior: Set[Tuple[int, int]]) -> bool:
+        min_x = min(x for x, _ in boundary | interior)
+        max_x = max(x for x, _ in boundary | interior)
+        min_y = min(y for _, y in boundary | interior)
+        max_y = max(y for _, y in boundary | interior)
+        return len(boundary | interior) == (max_x - min_x + 1) * (max_y - min_y + 1)
+    
     def process_region(boundary: Set[Tuple[int, int]], interior: Set[Tuple[int, int]], color: int):
         enclosed, enclosing_color = is_enclosed(boundary, color)
-        if enclosed:
+        is_solid = is_solid_shape(boundary, interior)
+        
+        if enclosed and not is_solid:
             for x, y in boundary | interior:
                 output_grid.values[x][y] = enclosing_color
         else:
