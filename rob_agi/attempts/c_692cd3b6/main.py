@@ -11,6 +11,7 @@ def solve_692cd3b6(input_grid: ColoredGrid) -> ColoredGrid:
     4. Extend yellow to grid edges if a C-shape touches an edge.
     5. Clean up any disconnected yellow areas.
     6. Preserve the original 'C' shapes.
+    7. Ensure yellow forms a single connected region.
     
     This approach ensures the correct yellow path between the C-shapes
     and extends to the appropriate grid edges only when a C-shape touches an edge.
@@ -28,7 +29,7 @@ def solve_692cd3b6(input_grid: ColoredGrid) -> ColoredGrid:
     # Step 4: Extend to edges if necessary
     extend_to_edges(new_grid, c_shapes[0], c_shapes[1])
     
-    # Step 5: Clean up disconnected yellow areas
+    # Step 5 & 7: Clean up disconnected yellow areas and ensure single connected region
     clean_up_yellow(new_grid, connecting_rectangle)
     
     # Step 6: Preserve original 'C' shapes
@@ -93,52 +94,55 @@ def extend_to_edges(grid: ColoredGrid, shape1: List[Tuple[int, int]], shape2: Li
     # Extend to left edge if any shape touches it
     if bbox1[1] == 0 or bbox2[1] == 0:
         for r in range(rows):
-            if grid.values[r][0] == 0:
-                grid.values[r][0] = 4
+            grid.values[r][0] = 4
     
     # Extend to right edge if any shape touches it
     if bbox1[3] == cols - 1 or bbox2[3] == cols - 1:
         for r in range(rows):
-            if grid.values[r][cols - 1] == 0:
-                grid.values[r][cols - 1] = 4
+            grid.values[r][cols - 1] = 4
     
     # Extend to top edge if any shape touches it
     if bbox1[0] == 0 or bbox2[0] == 0:
         for c in range(cols):
-            if grid.values[0][c] == 0:
-                grid.values[0][c] = 4
+            grid.values[0][c] = 4
     
     # Extend to bottom edge if any shape touches it
     if bbox1[2] == rows - 1 or bbox2[2] == rows - 1:
         for c in range(cols):
-            if grid.values[rows - 1][c] == 0:
-                grid.values[rows - 1][c] = 4
+            grid.values[rows - 1][c] = 4
 
 def clean_up_yellow(grid: ColoredGrid, connecting_rectangle: Tuple[int, int, int, int]):
     rows, cols = grid.get_dimensions()
-    top, left, bottom, right = connecting_rectangle
     
-    def is_connected(r: int, c: int) -> bool:
-        visited = set()
-        stack = [(r, c)]
-        while stack:
-            curr_r, curr_c = stack.pop()
-            if curr_r < top or curr_r > bottom or curr_c < left or curr_c > right:
-                return True
-            if (curr_r, curr_c) in visited:
-                continue
-            visited.add((curr_r, curr_c))
-            if grid.values[curr_r][curr_c] == 4:
-                for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                    nr, nc = curr_r + dr, curr_c + dc
-                    if 0 <= nr < rows and 0 <= nc < cols:
-                        stack.append((nr, nc))
-        return False
+    def flood_fill(r: int, c: int, target_color: int, replacement_color: int):
+        if target_color == replacement_color:
+            return
+        if grid.values[r][c] != target_color:
+            return
+        
+        grid.values[r][c] = replacement_color
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols:
+                flood_fill(nr, nc, target_color, replacement_color)
     
+    # Find a yellow cell within the connecting rectangle
     for r in range(rows):
         for c in range(cols):
-            if grid.values[r][c] == 4 and not is_connected(r, c):
+            if grid.values[r][c] == 4:
+                flood_fill(r, c, 4, 5)  # Temporarily mark connected yellow as 5
+                break
+        else:
+            continue
+        break
+    
+    # Clean up disconnected yellow and revert connected yellow back to 4
+    for r in range(rows):
+        for c in range(cols):
+            if grid.values[r][c] == 4:
                 grid.values[r][c] = 0
+            elif grid.values[r][c] == 5:
+                grid.values[r][c] = 4
 
 def preserve_c_shapes(grid: ColoredGrid, c_shapes: List[List[Tuple[int, int]]]):
     for shape in c_shapes:
