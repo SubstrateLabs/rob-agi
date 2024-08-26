@@ -1,35 +1,106 @@
 example_0:
   input: |
-    The grid is 30x30. There's a large green (3) rectangular frame in the top-left quadrant, spanning from (2,2) to (18,12). Inside this frame is a yellow (4) rectangle from (4,4) to (16,10). Within the yellow area is a blue (1) rectangle from (6,6) to (14,8), and inside that is a sky blue (8) rectangle from (8,8) to (12,12). The rest of the grid is black (0). In the bottom-right quadrant, there's another green rectangle from (14,15) to (28,24).
+    The grid is 30x30, divided into four quadrants by a black cross at rows/columns 14-15.
+    Top-left quadrant (0-13, 0-13):
+    - Green (3) frame: (2,2) to (18,12)
+    - Yellow (4) rectangle: (4,4) to (16,10)
+    - Blue (1) rectangle: (6,6) to (14,8)
+    - Sky blue (8) rectangle: (8,8) to (12,12)
+    Bottom-right quadrant (16-29, 16-29):
+    - Green (3) rectangle: (14,15) to (28,24)
+    All other areas are black (0).
   output: |
-    The grid layout is similar to the input, but the bottom-right green rectangle has been transformed. It now contains a yellow rectangle inside it, which in turn contains a blue rectangle, which contains a smaller sky blue rectangle. This mirrors the pattern seen in the top-left quadrant of both the input and output. The top-left quadrant remains unchanged.
+    The grid structure remains 30x30 with the black cross.
+    Top-left quadrant: Unchanged from input.
+    Bottom-right quadrant: The green rectangle now contains nested rectangles mirroring the top-left pattern:
+    - Green (3) outer rectangle
+    - Yellow (4) rectangle inside
+    - Blue (1) rectangle within yellow
+    - Sky blue (8) innermost rectangle
+    Other quadrants and the central cross remain black (0).
 
 example_1:
   input: |
-    The grid is 30x30. In the top-left quadrant, there's a red (2) rectangle from (2,2) to (13,11). Inside this is a yellow (4) rectangle from (5,5) to (11,10). Within the yellow area is a blue (1) rectangle from (7,7) to (9,10). There's a sky blue (8) rectangle from (3,6) to (10,7), partially overlapping the yellow area. A magenta (6) shape forms an inverted 'L' along the top and left edges of the red rectangle. In the bottom-right quadrant, there's another red rectangle from (14,19) to (28,28).
+    30x30 grid with black cross at rows/columns 14-15.
+    Top-left quadrant (0-13, 0-13):
+    - Red (2) rectangle: (2,2) to (13,11)
+    - Yellow (4) rectangle: (5,5) to (11,10)
+    - Blue (1) rectangle: (7,7) to (9,10)
+    - Sky blue (8) rectangle: (3,6) to (10,7), overlapping yellow
+    - Magenta (6) inverted 'L': top and left edges of red rectangle
+    Bottom-right quadrant (16-29, 16-29):
+    - Red (2) rectangle: (14,19) to (28,28)
+    Other areas black (0).
   output: |
-    The layout is similar to the input, but the bottom-right red rectangle has been transformed. It now contains a yellow rectangle, which contains a blue rectangle. A sky blue rectangle partially overlaps the yellow area, and a magenta inverted 'L' shape borders the top and left of the red rectangle. This mirrors the pattern seen in the top-left quadrant of both the input and output. The top-left quadrant remains unchanged.
+    Grid structure and top-left quadrant unchanged.
+    Bottom-right quadrant: Red rectangle now contains the complete pattern from top-left:
+    - Red (2) outer rectangle
+    - Yellow (4) rectangle inside
+    - Blue (1) rectangle within yellow
+    - Sky blue (8) rectangle overlapping yellow
+    - Magenta (6) inverted 'L' along top and left of red rectangle
+    Other quadrants and central cross remain black (0).
 
 example_2:
   input: |
-    The grid is 30x30. In the top-left quadrant, there's a sky blue (8) rectangle from (3,3) to (14,11). Inside this is a yellow (4) rectangle from (5,5) to (11,9). Within the yellow area is a red (2) rectangle from (6,6) to (10,8). In the top-right quadrant, there's another sky blue rectangle from (19,5) to (28,11). In the bottom-left quadrant, there's a large sky blue rectangle from (2,17) to (18,27).
+    30x30 grid with black cross at rows/columns 14-15.
+    Top-left quadrant (0-13, 0-13):
+    - Sky blue (8) rectangle: (3,3) to (14,11)
+    - Yellow (4) rectangle: (5,5) to (11,9)
+    - Red (2) rectangle: (6,6) to (10,8)
+    Top-right quadrant (0-13, 16-29):
+    - Sky blue (8) rectangle: (19,5) to (28,11)
+    Bottom-left quadrant (16-29, 0-13):
+    - Sky blue (8) rectangle: (2,17) to (18,27)
+    Other areas black (0).
   output: |
-    The layout is similar to the input, but both the top-right and bottom-left sky blue rectangles have been transformed. They now contain yellow rectangles, which in turn contain red rectangles. This mirrors the pattern seen in the top-left quadrant of both the input and output. The top-left quadrant remains unchanged.
+    Grid structure and top-left quadrant unchanged.
+    Top-right and bottom-left quadrants: Sky blue rectangles now contain the complete pattern from top-left:
+    - Sky blue (8) outer rectangle
+    - Yellow (4) rectangle inside
+    - Red (2) innermost rectangle
+    Bottom-right quadrant and central cross remain black (0).
 
 test_case_0:
   input: |
-    The grid is 30x30. In the top-left quadrant, there's a green (3) rectangular frame from (2,2) to (18,12). Inside this frame is a yellow (4) rectangle from (4,4) to (16,10). Within the yellow area is a blue (1) rectangle from (6,6) to (14,8), and inside that is a sky blue (8) rectangle from (8,8) to (12,12). The rest of the grid is black (0). In the bottom-right quadrant, there's another green rectangle from (14,15) to (28,24).
+    30x30 grid with black cross at rows/columns 14-15.
+    Top-left quadrant (0-13, 0-13):
+    - Green (3) frame: (2,2) to (18,12)
+    - Yellow (4) rectangle: (4,4) to (16,10)
+    - Blue (1) rectangle: (6,6) to (14,8)
+    - Sky blue (8) rectangle: (8,8) to (12,12)
+    Bottom-right quadrant (16-29, 16-29):
+    - Green (3) rectangle: (14,15) to (28,24)
+    Other areas black (0).
   output: |
-    The expected output is not provided for this test case.
+    The expected output should mirror the pattern from the top-left quadrant into the bottom-right quadrant's green rectangle, while keeping other areas unchanged.
 
 test_case_1:
   input: |
-    The grid is 30x30. In the top-left quadrant, there's a red (2) rectangle from (2,2) to (13,11). Inside this is a yellow (4) rectangle from (5,5) to (11,10). Within the yellow area is a blue (1) rectangle from (7,7) to (9,10). There's a sky blue (8) rectangle from (3,6) to (10,7), partially overlapping the yellow area. A magenta (6) shape forms an inverted 'L' along the top and left edges of the red rectangle. In the bottom-right quadrant, there's another red rectangle from (14,19) to (28,28).
+    30x30 grid with black cross at rows/columns 14-15.
+    Top-left quadrant (0-13, 0-13):
+    - Red (2) rectangle: (2,2) to (13,11)
+    - Yellow (4) rectangle: (5,5) to (11,10)
+    - Blue (1) rectangle: (7,7) to (9,10)
+    - Sky blue (8) rectangle: (3,6) to (10,7), overlapping yellow
+    - Magenta (6) inverted 'L': top and left edges of red rectangle
+    Bottom-right quadrant (16-29, 16-29):
+    - Red (2) rectangle: (14,19) to (28,28)
+    Other areas black (0).
   output: |
-    The expected output is not provided for this test case.
+    The expected output should replicate the complex pattern from the top-left quadrant into the bottom-right quadrant's red rectangle, while keeping other areas unchanged.
 
 test_case_2:
   input: |
-    The grid is 30x30. In the top-left quadrant, there's a sky blue (8) rectangle from (3,3) to (14,11). Inside this is a yellow (4) rectangle from (5,5) to (11,9). Within the yellow area is a red (2) rectangle from (6,6) to (10,8). In the top-right quadrant, there's another sky blue rectangle from (19,5) to (28,11). In the bottom-left quadrant, there's a large sky blue rectangle from (2,17) to (18,27).
+    30x30 grid with black cross at rows/columns 14-15.
+    Top-left quadrant (0-13, 0-13):
+    - Sky blue (8) rectangle: (3,3) to (14,11)
+    - Yellow (4) rectangle: (5,5) to (11,9)
+    - Red (2) rectangle: (6,6) to (10,8)
+    Top-right quadrant (0-13, 16-29):
+    - Sky blue (8) rectangle: (19,5) to (28,11)
+    Bottom-left quadrant (16-29, 0-13):
+    - Sky blue (8) rectangle: (2,17) to (18,27)
+    Other areas black (0).
   output: |
-    The expected output is not provided for this test case.
+    The expected output should replicate the pattern from the top-left quadrant into both the top-right and bottom-left quadrants' sky blue rectangles, while keeping other areas unchanged.
