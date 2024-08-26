@@ -27,9 +27,10 @@ def solve_4acc7107(input_grid: ColoredGrid) -> ColoredGrid:
             color = input_grid.get_cell(r, c)
             if color != 0:
                 if color not in color_groups:
-                    color_groups[color] = {'left': c, 'right': c, 'rows': []}
+                    color_groups[color] = {'left': c, 'right': c, 'rows': set(), 'cells': []}
                 color_groups[color]['right'] = max(color_groups[color]['right'], c)
-                color_groups[color]['rows'].append(r)
+                color_groups[color]['rows'].add(r)
+                color_groups[color]['cells'].append((r, c))
     
     # Step 2 and 3: Process color groups and place in new grid
     new_grid = [[0 for _ in range(cols)] for _ in range(rows)]
@@ -37,18 +38,16 @@ def solve_4acc7107(input_grid: ColoredGrid) -> ColoredGrid:
     
     for color, group in sorted(color_groups.items(), key=lambda x: x[1]['left']):
         width = group['right'] - group['left'] + 1
-        height = len(set(group['rows']))
+        height = len(group['rows'])
         bottom_row = rows - 1
         
-        # Sort rows in descending order for vertical flip
-        sorted_rows = sorted(set(group['rows']), reverse=True)
+        # Sort cells in descending order of rows for vertical flip
+        sorted_cells = sorted(group['cells'], key=lambda x: x[0], reverse=True)
         
-        for i, r in enumerate(sorted_rows):
-            for c in range(group['left'], group['right'] + 1):
-                if input_grid.get_cell(r, c) == color:
-                    new_c = current_col + (c - group['left'])
-                    new_r = bottom_row - (i % height)
-                    new_grid[new_r][new_c] = color
+        for i, (r, c) in enumerate(sorted_cells):
+            new_c = current_col + (c - group['left'])
+            new_r = bottom_row - (i % height)
+            new_grid[new_r][new_c] = color
         
         current_col += width
     
