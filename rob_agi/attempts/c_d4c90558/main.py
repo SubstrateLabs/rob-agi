@@ -8,19 +8,18 @@ def solve_d4c90558(input_grid: ColoredGrid) -> ColoredGrid:
     The function scans the input grid row by row, identifies the largest contiguous width
     for each unique color (excluding black), and arranges these widths in the order
     of their first appearance in the input grid. The output grid is created with each row
-    representing a color, and all rows are padded to have the same length as the overall
-    largest width found. The colors are arranged in order of their topmost occurrence,
-    with ties broken by leftmost position. Gray (5) is treated as a continuation of the
-    current color when calculating contiguous widths, but is excluded from the output.
-    The function also ensures that the output grid's width is limited to the maximum
-    contiguous width found across all colors.
+    representing a color, and all rows have the same length as the largest width found.
+    The colors are arranged in order of their topmost occurrence, with ties broken by
+    leftmost position. Gray (5) is treated as a continuation of the current color when
+    calculating contiguous widths, but is excluded from the output. The function ensures
+    that the output grid's width is exactly the largest contiguous width found for any color.
     
     Args:
     input_grid (ColoredGrid): The input grid to process.
     
     Returns:
     ColoredGrid: A new grid where each row represents the largest contiguous width of a unique color,
-                 padded to ensure all rows have the same length as the largest contiguous width found.
+                 with all rows having the same length as the largest width found.
     """
     def find_contiguous_width(row: int, col: int, color: int) -> int:
         width = 0
