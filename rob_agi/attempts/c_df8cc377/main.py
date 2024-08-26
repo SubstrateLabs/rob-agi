@@ -15,6 +15,7 @@ def solve_df8cc377(input_grid: ColoredGrid) -> ColoredGrid:
     6. For shapes smaller than 3x3 but closed, preserving them without filling.
     7. Clearing all cells not part of any shape's boundary or interior.
     8. Reconstructing the grid with the modified shapes.
+    9. Removing all scattered dots that are not part of any closed shape.
     """
     BLACK = 0
 
@@ -88,7 +89,7 @@ def solve_df8cc377(input_grid: ColoredGrid) -> ColoredGrid:
             else:
                 grid.set_cell(min_r + 1, min_c + 1, fill_color)
                 grid.set_cell(min_r + 1, min_c + 3, fill_color)
-        # For shapes smaller than 3x3, we don't fill them (they will be preserved as is)
+        # For shapes smaller than 3x3, we preserve them as is
 
     new_grid = ColoredGrid(values=[[BLACK for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
     shapes = find_shapes(input_grid)
@@ -99,12 +100,26 @@ def solve_df8cc377(input_grid: ColoredGrid) -> ColoredGrid:
         for r, c in boundary:
             new_grid.set_cell(r, c, shape_color)
         
-        # Fill interior only for shapes 3x3 or larger
+        # Fill interior based on shape size
         if len(boundary) + len(interior) >= 9:
             fill_shape(new_grid, boundary, interior, shape_color, fill_color)
         else:
             # For smaller closed shapes, preserve the interior as is
             for r, c in interior:
                 new_grid.set_cell(r, c, shape_color)
+
+    # Remove all scattered dots that are not part of any closed shape
+    rows, cols = new_grid.get_dimensions()
+    for r in range(rows):
+        for c in range(cols):
+            if new_grid.get_cell(r, c) != BLACK:
+                is_isolated = True
+                for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                    nr, nc = r + dr, c + dc
+                    if 0 <= nr < rows and 0 <= nc < cols and new_grid.get_cell(nr, nc) != BLACK:
+                        is_isolated = False
+                        break
+                if is_isolated:
+                    new_grid.set_cell(r, c, BLACK)
 
     return new_grid
