@@ -1,0 +1,61 @@
+example_0:
+  input: |
+    A 22x16 grid mostly filled with black (0). There are a few colored squares:
+    - A red (2) square in the top left corner (row 1, column 2)
+    - A sky blue (8) square in the top row (row 1, column 5)
+    - A green (3) square in the top row (row 1, column 8)
+    - Another sky blue (8) square in the top row (row 1, column 12)
+    - A distinctive red (2) shape in the middle-left of the grid (rows 8-10, columns 1-3). This shape looks like a sideways "T" or a hammer, with a vertical line of 3 red squares and a horizontal line of 3 red squares intersecting at the top.
+  output: |
+    The 22x16 grid maintains the same black (0) background and colored squares in the top row.
+    The distinctive red (2) "T" shape in the middle-left remains unchanged.
+    New shapes have appeared to the right of the red "T":
+    - A sky blue (8) "T" shape, identical in form to the red one, appears immediately to the right.
+    - A green (3) "T" shape follows.
+    - Another sky blue (8) "T" shape appears at the far right.
+    These new shapes are all on the same rows as the original red shape (rows 8-10).
+
+example_1:
+  input: |
+    A 17x23 grid mostly filled with black (0). There are several colored squares scattered around:
+    - A red (2) square near the top left (row 1, column 1)
+    - A yellow (4) square in the left column (row 3, column 1)
+    - Another yellow (4) square in the left column (row 6, column 1)
+    - A green (3) square in the left column (row 11, column 1)
+    - A distinctive red (2) shape in the top-right quadrant (rows 2-4, columns 9-11). This shape looks like a plus sign or a cross, with a vertical line of 3 red squares intersected by a horizontal line of 3 red squares in the middle.
+  output: |
+    The 17x23 grid maintains the same black (0) background and scattered colored squares from the input.
+    The distinctive red (2) plus sign in the top-right quadrant remains unchanged.
+    New shapes have appeared:
+    - A yellow (4) plus sign, identical in form to the red one, appears below the red shape (rows 6-8, columns 9-11).
+    - Another yellow (4) plus sign appears below that (rows 11-13, columns 9-11).
+    - A green (3) plus sign appears at the bottom of the grid (rows 19-21, columns 9-11).
+    These new shapes are all in the same columns as the original red shape.
+
+example_2:
+  input: |
+    A 14x23 grid mostly filled with black (0). There are several colored squares scattered around:
+    - A sky blue (8) square near the top left (row 10, column 2)
+    - A green (3) square in the left column (row 15, column 2)
+    - Another green (3) square lower down (row 18, column 2)
+    - A red (2) square near the bottom left (row 21, column 2)
+    - A distinctive red (2) shape in the bottom-right quadrant (rows 18-20, columns 7-9). This shape looks like an inverted "L" or a corner, with a vertical line of 3 red squares and a horizontal line of 3 red squares intersecting at the bottom-right.
+  output: |
+    The 14x23 grid maintains the same black (0) background and scattered colored squares from the input.
+    The distinctive red (2) inverted "L" shape in the bottom-right quadrant remains unchanged.
+    New shapes have appeared:
+    - A sky blue (8) inverted "L" shape, identical in form to the red one, appears at the top of the grid (rows 1-3, columns 7-9).
+    - A green (3) inverted "L" shape appears in the middle of the grid (rows 8-10, columns 7-9).
+    - Another green (3) inverted "L" shape appears just above the original red shape (rows 13-15, columns 7-9).
+    These new shapes are all in the same columns as the original red shape, forming a vertical stack of inverted "L" shapes.
+
+test_case_0:
+  input: |
+    A 14x23 grid mostly filled with black (0). There are several colored squares scattered around:
+    - A sky blue (8) square near the top left (row 10, column 2)
+    - A green (3) square in the left column (row 15, column 2)
+    - Another green (3) square lower down (row 18, column 2)
+    - A red (2) square near the bottom left (row 21, column 2)
+    - A distinctive red (2) shape in the bottom-right quadrant (rows 18-20, columns 7-9). This shape looks like an inverted "L" or a corner, with a vertical line of 3 red squares and a horizontal line of 3 red squares intersecting at the bottom-right.
+  output: |
+    The output is not provided for the test case.
