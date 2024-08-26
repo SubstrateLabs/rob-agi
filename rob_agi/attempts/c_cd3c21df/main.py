@@ -8,11 +8,8 @@ def solve_cd3c21df(input_grid: ColoredGrid) -> ColoredGrid:
     This function identifies the largest subgrid that appears only once in the input grid.
     If multiple such subgrids exist, it returns the one that appears first (top-left to bottom-right).
     
-    Steps:
-    1. Generate all possible subgrids
-    2. Count occurrences of each unique subgrid
-    3. Find the largest subgrid(s) that appear only once
-    4. Return the first largest unique subgrid
+    The function scans the input grid from largest possible subgrid to smallest,
+    checking if each subgrid is unique. It returns the first (top-left most) largest unique subgrid found.
     
     Args:
     input_grid (ColoredGrid): The input grid to analyze
@@ -22,35 +19,32 @@ def solve_cd3c21df(input_grid: ColoredGrid) -> ColoredGrid:
     """
     rows, cols = input_grid.get_dimensions()
     
-    def subgrid_to_tuple(subgrid: ColoredGrid) -> Tuple[Tuple[int, ...]]:
-        return tuple(tuple(row) for row in subgrid.values)
+    def is_unique_subgrid(subgrid: ColoredGrid, orig_top: int, orig_left: int) -> bool:
+        subgrid_height, subgrid_width = subgrid.get_dimensions()
+        occurrence_count = 0
+        
+        for top in range(rows - subgrid_height + 1):
+            for left in range(cols - subgrid_width + 1):
+                if top == orig_top and left == orig_left:
+                    occurrence_count += 1
+                    continue
+                
+                if all(input_grid.values[top+i][left+j] == subgrid.values[i][j]
+                       for i in range(subgrid_height)
+                       for j in range(subgrid_width)):
+                    occurrence_count += 1
+                    
+                if occurrence_count > 1:
+                    return False
+        
+        return occurrence_count == 1
+
+    for height in range(rows, 0, -1):
+        for width in range(cols, 0, -1):
+            for top in range(rows - height + 1):
+                for left in range(cols - width + 1):
+                    subgrid = input_grid.extract_subgrid(top, left, height, width)
+                    if is_unique_subgrid(subgrid, top, left):
+                        return subgrid
     
-    def generate_subgrids() -> List[Tuple[int, int, int, int, ColoredGrid]]:
-        subgrids = []
-        for top in range(rows):
-            for left in range(cols):
-                for height in range(1, rows - top + 1):
-                    for width in range(1, cols - left + 1):
-                        subgrid = input_grid.extract_subgrid(top, left, height, width)
-                        subgrids.append((top, left, height, width, subgrid))
-        return subgrids
-    
-    subgrids = generate_subgrids()
-    subgrid_counts: Dict[Tuple[Tuple[int, ...]], List[Tuple[int, int, int, int, ColoredGrid]]] = {}
-    
-    for top, left, height, width, subgrid in subgrids:
-        key = subgrid_to_tuple(subgrid)
-        if key not in subgrid_counts:
-            subgrid_counts[key] = []
-        subgrid_counts[key].append((top, left, height, width, subgrid))
-    
-    unique_subgrids = [subgrids[0] for subgrids in subgrid_counts.values() if len(subgrids) == 1]
-    
-    if not unique_subgrids:
-        return None
-    
-    largest_subgrids = [subgrid for subgrid in unique_subgrids if subgrid[2] * subgrid[3] == max(s[2] * s[3] for s in unique_subgrids)]
-    
-    largest_subgrids.sort(key=lambda x: (x[0], x[1]))  # Sort by top, then left
-    
-    return largest_subgrids[0][4]  # Return the ColoredGrid object
+    return None
