@@ -1,5 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List
+from typing import List, Tuple
 
 def solve_9b365c51(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -9,8 +9,9 @@ def solve_9b365c51(input_grid: ColoredGrid) -> ColoredGrid:
     1. Identifies the sequence of unique colors from the left side of the grid.
     2. Creates a deep copy of the input grid.
     3. Clears the left side of the grid (first 7 columns).
-    4. Replaces sky blue (8) cells on the right side with colors from the identified sequence,
-       using a new color for each column containing sky blue cells.
+    4. Replaces sky blue (8) cells and their vertical sections on the right side 
+       with colors from the identified sequence, using a new color for each 
+       contiguous vertical section containing sky blue cells.
     5. Returns the transformed grid.
 
     Args:
@@ -19,8 +20,8 @@ def solve_9b365c51(input_grid: ColoredGrid) -> ColoredGrid:
     Returns:
     ColoredGrid: The transformed grid.
     """
-    # Step 1: Identify the color sequence
-    color_sequence = get_color_sequence(input_grid)
+    # Step 1: Identify the color sequence and find the leftmost sky blue column
+    color_sequence, leftmost_sky_blue_col = analyze_input_grid(input_grid)
 
     # Step 2: Create a deep copy of the input grid
     output_grid = input_grid.deep_copy()
@@ -32,22 +33,33 @@ def solve_9b365c51(input_grid: ColoredGrid) -> ColoredGrid:
 
     # Step 4: Process the right side of the grid
     color_index = 0
-    for col in range(7, output_grid.num_cols):
-        has_sky_blue = any(output_grid.values[row][col] == 8 for row in range(output_grid.num_rows))
-        if has_sky_blue:
+    for col in range(leftmost_sky_blue_col, output_grid.num_cols):
+        if any(output_grid.values[row][col] == 8 for row in range(output_grid.num_rows)):
+            current_color = color_sequence[color_index]
             for row in range(output_grid.num_rows):
-                if output_grid.values[row][col] == 8:
-                    output_grid.values[row][col] = color_sequence[color_index]
+                if output_grid.values[row][col] == 8 or is_in_sky_blue_section(output_grid, row, col):
+                    output_grid.values[row][col] = current_color
             color_index = (color_index + 1) % len(color_sequence)
 
     # Step 5: Return the transformed grid
     return output_grid
 
-def get_color_sequence(grid: ColoredGrid) -> List[int]:
+def analyze_input_grid(grid: ColoredGrid) -> Tuple[List[int], int]:
     colors = []
+    leftmost_sky_blue_col = grid.num_cols
     for col in range(7):
         for row in range(grid.num_rows):
             color = grid.values[row][col]
             if color != 0 and color not in colors:
                 colors.append(color)
-    return colors
+    for col in range(7, grid.num_cols):
+        if any(grid.values[row][col] == 8 for row in range(grid.num_rows)):
+            leftmost_sky_blue_col = col
+            break
+    return colors, leftmost_sky_blue_col
+
+def is_in_sky_blue_section(grid: ColoredGrid, row: int, col: int) -> bool:
+    for r in range(grid.num_rows):
+        if grid.values[r][col] == 8:
+            return True
+    return False
