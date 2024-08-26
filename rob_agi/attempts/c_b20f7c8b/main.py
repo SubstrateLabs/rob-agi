@@ -5,14 +5,12 @@ def solve_b20f7c8b(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by applying specific rules to 5x5 regions.
     
     The transformation rules are:
-    1. If a 5x5 region is solid, it's transformed into a solid color based on its position.
-    2. If a 5x5 region has a pattern, it's transformed into a solid color based on its position.
-    3. For solid regions:
-       - Left side: new_color = (original_color + 1) % 10
-       - Right side: new_color = (original_color + 3) % 10
-    4. For patterned regions:
-       - Left side: new_color = 3 (green)
-       - Right side: new_color = 5 (gray)
+    1. For left regions:
+       - If solid, new_color = (original_color + 1) % 10
+       - If patterned, fill with the color of the top-left pixel
+    2. For right regions:
+       - If solid, new_color = (original_color + 1) % 10
+       - If patterned, fill with gray (5)
     
     The function identifies 5x5 regions in the middle and right side of the grid,
     analyzes them, and applies the appropriate transformation.
@@ -38,9 +36,9 @@ def is_solid_block(block: ColoredGrid) -> bool:
 def transform_block(block: ColoredGrid, is_left: bool) -> ColoredGrid:
     if is_solid_block(block):
         original_color = block.values[0][0]
-        new_color = (original_color + 1) % 10 if is_left else (original_color + 3) % 10
+        new_color = (original_color + 1) % 10
     else:
-        new_color = 3 if is_left else 5
+        new_color = block.values[0][0] if is_left else 5
     
     return ColoredGrid(values=[[new_color for _ in range(5)] for _ in range(5)])
 
