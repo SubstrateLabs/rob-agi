@@ -1,61 +1,63 @@
 example_0:
   input: |
-    The input grid shows a pattern of sky blue (8) shapes on a black (0) background. There are several distinct shapes visible:
-    1. A small square in the top left corner.
-    2. A larger, more complex shape in the center-left, resembling a stylized letter 'E' or a comb.
-    3. A large rectangular shape in the center-right, with some internal gaps and protrusions.
-    4. A smaller rectangular shape in the bottom left.
-    5. Three small square shapes in the bottom right, arranged in an 'L' formation.
-    The shapes are separated by black space and do not touch each other.
+    The 17x19 grid is divided into distinct regions, each containing sky blue (8) shapes on a black (0) background:
+    1. Top-left (0-4, 0-4): A 3x3 square with a hollow center.
+    2. Center-left (3-7, 0-6): A shape resembling a stylized 'E' or comb.
+    3. Center-right (3-7, 8-16): A large irregular shape with internal gaps.
+    4. Bottom-left (10-13, 3-6): A small rectangular shape.
+    5. Bottom-right (13-17, 11-15): Three 2x2 squares arranged in an 'L' formation.
+    The shapes are separated by at least one cell of black space.
   output: |
-    The output grid maintains the same overall structure as the input, but with color changes:
-    1. The small square in the top left is now blue (1).
-    2. The 'E' or comb shape in the center-left is now blue (1).
-    3. The large rectangular shape in the center-right is now green (3).
-    4. The smaller rectangular shape in the bottom left remains blue (1).
-    5. The three small squares in the bottom right are now red (2).
-    The black background remains unchanged. Each distinct shape from the input has been assigned a unique color in the output.
+    The grid structure remains identical, but the colors change in a specific pattern:
+    1. Top-left and center-left shapes: Blue (1)
+    2. Center-right shape: Green (3)
+    3. Bottom-left shape: Blue (1)
+    4. Bottom-right shapes: Red (2)
+    This color distribution suggests a pattern based on the grid's quadrants or regions.
 
 example_1:
   input: |
-    The input grid shows several sky blue (8) shapes on a black (0) background:
-    1. A large rectangular shape with internal gaps in the top left quadrant.
-    2. A smaller rectangular shape with internal gaps in the top right quadrant.
-    3. A small square shape in the center-left.
-    4. A medium-sized rectangular shape with internal gaps in the center-right.
-    5. A large rectangular shape with internal gaps occupying the entire bottom third of the grid.
-    The shapes are separated by black space and do not touch each other.
+    The 17x17 grid contains five distinct sky blue (8) shapes on a black (0) background:
+    1. Top-left (1-5, 1-7): A large shape with a complex internal structure.
+    2. Top-right (1-5, 11-15): A smaller shape with a similar internal structure.
+    3. Center-left (6-10, 5-8): A small 4x4 square.
+    4. Center-right (7-10, 11-14): A medium-sized shape with internal gaps.
+    5. Bottom (12-16, 0-16): A large shape spanning the entire width with internal structure.
+    Each shape is separated by at least one cell of black space.
   output: |
-    The output grid maintains the same structure as the input, but with color changes:
-    1. The large shape in the top left is now red (2).
-    2. The shape in the top right is now green (3).
-    3. The small square in the center-left remains red (2).
-    4. The shape in the center-right is now blue (1).
-    5. The large shape at the bottom is now orange (7).
-    The black background remains unchanged. Each distinct shape from the input has been assigned a unique color in the output, with the exception of the small square which shares its color with the top-left shape.
+    The shapes retain their positions and structures, but colors change:
+    1. Top-left: Red (2)
+    2. Top-right: Green (3)
+    3. Center-left: Red (2)
+    4. Center-right: Blue (1)
+    5. Bottom: Orange (7)
+    The color pattern suggests a sequence (2, 3, 1, 7) applied to shapes in order of appearance.
 
 example_2:
   input: |
-    The input grid shows several sky blue (8) shapes on a black (0) background:
-    1. A large rectangular shape with internal gaps occupying most of the left half of the grid.
-    2. A medium-sized rectangular shape with internal gaps in the top right quadrant.
-    3. A large rectangular shape with internal gaps occupying most of the bottom right quadrant.
-    The shapes are separated by black space and do not touch each other.
+    The 16x16 grid is divided into three main regions, each containing sky blue (8) shapes:
+    1. Left half (0-15, 0-6): A large shape with complex internal structure.
+    2. Top-right (3-5, 8-15): A medium-sized shape with internal gaps.
+    3. Bottom-right (12-16, 10-15): A large shape with internal structure.
+    The shapes are separated by at least one cell of black (0) space.
   output: |
-    The output grid maintains the same structure as the input, but with color changes:
-    1. The large shape on the left is now green (3).
-    2. The shape in the top right is now green (3).
-    3. The shape in the bottom right is now orange (7).
-    The black background remains unchanged. In this case, two of the shapes (left and top right) have been assigned the same color, while the bottom right shape has a different color.
+    The grid structure remains the same, but colors change following a pattern:
+    1. Left half: Green (3)
+    2. Top-right: Green (3)
+    3. Bottom-right: Orange (7)
+    This color distribution suggests a pattern based on the order of regions from left to right, top to bottom.
 
 test_case_0:
   input: |
-    The input grid shows several sky blue (8) shapes on a black (0) background:
-    1. A large rectangular shape with internal gaps occupying most of the top left quadrant.
-    2. A medium-sized rectangular shape with internal gaps in the top right quadrant.
-    3. A small rectangular shape with internal gaps in the center-left.
-    4. A medium-sized rectangular shape with internal gaps in the center-right.
-    5. A large rectangular shape with internal gaps occupying most of the bottom third of the grid.
-    The shapes are separated by black space and do not touch each other.
+    The 17x17 grid contains five distinct sky blue (8) shapes on a black (0) background:
+    1. Top-left (1-5, 1-7): A large shape with internal gaps.
+    2. Top-right (1-5, 11-15): A medium-sized shape with internal structure.
+    3. Center-left (7-9, 3-6): A small rectangular shape.
+    4. Center-right (7-10, 11-14): A medium-sized shape with internal gaps.
+    5. Bottom (12-16, 1-15): A large shape spanning most of the bottom, with internal structure.
+    Each shape is separated by at least one cell of black space.
   output: |
-    The output is not provided for this test case.
+    The output is not provided for this test case. Based on previous examples, we might expect:
+    1. A color sequence like [1, 2, 3, 7] applied to shapes in order of appearance.
+    2. Colors potentially repeating if there are more shapes than unique colors in the sequence.
+    3. The black background remaining unchanged.
