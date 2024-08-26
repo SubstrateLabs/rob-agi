@@ -6,12 +6,13 @@ def solve_981571dc(input_grid: ColoredGrid) -> ColoredGrid:
     
     The function performs the following steps:
     1. Create a deep copy of the input grid.
-    2. Perform a left-to-right fill for each row.
-    3. Perform a top-to-bottom fill for each column.
-    4. Handle edge cases for the leftmost column and top row.
+    2. Iterate through each cell from left to right, top to bottom.
+    3. If a black cell (value 0) is found:
+       a. If it's in the first column, set its value to the cell above (if exists).
+       b. Otherwise, set its value to the cell to its left.
+    4. After processing all rows, fill any remaining black cells in the first row.
     
-    This approach ensures that patterns are extended consistently,
-    prioritizing horizontal continuations followed by vertical continuations.
+    This approach ensures consistent pattern extension, prioritizing left-to-right filling.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -22,23 +23,15 @@ def solve_981571dc(input_grid: ColoredGrid) -> ColoredGrid:
     grid = input_grid.deep_copy()
     rows, cols = len(grid.values), len(grid.values[0])
 
-    # Left-to-right fill
     for r in range(rows):
-        for c in range(1, cols):
-            if grid.values[r][c] == 0 and grid.values[r][c-1] != 0:
-                grid.values[r][c] = grid.values[r][c-1]
+        for c in range(cols):
+            if grid.values[r][c] == 0:
+                if c == 0 and r > 0:
+                    grid.values[r][c] = grid.values[r-1][c]
+                elif c > 0:
+                    grid.values[r][c] = grid.values[r][c-1]
 
-    # Top-to-bottom fill
-    for c in range(cols):
-        for r in range(1, rows):
-            if grid.values[r][c] == 0 and grid.values[r-1][c] != 0:
-                grid.values[r][c] = grid.values[r-1][c]
-
-    # Handle edge cases
-    for r in range(1, rows):
-        if grid.values[r][0] == 0:
-            grid.values[r][0] = grid.values[r-1][0]
-    
+    # Handle remaining black cells in the first row
     for c in range(1, cols):
         if grid.values[0][c] == 0:
             grid.values[0][c] = grid.values[0][c-1]
