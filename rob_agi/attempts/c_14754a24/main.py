@@ -8,12 +8,11 @@ def solve_14754a24(input_grid: ColoredGrid) -> ColoredGrid:
     
     1. Scans the grid to identify all yellow (4) squares.
     2. Creates a deep copy of the input grid to modify.
-    3. Processes each yellow square:
-       - Identifies possible L-shapes around the yellow square.
-       - Evaluates and scores each L-shape based on size, enclosed yellows, and connections.
-       - Selects and applies the best L-shape, converting it to red (2).
-    4. Performs an optimization pass to improve L-shapes and handle edge cases.
-    5. Verifies that all red squares form valid L-shapes associated with yellow squares.
+    3. Generates and scores all possible L-shapes for each yellow square.
+    4. Optimizes L-shape selection using a priority queue based on scores.
+    5. Applies selected L-shapes, converting them to red (2).
+    6. Performs multiple optimization passes to improve L-shapes and handle edge cases.
+    7. Verifies that all red squares form valid L-shapes associated with yellow squares.
     
     Returns a new ColoredGrid with the transformed values.
     """
@@ -49,21 +48,35 @@ def solve_14754a24(input_grid: ColoredGrid) -> ColoredGrid:
     
     def process_yellow_squares() -> None:
         yellow_squares = find_yellow_squares()
+        all_shapes = []
         for r, c in yellow_squares:
-            if grid.values[r][c] == 4:  # Check if still yellow
-                possible_shapes = get_possible_l_shapes(r, c)
-                if possible_shapes:
-                    best_shape = max(possible_shapes, key=score_l_shape)
-                    apply_l_shape(best_shape)
+            possible_shapes = get_possible_l_shapes(r, c)
+            for shape in possible_shapes:
+                score = score_l_shape(shape)
+                heapq.heappush(all_shapes, (-score, shape))  # Use negative score for max-heap
+        
+        while all_shapes:
+            _, shape = heapq.heappop(all_shapes)
+            if any(grid.values[r][c] == 4 for r, c in shape):  # Check if shape still contains a yellow square
+                apply_l_shape(shape)
     
     def optimize_pattern() -> None:
-        for r in range(rows):
-            for c in range(cols):
-                if grid.values[r][c] == 2:
-                    neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
-                                    if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 2)
-                    if neighbors == 0:
-                        grid.values[r][c] = 0  # Remove isolated red squares
+        for _ in range(2):  # Multiple optimization passes
+            for r in range(rows):
+                for c in range(cols):
+                    if grid.values[r][c] == 2:
+                        neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                                        if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 2)
+                        if neighbors == 0:
+                            grid.values[r][c] = 0  # Remove isolated red squares
+            
+            # Try to extend L-shapes
+            for r in range(rows):
+                for c in range(cols):
+                    if grid.values[r][c] == 4:
+                        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                            if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 0:
+                                grid.values[r+dr][c+dc] = 2  # Extend L-shape
     
     def verify_l_shapes() -> bool:
         for r in range(rows):
