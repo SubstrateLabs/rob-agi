@@ -15,21 +15,23 @@ def solve_692cd3b6(input_grid: ColoredGrid) -> ColoredGrid:
     This approach ensures the correct yellow path between the C-shapes
     and extends to the appropriate grid edges only when a C-shape touches an edge.
     """
-    # Step 1 & 2: Identify 'C' shapes and determine their positions
+    # Step 1: Identify 'C' shapes
     c_shapes = find_c_shapes(input_grid)
-    top_left_c, bottom_right_c = determine_c_shape_positions(c_shapes)
+    if len(c_shapes) != 2:
+        raise ValueError("Expected exactly two C-shapes")
     
-    # Step 3 & 4: Create bounding box and fill connecting area
+    # Step 2 & 3: Create connecting rectangle and fill with yellow
     new_grid = input_grid.deep_copy()
-    fill_connecting_area(new_grid, top_left_c, bottom_right_c)
+    connecting_rectangle = create_connecting_rectangle(c_shapes[0], c_shapes[1])
+    fill_yellow(new_grid, *connecting_rectangle)
     
-    # Step 5 & 6: Extend yellow to appropriate edges
-    extend_to_specific_edges(new_grid, top_left_c, bottom_right_c)
+    # Step 4: Extend to edges if necessary
+    extend_to_edges(new_grid, c_shapes[0], c_shapes[1])
     
-    # Step 7: Clean up unnecessary yellow
-    clean_up_yellow(new_grid, top_left_c, bottom_right_c)
+    # Step 5: Clean up disconnected yellow areas
+    clean_up_yellow(new_grid, connecting_rectangle)
     
-    # Step 8: Preserve original 'C' shapes
+    # Step 6: Preserve original 'C' shapes
     preserve_c_shapes(new_grid, c_shapes)
     
     return new_grid
@@ -44,7 +46,7 @@ def find_c_shapes(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
         stack = [(r, c)]
         while stack:
             curr_r, curr_c = stack.pop()
-            if (curr_r, curr_c) not in visited and grid.values[curr_r][curr_c] == 2:
+            if (curr_r, curr_c) not in visited and grid.values[curr_r][curr_c] in [2, 5]:
                 visited.add((curr_r, curr_c))
                 shape.append((curr_r, curr_c))
                 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
@@ -60,47 +62,6 @@ def find_c_shapes(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
     
     return shapes
 
-def get_occupied_rows_cols(shapes: List[List[Tuple[int, int]]]) -> Tuple[Set[int], Set[int]]:
-    occupied_rows = set()
-    occupied_cols = set()
-    for shape in shapes:
-        for r, c in shape:
-            occupied_rows.add(r)
-            occupied_cols.add(c)
-    return occupied_rows, occupied_cols
-
-def determine_c_shape_positions(c_shapes: List[List[Tuple[int, int]]]) -> Tuple[List[Tuple[int, int]], List[Tuple[int, int]]]:
-    if len(c_shapes) != 2:
-        raise ValueError("Expected exactly two C-shapes")
-    
-    c1, c2 = c_shapes
-    c1_center = sum(r for r, _ in c1) / len(c1), sum(c for _, c in c1) / len(c1)
-    c2_center = sum(r for r, _ in c2) / len(c2), sum(c for _, c in c2) / len(c2)
-    
-    if c1_center < c2_center:
-        return c1, c2
-    else:
-        return c2, c1
-
-def fill_connecting_area(grid: ColoredGrid, top_left_c: List[Tuple[int, int]], bottom_right_c: List[Tuple[int, int]]):
-    bbox1 = get_bounding_box(top_left_c)
-    bbox2 = get_bounding_box(bottom_right_c)
-    
-    connecting_bbox = get_connecting_bbox(bbox1, bbox2)
-    
-    # Extend the bounding box slightly beyond C-shape openings
-    connecting_bbox = (
-        max(0, connecting_bbox[0] - 1),
-        max(0, connecting_bbox[1] - 1),
-        min(grid.num_rows - 1, connecting_bbox[2] + 1),
-        min(grid.num_cols - 1, connecting_bbox[3] + 1)
-    )
-    
-    for r in range(connecting_bbox[0], connecting_bbox[2] + 1):
-        for c in range(connecting_bbox[1], connecting_bbox[3] + 1):
-            if grid.values[r][c] == 0:
-                grid.values[r][c] = 4
-
 def get_bounding_box(shape: List[Tuple[int, int]]) -> Tuple[int, int, int, int]:
     min_r = min(r for r, _ in shape)
     max_r = max(r for r, _ in shape)
@@ -108,7 +69,9 @@ def get_bounding_box(shape: List[Tuple[int, int]]) -> Tuple[int, int, int, int]:
     max_c = max(c for _, c in shape)
     return (min_r, min_c, max_r, max_c)
 
-def get_connecting_bbox(bbox1: Tuple[int, int, int, int], bbox2: Tuple[int, int, int, int]) -> Tuple[int, int, int, int]:
+def create_connecting_rectangle(shape1: List[Tuple[int, int]], shape2: List[Tuple[int, int]]) -> Tuple[int, int, int, int]:
+    bbox1 = get_bounding_box(shape1)
+    bbox2 = get_bounding_box(shape2)
     return (
         min(bbox1[0], bbox2[0]),
         min(bbox1[1], bbox2[1]),
@@ -116,47 +79,52 @@ def get_connecting_bbox(bbox1: Tuple[int, int, int, int], bbox2: Tuple[int, int,
         max(bbox1[3], bbox2[3])
     )
 
-def extend_to_specific_edges(grid: ColoredGrid, top_left_c: List[Tuple[int, int]], bottom_right_c: List[Tuple[int, int]]):
-    rows, cols = grid.get_dimensions()
-    
-    # Extend to top and left for top-left C-shape
-    min_r_top = min(r for r, _ in top_left_c)
-    min_c_left = min(c for _, c in top_left_c)
-    
-    for r in range(min_r_top, -1, -1):
-        for c in range(min_c_left + 1):
-            if grid.values[r][c] == 0:
-                grid.values[r][c] = 4
-    
-    for c in range(min_c_left, -1, -1):
-        for r in range(min_r_top + 1):
-            if grid.values[r][c] == 0:
-                grid.values[r][c] = 4
-    
-    # Extend to bottom and right for bottom-right C-shape
-    max_r_bottom = max(r for r, _ in bottom_right_c)
-    max_c_right = max(c for _, c in bottom_right_c)
-    
-    for r in range(max_r_bottom, rows):
-        for c in range(max_c_right, cols):
-            if grid.values[r][c] == 0:
-                grid.values[r][c] = 4
-    
-    for c in range(max_c_right, cols):
-        for r in range(max_r_bottom, rows):
+def fill_yellow(grid: ColoredGrid, left: int, top: int, right: int, bottom: int):
+    for r in range(top, bottom + 1):
+        for c in range(left, right + 1):
             if grid.values[r][c] == 0:
                 grid.values[r][c] = 4
 
-def clean_up_yellow(grid: ColoredGrid, top_left_c: List[Tuple[int, int]], bottom_right_c: List[Tuple[int, int]]):
+def extend_to_edges(grid: ColoredGrid, shape1: List[Tuple[int, int]], shape2: List[Tuple[int, int]]):
     rows, cols = grid.get_dimensions()
+    bbox1 = get_bounding_box(shape1)
+    bbox2 = get_bounding_box(shape2)
     
-    def is_connected_to_main_path(r: int, c: int) -> bool:
+    # Extend to left edge if any shape touches it
+    if bbox1[1] == 0 or bbox2[1] == 0:
+        for r in range(rows):
+            if grid.values[r][0] == 0:
+                grid.values[r][0] = 4
+    
+    # Extend to right edge if any shape touches it
+    if bbox1[3] == cols - 1 or bbox2[3] == cols - 1:
+        for r in range(rows):
+            if grid.values[r][cols - 1] == 0:
+                grid.values[r][cols - 1] = 4
+    
+    # Extend to top edge if any shape touches it
+    if bbox1[0] == 0 or bbox2[0] == 0:
+        for c in range(cols):
+            if grid.values[0][c] == 0:
+                grid.values[0][c] = 4
+    
+    # Extend to bottom edge if any shape touches it
+    if bbox1[2] == rows - 1 or bbox2[2] == rows - 1:
+        for c in range(cols):
+            if grid.values[rows - 1][c] == 0:
+                grid.values[rows - 1][c] = 4
+
+def clean_up_yellow(grid: ColoredGrid, connecting_rectangle: Tuple[int, int, int, int]):
+    rows, cols = grid.get_dimensions()
+    top, left, bottom, right = connecting_rectangle
+    
+    def is_connected(r: int, c: int) -> bool:
         visited = set()
         stack = [(r, c)]
         while stack:
             curr_r, curr_c = stack.pop()
-            if curr_r < 0 or curr_r >= rows or curr_c < 0 or curr_c >= cols:
-                continue
+            if curr_r < top or curr_r > bottom or curr_c < left or curr_c > right:
+                return True
             if (curr_r, curr_c) in visited:
                 continue
             visited.add((curr_r, curr_c))
@@ -164,18 +132,16 @@ def clean_up_yellow(grid: ColoredGrid, top_left_c: List[Tuple[int, int]], bottom
                 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
                     nr, nc = curr_r + dr, curr_c + dc
                     if 0 <= nr < rows and 0 <= nc < cols:
-                        if (nr, nc) in top_left_c or (nr, nc) in bottom_right_c:
-                            return True
-                stack.extend([(curr_r + dr, curr_c + dc) for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]])
+                        stack.append((nr, nc))
         return False
     
     for r in range(rows):
         for c in range(cols):
-            if grid.values[r][c] == 4 and not is_connected_to_main_path(r, c):
+            if grid.values[r][c] == 4 and not is_connected(r, c):
                 grid.values[r][c] = 0
 
 def preserve_c_shapes(grid: ColoredGrid, c_shapes: List[List[Tuple[int, int]]]):
     for shape in c_shapes:
         for r, c in shape:
-            if grid.values[r][c] == 4:
-                grid.values[r][c] = 2
+            if grid.values[r][c] in [2, 5]:
+                grid.values[r][c] = grid.values[r][c]  # Preserve original color
