@@ -5,7 +5,7 @@ def solve_9b2a60aa(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the grid transformation challenge by replicating the largest non-zero shape
     in the input grid. The replication is done vertically (top to bottom) by default,
-    or horizontally (right to left) if the shape touches the bottom of the grid.
+    switching to horizontal (right to left) if vertical space runs out.
     Up to three replicas are created using colors from the leftmost column.
     The original shape and grid contents remain unchanged. Replication stops if it would
     exceed grid boundaries or overlap with existing non-zero cells.
@@ -14,7 +14,6 @@ def solve_9b2a60aa(input_grid: ColoredGrid) -> ColoredGrid:
     if not original_shape:
         return input_grid  # No shape to replicate
 
-    direction = get_replication_direction(original_shape, input_grid.get_dimensions())
     replication_colors = get_replication_colors(input_grid)
     output_grid = input_grid.deep_copy()
 
@@ -22,32 +21,34 @@ def solve_9b2a60aa(input_grid: ColoredGrid) -> ColoredGrid:
     shape_height = shape_bounds[2] - shape_bounds[0] + 1
     shape_width = shape_bounds[3] - shape_bounds[1] + 1
 
-    transformed_shape = transform_shape(original_shape, direction)
-
-    if direction == 'horizontal':
-        start_row = shape_bounds[0]
-        start_col = input_grid.num_cols - shape_width
-    else:
-        start_row = 0
-        start_col = shape_bounds[1]
+    start_row = 0
+    start_col = shape_bounds[1]
+    direction = 'vertical'
 
     replicas_placed = 0
     for color in replication_colors:
+        if direction == 'vertical':
+            if start_row + shape_height > input_grid.num_rows:
+                direction = 'horizontal'
+                start_row = shape_bounds[0]
+                start_col = input_grid.num_cols - shape_width
+            
         if direction == 'horizontal':
             if start_col < 0:
                 break
-            if can_place_shape(output_grid, transformed_shape, (start_row, start_col)):
-                place_shape(output_grid, transformed_shape, (start_row, start_col), color)
-                start_col -= shape_width
-                replicas_placed += 1
-        else:
-            if start_row + shape_height > input_grid.num_rows:
-                break
-            if can_place_shape(output_grid, transformed_shape, (start_row, start_col)):
-                place_shape(output_grid, transformed_shape, (start_row, start_col), color)
+
+        transformed_shape = transform_shape(original_shape, direction)
+        if can_place_shape(output_grid, transformed_shape, (start_row, start_col)):
+            place_shape(output_grid, transformed_shape, (start_row, start_col), color)
+            replicas_placed += 1
+            
+            if direction == 'vertical':
                 start_row += shape_height
-                replicas_placed += 1
-        
+            else:
+                start_col -= shape_width
+        else:
+            break
+
         if replicas_placed == 3:
             break
 
@@ -88,12 +89,10 @@ def find_largest_shape(grid: ColoredGrid) -> List[Tuple[int, int]]:
 
     return largest_shape
 
-def get_replication_direction(shape: List[Tuple[int, int]], grid_dimensions: Tuple[int, int]) -> str:
-    max_row = max(r for r, _ in shape)
-    return 'horizontal' if max_row == grid_dimensions[0] - 1 else 'vertical'
-
-def get_replication_colors_and_positions(grid: ColoredGrid) -> List[Tuple[int, int]]:
-    return [(grid.get_cell(r, 0), r) for r in range(grid.num_rows) if grid.get_cell(r, 0) != 0]
+def get_replication_colors(grid: ColoredGrid) -> List[int]:
+    """Get up to three non-zero colors from the leftmost column."""
+    colors = [grid.get_cell(r, 0) for r in range(grid.num_rows) if grid.get_cell(r, 0) != 0]
+    return list(dict.fromkeys(colors))[:3]  # Remove duplicates and take up to 3 colors
 
 def can_place_shape(grid: ColoredGrid, shape: List[Tuple[int, int]], position: Tuple[int, int]) -> bool:
     min_row = min(r for r, _ in shape)
