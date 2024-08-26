@@ -93,8 +93,8 @@ def solve_184a9768(input_grid: ColoredGrid) -> ColoredGrid:
                 create_rectangle(color, top, left, top + 1, left + 1)
             elif all(abs(x) < (main_bbox[2] - main_bbox[0]) // 3 for x in relative_position):
                 # Place inside main structure
-                height = min(bbox[2] - bbox[0] + 1, (main_bbox[2] - main_bbox[0]) // 2)
-                width = min(bbox[3] - bbox[1] + 1, (main_bbox[3] - main_bbox[1]) // 2)
+                height = min(bbox[2] - bbox[0] + 1, (main_bbox[2] - main_bbox[0]) // 3)
+                width = min(bbox[3] - bbox[1] + 1, (main_bbox[3] - main_bbox[1]) // 3)
                 top = main_bbox[0] + (main_bbox[2] - main_bbox[0] - height) // 2
                 left = main_bbox[1] + (main_bbox[3] - main_bbox[1] - width) // 2
                 create_rectangle(color, top, left, top + height - 1, left + width - 1)
