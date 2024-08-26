@@ -2,33 +2,28 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_e9ac8c9e(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transform the input grid by identifying a gray square and four colored squares,
-    then creating a new compact arrangement of those colors.
+    Transform the input grid by replacing a gray square with a 2x2 arrangement of surrounding colors.
     
     1. Find the gray (5) square in the input.
     2. Identify the four colored squares around the gray square.
-    3. Create a new grid with the colored squares arranged in a 2x2 formation,
+    3. Create a new grid where the gray square is replaced by a 2x2 formation of the surrounding colors,
        each color occupying a quarter of the space previously taken by the gray square.
-    4. Center this new formation in the output grid.
+    4. The position of the new formation is exactly where the gray square was.
     
-    The gray square is removed in the output, and the colored squares are expanded
+    The gray square is removed in the output, and the surrounding colored squares are expanded
     to fill the space in a compact, symmetrical arrangement.
     """
-    rows, cols = input_grid.get_dimensions()
-    
     # Find the gray square
     gray_top, gray_left, gray_size = find_gray_square(input_grid)
     
     # Find the four colors
     colors = find_colors(input_grid, gray_top, gray_left, gray_size)
     
-    # Create the output grid
-    output = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
+    # Create the output grid as a copy of the input
+    output = input_grid.deep_copy()
     
-    # Calculate the new block size and starting position
+    # Calculate the new block size
     block_size = gray_size // 2
-    start_row = (rows - gray_size) // 2
-    start_col = (cols - gray_size) // 2
     
     # Fill the new formation
     for i in range(2):
@@ -36,7 +31,7 @@ def solve_e9ac8c9e(input_grid: ColoredGrid) -> ColoredGrid:
             color = colors[i * 2 + j]
             for r in range(block_size):
                 for c in range(block_size):
-                    output.values[start_row + i * block_size + r][start_col + j * block_size + c] = color
+                    output.values[gray_top + i * block_size + r][gray_left + j * block_size + c] = color
     
     return output
 
