@@ -6,19 +6,20 @@ def solve_0c786b71(input_grid: ColoredGrid) -> ColoredGrid:
     
     The transformation follows these steps:
     1. Fill the top-left 3x4 quadrant with the input rows in a specific order:
-       last row, first row, second row of the input.
+       last row, first row, second row of the input, swapping the first and last elements of each row.
     2. Mirror the top-left quadrant horizontally to fill the top-right quadrant.
     3. Mirror the entire top half vertically to create the bottom half.
     
-    This creates a symmetrical expansion of the input grid with specific row reordering.
+    This creates a symmetrical expansion of the input grid with specific row reordering and element swapping.
     """
     # Initialize 6x8 output grid
     output = [[0 for _ in range(8)] for _ in range(6)]
     
     # Fill top-left quadrant
-    output[0] = input_grid.values[2][:4]  # Last row of input
-    output[1] = input_grid.values[0][:4]  # First row of input
-    output[2] = input_grid.values[1][:4]  # Second row of input
+    for i, row in enumerate([2, 0, 1]):  # Order: last, first, second row of input
+        output[i][0] = input_grid.values[row][3]
+        output[i][1:3] = input_grid.values[row][1:3]
+        output[i][3] = input_grid.values[row][0]
     
     # Mirror top-left quadrant horizontally
     for row in range(3):
