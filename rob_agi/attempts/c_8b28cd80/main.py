@@ -3,73 +3,94 @@ from rob_agi.colored_grid import ColoredGrid
 def solve_8b28cd80(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transform a 3x3 input grid into a 9x9 output grid by drawing a 7-segment digit.
-    The position of the non-zero color in the input determines which digit to draw.
-    The non-zero color is used to draw the digit in the output grid.
+    The position of the non-zero color in the input determines which digit to draw and its alignment.
+    The non-zero color is used to draw the digit, its border, and additional lines if required.
+    The output includes a partial border and may have additional lines based on the digit.
     """
     # Position to digit mapping
     position_to_digit = {
-        (0, 0): 0, (0, 1): 1, (0, 2): 3,
+        (0, 0): 7, (0, 1): 1, (0, 2): 3,
         (1, 0): 4, (1, 1): 5, (1, 2): 6,
         (2, 0): 7, (2, 1): 8, (2, 2): 9
     }
 
     # Segment definitions for each digit
     segments = {
-        0: [0, 1, 2, 3, 4, 5],
-        1: [1, 2],
-        2: [0, 1, 3, 4, 6],
-        3: [0, 1, 2, 3, 6],
-        4: [1, 2, 5, 6],
-        5: [0, 2, 3, 5, 6],
-        6: [0, 2, 3, 4, 5, 6],
-        7: [0, 1, 2],
-        8: [0, 1, 2, 3, 4, 5, 6],
+        0: [0, 1, 2, 3, 4, 5], 1: [1, 2], 2: [0, 1, 3, 4, 6],
+        3: [0, 1, 2, 3, 6], 4: [1, 2, 5, 6], 5: [0, 2, 3, 5, 6],
+        6: [0, 2, 3, 4, 5, 6], 7: [0, 1, 2], 8: [0, 1, 2, 3, 4, 5, 6],
         9: [0, 1, 2, 3, 5, 6]
     }
 
-    def draw_segment(grid, segment, color):
-        if segment == 0:
-            for i in range(1, 8):
-                grid[0][i] = color
-        elif segment == 1:
-            for i in range(1, 4):
-                grid[i][8] = color
-        elif segment == 2:
-            for i in range(5, 8):
-                grid[i][8] = color
-        elif segment == 3:
-            for i in range(1, 8):
-                grid[8][i] = color
-        elif segment == 4:
-            for i in range(5, 8):
-                grid[i][0] = color
-        elif segment == 5:
-            for i in range(1, 4):
-                grid[i][0] = color
-        elif segment == 6:
-            for i in range(1, 8):
-                grid[4][i] = color
+    def draw_segment(grid, segment, color, offset_x, offset_y):
+        coords = {
+            0: [(i, 1) for i in range(1, 6)],
+            1: [(1, i) for i in range(2, 7)],
+            2: [(5, i) for i in range(2, 7)],
+            3: [(i, 1) for i in range(6, 11)],
+            4: [(5, i) for i in range(-3, 2)],
+            5: [(1, i) for i in range(-3, 2)],
+            6: [(3, i) for i in range(1, 6)]
+        }
+        for x, y in coords[segment]:
+            grid[y + offset_y][x + offset_x] = color
 
-    def draw_digit(digit, color):
-        grid = [[0 for _ in range(9)] for _ in range(9)]
+    def draw_digit(digit, color, offset_x, offset_y):
         for segment in segments[digit]:
-            draw_segment(grid, segment, color)
-        return grid
+            draw_segment(output_grid, segment, color, offset_x, offset_y)
+
+    def draw_border(color, left, right, bottom):
+        for i in range(9):
+            output_grid[0][i] = color  # Top border
+        if left:
+            for i in range(9):
+                output_grid[i][0] = color  # Left border
+        if right:
+            for i in range(9):
+                output_grid[i][8] = color  # Right border
+        if bottom:
+            for i in range(9):
+                output_grid[8][i] = color  # Bottom border
+
+    def add_lines(digit, color, row):
+        if digit in [1, 2]:
+            for i in range(3):
+                output_grid[6 + i][1:8] = [color] * 7
+        elif digit == 3:
+            for i in range(4):
+                output_grid[5 + i][1:8-i] = [color] * (7-i)
+        elif digit == 7:
+            for i in range(4):
+                output_grid[5 + i][1:8] = [color] * 7
+        
+        if row == 2:  # Bottom row input, move lines up
+            for i in range(4):
+                output_grid[i+1] = output_grid[i+5]
+                output_grid[i+5] = [0] * 9
 
     # Find non-zero color and its position
-    color = 0
-    position = (0, 0)
-    for i in range(3):
-        for j in range(3):
-            if input_grid.values[i][j] != 0:
-                color = input_grid.values[i][j]
-                position = (i, j)
-                break
-        if color != 0:
-            break
+    color, position = next((input_grid.values[i][j], (i, j)) 
+                           for i in range(3) for j in range(3) 
+                           if input_grid.values[i][j] != 0)
 
-    # Determine digit and draw it
+    # Initialize output grid
+    output_grid = [[0 for _ in range(9)] for _ in range(9)]
+
+    # Determine digit and alignment
     digit = position_to_digit[position]
-    output_grid = draw_digit(digit, color)
+    row, col = position
+
+    # Set offsets based on alignment
+    offset_x = 0 if col == 0 else (2 if col == 2 else 1)
+    offset_y = 0 if row == 0 else (2 if row == 2 else 1)
+
+    # Draw the digit
+    draw_digit(digit, color, offset_x, offset_y)
+
+    # Draw the border
+    draw_border(color, col != 2, col != 0, False)
+
+    # Add additional lines if needed
+    add_lines(digit, color, row)
 
     return ColoredGrid(values=output_grid)
