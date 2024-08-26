@@ -1,35 +1,33 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
 
 def solve_da2b0fe3(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the grid transformation challenge by adding a green line to the input grid.
-    The line is always placed vertically in the middle column (5th column in a 10x10 grid).
-    The green line extends from the top to the bottom of the grid, regardless of the content.
+    The line is placed to intersect with the existing shape in the grid.
+    If the shape is vertically oriented, add a horizontal green line.
+    If the shape is horizontally oriented, add a vertical green line.
     
     1. Create a deep copy of the input grid.
-    2. Add a vertical green line in the middle column (index 4 for a 0-indexed grid).
-    3. Return the modified grid with the added green line.
+    2. Determine the orientation of the existing shape.
+    3. Add the green line in the appropriate direction.
+    4. Return the modified grid with the added green line.
     """
     new_grid = input_grid.deep_copy()
+    rows, cols = new_grid.get_dimensions()
     
-    # Add the vertical green line in the middle column (5th column, index 4)
-    for r in range(len(new_grid.values)):
-        new_grid.values[r][4] = 3
+    # Determine the orientation of the existing shape
+    vertical_count = sum(any(new_grid.values[r][c] != 0 for r in range(rows)) for c in range(cols))
+    horizontal_count = sum(any(new_grid.values[r][c] != 0 for c in range(cols)) for r in range(rows))
+    
+    if vertical_count > horizontal_count:
+        # Add horizontal green line
+        middle_row = rows // 2
+        for c in range(cols):
+            new_grid.values[middle_row][c] = 3
+    else:
+        # Add vertical green line
+        middle_col = cols // 2
+        for r in range(rows):
+            new_grid.values[r][middle_col] = 3
     
     return new_grid
-
-def find_bounding_box(grid: List[List[int]]) -> Tuple[int, int, int, int]:
-    rows, cols = len(grid), len(grid[0])
-    top, left = rows, cols
-    bottom, right = -1, -1
-    
-    for r in range(rows):
-        for c in range(cols):
-            if grid[r][c] != 0:
-                top = min(top, r)
-                left = min(left, c)
-                bottom = max(bottom, r)
-                right = max(right, c)
-    
-    return top, left, bottom, right
