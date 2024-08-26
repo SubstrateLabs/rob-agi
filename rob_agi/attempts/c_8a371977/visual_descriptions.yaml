@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 19x19 grid with a distinct pattern. The grid is primarily composed of blue (1) squares forming a frame-like structure. Within this blue frame are 3x3 black (0) regions, creating a checkered pattern of blue and black. The blue frame is one square thick, forming a grid-like structure that separates the black regions.
+  output: |
+    The 19x19 grid maintains its overall structure but with color changes. The blue (1) frame remains unchanged. The previously black (0) 3x3 regions are now filled with different colors. The corner regions and the regions along the edges are filled with red (2). The central 3x3 region is filled with green (3). This creates a concentric pattern of coloration within the blue frame.
+
+example_1:
+  input: |
+    A 23x23 grid with a checkered pattern. The grid alternates between blue (1) and black (0) squares in both horizontal and vertical directions. The blue squares form a consistent grid-like structure throughout, with single black squares in between.
+  output: |
+    The 23x23 grid maintains its overall checkered structure but with color changes. The blue (1) squares remain unchanged, forming the same grid-like structure. The previously black (0) squares are now filled with different colors. The outermost layer of previously black squares is now red (2). All inner previously black squares, except for the four corners of the second layer, are now green (3). The four corner squares of the second layer remain red (2). This creates a concentric pattern within the blue grid structure.
+
+example_2:
+  input: |
+    A 25x25 grid with a distinct pattern. The grid is primarily composed of blue (1) squares forming a frame-like structure. Within this blue frame are 3x3 black (0) regions, creating a regular pattern of blue and black. The blue frame is one square thick, forming a grid-like structure that separates the black regions. This pattern is similar to example_0, but with a larger grid size.
+  output: |
+    The 25x25 grid maintains its overall structure but with color changes. The blue (1) frame remains unchanged. The previously black (0) 3x3 regions are now filled with different colors. The corner regions and the regions along the outermost edge are filled with red (2). All inner 3x3 regions are filled with green (3). This creates a concentric pattern of coloration within the blue frame, similar to example_0 but with a larger central green area.
