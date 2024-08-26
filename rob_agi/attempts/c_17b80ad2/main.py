@@ -4,80 +4,78 @@ from collections import deque
 
 def solve_17b80ad2(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by extending colors based on the following rules:
-    1. Identify connected color regions, including adjacent columns.
-    2. Sort regions by their top-most and then left-most positions.
-    3. Extend colors from the bottom row upwards.
-    4. Fill remaining space by extending color regions vertically and horizontally.
-    5. Handle overlaps by giving precedence to higher or more left regions.
+    Transforms the input grid by extending colors vertically and horizontally based on the following rules:
+    1. Identify all non-zero color points in the input grid.
+    2. Create vertical lines for each color point, extending up and down until hitting another color or edge.
+    3. Create horizontal lines for each color point, extending left and right until hitting another color or edge.
+    4. Handle intersections by giving priority to lines from higher or more left starting points.
+    5. Fill remaining black cells with the nearest non-black color above or to the left.
     6. Preserve original non-black cells in their positions.
     """
     height, width = input_grid.get_dimensions()
     new_grid = ColoredGrid(values=[[0 for _ in range(width)] for _ in range(height)])
 
-    def get_region(start_row: int, start_col: int, color: int) -> List[Tuple[int, int]]:
-        region = []
-        queue = deque([(start_row, start_col)])
-        visited = set()
-        while queue:
-            row, col = queue.popleft()
-            if (row, col) in visited or input_grid.values[row][col] != color:
-                continue
-            visited.add((row, col))
-            region.append((row, col))
-            for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-                new_row, new_col = row + dr, col + dc
-                if 0 <= new_row < height and 0 <= new_col < width:
-                    queue.append((new_row, new_col))
-        return region
+    # Identify color points
+    color_points = [(row, col, input_grid.values[row][col]) 
+                    for row in range(height) 
+                    for col in range(width) 
+                    if input_grid.values[row][col] != 0]
+    color_points.sort(key=lambda x: (x[0], x[1]))  # Sort top-to-bottom, then left-to-right
 
-    # Identify and sort color regions
-    regions = []
-    for row in range(height):
-        for col in range(width):
-            if input_grid.values[row][col] != 0 and (row, col) not in [cell for region in regions for cell in region]:
-                color = input_grid.values[row][col]
-                region = get_region(row, col, color)
-                regions.append((color, region))
-    
-    regions.sort(key=lambda x: (min(cell[0] for cell in x[1]), min(cell[1] for cell in x[1])))
+    # Process vertical lines
+    for row, col, color in color_points:
+        # Extend upwards
+        for r in range(row, -1, -1):
+            if new_grid.values[r][col] != 0:
+                break
+            new_grid.values[r][col] = color
+        # Extend downwards
+        for r in range(row, height):
+            if new_grid.values[r][col] == 0:
+                new_grid.values[r][col] = color
 
-    # Process bottom row
-    bottom_colors = [(col, input_grid.values[height-1][col]) for col in range(width) if input_grid.values[height-1][col] != 0]
-    for col, color in bottom_colors:
-        for row in range(height-1, -1, -1):
-            if new_grid.values[row][col] == 0:
-                new_grid.values[row][col] = color
+    # Process horizontal lines
+    for row, col, color in color_points:
+        # Extend left
+        for c in range(col, -1, -1):
+            if new_grid.values[row][c] != 0 and new_grid.values[row][c] != color:
+                break
+            new_grid.values[row][c] = color
+        # Extend right
+        for c in range(col, width):
+            if new_grid.values[row][c] == 0 or new_grid.values[row][c] == color:
+                new_grid.values[row][c] = color
             else:
                 break
 
-    # Fill remaining space
-    for color, region in regions:
-        top = min(cell[0] for cell in region)
-        bottom = max(cell[0] for cell in region)
-        left = min(cell[1] for cell in region)
-        right = max(cell[1] for cell in region)
+    # Handle color changes in columns
+    for col in range(width):
+        last_color = 0
+        for row in range(height):
+            if new_grid.values[row][col] != 0:
+                last_color = new_grid.values[row][col]
+            elif last_color != 0:
+                new_grid.values[row][col] = last_color
 
-        # Extend upwards
-        for col in range(left, right + 1):
-            for row in range(top, -1, -1):
-                if new_grid.values[row][col] == 0:
-                    new_grid.values[row][col] = color
-                else:
-                    break
-
-        # Extend downwards
-        for col in range(left, right + 1):
-            for row in range(bottom, height):
-                if new_grid.values[row][col] == 0:
-                    new_grid.values[row][col] = color
-                else:
-                    break
-
-    # Preserve original non-black cells
+    # Preserve original colors
     for row in range(height):
         for col in range(width):
             if input_grid.values[row][col] != 0:
                 new_grid.values[row][col] = input_grid.values[row][col]
+
+    # Final check: fill remaining black cells
+    for row in range(height):
+        for col in range(width):
+            if new_grid.values[row][col] == 0 and input_grid.values[row][col] == 0:
+                # Find nearest non-black color above or to the left
+                for r in range(row, -1, -1):
+                    if new_grid.values[r][col] != 0:
+                        new_grid.values[row][col] = new_grid.values[r][col]
+                        break
+                if new_grid.values[row][col] == 0:
+                    for c in range(col, -1, -1):
+                        if new_grid.values[row][c] != 0:
+                            new_grid.values[row][col] = new_grid.values[row][c]
+                            break
 
     return new_grid
