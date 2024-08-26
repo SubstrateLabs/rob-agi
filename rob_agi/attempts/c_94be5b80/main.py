@@ -9,8 +9,9 @@ def solve_94be5b80(input_grid: ColoredGrid) -> ColoredGrid:
     2. Identifying existing horseshoes in the input grid.
     3. Creating a layout plan for all horseshoes (existing and new).
     4. Generating the output grid with horseshoes in their determined positions.
-    5. Ensuring exactly 2 rows of space between horseshoes.
+    5. Ensuring exactly 2 rows of space between horseshoes when possible.
     6. Filling remaining space with black (0).
+    7. Limiting the output grid to a maximum of 30 rows.
     """
     rows, cols = input_grid.get_dimensions()
 
@@ -66,17 +67,21 @@ def solve_94be5b80(input_grid: ColoredGrid) -> ColoredGrid:
     layout.sort(key=lambda x: x[1])  # Sort by row position
 
     # Calculate output grid size
-    output_rows = len(layout) * 5 - 2  # 3 rows per horseshoe + 2 rows spacing, -2 for no spacing after last horseshoe
+    output_rows = min(len(layout) * 5 - 2, 30)  # Limit to 30 rows maximum
     output_rows = max(output_rows, rows)  # Ensure output is at least as tall as input
     output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(output_rows)])
 
     # Step 4: Determine positions and create horseshoes
     current_row = 2
     for color, top, left in layout:
+        if current_row + 3 > output_rows:
+            break  # Stop if we can't fit another horseshoe
         if top == -1:  # New horseshoe
             create_horseshoe(output_grid, color, current_row, 3)
         else:  # Existing horseshoe
             create_horseshoe(output_grid, color, current_row, left)
         current_row += 5
+        if current_row + 3 > output_rows:
+            break  # Stop if we can't fit another horseshoe with spacing
 
     return output_grid
