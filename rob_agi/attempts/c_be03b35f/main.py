@@ -2,48 +2,56 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_be03b35f(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms a 5x5 input grid into a 2x2 output grid based on the presence of blue cells in specific regions.
+    Transforms a 5x5 input grid into a 2x2 output grid based on the presence of blue cells in specific quadrants.
     
-    The function checks for blue cells (1) in the following regions:
-    - Left column (columns 0-1): If found, sets both left cells in the output to blue.
-    - Right column (columns 3-4): If found, sets both right cells in the output to blue.
-    - Top row (row 0): If found in left half, sets top-left cell to blue; if found in right half, sets top-right cell to blue.
-    - Bottom row (row 4): If found in left half, sets bottom-left cell to blue; if found in right half, sets bottom-right cell to blue.
+    The function checks for blue cells (1) in the following quadrants:
+    - Top-left (rows 0-1, columns 0-1): If found, sets output[0][0] to blue.
+    - Top-right (rows 0-1, columns 3-4): If found, sets output[0][1] to blue.
+    - Bottom-left (rows 3-4, columns 0-1): If found, sets output[1][0] to blue.
+    - Bottom-right (rows 3-4, columns 3-4): If found, sets output[1][1] to blue.
     
     Args:
     input_grid (ColoredGrid): A 5x5 input grid where 1 represents blue cells.
     
     Returns:
-    ColoredGrid: A 2x2 output grid representing the presence of blue cells in each region.
+    ColoredGrid: A 2x2 output grid representing the presence of blue cells in each quadrant.
     """
     output = [[0, 0], [0, 0]]
 
-    # Check left column (columns 0-1)
-    for r in range(5):
-        if input_grid.get_cell(r, 0) == 1 or input_grid.get_cell(r, 1) == 1:
-            output[0][0] = 1
-            output[1][0] = 1
+    # Check top-left quadrant
+    for r in range(2):
+        for c in range(2):
+            if input_grid.get_cell(r, c) == 1:
+                output[0][0] = 1
+                break
+        if output[0][0] == 1:
             break
 
-    # Check right column (columns 3-4)
-    for r in range(5):
-        if input_grid.get_cell(r, 3) == 1 or input_grid.get_cell(r, 4) == 1:
-            output[0][1] = 1
-            output[1][1] = 1
+    # Check top-right quadrant
+    for r in range(2):
+        for c in range(3, 5):
+            if input_grid.get_cell(r, c) == 1:
+                output[0][1] = 1
+                break
+        if output[0][1] == 1:
             break
 
-    # Check top row (row 0)
-    for c in range(5):
-        if c < 2 and input_grid.get_cell(0, c) == 1:
-            output[0][0] = 1
-        elif c > 2 and input_grid.get_cell(0, c) == 1:
-            output[0][1] = 1
+    # Check bottom-left quadrant
+    for r in range(3, 5):
+        for c in range(2):
+            if input_grid.get_cell(r, c) == 1:
+                output[1][0] = 1
+                break
+        if output[1][0] == 1:
+            break
 
-    # Check bottom row (row 4)
-    for c in range(5):
-        if c < 2 and input_grid.get_cell(4, c) == 1:
-            output[1][0] = 1
-        elif c > 2 and input_grid.get_cell(4, c) == 1:
-            output[1][1] = 1
+    # Check bottom-right quadrant
+    for r in range(3, 5):
+        for c in range(3, 5):
+            if input_grid.get_cell(r, c) == 1:
+                output[1][1] = 1
+                break
+        if output[1][1] == 1:
+            break
 
     return ColoredGrid(values=output)
