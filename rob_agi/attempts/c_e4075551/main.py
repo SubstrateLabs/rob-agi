@@ -6,8 +6,8 @@ def solve_e4075551(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid into a rectangular frame pattern based on the colors present.
     
     1. Identifies unique non-black (0) and non-red (2) colors in the input grid
-    2. Determines frame dimensions based on the number of unique colors and grid size
-    3. Calculates frame position to center it horizontally and vertically
+    2. Determines frame dimensions based on the number of unique colors
+    3. Calculates frame position to center it in the grid
     4. Assigns colors to different parts of the frame (top, left, right, bottom)
     5. Creates a new grid and draws the frame with assigned colors
     6. Fills the frame interior with gray (5)
@@ -22,7 +22,7 @@ def solve_e4075551(input_grid: ColoredGrid) -> ColoredGrid:
     if not unique_colors:
         return output_grid  # Return all black grid if no unique colors found
 
-    frame_height = len(unique_colors) * 2 + 1
+    frame_height = len(unique_colors) + 3
     frame_width = frame_height + 2
     start_row = (rows - frame_height) // 2
     start_col = (cols - frame_width) // 2
@@ -52,9 +52,15 @@ def find_unique_colors(grid: ColoredGrid) -> List[int]:
 def assign_colors(unique_colors: List[int]) -> dict:
     assignments = {}
     assignments['top'] = unique_colors[0]
-    assignments['left'] = unique_colors[0] if len(unique_colors) == 1 else unique_colors[1]
-    assignments['right'] = unique_colors[-1] if len(unique_colors) > 2 else unique_colors[0]
     assignments['bottom'] = unique_colors[-1]
+    if len(unique_colors) == 2:
+        assignments['left'] = unique_colors[0]
+        assignments['right'] = unique_colors[-1]
+    elif len(unique_colors) >= 3:
+        assignments['left'] = unique_colors[1]
+        assignments['right'] = unique_colors[-2]
+    else:
+        assignments['left'] = assignments['right'] = unique_colors[0]
     return assignments
 
 def draw_frame(grid: ColoredGrid, start_row: int, start_col: int, frame_height: int, frame_width: int, colors: dict):
