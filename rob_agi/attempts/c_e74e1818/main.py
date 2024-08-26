@@ -10,32 +10,25 @@ def solve_e74e1818(input_grid: ColoredGrid) -> ColoredGrid:
     The solution involves the following steps:
     1. Identify distinct shapes in the grid
     2. Analyze each shape's characteristics (weight distribution, bounds)
-    3. Generate and evaluate all possible combinations of flipped shapes
-    4. Select the best combination based on balance, symmetry, and weight distribution
+    3. For each shape, determine if flipping it vertically improves the overall composition
+    4. Apply the flips that result in the best overall improvement
     5. Reconstruct the grid with the optimal configuration of flipped shapes
     
     This function aims to improve vertical symmetry and balance of the image while maintaining
     the vertical ordering and horizontal positions of shapes.
     """
     shapes = identify_shapes(input_grid)
-    initial_metrics = calculate_grid_metrics(input_grid, shapes)
+    flipped_shapes = {}
     
-    best_grid = input_grid
-    best_metrics = initial_metrics
-    best_flips = {}
+    for color, shape in shapes.items():
+        original_metrics = calculate_shape_metrics(shape)
+        flipped_shape = flip_shape_vertically(shape)
+        flipped_metrics = calculate_shape_metrics(flipped_shape)
+        
+        if is_better_shape_configuration(flipped_metrics, original_metrics):
+            flipped_shapes[color] = flipped_shape
     
-    for i in range(len(shapes) + 1):
-        for flip_combination in combinations(shapes.keys(), i):
-            flipped_shapes = {color: flip_shape_vertically(shape) for color, shape in shapes.items() if color in flip_combination}
-            temp_grid = reconstruct_grid(shapes, input_grid, flipped_shapes)
-            temp_metrics = calculate_grid_metrics(temp_grid, shapes)
-            
-            if is_better_configuration(temp_metrics, best_metrics):
-                best_grid = temp_grid
-                best_metrics = temp_metrics
-                best_flips = flipped_shapes
-    
-    return best_grid
+    return reconstruct_grid(shapes, input_grid, flipped_shapes)
 
 def identify_shapes(grid: ColoredGrid) -> Dict[int, List[Tuple[int, int]]]:
     shapes = {}
@@ -111,9 +104,13 @@ def reconstruct_grid(shapes: Dict[int, List[Tuple[int, int]]], original_grid: Co
     
     for color, shape in shapes.items():
         current_shape = flipped_shapes.get(color, shape)
+        min_r = min(r for r, _ in current_shape)
+        max_r = max(r for r, _ in current_shape)
+        min_c = min(c for _, c in current_shape)
+        
         for r, c in current_shape:
-            if 0 <= r < original_grid.num_rows and 0 <= c < original_grid.num_cols:
-                new_grid[r][c] = color
+            new_r = r - min_r
+            new_grid[new_r][c] = color
     
     return ColoredGrid(values=new_grid)
 
