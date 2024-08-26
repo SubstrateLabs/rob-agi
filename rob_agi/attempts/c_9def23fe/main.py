@@ -9,12 +9,14 @@ def solve_9def23fe(input_grid: ColoredGrid) -> ColoredGrid:
     2. Determines vertical bar positions based on the original rectangle's width.
     3. Determines horizontal bar positions based on the original rectangle's height.
     4. Creates a new grid with expanded red area, including horizontal and vertical bars.
-    5. Fills the area between the leftmost and rightmost vertical bars from the top of the original rectangle to the bottom of the grid.
-    6. Preserves the positions of all scattered colored dots from the original grid.
+    5. Fills the entire width of the grid with red for specific horizontal bar rows.
+    6. Fills the area between the leftmost and rightmost vertical bars from the top of the original rectangle to the bottom of the grid.
+    7. Preserves the positions of all scattered colored dots from the original grid.
     
     The transformation includes:
     - Creating vertical red bars at the left and right edges of the original rectangle, and 1-2 additional bars based on the width.
     - Creating horizontal red bars at the top and bottom of the original rectangle, and potentially a middle bar for taller rectangles.
+    - Extending specific horizontal bars across the full width of the grid.
     - Extending the red area vertically from the top of the original rectangle to the bottom of the grid, between the outermost vertical bars.
     - Maintaining all non-red, non-black dots from the original grid in their original positions.
     
@@ -36,7 +38,7 @@ def solve_9def23fe(input_grid: ColoredGrid) -> ColoredGrid:
     draw_horizontal_bars(new_grid, horizontal_bars)
 
     # Step 5: Fill expanded rectangle
-    fill_expanded_rectangle(new_grid, original_rect, vertical_bars)
+    fill_expanded_rectangle(new_grid, original_rect, vertical_bars, horizontal_bars)
 
     # Step 6: Preserve scattered dots
     preserve_scattered_dots(new_grid, scattered_dots)
@@ -71,16 +73,6 @@ def create_empty_grid(dimensions: Tuple[int, int]) -> List[List[int]]:
     rows, cols = dimensions
     return [[0 for _ in range(cols)] for _ in range(rows)]
 
-def expand_horizontally(grid: List[List[int]], rect: Tuple[int, int, int, int], dots: List[Tuple[int, int, int]]):
-    top, _, bottom, _ = rect
-    rows, cols = len(grid), len(grid[0])
-    for r in range(top, bottom + 1):
-        for c in range(cols):
-            grid[r][c] = 2
-    for r, c, value in dots:
-        if top <= r <= bottom:
-            grid[r][c] = value
-
 def calculate_vertical_bars(rect: Tuple[int, int, int, int]) -> List[int]:
     _, left, _, right = rect
     width = right - left + 1
@@ -108,13 +100,16 @@ def draw_horizontal_bars(grid: List[List[int]], bars: List[int]):
     for r in bars:
         grid[r] = [2] * len(grid[0])
 
-def fill_expanded_rectangle(grid: List[List[int]], rect: Tuple[int, int, int, int], vertical_bars: List[int]):
+def fill_expanded_rectangle(grid: List[List[int]], rect: Tuple[int, int, int, int], vertical_bars: List[int], horizontal_bars: List[int]):
     top, _, _, _ = rect
     rows, cols = len(grid), len(grid[0])
     left, right = min(vertical_bars), max(vertical_bars)
     for r in range(top, rows):
-        for c in range(left, right + 1):
-            grid[r][c] = 2
+        if r in horizontal_bars:
+            grid[r] = [2] * cols
+        else:
+            for c in range(left, right + 1):
+                grid[r][c] = 2
 
 def preserve_scattered_dots(grid: List[List[int]], dots: List[Tuple[int, int, int]]):
     for r, c, value in dots:
