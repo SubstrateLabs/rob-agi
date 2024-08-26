@@ -1,0 +1,33 @@
+example_0:
+  input: |
+    A 19x13 grid predominantly filled with sky blue (8). In the center, there's a 6x8 rectangular area of black (0) and red (2) pixels. The top-left corner of this area (3x3) contains a simple pattern: red pixels forming an inverted L-shape, with black pixels filling the rest.
+  output: |
+    The grid maintains its 19x13 size and sky blue (8) background. The central 6x8 area is now filled with an intricate pattern of black (0) and red (2) pixels. This pattern appears to be a 3x4 repetition of the original 3x3 pattern from the input, creating a larger, more complex design. The pattern consists of red pixels forming connected lines that create rectangular shapes, with black pixels filling the spaces in between.
+
+example_1:
+  input: |
+    A 23x19 grid with a sky blue (8) background. There are two distinct regions of interest:
+    1. Top-left: A 6x10 area starting at row 2, column 2. It contains mostly black (0) pixels with a few blue (1) pixels in the top-left corner forming a small L-shape.
+    2. Bottom-right: A 6x10 area starting at row 13, column 7. It's mostly black (0) with a small cluster of green (3) pixels in the bottom-right corner forming a triangular shape.
+  output: |
+    The grid maintains its 23x19 size and sky blue (8) background. The two regions of interest have been transformed:
+    1. Top-left: The 6x10 area is now filled with a checkered pattern of blue (1) and black (0) pixels. The pattern starts with blue in the top-left corner and alternates.
+    2. Bottom-right: The 6x10 area is now filled with a more complex pattern of green (3) and black (0) pixels. The pattern appears to be a 3x3 repetition of a base pattern that includes diagonal lines of green pixels.
+
+example_2:
+  input: |
+    A 24x21 grid with a sky blue (8) background. There are two regions of interest:
+    1. Top-center: A 9x10 area starting at row 3, column 6. It's mostly black (0) with a small cluster of red (2) pixels in the top-right corner forming a simple pattern.
+    2. Bottom-left: A 6x15 area starting at row 14, column 2. It's mostly black (0) with a small cluster of yellow (4) pixels in the top-left corner forming an inverted T-shape.
+  output: |
+    The grid maintains its 24x21 size and sky blue (8) background. The two regions have been transformed:
+    1. Top-center: The 9x10 area is now filled with a complex pattern of red (2) and black (0) pixels. The pattern appears to be a 3x3 repetition of a base pattern that includes diagonal lines and rectangular shapes of red pixels.
+    2. Bottom-left: The 6x15 area is now filled with a checkered pattern of yellow (4) and black (0) pixels. The pattern starts with yellow in the top-left corner and alternates, creating a grid-like structure.
+
+test_case_0:
+  input: |
+    A 24x21 grid with a sky blue (8) background. There are two regions of interest:
+    1. Top-center: A 9x10 area starting at row 3, column 6. It's mostly black (0) with a small cluster of red (2) pixels in the top-right corner forming a simple pattern.
+    2. Bottom-left: A 6x15 area starting at row 14, column 2. It's mostly black (0) with a small cluster of yellow (4) pixels in the top-left corner forming an inverted T-shape.
+  output: |
+    The output grid is not provided for this test case.
