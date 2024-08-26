@@ -8,11 +8,11 @@ def solve_bb52a14b(input_grid: ColoredGrid) -> ColoredGrid:
     in the left two-thirds of the grid and replicating it in suitable areas
     on the right third of the grid.
 
-    1. Scan the left two-thirds for 3x3 non-black color patterns.
-    2. Select the most distinctive pattern based on unique colors and repetitions.
+    1. Scan the left two-thirds for 3x3 patterns, prioritizing those with yellow (4).
+    2. Select the most distinctive pattern based on color uniqueness and presence of yellow.
     3. Find potential replication areas in the right third of the grid.
-    4. Replicate the pattern in suitable areas, preserving existing non-black colors.
-    5. Limit replications to maintain balance in the grid.
+    4. Replicate the pattern in 1-2 suitable areas, preserving existing non-black colors.
+    5. Ensure no more than 2 replications are made.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -32,7 +32,7 @@ def solve_bb52a14b(input_grid: ColoredGrid) -> ColoredGrid:
     # Step 5: Replicate the pattern in suitable areas
     replications = 0
     for area in replication_areas:
-        if replications >= 3:
+        if replications >= 2:
             break
         if replicate_pattern(output_grid, pattern, area[0], area[1]):
             replications += 1
@@ -40,7 +40,7 @@ def solve_bb52a14b(input_grid: ColoredGrid) -> ColoredGrid:
     return output_grid
 
 def find_most_distinctive_pattern(grid: ColoredGrid) -> List[List[int]]:
-    """Find the most distinctive 3x3 non-black color pattern in the left two-thirds of the grid."""
+    """Find the most distinctive 3x3 color pattern in the left two-thirds of the grid."""
     rows, cols = grid.get_dimensions()
     best_pattern = None
     best_score = -1
@@ -49,7 +49,7 @@ def find_most_distinctive_pattern(grid: ColoredGrid) -> List[List[int]]:
         for c in range(int(2 * cols / 3) - 2):
             pattern = extract_pattern(grid, r, c)
             score = calculate_distinctiveness(pattern)
-            if score > best_score:
+            if score > best_score or (score == best_score and 4 in [cell for row in pattern for cell in row]):
                 best_score = score
                 best_pattern = pattern
     
@@ -63,7 +63,8 @@ def calculate_distinctiveness(pattern: List[List[int]]) -> int:
     """Calculate the distinctiveness score of a pattern."""
     flat_pattern = [cell for row in pattern for cell in row if cell != 0]
     unique_colors = set(flat_pattern)
-    return len(unique_colors) * 10 - (len(flat_pattern) - len(unique_colors))
+    yellow_bonus = 20 if 4 in unique_colors else 0
+    return len(unique_colors) * 10 - (len(flat_pattern) - len(unique_colors)) + yellow_bonus
 
 def find_replication_areas(grid: ColoredGrid, pattern: List[List[int]]) -> List[Tuple[int, int, int]]:
     """Find potential replication areas in the right third of the grid."""
@@ -73,9 +74,9 @@ def find_replication_areas(grid: ColoredGrid, pattern: List[List[int]]) -> List[
     for r in range(rows - 2):
         for c in range(start_col, cols - 2):
             match_score = calculate_match_score(grid, pattern, r, c)
-            if match_score >= 3:
+            if match_score >= 5:
                 areas.append((r, c, match_score))
-    return sorted(areas, key=lambda x: (-x[2], abs(x[0] - rows/2)))  # Sort by match score (desc) and centrality
+    return sorted(areas, key=lambda x: (-x[2], abs(x[0] - rows/2)))[:2]  # Sort by match score (desc) and centrality, limit to top 2
 
 def calculate_match_score(grid: ColoredGrid, pattern: List[List[int]], start_r: int, start_c: int) -> int:
     """Calculate the match score between the pattern and the grid area."""
@@ -83,10 +84,7 @@ def calculate_match_score(grid: ColoredGrid, pattern: List[List[int]], start_r: 
     for r in range(3):
         for c in range(3):
             grid_value = grid.get_cell(start_r + r, start_c + c)
-            pattern_value = pattern[r][c]
-            if grid_value == pattern_value and grid_value != 0:
-                score += 3
-            elif grid_value == 0:
+            if grid_value == 0:
                 score += 1
     return score
 
