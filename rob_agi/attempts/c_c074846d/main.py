@@ -28,15 +28,15 @@ def solve_c074846d(input_grid: ColoredGrid) -> ColoredGrid:
     # Determine orientation and new red square positions
     if len(red_line) > 1:
         if red_line[0][0] == red_line[1][0]:  # Horizontal
-            new_red_squares = [(gray_pos[0] - i - 1, gray_pos[1]) for i in range(len(red_line))]
-        else:  # Vertical
             new_red_squares = [(gray_pos[0], gray_pos[1] + i + 1) for i in range(len(red_line))]
+        else:  # Vertical
+            new_red_squares = [(gray_pos[0] - i - 1, gray_pos[1]) for i in range(len(red_line))]
     else:  # Single red square
-        directions = [(0, 1), (-1, 0), (0, -1), (1, 0)]  # Right, Up, Left, Down
+        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]  # Right, Down, Left, Up
         original_dir = (red_line[0][0] - gray_pos[0], red_line[0][1] - gray_pos[1])
         start_index = directions.index(original_dir)
         for i in range(4):
-            new_dir = directions[(start_index + i + 1) % 4]
+            new_dir = directions[(start_index + 1) % 4]
             new_r, new_c = gray_pos[0] + new_dir[0], gray_pos[1] + new_dir[1]
             if 0 <= new_r < rows and 0 <= new_c < cols:
                 new_red_squares = [(new_r, new_c)]
