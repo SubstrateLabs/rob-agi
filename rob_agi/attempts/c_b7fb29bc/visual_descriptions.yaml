@@ -1,0 +1,40 @@
+example_0:
+  input: |
+    A green (3) rectangular frame or border, 9x7 cells in size, centered in a 15x15 black (0) grid. The interior of the frame is filled with black (0), except for a single green (3) cell in the center of the frame.
+  output: |
+    The same green (3) rectangular frame as in the input. The interior is now filled with a pattern:
+    - A yellow (4) border just inside the green frame
+    - A red (2) rectangle inside the yellow border
+    - The red rectangle has a yellow cross shape dividing it into four sections
+    - The center of the cross retains the green (3) cell from the input
+
+example_1:
+  input: |
+    A green (3) rectangular frame, 9x7 cells, centered in a 15x15 black grid. The interior is black except for a single green (3) cell in the bottom left corner of the frame's interior.
+  output: |
+    The same green frame as the input. The interior now has a pattern:
+    - A yellow border just inside the green frame
+    - The left half of the interior is filled with alternating red (2) and yellow (4) vertical stripes
+    - The right half has two rows: top row is red, bottom row is yellow
+    - The green cell from the input remains in the bottom left corner
+
+example_2:
+  input: |
+    A green rectangular frame, 9x7 cells, centered in a 15x15 black grid. The interior is black except for a green cell in the top right corner of the frame's interior.
+  output: |
+    The same green frame as the input. The interior now has a complex pattern:
+    - Alternating horizontal stripes of yellow (4) and red (2)
+    - The stripes are not uniform:
+      - Top row: YRYRY (Y=Yellow, R=Red)
+      - Second row: YYYYY
+      - Third row: RRRRR
+      - Fourth row: YYYY
+      - Fifth row: RRR
+      - Bottom two rows: YY
+    - The green cell from the input remains in the top right corner
+
+test_case_0:
+  input: |
+    A green rectangular frame, 9x7 cells, centered in a 15x15 black grid. The interior is entirely black with no additional colored cells.
+  output: |
+    This is a test case, so no output is provided in the test file.
