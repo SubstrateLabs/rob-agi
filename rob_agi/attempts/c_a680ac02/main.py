@@ -14,6 +14,12 @@ def is_square_outline(grid: ColoredGrid, row: int, col: int) -> Tuple[bool, int]
     if size < 2:
         return False, 0
     
+    # Check if it's the top-left corner of the outline
+    if row > 0 and grid.get_cell(row - 1, col) == color:
+        return False, 0
+    if col > 0 and grid.get_cell(row, col - 1) == color:
+        return False, 0
+    
     for i in range(size):
         if (grid.get_cell(row + i, col) != color or
             grid.get_cell(row + i, col + size - 1) != color or
@@ -78,7 +84,7 @@ def solve_a680ac02(input_grid: ColoredGrid) -> ColoredGrid:
     result = ColoredGrid(values=[[0 for _ in range(output_width)] for _ in range(output_height)])
 
     # Place standardized outlines in the output grid
-    for i, (color, _, _, _) in enumerate(outlines):
+    for i, (color, row, col, size) in enumerate(outlines):
         if len(outlines) == 2:
             tgt_row, tgt_col = i * 4, 0
         else:
