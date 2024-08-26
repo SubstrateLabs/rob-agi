@@ -1,29 +1,29 @@
 example_0:
   input: |
-    A 4x4 grid with a red (2) frame around the edges, except for the bottom-left corner which is black (0). The interior of the frame is filled with black (0), except for the top-right corner which is red (2).
+    A 4x4 grid with a red (2) frame around the edges, except for the bottom-left corner which is black (0). The interior is black (0), except for the top-right corner which is red (2). This creates an asymmetrical pattern with more red in the top-right quadrant.
   output: |
-    A 16x16 grid that appears to be an expanded version of the input. The original 4x4 pattern is replicated in the center and each corner of the larger grid. The spaces between these replications are filled with black (0), creating a symmetrical pattern. The overall effect is a larger, more intricate version of the original red frame pattern.
+    A 16x16 grid that expands the input pattern. The original 4x4 pattern is replicated in a 2x2 arrangement in the bottom-right quadrant of the 16x16 grid. This quadrant expansion is mirrored in the top-left quadrant. The top-right and bottom-left quadrants contain single copies of the original pattern. Black spaces separate these pattern blocks, preserving the original pattern's structure while creating a larger, more complex design.
 
 example_1:
   input: |
-    A 4x4 grid that is mostly black (0) with a few blue (1) squares. There's a blue square in the top-right corner, two blue squares in the middle of the second row, and a blue square in the bottom-right corner.
+    A 4x4 grid predominantly black (0) with strategic blue (1) placements: top-right corner, middle of the second row (two adjacent blues), and bottom-right corner. This creates a sparse, asymmetrical pattern with more blue content in the right half.
   output: |
-    A 16x16 grid that expands the input pattern. The original 4x4 pattern is visible in the center and corners of the larger grid. The blue squares from the original pattern are preserved in these locations, while the rest of the grid is filled with black (0). This creates a sparse, symmetrical pattern of blue squares on a predominantly black background.
+    A 16x16 grid that expands the input pattern. The original 4x4 pattern is replicated in a 2x2 arrangement in the top-left quadrant of the 16x16 grid. This quadrant expansion is mirrored in the bottom-right quadrant. The top-right and bottom-left quadrants contain single copies of the original pattern. The result is a larger grid with blue elements concentrated in specific areas, maintaining the original pattern's sparsity and asymmetry.
 
 example_2:
   input: |
-    A 4x4 grid with a mix of black (0) and yellow (4) squares. The top row is all black, the second row is all yellow, the third row has yellow on the edges and black in the middle, and the bottom row has yellow on the left half and black on the right half.
+    A 4x4 grid with distinct rows: all black (0), all yellow (4), yellow-black-yellow, and half yellow-half black. This creates a strong horizontal pattern with more yellow content in the bottom half.
   output: |
-    A 16x16 grid that expands the input pattern. The original 4x4 pattern is replicated in the center-left, center-right, and bottom-left quadrants of the larger grid. The top-left quadrant is entirely black. The spaces between these replications are filled with black, creating a complex pattern of yellow stripes and blocks on a black background.
+    A 16x16 grid that expands the input pattern. The original 4x4 pattern is replicated in a 2x2 arrangement in the bottom-left quadrant of the 16x16 grid. This quadrant expansion is mirrored in the top-right quadrant. The top-left quadrant is entirely black, while the bottom-right quadrant contains a single copy of the original pattern. The expansion preserves the strong horizontal yellow stripes while introducing larger black areas, creating a balance between structure and negative space.
 
 example_3:
   input: |
-    A 4x4 grid with a pattern of green (3) and black (0) squares. The left and right columns are mostly green with a black square in the third row. The middle two columns are mostly black with green squares in the top and bottom rows.
+    A 4x4 grid with green (3) columns on the left and right, and mostly black (0) columns in the center. The third row breaks this pattern with black in the outer columns and green in the center. This creates a vertical symmetry with a horizontal interruption.
   output: |
-    A 16x16 grid that expands the input pattern. The original 4x4 pattern is replicated in the top-left, top-right, and bottom-left quadrants of the larger grid. The bottom-right quadrant is mostly black with some green squares matching the pattern of the original input. The overall effect is a symmetrical, larger version of the original pattern with more intricate details.
+    A 16x16 grid that expands the input pattern. The original 4x4 pattern is replicated in a 2x2 arrangement in the top-left quadrant of the 16x16 grid. This quadrant expansion is mirrored in the bottom-right quadrant, but with more black space. The top-right and bottom-left quadrants contain single copies of the original pattern. The expansion maintains the vertical green columns and the horizontal black interruption, creating a larger pattern that preserves the original symmetry and asymmetry.
 
 example_4:
   input: |
-    A 4x4 grid with a pattern of blue (1) and black (0) squares. The left column is all blue, the top row alternates blue-black-blue-black, the second row has blue in the first two squares and black in the last two, the third row is all blue, and the bottom row has blue in the first and last squares with black in between.
+    A 4x4 grid with a complex blue (1) and black (0) pattern. The left column is solid blue, creating a strong vertical element. The top and bottom rows have alternating colors, while the middle rows show a transition from more blue to more black, creating a diagonal feel.
   output: |
-    A 16x16 grid that expands the input pattern. The original 4x4 pattern is replicated in all four quadrants of the larger grid. The center of the grid (where the quadrants meet) creates a more complex pattern of blue and black squares. The overall effect is a symmetrical, larger version of the original pattern with additional intricacy in the center.
+    A 16x16 grid that expands the input pattern. The original 4x4 pattern is replicated in all four quadrants of the 16x16 grid. This creates a larger pattern with strong vertical blue lines (from the left columns of each quadrant) and intricate blue-black interactions in the center where the quadrants meet. The expansion emphasizes both the vertical and diagonal elements of the original pattern, resulting in a complex, symmetrical design with varied blue density across the grid.
