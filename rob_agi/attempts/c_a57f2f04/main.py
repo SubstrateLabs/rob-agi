@@ -9,7 +9,7 @@ def solve_a57f2f04(input_grid: ColoredGrid) -> ColoredGrid:
     The function identifies non-sky blue regions in the input grid and replaces them
     with specific patterns based on the color of non-black elements:
     - For green (3): 3x3 pattern with color in corners and center.
-    - For red (2): 3x3 pattern with specific arrangement.
+    - For red (2): 3x3 pattern with specific arrangement, repeating vertically and horizontally.
     - For other colors: 2x2 checkerboard pattern, starting with the color.
     The sky blue (8) background remains unchanged.
     
@@ -65,7 +65,7 @@ def generate_pattern(color: int) -> List[List[int]]:
     if color == 3:  # Green
         return [[3, 0, 3], [0, 3, 0], [3, 0, 3]]
     elif color == 2:  # Red
-        return [[0, 2, 0], [2, 2, 2], [0, 2, 0]]
+        return [[0, 2, 0], [2, 2, 0], [0, 2, 2]]
     else:
         return [[color, 0], [0, color]]
 
@@ -73,7 +73,12 @@ def apply_pattern(grid: ColoredGrid, pattern: List[List[int]], region: List[Tupl
     pattern_height, pattern_width = len(pattern), len(pattern[0])
     min_r = min(r for r, _ in region)
     min_c = min(c for _, c in region)
-    for r, c in region:
-        pr = (r - min_r) % pattern_height
-        pc = (c - min_c) % pattern_width
-        grid.values[r][c] = pattern[pr][pc]
+    max_r = max(r for r, _ in region)
+    max_c = max(c for _, c in region)
+    
+    for r in range(min_r, max_r + 1):
+        for c in range(min_c, max_c + 1):
+            if (r, c) in region:
+                pr = (r - min_r) % pattern_height
+                pc = (c - min_c) % pattern_width
+                grid.values[r][c] = pattern[pr][pc]
