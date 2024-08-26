@@ -6,34 +6,96 @@ Region = namedtuple('Region', ['id', 'color', 'cells', 'centroid', 'quadrant'])
 
 def solve_fea12743(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the fea12743 challenge by dividing the grid into quadrants,
-    identifying shapes in each quadrant, analyzing quadrant connectivity,
-    and applying color transformations based on the identified pattern:
-    - The source quadrant (usually bottom-right or the most connected) remains red (2)
-    - The next quadrant clockwise becomes green (3)
-    - The remaining two quadrants become sky blue (8)
-    - Black cells (0) are preserved
-    - Special case: bottom-right quadrant is never sky blue
+    Solves the fea12743 challenge by:
+    1. Dividing the grid into quadrants
+    2. Analyzing each quadrant for size and complexity of red shapes
+    3. Ranking quadrants based on a scoring system
+    4. Applying color transformations:
+       - Highest-ranked quadrant remains red (2)
+       - Second-highest becomes green (3), unless it's bottom-right
+       - Remaining quadrants become sky blue (8)
+       - Bottom-right is never sky blue, becomes green (3) if not highest-ranked
+    5. Preserving black cells (0)
     """
-    # Step 1-2: Parse the input grid and divide into quadrants
+    # Step 1: Divide the grid into quadrants
     rows, cols = input_grid.get_dimensions()
     mid_row, mid_col = rows // 2, cols // 2
 
-    # Step 3: Identify shapes in each quadrant
-    regions = find_regions(input_grid, mid_row, mid_col)
+    # Step 2-3: Analyze quadrants and rank them
+    quadrant_scores = analyze_and_score_quadrants(input_grid, mid_row, mid_col)
+    ranked_quadrants = rank_quadrants(quadrant_scores)
 
-    # Step 4-5: Analyze quadrant connectivity and determine the source quadrant
-    quadrant_connections = analyze_quadrant_connectivity(regions)
-    source_quadrant = determine_source_quadrant(quadrant_connections)
-
-    # Step 6-7: Establish color transformation order and apply it
-    color_order = get_color_transformation_order(source_quadrant)
-    new_grid = apply_color_transformation(input_grid, regions, color_order)
-
-    # Step 8: Handle special case (bottom-right never sky blue)
-    handle_bottom_right_special_case(new_grid, mid_row, mid_col)
+    # Step 4-5: Apply color transformation
+    new_grid = apply_color_transformation(input_grid, ranked_quadrants, mid_row, mid_col)
 
     return new_grid
+
+def analyze_and_score_quadrants(grid: ColoredGrid, mid_row: int, mid_col: int) -> Dict[str, float]:
+    quadrant_scores = {'top-left': 0, 'top-right': 0, 'bottom-left': 0, 'bottom-right': 0}
+    for quadrant in quadrant_scores:
+        regions = find_regions(grid, quadrant, mid_row, mid_col)
+        size = sum(len(region) for region in regions)
+        complexity = sum(calculate_complexity(region) for region in regions)
+        quadrant_scores[quadrant] = size * 0.7 + complexity * 0.3
+    return quadrant_scores
+
+def find_regions(grid: ColoredGrid, quadrant: str, mid_row: int, mid_col: int) -> List[Set[Tuple[int, int]]]:
+    regions = []
+    visited = set()
+    row_range = range(mid_row) if 'top' in quadrant else range(mid_row, grid.num_rows)
+    col_range = range(mid_col) if 'left' in quadrant else range(mid_col, grid.num_cols)
+    
+    for r in row_range:
+        for c in col_range:
+            if grid.values[r][c] == 2 and (r, c) not in visited:
+                region = flood_fill(grid, r, c, 2)
+                regions.append(region)
+                visited.update(region)
+    return regions
+
+def calculate_complexity(region: Set[Tuple[int, int]]) -> int:
+    return sum(1 for r, c in region if any((r+dr, c+dc) not in region for dr, dc in [(0,1),(1,0),(0,-1),(-1,0)]))
+
+def rank_quadrants(quadrant_scores: Dict[str, float]) -> List[str]:
+    return sorted(quadrant_scores, key=quadrant_scores.get, reverse=True)
+
+def apply_color_transformation(grid: ColoredGrid, ranked_quadrants: List[str], mid_row: int, mid_col: int) -> ColoredGrid:
+    new_grid = grid.deep_copy()
+    color_map = {ranked_quadrants[0]: 2}
+    
+    if ranked_quadrants[0] != 'bottom-right':
+        color_map['bottom-right'] = 3
+        color_map[ranked_quadrants[1]] = 3
+    else:
+        color_map[ranked_quadrants[1]] = 3
+    
+    for quadrant in ranked_quadrants[2:]:
+        if quadrant != 'bottom-right':
+            color_map[quadrant] = 8
+    
+    for r in range(grid.num_rows):
+        for c in range(grid.num_cols):
+            if grid.values[r][c] != 0:
+                quadrant = get_quadrant(r, c, mid_row, mid_col)
+                new_grid.values[r][c] = color_map[quadrant]
+    
+    return new_grid
+
+def get_quadrant(r: int, c: int, mid_row: int, mid_col: int) -> str:
+    if r < mid_row:
+        return 'top-left' if c < mid_col else 'top-right'
+    else:
+        return 'bottom-left' if c < mid_col else 'bottom-right'
+
+def flood_fill(grid: ColoredGrid, r: int, c: int, color: int) -> Set[Tuple[int, int]]:
+    region = set()
+    stack = [(r, c)]
+    while stack:
+        r, c = stack.pop()
+        if (r, c) not in region and 0 <= r < grid.num_rows and 0 <= c < grid.num_cols and grid.values[r][c] == color:
+            region.add((r, c))
+            stack.extend([(r+1, c), (r-1, c), (r, c+1), (r, c-1)])
+    return region
 
 def find_regions(grid: ColoredGrid, mid_row: int, mid_col: int) -> List[Region]:
     regions = []
