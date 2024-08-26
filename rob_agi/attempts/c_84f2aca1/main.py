@@ -8,10 +8,11 @@ def solve_84f2aca1(input_grid: ColoredGrid) -> ColoredGrid:
     The function identifies all shapes in the grid, determines their bounding boxes,
     and fills their centers based on the following rules:
     - For 3x3 shapes: Fill the center with gray (5)
-    - For shapes 4x4 or larger: Fill a 2x2 area in the center with orange (7)
+    - For shapes larger than 3x3 in either dimension: Fill a rectangular area in the center with orange (7)
     
     The function uses a flood fill algorithm to identify connected regions of the same color,
     calculates the bounding box for each shape, and applies the appropriate fill.
+    The fill size adapts to the shape's dimensions, ensuring only cells that were part of the original shape are filled.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -47,11 +48,15 @@ def solve_84f2aca1(input_grid: ColoredGrid) -> ColoredGrid:
                     center_r = (min_r + max_r) // 2
                     center_c = (min_c + max_c) // 2
                     
-                    if height >= 4 or width >= 4:
-                        for dr in range(2):
-                            for dc in range(2):
-                                if (center_r - 1 + dr, center_c - 1 + dc) in shape:
-                                    output_grid.set_cell(center_r - 1 + dr, center_c - 1 + dc, 7)
+                    if height > 3 or width > 3:
+                        fill_height = min(height - 2, 2)
+                        fill_width = min(width - 2, 2)
+                        fill_start_r = center_r - (fill_height // 2)
+                        fill_start_c = center_c - (fill_width // 2)
+                        for dr in range(fill_height):
+                            for dc in range(fill_width):
+                                if (fill_start_r + dr, fill_start_c + dc) in shape:
+                                    output_grid.set_cell(fill_start_r + dr, fill_start_c + dc, 7)
                     elif height == 3 and width == 3:
                         if (center_r, center_c) in shape:
                             output_grid.set_cell(center_r, center_c, 5)
