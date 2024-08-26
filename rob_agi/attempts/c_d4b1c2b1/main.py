@@ -5,15 +5,12 @@ def solve_d4b1c2b1(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Expands a colored grid based on the following rules:
     1. If the grid is uniform (all cells have the same color), return the input grid unchanged.
-    2. Otherwise, expand each cell into a square region, where the size of the square is determined by the complexity of the input grid.
-    The complexity is measured by the number of unique color pairs between adjacent cells.
+    2. Otherwise, expand each cell into a square region, where the size of the square is determined by the number of unique colors in the input grid.
     """
     if is_uniform(input_grid):
         return input_grid
 
-    complexity = analyze_complexity(input_grid)
-    expansion_factor = get_expansion_factor(complexity)
-    
+    expansion_factor = count_unique_colors(input_grid)
     expanded_grid = create_expanded_grid(input_grid, expansion_factor)
     fill_expanded_grid(input_grid, expanded_grid, expansion_factor)
 
@@ -25,29 +22,14 @@ def is_uniform(grid: ColoredGrid) -> bool:
     rows, cols = grid.get_dimensions()
     return all(grid.get_cell(r, c) == first_color for r in range(rows) for c in range(cols))
 
-def analyze_complexity(grid: ColoredGrid) -> int:
-    """Analyze the complexity of the grid by counting unique color pairs."""
-    unique_pairs: Set[Tuple[int, int]] = set()
+def count_unique_colors(grid: ColoredGrid) -> int:
+    """Count the number of unique colors in the grid."""
+    unique_colors = set()
     rows, cols = grid.get_dimensions()
     for r in range(rows):
         for c in range(cols):
-            color = grid.get_cell(r, c)
-            if c < cols - 1:
-                right_color = grid.get_cell(r, c + 1)
-                unique_pairs.add((min(color, right_color), max(color, right_color)))
-            if r < rows - 1:
-                bottom_color = grid.get_cell(r + 1, c)
-                unique_pairs.add((min(color, bottom_color), max(color, bottom_color)))
-    return len(unique_pairs)
-
-def get_expansion_factor(complexity: int) -> int:
-    """Determine the expansion factor based on the grid complexity."""
-    if complexity <= 3:
-        return 2
-    elif complexity <= 5:
-        return 3
-    else:
-        return 4
+            unique_colors.add(grid.get_cell(r, c))
+    return len(unique_colors)
 
 def create_expanded_grid(original_grid: ColoredGrid, expansion_factor: int) -> ColoredGrid:
     """Create an expanded grid based on the original grid and expansion factor."""
