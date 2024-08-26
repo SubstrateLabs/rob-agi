@@ -6,13 +6,13 @@ def solve_da515329(input_grid: ColoredGrid) -> ColoredGrid:
     Solves the da515329 challenge by transforming the input grid into a maze-like structure.
     
     The solution involves the following steps:
-    1. Find the center of the plus sign in the input grid
-    2. Create a new grid and copy the original plus sign
-    3. Generate a maze starting from the center of the plus sign
-    4. Create an outer frame with gaps
-    5. Connect the maze to the outer frame
-    6. Fill some dead ends and create loops
-    7. Make final adjustments for symmetry and connectivity
+    1. Analyze the input grid to find the plus sign center and dimensions
+    2. Initialize the output grid with the original plus sign
+    3. Expand the central structure while maintaining symmetry
+    4. Implement recursive division for maze generation
+    5. Create a frame with characteristic gaps and protrusions
+    6. Ensure connectivity and fill isolated areas
+    7. Add final details and optimize based on grid size
     
     Args:
     input_grid (ColoredGrid): The input grid containing a plus sign
@@ -23,40 +23,30 @@ def solve_da515329(input_grid: ColoredGrid) -> ColoredGrid:
     rows, cols = input_grid.get_dimensions()
     new_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
     
-    # Find the center of the plus sign
-    center = find_center(input_grid)
-    
-    # Copy the original plus sign
+    center, plus_width, plus_height = analyze_input(input_grid)
     copy_plus_sign(input_grid, new_grid)
-    
-    # Generate the maze
-    generate_maze(new_grid, center)
-    
-    # Create outer frame
-    create_outer_frame(new_grid)
-    
-    # Connect maze to frame
-    connect_maze_to_frame(new_grid)
-    
-    # Fill dead ends and create loops
-    fill_dead_ends(new_grid)
-    
-    # Final adjustments
-    make_final_adjustments(new_grid)
+    expand_central_structure(new_grid, center, plus_width, plus_height)
+    recursive_division(new_grid, 0, 0, rows, cols, center, plus_width, plus_height)
+    create_frame(new_grid)
+    ensure_connectivity(new_grid)
+    add_final_details(new_grid)
     
     return new_grid
 
-def find_center(grid: ColoredGrid) -> tuple:
+def analyze_input(grid: ColoredGrid) -> tuple:
     rows, cols = grid.get_dimensions()
+    center = None
+    plus_width, plus_height = 0, 0
+    
     for r in range(rows):
         for c in range(cols):
             if grid.values[r][c] == 8:
-                if (r > 0 and grid.values[r-1][c] == 8 and
-                    r < rows-1 and grid.values[r+1][c] == 8 and
-                    c > 0 and grid.values[r][c-1] == 8 and
-                    c < cols-1 and grid.values[r][c+1] == 8):
-                    return (r, c)
-    return (rows // 2, cols // 2)  # Fallback to grid center
+                if center is None:
+                    center = (r, c)
+                plus_height = max(plus_height, r - center[0] + 1)
+                plus_width = max(plus_width, c - center[1] + 1)
+    
+    return center, plus_width * 2 - 1, plus_height * 2 - 1
 
 def copy_plus_sign(input_grid: ColoredGrid, new_grid: ColoredGrid):
     rows, cols = input_grid.get_dimensions()
@@ -65,78 +55,99 @@ def copy_plus_sign(input_grid: ColoredGrid, new_grid: ColoredGrid):
             if input_grid.values[r][c] == 8:
                 new_grid.values[r][c] = 8
 
-def generate_maze(grid: ColoredGrid, start: tuple):
-    def is_valid(r, c):
-        return 0 <= r < len(grid.values) and 0 <= c < len(grid.values[0])
+def expand_central_structure(grid: ColoredGrid, center: tuple, width: int, height: int):
+    rows, cols = grid.get_dimensions()
+    for r in range(max(0, center[0] - height), min(rows, center[0] + height + 1)):
+        for c in range(max(0, center[1] - width), min(cols, center[1] + width + 1)):
+            if random.random() < 0.7:  # 70% chance to expand
+                grid.values[r][c] = 8
 
-    def get_neighbors(r, c):
-        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-        return [(r + dr, c + dc) for dr, dc in directions if is_valid(r + dr, c + dc)]
+def recursive_division(grid: ColoredGrid, x: int, y: int, width: int, height: int, center: tuple, plus_width: int, plus_height: int):
+    if width < 4 or height < 4:
+        return
+    
+    horizontal = random.choice([True, False]) if width != height else width < height
+    
+    if horizontal:
+        divide_horizontally(grid, x, y, width, height, center, plus_width, plus_height)
+    else:
+        divide_vertically(grid, x, y, width, height, center, plus_width, plus_height)
 
-    visited = set()
-    stack = [start]
+def divide_horizontally(grid: ColoredGrid, x: int, y: int, width: int, height: int, center: tuple, plus_width: int, plus_height: int):
+    divide_y = random.randint(y + 1, y + height - 2)
+    passage = random.randint(x, x + width - 1)
+    
+    for i in range(x, x + width):
+        if i != passage and not is_in_plus(i, divide_y, center, plus_width, plus_height):
+            grid.values[divide_y][i] = 8
+    
+    recursive_division(grid, x, y, width, divide_y - y, center, plus_width, plus_height)
+    recursive_division(grid, x, divide_y + 1, width, y + height - divide_y - 1, center, plus_width, plus_height)
 
-    while stack:
-        r, c = stack.pop()
-        if (r, c) not in visited:
-            visited.add((r, c))
-            grid.values[r][c] = 8
-            neighbors = get_neighbors(r, c)
-            random.shuffle(neighbors)
-            for nr, nc in neighbors:
-                if (nr, nc) not in visited and grid.values[nr][nc] != 8:
-                    stack.append((nr, nc))
+def divide_vertically(grid: ColoredGrid, x: int, y: int, width: int, height: int, center: tuple, plus_width: int, plus_height: int):
+    divide_x = random.randint(x + 1, x + width - 2)
+    passage = random.randint(y, y + height - 1)
+    
+    for i in range(y, y + height):
+        if i != passage and not is_in_plus(divide_x, i, center, plus_width, plus_height):
+            grid.values[i][divide_x] = 8
+    
+    recursive_division(grid, x, y, divide_x - x, height, center, plus_width, plus_height)
+    recursive_division(grid, divide_x + 1, y, x + width - divide_x - 1, height, center, plus_width, plus_height)
 
-def create_outer_frame(grid: ColoredGrid):
+def is_in_plus(x: int, y: int, center: tuple, plus_width: int, plus_height: int) -> bool:
+    return (center[0] - plus_height // 2 <= y <= center[0] + plus_height // 2 and
+            center[1] - plus_width // 2 <= x <= center[1] + plus_width // 2)
+
+def create_frame(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
     for r in range(rows):
         for c in range(cols):
             if r == 0 or r == rows - 1 or c == 0 or c == cols - 1:
                 if random.random() < 0.9:  # 90% chance to be part of the frame
                     grid.values[r][c] = 8
-
-def connect_maze_to_frame(grid: ColoredGrid):
-    rows, cols = grid.get_dimensions()
-    for _ in range(4):  # Ensure at least one connection on each side
+    
+    # Add characteristic gaps
+    for _ in range(4):
         side = random.choice(['top', 'bottom', 'left', 'right'])
         if side == 'top':
-            c = random.randint(1, cols - 2)
-            grid.values[0][c] = 8
-            grid.values[1][c] = 8
+            grid.values[0][random.randint(1, cols - 2)] = 0
         elif side == 'bottom':
-            c = random.randint(1, cols - 2)
-            grid.values[rows-1][c] = 8
-            grid.values[rows-2][c] = 8
+            grid.values[rows - 1][random.randint(1, cols - 2)] = 0
         elif side == 'left':
-            r = random.randint(1, rows - 2)
-            grid.values[r][0] = 8
-            grid.values[r][1] = 8
+            grid.values[random.randint(1, rows - 2)][0] = 0
         else:  # right
-            r = random.randint(1, rows - 2)
-            grid.values[r][cols-1] = 8
-            grid.values[r][cols-2] = 8
+            grid.values[random.randint(1, rows - 2)][cols - 1] = 0
 
-def fill_dead_ends(grid: ColoredGrid):
+def ensure_connectivity(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
-    for r in range(1, rows - 1):
-        for c in range(1, cols - 1):
-            if grid.values[r][c] == 8:
-                neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)] if grid.values[r+dr][c+dc] == 8)
-                if neighbors == 1 and random.random() < 0.5:  # 50% chance to extend dead end
-                    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-                    random.shuffle(directions)
-                    for dr, dc in directions:
-                        if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 0:
-                            grid.values[r+dr][c+dc] = 8
-                            break
+    visited = set()
+    
+    def dfs(r, c):
+        if not (0 <= r < rows and 0 <= c < cols) or grid.values[r][c] == 0 or (r, c) in visited:
+            return
+        visited.add((r, c))
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            dfs(r + dr, c + dc)
+    
+    # Start DFS from the center
+    center = (rows // 2, cols // 2)
+    dfs(center[0], center[1])
+    
+    # Fill in unvisited sky blue cells
+    for r in range(rows):
+        for c in range(cols):
+            if grid.values[r][c] == 8 and (r, c) not in visited:
+                grid.values[r][c] = 0
 
-def make_final_adjustments(grid: ColoredGrid):
+def add_final_details(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
     # Ensure corners are empty
     grid.values[0][0] = grid.values[0][cols-1] = grid.values[rows-1][0] = grid.values[rows-1][cols-1] = 0
     
-    # Add some random empty spaces for larger grids
+    # Add some random paths for larger grids
     if rows > 15 and cols > 15:
-        for _ in range(rows * cols // 100):  # Add empty spaces proportional to grid size
+        for _ in range(rows * cols // 50):  # Add paths proportional to grid size
             r, c = random.randint(1, rows - 2), random.randint(1, cols - 2)
-            grid.values[r][c] = 0
+            if grid.values[r][c] == 0:
+                grid.values[r][c] = 8
