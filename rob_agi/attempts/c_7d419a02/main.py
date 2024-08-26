@@ -15,6 +15,8 @@ def solve_7d419a02(input_grid: ColoredGrid) -> ColoredGrid:
     6. Larger blue regions are more likely to be transformed than smaller ones.
     7. The central cross structure is preserved more strongly in larger grids.
     8. The transformation is more aggressive for larger grids.
+    9. Contextual analysis is performed to ensure consistent patterns.
+    10. The overall blue-to-yellow ratio is balanced during transformation.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -26,7 +28,7 @@ def solve_7d419a02(input_grid: ColoredGrid) -> ColoredGrid:
     rows, cols = grid.get_dimensions()
     center_row, center_col = (rows - 1) / 2, (cols - 1) / 2
     max_distance = math.sqrt(center_row**2 + center_col**2)
-    cross_threshold = max(rows, cols) * 0.25
+    cross_threshold = max(rows, cols) * 0.3
     processed = set()
 
     def distance_from_center(r: int, c: int) -> float:
@@ -45,16 +47,19 @@ def solve_7d419a02(input_grid: ColoredGrid) -> ColoredGrid:
     def is_part_of_cross(r: int, c: int) -> bool:
         return (abs(r - center_row) <= 1 or abs(c - center_col) <= 1) and distance_from_center(r, c) <= cross_threshold
 
-    def should_transform(region: List[Tuple[int, int]]) -> bool:
-        if is_line_like(region) or len(region) <= 2:
-            return False
+    def calculate_transform_score(region: List[Tuple[int, int]]) -> float:
         avg_distance = sum(distance_from_center(r, c) for r, c in region) / len(region)
         edge_factor = sum(1 for r, c in region if is_edge_or_corner(r, c)) / len(region)
         size_factor = min(1, len(region) / (rows * cols * 0.05))
         cross_factor = sum(1 for r, c in region if is_part_of_cross(r, c)) / len(region)
         
-        transform_score = (avg_distance / max_distance) * 0.4 + edge_factor * 0.3 + size_factor * 0.3 - cross_factor * 0.6
-        threshold = 0.35 - (max(rows, cols) / 100) * 0.05  # Lower threshold for larger grids
+        return (avg_distance / max_distance) * 0.4 + edge_factor * 0.3 + size_factor * 0.3 - cross_factor * 0.6
+
+    def should_transform(region: List[Tuple[int, int]], context_score: float) -> bool:
+        if is_line_like(region) or len(region) <= 2:
+            return False
+        transform_score = calculate_transform_score(region) + context_score
+        threshold = 0.4 - (max(rows, cols) / 100) * 0.05  # Lower threshold for larger grids
         return transform_score > threshold
 
     def flood_fill(row: int, col: int) -> List[Tuple[int, int]]:
@@ -71,13 +76,33 @@ def solve_7d419a02(input_grid: ColoredGrid) -> ColoredGrid:
                         stack.append((nr, nc))
         return region
 
+    def get_context_score(region: List[Tuple[int, int]]) -> float:
+        context_cells = set()
+        for r, c in region:
+            for dr in [-1, 0, 1]:
+                for dc in [-1, 0, 1]:
+                    nr, nc = r + dr, c + dc
+                    if 0 <= nr < rows and 0 <= nc < cols and (nr, nc) not in region:
+                        context_cells.add((nr, nc))
+        yellow_count = sum(1 for r, c in context_cells if grid.values[r][c] == 4)
+        return yellow_count / len(context_cells) if context_cells else 0
+
+    regions = []
     for row in range(rows):
         for col in range(cols):
             if is_blue(grid.values[row][col]) and (row, col) not in processed:
                 region = flood_fill(row, col)
-                if should_transform(region):
-                    for r, c in region:
-                        grid.values[r][c] = 4  # Change to yellow
+                regions.append(region)
+
+    regions.sort(key=len, reverse=True)
+    yellow_ratio = 0
+
+    for region in regions:
+        context_score = get_context_score(region)
+        if should_transform(region, context_score) and yellow_ratio < 0.6:
+            for r, c in region:
+                grid.values[r][c] = 4  # Change to yellow
+            yellow_ratio = sum(row.count(4) for row in grid.values) / (rows * cols)
 
     return grid
 
