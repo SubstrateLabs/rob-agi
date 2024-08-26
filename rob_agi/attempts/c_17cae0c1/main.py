@@ -6,9 +6,10 @@ def solve_17cae0c1(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms a 3x9 input grid into a 3x9 output grid based on the distribution of gray (5) squares.
     
     The input grid is divided into three 3x3 sections. The section with the most gray squares
-    becomes green (3). If the remaining two sections have equal gray counts, the left becomes
-    magenta (6) and the right becomes blue (1). Otherwise, the section with more gray squares
-    becomes yellow (4) and the one with fewer becomes brown (9).
+    becomes green (3). For the remaining two sections:
+    - If they have equal gray counts, the left becomes yellow (4) and the right becomes brown (9).
+    - If they have different gray counts, the one with more gray squares becomes yellow (4) and
+      the one with fewer becomes brown (9), regardless of their position.
     """
     # Step 1: Parse the input grid
     sections = [
@@ -28,8 +29,8 @@ def solve_17cae0c1(input_grid: ColoredGrid) -> ColoredGrid:
     colors[ranked_sections[0][0]] = 3  # Green for highest count
 
     if ranked_sections[1][1] == ranked_sections[2][1]:
-        colors[ranked_sections[1][0]] = 6  # Magenta for left-most of equal
-        colors[ranked_sections[2][0]] = 1  # Blue for right-most of equal
+        colors[min(ranked_sections[1][0], ranked_sections[2][0])] = 4  # Yellow for left-most of equal
+        colors[max(ranked_sections[1][0], ranked_sections[2][0])] = 9  # Brown for right-most of equal
     else:
         colors[ranked_sections[1][0]] = 4  # Yellow for second highest
         colors[ranked_sections[2][0]] = 9  # Brown for lowest
