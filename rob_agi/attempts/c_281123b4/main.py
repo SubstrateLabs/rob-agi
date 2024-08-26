@@ -5,69 +5,81 @@ import random
 def solve_281123b4(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms a 19x4 input grid into a 4x4 output grid through a multi-step process:
-    1. Input Analysis: Analyzes color frequencies and distribution in the input grid.
-    2. Color Palette Creation: Selects the most prominent colors for the output.
-    3. Output Grid Construction: Builds a 4x4 grid using the color palette.
-    4. Pattern Application: Applies specific patterns based on color dominance.
-    5. Color Distribution: Distributes remaining colors based on input frequencies.
-    6. Balance and Refinement: Adjusts the grid for visual interest and color representation.
-    7. Final Validation: Ensures all palette colors are represented in the output.
-    The final 4x4 grid reflects the essence of the input while creating a visually coherent output.
+    1. Input Preprocessing: Verifies input dimensions and divides into sections.
+    2. Section Analysis: Analyzes color frequencies and distributions in each section.
+    3. Output Grid Construction: Builds a 4x4 grid based on section analysis.
+    4. Color Placement: Places primary and secondary colors for each quadrant.
+    5. Inter-section Influence: Considers colors from adjacent sections.
+    6. Balance and Refinement: Adjusts for color variety and representation.
+    7. Final Validation: Ensures output reflects input essence while maintaining coherence.
+    The final 4x4 grid captures the key characteristics of each input section.
     """
     rows, cols = input_grid.get_dimensions()
     if rows != 4 or cols != 19:
         raise ValueError("Input grid must be 19x4")
 
-    # Input Analysis
-    color_counts = Counter(cell for row in input_grid.values for cell in row if cell not in [0, 3])
-    total_colored_cells = sum(color_counts.values())
-    color_percentages = {color: count / total_colored_cells for color, count in color_counts.items()}
-    black_percentage = sum(row.count(0) for row in input_grid.values) / (rows * cols)
+    # Input Preprocessing
+    sections = [
+        [row[0:4] for row in input_grid.values],
+        [row[5:9] for row in input_grid.values],
+        [row[10:14] for row in input_grid.values],
+        [row[15:19] for row in input_grid.values]
+    ]
 
-    # Color Palette Creation
-    palette = sorted(color_counts, key=color_counts.get, reverse=True)[:4]
-    if black_percentage > 0.15 and 0 not in palette:
-        palette[-1] = 0
+    # Section Analysis
+    section_colors = []
+    for section in sections:
+        colors = [cell for row in section for cell in row if cell != 0]
+        color_counts = Counter(colors)
+        section_colors.append(sorted(color_counts.items(), key=lambda x: x[1], reverse=True))
 
     # Output Grid Construction
     output = [[0 for _ in range(4)] for _ in range(4)]
-    dominant_color = palette[0]
 
-    # Pattern Application
-    if color_percentages[dominant_color] > 0.4:
-        for i in range(4):
-            output[i][0] = output[i][-1] = dominant_color
-        output[0][1:3] = [dominant_color, dominant_color]
-    else:
-        for i in range(4):
-            output[i][i] = output[i][3-i] = dominant_color
+    # Color Placement and Inter-section Influence
+    for i, colors in enumerate(section_colors):
+        row, col = divmod(i, 2)
+        primary_color = colors[0][0] if colors else 0
+        secondary_color = colors[1][0] if len(colors) > 1 else 0
 
-    # Color Distribution
-    remaining_cells = [(r, c) for r in range(4) for c in range(4) if output[r][c] == 0]
-    for color in palette[1:]:
-        cells_to_fill = int(len(remaining_cells) * color_percentages.get(color, 0) / sum(color_percentages.values()))
-        for _ in range(cells_to_fill):
-            if remaining_cells:
-                r, c = remaining_cells.pop(0)
-                output[r][c] = color
+        # Place primary color
+        output[row*2][col*2] = primary_color
+        if random.random() < 0.7:  # 70% chance to place primary color twice
+            output[row*2+1][col*2+1] = primary_color
 
-    # Fill remaining cells
-    for r, c in remaining_cells:
-        output[r][c] = random.choice(palette)
+        # Place secondary color
+        if secondary_color:
+            output[row*2+(1-row)][col*2+(1-col)] = secondary_color
 
-    # Balance and Refinement
+        # Consider adjacent sections
+        adjacent_sections = [(row-1, col), (row+1, col), (row, col-1), (row, col+1)]
+        for adj_row, adj_col in adjacent_sections:
+            if 0 <= adj_row < 2 and 0 <= adj_col < 2:
+                adj_colors = section_colors[adj_row*2 + adj_col]
+                if adj_colors:
+                    adj_color = adj_colors[0][0]
+                    if adj_color not in [primary_color, secondary_color]:
+                        empty_cells = [(r, c) for r in range(row*2, row*2+2) for c in range(col*2, col*2+2) if output[r][c] == 0]
+                        if empty_cells:
+                            r, c = random.choice(empty_cells)
+                            output[r][c] = adj_color
+
+    # Fill remaining spaces and balance
+    all_colors = set(color for section in section_colors for color, _ in section)
+    for row in range(4):
+        for col in range(4):
+            if output[row][col] == 0:
+                output[row][col] = random.choice(list(all_colors))
+
+    # Final Validation and Refinement
     for _ in range(2):
-        for r in range(4):
-            for c in range(4):
-                neighbors = [output[nr][nc] for nr, nc in [(r-1, c), (r+1, c), (r, c-1), (r, c+1)]
-                             if 0 <= nr < 4 and 0 <= nc < 4]
+        for row in range(4):
+            for col in range(4):
+                neighbors = [output[r][c] for r in range(max(0, row-1), min(4, row+2)) 
+                             for c in range(max(0, col-1), min(4, col+2)) if (r, c) != (row, col)]
                 if len(set(neighbors)) < 2:
-                    output[r][c] = random.choice([color for color in palette if color != output[r][c]])
-
-    # Final Validation
-    for color in palette:
-        if all(color not in row for row in output):
-            r, c = random.choice([(r, c) for r in range(4) for c in range(4)])
-            output[r][c] = color
+                    other_colors = list(all_colors - set(neighbors))
+                    if other_colors:
+                        output[row][col] = random.choice(other_colors)
 
     return ColoredGrid(values=output)
