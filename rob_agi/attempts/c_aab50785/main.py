@@ -56,10 +56,10 @@ def is_valid_region(grid: ColoredGrid, top: int, left: int, bottom: int, right: 
     """Check if a region is valid according to the criteria."""
     # Check if bordered by 8's on exactly two sides
     sides_with_eights = 0
-    top_has_eight = any(grid.get_cell(top, c) == 8 for c in range(left, right+1))
-    bottom_has_eight = any(grid.get_cell(bottom, c) == 8 for c in range(left, right+1))
-    left_has_eight = any(grid.get_cell(r, left) == 8 for r in range(top, bottom+1))
-    right_has_eight = any(grid.get_cell(r, right) == 8 for r in range(top, bottom+1))
+    top_has_eight = any(grid.get_cell(top-1, c) == 8 for c in range(left, right+1) if top > 0)
+    bottom_has_eight = any(grid.get_cell(bottom+1, c) == 8 for c in range(left, right+1) if bottom < grid.num_rows - 1)
+    left_has_eight = any(grid.get_cell(r, left-1) == 8 for r in range(top, bottom+1) if left > 0)
+    right_has_eight = any(grid.get_cell(r, right+1) == 8 for r in range(top, bottom+1) if right < grid.num_cols - 1)
     
     sides_with_eights = sum([top_has_eight, bottom_has_eight, left_has_eight, right_has_eight])
     
@@ -67,8 +67,8 @@ def is_valid_region(grid: ColoredGrid, top: int, left: int, bottom: int, right: 
         return False
     
     # Check if there are no 8's inside the region
-    for r in range(top+1, bottom):
-        for c in range(left+1, right):
+    for r in range(top, bottom+1):
+        for c in range(left, right+1):
             if grid.get_cell(r, c) == 8:
                 return False
     
