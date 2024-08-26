@@ -7,6 +7,8 @@ def extract_color_key(grid):
         for cell in row:
             if cell != 0 and cell != 5 and cell not in color_key:
                 color_key.append(cell)
+        if color_key:  # Stop after finding colors in the first non-empty row
+            break
     return color_key
 
 def get_sorted_regions(grid):
@@ -34,13 +36,7 @@ def transform_grid(input_grid):
     color_key = extract_color_key(input_grid)
     sorted_regions = get_sorted_regions(input_grid)
     
-    new_grid = [[0 for _ in row] for row in input_grid]
-    
-    # Copy gray cells
-    for r, row in enumerate(input_grid):
-        for c, cell in enumerate(row):
-            if cell == 5:
-                new_grid[r][c] = 5
+    new_grid = [row[:] for row in input_grid]  # Create a deep copy of the input grid
     
     # Assign new colors to regions
     for i, region in enumerate(sorted_regions):
@@ -53,10 +49,10 @@ def transform_grid(input_grid):
 def solve_1da012fc(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the grid transformation challenge by:
-    1. Extracting the ordered list of colors from the non-gray, non-black cells in the gray area.
+    1. Extracting the ordered list of colors from the first non-empty row in the gray area.
     2. Identifying and sorting non-gray, non-black regions in the grid based on their top-left coordinate.
     3. Assigning new colors to the sorted regions cyclically using the extracted color key.
-    4. Creating a new grid with the transformed colors while preserving the gray area.
+    4. Creating a new grid with the transformed colors while preserving the original structure.
     5. Returning the transformed grid.
     """
     transformed_values = transform_grid(input_grid.values)
