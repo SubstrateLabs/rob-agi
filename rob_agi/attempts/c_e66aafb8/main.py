@@ -10,7 +10,7 @@ def solve_e66aafb8(input_grid: ColoredGrid) -> ColoredGrid:
     The function works as follows:
     1. Preprocess the input grid to create a numpy array and identify non-black cells.
     2. Extract a representative subgrid from the non-black area.
-    3. Analyze color transitions and patterns in the subgrid.
+    3. Analyze color frequencies and transitions in the subgrid.
     4. Generate an output grid that captures the essence of the color patterns.
     5. Post-process the output grid to ensure no black cells and appropriate size.
     6. Return the result as a ColoredGrid object.
@@ -31,42 +31,42 @@ def solve_e66aafb8(input_grid: ColoredGrid) -> ColoredGrid:
     bottom, right = non_black_rows.max(), non_black_cols.max()
     subgrid = grid[top:bottom+1, left:right+1]
     
-    # Analyze color transitions
-    def analyze_transitions(grid: np.ndarray) -> Dict[Tuple[int, int], int]:
-        transitions = defaultdict(int)
-        rows, cols = grid.shape
-        for r in range(rows):
-            for c in range(cols):
-                if grid[r, c] != 0:
-                    if c < cols - 1 and grid[r, c+1] != 0:
-                        transitions[(grid[r, c], grid[r, c+1])] += 1
-                    if r < rows - 1 and grid[r+1, c] != 0:
-                        transitions[(grid[r, c], grid[r+1, c])] += 1
-        return transitions
-    
-    transitions = analyze_transitions(subgrid)
+    # Analyze color frequencies and transitions
+    color_freq = defaultdict(int)
+    transitions = defaultdict(int)
+    rows, cols = subgrid.shape
+    for r in range(rows):
+        for c in range(cols):
+            if subgrid[r, c] != 0:
+                color_freq[subgrid[r, c]] += 1
+                if c < cols - 1 and subgrid[r, c+1] != 0:
+                    transitions[(subgrid[r, c], subgrid[r, c+1])] += 1
+                if r < rows - 1 and subgrid[r+1, c] != 0:
+                    transitions[(subgrid[r, c], subgrid[r+1, c])] += 1
     
     # Determine output size
-    min_size = 2
-    max_size = min(8, min(subgrid.shape) // 2)
-    size = min(max(min_size, int(len(transitions) ** 0.5)), max_size)
+    total_colors = len(color_freq)
+    size = min(max(int(total_colors ** 0.5), 2), 8)  # Between 2x2 and 8x8
     
     # Generate output grid
     output_grid = np.zeros((size, size), dtype=int)
-    colors = list(set(subgrid.flatten()) - {0})
-    color_index = 0
+    colors = sorted(color_freq, key=color_freq.get, reverse=True)
     
+    # Fill the grid with the most frequent colors first
+    color_index = 0
     for r in range(size):
         for c in range(size):
             output_grid[r, c] = colors[color_index]
             color_index = (color_index + 1) % len(colors)
     
-    # Apply some transitions
-    for _ in range(size):
+    # Apply transitions to make the pattern more representative
+    for _ in range(size * 2):
         r, c = np.random.randint(0, size, 2)
-        if (output_grid[r, c], output_grid[(r+1)%size, c]) in transitions:
-            output_grid[r, c], output_grid[(r+1)%size, c] = output_grid[(r+1)%size, c], output_grid[r, c]
-        if (output_grid[r, c], output_grid[r, (c+1)%size]) in transitions:
-            output_grid[r, c], output_grid[r, (c+1)%size] = output_grid[r, (c+1)%size], output_grid[r, c]
+        neighbors = [(r-1, c), (r+1, c), (r, c-1), (r, c+1)]
+        valid_neighbors = [(nr, nc) for nr, nc in neighbors if 0 <= nr < size and 0 <= nc < size]
+        for nr, nc in valid_neighbors:
+            if (output_grid[r, c], output_grid[nr, nc]) in transitions:
+                output_grid[r, c], output_grid[nr, nc] = output_grid[nr, nc], output_grid[r, c]
+                break
     
     return ColoredGrid(values=output_grid.tolist())
