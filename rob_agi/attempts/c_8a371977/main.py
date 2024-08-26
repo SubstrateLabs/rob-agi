@@ -9,32 +9,32 @@ def solve_8a371977(input_grid: ColoredGrid) -> ColoredGrid:
     2. Calculates the layer number for each cell based on its distance from the edge.
     3. Colors the regions based on their layer number and grid structure:
        - For 1x1 checkered pattern:
-         * Outermost two layers are red (2).
-         * Inner layers alternate between green (3) and red (2) every two layers.
+         * Outermost layer is red (2).
+         * Second layer is red (2) for corner cells, green (3) for others.
+         * Inner layers alternate between green (3) and red (2).
        - For 3x3 region pattern:
          * Layers alternate between red (2) and green (3).
-    4. Handles special cases for the center in odd-sized fine checkered grids.
+    4. Handles special cases for the corners in checkered grids.
     """
     rows, cols = input_grid.get_dimensions()
     output_grid = input_grid.deep_copy()
     
     def is_checkered_pattern():
-        center_r, center_c = rows // 2, cols // 2
-        return (input_grid.values[center_r][center_c] == 1 and
-                input_grid.values[center_r][center_c+1] == 0 and
-                input_grid.values[center_r+1][center_c] == 0 and
-                input_grid.values[center_r+1][center_c+1] == 1)
+        return any(input_grid.values[r][c] == 0 for r in range(rows) for c in range(cols))
     
     checkered = is_checkered_pattern()
     
     def get_layer(r, c):
         return min(r, c, rows-1-r, cols-1-c)
     
-    def get_color(layer):
+    def get_color(layer, r, c):
         if checkered:
-            if layer <= 1:
+            if layer == 0:
                 return 2
-            return 3 if (layer // 2) % 2 == 1 else 2
+            elif layer == 1:
+                return 2 if (r == 1 and c == 1) or (r == 1 and c == cols-2) or (r == rows-2 and c == 1) or (r == rows-2 and c == cols-2) else 3
+            else:
+                return 3 if layer % 2 == 1 else 2
         else:
             return 2 if layer % 2 == 0 else 3
     
@@ -42,12 +42,6 @@ def solve_8a371977(input_grid: ColoredGrid) -> ColoredGrid:
         for c in range(cols):
             if input_grid.values[r][c] == 0:
                 layer = get_layer(r, c)
-                output_grid.values[r][c] = get_color(layer)
-    
-    # Special case for center in odd-sized fine checkered grids
-    if checkered and rows % 2 == 1 and cols % 2 == 1:
-        center = rows // 2
-        if output_grid.values[center][center] == 2:
-            output_grid.values[center][center] = 3
+                output_grid.values[r][c] = get_color(layer, r, c)
     
     return output_grid
