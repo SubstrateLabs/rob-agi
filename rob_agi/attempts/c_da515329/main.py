@@ -6,27 +6,30 @@ def solve_da515329(input_grid: ColoredGrid) -> ColoredGrid:
     
     The solution involves the following steps:
     1. Analyze the input grid to find the central structure
-    2. Initialize the output grid
-    3. Generate a spiral pattern with openings
-    4. Place and connect the central structure
-    5. Apply edge and corner patterns
+    2. Create the outermost frame
+    3. Generate concentric frames with gaps
+    4. Integrate the central structure
+    5. Apply specific patterns (corners, edges)
     6. Ensure connectivity of all sky-colored pixels
-    7. Make final adjustments based on grid size
+    7. Balance and symmetry check
+    8. Final adjustments
     
     Args:
     input_grid (ColoredGrid): The input grid containing a central structure
 
     Returns:
-    ColoredGrid: The transformed grid with a structured spiral pattern
+    ColoredGrid: The transformed grid with a structured concentric pattern
     """
     rows, cols = input_grid.get_dimensions()
     new_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
     
     center, structure_width, structure_height = analyze_input(input_grid)
-    generate_spiral(new_grid, center, structure_width, structure_height)
-    place_central_structure(new_grid, input_grid, center)
-    apply_edge_patterns(new_grid)
+    create_outermost_frame(new_grid)
+    generate_concentric_frames(new_grid, center, structure_width, structure_height)
+    integrate_central_structure(new_grid, input_grid, center)
+    apply_specific_patterns(new_grid)
     ensure_connectivity(new_grid)
+    balance_and_symmetry_check(new_grid)
     final_adjustments(new_grid, input_grid)
     
     return new_grid
@@ -46,39 +49,39 @@ def analyze_input(grid: ColoredGrid) -> tuple:
     
     return center, structure_width, structure_height
 
-def generate_spiral(grid: ColoredGrid, center: tuple, structure_width: int, structure_height: int):
+def create_outermost_frame(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
-    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]  # right, down, left, up
-    r, c = 1, 1  # Start from (1,1) to keep (0,0) black
-    dir_index = 0
-    steps = 0
-    max_steps = min(rows, cols) - 2
+    for r in range(rows):
+        grid.values[r][0] = grid.values[r][cols-1] = 8
+    for c in range(1, cols-1):
+        grid.values[0][c] = grid.values[rows-1][c] = 8
+    grid.values[0][0] = 0  # Keep top-left corner black
 
-    while steps < max_steps:
-        grid.values[r][c] = 8
+def generate_concentric_frames(grid: ColoredGrid, center: tuple, structure_width: int, structure_height: int):
+    rows, cols = grid.get_dimensions()
+    frame_count = min((rows - structure_height) // 2, (cols - structure_width) // 2)
+    
+    for frame in range(1, frame_count):
+        for r in range(frame, rows-frame):
+            if r == frame or r == rows-frame-1:
+                for c in range(frame, cols-frame):
+                    if (r + c) % 3 != 0:  # Create gaps
+                        grid.values[r][c] = 8
+            else:
+                grid.values[r][frame] = grid.values[r][cols-frame-1] = 8
         
-        # Check if we need to change direction
-        next_r, next_c = r + directions[dir_index][0], c + directions[dir_index][1]
-        if (next_r < 1 or next_r >= rows - 1 or next_c < 1 or next_c >= cols - 1 or
-            grid.values[next_r][next_c] == 8 or
-            (abs(next_r - center[0]) < structure_height // 2 and abs(next_c - center[1]) < structure_width // 2)):
-            dir_index = (dir_index + 1) % 4
-            steps += 1
-        
-        r, c = r + directions[dir_index][0], c + directions[dir_index][1]
-        
-        # Create openings
-        if steps % 3 == 0:
-            grid.values[r][c] = 0
+        # Ensure corners are always filled
+        grid.values[frame][frame] = grid.values[frame][cols-frame-1] = 8
+        grid.values[rows-frame-1][frame] = grid.values[rows-frame-1][cols-frame-1] = 8
 
-def place_central_structure(new_grid: ColoredGrid, input_grid: ColoredGrid, center: tuple):
+def integrate_central_structure(new_grid: ColoredGrid, input_grid: ColoredGrid, center: tuple):
     rows, cols = new_grid.get_dimensions()
     for r in range(rows):
         for c in range(cols):
             if input_grid.values[r][c] == 8:
                 new_grid.values[r][c] = 8
     
-    # Connect central structure to spiral
+    # Connect central structure to innermost frame
     r, c = center
     for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
         nr, nc = r + dr, c + dc
@@ -88,22 +91,20 @@ def place_central_structure(new_grid: ColoredGrid, input_grid: ColoredGrid, cent
             new_grid.values[nr][nc] = 8
             nr, nc = nr + dr, nc + dc
 
-def apply_edge_patterns(grid: ColoredGrid):
+def apply_specific_patterns(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
     
-    # Top and bottom edges
-    for c in range(2, cols - 2, 3):
-        grid.values[0][c] = grid.values[rows-1][c] = 8
+    # Corner patterns
+    grid.values[1][1] = grid.values[1][2] = grid.values[2][1] = 8
+    grid.values[1][cols-2] = grid.values[1][cols-3] = grid.values[2][cols-2] = 8
+    grid.values[rows-2][1] = grid.values[rows-3][1] = grid.values[rows-2][2] = 8
+    grid.values[rows-2][cols-2] = grid.values[rows-3][cols-2] = grid.values[rows-2][cols-3] = 8
     
-    # Left and right edges
-    for r in range(2, rows - 2, 3):
-        grid.values[r][0] = grid.values[r][cols-1] = 8
-    
-    # Corners
-    grid.values[0][0] = grid.values[0][1] = grid.values[1][0] = 0
-    grid.values[0][cols-1] = grid.values[0][cols-2] = grid.values[1][cols-1] = 8
-    grid.values[rows-1][0] = grid.values[rows-2][0] = grid.values[rows-1][1] = 8
-    grid.values[rows-1][cols-1] = 8
+    # Edge patterns
+    for i in range(4, rows-4, 4):
+        grid.values[i][0] = grid.values[i][cols-1] = 8
+    for j in range(4, cols-4, 4):
+        grid.values[0][j] = grid.values[rows-1][j] = 8
 
 def ensure_connectivity(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
@@ -126,6 +127,21 @@ def ensure_connectivity(grid: ColoredGrid):
             if grid.values[r][c] == 8 and (r, c) not in visited:
                 grid.values[r][c] = 0
 
+def balance_and_symmetry_check(grid: ColoredGrid):
+    rows, cols = grid.get_dimensions()
+    
+    # Horizontal symmetry check and fix
+    for r in range(rows // 2):
+        for c in range(cols):
+            if grid.values[r][c] != grid.values[rows-1-r][c]:
+                grid.values[r][c] = grid.values[rows-1-r][c] = max(grid.values[r][c], grid.values[rows-1-r][c])
+    
+    # Vertical symmetry check and fix
+    for c in range(cols // 2):
+        for r in range(rows):
+            if grid.values[r][c] != grid.values[r][cols-1-c]:
+                grid.values[r][c] = grid.values[r][cols-1-c] = max(grid.values[r][c], grid.values[r][cols-1-c])
+
 def final_adjustments(new_grid: ColoredGrid, input_grid: ColoredGrid):
     rows, cols = new_grid.get_dimensions()
     
@@ -135,15 +151,8 @@ def final_adjustments(new_grid: ColoredGrid, input_grid: ColoredGrid):
             if input_grid.values[r][c] == 8:
                 new_grid.values[r][c] = 8
 
-    # Add isolated pixels if needed
-    isolated_pixels = [
-        (1, cols // 4), (2, cols // 3),
-        (rows // 4, 1), (rows // 3, 2),
-        (rows - 3, cols - 3), (rows - 4, cols - 4)
-    ]
-    for r, c in isolated_pixels:
-        if 0 <= r < rows and 0 <= c < cols:
-            new_grid.values[r][c] = 8
+    # Ensure top-left corner is black
+    new_grid.values[0][0] = 0
 
-    # Ensure connectivity after adding isolated pixels
+    # Ensure connectivity after all adjustments
     ensure_connectivity(new_grid)
