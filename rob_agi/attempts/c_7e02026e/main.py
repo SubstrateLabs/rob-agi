@@ -3,97 +3,65 @@ from typing import List, Tuple, Set
 
 def solve_7e02026e(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by identifying and coloring specific 'L'-shaped or extended 'L'-shaped
-    regions of black (0) squares to green (3). The algorithm follows these steps:
-    1. Check corners and edges for L-shapes
-    2. Spiral inward, identifying and transforming L-shapes
-    3. Ensure a balanced distribution of green shapes
-    4. Make a final pass to catch any missed opportunities
+    Transforms the input grid by identifying and coloring specific 'L'-shaped regions
+    of black (0) squares to green (3). The algorithm follows these steps:
+    1. Find the largest contiguous black region
+    2. Identify the bottom-right corner of this region
+    3. Create the largest possible 'L' shape at this corner
+    4. Transform the 'L' shape to green (3)
 
-    The transformation aims to create a balanced distribution of green shapes while maintaining
-    the overall aesthetic of the grid, prioritizing edge-to-center progression.
+    The transformation aims to create a single, large green 'L' shape while maintaining
+    the overall structure of the grid.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
-    transformed_shapes = []
 
-    def is_valid_L_shape(r: int, c: int, size: int) -> bool:
-        if size == 3:
-            shape = [(r, c), (r+1, c), (r, c+1)]
-        else:  # size == 5
-            shape = [(r, c), (r+1, c), (r+2, c), (r, c+1), (r, c+2)]
-        
-        if not all(0 <= x < rows and 0 <= y < cols for x, y in shape):
-            return False
-        
-        if not all(output_grid.get_cell(x, y) == 0 for x, y in shape):
-            return False
-        
-        neighbors = set((x+dx, y+dy) for x, y in shape for dx, dy in [(0,1), (1,0), (0,-1), (-1,0)])
-        neighbors -= set(shape)
-        return all(not (0 <= nx < rows and 0 <= ny < cols) or output_grid.get_cell(nx, ny) in [0, 8] for nx, ny in neighbors)
+    def find_largest_black_region():
+        visited = set()
+        largest_region = []
 
-    def transform_L_shape(r: int, c: int, size: int):
-        shape = [(r, c), (r+1, c), (r, c+1)] if size == 3 else [(r, c), (r+1, c), (r+2, c), (r, c+1), (r, c+2)]
-        for x, y in shape:
-            output_grid.set_cell(x, y, 3)
-        transformed_shapes.append(shape)
+        def dfs(r, c):
+            if (r, c) in visited or r < 0 or r >= rows or c < 0 or c >= cols or output_grid.get_cell(r, c) != 0:
+                return []
+            visited.add((r, c))
+            region = [(r, c)]
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                region.extend(dfs(r + dr, c + dc))
+            return region
 
-    def check_and_transform(r: int, c: int):
-        if is_valid_L_shape(r, c, 5):
-            transform_L_shape(r, c, 5)
-            return True
-        elif is_valid_L_shape(r, c, 3):
-            transform_L_shape(r, c, 3)
-            return True
-        return False
-
-    # Check corners
-    corners = [(0, 0), (0, cols-1), (rows-1, 0), (rows-1, cols-1)]
-    for r, c in corners:
-        check_and_transform(r, c)
-
-    # Check edges
-    for r in range(1, rows-1):
-        check_and_transform(r, 0)
-        check_and_transform(r, cols-1)
-    for c in range(1, cols-1):
-        check_and_transform(0, c)
-        check_and_transform(rows-1, c)
-
-    # Spiral inward
-    top, bottom, left, right = 1, rows-2, 1, cols-2
-    while top <= bottom and left <= right:
-        for c in range(left, right+1):
-            if check_and_transform(top, c):
-                break
-        top += 1
-
-        for r in range(top, bottom+1):
-            if check_and_transform(r, right):
-                break
-        right -= 1
-
-        if top <= bottom:
-            for c in range(right, left-1, -1):
-                if check_and_transform(bottom, c):
-                    break
-            bottom -= 1
-
-        if left <= right:
-            for r in range(bottom, top-1, -1):
-                if check_and_transform(r, left):
-                    break
-            left += 1
-
-    # Final pass
-    if len(transformed_shapes) < 2:
         for r in range(rows):
             for c in range(cols):
-                if output_grid.get_cell(r, c) == 0 and check_and_transform(r, c):
-                    if len(transformed_shapes) >= 2:
-                        break
-            if len(transformed_shapes) >= 2:
+                if output_grid.get_cell(r, c) == 0 and (r, c) not in visited:
+                    region = dfs(r, c)
+                    if len(region) > len(largest_region):
+                        largest_region = region
+
+        return largest_region
+
+    def find_bottom_right_corner(region):
+        return max(region, key=lambda x: (x[0], x[1]))
+
+    def create_L_shape(corner_r, corner_c):
+        L_shape = [(corner_r, corner_c)]
+        # Extend vertically
+        for r in range(corner_r - 1, -1, -1):
+            if output_grid.get_cell(r, corner_c) == 0:
+                L_shape.append((r, corner_c))
+            else:
                 break
+        # Extend horizontally
+        for c in range(corner_c - 1, -1, -1):
+            if output_grid.get_cell(corner_r, c) == 0:
+                L_shape.append((corner_r, c))
+            else:
+                break
+        return L_shape
+
+    largest_region = find_largest_black_region()
+    if largest_region:
+        corner_r, corner_c = find_bottom_right_corner(largest_region)
+        L_shape = create_L_shape(corner_r, corner_c)
+        for r, c in L_shape:
+            output_grid.set_cell(r, c, 3)
 
     return output_grid
