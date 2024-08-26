@@ -19,23 +19,17 @@ def solve_b20f7c8b(input_grid: ColoredGrid) -> ColoredGrid:
     output_grid = input_grid.deep_copy()
     
     transformation_regions = [
-        (1, 8), (9, 8),  # Left regions
-        (1, 16), (9, 16)  # Right regions
+        (1, 8), (1, 16),  # Top regions
+        (9, 8), (9, 16)   # Bottom regions
     ]
     
     # First pass: Transform all regions
     for row, col in transformation_regions:
-        block = output_grid.extract_subgrid(row, col, 5, 5)
-        is_left = col == 8
-        transformed_block = transform_block(block, is_left)
-        replace_5x5_block(output_grid, row, col, transformed_block)
+        transform_region(output_grid, row, col)
     
     # Second pass: Transform only bottom regions
-    for row, col in transformation_regions[1:3]:  # Only bottom two regions
-        block = output_grid.extract_subgrid(row, col, 5, 5)
-        is_left = col == 8
-        transformed_block = transform_block(block, is_left)
-        replace_5x5_block(output_grid, row, col, transformed_block)
+    for row, col in transformation_regions[2:]:
+        transform_region(output_grid, row, col)
     
     return output_grid
 
@@ -59,7 +53,10 @@ def transform_block(block: ColoredGrid, is_left: bool) -> ColoredGrid:
     
     return ColoredGrid(values=[[new_color for _ in range(5)] for _ in range(5)])
 
-def replace_5x5_block(grid: ColoredGrid, row: int, col: int, new_block: ColoredGrid):
+def transform_region(grid: ColoredGrid, row: int, col: int):
+    block = grid.extract_subgrid(row, col, 5, 5)
+    is_left = col == 8
+    transformed_block = transform_block(block, is_left)
     for i in range(5):
         for j in range(5):
-            grid.values[row + i][col + j] = new_block.values[i][j]
+            grid.values[row + i][col + j] = transformed_block.values[i][j]
