@@ -1,0 +1,41 @@
+example_0:
+  input: |
+    A 22x22 grid with a pattern of sky blue (8) lines forming a grid. The lines are 1 unit thick and spaced every 4 units horizontally and vertically. This creates 5x5 "cells" of empty black space. Within these cells, there are three colored squares: a red (2) square in the top-left cell of the second column, and two green (3) squares in the bottom-left cell of the fourth column and the bottom-right cell of the fourth column from the right.
+  output: |
+    The same 22x22 grid structure with sky blue (8) lines is maintained. The main changes are:
+    1. The red (2) square in the top-left has expanded to fill its entire 3x3 cell.
+    2. The two green (3) squares have each expanded to fill their respective 3x3 cells.
+    3. A new magenta (6) 3x3 cell has appeared in the center of the third row of cells.
+    4. The bottom-right quadrant of the grid (excluding the rightmost column and bottom row) is now filled with green (3) squares.
+
+example_1:
+  input: |
+    A 24x24 grid with sky blue (8) lines forming a grid. The lines are 1 unit thick and spaced every 3 units horizontally and vertically, creating 2x2 "cells" of empty black space. There are four colored squares: two red (2) squares in the top-left and bottom-right quadrants, and two green (3) squares in the top-right and bottom-left quadrants.
+  output: |
+    The 24x24 grid structure with sky blue (8) lines is maintained. The changes are:
+    1. Each of the four colored squares has expanded to fill its entire 2x2 cell.
+    2. New colored regions have appeared:
+       - The top two rows of cells in the second column from the left are now red (2).
+       - The bottom two rows of cells in the second column from the right are now red (2).
+       - The middle four rows of cells in the center two columns are now magenta (6).
+    3. The entire third column from the left and third column from the right, excluding the top and bottom two cells, are filled with green (3).
+
+example_2:
+  input: |
+    A 26x26 grid with sky blue (8) lines forming a grid. The lines are 1 unit thick and spaced every 6 units horizontally and vertically, creating 5x5 "cells" of empty black space. There are four colored squares: two red (2) squares in the top-left and bottom-right quadrants, and two green (3) squares in the middle-left and middle-right sides.
+  output: |
+    The 26x26 grid structure with sky blue (8) lines is maintained. The changes are:
+    1. The red (2) square in the top-left has expanded to fill the entire top-left 5x5 cell.
+    2. The two green (3) squares have each expanded to fill their respective 5x5 cells.
+    3. The entire second row of 5x5 cells from the top is now filled with red (2).
+    4. The entire third row of 5x5 cells from the top is now filled with green (3).
+
+test_case_0:
+  input: |
+    A 26x26 grid with sky blue (8) lines forming a grid. The lines are 1 unit thick and spaced every 6 units horizontally and vertically, creating 5x5 "cells" of empty black space. There are four colored squares: two red (2) squares in the top-left and bottom-right quadrants, and two green (3) squares in the middle-left and middle-right sides.
+  output: |
+    The 26x26 grid structure with sky blue (8) lines is maintained. The changes are:
+    1. The red (2) square in the top-left has expanded to fill the entire top-left 5x5 cell.
+    2. The two green (3) squares have each expanded to fill their respective 5x5 cells.
+    3. The entire second row of 5x5 cells from the top is now filled with red (2).
+    4. The entire third row of 5x5 cells from the top is now filled with green (3).
