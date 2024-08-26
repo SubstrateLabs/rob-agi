@@ -18,15 +18,15 @@ def solve_31d5ba1a(input_grid: ColoredGrid) -> ColoredGrid:
     # Process each column
     for col in range(5):
         # Check top section (rows 0 and 1)
-        if input_grid.values[0][col] == 9 or input_grid.values[1][col] == 9:
+        if 9 in [input_grid.values[0][col], input_grid.values[1][col]]:
             output_grid.values[0][col] = 6
         
         # Check middle section (rows 2 and 3)
-        if input_grid.values[2][col] == 9 or input_grid.values[3][col] == 9:
+        if 9 in [input_grid.values[2][col], input_grid.values[3][col]]:
             output_grid.values[1][col] = 6
         
         # Check bottom section (rows 4 and 5)
-        if input_grid.values[4][col] == 4 or input_grid.values[5][col] == 4:
+        if 4 in [input_grid.values[4][col], input_grid.values[5][col]]:
             output_grid.values[2][col] = 6
     
     return output_grid
