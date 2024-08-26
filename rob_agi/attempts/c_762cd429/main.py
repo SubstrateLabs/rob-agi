@@ -1,15 +1,16 @@
+import math
 from rob_agi.colored_grid import ColoredGrid
 
 def solve_762cd429(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by expanding a 2x2 color cluster in the bottom-left corner
+    Transforms the input grid by expanding a 2x2 color cluster in the bottom-right corner
     into a larger pattern that fills most of the grid.
     
-    1. Extracts the 2x2 color cluster from the bottom-left corner.
-    2. Determines the expansion factor (2x2 for smaller grids, 4x4 for larger grids).
-    3. Calculates the size of each expanded square based on the smaller grid dimension.
-    4. Creates an expanded pattern based on the original 2x2 cluster.
-    5. Fills the new grid with the expanded pattern, maintaining the original grid size.
+    1. Extracts the 2x2 color cluster from the bottom-right corner.
+    2. Calculates the expansion size based on the grid dimensions.
+    3. Determines the sizes for each quadrant of the expanded pattern.
+    4. Creates a new grid and fills it with the expanded pattern.
+    5. Copies the unchanged area from the input grid to the new grid.
     
     Returns a new ColoredGrid with the transformed pattern.
     """
@@ -17,40 +18,48 @@ def solve_762cd429(input_grid: ColoredGrid) -> ColoredGrid:
     height, width = len(input_values), len(input_values[0])
     
     # Extract 2x2 color cluster
-    cluster = [
-        [input_values[-2][-2], input_values[-2][-1]],
-        [input_values[-1][-2], input_values[-1][-1]]
-    ]
+    top_left = input_values[height-2][width-2]
+    top_right = input_values[height-2][width-1]
+    bottom_left = input_values[height-1][width-2]
+    bottom_right = input_values[height-1][width-1]
     
-    # Determine expansion factor
-    expansion_factor = 4 if min(height, width) > 14 else 2
+    # Calculate expansion size
+    width_expansion = math.ceil(width / 2)
+    height_expansion = math.ceil(height / 2)
     
-    # Calculate square size
-    square_size = min(width, height) // expansion_factor
+    # Calculate quadrant sizes
+    top_left_height = height_expansion // 2
+    top_left_width = width_expansion // 2
+    top_right_height = height_expansion // 2
+    top_right_width = width_expansion - (width_expansion // 2)
+    bottom_left_height = height_expansion - (height_expansion // 2)
+    bottom_left_width = width_expansion // 2
+    bottom_right_height = height_expansion - (height_expansion // 2)
+    bottom_right_width = width_expansion - (width_expansion // 2)
     
     # Create new grid
     new_grid = [[0 for _ in range(width)] for _ in range(height)]
     
-    # Calculate starting position
-    start_row = height - (expansion_factor * square_size)
-    start_col = width - (expansion_factor * square_size)
+    # Fill expanded pattern
+    for i in range(height - bottom_right_height, height):
+        for j in range(width - bottom_right_width, width):
+            new_grid[i][j] = bottom_right
+
+    for i in range(height - bottom_left_height - top_left_height, height - top_left_height):
+        for j in range(width - bottom_left_width - bottom_right_width, width - bottom_right_width):
+            new_grid[i][j] = bottom_left
+
+    for i in range(height - top_right_height - bottom_right_height, height - bottom_right_height):
+        for j in range(width - top_right_width, width):
+            new_grid[i][j] = top_right
+
+    for i in range(height - height_expansion, height - top_right_height):
+        for j in range(width - width_expansion, width - top_right_width):
+            new_grid[i][j] = top_left
     
-    # Fill the grid with the expanded pattern
-    for i in range(expansion_factor):
-        for j in range(expansion_factor):
-            if i < 2 and j < 2:
-                color = cluster[i][j]
-            elif i < 2:
-                color = cluster[i][1]
-            elif j < 2:
-                color = cluster[1][j]
-            else:
-                color = cluster[0][0]
-            
-            for row in range(square_size):
-                for col in range(square_size):
-                    new_row = start_row + (i * square_size) + row
-                    new_col = start_col + (j * square_size) + col
-                    new_grid[new_row][new_col] = color
+    # Copy unchanged area
+    for i in range(height - height_expansion):
+        for j in range(width - width_expansion):
+            new_grid[i][j] = input_values[i][j]
     
     return ColoredGrid(values=new_grid)
