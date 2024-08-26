@@ -12,6 +12,7 @@ def solve_d94c3b52(input_grid: ColoredGrid) -> ColoredGrid:
        - Alternates between blue (1) and orange (7) for other colored squares.
     5. Maintains the overall structure and patterns of the input grid.
     6. Ensures black (0) squares remain unchanged.
+    7. Preserves original patterns in their positions when not conflicting with sky blue area.
     """
     new_grid = input_grid.deep_copy()
     sky_blue_pos = find_sky_blue(new_grid)
@@ -71,7 +72,7 @@ def create_alternation_template(grid: ColoredGrid, sky_blue_pos: Optional[Tuple[
     for r in range(grid.num_rows):
         for c in range(grid.num_cols):
             if sky_blue_pos and abs(r - sky_blue_pos[0]) <= 1 and abs(c - sky_blue_pos[1]) <= 1:
-                template[r][c] = 2  # Sky blue area
+                template[r][c] = 8  # Sky blue area
             elif (r + c) % 2 == 0:
                 template[r][c] = 1  # Blue
             else:
@@ -84,8 +85,24 @@ def apply_color_transformation(input_grid: ColoredGrid, new_grid: ColoredGrid, t
             if input_grid.values[r][c] != 0:  # Non-black cell in input
                 if sky_blue_pos and abs(r - sky_blue_pos[0]) <= 1 and abs(c - sky_blue_pos[1]) <= 1:
                     new_grid.values[r][c] = 8  # Sky blue area
+                elif template[r][c] == 8:
+                    new_grid.values[r][c] = 8  # Keep sky blue in its new position
                 else:
-                    new_grid.values[r][c] = template[r][c]  # Use template color (1 or 7)
+                    # Preserve original pattern if it's a solid color (3x3 block)
+                    if is_solid_color_block(input_grid, r, c):
+                        new_grid.values[r][c] = input_grid.values[r][c]
+                    else:
+                        new_grid.values[r][c] = template[r][c]  # Use template color (1 or 7)
             else:
                 new_grid.values[r][c] = 0  # Keep black cells black
     return new_grid
+
+def is_solid_color_block(grid: ColoredGrid, r: int, c: int) -> bool:
+    color = grid.values[r][c]
+    for dr in range(-1, 2):
+        for dc in range(-1, 2):
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < grid.num_rows and 0 <= nc < grid.num_cols:
+                if grid.values[nr][nc] != color:
+                    return False
+    return True
