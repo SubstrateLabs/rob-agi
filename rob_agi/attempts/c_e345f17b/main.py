@@ -8,11 +8,11 @@ def solve_e345f17b(input_grid: ColoredGrid) -> ColoredGrid:
     and patterns of magenta (6) and gray (5) squares.
 
     The algorithm works as follows:
-    1. Analyzes the input grid's color distribution in four quadrants.
-    2. Identifies connected components of magenta and gray squares in each quadrant.
-    3. Determines the number of yellow squares to place based on total colored squares.
-    4. Places yellow squares in the output grid corners based on input patterns.
-    5. Adjusts yellow square placement to ensure no adjacency and correct count.
+    1. Creates a heat map of the input grid, giving higher weights to squares near corners and edges.
+    2. Determines the number of yellow squares to place based on the total heat.
+    3. Identifies potential positions for yellow squares based on influence scores.
+    4. Places yellow squares ensuring no adjacency and considering the input pattern.
+    5. Handles special cases like aligned yellow squares.
 
     Args:
     input_grid (ColoredGrid): An 8x4 grid representing the input pattern.
@@ -23,58 +23,61 @@ def solve_e345f17b(input_grid: ColoredGrid) -> ColoredGrid:
     input_array = np.array(input_grid.values)
     output = np.zeros((4, 4), dtype=int)
 
-    def get_connected_components(quadrant: np.ndarray) -> List[int]:
-        visited = set()
-        components = []
-        for r in range(quadrant.shape[0]):
-            for c in range(quadrant.shape[1]):
-                if (r, c) not in visited and quadrant[r, c] in [5, 6]:
-                    component = []
-                    stack = [(r, c)]
-                    while stack:
-                        cr, cc = stack.pop()
-                        if (cr, cc) not in visited:
-                            visited.add((cr, cc))
-                            component.append(quadrant[cr, cc])
-                            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                                nr, nc = cr + dr, cc + dc
-                                if 0 <= nr < quadrant.shape[0] and 0 <= nc < quadrant.shape[1] and quadrant[nr, nc] in [5, 6]:
-                                    stack.append((nr, nc))
-                    components.append(len(component))
-        return components
+    def create_heat_map(grid: np.ndarray) -> np.ndarray:
+        heat_map = np.zeros_like(grid, dtype=float)
+        rows, cols = grid.shape
+        for r in range(rows):
+            for c in range(cols):
+                if grid[r, c] in [5, 6]:
+                    weight = 1.0
+                    if grid[r, c] == 6:  # Give higher weight to magenta
+                        weight = 1.5
+                    # Give higher weight to corners and edges
+                    if r in [0, rows-1] and c in [0, cols-1]:
+                        weight *= 2
+                    elif r in [0, rows-1] or c in [0, cols-1]:
+                        weight *= 1.5
+                    heat_map[r, c] = weight
+        return heat_map
 
-    # Analyze input quadrants
-    quadrants = [
-        input_array[:2, :4], input_array[:2, 4:],
-        input_array[2:, :4], input_array[2:, 4:]
-    ]
-    quadrant_scores = [sum(get_connected_components(q)) for q in quadrants]
+    heat_map = create_heat_map(input_array)
+    total_heat = np.sum(heat_map)
 
     # Determine number of yellow squares
-    total_colored = sum(quadrant_scores)
-    num_yellow = 4 if total_colored > 16 else 3
+    num_yellow = 4 if total_heat > 20 else 3
 
-    # Place yellow squares based on quadrant scores
-    corners = [(0, 0), (0, 3), (3, 0), (3, 3)]
+    # Calculate influence scores for each position in the output grid
+    influence_scores = np.zeros((4, 4))
+    for r in range(4):
+        for c in range(4):
+            influence_scores[r, c] = np.sum(heat_map[r*2:(r+1)*2, c*2:(c+1)*2])
+
+    # Place yellow squares
     yellow_positions = []
     for _ in range(num_yellow):
-        max_score_index = quadrant_scores.index(max(quadrant_scores))
-        yellow_positions.append(corners[max_score_index])
-        quadrant_scores[max_score_index] = -1  # Mark as used
+        max_score = np.max(influence_scores)
+        if max_score == 0:
+            break
+        r, c = np.unravel_index(np.argmax(influence_scores), influence_scores.shape)
+        yellow_positions.append((r, c))
+        influence_scores[r, c] = 0
+        # Set adjacent positions to 0 to avoid adjacency
+        if r > 0: influence_scores[r-1, c] = 0
+        if r < 3: influence_scores[r+1, c] = 0
+        if c > 0: influence_scores[r, c-1] = 0
+        if c < 3: influence_scores[r, c+1] = 0
 
-    # Adjust yellow positions to avoid adjacency
-    def are_adjacent(pos1: Tuple[int, int], pos2: Tuple[int, int]) -> bool:
-        return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1]) == 1
-
-    for i in range(len(yellow_positions)):
-        for j in range(i + 1, len(yellow_positions)):
-            if are_adjacent(yellow_positions[i], yellow_positions[j]):
-                # Move one of the yellow squares to the center if adjacent
-                yellow_positions[j] = (1, 1)
-                break
+    # Handle special case: align yellow squares if there's a strong horizontal or vertical pattern
+    if num_yellow == 3:
+        row_sums = np.sum(heat_map, axis=1)
+        col_sums = np.sum(heat_map, axis=0)
+        if np.max(row_sums) > 1.5 * np.mean(row_sums):
+            yellow_positions = [(1, 0), (1, 1), (1, 2)]
+        elif np.max(col_sums) > 1.5 * np.mean(col_sums):
+            yellow_positions = [(0, 1), (1, 1), (2, 1)]
 
     # Place yellow squares in output grid
-    for pos in yellow_positions:
-        output[pos] = 4
+    for r, c in yellow_positions:
+        output[r, c] = 4
 
     return ColoredGrid(values=output.tolist())
