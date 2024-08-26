@@ -3,43 +3,19 @@ from typing import List, Tuple, Dict
 from collections import defaultdict
 
 def solve_e78887d1(input_grid: ColoredGrid) -> ColoredGrid:
-    """
-    Transforms the input grid into a 3-row representation that captures the essence of the input patterns.
-    
-    The function performs the following steps:
-    1. Analyzes the input grid to identify color groups and their patterns.
-    2. Creates idealized 3-row representations for each color group.
-    3. Combines the representations while maintaining relative positions and prominence.
-    4. Refines the output to ensure balance, pattern completion, and aesthetic arrangement.
-    5. Makes final adjustments to optimize the 3-row representation.
-    
-    This approach focuses on distilling and idealizing the essence of the input patterns
-    rather than strict replication, allowing for creative interpretation while maintaining
-    consistency across different inputs.
-    """
-    """
-    Transforms the input grid into a 3-row representation that captures the essence of the input patterns.
-    
-    The function performs the following steps:
-    1. Identifies distinct color groups and their patterns in the input grid.
-    2. Creates an idealized 3-row representation for each color group.
-    3. Combines the representations while maintaining relative proportions and order.
-    4. Refines the output to ensure balance and utilization of all 3 rows.
-    
-    This approach focuses on distilling and idealizing the essence of the input patterns
-    rather than strict replication, allowing for creative interpretation while maintaining
-    consistency across different inputs.
-    """
     rows, cols = input_grid.get_dimensions()
     color_groups = identify_color_groups(input_grid)
-    output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(3)])
     
+    representations = []
     for color, positions in color_groups.items():
-        pattern = identify_pattern(positions, rows, cols)
-        representation = create_representation(color, pattern, cols)
-        merge_representation(output_grid, representation)
+        pattern = analyze_pattern(positions, rows, cols)
+        prominence = len(positions) / (rows * cols)
+        representation = create_idealized_representation(color, pattern, prominence)
+        representations.append(representation)
     
+    output_grid = combine_representations(representations, cols)
     refine_output(output_grid)
+    complete_patterns(output_grid)
     
     return output_grid
 
