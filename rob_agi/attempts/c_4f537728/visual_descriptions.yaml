@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The input grid is a 20x20 grid with a repeating pattern. It consists of 2x2 blue (1) squares separated by black (0) lines both horizontally and vertically. There's one exception: in the 7th and 8th rows, columns 7 and 8, there's a 2x2 red (2) square instead of blue.
+  output: |
+    The output grid maintains the same overall structure as the input, with the following changes:
+    1. The 2x2 red square in the center has expanded horizontally, turning all 2x2 blue squares in its row (7th and 8th) into red.
+    2. The red color has also propagated vertically, turning all 2x2 squares in its column (7th and 8th) into red.
+    3. The black (0) lines remain unchanged, acting as barriers to the color propagation.
+
+example_1:
+  input: |
+    The input is a 20x20 grid with a different pattern. It consists of alternating columns of 1x2 blue (1) rectangles and black (0) lines. The black columns are one unit wide, while the blue columns are two units wide. There's one exception: in the 15th and 16th rows, columns 12 and 13, there's a 2x2 green (3) square instead of blue.
+  output: |
+    The output grid maintains the same overall structure as the input, with the following changes:
+    1. The 2x2 green square near the bottom has propagated vertically, turning all blue rectangles in its column (12th and 13th) into green.
+    2. The green color has also spread horizontally, but only in the row where it originated (15th and 16th), turning all blue rectangles in these rows into green.
+    3. The black (0) columns remain unchanged, acting as barriers to the color propagation.
+
+test_case_0:
+  input: |
+    The input for the test case is identical to the input of example_0. It's a 20x20 grid with 2x2 blue (1) squares separated by black (0) lines, and a 2x2 red (2) square in the 7th and 8th rows, columns 7 and 8.
+  output: |
+    The expected output is not provided for the test case, as it's meant to be solved based on the pattern observed in the examples.

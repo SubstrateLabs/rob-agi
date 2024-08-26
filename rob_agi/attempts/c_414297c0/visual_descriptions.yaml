@@ -1,0 +1,54 @@
+example_0:
+  input: |
+    A large 22x18 grid mostly filled with black (0). There are several distinct objects:
+    1. A red (2) cross-like shape in the top left, with a orange (7) center.
+    2. A small red (2) and yellow (4) formation in the middle left.
+    3. A large blue (1) rectangular area on the right side, taking up about half the grid. It has a green (3) dot near the top and a yellow (4) dot near the center.
+    4. Two small formations at the bottom of the blue area: one sky blue (8) and one orange (7).
+  output: |
+    A more compact 12x11 grid. The blue (1) area now forms the background. The objects from the input are preserved but rearranged:
+    1. The red (2) cross with orange (7) center is now in the top left corner.
+    2. The red (2) and yellow (4) formation is in the middle left.
+    3. The green (3) and yellow (4) dots are in roughly the same relative positions.
+    4. The sky blue (8) and orange (7) formations are at the bottom, closer together.
+
+example_1:
+  input: |
+    A 20x16 grid with a black (0) background. There are two main areas of interest:
+    1. On the left, a large sky blue (8) rectangular area, 7x7 in size. It has a blue (1) dot in the center-left and a yellow (4) dot near the bottom.
+    2. On the right, several small red (2) formations:
+       - A T-shape with a blue (1) center
+       - An L-shape with a yellow (4) center
+       - A small cross shape
+       - A formation that looks like a backwards C with a green (3) center
+  output: |
+    A compact 9x6 grid. The sky blue (8) area now forms the background. The objects from the input are preserved and rearranged:
+    1. The blue (1) dot is now in the top left corner.
+    2. The red (2) formations are arranged along the right and bottom edges:
+       - The T-shape with blue (1) center is in the top right
+       - The L-shape with yellow (4) center is in the middle right
+       - The small cross is in the bottom right
+       - The backwards C with green (3) center is in the bottom left
+    3. The yellow (4) dot from the original sky blue area is now in the bottom right corner.
+
+example_2:
+  input: |
+    An 18x16 grid with a black (0) background. There are three main areas of interest:
+    1. A large green (3) rectangular area in the top left, 12x6 in size. It contains:
+       - A yellow (4) dot near the center
+       - A blue (1) dot on the left side
+       - A sky blue (8) dot on the right side
+    2. In the bottom right, a small red (2) cross formation with a yellow (4) center
+    3. In the bottom left, a red (2) formation that looks like a backwards L with a sky blue (8) center
+  output: |
+    A compact 6x12 grid. The green (3) area now forms the background. The objects from the input are preserved and rearranged:
+    1. The yellow (4), blue (1), and sky blue (8) dots from the original green area are in roughly the same relative positions.
+    2. The red (2) cross with yellow (4) center is now in the top right corner.
+    3. The backwards L formation with sky blue (8) center is now in the bottom right corner.
+    4. There's a new red (2) formation in the bottom left that wasn't clearly visible in the input grid.
+
+test_case_0:
+  input: |
+    This test case is not provided in the given code snippet.
+  output: |
+    This test case is not provided in the given code snippet.

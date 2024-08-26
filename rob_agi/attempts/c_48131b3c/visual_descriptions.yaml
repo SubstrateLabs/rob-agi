@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 3x3 grid with a pattern resembling a plus sign or cross. The center and corners are black (0), while the middle of each edge is sky blue (8). This creates a symmetrical pattern with sky blue squares forming a cross shape against a black background.
+  output: |
+    A 6x6 grid that appears to be an expanded version of the input. The pattern is doubled in both width and height, creating a larger, more intricate design. The sky blue (8) squares now form a more complex cross-like pattern, with additional sky blue squares filling in the spaces between the original pattern. The black (0) squares maintain their positions relative to the original pattern but are now spaced further apart. The result is a symmetrical, ornate design that resembles a stylized snowflake or decorative tile.
+
+example_1:
+  input: |
+    A 2x2 grid with a simple checkerboard pattern. The top-left and bottom-right squares are orange (7), while the top-right and bottom-left squares are black (0). This creates a diagonal pattern of alternating colors.
+  output: |
+    A 4x4 grid that expands on the input pattern. The original 2x2 checkerboard is replicated four times to create a larger, more complex checkerboard. The pattern maintains its alternating orange (7) and black (0) squares, but now in a 4x4 arrangement. This creates a symmetrical design with diagonal lines of the same color running from corner to corner.
+
+example_2:
+  input: |
+    A 4x4 grid with an asymmetrical pattern. The top-left corner is yellow (4), and there's a yellow L-shaped pattern in the bottom-right quadrant. The rest of the grid is filled with black (0) squares. This creates an interesting, unbalanced design with yellow elements against a predominantly black background.
+  output: |
+    An 8x8 grid that expands and mirrors the input pattern. The original 4x4 design is replicated four times, but with alternating horizontal and vertical flips. This creates a more complex, symmetrical pattern. The yellow (4) elements now form intricate shapes that resemble stylized flowers or crosses, separated by black (0) spaces. The overall effect is a balanced, ornate design that maintains elements of the original pattern while creating new, larger-scale structures.

@@ -1,23 +1,23 @@
 example_0:
   input: |
-    A 9x10 grid with mostly black (empty) space. There are three vertical lines of sky blue (8) squares, each one square wide, positioned at columns 1, 5, and 9. These lines extend from the top row to the third row. In the middle of the grid (row 4), there's a horizontal line of three red (2) squares.
+    A 9x10 grid with mostly black (0) background. Three vertical sky blue (8) lines, each one square wide, at columns 2, 6, and 10. These lines extend from the top to the third row. In the middle of the grid (row 5), there's a horizontal red (2) line that's three squares wide, centered in the grid.
   output: |
-    The same 9x10 grid, but with significant changes. The three vertical sky blue lines now extend all the way from the top to the bottom of the grid. Additionally, a new vertical sky blue line has appeared, connecting the right end of the red line to the bottom of the grid. This forms a rectangular enclosure around the red line, with the left side open.
+    The same 9x10 grid, but the sky blue (8) vertical lines now extend all the way from top to bottom. The three original lines remain unchanged at the top. The new extensions form a pattern: the leftmost and rightmost lines are straight, while the middle line bends to the right to enclose the red horizontal line. This creates a rectangular shape around the red line, with the bottom right corner of this shape touching the rightmost vertical line.
 
 example_1:
   input: |
-    A 10x12 grid with alternating vertical lines of black (0) and sky blue (8) squares in the top four rows. There are six sky blue lines, each one square wide. The bottom six rows are mostly black, except for a horizontal line of three red (2) squares in the middle of row 5.
+    A 10x12 grid with a black (0) background. Six vertical sky blue (8) lines, each one square wide, alternating with black spaces. These lines extend from the top to the fourth row. In the middle of the grid (row 6), there's a horizontal red (2) line that's three squares wide, slightly right of center.
   output: |
-    The same 10x12 grid, but with changes. The alternating pattern of black and sky blue lines now extends all the way to the bottom of the grid. Additionally, two new vertical sky blue lines have appeared, enclosing the red line on both sides and extending to the bottom of the grid. This forms a complete rectangular enclosure around the red line.
+    The same 10x12 grid, but all sky blue (8) vertical lines now extend from top to bottom. The original pattern at the top remains unchanged. Below, the lines create a new pattern: the outermost lines on each side remain straight, while the inner lines bend to enclose the red horizontal line. This forms three rectangular shapes: two narrow ones on the sides and a wider one in the middle containing the red line. The bottom corners of these rectangles touch the straight outer lines.
 
 example_2:
   input: |
-    A 10x12 grid with three vertical lines of sky blue (8) squares in the top four rows, positioned at columns 1, 5, and 7. There's also a partial fourth line at column 10. In row 5, there are two separate horizontal red (2) lines: one with two squares on the left side, and another with three squares near the center.
+    A 10x12 grid with a black (0) background. Five vertical sky blue (8) lines of varying positions, each one square wide, extending from the top to the fourth row. In row 6, there are two red (2) segments: a two-square wide segment on the left, and a three-square wide segment right of center.
   output: |
-    The same 10x12 grid, but with changes. All existing sky blue lines now extend to the bottom of the grid. New sky blue lines have appeared, forming rectangular enclosures around both red lines. The left red line is enclosed on three sides (left, right, bottom), while the center red line is fully enclosed.
+    The same 10x12 grid, but all sky blue (8) vertical lines now extend from top to bottom. The original pattern at the top remains unchanged. Below, the lines create a new pattern: they bend to enclose both red segments, forming rectangular shapes around them. The leftmost and rightmost vertical lines remain straight, while the inner lines bend to create these enclosures. The bottom corners of these rectangles touch the straight outer lines.
 
 example_3:
   input: |
-    A 10x12 grid with four vertical lines of sky blue (8) squares in the top four rows, positioned at columns 0, 2, 6, and 9. In row 5, there are two separate horizontal red (2) lines: one with two squares on the left side, and another with three squares near the center.
+    A 10x12 grid with a black (0) background. Four vertical sky blue (8) lines of varying positions, each one square wide, extending from the top to the fourth row. In row 6, there are two red (2) segments: a two-square wide segment left of center, and a three-square wide segment right of center.
   output: |
-    The same 10x12 grid, but with changes. All existing sky blue lines now extend to the bottom of the grid. New sky blue lines have appeared, forming rectangular enclosures around both red lines. Both red lines are now fully enclosed by sky blue squares, creating two distinct "boxes" that extend to the bottom of the grid.
+    The same 10x12 grid, but all sky blue (8) vertical lines now extend from top to bottom. The original pattern at the top remains unchanged. Below, the lines create a new pattern: they bend to enclose both red segments, forming rectangular shapes around them. The leftmost and rightmost vertical lines remain straight, while the inner lines bend to create these enclosures. The bottom corners of these rectangles touch the adjacent vertical lines, creating a connected structure across the width of the grid.

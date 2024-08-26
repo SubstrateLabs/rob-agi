@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    The grid is 15x15. There are several green (3) and brown (9) regions scattered throughout the grid. The largest green region is in the top-left corner, extending to the middle of the grid. There's a smaller green region in the top-right corner. The bottom-right quadrant has a large green region with brown spots. There are isolated green and brown regions in the center-left and bottom-left areas. The rest of the grid is filled with black (0).
+  output: |
+    The grid maintains the same 15x15 size. The large green region in the top-left corner remains unchanged. The green region in the top-right corner is preserved. The large green region in the bottom-right quadrant with brown spots is also unchanged. However, the isolated green and brown regions in the center-left and bottom-left areas have been replaced with black (0). The overall structure of the larger connected regions is maintained, while smaller isolated regions are removed.
+
+example_1:
+  input: |
+    The grid is 15x15. There are three distinct green (3) regions: one in the top-left corner, one in the center-right, and one large region covering most of the bottom-right quadrant. The top-left region has brown (9) spots within it. The center-right region is a rectangular shape. The bottom-right region has several brown spots scattered throughout. There are two small isolated green regions: one in the center-left and one in the center-bottom. The rest of the grid is black (0).
+  output: |
+    The grid maintains the 15x15 size. The green region in the top-left corner with brown spots is preserved. The large green region in the bottom-right quadrant with brown spots is also unchanged. However, the rectangular green region in the center-right and the two small isolated green regions (center-left and center-bottom) have been replaced with black (0). The overall structure of the edge-connected regions is maintained, while internal isolated regions are removed.
+
+example_2:
+  input: |
+    The grid is 15x15. There are several distinct green (3) regions with brown (9) spots: one in the top-right corner, one rectangular region in the center-right, one in the bottom-left corner, and one rectangular region in the bottom-center. There's also a small green region in the top-left corner. The rest of the grid is black (0), creating clear separations between the colored regions.
+  output: |
+    The grid keeps its 15x15 size. The green region with brown spots in the top-right corner is preserved. The rectangular green region with brown spots in the bottom-center is also unchanged. The green region in the bottom-left corner remains intact. However, the rectangular green region in the center-right and the small green region in the top-left corner have been replaced with black (0). The overall structure of the edge-connected regions is maintained, while internal isolated regions are removed.
+
+example_3:
+  input: |
+    The grid is 15x15. There are three large green (3) regions with brown (9) spots: one spanning the top of the grid, one in the center-left, and one in the center-right. The top region is connected to the left edge. The center-left region is connected to the left edge. The center-right region is isolated. There's a black (0) border around most of the grid, except where the regions touch the edges. The bottom third of the grid is entirely black.
+  output: |
+    The grid maintains its 15x15 size. The large green region with brown spots spanning the top of the grid remains unchanged, as it's connected to the left edge. The green region in the center-left also remains, as it's connected to the left edge. However, the isolated green region in the center-right has been replaced with black (0). The black border and the entirely black bottom third of the grid remain unchanged. The overall structure of the edge-connected regions is maintained, while the internal isolated region is removed.
+
+test_case_0:
+  input: |
+    The grid is 15x15. There are several distinct green (3) regions with brown (9) spots: a large region spanning most of the left side of the grid, a smaller region in the top-right corner, a rectangular region in the center-right, and a region in the bottom-right corner. There's also an isolated green region with brown spots in the center-left. The rest of the grid is black (0), creating clear separations between the colored regions.
+  output: |
+    The output grid is not provided for the test case.

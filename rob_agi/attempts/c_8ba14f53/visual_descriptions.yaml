@@ -1,0 +1,73 @@
+example_0:
+  input: |
+    A 4x9 grid with three distinct shapes:
+    1. A vertical black line on the left side.
+    2. A yellow (4) shape in the top-left corner, resembling an inverted 'L'.
+    3. A magenta (6) shape occupying most of the right side, forming a large 'C'.
+    The magenta shape has a black void in its center.
+  output: |
+    A 3x3 grid with three distinct rows:
+    1. Top row: Yellow (4) on the left, black (0) in the center and right.
+    2. Middle row: Magenta (6) filling the entire row.
+    3. Bottom row: Magenta (6) filling the entire row.
+
+example_1:
+  input: |
+    A 4x9 grid with three main elements:
+    1. An orange (7) shape on the left side, forming a jagged 'E' or comb-like structure.
+    2. A vertical black line in the center.
+    3. A sky blue (8) shape on the right side, forming a rectangular frame with a black center.
+  output: |
+    A 3x3 grid with three distinct rows:
+    1. Top row: Orange (7) filling the entire row.
+    2. Middle row: Sky blue (8) on the left and center, black (0) on the right.
+    3. Bottom row: Entirely black (0).
+
+example_2:
+  input: |
+    A 4x9 grid with three primary elements:
+    1. A brown (9) shape on the left side, forming a frame with a small gap.
+    2. A vertical black line in the center.
+    3. A gray (5) shape on the right side, forming a frame with small gaps.
+  output: |
+    A 3x3 grid with three distinct rows:
+    1. Top row: Brown (9) filling the entire row.
+    2. Middle row: Gray (5) filling the entire row.
+    3. Bottom row: Entirely black (0).
+
+example_3:
+  input: |
+    A 4x9 grid with three main components:
+    1. A green (3) shape on the left side, forming a rectangular frame.
+    2. A vertical black line in the center.
+    3. A blue (1) shape on the right side, forming an 'E' shape.
+  output: |
+    A 3x3 grid with three distinct rows:
+    1. Top row: Green (3) filling the entire row.
+    2. Middle row: Green (3) on the left, black (0) in the center and right.
+    3. Bottom row: Blue (1) on the left and center, black (0) on the right.
+
+example_4:
+  input: |
+    A 4x9 grid with three primary elements:
+    1. A sky blue (8) shape on the left side, forming a 'B' shape.
+    2. A vertical black line in the center.
+    3. A magenta (6) shape on the right side, forming a 'B' shape.
+    4. The bottom row is entirely black.
+  output: |
+    A 3x3 grid with three distinct rows:
+    1. Top row: Sky blue (8) on the left, black (0) in the center and right.
+    2. Middle row: Magenta (6) on the left, black (0) in the center and right.
+    3. Bottom row: Entirely black (0).
+
+example_5:
+  input: |
+    A 4x9 grid with three main components:
+    1. An orange (7) shape on the left side, forming a rectangular frame.
+    2. A vertical black line in the center.
+    3. A sky blue (8) shape on the right side, forming an irregular 'E' shape.
+  output: |
+    A 3x3 grid with three distinct rows:
+    1. Top row: Orange (7) on the left and center, black (0) on the right.
+    2. Middle row: Sky blue (8) filling the entire row.
+    3. Bottom row: Entirely black (0).

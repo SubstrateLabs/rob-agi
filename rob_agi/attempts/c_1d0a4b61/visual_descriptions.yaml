@@ -1,0 +1,50 @@
+example_0:
+  input: |
+    The grid appears to be a repeating pattern of colored squares. The overall structure is a 25x25 grid with a blue (1) border around the entire perimeter. Inside this border, there's a repeating pattern of 5x5 squares. Each 5x5 square is composed of:
+    - A red (2) square in the top-left corner
+    - A gray (5) square in the top-right corner
+    - A yellow (4) square in the center
+    - Gray (5) squares filling the rest of the pattern
+    This 5x5 pattern repeats horizontally and vertically across the grid, separated by blue (1) lines.
+    There's a large black (0) region that disrupts this pattern, roughly in the shape of an inverted 'L'. This black region starts from the right side of the grid, about 1/3 from the top, and extends leftward before dropping down to the bottom of the grid.
+  output: |
+    The output grid is identical to the input grid, except that the large black (0) region has been completely filled in with the same repeating 5x5 pattern seen in the rest of the grid. The blue (1) border and separating lines remain intact, and the pattern seamlessly continues through what was previously the black region.
+
+example_1:
+  input: |
+    This grid also has a 25x25 structure with a blue (1) border. The internal pattern is more complex:
+    - It consists of alternating columns of different patterns.
+    - One column pattern is: red (2), green (3), gray (5), gray (5), green (3), red (2)
+    - The adjacent column pattern is: gray (5), red (2), green (3), green (3), red (2), gray (5)
+    - These columns alternate across the grid, separated by blue (1) lines.
+    There are several black (0) regions disrupting this pattern:
+    - A small rectangular region in the top-right quadrant
+    - A larger, roughly L-shaped region in the bottom-left quadrant
+    - A few scattered black squares in the center-right area
+  output: |
+    The output grid is identical to the input grid, but with all black (0) regions filled in with the appropriate continuing patterns. The column patterns seamlessly extend through what were previously black areas, maintaining the alternating structure and blue (1) separating lines.
+
+example_2:
+  input: |
+    This grid has a 25x25 structure with a blue (1) border. The internal pattern is simpler:
+    - It consists of alternating columns of blue (1), red (2), blue (1), gray (5)
+    - This pattern repeats across the entire grid
+    There are several black (0) regions disrupting this pattern:
+    - A large region in the top-right quadrant
+    - A smaller region in the center-left area
+    - A few scattered black squares near the bottom-left
+  output: |
+    The output grid is identical to the input grid, but with all black (0) regions filled in with the appropriate continuing pattern. The alternating column pattern of blue (1), red (2), blue (1), gray (5) extends seamlessly through what were previously black areas, maintaining the structure across the entire grid.
+
+test_case_0:
+  input: |
+    This grid has a 25x25 structure with a blue (1) border. The internal pattern is complex:
+    - It consists of a repeating 6x6 pattern of colored squares
+    - The pattern includes red (2), green (3), and gray (5) squares in a specific arrangement
+    - Blue (1) lines separate each 6x6 block
+    There are several black (0) regions disrupting this pattern:
+    - A large region in the top-right quadrant
+    - A smaller region in the bottom-left quadrant
+    - A few scattered black squares in various locations
+  output: |
+    The expected output is not provided for this test case.

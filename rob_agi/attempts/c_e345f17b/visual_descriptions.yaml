@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    An 8x4 grid with a distinct pattern. The top-left corner has a magenta (6) L-shape extending down and to the right. There's a gray (5) zigzag pattern starting from the top-right, moving left, then down, and finally right. Black (0) spaces are scattered throughout, creating gaps in the colored areas.
+  output: |
+    A 4x4 grid with a simple pattern. The grid is mostly black (0), with four yellow (4) squares positioned in a diagonal pattern from top-right to bottom-left. The yellow squares are not touching each other.
+
+example_1:
+  input: |
+    An 8x4 grid with two main color regions. The left side has a magenta (6) pattern that forms a rough C-shape, with some gaps. The right side is dominated by a gray (5) pattern that forms an irregular shape with some protrusions and indentations. There are black (0) spaces scattered throughout, creating separation between the colored regions.
+  output: |
+    A 4x4 grid that is mostly black (0). There are three yellow (4) squares arranged in an L-shape: one in the top-right corner, one directly below it, and one in the bottom-left corner.
+
+example_2:
+  input: |
+    An 8x4 grid with two distinct color regions. The left side has a magenta (6) pattern forming an inverted L-shape, with some gaps. The right side has a gray (5) pattern that's more scattered and irregular. There's a significant amount of black (0) space, especially in the middle and bottom-right areas of the grid.
+  output: |
+    A 4x4 grid that is mostly black (0). There's a horizontal line of three yellow (4) squares in the third row from the top. All other squares are black.
+
+example_3:
+  input: |
+    An 8x4 grid with intertwining magenta (6) and gray (5) patterns. The magenta forms a complex shape on the left side and top of the grid, while the gray is concentrated on the right side. There are black (0) spaces scattered throughout, creating gaps and separations between the colored areas.
+  output: |
+    A 4x4 grid that is mostly black (0). There are three yellow (4) squares: one in the top-right corner, and two adjacent squares in the bottom-right corner. All other squares are black.
+
+test_case_0:
+  input: |
+    An 8x4 grid with intertwining magenta (6) and gray (5) patterns. The magenta forms a complex shape on the left side and top of the grid, while the gray is concentrated on the right side. There are black (0) spaces scattered throughout, creating gaps and separations between the colored areas.
+  output: |
+    Not provided in the test case.

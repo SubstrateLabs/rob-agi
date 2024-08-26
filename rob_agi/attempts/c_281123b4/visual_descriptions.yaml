@@ -1,95 +1,83 @@
 example_0:
   input: |
-    A 19x4 grid with four distinct sections separated by green (3) columns. From left to right:
-    1. Sky blue (8) dominant, with some black (0) spaces.
-    2. Gray (5) dominant, with some black (0) spaces.
-    3. Brown (9) dominant, with some black (0) spaces.
-    4. Yellow (4) dominant, with some black (0) spaces.
-    Each section has a unique pattern of its dominant color and black.
+    A 4x19 grid with four distinct regions separated by green (3) vertical lines. From left to right:
+    1. A sky blue (8) region with some black (0) spaces, forming an irregular shape.
+    2. A gray (5) region, mostly solid but with some black spaces.
+    3. A brown (9) region with some black spaces, forming another irregular shape.
+    4. A yellow (4) region, mostly solid in the top and bottom rows, with black spaces in the middle rows.
   output: |
-    A 4x4 grid showcasing a mix of colors from the input:
-    - Brown (9) is most prominent, forming a rough L-shape.
-    - Sky blue (8) appears in two corners.
-    - Yellow (4) forms a diagonal line.
-    - Gray (5) appears once.
-    The pattern seems to balance the colors from the input sections.
+    A 4x4 grid where each column seems to represent a condensed version of the input regions:
+    1. Mostly brown (9) with one sky blue (8) square.
+    2. A mix of brown (9), sky blue (8), and gray (5).
+    3. A mix of yellow (4) and sky blue (8).
+    4. Mostly yellow (4) with one brown (9) square.
 
 example_1:
   input: |
-    A 19x4 grid with four sections divided by green (3) columns. From left to right:
-    1. Sky blue (8) dominant, with some black (0) spaces.
-    2. Gray (5) present, but less dominant, with more black (0) spaces.
-    3. Brown (9) present, but scattered, with many black (0) spaces.
-    4. Yellow (4) present, but scattered, with many black (0) spaces.
-    Each section has a unique distribution of its colors and black.
+    A 4x19 grid with four regions separated by green (3) vertical lines. From left to right:
+    1. A sky blue (8) region with some black (0) spaces, forming an irregular shape.
+    2. A gray (5) region with significant black spaces, creating a scattered pattern.
+    3. A brown (9) region with black spaces, forming a sparse pattern.
+    4. A yellow (4) region with significant black spaces, creating a scattered pattern.
   output: |
-    A 4x4 grid showing:
-    - Brown (9) forms a C-shape around the edges.
-    - Yellow (4) forms a partial diagonal.
-    - Sky blue (8) appears twice in the bottom row.
-    - Gray (5) appears once.
-    The pattern balances colors from the input while creating a structured layout.
+    A 4x4 grid where each column seems to represent a condensed version of the input regions:
+    1. Mostly yellow (4) with one sky blue (8) square.
+    2. A mix of brown (9), sky blue (8), and yellow (4).
+    3. A mix of sky blue (8), yellow (4), and gray (5).
+    4. Mostly brown (9) with one yellow (4) square.
 
 example_2:
   input: |
-    A 19x4 grid with four sections separated by green (3) columns. From left to right:
-    1. Sky blue (8) dominant, with some black (0) spaces.
-    2. Gray (5) dominant, with some black (0) spaces.
-    3. Brown (9) present, but scattered, with many black (0) spaces.
-    4. Yellow (4) present, but scattered, with many black (0) spaces.
-    Each section has a unique pattern of color distribution.
+    A 4x19 grid with four regions separated by green (3) vertical lines. From left to right:
+    1. A sky blue (8) region with some black (0) spaces, forming an irregular shape.
+    2. A gray (5) region, mostly solid but with some black spaces.
+    3. A brown (9) region with significant black spaces, creating a scattered pattern.
+    4. A yellow (4) region with significant black spaces, forming an irregular pattern.
   output: |
-    A 4x4 grid displaying:
-    - Brown (9) forms an inverted L-shape.
-    - Yellow (4) appears in a diagonal and one corner.
-    - Sky blue (8) is in two corners.
-    - Gray (5) and black (0) each appear once.
-    The pattern creates a balanced distribution of colors from the input.
+    A 4x4 grid where each column seems to represent a condensed version of the input regions:
+    1. A mix of brown (9) and sky blue (8).
+    2. A mix of yellow (4), brown (9), and gray (5).
+    3. A mix of brown (9), black (0), and yellow (4).
+    4. A mix of brown (9), yellow (4), and sky blue (8).
 
 example_3:
   input: |
-    A 19x4 grid with four sections divided by green (3) columns. From left to right:
-    1. Sky blue (8) dominant, with some black (0) spaces.
-    2. Gray (5) present, but less dominant, with many black (0) spaces.
-    3. Brown (9) present, but scattered, with many black (0) spaces.
-    4. Yellow (4) present, but scattered, with many black (0) spaces.
-    Each section has a unique distribution of its colors and black.
+    A 4x19 grid with four regions separated by green (3) vertical lines. From left to right:
+    1. A sky blue (8) region with significant black (0) spaces, creating a scattered pattern.
+    2. A gray (5) region with significant black spaces, forming an irregular pattern.
+    3. A brown (9) region with some black spaces, forming an irregular shape.
+    4. A yellow (4) region with significant black spaces, creating a scattered pattern.
   output: |
-    A 4x4 grid showing:
-    - Brown (9) forms an inverted L-shape.
-    - Sky blue (8) appears twice.
-    - Yellow (4) forms a partial row.
-    - Black (0) appears twice.
-    The pattern balances colors from the input while creating a structured layout.
+    A 4x4 grid where each column seems to represent a condensed version of the input regions:
+    1. Mostly brown (9) with one sky blue (8) square.
+    2. Mostly brown (9) with one black (0) square.
+    3. A mix of sky blue (8) and yellow (4).
+    4. A mix of brown (9), black (0), and yellow (4).
 
 example_4:
   input: |
-    A 19x4 grid with four sections separated by green (3) columns. From left to right:
-    1. Sky blue (8) present, but less dominant, with many black (0) spaces.
-    2. Gray (5) present, but scattered, with many black (0) spaces.
-    3. Brown (9) present, but scattered, with many black (0) spaces.
-    4. Yellow (4) present, but scattered, with many black (0) spaces.
-    Each section has a sparse distribution of its colors among black spaces.
+    A 4x19 grid with four regions separated by green (3) vertical lines. From left to right:
+    1. A sky blue (8) region with significant black (0) spaces, creating a scattered pattern.
+    2. A gray (5) region with significant black spaces, forming an irregular pattern.
+    3. A brown (9) region with significant black spaces, creating a scattered pattern.
+    4. A yellow (4) region with significant black spaces, forming an irregular pattern.
   output: |
-    A 4x4 grid displaying:
-    - Brown (9) forms a partial diagonal.
-    - Yellow (4) appears in multiple positions.
-    - Sky blue (8) appears once.
-    - Gray (5) forms the bottom-right corner.
-    The pattern creates a balanced distribution of colors from the input, with more emphasis on brown and yellow.
+    A 4x4 grid where each column seems to represent a condensed version of the input regions:
+    1. A mix of yellow (4) and sky blue (8).
+    2. Mostly brown (9) with one gray (5) square.
+    3. Mostly brown (9) with one yellow (4) square.
+    4. A mix of gray (5), yellow (4), and brown (9).
 
 example_5:
   input: |
-    A 19x4 grid with four sections divided by green (3) columns. From left to right:
-    1. Sky blue (8) dominant, with some black (0) spaces.
-    2. Gray (5) present, but less dominant, with many black (0) spaces.
-    3. Brown (9) dominant, with some black (0) spaces.
-    4. Yellow (4) present, but scattered, with many black (0) spaces.
-    Each section has a unique distribution of its colors and black.
+    A 4x19 grid with four regions separated by green (3) vertical lines. From left to right:
+    1. A sky blue (8) region with some black (0) spaces, forming an irregular shape.
+    2. A gray (5) region with significant black spaces, creating a scattered pattern.
+    3. A brown (9) region with some black spaces, forming an irregular shape.
+    4. A yellow (4) region with significant black spaces, creating a scattered pattern.
   output: |
-    A 4x4 grid showing:
-    - Brown (9) forms a C-shape around the edges.
-    - Sky blue (8) appears twice.
-    - Yellow (4) and gray (5) each appear once.
-    - Black (0) appears twice.
-    The pattern balances colors from the input while creating a structured layout, with emphasis on brown.
+    A 4x4 grid where each column seems to represent a condensed version of the input regions:
+    1. Mostly brown (9) with one sky blue (8) square.
+    2. A mix of brown (9), gray (5), and yellow (4).
+    3. A mix of sky blue (8), yellow (4), and black (0).
+    4. A mix of brown (9), yellow (4), and sky blue (8).

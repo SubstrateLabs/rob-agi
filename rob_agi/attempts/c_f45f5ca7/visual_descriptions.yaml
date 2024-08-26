@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A vertical line of colored squares in the leftmost column of a 10x10 grid. The colors from top to bottom are: green (3), yellow (4), red (2), green (3), yellow (4), sky (8), red (2). The rest of the grid is filled with black (0) squares.
+  output: |
+    The colored squares from the input have been moved to form a diagonal line from top-left to bottom-right. The colors maintain their original order: green (3) in row 1, column 5; yellow (4) in row 2, column 4; red (2) in row 3, column 3; green (3) in row 4, column 5; yellow (4) in row 6, column 4; sky (8) in row 7, column 2; red (2) in row 8, column 3. The rest of the grid remains filled with black (0) squares.
+
+example_1:
+  input: |
+    A vertical line of colored squares in the leftmost column of a 10x10 grid. The colors from top to bottom are: red (2), sky (8), green (3), red (2), yellow (4), sky (8), green (3). The rest of the grid is filled with black (0) squares.
+  output: |
+    The colored squares from the input have been moved to form a diagonal line from top-left to bottom-right. The colors maintain their original order: red (2) in row 1, column 3; sky (8) in row 2, column 2; green (3) in row 4, column 5; red (2) in row 5, column 3; yellow (4) in row 6, column 4; sky (8) in row 8, column 2; green (3) in row 10, column 5. The rest of the grid remains filled with black (0) squares.
+
+example_2:
+  input: |
+    A vertical line of colored squares in the leftmost column of a 10x10 grid. The colors from top to bottom are: sky (8), green (3), red (2), yellow (4), green (3), sky (8), green (3), sky (8). The rest of the grid is filled with black (0) squares.
+  output: |
+    The colored squares from the input have been moved to form a diagonal line from top-left to bottom-right. The colors maintain their original order: sky (8) in row 1, column 2; green (3) in row 2, column 5; red (2) in row 3, column 3; yellow (4) in row 4, column 4; green (3) in row 5, column 5; sky (8) in row 6, column 2; green (3) in row 7, column 5; sky (8) in row 9, column 2. The rest of the grid remains filled with black (0) squares.

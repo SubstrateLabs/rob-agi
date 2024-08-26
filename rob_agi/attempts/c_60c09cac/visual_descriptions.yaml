@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 3x3 grid with mostly black (empty) squares. There's a single green square in the top-middle position, and two orange squares side by side in the middle-right position. The rest of the grid is black.
+  output: |
+    A 6x6 grid that appears to be an expanded version of the input. The green square from the input has become a 2x2 green square in the top-middle. The two orange squares have expanded into a 2x4 orange rectangle on the right side of the middle rows. The rest of the grid is filled with black squares, maintaining the overall rectangular shape but doubling the size in both dimensions.
+
+example_1:
+  input: |
+    A 4x4 grid with a mix of colors. There's a single sky blue square in the top-right corner. Below it, there are two gray squares side by side. To the left of the gray squares, there's another sky blue square. The rest of the grid is black (empty).
+  output: |
+    An 8x8 grid that looks like an expanded version of the input. The single sky blue square from the top-right has become a 2x2 sky blue square in the same relative position. The two gray squares have expanded into a 2x4 gray rectangle on the right side. The sky blue square that was below the first one has expanded into a 2x2 square, positioned to the left of the gray rectangle. The rest of the grid is filled with black squares, effectively doubling the size of the original grid in both dimensions while maintaining the relative positions of the colored areas.
+
+test_case_0:
+  input: |
+    A 4x4 grid with a mix of colors. There's a single sky blue square in the top-right corner. Below it, there are two gray squares side by side. To the left of the gray squares, there's another sky blue square. The rest of the grid is black (empty).
+  output: |
+    The output is not provided for this test case.

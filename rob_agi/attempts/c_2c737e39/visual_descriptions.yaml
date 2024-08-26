@@ -1,0 +1,53 @@
+example_0:
+  input: |
+    A 12x10 grid with mostly black (empty) space. There's a small, irregular shape in the top-left corner made of various colors. The shape consists of:
+    - A green (3) vertical line of two squares
+    - Two blue (1) squares flanking the top of the green line
+    - Two yellow (4) squares and a gray (5) square forming an L-shape to the left of the green line
+    - An orange (7) square with a red (2) square to its right, below the main shape
+    There's also an isolated gray (5) square in the bottom-left quadrant of the grid.
+  output: |
+    The same 12x10 grid, but the irregular shape from the top-left has been duplicated. The original shape remains unchanged, and an exact copy appears shifted down and to the right. The copy's top-left corner is at the position where the isolated gray square was in the input. The isolated gray square is no longer present in its original position.
+
+example_1:
+  input: |
+    A 12x12 grid, mostly black (empty). There's a small shape in the top-left quadrant:
+    - Two green (3) squares horizontally at the top
+    - Two red (2) squares horizontally below the green ones
+    - Another red (2) square below the left red square
+    - A gray (5) square to the right of the bottom red square
+    There's also an isolated gray (5) square in the bottom-right quadrant.
+  output: |
+    The same 12x12 grid. The shape from the top-left remains unchanged. A new, similar shape appears in the middle-right of the grid:
+    - Two green (3) squares horizontally at the top
+    - Two red (2) squares horizontally below the green ones
+    - Another red (2) square below the left red square
+    The isolated gray square from the input is no longer present. The new shape doesn't include a gray square.
+
+example_2:
+  input: |
+    A 9x10 grid, mostly black (empty). There's an irregular shape in the top-left quadrant:
+    - A vertical blue (1) line of two squares at the left
+    - A horizontal blue (1) line of two squares at the top, overlapping with the vertical line
+    - A gray (5) square below the right blue square
+    - Two red (2) squares vertically to the right of the gray square
+    - A green (3) square to the right of the bottom red square
+    There's also an isolated gray (5) square in the bottom-left quadrant.
+  output: |
+    The same 9x10 grid. The original shape in the top-left remains unchanged. A new, similar shape appears below and slightly to the right of the original:
+    - A vertical blue (1) line of two squares at the left
+    - A horizontal blue (1) line of two squares at the top, overlapping with the vertical line
+    - Two red (2) squares vertically to the right of where the gray square would be
+    - A green (3) square to the right of the bottom red square
+    The new shape doesn't include a gray square. The isolated gray square from the input is no longer present.
+
+test_case_0:
+  input: |
+    A 12x10 grid, mostly black (empty). There's an irregular shape in the top-left quadrant:
+    - A vertical green (3) line of two squares
+    - Two blue (1) squares flanking the top of the green line
+    - Two yellow (4) squares and a gray (5) square forming an L-shape to the left of the green line
+    - An orange (7) square with a red (2) square to its right, below the main shape
+    There's also an isolated gray (5) square in the bottom-left quadrant.
+  output: |
+    Description not provided in the test case.

@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 13x13 grid mostly filled with black (0) squares. There are two sky-colored (8) squares: one near the top-left corner at position (1, 2) and another near the bottom-right corner at position (10, 8).
+  output: |
+    The same 13x13 grid with the two sky-colored (8) squares in their original positions. A zigzag path of green (3) squares connects these two sky squares. The path starts from the top-left sky square, moves diagonally down-right, then straight right, alternating between diagonal and straight movements until it reaches the bottom-right sky square.
+
+example_1:
+  input: |
+    A 14x12 grid mostly filled with black (0) squares. There are two sky-colored (8) squares: one near the top-right corner at position (0, 11) and another on the left side at position (7, 2).
+  output: |
+    The same 14x12 grid with the two sky-colored (8) squares in their original positions. A zigzag path of green (3) squares connects these two sky squares. The path starts from the top-right sky square, moves diagonally down-left, then straight left, alternating between diagonal and straight movements until it reaches the left-side sky square.
+
+example_2:
+  input: |
+    A 14x11 grid mostly filled with black (0) squares. There are two sky-colored (8) squares: one on the right side at position (6, 12) and another on the left side at position (8, 2).
+  output: |
+    The same 14x11 grid with the two sky-colored (8) squares in their original positions. A rectangular path of green (3) squares connects these two sky squares. The path forms a rectangle with the sky squares at opposite corners, using only horizontal and vertical movements.
+
+test_case_0:
+  input: |
+    A 13x13 grid mostly filled with black (0) squares. There are two sky-colored (8) squares: one near the top-left corner at position (1, 2) and another near the bottom-right corner at position (10, 8).
+  output: |
+    This is a test case, so no output is provided in the test file.

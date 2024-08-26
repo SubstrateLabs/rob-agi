@@ -1,0 +1,46 @@
+example_0:
+  input: |
+    A 10x10 grid with mostly black (0) squares. There are four colored squares forming a rough diamond shape:
+    - Yellow (4) in the top left of the diamond
+    - Red (2) in the top right
+    - Orange (7) in the bottom left
+    - Blue (1) in the bottom right
+    In the center of this diamond is a 2x2 square of gray (5) squares.
+  output: |
+    A 10x10 grid, mostly black (0). The colored squares from the input have been moved:
+    - They now form a tight 2x2 square in the center of the grid
+    - The colors maintain their relative positions (yellow top-left, red top-right, orange bottom-left, blue bottom-right)
+    - The gray squares are no longer present
+
+example_1:
+  input: |
+    A 10x10 grid, mostly black (0). There's a large 4x4 square of gray (5) in the center.
+    Around this gray square, there are four colored squares, one at each corner:
+    - Green (3) at top-left
+    - Yellow (4) at top-right
+    - Sky blue (8) at bottom-left
+    - Magenta (6) at bottom-right
+  output: |
+    A 10x10 grid, mostly black (0). The gray square is gone.
+    In its place is a 4x4 square made up of 2x2 sections of each color from the input:
+    - Top-left 2x2 is green (3)
+    - Top-right 2x2 is yellow (4)
+    - Bottom-left 2x2 is sky blue (8)
+    - Bottom-right 2x2 is magenta (6)
+
+example_2:
+  input: |
+    A 10x10 grid. There's a large 6x6 square of gray (5) slightly off-center, touching the left edge.
+    Around this gray square are four colored squares, one at each corner:
+    - Sky blue (8) at top-left
+    - Brown (9) at top-right
+    - Orange (7) at bottom-left
+    - Magenta (6) at bottom-right
+  output: |
+    A 10x10 grid, mostly black (0). The gray square is gone.
+    In its place is a 6x6 square made up of 3x3 sections of each color from the input:
+    - Top-left 3x3 is sky blue (8)
+    - Top-right 3x3 is brown (9)
+    - Bottom-left 3x3 is orange (7)
+    - Bottom-right 3x3 is magenta (6)
+    This new colored square is centered in the grid, not touching any edges.

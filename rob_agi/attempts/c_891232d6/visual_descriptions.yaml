@@ -1,0 +1,107 @@
+example_0:
+  input: |
+    A 28x19 grid with mostly black (0) background. There are several orange (7) shapes and patterns:
+    - A small L-shape in the top-right corner
+    - A horizontal line of 3 squares in the 2nd row from the top, slightly right of center
+    - Two disconnected squares in the 3rd row
+    - A single square in the 4th row
+    - A horizontal line of 6 squares in the 5th row, right of center
+    - A single square in the 7th row
+    - A horizontal line of 5 squares in the 8th row, right of center
+    - Three disconnected squares forming a diagonal line in rows 9-11
+    - A horizontal line of 7 squares in the 12th row, left of center
+    - Two squares next to each other in the 15th row
+    - A horizontal line of 5 squares in the 17th row, center-right
+    - A horizontal line of 5 squares in the 19th row, left of center
+    - A horizontal line of 7 squares in the 24th row, far left
+    - A horizontal line of 4 squares in the 18th row from the bottom, center-right
+    - Three disconnected squares forming a diagonal line in the bottom 3 rows
+    There are also two magenta (6) squares: one in the bottom-left corner and one 3 squares to its right
+  output: |
+    The grid maintains the same size and mostly black background. The orange shapes are transformed:
+    - The L-shape in the top-right is unchanged
+    - The horizontal lines are now "capped" on the left end with a sky blue (8) square and have red (2) squares extending downward from their right ends, forming reverse-L shapes
+    - Isolated squares or short segments are connected by red lines to the nearest larger shape or to the bottom of the grid
+    - The magenta squares remain unchanged
+    This creates a pattern of interconnected orange shapes with red "tails" extending downward, all anchored to the bottom of the grid
+
+example_1:
+  input: |
+    A 29x29 grid with mostly black (0) background. There are several orange (7) shapes and patterns:
+    - An L-shape in the top-left corner
+    - A horizontal line of 3 squares in the 2nd row, center-right
+    - Two disconnected squares in the 3rd row
+    - A horizontal line of 6 squares in the 5th row, center
+    - A single square in the 7th row
+    - A horizontal line of 5 squares in the 8th row, right side
+    - Three disconnected squares forming a diagonal line in rows 9-11, left side
+    - A horizontal line of 7 squares in the 12th row, left side
+    - Two squares next to each other in the 15th row, center
+    - A horizontal line of 5 squares in the 17th row, right side
+    - A horizontal line of 5 squares in the 21st row, left side
+    - A horizontal line of 7 squares in the 24th row, left side
+    - A horizontal line of 4 squares in the 25th row, center
+    - Three disconnected squares forming a diagonal line in the bottom 3 rows, right side
+    There are also two magenta (6) squares: one in the bottom-left corner and one 4 squares to its right
+  output: |
+    The grid maintains the same size and mostly black background. The orange shapes are transformed:
+    - The L-shape in the top-left is unchanged
+    - The horizontal lines are now "capped" on the left end with a sky blue (8) square and have red (2) squares extending downward from their right ends, forming reverse-L shapes
+    - Isolated squares or short segments are connected by red lines to the nearest larger shape or to the bottom of the grid
+    - The magenta squares remain unchanged
+    This creates a pattern of interconnected orange shapes with red "tails" extending downward, all anchored to the bottom of the grid
+    The pattern is more complex due to the larger grid size, with more intersecting red lines
+
+example_2:
+  input: |
+    A 20x23 grid with mostly black (0) background. There are several orange (7) shapes:
+    - A horizontal line of 6 squares in the 5th row, right side
+    - A horizontal line of 5 squares in the 10th row, left side
+    - A horizontal line of 6 squares in the 13th row, right side
+    - A horizontal line of 7 squares in the 16th row, left side
+    - A horizontal line of 4 squares in the 18th row, center
+    - A horizontal line of 3 squares in the 21st row, left side
+    There are also two magenta (6) squares in the bottom row: one on the far left and one 4 squares to its right
+  output: |
+    The grid maintains the same size and mostly black background. The orange shapes are transformed:
+    - Each horizontal line is now "capped" on the left end with a sky blue (8) square
+    - Red (2) squares extend downward from the right end of each orange line, forming reverse-L shapes
+    - These red lines connect to form a tree-like structure, with all lines eventually connecting to the bottom of the grid
+    - The magenta squares remain unchanged
+    This creates a pattern of interconnected orange shapes with a red "skeleton" extending downward, all anchored to the bottom of the grid
+
+example_3:
+  input: |
+    A 10x17 grid with mostly black (0) background. There are several orange (7) shapes:
+    - A horizontal line of 3 squares in the 6th row, center
+    - An L-shape (3 horizontal, 1 vertical) in the 6th and 7th rows, slightly left of center
+    - A horizontal line of 4 squares in the 12th row, left side
+    There is also one magenta (6) square in the bottom-left corner
+  output: |
+    The grid maintains the same size and mostly black background. The orange shapes are transformed:
+    - The horizontal line in the 6th row is now "capped" on the left end with a sky blue (8) square
+    - The L-shape is modified: the vertical part is replaced with a magenta (6) square
+    - Red (2) squares extend downward from the right end of each orange line, forming reverse-L shapes
+    - These red lines connect to form a simple tree-like structure, with all lines eventually connecting to the bottom of the grid
+    - The original magenta square remains unchanged
+    This creates a pattern of interconnected orange shapes with a red "skeleton" extending downward, all anchored to the bottom of the grid
+
+test_case_0:
+  input: |
+    A 19x28 grid with mostly black (0) background. There are several orange (7) shapes and patterns:
+    - A small L-shape in the top-right corner
+    - A horizontal line of 3 squares in the 2nd row from the top, slightly right of center
+    - Two disconnected squares in the 3rd row
+    - A single square in the 4th row
+    - A horizontal line of 6 squares in the 5th row, right of center
+    - A single square in the 7th row
+    - A horizontal line of 5 squares in the 8th row, right of center
+    - Three disconnected squares forming a diagonal line in rows 10-12
+    - A horizontal line of 7 squares in the 12th row, left of center
+    - Two squares next to each other in the 15th row
+    - A horizontal line of 5 squares in the 19th row, left of center
+    - A horizontal line of 4 squares in the 21st row, right side
+    - Three disconnected squares forming a diagonal line in the bottom 3 rows
+    There are also two magenta (6) squares: one in the bottom-left corner and one 3 squares to its right
+  output: |
+    The description for the output is not provided in the test case, as this is meant to be solved.

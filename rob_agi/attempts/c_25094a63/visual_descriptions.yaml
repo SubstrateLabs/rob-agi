@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 30x30 grid with a complex pattern of colors. The dominant colors are green (3), sky blue (8), and red (2). There's a large sky blue region in the center, surrounded by a mix of other colors. The top-left and bottom-right corners have more green, while the top-right and bottom-left have more red. There are scattered magenta (6) squares throughout, often appearing in small clusters or lines.
+  output: |
+    Similar to the input, but with a significant change: a large yellow (4) rectangular region has been inserted in the center, covering most of the previously sky blue area. This yellow rectangle is approximately 7x9 squares in size. The rest of the grid remains largely unchanged, maintaining the complex pattern of colors from the input.
+
+example_1:
+  input: |
+    Another 30x30 grid with a different complex color pattern. The dominant colors are sky blue (8), magenta (6), and green (3). There's a large sky blue region in the center, similar to the previous example. The corners have more varied colors, with no clear dominance of a single color. There are several magenta squares scattered throughout, often appearing in small clusters or lines.
+  output: |
+    Similar to the input, but again with a significant change: a large yellow (4) rectangular region has been inserted in the center, covering most of the previously sky blue area. This yellow rectangle is approximately 7x7 squares in size. The rest of the grid remains largely unchanged, preserving the complex pattern of colors from the input.
+
+test_case_0:
+  input: |
+    A 30x30 grid with yet another complex color pattern. The dominant colors are green (3), sky blue (8), and red (2), similar to the first example. There's a large sky blue region in the center. The corners and edges have a mix of colors, with no clear dominance. There are scattered magenta (6) and blue (1) squares throughout the grid.
+  output: |
+    The output is not provided for the test case, but based on the pattern observed in the examples, we would expect to see a large yellow (4) rectangular region inserted in the center, covering most of the sky blue area. The size of this yellow rectangle might vary, but it would likely be similar in proportion to the examples (around 7x7 or 7x9). The rest of the grid would likely remain unchanged from the input.

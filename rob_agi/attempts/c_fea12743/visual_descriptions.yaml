@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid shows four distinct red (2) square shapes, each separated by black (0) spaces. These squares are positioned in each corner of the grid, with a black border surrounding the entire grid. Each red square has a hollow center, forming a frame-like structure. The squares in the top-left and bottom-right corners are perfect squares, while the ones in the top-right and bottom-left corners have slight variations in their inner structure.
+  output: |
+    The output grid maintains the overall structure of the input, but with color transformations applied to three of the four corner squares. The top-left square remains red (2), the top-right square has changed to sky blue (8), the bottom-left square is now sky blue (8), and the bottom-right square has transformed to green (3). The black borders and spaces between the squares remain unchanged.
+
+example_1:
+  input: |
+    Similar to the previous example, this grid features four red (2) squares in each corner, separated by black (0) spaces. However, each square has a more complex internal structure. The squares are not perfectly hollow, but contain additional red elements inside, creating a more intricate pattern within each square. The overall symmetry is maintained, with the top-left and bottom-right squares mirroring each other, and the top-right and bottom-left squares also being mirror images of each other.
+  output: |
+    The output grid preserves the intricate internal structure of each square but applies color transformations to three of the four corners. The top-left square has changed to sky blue (8), the top-right square remains red (2), the bottom-left square has transformed to green (3), and the bottom-right square stays red (2). The complex internal patterns within each square are maintained, only changing in color where applicable. The black borders and spaces between squares remain unchanged.
+
+example_2:
+  input: |
+    This grid presents a more varied and asymmetrical pattern compared to the previous examples. Red (2) shapes are distributed across the grid, but they are not uniform squares. The top half of the grid contains larger, more complex red shapes, while the bottom half has smaller, simpler red elements. The shapes are not perfectly symmetrical, and there's more black (0) space visible throughout the grid. The overall impression is of a less structured, more organic pattern.
+  output: |
+    The output grid maintains the overall asymmetrical structure of the input, but with color transformations applied to certain areas. The top-left quadrant's red shapes have changed to green (3), and the top-right quadrant's shapes have transformed to sky blue (8). The bottom half of the grid remains largely unchanged, with most red shapes staying red. The black spaces and overall pattern distribution remain the same, creating a more colorful but still asymmetrical and organic-looking grid.
+
+test_case_0:
+  input: |
+    This test case presents a grid with four distinct red (2) shapes in each corner, similar to the first two examples. However, these shapes are not perfect squares. They appear to be stylized representations of the number "2", with curved elements and varying thicknesses. The "2" shapes in the top-left and bottom-right corners are mirror images of each other, as are the ones in the top-right and bottom-left corners. Black (0) spaces separate these shapes and form a border around the entire grid.
+  output: |
+    As this is a test case, no output grid is provided. Based on the pattern observed in the previous examples, we might expect a color transformation to be applied to three of the four "2" shapes, possibly leaving one red and changing the others to sky blue and green. However, the exact transformation cannot be determined without seeing the actual output.

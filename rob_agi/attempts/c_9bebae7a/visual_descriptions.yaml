@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    The grid shows a yellow (4) shape resembling an inverted 'U' or horseshoe in the upper half. The shape is not completely solid, with a small gap on the right side. Below this, there's a smaller magenta (6) shape that looks like an upright 'T'. Both shapes are surrounded by black (0) space.
+  output: |
+    The yellow (4) shape from the input has been mirrored vertically. It now appears as a complete, solid inverted 'U' shape in the upper half and a matching upright 'U' shape in the lower half of the grid. The magenta shape is gone, and the rest of the grid remains black (0).
+
+example_1:
+  input: |
+    The grid shows a yellow (4) shape in the upper portion that resembles a diamond or kite, with a small protrusion at the top. Below this, separated by several rows of black (0), there's a small magenta (6) shape that looks like an upright 'T'. The rest of the grid is black (0).
+  output: |
+    The yellow (4) shape has been vertically mirrored. It now appears as the original diamond/kite shape in the upper portion, and an identical shape mirrored below it. The two shapes are connected at their closest points, forming a symmetrical figure that resembles an hourglass or butterfly shape. The magenta shape is gone, and the rest of the grid remains black (0).
+
+example_2:
+  input: |
+    The grid shows a scattered yellow (4) shape in the upper left quadrant. It looks like an incomplete or fragmented figure. In the lower right quadrant, there's a small magenta (6) shape that resembles an upside-down 'T'. The rest of the grid is black (0).
+  output: |
+    The scattered yellow (4) shape has been completed and mirrored. It now forms a symmetrical figure that spans from the upper left to the lower right of the grid. The shape resembles a diagonal hourglass or butterfly, with the original scattered pieces now forming the upper left wing, and a mirrored copy forming the lower right wing. The magenta shape is gone, and the rest of the grid remains black (0).
+
+example_3:
+  input: |
+    The grid shows a yellow (4) shape in the upper right quadrant that resembles a partial spiral or hook. In the lower left quadrant, there's a small magenta (6) shape that looks like an upright 'T'. The rest of the grid is black (0).
+  output: |
+    The yellow (4) shape has been completed and expanded. It now forms a larger spiral or hook shape that extends further to the right and down. The shape has been mirrored diagonally, creating a symmetrical figure that resembles two interlocking spirals or a stylized butterfly. The magenta shape is gone, and the rest of the grid remains black (0).
+
+example_4:
+  input: |
+    The grid shows a yellow (4) shape in the center that resembles a cross with additional pieces, forming a complex, asymmetrical pattern. Below and to the right of this, there's a small magenta (6) shape that looks like an upright 'T'. The rest of the grid is black (0).
+  output: |
+    The yellow (4) shape has been vertically mirrored and slightly expanded. It now forms a symmetrical figure centered in the grid. The shape resembles a more complex cross or star-like pattern, with the original shape forming the upper half and a mirrored copy forming the lower half. The two halves connect seamlessly in the middle. The magenta shape is gone, and the rest of the grid remains black (0).

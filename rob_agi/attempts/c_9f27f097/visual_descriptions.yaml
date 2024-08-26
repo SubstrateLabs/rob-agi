@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 12x12 grid with a red (2) border. Inside the border, there's a small 4x4 pattern in the top-left corner. This pattern consists of blue (1) and green (3) squares forming a simple design. The rest of the grid inside the border is filled with red (2), except for a 4x4 black (0) square in the bottom-right corner.
+  output: |
+    The grid maintains its 12x12 size and red (2) border. The small 4x4 pattern from the top-left corner of the input is now replicated in the bottom-right corner, replacing the black square. The original pattern in the top-left remains unchanged. The rest of the grid inside the border is still filled with red (2).
+
+example_1:
+  input: |
+    A 12x12 grid with a red (2) border. In the top-right corner, there's a 5x5 black (0) square. In the bottom-left corner, there's a 5x5 pattern made up of yellow (4) and blue (1) squares, forming a flower-like or star-like design.
+  output: |
+    The 12x12 grid maintains its red (2) border. The 5x5 pattern from the bottom-left corner of the input is now replicated in the top-right corner, replacing the black square. The original pattern in the bottom-left remains unchanged. The rest of the grid inside the border remains the same as in the input.
+
+example_2:
+  input: |
+    A 12x12 grid with a blue (1) border. In the top-left quadrant, there's a 6x6 pattern made up of green (3) and red (2) squares, forming a circular or flower-like design. In the bottom-right quadrant, there's a 6x4 black (0) rectangle.
+  output: |
+    The 12x12 grid maintains its blue (1) border. The 6x6 pattern from the top-left quadrant of the input is now replicated in the bottom-right quadrant, replacing the black rectangle and extending slightly beyond its original boundaries. The original pattern in the top-left remains unchanged. The rest of the grid inside the border remains the same as in the input.
+
+test_case_0:
+  input: |
+    A 12x12 grid with a red (2) border. In the top-left quadrant, there's a 6x6 pattern made up of yellow (4) and blue (1) squares, forming a complex design that resembles a stylized face or mask. In the bottom-right quadrant, there's a 6x4 black (0) rectangle.
+  output: |
+    The output is not provided for this test case.

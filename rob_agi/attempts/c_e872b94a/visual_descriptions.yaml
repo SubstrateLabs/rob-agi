@@ -1,0 +1,28 @@
+example_0:
+  input: |
+    A 12x12 grid with a complex gray (5) pattern on a black (0) background. The pattern resembles a stylized tree or branching structure. The "trunk" starts at the bottom center, branches out to the left and right, and has several offshoots. There are also isolated gray areas, including two squares in the top-right corner and a small L-shape in the top-left corner. The overall shape is asymmetrical but balanced.
+  output: |
+    A 4x1 grid, all black (0). This appears to be a significant reduction and simplification of the input.
+
+example_1:
+  input: |
+    A 3x3 grid with a simple gray (5) pattern on a black (0) background. The pattern forms an L-shape, starting from the top-middle, going down, and then turning right at the bottom.
+  output: |
+    A 2x1 grid, all black (0). Again, this is a reduction and simplification of the input.
+
+example_2:
+  input: |
+    A 7x7 grid with two distinct gray (5) patterns on a black (0) background. The first pattern is on the left side, forming a vertical line with two branches to the right. The second pattern is on the right side, forming an inverted L-shape. These patterns do not connect.
+  output: |
+    A 3x1 grid, all black (0). Once more, this is a reduction and simplification of the input.
+
+example_3:
+  input: |
+    A 9x12 grid with multiple gray (5) patterns on a black (0) background. The patterns form various shapes:
+    1. Three vertical lines on the left side, with the middle one having horizontal offshoots.
+    2. A disconnected vertical line in the center-right.
+    3. An inverted U-shape on the right side.
+    4. A horizontal line at the bottom-right corner.
+    These patterns create a complex, interconnected structure with some isolated elements.
+  output: |
+    A 5x1 grid, all black (0). As with previous examples, this is a significant reduction and simplification of the input.
