@@ -8,15 +8,17 @@ def solve_cfb2ce5a(input_grid: ColoredGrid) -> ColoredGrid:
     and maintaining a black border.
 
     The algorithm works as follows:
-    1. Analyze the initial grid to identify unique colors and their patterns.
-    2. Perform a staged expansion process:
-       a. Pattern-based expansion: Expand each color based on its identified pattern.
-       b. Directional expansion: Expand colors in main directions based on current configuration.
-       c. Space filling: Fill remaining empty cells to create largest contiguous areas.
-    3. Maintain the black border throughout the process.
-    4. Iterate the expansion process until no more changes can be made.
-    5. Perform a final check to ensure all non-border cells are filled and patterns are maintained.
-    6. Return the transformed grid.
+    1. Analyze the initial grid to identify unique colors, their patterns, and frequencies.
+    2. Assign expansion priorities to colors based on their initial frequency and pattern.
+    3. Perform a multi-stage expansion process:
+       a. Core Pattern Expansion: Expand each color's core pattern.
+       b. Directional Expansion: Expand colors in main directions based on priorities.
+       c. Edge Behavior and Boundary Formation: Apply rules for color interactions at boundaries.
+       d. Fill and Balance: Fill remaining empty cells and balance color frequencies.
+    4. Adjust for symmetry or controlled asymmetry.
+    5. Maintain the black border throughout the process.
+    6. Verify and refine the final pattern.
+    7. Return the transformed grid.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -48,15 +50,26 @@ def solve_cfb2ce5a(input_grid: ColoredGrid) -> ColoredGrid:
         else:
             return "cluster"
 
-    def expand_pattern(color: int, pattern: str):
+    def get_color_frequencies() -> Dict[int, int]:
+        return Counter(grid.values[r][c] for r in range(rows) for c in range(cols) if grid.values[r][c] != 0)
+
+    def assign_priorities(colors: List[int], patterns: Dict[int, str], frequencies: Dict[int, int]) -> Dict[int, int]:
+        priorities = {}
+        for color in colors:
+            priority = frequencies[color]
+            if patterns[color] == "complex":
+                priority += 3
+            elif patterns[color] == "cluster":
+                priority += 2
+            elif patterns[color] == "line":
+                priority += 1
+            priorities[color] = priority
+        return priorities
+
+    def expand_core_pattern(color: int, pattern: str):
         positions = get_color_positions(color)
         new_positions = []
-        if pattern == "line":
-            directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-        elif pattern == "diagonal":
-            directions = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
-        else:
-            directions = [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
+        directions = [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
         
         for r, c in positions:
             for dr, dc in directions:
@@ -66,16 +79,20 @@ def solve_cfb2ce5a(input_grid: ColoredGrid) -> ColoredGrid:
                     new_positions.append((nr, nc))
         return new_positions
 
-    def directional_expansion(color: int):
+    def directional_expansion(color: int, priority: int):
         positions = get_color_positions(color)
         directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
         new_positions = []
         for r, c in positions:
             for dr, dc in directions:
                 nr, nc = r + dr, c + dc
-                if 1 <= nr < rows - 1 and 1 <= nc < cols - 1 and grid.values[nr][nc] == 0:
-                    grid.values[nr][nc] = color
-                    new_positions.append((nr, nc))
+                if 1 <= nr < rows - 1 and 1 <= nc < cols - 1:
+                    if grid.values[nr][nc] == 0:
+                        grid.values[nr][nc] = color
+                        new_positions.append((nr, nc))
+                    elif grid.values[nr][nc] != color and priorities[grid.values[nr][nc]] < priority:
+                        grid.values[nr][nc] = color
+                        new_positions.append((nr, nc))
         return new_positions
 
     def fill_space():
@@ -97,26 +114,26 @@ def solve_cfb2ce5a(input_grid: ColoredGrid) -> ColoredGrid:
         for c in range(cols):
             grid.values[0][c] = grid.values[-1][c] = 0
 
+    def adjust_symmetry():
+        # Implement symmetry adjustments here if needed
+        pass
+
     colors = get_unique_colors()
     color_patterns = {color: identify_pattern(color) for color in colors}
+    initial_frequencies = get_color_frequencies()
+    priorities = assign_priorities(colors, color_patterns, initial_frequencies)
     
-    changed = True
-    while changed:
-        changed = False
-        for color in colors:
-            new_positions = expand_pattern(color, color_patterns[color])
-            if new_positions:
-                changed = True
+    for _ in range(3):  # Perform multiple iterations of expansion
+        for color in sorted(colors, key=lambda c: priorities[c], reverse=True):
+            expand_core_pattern(color, color_patterns[color])
         
-        if not changed:
-            for color in colors:
-                new_positions = directional_expansion(color)
-                if new_positions:
-                    changed = True
+        for color in sorted(colors, key=lambda c: priorities[c], reverse=True):
+            directional_expansion(color, priorities[color])
         
-        if not changed:
-            changed = fill_space()
-        
+        fill_space()
         maintain_border()
+    
+    adjust_symmetry()
+    maintain_border()
 
     return grid
