@@ -7,11 +7,11 @@ def solve_b7fb29bc(input_grid: ColoredGrid) -> ColoredGrid:
     The pattern consists of:
     1. A yellow (4) border just inside the green (3) border
     2. A complex pattern of red (2) and yellow (4) in the interior
-    3. Alternating columns of red and yellow, with more red on the left and more yellow on the right
+    3. A gradient from more red in the top-left to more yellow in the bottom-right
     4. Preservation of any original green (3) cells within the border
     5. Special handling for small interiors
-    6. A bottom row of red (2) cells
-    7. A diagonal pattern from top-left to bottom-right
+    6. The bottom row is always red (2), except in small interiors
+    7. Alternating columns of red and yellow in the top rows
     """
     # Step 1: Identify the green border
     rows, cols = input_grid.get_dimensions()
@@ -34,14 +34,18 @@ def solve_b7fb29bc(input_grid: ColoredGrid) -> ColoredGrid:
         for c in range(inner_left, inner_right + 1):
             if r == inner_top or r == inner_bottom or c == inner_left or c == inner_right:
                 result.set_cell(r, c, 4)  # Yellow border
-            elif r == inner_bottom - 1:
+            elif r == inner_bottom:
                 result.set_cell(r, c, 2)  # Bottom row is red
             else:
-                # Create a diagonal pattern
-                if (r - inner_top) <= (c - inner_left):
-                    result.set_cell(r, c, 4)  # Yellow
-                else:
+                # Create a gradient pattern
+                x = (c - inner_left) / (inner_width - 1)
+                y = (r - inner_top) / (inner_height - 1)
+                if y < 0.5:  # Top half
+                    result.set_cell(r, c, 2 if c % 2 == 0 else 4)  # Alternating red and yellow
+                elif x < 0.5:  # Bottom-left quadrant
                     result.set_cell(r, c, 2)  # Red
+                else:  # Bottom-right quadrant
+                    result.set_cell(r, c, 4)  # Yellow
 
     # Step 5: Handle small interiors
     if inner_width <= 3 or inner_height <= 3:
