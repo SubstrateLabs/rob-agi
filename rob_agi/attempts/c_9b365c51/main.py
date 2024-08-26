@@ -1,20 +1,19 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 def solve_9b365c51(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by projecting vertical color lines from the left side
     onto sky blue (8) regions on the right side of the grid.
 
-    1. Analyzes the input grid to identify unique colors and their vertical positions.
+    1. Analyzes the input grid to create a row-to-color mapping and color sequence.
     2. Identifies sky blue (8) regions on the right side of the grid.
-    3. Creates a deep copy of the input grid.
-    4. Clears the left side of the grid (first 7 columns).
-    5. Fills each sky blue region with a color based on its vertical position.
-    6. Returns the transformed grid.
+    3. Creates a deep copy of the input grid and clears the left side.
+    4. Fills each sky blue region with a color based on its vertical position.
+    5. Returns the transformed grid.
 
-    The color sequence is determined by the vertical order of colors on the left side.
-    Each sky blue region is filled with a single color based on its vertical position.
+    The color sequence repeats vertically, and each sky blue region is filled
+    with a single color based on its top row position.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -23,39 +22,36 @@ def solve_9b365c51(input_grid: ColoredGrid) -> ColoredGrid:
     ColoredGrid: The transformed grid.
     """
     # Step 1: Analyze the input grid
-    color_sequence, color_positions = analyze_input_grid(input_grid)
+    color_mapping, color_sequence = analyze_input_grid(input_grid)
 
     # Step 2: Identify sky blue regions
     sky_blue_regions = identify_sky_blue_regions(input_grid)
 
-    # Step 3: Create a deep copy of the input grid
+    # Step 3: Create a deep copy of the input grid and clear the left side
     output_grid = input_grid.deep_copy()
-
-    # Step 4: Clear the left side of the grid
     for row in range(output_grid.num_rows):
         for col in range(7):
             output_grid.values[row][col] = 0
 
-    # Step 5: Fill sky blue regions
+    # Step 4: Fill sky blue regions
     for region in sky_blue_regions:
         top, left, height, width = region
-        color_index = find_color_index(top, color_positions)
-        fill_color = color_sequence[color_index % len(color_sequence)]
+        fill_color = get_color_for_row(top, color_mapping, color_sequence)
         fill_region(output_grid, top, left, height, width, fill_color)
 
-    # Step 6: Return the transformed grid
+    # Step 5: Return the transformed grid
     return output_grid
 
-def analyze_input_grid(grid: ColoredGrid) -> Tuple[List[int], List[int]]:
-    colors = []
-    positions = []
+def analyze_input_grid(grid: ColoredGrid) -> Tuple[Dict[int, int], List[int]]:
+    color_mapping = {}
+    color_sequence = []
     for col in range(7):
         for row in range(grid.num_rows):
             color = grid.values[row][col]
-            if color != 0 and color not in colors:
-                colors.append(color)
-                positions.append(row)
-    return colors, positions
+            if color != 0 and color not in color_sequence:
+                color_mapping[row] = color
+                color_sequence.append(color)
+    return color_mapping, color_sequence
 
 def identify_sky_blue_regions(grid: ColoredGrid) -> List[Tuple[int, int, int, int]]:
     regions = []
@@ -80,8 +76,14 @@ def flood_fill(grid: ColoredGrid, row: int, col: int, visited: set) -> Tuple[int
                 stack.append((r + dr, c + dc))
     return top, left, bottom - top + 1, right - left + 1
 
-def find_color_index(top: int, color_positions: List[int]) -> int:
-    return next((i for i, pos in enumerate(color_positions) if pos > top), 0)
+def get_color_for_row(row: int, color_mapping: Dict[int, int], color_sequence: List[int]) -> int:
+    if row in color_mapping:
+        return color_mapping[row]
+    above_rows = [r for r in color_mapping if r < row]
+    if above_rows:
+        nearest_row = max(above_rows)
+        return color_mapping[nearest_row]
+    return color_sequence[-1]  # Wrap around to the bottom color
 
 def fill_region(grid: ColoredGrid, top: int, left: int, height: int, width: int, color: int):
     for r in range(top, top + height):
