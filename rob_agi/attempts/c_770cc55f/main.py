@@ -7,10 +7,10 @@ def solve_770cc55f(input_grid: ColoredGrid) -> ColoredGrid:
     
     1. Identifies top and bottom colored lines and the red line.
     2. Finds overlapping columns between top and bottom lines.
-    3. If overlap exists and a red line is present, creates a yellow rectangle connecting either top or bottom line to the red line,
-       choosing the connection that results in the larger area.
-    4. The yellow rectangle's width is refined to match the width of the colored line it's connecting to, within the overlap area.
-    5. Returns the modified grid with the yellow rectangle added, or the original grid if no overlap or no red line.
+    3. If overlap exists and a red line is present, creates a yellow rectangle:
+       - Width is exactly 2 columns, positioned at the rightmost overlap.
+       - Extends from just below the red line to just above the bottom colored line.
+    4. Returns the modified grid with the yellow rectangle added, or the original grid if conditions aren't met.
     """
     rows, cols = input_grid.get_dimensions()
     output_grid = input_grid.deep_copy()
@@ -29,33 +29,20 @@ def solve_770cc55f(input_grid: ColoredGrid) -> ColoredGrid:
     # Find overlapping columns
     overlap = top_line.intersection(bottom_line)
     
-    if not overlap or red_line_row is None:
+    if len(overlap) < 2 or red_line_row is None:
         return output_grid
     
-    # Determine potential rectangle dimensions
-    left_col = max(min(overlap), min(top_line), min(bottom_line))
-    right_col = min(max(overlap), max(top_line), max(bottom_line))
-    
-    # Calculate areas for top and bottom connections
-    top_area = (right_col - left_col + 1) * (red_line_row - 1)
-    bottom_area = (right_col - left_col + 1) * (rows - red_line_row - 2)
-    
-    # Decide whether to connect to top or bottom
-    if top_area >= bottom_area:
-        start_row, end_row = 1, red_line_row
-        connected_line = top_line
-    else:
-        start_row, end_row = red_line_row + 1, rows - 1
-        connected_line = bottom_line
-    
-    # Refine the yellow rectangle dimensions
-    left_col = max(c for c in range(left_col, right_col + 1) if c in connected_line)
-    right_col = min(c for c in range(right_col, left_col - 1, -1) if c in connected_line)
+    # Find the rightmost pair of overlapping columns
+    right_col = max(overlap)
+    left_col = right_col - 1
     
     # Create yellow rectangle
+    start_row = red_line_row + 1
+    end_row = rows - 1  # Just above the bottom line
+    
     for row in range(start_row, end_row):
-        for col in range(left_col, right_col + 1):
-            output_grid[row][col] = 4
+        output_grid[row][left_col] = 4
+        output_grid[row][right_col] = 4
     
     return output_grid
 
