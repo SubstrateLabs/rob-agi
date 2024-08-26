@@ -4,26 +4,23 @@ import math
 
 def solve_73ccf9c2(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Identify the most figure-like shape in the input grid, simplify it, and return a scaled-down version.
+    Identify the largest shape in the input grid, scale it, and center it in a 7x5 output grid.
     
     The function performs the following steps:
     1. Find all non-black shapes in the input grid
-    2. Select the most figure-like shape based on complexity, symmetry, and distinctive features
-    3. Extract key features of the selected shape
-    4. Transform and simplify the shape while preserving its essential characteristics
-    5. Scale down and center the simplified shape in a smaller output grid
+    2. Select the largest shape based on pixel count
+    3. Determine the bounding box of the selected shape
+    4. Scale the shape to fit within a 7x5 grid while maintaining aspect ratio
+    5. Center the scaled shape in the 7x5 output grid
     6. Apply the original color to the output shape
     """
     shapes = find_shapes(input_grid)
     if not shapes:
-        return ColoredGrid(values=[[0]])  # Return a 1x1 black grid if no shapes found
+        return ColoredGrid(values=[[0] * 5 for _ in range(7)])  # Return a 7x5 black grid if no shapes found
     
-    most_figure_like = select_most_figure_like(shapes)
-    key_points = extract_key_points(most_figure_like)
-    simplified = simplify_shape(key_points)
-    output_size = determine_output_size(input_grid.get_dimensions())
-    color = input_grid.get_cell(most_figure_like[0][0], most_figure_like[0][1])
-    return scale_and_center(simplified, output_size, color)
+    largest_shape = max(shapes, key=len)
+    color = input_grid.get_cell(largest_shape[0][0], largest_shape[0][1])
+    return scale_and_center(largest_shape, (7, 5), color)
 
 def find_shapes(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
     shapes = []
@@ -136,21 +133,29 @@ def scale_and_center(shape: List[Tuple[int, int]], output_size: Tuple[int, int],
     scale_c = (cols - 1) / (max_c - min_c) if max_c > min_c else 1
     scale = min(scale_r, scale_c)
     
-    # Scale and center the shape
+    # Scale the shape
     scaled_shape = []
     for r, c in shape:
-        new_r = int((r - min_r) * scale + (rows - (max_r - min_r) * scale) / 2)
-        new_c = int((c - min_c) * scale + (cols - (max_c - min_c) * scale) / 2)
-        if 0 <= new_r < rows and 0 <= new_c < cols:
-            scaled_shape.append((new_r, new_c))
+        new_r = (r - min_r) * scale
+        new_c = (c - min_c) * scale
+        scaled_shape.append((new_r, new_c))
     
-    # Draw lines between adjacent points
-    for i in range(len(scaled_shape)):
-        r1, c1 = scaled_shape[i]
-        r2, c2 = scaled_shape[(i + 1) % len(scaled_shape)]
-        for r, c in bresenham_line(r1, c1, r2, c2):
-            if 0 <= r < rows and 0 <= c < cols:
-                output[r][c] = color
+    # Find the bounding box of the scaled shape
+    min_scaled_r = min(r for r, _ in scaled_shape)
+    max_scaled_r = max(r for r, _ in scaled_shape)
+    min_scaled_c = min(c for _, c in scaled_shape)
+    max_scaled_c = max(c for _, c in scaled_shape)
+    
+    # Calculate centering offsets
+    offset_r = (rows - (max_scaled_r - min_scaled_r)) / 2 - min_scaled_r
+    offset_c = (cols - (max_scaled_c - min_scaled_c)) / 2 - min_scaled_c
+    
+    # Center and draw the scaled shape
+    for r, c in scaled_shape:
+        new_r = int(r + offset_r)
+        new_c = int(c + offset_c)
+        if 0 <= new_r < rows and 0 <= new_c < cols:
+            output[new_r][new_c] = color
     
     return ColoredGrid(values=output)
 
