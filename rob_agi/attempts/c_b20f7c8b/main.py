@@ -12,8 +12,9 @@ def solve_b20f7c8b(input_grid: ColoredGrid) -> ColoredGrid:
        - If solid, new_color = (original_color + 3) % 10
        - If patterned, fill with gray (5)
     
-    The function identifies 5x5 regions in the middle and right side of the grid,
-    analyzes them, and applies the appropriate transformation.
+    The function applies the transformation twice:
+    - First pass: Transform all four 5x5 regions
+    - Second pass: Transform only the bottom two regions
     """
     output_grid = input_grid.deep_copy()
     
@@ -22,7 +23,15 @@ def solve_b20f7c8b(input_grid: ColoredGrid) -> ColoredGrid:
         (1, 16), (9, 16)  # Right regions
     ]
     
+    # First pass: Transform all regions
     for row, col in transformation_regions:
+        block = output_grid.extract_subgrid(row, col, 5, 5)
+        is_left = col == 8
+        transformed_block = transform_block(block, is_left)
+        replace_5x5_block(output_grid, row, col, transformed_block)
+    
+    # Second pass: Transform only bottom regions
+    for row, col in transformation_regions[1:3]:  # Only bottom two regions
         block = output_grid.extract_subgrid(row, col, 5, 5)
         is_left = col == 8
         transformed_block = transform_block(block, is_left)
