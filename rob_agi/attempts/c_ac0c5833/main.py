@@ -1,63 +1,57 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Set
+from typing import List, Tuple
 
 def solve_ac0c5833(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by expanding red (2) regions and creating new red regions around yellow (4) cells
-    adjacent to red. The process continues until no further expansion is possible. Yellow cells act as barriers
-    and remain unchanged. The expansion occurs in all eight directions (including diagonals).
+    Transforms the input grid by expanding red (2) regions into 3x3 areas with one corner missing.
+    The expansion respects yellow (4) cells as barriers and maintains the pattern of leaving
+    one corner empty when possible. Overlapping expansions are merged consistently.
     """
     grid = input_grid.deep_copy()
-    red_cells, yellow_cells = identify_colored_cells(grid)
+    original_red_cells = find_red_cells(input_grid)
     
-    # Initial expansion
-    for red_cell in red_cells:
-        flood_fill(grid, red_cell)
+    # First pass: expand each original red cell
+    for cell in original_red_cells:
+        expand_3x3(grid, input_grid, cell)
     
-    # Expand around yellow cells
-    while True:
-        new_red_cells = identify_yellow_adjacent_to_red(grid, yellow_cells)
-        if not new_red_cells:
-            break
-        for cell in new_red_cells:
-            expand_around_yellow(grid, cell)
+    # Second pass: merge overlapping areas
+    for row in range(grid.num_rows):
+        for col in range(grid.num_cols):
+            if grid.values[row][col] == 2:
+                merge_3x3(grid, input_grid, (row, col))
     
     return grid
 
-def identify_colored_cells(grid: ColoredGrid) -> Tuple[List[Tuple[int, int]], List[Tuple[int, int]]]:
-    red_cells = []
-    yellow_cells = []
-    for i in range(grid.num_rows):
-        for j in range(grid.num_cols):
-            if grid.values[i][j] == 2:
-                red_cells.append((i, j))
-            elif grid.values[i][j] == 4:
-                yellow_cells.append((i, j))
-    return red_cells, yellow_cells
+def find_red_cells(grid: ColoredGrid) -> List[Tuple[int, int]]:
+    return [(row, col) for row in range(grid.num_rows) for col in range(grid.num_cols) if grid.values[row][col] == 2]
 
-def flood_fill(grid: ColoredGrid, start: Tuple[int, int]):
-    stack = [start]
-    while stack:
-        x, y = stack.pop()
-        for dx, dy in [(-1,-1), (-1,0), (-1,1), (0,-1), (0,1), (1,-1), (1,0), (1,1)]:
-            nx, ny = x + dx, y + dy
-            if 0 <= nx < grid.num_rows and 0 <= ny < grid.num_cols and grid.values[nx][ny] == 0:
-                grid.values[nx][ny] = 2
-                stack.append((nx, ny))
+def get_3x3_area(grid: ColoredGrid, row: int, col: int) -> List[Tuple[int, int]]:
+    return [(r, c) for r in range(max(0, row-1), min(grid.num_rows, row+2))
+            for c in range(max(0, col-1), min(grid.num_cols, col+2))]
 
-def identify_yellow_adjacent_to_red(grid: ColoredGrid, yellow_cells: List[Tuple[int, int]]) -> Set[Tuple[int, int]]:
-    new_red_cells = set()
-    for x, y in yellow_cells:
-        for dx, dy in [(-1,-1), (-1,0), (-1,1), (0,-1), (0,1), (1,-1), (1,0), (1,1)]:
-            nx, ny = x + dx, y + dy
-            if 0 <= nx < grid.num_rows and 0 <= ny < grid.num_cols and grid.values[nx][ny] == 2:
-                new_red_cells.add((x, y))
-                break
-    return new_red_cells
+def count_original_red(original_grid: ColoredGrid, area: List[Tuple[int, int]]) -> int:
+    return sum(1 for r, c in area if original_grid.values[r][c] == 2)
 
-def expand_around_yellow(grid: ColoredGrid, yellow_cell: Tuple[int, int]):
-    x, y = yellow_cell
-    for dx, dy in [(-1,-1), (-1,0), (-1,1), (0,-1), (0,1), (1,-1), (1,0), (1,1)]:
-        nx, ny = x + dx, y + dy
-        if 0 <= nx < grid.num_rows and 0 <= ny < grid.num_cols and grid.values[nx][ny] == 0:
-            flood_fill(grid, (nx, ny))
+def choose_corner_to_remove(original_grid: ColoredGrid, area: List[Tuple[int, int]]) -> Tuple[int, int]:
+    corners = [area[0], area[2], area[6], area[8]]
+    for corner in corners:
+        if original_grid.values[corner[0]][corner[1]] != 2:
+            return corner
+    return corners[0]  # Default to top-left if all corners were originally red
+
+def expand_3x3(grid: ColoredGrid, original_grid: ColoredGrid, cell: Tuple[int, int]):
+    area = get_3x3_area(grid, *cell)
+    red_count = count_original_red(original_grid, area)
+    corner_to_remove = choose_corner_to_remove(original_grid, area) if red_count < 8 else None
+    
+    for r, c in area:
+        if original_grid.values[r][c] != 4 and (r, c) != corner_to_remove:
+            grid.values[r][c] = 2
+
+def merge_3x3(grid: ColoredGrid, original_grid: ColoredGrid, cell: Tuple[int, int]):
+    area = get_3x3_area(grid, *cell)
+    corner_to_remove = choose_corner_to_remove(original_grid, area)
+    
+    for r, c in area:
+        if grid.values[r][c] == 0 and original_grid.values[r][c] != 4 and (r, c) != corner_to_remove:
+            grid.values[r][c] = 2
