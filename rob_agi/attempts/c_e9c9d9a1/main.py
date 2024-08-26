@@ -31,6 +31,39 @@ def solve_e9c9d9a1(input_grid: ColoredGrid) -> ColoredGrid:
                 if grid.values[r][c] == 0:
                     grid.values[r][c] = color
     
+    def is_top_row(row_index: int, total_rows: int) -> bool:
+        return row_index == 0
+    
+    def is_bottom_row(row_index: int, total_rows: int) -> bool:
+        return row_index == total_rows - 1
+    
+    def is_leftmost_column(col_index: int, total_cols: int) -> bool:
+        return col_index == 0
+    
+    def is_rightmost_column(col_index: int, total_cols: int) -> bool:
+        return col_index == total_cols - 1
+    
+    def get_fill_color(row_index: int, col_index: int, total_rows: int, total_cols: int) -> int:
+        if is_top_row(row_index, total_rows):
+            if is_leftmost_column(col_index, total_cols):
+                return 2  # Red
+            elif is_rightmost_column(col_index, total_cols):
+                return 4  # Yellow
+            else:
+                return 0  # Black
+        elif is_bottom_row(row_index, total_rows):
+            if is_leftmost_column(col_index, total_cols):
+                return 1  # Blue
+            elif is_rightmost_column(col_index, total_cols):
+                return 8  # Sky blue
+            else:
+                return 0  # Black
+        else:
+            if is_leftmost_column(col_index, total_cols) or is_rightmost_column(col_index, total_cols):
+                return 0  # Black
+            else:
+                return 7  # Orange
+    
     # Create a copy of the input grid
     output_grid = input_grid.deep_copy()
     
@@ -43,13 +76,7 @@ def solve_e9c9d9a1(input_grid: ColoredGrid) -> ColoredGrid:
             top, bottom = h_lines[i], h_lines[i + 1]
             left, right = v_lines[j], v_lines[j + 1]
             
-            if i == 0:  # Top row
-                color = 2 if j == 0 else 4 if j == len(v_lines) - 2 else 0
-            elif i == len(h_lines) - 2:  # Bottom row
-                color = 1 if j == 0 else 8 if j == len(v_lines) - 2 else 0
-            else:  # Middle rows
-                color = 0 if j == 0 or j == len(v_lines) - 2 else 7
-            
+            color = get_fill_color(i, j, len(h_lines) - 1, len(v_lines) - 1)
             fill_rectangle(output_grid, top, left, bottom, right, color)
     
     return output_grid
