@@ -8,12 +8,11 @@ def solve_a3f84088(input_grid: ColoredGrid) -> ColoredGrid:
     The function does the following:
     1. Preserves the outer gray (5) outline from the input grid.
     2. Creates nested frames of alternating colors (red and gray) moving inward.
-    3. Handles the center area based on the remaining space size:
-       - For 2x2 or smaller center, fills it with the current color.
-       - For 3x3, draws an outline with the current color, leaving the center black.
-       - For 4x4 and larger, draws an outline with the current color and fills the inside with the previous color.
-    4. Maintains a one-cell black (0) gap between each colored frame.
-    5. Returns the transformed grid.
+    3. Maintains a one-cell black (0) gap between each colored frame.
+    4. Continues the pattern until reaching a 3x3 or smaller center.
+    5. For a 3x3 center, fills it with the current color.
+    6. For a 2x2 or 1x1 center, fills it with black (0).
+    7. Returns the transformed grid.
     """
     new_grid = input_grid.deep_copy()
     top, left, bottom, right = find_outer_boundary(new_grid)
@@ -21,7 +20,7 @@ def solve_a3f84088(input_grid: ColoredGrid) -> ColoredGrid:
     current_color = 2  # Start with red for the first inner frame
     previous_color = 5  # Gray
 
-    while bottom - top > 2 and right - left > 2:
+    while bottom - top > 3 and right - left > 3:
         # Draw current color frame
         draw_outline(new_grid, top+1, left+1, bottom-1, right-1, current_color)
         
@@ -37,13 +36,10 @@ def solve_a3f84088(input_grid: ColoredGrid) -> ColoredGrid:
     # Handle center area
     center_height = bottom - top + 1
     center_width = right - left + 1
-    if center_height <= 2 and center_width <= 2:
+    if center_height == 3 and center_width == 3:
         fill_area(new_grid, top, left, bottom, right, current_color)
-    elif center_height == 3 and center_width == 3:
-        draw_outline(new_grid, top, left, bottom, right, current_color)
     else:
-        draw_outline(new_grid, top, left, bottom, right, current_color)
-        fill_area(new_grid, top+1, left+1, bottom-1, right-1, previous_color)
+        fill_area(new_grid, top, left, bottom, right, 0)  # Fill with black
     
     return new_grid
 
