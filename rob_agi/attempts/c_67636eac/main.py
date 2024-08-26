@@ -3,12 +3,12 @@ from typing import List, Tuple
 
 def solve_67636eac(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Extracts 3x3 shapes from the input grid and arranges them in a new grid.
+    Extracts shapes from the input grid and arranges them in a new grid.
     
     1. Scans the input grid to identify non-black shapes.
-    2. Extracts a 3x3 subgrid centered on each shape.
-    3. Determines the orientation (horizontal or vertical) based on shape distribution.
-    4. Arranges shapes in the order they appear in the input grid (left-to-right, top-to-bottom).
+    2. Extracts each shape in its minimal bounding box.
+    3. Determines the orientation (horizontal or vertical) based on the number of shapes.
+    4. Arranges shapes in the order they appear in the input grid (top-to-bottom, left-to-right).
     5. Creates a new grid with the extracted shapes arranged accordingly.
     
     Args:
@@ -20,8 +20,6 @@ def solve_67636eac(input_grid: ColoredGrid) -> ColoredGrid:
     shapes = []
     rows, cols = input_grid.get_dimensions()
     visited = set()
-    unique_rows = set()
-    unique_cols = set()
 
     # Identify and extract shapes
     for r in range(rows):
@@ -31,39 +29,47 @@ def solve_67636eac(input_grid: ColoredGrid) -> ColoredGrid:
                 region = input_grid.find_connected_regions(color)[0]
                 visited.update(region)
                 
-                # Calculate center of the shape
-                center_r = sum(x[0] for x in region) // len(region)
-                center_c = sum(x[1] for x in region) // len(region)
+                # Calculate bounding box
+                min_r = min(x[0] for x in region)
+                max_r = max(x[0] for x in region)
+                min_c = min(x[1] for x in region)
+                max_c = max(x[1] for x in region)
                 
-                # Extract 3x3 subgrid
-                subgrid = input_grid.extract_subgrid(center_r - 1, center_c - 1, 3, 3)
-                shapes.append((r, c, subgrid))
-                unique_rows.add(r)
-                unique_cols.add(c)
+                # Extract shape
+                shape = input_grid.extract_subgrid(min_r, min_c, max_r - min_r + 1, max_c - min_c + 1)
+                shapes.append((r, c, shape))
 
     # Determine orientation
-    vertical_orientation = len(unique_rows) >= len(unique_cols)
+    vertical_orientation = len(shapes) > 2
 
-    # Sort shapes based on their original position (left-to-right, top-to-bottom)
-    shapes.sort(key=lambda x: (x[1], x[0]) if vertical_orientation else (x[0], x[1]))
+    # Sort shapes based on their original position (top-to-bottom, left-to-right)
+    shapes.sort(key=lambda x: (x[0], x[1]))
 
-    # Create output grid
+    # Calculate output grid dimensions
     if vertical_orientation:
-        output_width = 3
-        output_height = 3 * len(shapes)
+        output_width = max(shape.get_dimensions()[1] for _, _, shape in shapes)
+        output_height = sum(shape.get_dimensions()[0] for _, _, shape in shapes)
     else:
-        output_width = 3 * len(shapes)
-        output_height = 3
+        output_width = sum(shape.get_dimensions()[1] for _, _, shape in shapes)
+        output_height = max(shape.get_dimensions()[0] for _, _, shape in shapes)
     
     output_grid = ColoredGrid(values=[[0 for _ in range(output_width)] for _ in range(output_height)])
 
     # Populate output grid
-    for i, (_, _, shape) in enumerate(shapes):
-        for r in range(3):
-            for c in range(3):
-                if vertical_orientation:
-                    output_grid.set_cell(i * 3 + r, c, shape.get_cell(r, c))
-                else:
-                    output_grid.set_cell(r, i * 3 + c, shape.get_cell(r, c))
+    current_pos = 0
+    for _, _, shape in shapes:
+        shape_height, shape_width = shape.get_dimensions()
+        if vertical_orientation:
+            start_col = (output_width - shape_width) // 2
+            for r in range(shape_height):
+                for c in range(shape_width):
+                    output_grid.set_cell(current_pos + r, start_col + c, shape.get_cell(r, c))
+            current_pos += shape_height
+        else:
+            start_row = (output_height - shape_height) // 2
+            for r in range(shape_height):
+                for c in range(shape_width):
+                    output_grid.set_cell(start_row + r, current_pos + c, shape.get_cell(r, c))
+            current_pos += shape_width
 
     return output_grid
