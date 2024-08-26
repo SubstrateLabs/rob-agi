@@ -28,6 +28,7 @@ def solve_4364c1c4(input_grid: ColoredGrid) -> ColoredGrid:
 
         new_shape = move_shape(shape, dx, dy, new_grid.num_rows, new_grid.num_cols)
         color = input_grid.values[shape[0][0]][shape[0][1]]
+        new_shape = adjust_shape_position(new_grid, new_shape, background_color)
         place_shape(new_grid, new_shape, color)
 
         if i % 2 == 1:  # Increment counter after each pair
@@ -75,6 +76,14 @@ def move_shape(shape: List[Tuple[int, int]], dx: int, dy: int, max_row: int, max
 
     return new_shape
 
+def adjust_shape_position(grid: ColoredGrid, shape: List[Tuple[int, int]], background_color: int) -> List[Tuple[int, int]]:
+    while any(grid.values[r][c] != background_color for r, c in shape):
+        shape = [(r - 1, c) for r, c in shape]  # Move shape up
+        if any(r < 0 for r, _ in shape):
+            return None  # Cannot place the shape without overlap
+    return shape
+
 def place_shape(grid: ColoredGrid, shape: List[Tuple[int, int]], color: int):
-    for r, c in shape:
-        grid.values[r][c] = color
+    if shape is not None:
+        for r, c in shape:
+            grid.values[r][c] = color
