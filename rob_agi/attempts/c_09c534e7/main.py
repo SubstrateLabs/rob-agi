@@ -3,19 +3,22 @@ from typing import List, Tuple, Set
 
 def solve_09c534e7(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by applying color progression to regions while preserving structure.
+    Transforms the input grid by applying color progression to shapes while preserving structure.
     
     The transformation follows these rules:
     1. Identify distinct shapes in the grid using flood-fill.
-    2. Analyze each shape for size, border, center, and highest color.
-    3. Determine color progression based on shape size and current colors.
-    4. Apply color transformation to each shape, maintaining borders and structure.
-    5. Handle special cases like high-value color expansion and complex shapes.
+    2. Categorize shapes based on size and structure (e.g., large, medium, small, special).
+    3. Apply color progression rules based on shape category:
+       - Large shapes: Create internal gradients with higher values towards the center.
+       - Medium shapes: Increase color values while maintaining overall structure.
+       - Small shapes: Maintain structure or increase color value uniformly.
+       - Special structures (e.g., L-shapes): Apply specific rules.
+    4. Preserve shape borders, typically keeping them at the original color value.
+    5. Handle high-value color expansion within shapes.
     6. Balance color distribution across the entire grid.
-    7. Maintain structural integrity and connectivity.
-    8. Refine borders for smooth color transitions.
-    9. Ensure no decrease in color values from input to output.
-    10. Handle edge cases like maintaining zero values and small grid/shape sizes.
+    7. Refine borders for smooth color transitions.
+    8. Ensure no decrease in color values from input to output.
+    9. Handle edge cases like maintaining zero values and small grid/shape sizes.
 
     Args:
         input_grid (ColoredGrid): The input grid to be transformed.
@@ -26,12 +29,15 @@ def solve_09c534e7(input_grid: ColoredGrid) -> ColoredGrid:
     output_grid = input_grid.deep_copy()
     color_sequence = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     
-    # Identify distinct shapes
-    shapes = identify_shapes(output_grid)
+    # Identify and categorize shapes
+    shapes = identify_and_categorize_shapes(output_grid)
     
     # Process each shape
-    for shape in shapes:
-        process_shape(output_grid, shape, color_sequence)
+    for shape, category in shapes:
+        process_shape(output_grid, shape, category, color_sequence)
+    
+    # Handle high-value color expansion
+    expand_high_value_colors(output_grid)
     
     # Balance color distribution
     balance_colors(output_grid)
@@ -44,7 +50,7 @@ def solve_09c534e7(input_grid: ColoredGrid) -> ColoredGrid:
     
     return output_grid
 
-def identify_shapes(grid: ColoredGrid) -> List[Set[Tuple[int, int]]]:
+def identify_and_categorize_shapes(grid: ColoredGrid) -> List[Tuple[Set[Tuple[int, int]], str]]:
     shapes = []
     visited = set()
     
@@ -52,7 +58,8 @@ def identify_shapes(grid: ColoredGrid) -> List[Set[Tuple[int, int]]]:
         for c in range(grid.num_cols):
             if (r, c) not in visited and grid.values[r][c] != 0:
                 shape = flood_fill(grid, r, c, visited)
-                shapes.append(shape)
+                category = categorize_shape(shape, grid)
+                shapes.append((shape, category))
     
     return shapes
 
@@ -71,20 +78,33 @@ def flood_fill(grid: ColoredGrid, r: int, c: int, visited: Set[Tuple[int, int]])
     
     return shape
 
-def process_shape(grid: ColoredGrid, shape: Set[Tuple[int, int]], color_sequence: List[int]):
+def categorize_shape(shape: Set[Tuple[int, int]], grid: ColoredGrid) -> str:
     size = len(shape)
+    if size > 9:
+        return "large"
+    elif 4 <= size <= 9:
+        return "medium"
+    elif size < 4:
+        return "small"
+    # Add more categories here if needed, e.g., "L-shape", "cross", etc.
+
+def process_shape(grid: ColoredGrid, shape: Set[Tuple[int, int]], category: str, color_sequence: List[int]):
     current_color = grid.values[list(shape)[0][0]][list(shape)[0][1]]
     highest_color = max(grid.values[r][c] for r, c in shape)
     
-    if size < 4:
-        target_color = highest_color
-    elif 4 <= size < 9:
-        target_color = next_color_in_sequence(highest_color, color_sequence)
-    else:
-        target_color = next_color_in_sequence(next_color_in_sequence(highest_color, color_sequence), color_sequence)
-    
+    if category == "large":
+        process_large_shape(grid, shape, color_sequence)
+    elif category == "medium":
+        process_medium_shape(grid, shape, color_sequence)
+    elif category == "small":
+        process_small_shape(grid, shape, color_sequence)
+    # Add more shape processing functions as needed
+
+def process_large_shape(grid: ColoredGrid, shape: Set[Tuple[int, int]], color_sequence: List[int]):
     border = find_border(grid, shape)
     center = find_center(shape)
+    current_color = grid.values[list(shape)[0][0]][list(shape)[0][1]]
+    target_color = next_color_in_sequence(next_color_in_sequence(current_color, color_sequence), color_sequence)
     
     for r, c in shape:
         if (r, c) in border:
@@ -94,7 +114,27 @@ def process_shape(grid: ColoredGrid, shape: Set[Tuple[int, int]], color_sequence
         elif (r, c) == center:
             grid.values[r][c] = target_color
         else:
-            grid.values[r][c] = next_color_in_sequence(current_color, color_sequence)
+            distance_to_center = max(abs(r - center[0]), abs(c - center[1]))
+            color_index = min(distance_to_center, len(color_sequence) - 1)
+            grid.values[r][c] = color_sequence[color_index]
+
+def process_medium_shape(grid: ColoredGrid, shape: Set[Tuple[int, int]], color_sequence: List[int]):
+    current_color = grid.values[list(shape)[0][0]][list(shape)[0][1]]
+    target_color = next_color_in_sequence(current_color, color_sequence)
+    border = find_border(grid, shape)
+    
+    for r, c in shape:
+        if (r, c) in border:
+            grid.values[r][c] = current_color
+        else:
+            grid.values[r][c] = target_color
+
+def process_small_shape(grid: ColoredGrid, shape: Set[Tuple[int, int]], color_sequence: List[int]):
+    current_color = grid.values[list(shape)[0][0]][list(shape)[0][1]]
+    target_color = next_color_in_sequence(current_color, color_sequence)
+    
+    for r, c in shape:
+        grid.values[r][c] = target_color
 
 def next_color_in_sequence(color: int, color_sequence: List[int]) -> int:
     if color not in color_sequence:
@@ -205,3 +245,17 @@ def reconnect_borders(grid: ColoredGrid):
                     nr, nc = r + dr, c + dc
                     if 0 <= nr < grid.num_rows and 0 <= nc < grid.num_cols and grid.values[nr][nc] == 0:
                         grid.values[nr][nc] = grid.values[r][c] - 1
+def expand_high_value_colors(grid: ColoredGrid):
+    high_value_threshold = 4
+    for r in range(grid.num_rows):
+        for c in range(grid.num_cols):
+            if grid.values[r][c] >= high_value_threshold:
+                expand_color(grid, r, c)
+
+def expand_color(grid: ColoredGrid, r: int, c: int):
+    color = grid.values[r][c]
+    for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+        nr, nc = r + dr, c + dc
+        if 0 <= nr < grid.num_rows and 0 <= nc < grid.num_cols:
+            if grid.values[nr][nc] != 0 and grid.values[nr][nc] < color:
+                grid.values[nr][nc] = color
