@@ -12,8 +12,9 @@ def solve_c658a4bd(input_grid: ColoredGrid) -> ColoredGrid:
     and each color forms a complete frame around the inner colors, with the innermost
     color being a 2x2 square in the center if there are at least 4 colors, or a single cell otherwise.
     
-    The algorithm ignores small, isolated color patches and completes frames even if
-    the input regions are incomplete. The background color (black/0) is ignored in calculations.
+    The algorithm considers the largest connected region for each color, prioritizing colors
+    based on their distance from the edge, size of the region, and position. The background
+    color (black/0) is ignored in calculations.
     """
     def analyze_grid(grid):
         regions = []
@@ -66,5 +67,5 @@ def solve_c658a4bd(input_grid: ColoredGrid) -> ColoredGrid:
         return output
 
     regions = analyze_grid(input_grid)
-    ordered_colors = order_colors(regions, len(input_grid.values))
+    ordered_colors = order_colors(regions, max(len(input_grid.values), len(input_grid.values[0])))
     return create_output_grid(ordered_colors)
