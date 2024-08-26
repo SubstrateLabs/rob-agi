@@ -1,17 +1,13 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Dict, Set
-from collections import deque
 
 def solve_2a5f8217(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the grid transformation challenge by identifying shapes and updating their colors
-    based on the highest adjacent color value, without expanding the shapes.
+    Solves the grid transformation challenge by updating each non-zero cell's color
+    to the maximum color value among its adjacent cells (including diagonals) and itself.
 
-    1. Identify shapes in the input grid.
-    2. Create an adjacency map for shapes.
-    3. Determine color changes based on adjacent higher-valued shapes.
-    4. Apply color changes to the shapes.
-    5. Create and return the transformed grid.
+    The transformation happens in a single step:
+    1. Analyze the input grid and store the new maximum values.
+    2. Create a new grid with the stored maximum values.
 
     Args:
         input_grid (ColoredGrid): The input grid to be transformed.
@@ -20,55 +16,18 @@ def solve_2a5f8217(input_grid: ColoredGrid) -> ColoredGrid:
         ColoredGrid: The transformed grid with colors updated.
     """
     rows, cols = input_grid.get_dimensions()
-    
-    def find_shape(start_x: int, start_y: int, color: int) -> Set[Tuple[int, int]]:
-        shape = set()
-        queue = deque([(start_x, start_y)])
-        while queue:
-            x, y = queue.popleft()
-            if (x, y) not in shape and 0 <= x < rows and 0 <= y < cols and input_grid.values[x][y] == color:
-                shape.add((x, y))
-                for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                    queue.append((x + dx, y + dy))
-        return shape
+    max_values = [[0 for _ in range(cols)] for _ in range(rows)]
 
-    def get_adjacent_cells(shape: Set[Tuple[int, int]]) -> Set[Tuple[int, int]]:
-        adjacent = set()
-        for x, y in shape:
-            for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]:
-                nx, ny = x + dx, y + dy
-                if 0 <= nx < rows and 0 <= ny < cols and (nx, ny) not in shape:
-                    adjacent.add((nx, ny))
-        return adjacent
+    for r in range(rows):
+        for c in range(cols):
+            if input_grid.values[r][c] != 0:
+                max_color = input_grid.values[r][c]
+                for dr in [-1, 0, 1]:
+                    for dc in [-1, 0, 1]:
+                        nr, nc = r + dr, c + dc
+                        if 0 <= nr < rows and 0 <= nc < cols:
+                            max_color = max(max_color, input_grid.values[nr][nc])
+                max_values[r][c] = max_color
 
-    # Identify shapes
-    shapes = []
-    visited = set()
-    for x in range(rows):
-        for y in range(cols):
-            if (x, y) not in visited and input_grid.values[x][y] != 0:
-                shape = find_shape(x, y, input_grid.values[x][y])
-                shapes.append((input_grid.values[x][y], shape))
-                visited.update(shape)
-
-    # Create adjacency map
-    adjacency_map = {}
-    for i, (color, shape) in enumerate(shapes):
-        adjacent_cells = get_adjacent_cells(shape)
-        adjacency_map[i] = [(j, other_color) for j, (other_color, other_shape) in enumerate(shapes)
-                            if i != j and any(cell in other_shape for cell in adjacent_cells)]
-
-    # Determine color changes
-    new_colors = {}
-    for i, (color, _) in enumerate(shapes):
-        adjacent_colors = [other_color for _, other_color in adjacency_map[i]]
-        new_colors[i] = max([color] + adjacent_colors)
-
-    # Apply color changes
-    new_grid = [[0 for _ in range(cols)] for _ in range(rows)]
-    for i, (_, shape) in enumerate(shapes):
-        new_color = new_colors[i]
-        for x, y in shape:
-            new_grid[x][y] = new_color
-
+    new_grid = [[max_values[r][c] for c in range(cols)] for r in range(rows)]
     return ColoredGrid(values=new_grid)
