@@ -58,3 +58,5 @@ def propagate_color(grid: ColoredGrid, section: Tuple[int, int], col: int, color
     for r in range(start, end):
         if grid.values[r][col] not in [0, 4]:
             grid.values[r][col] = color
+        elif grid.values[r][col] == 4:
+            break  # Stop propagation at yellow lines within the section
