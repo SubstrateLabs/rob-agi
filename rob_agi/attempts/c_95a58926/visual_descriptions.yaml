@@ -1,23 +1,74 @@
 example_0:
   input: |
-    The grid is 19x13 in size. It consists primarily of gray (5) and black (0) squares, with some red (2) squares scattered throughout. There are three distinct horizontal gray lines spanning the entire width of the grid at rows 5, 10, and 15. Two vertical gray lines run from top to bottom at columns 5 and 10. The red squares appear randomly placed, mostly near the intersections of the gray lines and along the edges of the grid. The overall effect is a grid divided into 16 rectangular sections by the gray lines, with red dots appearing sporadically.
+    Grid size: 19x13
+    Primary colors: Gray (5), Black (0), Red (2)
+    Structure:
+    - 3 horizontal gray lines: Rows 5, 10, 15
+    - 2 vertical gray lines: Columns 5, 10
+    - Red squares: Scattered randomly, higher concentration near gray line intersections and grid edges
+    - Grid divided into 16 rectangular sections by gray lines
+    Key observation: Red is the only color besides gray and black, appearing in a scattered pattern
   output: |
-    The output grid maintains the same 19x13 size and overall structure as the input. The three horizontal gray lines and two vertical gray lines remain in the same positions. However, all red squares have been removed, and new red squares have been added at specific intersections of the gray lines. These new red squares appear at the points where the horizontal and vertical gray lines meet, creating a regular pattern. The rest of the grid is filled with black (0) squares, giving a cleaner and more organized appearance compared to the input.
+    Grid size: 19x13 (unchanged)
+    Colors: Gray (5), Black (0), Red (2)
+    Structure:
+    - Gray lines: Same positions as input (3 horizontal, 2 vertical)
+    - Red squares: Only at intersections of gray lines
+    - All other squares: Black (0)
+    Key changes: Red squares now form a regular pattern at gray line intersections, rest of grid is black
 
 example_1:
   input: |
-    The grid is 21x17 in size. It's dominated by gray (5) and black (0) squares, with green (3) squares scattered throughout. Three horizontal gray lines span the entire width at rows 6, 12, and 18. Two vertical gray lines run from top to bottom at columns 6 and 12. Green squares are randomly distributed, with higher concentrations near the gray line intersections and along the grid edges. Some areas have clusters of green squares. The overall effect is a grid divided into 16 sections by the gray lines, with green elements scattered across it.
+    Grid size: 21x17
+    Primary colors: Gray (5), Black (0), Green (3)
+    Structure:
+    - 3 horizontal gray lines: Rows 6, 12, 18
+    - 2 vertical gray lines: Columns 6, 12
+    - Green squares: Scattered randomly, some clustering, higher concentration near intersections and edges
+    - Grid divided into 16 sections by gray lines
+    Key observation: Green is the scattered color, appearing in various patterns across the grid
   output: |
-    The output grid maintains the 21x17 size and basic structure of the input. The three horizontal and two vertical gray lines remain in their original positions. However, all randomly placed green squares have been removed. New green squares have been added at the intersections of the gray lines, creating a regular pattern. These green squares appear where the horizontal and vertical gray lines meet. The rest of the grid is filled with black (0) squares, resulting in a more organized and symmetrical appearance compared to the input.
+    Grid size: 21x17 (unchanged)
+    Colors: Gray (5), Black (0), Green (3)
+    Structure:
+    - Gray lines: Same positions as input (3 horizontal, 2 vertical)
+    - Green squares: Only at intersections of gray lines
+    - All other squares: Black (0)
+    Key changes: Green squares now form a regular pattern at gray line intersections, rest of grid is black
 
 example_2:
   input: |
-    The grid is 21x24 in size. It's primarily composed of gray (5) and black (0) squares, with yellow (4) squares scattered throughout. Five horizontal gray lines span the entire width at every fourth row (rows 4, 8, 12, 16, 20). Six vertical gray lines run from top to bottom at every fourth column (columns 4, 8, 12, 16, 20, 24). Yellow squares are randomly distributed across the grid, with some clustering in certain areas. The overall effect is a grid divided into 35 rectangular sections by the gray lines, with yellow elements scattered across it.
+    Grid size: 21x24
+    Primary colors: Gray (5), Black (0), Yellow (4)
+    Structure:
+    - 5 horizontal gray lines: Every 4th row (4, 8, 12, 16, 20)
+    - 6 vertical gray lines: Every 4th column (4, 8, 12, 16, 20, 24)
+    - Yellow squares: Scattered randomly across the grid, some clustering
+    - Grid divided into 35 rectangular sections by gray lines
+    Key observation: Yellow is the scattered color, appearing in various densities throughout the grid
   output: |
-    The output grid maintains the 21x24 size and basic structure of the input. The five horizontal and six vertical gray lines remain in their original positions. However, all randomly placed yellow squares have been removed. New yellow squares have been added at the intersections of the gray lines, creating a regular pattern. These yellow squares appear where the horizontal and vertical gray lines meet. The rest of the grid is filled with black (0) squares. The result is a highly organized grid with a clear pattern of yellow squares at regular intervals along the gray lines.
+    Grid size: 21x24 (unchanged)
+    Colors: Gray (5), Black (0), Yellow (4)
+    Structure:
+    - Gray lines: Same positions as input (5 horizontal, 6 vertical)
+    - Yellow squares: Only at intersections of gray lines
+    - All other squares: Black (0)
+    Key changes: Yellow squares now form a regular pattern at gray line intersections, rest of grid is black
 
 test_case_0:
   input: |
-    The grid is 21x24 in size. It's primarily composed of gray (5) and black (0) squares, with yellow (4) squares scattered throughout. Five horizontal gray lines span the entire width at every fourth row (rows 4, 8, 12, 16, 20). Six vertical gray lines run from top to bottom at every fourth column (columns 4, 8, 12, 16, 20, 24). Yellow squares are randomly distributed across the grid, with some clustering in certain areas. The overall effect is a grid divided into 35 rectangular sections by the gray lines, with yellow elements scattered across it.
+    Grid size: 21x24
+    Primary colors: Gray (5), Black (0), Yellow (4)
+    Structure:
+    - 5 horizontal gray lines: Every 4th row (4, 8, 12, 16, 20)
+    - 6 vertical gray lines: Every 4th column (4, 8, 12, 16, 20, 24)
+    - Yellow squares: Scattered randomly across the grid, some clustering
+    - Grid divided into 35 rectangular sections by gray lines
+    Key observation: Identical structure to example_2, with yellow as the scattered color
   output: |
-    The output grid is not provided in the test case, so no description can be given.
+    Output not provided, but based on the pattern observed in previous examples:
+    Expected structure:
+    - Gray lines: Same positions as input
+    - Yellow squares: Only at intersections of gray lines
+    - All other squares: Black (0)
+    Expected key change: Yellow squares should form a regular pattern at gray line intersections
