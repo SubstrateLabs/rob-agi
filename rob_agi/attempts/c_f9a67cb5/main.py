@@ -16,27 +16,13 @@ def solve_f9a67cb5(input_grid: ColoredGrid) -> ColoredGrid:
     
     Returns a new grid with the minimal red structure added while preserving all blue squares and existing red squares.
     """
-    rows, cols = input_grid.get_dimensions()
     output_grid = input_grid.deep_copy()
-    
-    # Find all blue squares and segments
-    blue_elements = find_blue_elements(input_grid)
-    
-    # Create graph representation
-    graph = create_graph(blue_elements)
-    
-    # Find Minimum Spanning Tree
-    mst = minimum_spanning_tree(graph)
-    
-    # Convert MST to grid structure
-    add_red_structure(output_grid, mst, blue_elements)
-    
-    # Incorporate existing red squares
+    elements = find_elements(input_grid)
+    graph = create_graph(elements)
+    mst = minimum_spanning_tree(graph, len(elements[2]) + len(elements[8]))
+    add_red_structure(output_grid, mst, elements)
     connect_existing_red(output_grid, input_grid)
-    
-    # Optimize red structure
     optimize_red_structure(output_grid)
-    
     return output_grid
 
 def find_elements(grid: ColoredGrid) -> Dict[int, List[Tuple[int, int, int, int]]]:
@@ -76,7 +62,7 @@ def create_graph(elements: Dict[int, List[Tuple[int, int, int, int]]]) -> List[T
     all_elements = elements[2] + elements[8]
     for i, (r1, c1, r2, c2) in enumerate(all_elements):
         for j, (r3, c3, r4, c4) in enumerate(all_elements[i+1:], i+1):
-            dist = min(abs(r2 - r3), abs(r1 - r4)) + min(abs(c2 - c3), abs(c1 - c4))
+            dist = abs(r2 - r3) + abs(c2 - c3)
             graph.append((dist, i, j))
     return graph
 
@@ -108,7 +94,9 @@ def add_red_structure(grid: ColoredGrid, mst: List[Tuple[int, int, int]], elemen
         connect_segments(grid, r1, c1, r2, c2, r3, c3, r4, c4)
 
 def connect_segments(grid: ColoredGrid, r1: int, c1: int, r2: int, c2: int, r3: int, c3: int, r4: int, c4: int):
-    path = find_path(grid, (r1, c1), (r3, c3))
+    start = ((r1 + r2) // 2, (c1 + c2) // 2)
+    end = ((r3 + r4) // 2, (c3 + c4) // 2)
+    path = find_path(grid, start, end)
     for r, c in path:
         if grid.values[r][c] == 0:
             grid.values[r][c] = 2
@@ -131,6 +119,36 @@ def find_path(grid: ColoredGrid, start: Tuple[int, int], end: Tuple[int, int]) -
                     heapq.heappush(queue, (new_cost, (nr, nc), path + [(r, c)]))
     
     return []
+
+def connect_existing_red(output_grid: ColoredGrid, input_grid: ColoredGrid):
+    rows, cols = input_grid.get_dimensions()
+    for r in range(rows):
+        for c in range(cols):
+            if input_grid.values[r][c] == 2 and output_grid.values[r][c] != 2:
+                nearest_red = find_nearest_red(output_grid, r, c)
+                if nearest_red:
+                    path = find_path(output_grid, (r, c), nearest_red)
+                    for pr, pc in path:
+                        if output_grid.values[pr][pc] == 0:
+                            output_grid.values[pr][pc] = 2
+
+def find_nearest_red(grid: ColoredGrid, r: int, c: int) -> Tuple[int, int]:
+    rows, cols = grid.get_dimensions()
+    queue = deque([(r, c, 0)])
+    visited = set()
+    
+    while queue:
+        cr, cc, dist = queue.popleft()
+        if (cr, cc) not in visited:
+            visited.add((cr, cc))
+            if grid.values[cr][cc] == 2:
+                return (cr, cc)
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                nr, nc = cr + dr, cc + dc
+                if 0 <= nr < rows and 0 <= nc < cols:
+                    queue.append((nr, nc, dist + 1))
+    
+    return None
 
 def optimize_red_structure(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
@@ -159,12 +177,3 @@ def is_connected(grid: ColoredGrid) -> bool:
                     queue.append((nr, nc))
     
     return all((r, c) in visited for r in range(rows) for c in range(cols) if grid.values[r][c] in {2, 8})
-
-def solve_f9a67cb5(input_grid: ColoredGrid) -> ColoredGrid:
-    output_grid = input_grid.deep_copy()
-    elements = find_elements(input_grid)
-    graph = create_graph(elements)
-    mst = minimum_spanning_tree(graph, len(elements[2]) + len(elements[8]))
-    add_red_structure(output_grid, mst, elements)
-    optimize_red_structure(output_grid)
-    return output_grid
