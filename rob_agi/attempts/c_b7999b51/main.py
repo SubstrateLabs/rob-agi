@@ -7,14 +7,14 @@ def solve_b7999b51(input_grid: ColoredGrid) -> ColoredGrid:
     
     The function performs the following steps:
     1. Analyzes the input grid to gather information about each non-black color.
-    2. Sorts colors based on their leftmost appearance in the input grid.
+    2. Sorts colors based on their bottommost occurrence and leftmost appearance in that row.
     3. Creates a new grid with columns representing each color, maintaining their sorted order and relative heights.
     4. Aligns all colors to the top of the output grid.
     5. Optimizes the output by removing any completely black rows from the bottom.
     
     The transformation follows these rules:
     - Each non-black color is compressed into a single column.
-    - Colors are ordered from left to right based on their leftmost occurrence in the input.
+    - Colors are ordered from left to right based on their bottommost occurrence, then leftmost appearance in that row.
     - The height of each color column is determined by its vertical span in the input.
     - All color columns are aligned to the top of the output grid.
     - Any remaining empty (black) rows at the bottom are removed.
@@ -23,26 +23,26 @@ def solve_b7999b51(input_grid: ColoredGrid) -> ColoredGrid:
     input_grid (ColoredGrid): The input grid to be transformed.
     
     Returns:
-    ColoredGrid: The transformed grid with compressed color columns, preserving left-to-right order and relative heights.
+    ColoredGrid: The transformed grid with compressed color columns, preserving order based on bottommost occurrence and relative heights.
     """
     # Step 1: Analyze the input grid
     color_info: Dict[int, Dict[str, int]] = {}
     rows, cols = input_grid.get_dimensions()
     
-    for r in range(rows):
+    for r in range(rows - 1, -1, -1):  # Iterate from bottom to top
         for c in range(cols):
             color = input_grid.values[r][c]
             if color != 0:  # Non-black color
                 if color not in color_info:
-                    color_info[color] = {"left": c, "top": r, "bottom": r}
+                    color_info[color] = {"left": c, "top": r, "bottom": r, "first_row": r}
                 else:
                     info = color_info[color]
                     info["left"] = min(info["left"], c)
                     info["top"] = min(info["top"], r)
                     info["bottom"] = max(info["bottom"], r)
 
-    # Step 2: Sort colors based on leftmost appearance
-    sorted_colors = sorted(color_info.items(), key=lambda x: x[1]["left"])
+    # Step 2: Sort colors based on bottommost occurrence and leftmost appearance
+    sorted_colors = sorted(color_info.items(), key=lambda x: (-x[1]["first_row"], x[1]["left"]))
 
     # Step 3 & 4: Create and fill the output grid
     output_width = len(sorted_colors)
