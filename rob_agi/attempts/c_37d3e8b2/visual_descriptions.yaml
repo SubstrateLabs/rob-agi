@@ -1,0 +1,61 @@
+example_0:
+  input: |
+    The input grid shows a pattern of sky blue (8) shapes on a black (0) background. There are several distinct shapes visible:
+    1. A small square in the top left corner.
+    2. A larger, more complex shape in the center-left, resembling a stylized letter 'E' or a comb.
+    3. A large rectangular shape in the center-right, with some internal gaps and protrusions.
+    4. A smaller rectangular shape in the bottom left.
+    5. Three small square shapes in the bottom right, arranged in an 'L' formation.
+    The shapes are separated by black space and do not touch each other.
+  output: |
+    The output grid maintains the same overall structure as the input, but with color changes:
+    1. The small square in the top left is now blue (1).
+    2. The 'E' or comb shape in the center-left is now blue (1).
+    3. The large rectangular shape in the center-right is now green (3).
+    4. The smaller rectangular shape in the bottom left remains blue (1).
+    5. The three small squares in the bottom right are now red (2).
+    The black background remains unchanged. Each distinct shape from the input has been assigned a unique color in the output.
+
+example_1:
+  input: |
+    The input grid shows several sky blue (8) shapes on a black (0) background:
+    1. A large rectangular shape with internal gaps in the top left quadrant.
+    2. A smaller rectangular shape with internal gaps in the top right quadrant.
+    3. A small square shape in the center-left.
+    4. A medium-sized rectangular shape with internal gaps in the center-right.
+    5. A large rectangular shape with internal gaps occupying the entire bottom third of the grid.
+    The shapes are separated by black space and do not touch each other.
+  output: |
+    The output grid maintains the same structure as the input, but with color changes:
+    1. The large shape in the top left is now red (2).
+    2. The shape in the top right is now green (3).
+    3. The small square in the center-left remains red (2).
+    4. The shape in the center-right is now blue (1).
+    5. The large shape at the bottom is now orange (7).
+    The black background remains unchanged. Each distinct shape from the input has been assigned a unique color in the output, with the exception of the small square which shares its color with the top-left shape.
+
+example_2:
+  input: |
+    The input grid shows several sky blue (8) shapes on a black (0) background:
+    1. A large rectangular shape with internal gaps occupying most of the left half of the grid.
+    2. A medium-sized rectangular shape with internal gaps in the top right quadrant.
+    3. A large rectangular shape with internal gaps occupying most of the bottom right quadrant.
+    The shapes are separated by black space and do not touch each other.
+  output: |
+    The output grid maintains the same structure as the input, but with color changes:
+    1. The large shape on the left is now green (3).
+    2. The shape in the top right is now green (3).
+    3. The shape in the bottom right is now orange (7).
+    The black background remains unchanged. In this case, two of the shapes (left and top right) have been assigned the same color, while the bottom right shape has a different color.
+
+test_case_0:
+  input: |
+    The input grid shows several sky blue (8) shapes on a black (0) background:
+    1. A large rectangular shape with internal gaps occupying most of the top left quadrant.
+    2. A medium-sized rectangular shape with internal gaps in the top right quadrant.
+    3. A small rectangular shape with internal gaps in the center-left.
+    4. A medium-sized rectangular shape with internal gaps in the center-right.
+    5. A large rectangular shape with internal gaps occupying most of the bottom third of the grid.
+    The shapes are separated by black space and do not touch each other.
+  output: |
+    The output is not provided for this test case.
