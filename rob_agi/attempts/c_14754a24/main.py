@@ -13,6 +13,7 @@ def solve_14754a24(input_grid: ColoredGrid) -> ColoredGrid:
     5. Applies selected L-shapes, converting them to red (2).
     6. Performs multiple optimization passes to improve L-shapes and handle edge cases.
     7. Verifies that all red squares form valid L-shapes associated with yellow squares.
+    8. Extends L-shapes to maximize coverage while maintaining validity.
     
     Returns a new ColoredGrid with the transformed values.
     """
@@ -39,7 +40,7 @@ def solve_14754a24(input_grid: ColoredGrid) -> ColoredGrid:
         yellow_count = sum(1 for r, c in shape if grid.values[r][c] == 4)
         adjacent_red = sum(1 for r, c in shape for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
                            if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 2)
-        return score + yellow_count * 2 + adjacent_red
+        return score + yellow_count * 3 + adjacent_red
     
     def apply_l_shape(shape: List[Tuple[int, int]]) -> None:
         for r, c in shape:
@@ -55,18 +56,21 @@ def solve_14754a24(input_grid: ColoredGrid) -> ColoredGrid:
                 score = score_l_shape(shape)
                 heapq.heappush(all_shapes, (-score, shape))  # Use negative score for max-heap
         
+        covered_yellows = set()
         while all_shapes:
             _, shape = heapq.heappop(all_shapes)
-            if any(grid.values[r][c] == 4 for r, c in shape):  # Check if shape still contains a yellow square
+            yellows_in_shape = set((r, c) for r, c in shape if grid.values[r][c] == 4)
+            if yellows_in_shape - covered_yellows:
                 apply_l_shape(shape)
+                covered_yellows.update(yellows_in_shape)
     
     def optimize_pattern() -> None:
-        for _ in range(2):  # Multiple optimization passes
+        for _ in range(3):  # Multiple optimization passes
             for r in range(rows):
                 for c in range(cols):
                     if grid.values[r][c] == 2:
                         neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
-                                        if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 2)
+                                        if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] in [2, 4])
                         if neighbors == 0:
                             grid.values[r][c] = 0  # Remove isolated red squares
             
@@ -78,19 +82,30 @@ def solve_14754a24(input_grid: ColoredGrid) -> ColoredGrid:
                             if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 0:
                                 grid.values[r+dr][c+dc] = 2  # Extend L-shape
     
-    def verify_l_shapes() -> bool:
+    def verify_and_extend_l_shapes() -> bool:
+        valid = True
         for r in range(rows):
             for c in range(cols):
                 if grid.values[r][c] == 2:
                     if not any(grid.values[r+dr][c+dc] == 4 for dr in [-1, 0, 1] for dc in [-1, 0, 1]
                                if 0 <= r+dr < rows and 0 <= c+dc < cols):
-                        return False  # Red square not associated with a yellow square
-        return True
+                        valid = False
+                        grid.values[r][c] = 0  # Remove invalid red square
+                else:
+                    # Try to extend L-shapes
+                    red_neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                                        if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 2)
+                    yellow_neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                                           if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 4)
+                    if red_neighbors >= 1 and yellow_neighbors >= 1 and grid.values[r][c] in [0, 5]:
+                        grid.values[r][c] = 2  # Extend L-shape
+        return valid
     
     process_yellow_squares()
     optimize_pattern()
     
-    if not verify_l_shapes():
-        return input_grid  # Return original grid if verification fails
+    for _ in range(3):  # Multiple verification and extension passes
+        if not verify_and_extend_l_shapes():
+            return input_grid  # Return original grid if verification fails
     
     return grid
