@@ -14,6 +14,8 @@ def solve_b4a43f3b(input_grid: ColoredGrid) -> ColoredGrid:
 
     The function adapts to various input patterns, prioritizing visual coherence
     and balance in the output while maintaining the essence of the input pattern.
+    It handles different scaling factors and arrangements based on the complexity
+    of the input pattern, ensuring a consistent output across various inputs.
     """
     upper_part = input_grid.values[:6]
     full_row_colors = identify_full_row_colors(input_grid.values[6:8])
@@ -24,7 +26,7 @@ def solve_b4a43f3b(input_grid: ColoredGrid) -> ColoredGrid:
     arrangement = determine_arrangement(template, scaling_factor)
     output_grid = create_base_output_grid(template, arrangement, scaling_factor)
     
-    apply_full_row_colors(output_grid, full_row_colors, arrangement)
+    apply_full_row_colors(output_grid, full_row_colors)
     process_bottom_shape(output_grid, lower_part, scaling_factor)
     center_pattern(output_grid)
 
@@ -45,19 +47,19 @@ def identify_full_row_colors(rows: List[List[int]]) -> List[int]:
 
 def determine_scaling_factor(template: List[List[int]]) -> int:
     non_zero_count = sum(1 for row in template for cell in row if cell != 0)
-    if non_zero_count <= 4:
+    if non_zero_count <= 3:
         return 3
-    elif non_zero_count <= 6:
+    elif non_zero_count <= 5:
         return 2
     else:
         return 1
 
 def determine_arrangement(template: List[List[int]], scaling_factor: int) -> List[Tuple[int, int]]:
     non_zero_cells = [(r, c) for r in range(3) for c in range(3) if template[r][c] != 0]
-    if len(non_zero_cells) <= 4:
+    if len(non_zero_cells) <= 3:
         return [(0, 0), (0, 2), (2, 0), (2, 2)]
-    elif len(non_zero_cells) <= 6:
-        return [(0, 0), (0, 1), (0, 2), (2, 0), (2, 1), (2, 2)]
+    elif len(non_zero_cells) <= 5:
+        return [(0, 0), (0, 2), (1, 1), (2, 0), (2, 2)]
     else:
         return [(r, c) for r in range(3) for c in range(3)]
 
@@ -67,19 +69,24 @@ def create_base_output_grid(template: List[List[int]], arrangement: List[Tuple[i
         for i in range(3):
             for j in range(3):
                 value = template[i][j]
-                for si in range(scaling_factor):
-                    for sj in range(scaling_factor):
-                        r = ar * 3 * scaling_factor + i * scaling_factor + si
-                        c = ac * 3 * scaling_factor + j * scaling_factor + sj
-                        if 0 <= r < 18 and 0 <= c < 18:
-                            output_grid[r][c] = value
+                if value != 0:
+                    for si in range(scaling_factor):
+                        for sj in range(scaling_factor):
+                            r = ar * 3 * scaling_factor + i * scaling_factor + si
+                            c = ac * 3 * scaling_factor + j * scaling_factor + sj
+                            if 0 <= r < 18 and 0 <= c < 18:
+                                output_grid[r][c] = value
     return output_grid
 
-def apply_full_row_colors(output_grid: List[List[int]], colors: List[int], arrangement: List[Tuple[int, int]]) -> None:
-    max_row = max(ar for ar, _ in arrangement) * 3 + 3
+def apply_full_row_colors(output_grid: List[List[int]], colors: List[int]) -> None:
+    non_zero_rows = [i for i, row in enumerate(output_grid) if any(cell != 0 for cell in row)]
+    if non_zero_rows:
+        start_row = max(non_zero_rows) + 1
+    else:
+        start_row = 0
     for idx, color in enumerate(colors):
         if color != 0:
-            row = (max_row + idx) % 18
+            row = (start_row + idx) % 18
             for c in range(18):
                 output_grid[row][c] = color
 
