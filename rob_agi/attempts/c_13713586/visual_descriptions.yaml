@@ -1,54 +1,64 @@
 example_0:
   input: |
-    A 16x15 grid with mostly black (empty) space. There are three distinct colored regions:
-    1. A horizontal yellow (4) line of 5 squares in the 4th row, slightly right of center.
-    2. A horizontal sky blue (8) line of 4 squares in the 7th row, on the left side.
-    3. A horizontal green (3) line of 3 squares in the 12th row, slightly right of center.
-    The bottom row (16th) is entirely gray (5), forming a solid base.
+    A 16x15 grid with mostly black (0) space. Three distinct colored regions:
+    1. Yellow (4): Horizontal line of 5 squares in row 4, columns 7-11.
+    2. Sky blue (8): Horizontal line of 4 squares in row 7, columns 1-4.
+    3. Green (3): Horizontal line of 3 squares in row 12, columns 8-10.
+    Gray (5) base: Entire bottom row (row 16).
+    Key observations: Colors are isolated, not touching each other or the gray base.
   output: |
-    The same 16x15 grid, but the colored regions have expanded:
-    1. The yellow region has grown into a 5x8 rectangle, extending downwards.
-    2. The sky blue region has expanded into an 8x4 rectangle, extending downwards to the gray base.
-    3. The green region has grown into a 3x4 rectangle, extending downwards.
-    The colored regions do not overlap. The gray base remains unchanged.
-    Black space fills the rest of the grid.
+    16x15 grid with expanded colored regions:
+    1. Yellow (4): 5x8 rectangle, rows 4-11, columns 7-11. Expanded downwards.
+    2. Sky blue (8): 4x8 rectangle, rows 7-14, columns 1-4. Expanded downwards to gray base.
+    3. Green (3): 3x4 rectangle, rows 12-15, columns 8-10. Expanded downwards.
+    Gray (5) base unchanged. Colored regions don't overlap. Rest is black (0).
+    Key expansions: Vertical first, then horizontal within vertical limits.
 
 example_1:
   input: |
-    A 16x17 grid with mostly black space. There are four distinct colored regions:
-    1. Two red (2) squares vertically aligned in the 12th column, 2nd and 3rd rows.
-    2. A vertical green (3) line of 4 squares in the 7th column, from 5th to 8th row.
-    3. A vertical orange (7) line of 4 squares in the 3rd column, from 8th to 11th row.
-    4. The rightmost column (17th) is entirely gray (5), forming a solid vertical border.
+    16x17 grid, mostly black (0). Four distinct colored regions:
+    1. Red (2): Two squares in column 12, rows 2-3.
+    2. Green (3): Vertical line of 4 squares in column 7, rows 5-8.
+    3. Orange (7): Vertical line of 4 squares in column 3, rows 8-11.
+    4. Gray (5): Entire rightmost column (column 17).
+    Key observations: Colors don't touch. Gray forms a vertical border.
   output: |
-    The same 16x17 grid, but the colored regions have expanded:
-    1. The red region has grown into a 5x2 rectangle, extending rightwards to the gray border.
-    2. The green region has expanded into a 7x10 rectangle, extending in all directions but mostly downwards and rightwards.
-    3. The orange region has grown into a 11x7 rectangle, extending in all directions but mostly downwards and rightwards.
-    The colored regions do not overlap. The gray border remains unchanged.
-    Black space fills the rest of the grid.
+    16x17 grid with expanded colored regions:
+    1. Red (2): 2x5 rectangle, rows 2-3, columns 12-16. Expanded right to gray border.
+    2. Green (3): 10x7 rectangle, rows 1-10, columns 7-13. Expanded in all directions, mostly down and right.
+    3. Orange (7): 7x11 rectangle, rows 5-15, columns 1-7. Expanded in all directions, mostly down and right.
+    Gray (5) border unchanged. Colored regions don't overlap. Rest is black (0).
+    Key expansions: Vertical first, then horizontal. Top-to-bottom priority.
 
 example_2:
   input: |
-    A 17x17 grid with mostly black space. There are four distinct colored regions:
-    1. A vertical gray (5) line forming the leftmost column.
-    2. A vertical green (3) line of 6 squares in the 10th column, from 2nd to 7th row.
-    3. A vertical magenta (6) line of 9 squares in the 14th column, from 5th to 13th row.
-    4. Two red (2) squares vertically aligned in the 7th column, 11th and 12th rows.
+    17x17 grid, mostly black (0). Four distinct colored regions:
+    1. Gray (5): Entire leftmost column (column 1).
+    2. Green (3): Vertical line of 6 squares in column 10, rows 2-7.
+    3. Magenta (6): Vertical line of 9 squares in column 14, rows 5-13.
+    4. Red (2): Two squares in column 7, rows 11-12.
+    Key observations: Colors don't touch. Gray forms a vertical border.
   output: |
-    The same 17x17 grid, but the colored regions have expanded:
-    1. The gray vertical line remains unchanged.
-    2. The green region has grown into a 9x10 rectangle, extending rightwards from the gray line and downwards.
-    3. The magenta region has expanded into a 9x6 rectangle, extending leftwards and slightly downwards.
-    4. The red region has grown into a 6x2 rectangle, extending leftwards to the gray line and slightly downwards.
-    The colored regions do not overlap. Black space fills the rest of the grid.
+    17x17 grid with expanded colored regions:
+    1. Gray (5): Unchanged, still entire leftmost column.
+    2. Green (3): 9x10 rectangle, rows 1-9, columns 2-11. Expanded left to gray, down, and right.
+    3. Magenta (6): 9x6 rectangle, rows 5-13, columns 12-17. Expanded left and slightly down.
+    4. Red (2): 2x6 rectangle, rows 11-12, columns 2-7. Expanded left to gray, slightly down.
+    Colored regions don't overlap. Rest is black (0).
+    Key expansions: Vertical first, then horizontal within vertical limits. Top-to-bottom, left-to-right priority.
 
 test_case_0:
   input: |
-    A 17x17 grid with mostly black space. There are four distinct colored regions:
-    1. A vertical gray (5) line forming the leftmost column.
-    2. A vertical green (3) line of 6 squares in the 10th column, from 2nd to 7th row.
-    3. A vertical magenta (6) line of 9 squares in the 14th column, from 5th to 13th row.
-    4. Two red (2) squares vertically aligned in the 7th column, 11th and 12th rows.
+    17x17 grid, mostly black (0). Four distinct colored regions:
+    1. Gray (5): Entire leftmost column (column 1).
+    2. Green (3): Vertical line of 6 squares in column 10, rows 2-7.
+    3. Magenta (6): Vertical line of 9 squares in column 14, rows 5-13.
+    4. Red (2): Two squares in column 7, rows 11-12.
+    Key observations: Colors don't touch. Gray forms a vertical border. Similar to example_2.
   output: |
-    Not provided in the test case.
+    Not provided. Expected expansion similar to example_2, following the established rules:
+    1. Vertical expansion first.
+    2. Horizontal expansion within vertical limits.
+    3. Top-to-bottom, left-to-right priority.
+    4. No overlap between colors.
+    5. Gray border remains unchanged.
