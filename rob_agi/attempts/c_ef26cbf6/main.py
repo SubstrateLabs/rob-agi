@@ -11,6 +11,7 @@ def solve_ef26cbf6(input_grid: ColoredGrid) -> ColoredGrid:
          * Propagates this color downwards in the column within the section.
     3. Preserves yellow lines and originally empty (black) cells.
     4. Maintains the original pattern of filled and empty spaces in each section.
+    5. Propagates colors within each section independently.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -56,7 +57,7 @@ def find_top_color(grid: ColoredGrid, section: Tuple[int, int], col: int) -> int
 def propagate_color(grid: ColoredGrid, section: Tuple[int, int], col: int, color: int):
     start, end = section
     for r in range(start, end):
-        if grid.values[r][col] not in [0, 4]:
-            grid.values[r][col] = color
-        elif grid.values[r][col] == 4:
+        if grid.values[r][col] == 4:
             break  # Stop propagation at yellow lines within the section
+        elif grid.values[r][col] != 0:
+            grid.values[r][col] = color
