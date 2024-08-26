@@ -9,7 +9,8 @@ def solve_7c9b52a0(input_grid: ColoredGrid) -> ColoredGrid:
     2. Finds all non-background elements
     3. Creates a new compact grid containing only non-background elements
     4. Preserves relative positions and relationships between elements
-    5. Returns the new compact grid
+    5. Removes any unnecessary empty space between non-background elements
+    6. Returns the new compact grid
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed
@@ -44,10 +45,15 @@ def solve_7c9b52a0(input_grid: ColoredGrid) -> ColoredGrid:
         max_row = max(elem[1] for elem in elements)
         max_col = max(elem[2] for elem in elements)
         
+        # Initialize grid with background color (0)
         grid = [[0 for _ in range(max_col - min_col + 1)] for _ in range(max_row - min_row + 1)]
         
         for color, r, c in elements:
             grid[r - min_row][c - min_col] = color
+        
+        # Remove empty rows and columns
+        grid = [row for row in grid if any(cell != 0 for cell in row)]
+        grid = [list(col) for col in zip(*grid) if any(cell != 0 for cell in col)]
         
         return grid
 
