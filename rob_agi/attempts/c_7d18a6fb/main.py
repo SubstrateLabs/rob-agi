@@ -4,26 +4,45 @@ from collections import defaultdict, Counter
 
 def solve_7d18a6fb(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid into a 7x7 output grid by identifying and arranging color patterns.
+    Transforms the input grid into a 7x7 output grid by identifying and arranging significant color patterns.
     
     1. Identifies the background color (most common color).
     2. Divides the grid into four quadrants.
     3. For each quadrant:
        a. Identifies distinct color regions using a flood fill algorithm.
-       b. Selects the most significant region based on size, color uniqueness, and position.
-    4. Extracts the shape of each selected region while maintaining its original position within the quadrant.
+       b. Selects the most significant region based on size, color rarity, and position.
+    4. Extracts and compresses the shape of each selected region to fit a 3x3 area.
     5. Creates a 7x7 output grid:
-       a. Places extracted shapes in the corners corresponding to their original quadrants.
+       a. Places compressed shapes in the corners corresponding to their original quadrants.
        b. Fills the central cross with the background color to separate quadrants.
     
     Returns a 7x7 ColoredGrid with the arranged patterns.
     """
-    preprocessed_grid = preprocess_grid(input_grid)
-    quadrants = divide_into_quadrants(preprocessed_grid)
-    patterns = [process_quadrant(quadrant) for quadrant in quadrants]
-    compressed_patterns = [compress_pattern(pattern) for pattern in patterns if pattern]
-    output_grid = create_output_grid(compressed_patterns)
-    return output_grid
+    background = identify_background(input_grid)
+    rows, cols = input_grid.get_dimensions()
+    mid_row, mid_col = rows // 2, cols // 2
+    
+    quadrants = [
+        input_grid.extract_subgrid(0, 0, mid_row, mid_col),
+        input_grid.extract_subgrid(0, mid_col, mid_row, cols - mid_col),
+        input_grid.extract_subgrid(mid_row, 0, rows - mid_row, mid_col),
+        input_grid.extract_subgrid(mid_row, mid_col, rows - mid_row, cols - mid_col)
+    ]
+    
+    color_counts = Counter(cell for row in input_grid.values for cell in row)
+    total_cells = rows * cols
+    color_rarity = {color: 1 - (count / total_cells) for color, count in color_counts.items()}
+    
+    extracted_shapes = []
+    for quadrant in quadrants:
+        regions = identify_regions(quadrant, background)
+        significant_region = select_significant_region(regions, quadrant.get_dimensions(), color_rarity)
+        if significant_region:
+            extracted_shapes.append(extract_shape(significant_region, quadrant.get_dimensions()))
+        else:
+            extracted_shapes.append(None)
+    
+    return create_output_grid(extracted_shapes, background)
 
 def identify_background(grid: ColoredGrid) -> int:
     color_counts = Counter(cell for row in grid.values for cell in row)
@@ -74,11 +93,19 @@ def select_significant_region(regions: List[Tuple[int, List[Tuple[int, int]]]], 
 def extract_shape(region: Tuple[int, List[Tuple[int, int]]], quadrant_size: Tuple[int, int]) -> List[List[int]]:
     color, cells = region
     rows, cols = quadrant_size
+    min_r = min(r for r, _ in cells)
+    min_c = min(c for _, c in cells)
+    max_r = max(r for r, _ in cells)
+    max_c = max(c for _, c in cells)
+    
+    shape_height = max_r - min_r + 1
+    shape_width = max_c - min_c + 1
+    
     shape = [[0 for _ in range(3)] for _ in range(3)]
     
     for r, c in cells:
-        shape_r = r * 3 // rows
-        shape_c = c * 3 // cols
+        shape_r = (r - min_r) * 3 // shape_height
+        shape_c = (c - min_c) * 3 // shape_width
         shape[shape_r][shape_c] = color
     
     return shape
@@ -91,8 +118,7 @@ def create_output_grid(extracted_shapes: List[Optional[List[List[int]]]], backgr
         if shape:
             for r in range(3):
                 for c in range(3):
-                    if shape[r][c] != 0:
-                        output[qr + r][qc + c] = shape[r][c]
+                    output[qr + r][qc + c] = shape[r][c]
     
     # Fill central cross
     for i in range(7):
