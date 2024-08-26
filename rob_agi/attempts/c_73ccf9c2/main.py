@@ -8,9 +8,9 @@ def solve_73ccf9c2(input_grid: ColoredGrid) -> ColoredGrid:
     
     The function performs the following steps:
     1. Find all non-black shapes in the input grid
-    2. Select the most figure-like shape based on complexity and distinctive features
+    2. Select the most figure-like shape based on complexity, symmetry, and distinctive features
     3. Extract key features of the selected shape
-    4. Transform and simplify the shape
+    4. Transform and simplify the shape while preserving its essential characteristics
     5. Scale down and center the simplified shape in a smaller output grid
     6. Apply the original color to the output shape
     """
@@ -61,12 +61,17 @@ def select_most_figure_like(shapes: List[List[Tuple[int, int]]]) -> List[Tuple[i
         bounding_box_area = (max_r - min_r + 1) * (max_c - min_c + 1)
         distinctive_features = complexity / bounding_box_area
         
-        return complexity * distinctive_features
+        # Calculate symmetry score
+        center_r = (min_r + max_r) / 2
+        center_c = (min_c + max_c) / 2
+        symmetry_score = sum(1 for r, c in shape if (2*center_r-r, 2*center_c-c) in shape)
+        symmetry_score /= len(shape)
+        
+        return complexity * distinctive_features * (1 + symmetry_score)
     
     return max(shapes, key=score_shape)
 
 def extract_key_points(shape: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
-    # For simplicity, we'll use corner points as key points
     min_r = min(r for r, _ in shape)
     max_r = max(r for r, _ in shape)
     min_c = min(c for _, c in shape)
@@ -75,11 +80,37 @@ def extract_key_points(shape: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
     corners = [(min_r, min_c), (min_r, max_c), (max_r, min_c), (max_r, max_c)]
     center = ((min_r + max_r) // 2, (min_c + max_c) // 2)
     
-    return corners + [center] + [p for p in shape if p not in corners and p != center]
+    # Find points furthest from the center in each quadrant
+    quadrants = [[], [], [], []]
+    for r, c in shape:
+        if r <= center[0] and c <= center[1]:
+            quadrants[0].append((r, c))
+        elif r <= center[0] and c > center[1]:
+            quadrants[1].append((r, c))
+        elif r > center[0] and c <= center[1]:
+            quadrants[2].append((r, c))
+        else:
+            quadrants[3].append((r, c))
+    
+    extremities = []
+    for quadrant in quadrants:
+        if quadrant:
+            extremities.append(max(quadrant, key=lambda p: (p[0]-center[0])**2 + (p[1]-center[1])**2))
+    
+    return list(set(corners + [center] + extremities))
 
 def simplify_shape(key_points: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
-    # For now, we'll just use the key points as the simplified shape
-    return key_points
+    # Sort points by their angle from the center
+    center = key_points[key_points.index(min(key_points, key=lambda p: p[0]**2 + p[1]**2))]
+    sorted_points = sorted(key_points, key=lambda p: math.atan2(p[1]-center[1], p[0]-center[0]))
+    
+    # Remove points that are too close to each other
+    simplified = [sorted_points[0]]
+    for point in sorted_points[1:]:
+        if math.hypot(point[0]-simplified[-1][0], point[1]-simplified[-1][1]) > 1:
+            simplified.append(point)
+    
+    return simplified
 
 def determine_output_size(input_size: Tuple[int, int]) -> Tuple[int, int]:
     rows, cols = input_size
