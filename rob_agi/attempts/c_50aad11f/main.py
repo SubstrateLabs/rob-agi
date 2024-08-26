@@ -56,8 +56,6 @@ def solve_50aad11f(input_grid: ColoredGrid) -> ColoredGrid:
                 if indicator != 0:
                     break
             
-            if indicator == 0 and indicators:  # If no indicator found, use the previous color
-                indicator = indicators[-1]
             indicators.append(indicator)
         
         return indicators
@@ -67,18 +65,18 @@ def solve_50aad11f(input_grid: ColoredGrid) -> ColoredGrid:
         max_r = max(r for r, _ in shape)
         min_c = min(c for _, c in shape)
         height = max_r - min_r + 1
+        width = max(c for _, c in shape) - min_c + 1
+        
         if height <= max_height:
             return [(r - min_r, c - min_c) for r, c in shape]
         
-        compression_ratio = max_height / height
         compressed_shape = set()
         for r, c in shape:
-            new_r = min(max_height - 1, int((r - min_r) * compression_ratio))
+            new_r = min(max_height - 1, int((r - min_r) * (max_height - 1) / (height - 1)))
             compressed_shape.add((new_r, c - min_c))
         
         # Ensure key features are preserved
-        if len(compressed_shape) < len(set(c for _, c in shape)):
-            # If we lost horizontal information, use a different compression method
+        if len(compressed_shape) < width:
             columns = set(c for _, c in shape)
             compressed_shape = set((r % max_height, c - min_c) for r, c in shape if c in columns)
         
