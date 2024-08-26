@@ -23,14 +23,14 @@ def solve_e5c44e8f(input_grid: ColoredGrid) -> ColoredGrid:
     if not initial_green:
         return output_grid
 
-    left_column = find_leftmost_column(output_grid, initial_green)
+    left_column = find_leftmost_column(output_grid)
     create_vertical_line(output_grid, left_column)
     create_horizontal_lines(output_grid, left_column, initial_green)
     ensure_three_edge_contact(output_grid, left_column)
     fill_bottom_row(output_grid, left_column)
     connect_disconnected_parts(output_grid)
     optimize_e_shape(output_grid, left_column)
-    clean_up_e_shape(output_grid, left_column)
+    clean_up_e_shape(output_grid)
 
     return output_grid
 
@@ -41,7 +41,7 @@ def find_initial_green(grid: ColoredGrid) -> Optional[Tuple[int, int]]:
                 return r, c
     return None
 
-def find_leftmost_column(grid: ColoredGrid, initial_green: Tuple[int, int]) -> int:
+def find_leftmost_column(grid: ColoredGrid) -> int:
     for c in range(grid.num_cols):
         if all(grid.get_cell(r, c) != 2 for r in range(grid.num_rows)):
             return c
@@ -63,9 +63,7 @@ def create_horizontal_lines(grid: ColoredGrid, left_col: int, initial_green: Tup
         grid.set_cell(top_row, c, 3)
     
     # Middle line
-    middle_row = min(initial_green[0], rows // 2)
-    while middle_row > 0 and grid.get_cell(middle_row, left_col) == 2:
-        middle_row -= 1
+    middle_row = initial_green[0]
     for c in range(left_col + 1, cols):
         if grid.get_cell(middle_row, c) == 2:
             break
@@ -145,12 +143,12 @@ def optimize_e_shape(grid: ColoredGrid, left_col: int):
         else:
             break
 
-def clean_up_e_shape(grid: ColoredGrid, left_col: int):
+def clean_up_e_shape(grid: ColoredGrid):
     rows, cols = grid.num_rows, grid.num_cols
     
     # Remove unnecessary green cells
-    for r in range(1, rows - 1):
-        for c in range(left_col + 1, cols - 1):
+    for r in range(rows):
+        for c in range(cols):
             if grid.get_cell(r, c) == 3:
                 neighbors = sum(1 for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]
                                 if 0 <= r + dr < rows and 0 <= c + dc < cols and grid.get_cell(r + dr, c + dc) == 3)
@@ -159,7 +157,7 @@ def clean_up_e_shape(grid: ColoredGrid, left_col: int):
     
     # Ensure clear spaces inside the 'E'
     for r in range(1, rows - 1):
-        for c in range(left_col + 1, cols - 1):
+        for c in range(1, cols - 1):
             if (grid.get_cell(r-1, c) == 3 and grid.get_cell(r+1, c) == 3 and
                 grid.get_cell(r, c-1) == 3 and grid.get_cell(r, c+1) == 3):
                 grid.set_cell(r, c, 0)
