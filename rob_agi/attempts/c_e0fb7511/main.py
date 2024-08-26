@@ -163,6 +163,16 @@ def solve_e0fb7511(input_grid: ColoredGrid) -> ColoredGrid:
                         edges_reached += 1
                     break
 
+    def fine_tune_pattern(structure):
+        for r in range(rows):
+            for c in range(cols):
+                if grid.get_cell(r, c) == 8:
+                    neighbors = get_neighbors(r, c)
+                    blue_neighbors = sum(1 for nr, nc in neighbors if grid.get_cell(nr, nc) == 1)
+                    if blue_neighbors >= 3:
+                        grid.set_cell(r, c, 1)
+                        structure.remove((r, c))
+
     # Main algorithm
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
@@ -170,8 +180,8 @@ def solve_e0fb7511(input_grid: ColoredGrid) -> ColoredGrid:
     max_heat = max(max(row) for row in heat_map)
     
     total_cells = rows * cols
-    target_size = int(total_cells * random.uniform(0.4, 0.5))
-    branching_probability = 0.1
+    target_size = int(total_cells * random.uniform(0.3, 0.4))  # Reduced target size
+    branching_probability = 0.15  # Increased branching probability
 
     start = get_random_edge_start()
     structure = grow_structure(start)
@@ -179,6 +189,7 @@ def solve_e0fb7511(input_grid: ColoredGrid) -> ColoredGrid:
     ensure_connectivity(structure)
     preserve_black_squares(structure)
     balance_composition(structure)
+    fine_tune_pattern(structure)
 
     return grid
     # Create a deep copy of the input grid
