@@ -5,15 +5,19 @@ def solve_88207623(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the grid transformation challenge by expanding single pixels adjacent to main shapes.
     
-    1. Identifies main shapes and their border colors.
-    2. Finds single pixels of unique colors adjacent to main shapes.
-    3. Expands these pixels to form new borders around the main shapes.
-    4. Preserves the original main shapes and their borders.
+    1. Identifies main shapes (largest non-black, non-border color regions).
+    2. Identifies the border color of these shapes.
+    3. Finds single pixels of unique colors adjacent to main shapes.
+    4. Expands these pixels to form new borders around the main shapes.
+    5. Preserves the original main shapes and their borders.
     
-    The expansion stops at existing borders, other colors, or grid edges.
+    The expansion fills available space in all directions, stopping at existing borders, 
+    other colors, or grid edges. Multiple expansions are handled in order from left to right, 
+    top to bottom.
     """
     def find_main_shapes(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
-        main_color = max(set(cell for row in grid.values for cell in row) - {0, 2}, key=lambda x: sum(row.count(x) for row in grid.values))
+        colors = set(cell for row in grid.values for cell in row) - {0}
+        main_color = max(colors, key=lambda x: sum(row.count(x) for row in grid.values))
         return grid.find_connected_regions(main_color)
 
     def find_border_color(grid: ColoredGrid, shapes: List[List[Tuple[int, int]]]) -> int:
@@ -35,7 +39,7 @@ def solve_88207623(input_grid: ColoredGrid) -> ColoredGrid:
                     for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
                         nr, nc = r + dr, c + dc
                         if 0 <= nr < len(grid.values) and 0 <= nc < len(grid.values[0]):
-                            if (nr, nc) in shape_cells:
+                            if (nr, nc) in shape_cells or grid.values[nr][nc] == border_color:
                                 expanding_pixels.append((r, c, grid.values[r][c]))
                                 break
         return expanding_pixels
@@ -48,15 +52,16 @@ def solve_88207623(input_grid: ColoredGrid) -> ColoredGrid:
 
         while stack:
             r, c = stack.pop()
-            if (r, c) in visited or grid.values[r][c] == border_color or (r, c) in shape_cells:
+            if (r, c) in visited or grid.values[r][c] in {border_color, color} or (r, c) in shape_cells:
                 continue
             
-            grid.values[r][c] = color
+            if grid.values[r][c] == 0:
+                grid.values[r][c] = color
             visited.add((r, c))
 
             for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
                 nr, nc = r + dr, c + dc
-                if 0 <= nr < rows and 0 <= nc < cols and grid.values[nr][nc] == 0:
+                if 0 <= nr < rows and 0 <= nc < cols:
                     stack.append((nr, nc))
 
     # Main solving process
@@ -65,6 +70,9 @@ def solve_88207623(input_grid: ColoredGrid) -> ColoredGrid:
     border_color = find_border_color(result_grid, main_shapes)
     expanding_pixels = find_expanding_pixels(result_grid, main_shapes, border_color)
 
+    # Sort expanding pixels from left to right, top to bottom
+    expanding_pixels.sort(key=lambda x: (x[1], x[0]))
+
     for r, c, color in expanding_pixels:
         expand_color(result_grid, (r, c), color, border_color, main_shapes)
 
@@ -72,5 +80,12 @@ def solve_88207623(input_grid: ColoredGrid) -> ColoredGrid:
     for shape in main_shapes:
         for r, c in shape:
             result_grid.values[r][c] = input_grid.values[r][c]
+    
+    # Preserve original borders
+    rows, cols = len(input_grid.values), len(input_grid.values[0])
+    for r in range(rows):
+        for c in range(cols):
+            if input_grid.values[r][c] == border_color:
+                result_grid.values[r][c] = border_color
 
     return result_grid
