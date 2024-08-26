@@ -15,12 +15,14 @@ def solve_b20f7c8b(input_grid: ColoredGrid) -> ColoredGrid:
     The function applies the transformation twice:
     - First pass: Transform all four 5x5 regions
     - Second pass: Transform only the bottom two regions
+    
+    The transformation preserves the original pattern for non-solid blocks in left regions.
     """
     output_grid = input_grid.deep_copy()
     
     transformation_regions = [
-        (1, 8), (1, 16),  # Top regions
-        (9, 8), (9, 16)   # Bottom regions
+        (1, 1), (1, 16),  # Top regions
+        (9, 1), (9, 16)   # Bottom regions
     ]
     
     # First pass: Transform all regions
@@ -48,14 +50,16 @@ def transform_block(block: ColoredGrid, is_left: bool) -> ColoredGrid:
     if is_solid_block(block):
         original_color = get_first_non_zero_color(block)
         new_color = (original_color + 1) % 10 if is_left else (original_color + 3) % 10
+        return ColoredGrid(values=[[new_color for _ in range(5)] for _ in range(5)])
     else:
-        new_color = get_first_non_zero_color(block) if is_left else 5
-    
-    return ColoredGrid(values=[[new_color for _ in range(5)] for _ in range(5)])
+        if is_left:
+            return block  # Preserve the original pattern for non-solid left blocks
+        else:
+            return ColoredGrid(values=[[5 for _ in range(5)] for _ in range(5)])
 
 def transform_region(grid: ColoredGrid, row: int, col: int):
     block = grid.extract_subgrid(row, col, 5, 5)
-    is_left = col == 8
+    is_left = col == 1
     transformed_block = transform_block(block, is_left)
     for i in range(5):
         for j in range(5):
