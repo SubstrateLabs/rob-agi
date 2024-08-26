@@ -25,14 +25,14 @@ def solve_319f2597(input_grid: ColoredGrid) -> ColoredGrid:
     stripe_left = next((col for col in range(cols) if any(input_grid.get_cell(row, col) == 0 for row in range(rows))), cols // 3)
     stripe_right = stripe_left + 1
     
+    # Find horizontal line position
+    horizontal_top = next((row for row in range(rows) if any(input_grid.get_cell(row, col) == 0 for col in range(cols))), rows // 2)
+    horizontal_bottom = horizontal_top + 1
+    
     # Create vertical stripe
     for row in range(rows):
         output_grid.set_cell(row, stripe_left, 0)
         output_grid.set_cell(row, stripe_right, 0)
-    
-    # Find horizontal line position
-    horizontal_top = next((row for row in range(rows) if any(input_grid.get_cell(row, col) == 0 for col in range(cols))), rows // 2)
-    horizontal_bottom = horizontal_top + 1
     
     # Create horizontal line
     for col in range(cols):
