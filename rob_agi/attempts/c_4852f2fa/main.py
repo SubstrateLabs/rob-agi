@@ -5,7 +5,7 @@ def solve_4852f2fa(input_grid: ColoredGrid) -> ColoredGrid:
     Transform the input grid based on the number of yellow squares.
     
     1. Count yellow (4) squares in the input grid.
-    2. Create a 3xN output grid where N = (yellow_count + 1) * 3.
+    2. Create a 3xN output grid where N = yellow_count * 3.
     3. Fill the output grid with a repeating pattern:
        - Top row: [0, 0, 8] repeated
        - Middle and bottom rows: [8, 8, 0] repeated
@@ -16,7 +16,7 @@ def solve_4852f2fa(input_grid: ColoredGrid) -> ColoredGrid:
     yellow_count = sum(row.count(4) for row in input_grid.values)
     
     # Calculate output width
-    output_width = (yellow_count + 1) * 3
+    output_width = yellow_count * 3
     
     # Create empty output grid
     output = [[0 for _ in range(output_width)] for _ in range(3)]
