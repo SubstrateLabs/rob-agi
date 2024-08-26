@@ -8,12 +8,11 @@ def solve_e5c44e8f(input_grid: ColoredGrid) -> ColoredGrid:
     2. Determine the leftmost valid column for the 'E'.
     3. Create the vertical line of the 'E'.
     4. Create the top, middle, and bottom horizontal lines of the 'E'.
-    5. Ensure the 'E' touches at least three edges of the grid.
-    6. Fill the bottom row if possible.
-    7. Connect any disconnected parts of the 'E'.
-    8. Optimize the 'E' shape.
-    9. Preserve all red (2) squares.
-    10. Ensure all green squares are connected.
+    5. Ensure the 'E' touches at least two edges of the grid.
+    6. Optimize the 'E' shape.
+    7. Clean up the 'E' shape.
+    8. Preserve all red (2) squares.
+    9. Ensure all green squares are connected.
 
     The function adapts to various initial conditions and red square placements
     to create the largest possible 'E' pattern that satisfies the challenge requirements.
@@ -26,11 +25,10 @@ def solve_e5c44e8f(input_grid: ColoredGrid) -> ColoredGrid:
     left_column = find_leftmost_column(output_grid)
     create_vertical_line(output_grid, left_column)
     create_horizontal_lines(output_grid, left_column, initial_green)
-    ensure_three_edge_contact(output_grid, left_column)
-    fill_bottom_row(output_grid, left_column)
-    connect_disconnected_parts(output_grid)
+    ensure_two_edge_contact(output_grid, left_column)
     optimize_e_shape(output_grid, left_column)
     clean_up_e_shape(output_grid)
+    connect_disconnected_parts(output_grid)
 
     return output_grid
 
@@ -70,43 +68,33 @@ def create_horizontal_lines(grid: ColoredGrid, left_col: int, initial_green: Tup
         grid.set_cell(middle_row, c, 3)
     
     # Bottom line
-    bottom_row = rows - 2
-    while bottom_row > middle_row and grid.get_cell(bottom_row, left_col) == 2:
+    bottom_row = rows - 1
+    while bottom_row > middle_row and (grid.get_cell(bottom_row, left_col) == 2 or all(grid.get_cell(bottom_row, c) == 0 for c in range(cols))):
         bottom_row -= 1
     for c in range(left_col + 1, cols):
         if grid.get_cell(bottom_row, c) == 2:
             break
         grid.set_cell(bottom_row, c, 3)
 
-def ensure_three_edge_contact(grid: ColoredGrid, left_col: int):
+def ensure_two_edge_contact(grid: ColoredGrid, left_col: int):
     rows, cols = grid.num_rows, grid.num_cols
     edges_touched = sum([
         any(grid.get_cell(0, c) == 3 for c in range(cols)),
         any(grid.get_cell(rows-1, c) == 3 for c in range(cols)),
         any(grid.get_cell(r, 0) == 3 for r in range(rows)),
-        any(grid.get_cell(r, cols-1) == 3 for r in range(rows))
+        any(grid.get_cell(r, cols-1) == 3 for c in range(rows))
     ])
     
-    if edges_touched < 3:
+    if edges_touched < 2:
         # Extend top line to right edge
         for c in range(cols-1, left_col, -1):
             if grid.get_cell(0, c) == 0:
                 grid.set_cell(0, c, 3)
         
-        # Extend bottom line to right edge
+        # Extend bottom horizontal line to right edge
+        bottom_row = max(r for r in range(rows) if grid.get_cell(r, left_col) == 3)
         for c in range(cols-1, left_col, -1):
-            if grid.get_cell(rows-2, c) == 0:
-                grid.set_cell(rows-2, c, 3)
-        
-        # Extend vertical line to top if needed
-        if grid.get_cell(0, left_col) == 0:
-            grid.set_cell(0, left_col, 3)
-
-def fill_bottom_row(grid: ColoredGrid, left_col: int):
-    bottom_row = grid.num_rows - 1
-    if all(grid.get_cell(bottom_row, c) != 2 for c in range(grid.num_cols)):
-        for c in range(left_col, grid.num_cols):
-            if grid.get_cell(bottom_row-1, c) == 3:
+            if grid.get_cell(bottom_row, c) == 0:
                 grid.set_cell(bottom_row, c, 3)
 
 def connect_disconnected_parts(grid: ColoredGrid):
@@ -127,12 +115,13 @@ def optimize_e_shape(grid: ColoredGrid, left_col: int):
     rows, cols = grid.num_rows, grid.num_cols
     
     # Try to extend horizontal lines
-    for r in [0, rows // 2, rows - 2]:
-        for c in range(cols - 1, left_col, -1):
-            if all(grid.get_cell(r, i) == 3 for i in range(left_col, c)) and grid.get_cell(r, c) == 0:
-                grid.set_cell(r, c, 3)
-            else:
-                break
+    for r in range(rows):
+        if grid.get_cell(r, left_col) == 3:
+            for c in range(cols - 1, left_col, -1):
+                if all(grid.get_cell(r, i) == 3 for i in range(left_col, c)) and grid.get_cell(r, c) == 0:
+                    grid.set_cell(r, c, 3)
+                else:
+                    break
     
     # Try to extend vertical line to the right
     for c in range(left_col + 1, cols):
@@ -161,3 +150,27 @@ def clean_up_e_shape(grid: ColoredGrid):
             if (grid.get_cell(r-1, c) == 3 and grid.get_cell(r+1, c) == 3 and
                 grid.get_cell(r, c-1) == 3 and grid.get_cell(r, c+1) == 3):
                 grid.set_cell(r, c, 0)
+    
+    # Remove any disconnected green cells
+    connected = set()
+    for r in range(rows):
+        for c in range(cols):
+            if grid.get_cell(r, c) == 3:
+                if not connected:
+                    connected = flood_fill(grid, r, c)
+                elif (r, c) not in connected:
+                    grid.set_cell(r, c, 0)
+
+def flood_fill(grid: ColoredGrid, r: int, c: int) -> Set[Tuple[int, int]]:
+    rows, cols = grid.num_rows, grid.num_cols
+    connected = set()
+    stack = [(r, c)]
+    while stack:
+        r, c = stack.pop()
+        if (r, c) not in connected and grid.get_cell(r, c) == 3:
+            connected.add((r, c))
+            for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < rows and 0 <= nc < cols:
+                    stack.append((nr, nc))
+    return connected
