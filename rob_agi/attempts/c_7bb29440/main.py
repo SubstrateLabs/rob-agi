@@ -6,19 +6,18 @@ class Rectangle(NamedTuple):
     left: int
     bottom: int
     right: int
-    special_count: int
     area: int
 
 def solve_7bb29440(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the 7bb29440 challenge by identifying the blue rectangle with the most
-    special squares (yellow or magenta), largest area, and most top-left position.
+    Solve the 7bb29440 challenge by identifying the largest blue rectangle
+    containing at least one special square (yellow or magenta).
 
     The function performs the following steps:
     1. Scan the grid for special squares (yellow 4 or magenta 6).
     2. For each special square, expand to find the largest blue rectangle containing it.
-    3. Evaluate each rectangle based on special square count, area, and position.
-    4. Select the best rectangle based on these criteria.
+    3. Select the rectangle with the largest area.
+    4. If multiple rectangles have the same largest area, choose the most top-left one.
     5. Construct and return the selected rectangle as a new ColoredGrid.
 
     Args:
@@ -43,11 +42,9 @@ def solve_7bb29440(input_grid: ColoredGrid) -> ColoredGrid:
         while right < cols-1 and all(is_valid_cell(r, right+1) for r in range(top, bottom+1)):
             right += 1
         
-        special_count = sum(1 for r in range(top, bottom+1) for c in range(left, right+1) 
-                            if input_grid.get_cell(r, c) in [4, 6])
         area = (bottom - top + 1) * (right - left + 1)
         
-        return Rectangle(top, left, bottom, right, special_count, area)
+        return Rectangle(top, left, bottom, right, area)
 
     # Generate candidate rectangles
     candidate_rectangles = []
@@ -61,7 +58,7 @@ def solve_7bb29440(input_grid: ColoredGrid) -> ColoredGrid:
     if not candidate_rectangles:
         return ColoredGrid(values=[[]])  # Return an empty grid if no special squares found
 
-    best_rect = max(candidate_rectangles, key=lambda x: (x.special_count, x.area, -x.top, -x.left))
+    best_rect = max(candidate_rectangles, key=lambda x: (x.area, -x.top, -x.left))
 
     # Construct the output grid
     result = ColoredGrid(values=[
