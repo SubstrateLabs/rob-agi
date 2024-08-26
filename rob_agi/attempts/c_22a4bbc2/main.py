@@ -25,6 +25,12 @@ def solve_22a4bbc2(input_grid: ColoredGrid) -> ColoredGrid:
                     if is_qualifying_shape(input_grid, r, c, height, width):
                         mark_for_change(to_change, r, c, height, width)
     
+    for r in range(rows):
+        for c in range(cols):
+            if input_grid.values[r][c] in [1, 8] and (r, c) not in to_change:
+                if is_part_of_larger_rectangle(input_grid, r, c, input_grid.values[r][c]):
+                    to_change.add((r, c))
+    
     for r, c in to_change:
         new_grid.values[r][c] = 2
     
@@ -45,3 +51,15 @@ def mark_for_change(to_change: Set[Tuple[int, int]], row: int, col: int, height:
     for i in range(height):
         for j in range(width):
             to_change.add((row+i, col+j))
+
+def is_part_of_larger_rectangle(grid: ColoredGrid, row: int, col: int, color: int) -> bool:
+    rows, cols = grid.get_dimensions()
+    directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+    
+    for dr, dc in directions:
+        nr, nc = row + dr, col + dc
+        if 0 <= nr < rows and 0 <= nc < cols and grid.values[nr][nc] == color:
+            if is_qualifying_shape(grid, min(row, nr), min(col, nc), abs(dr) + 1, abs(dc) + 1):
+                return True
+    
+    return False
