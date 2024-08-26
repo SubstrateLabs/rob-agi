@@ -8,7 +8,7 @@ def solve_d4b1c2b1(input_grid: ColoredGrid) -> ColoredGrid:
     2. Otherwise, expand each cell into a square region:
        - If the largest connected region is 1 cell, expand each cell into a 2x2 square.
        - If the largest connected region is 2 cells, expand each cell into a 3x3 square.
-       - If the largest connected region is 3 or more cells, expand each cell into a 4x4 square.
+       - If the largest connected region is 3 or more cells, expand each cell into a 2x2 square.
     
     The expansion preserves the color of each original cell in its expanded region.
     """
@@ -65,5 +65,5 @@ def get_expansion_factor(region_size: int) -> int:
         return 2
     elif region_size == 2:
         return 3
-    else:
-        return 4
+    else:  # region_size >= 3
+        return 2
