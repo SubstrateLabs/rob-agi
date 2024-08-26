@@ -4,19 +4,21 @@ from collections import defaultdict
 
 def solve_ac2e8ecf(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by rearranging shapes based on their size and original positions.
+    Transforms the input grid by rearranging shapes based on their size, color, and original positions.
     
     The solution follows these steps:
     1. Identify and analyze all shapes in the input grid.
-    2. Group shapes by their vertical position (top, middle, bottom).
-    3. Sort shapes within each group based on size (descending) and leftmost column (ascending).
+    2. Categorize shapes by their vertical position (top, middle, bottom) and color.
+    3. Sort shapes within each category based on size (descending).
     4. Create a new grid and calculate the top, middle, and bottom sections.
-    5. Place shapes in their respective sections, maintaining relative horizontal positioning.
-    6. Handle any overflow by adjusting positions within sections.
-    7. Fill empty spaces with black (0).
+    5. Place shapes in their respective sections, prioritizing color grouping and compactness.
+    6. Maintain rough vertical positioning and left-to-right order within color groups.
+    7. Adjust for compactness and handle overflow between sections if necessary.
+    8. Fill empty spaces with black (0).
+    9. Optimize placement for balance and aesthetics.
 
     This approach creates an organized output grid while preserving the original shapes,
-    their relative vertical positioning, and approximate horizontal positioning.
+    their rough vertical positioning, color grouping, and overall aesthetic balance.
     """
     shapes = analyze_shapes(input_grid)
     grouped_shapes = group_shapes_by_position(shapes, input_grid.get_dimensions()[0])
@@ -40,8 +42,8 @@ def analyze_shapes(grid: ColoredGrid) -> List[Dict]:
                 'size': len(region),
                 'bounding_box': get_bounding_box(region),
                 'cells': region,
+                'centroid': get_centroid(region),
                 'leftmost_col': min(c for _, c in region),
-                'top_row': min(r for r, _ in region)
             }
             shapes.append(shape)
     return shapes
@@ -53,29 +55,40 @@ def get_bounding_box(region: List[Tuple[int, int]]) -> Tuple[int, int, int, int]
     max_col = max(c for _, c in region)
     return (min_row, min_col, max_row - min_row + 1, max_col - min_col + 1)
 
-def group_shapes_by_position(shapes: List[Dict], total_rows: int) -> Dict[str, List[Dict]]:
-    grouped_shapes = defaultdict(list)
+def get_centroid(region: List[Tuple[int, int]]) -> Tuple[float, float]:
+    avg_row = sum(r for r, _ in region) / len(region)
+    avg_col = sum(c for _, c in region) / len(region)
+    return (avg_row, avg_col)
+
+def categorize_shapes(shapes: List[Dict], total_rows: int) -> Dict[str, Dict[int, List[Dict]]]:
+    categorized = {'top': {}, 'middle': {}, 'bottom': {}}
     third = total_rows // 3
     for shape in shapes:
-        if shape['top_row'] < third:
-            grouped_shapes['top'].append(shape)
-        elif shape['top_row'] < 2 * third:
-            grouped_shapes['middle'].append(shape)
+        if shape['centroid'][0] < third:
+            section = 'top'
+        elif shape['centroid'][0] < 2 * third:
+            section = 'middle'
         else:
-            grouped_shapes['bottom'].append(shape)
+            section = 'bottom'
+        
+        if shape['color'] not in categorized[section]:
+            categorized[section][shape['color']] = []
+        categorized[section][shape['color']].append(shape)
     
-    for group in grouped_shapes.values():
-        group.sort(key=lambda s: (-s['size'], s['leftmost_col']))
+    for section in categorized:
+        for color in categorized[section]:
+            categorized[section][color].sort(key=lambda s: -s['size'])
     
-    return grouped_shapes
+    return categorized
 
-def calculate_section_heights(total_rows: int, grouped_shapes: Dict[str, List[Dict]]) -> Dict[str, int]:
+def calculate_section_heights(total_rows: int, categorized_shapes: Dict[str, Dict[int, List[Dict]]]) -> Dict[str, int]:
     section_heights = {}
     remaining_rows = total_rows
     
     for section in ['top', 'middle', 'bottom']:
-        if section in grouped_shapes:
-            section_height = max(shape['bounding_box'][2] for shape in grouped_shapes[section])
+        if categorized_shapes[section]:
+            section_height = max(max(shape['bounding_box'][2] for shape in shapes) 
+                                 for shapes in categorized_shapes[section].values())
             section_heights[section] = min(section_height, remaining_rows)
             remaining_rows -= section_heights[section]
         else:
@@ -83,21 +96,23 @@ def calculate_section_heights(total_rows: int, grouped_shapes: Dict[str, List[Di
     
     return section_heights
 
-def place_shapes_in_sections(grid: ColoredGrid, grouped_shapes: Dict[str, List[Dict]], section_heights: Dict[str, int]):
+def place_shapes(grid: ColoredGrid, categorized_shapes: Dict[str, Dict[int, List[Dict]]], section_heights: Dict[str, int]):
     current_row = 0
     for section in ['top', 'middle', 'bottom']:
-        if section in grouped_shapes:
-            place_shapes_in_row(grid, grouped_shapes[section], current_row, section_heights[section])
+        if categorized_shapes[section]:
+            place_shapes_in_section(grid, categorized_shapes[section], current_row, section_heights[section])
         current_row += section_heights[section]
 
-def place_shapes_in_row(grid: ColoredGrid, shapes: List[Dict], start_row: int, height: int):
+def place_shapes_in_section(grid: ColoredGrid, shapes_by_color: Dict[int, List[Dict]], start_row: int, height: int):
     col = 0
-    for shape in shapes:
-        if col + shape['bounding_box'][3] > grid.get_dimensions()[1]:
-            col = 0  # Start a new row if we exceed the grid width
-        anchor = (start_row, col)
-        place_shape(grid, shape, anchor, height)
-        col += shape['bounding_box'][3] + 1
+    for color in sorted(shapes_by_color.keys(), key=lambda c: -len(shapes_by_color[c])):
+        for shape in shapes_by_color[color]:
+            if col + shape['bounding_box'][3] > grid.get_dimensions()[1]:
+                col = 0  # Start a new row if we exceed the grid width
+            anchor = (start_row, col)
+            place_shape(grid, shape, anchor, height)
+            col += shape['bounding_box'][3] + 1
+        col = 0  # Start a new row for each color group
 
 def place_shape(grid: ColoredGrid, shape: Dict, anchor: Tuple[int, int], max_height: int) -> bool:
     rows, cols = grid.get_dimensions()
@@ -114,3 +129,16 @@ def place_shape(grid: ColoredGrid, shape: Dict, anchor: Tuple[int, int], max_hei
         if dr < shape_height:
             grid.set_cell(anchor[0] + dr, anchor[1] + dc, shape['color'])
     return True
+
+def solve_ac2e8ecf(input_grid: ColoredGrid) -> ColoredGrid:
+    shapes = analyze_shapes(input_grid)
+    categorized_shapes = categorize_shapes(shapes, input_grid.get_dimensions()[0])
+    
+    rows, cols = input_grid.get_dimensions()
+    new_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
+    
+    section_heights = calculate_section_heights(rows, categorized_shapes)
+    
+    place_shapes(new_grid, categorized_shapes, section_heights)
+    
+    return new_grid
