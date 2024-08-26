@@ -24,7 +24,7 @@ def solve_184a9768(input_grid: ColoredGrid) -> ColoredGrid:
         color_counts = {}
         for row in input_grid.values:
             for cell in row:
-                if cell != 0:
+                if cell != 0 and cell != 5:  # Exclude black and gray
                     color_counts[cell] = color_counts.get(cell, 0) + 1
         return color_counts
 
@@ -75,8 +75,6 @@ def solve_184a9768(input_grid: ColoredGrid) -> ColoredGrid:
 
     # Process secondary colors
     for color in color_hierarchy[1:]:
-        if color == 5:  # Skip gray
-            continue
         region = find_largest_region(color)
         if not region:
             continue
@@ -91,7 +89,7 @@ def solve_184a9768(input_grid: ColoredGrid) -> ColoredGrid:
             top = (main_bbox[0] + main_bbox[2]) // 2 - 1
             left = (main_bbox[1] + main_bbox[3]) // 2 - 1
             create_rectangle(color, top, left, top + 1, left + 1)
-        elif all(abs(x) < (main_bbox[2] - main_bbox[0]) // 4 for x in relative_position):
+        elif all(abs(x) < (main_bbox[2] - main_bbox[0]) // 3 for x in relative_position):
             # Place inside main structure
             height = min(bbox[2] - bbox[0] + 1, (main_bbox[2] - main_bbox[0]) // 2)
             width = min(bbox[3] - bbox[1] + 1, (main_bbox[3] - main_bbox[1]) // 2)
@@ -110,5 +108,21 @@ def solve_184a9768(input_grid: ColoredGrid) -> ColoredGrid:
                 top = (main_bbox[0] + main_bbox[2]) // 2 - (bbox[2] - bbox[0]) // 2
                 left = main_bbox[1] - 2 if relative_position[1] < 0 else main_bbox[3] + 2
                 create_rectangle(color, top, left, top + (bbox[2] - bbox[0]), left + 1)
+
+    # Optimize space usage
+    non_zero_rows = [r for r in range(rows) if any(output_grid.values[r][c] != 0 for c in range(cols))]
+    non_zero_cols = [c for c in range(cols) if any(output_grid.values[r][c] != 0 for r in range(rows))]
+    
+    if non_zero_rows and non_zero_cols:
+        min_row, max_row = min(non_zero_rows), max(non_zero_rows)
+        min_col, max_col = min(non_zero_cols), max(non_zero_cols)
+        
+        optimized_grid = [[0 for _ in range(max_col - min_col + 3)] for _ in range(max_row - min_row + 3)]
+        
+        for r in range(min_row, max_row + 1):
+            for c in range(min_col, max_col + 1):
+                optimized_grid[r - min_row + 1][c - min_col + 1] = output_grid.values[r][c]
+        
+        output_grid = ColoredGrid(values=optimized_grid)
 
     return output_grid
