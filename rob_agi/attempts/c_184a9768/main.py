@@ -2,21 +2,20 @@ from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Dict
 from collections import deque
 
-from collections import deque
-from typing import List, Tuple, Dict
-
 def solve_184a9768(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by applying the following steps:
-    1. Identifies primary color regions (Blue, Red, Yellow) and expands them
-    2. Places secondary color regions within primary regions, maintaining relative positions
-    3. Processes sky blue (8) regions specially, placing them near yellow (4) if possible
-    4. Removes isolated cells and gray (5) cells
-    5. Fills in surrounded empty cells
-    6. Ensures all cells outside the main color regions are empty (0)
+    1. Analyzes the input grid to identify color regions and their sizes
+    2. Creates a main structure based on the dominant color (usually blue)
+    3. Processes other colors in order of their significance
+    4. Places color regions as rectangles within the main structure or as separate regions
+    5. Optimizes placements to maximize space usage and maintain relative positions
+    6. Handles multiple regions of the same color if necessary
+    7. Cleans up the grid by removing isolated cells and ensuring rectangular regions
+    8. Creates a black border around the entire grid
     
     The transformation reorganizes color regions while preserving their general shapes and relationships,
-    following a color hierarchy of Blue > Red > Yellow > Others.
+    following a color hierarchy typically of Blue > Red > Yellow > Others, but adaptable based on input.
     """
     rows, cols = input_grid.get_dimensions()
     output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
