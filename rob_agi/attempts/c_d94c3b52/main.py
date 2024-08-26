@@ -5,14 +5,15 @@ def solve_d94c3b52(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the grid transformation challenge by applying the following steps:
     1. Identifies and expands sky blue (8) squares to 3x3 if present.
-    2. Moves the sky blue area to a new position based on grid structure.
+    2. Moves the sky blue area to a new position based on grid quadrants.
     3. Creates an alternation template based on the grid structure.
-    4. Applies color transformations:
+    4. Identifies significant patterns to preserve.
+    5. Applies color transformations:
        - Preserves sky blue (8) squares in their new position.
        - Alternates between blue (1) and orange (7) for other colored squares.
-    5. Maintains the overall structure and patterns of the input grid.
+       - Maintains significant patterns while potentially changing their colors.
     6. Ensures black (0) squares remain unchanged.
-    7. Preserves original patterns in their positions when not conflicting with sky blue area.
+    7. Balances novelty and familiarity in the transformed grid.
     8. Handles edge cases and adjusts transformation based on input patterns.
     """
     new_grid = input_grid.deep_copy()
@@ -27,6 +28,7 @@ def solve_d94c3b52(input_grid: ColoredGrid) -> ColoredGrid:
     template = create_alternation_template(new_grid, new_sky_blue_pos)
     preserved_patterns = find_preserved_patterns(input_grid)
     new_grid = apply_color_transformation(input_grid, new_grid, template, new_sky_blue_pos, preserved_patterns)
+    new_grid = balance_novelty_and_familiarity(input_grid, new_grid)
     
     return new_grid
 
@@ -56,15 +58,16 @@ def move_sky_blue(grid: ColoredGrid, old_pos: Tuple[int, int]) -> Tuple[int, int
     elif r < rows // 2 and c >= cols // 2:  # Top-right quadrant
         new_r, new_c = rows - 1 - r, c
     elif r >= rows // 2 and c < cols // 2:  # Bottom-left quadrant
-        new_r, new_c = r, cols - 1 - c
-    else:  # Bottom-right quadrant
         new_r, new_c = rows - 1 - r, c
+    else:  # Bottom-right quadrant
+        new_r, new_c = r, cols - 1 - c
     
     # Move the 3x3 sky blue square
     for dr in range(-1, 2):
         for dc in range(-1, 2):
-            grid.values[new_r + dr][new_c + dc] = 8
-            if (r + dr, c + dc) != (new_r + dr, new_c + dc):
+            if 0 <= new_r + dr < rows and 0 <= new_c + dc < cols:
+                grid.values[new_r + dr][new_c + dc] = 8
+            if (r + dr, c + dc) != (new_r + dr, new_c + dc) and 0 <= r + dr < rows and 0 <= c + dc < cols:
                 grid.values[r + dr][c + dc] = 0  # Clear the old position
     
     return new_r, new_c
@@ -108,8 +111,6 @@ def apply_color_transformation(input_grid: ColoredGrid, new_grid: ColoredGrid, t
             if input_grid.values[r][c] != 0:  # Non-black cell in input
                 if sky_blue_pos and abs(r - sky_blue_pos[0]) <= 1 and abs(c - sky_blue_pos[1]) <= 1:
                     new_grid.values[r][c] = 8  # Sky blue area
-                elif template[r][c] == 8:
-                    new_grid.values[r][c] = 8  # Keep sky blue in its new position
                 elif is_preserved_pattern(r, c, preserved_patterns):
                     new_grid.values[r][c] = input_grid.values[r][c]  # Preserve original pattern
                 else:
@@ -120,3 +121,25 @@ def apply_color_transformation(input_grid: ColoredGrid, new_grid: ColoredGrid, t
 
 def is_preserved_pattern(r: int, c: int, preserved_patterns: List[Tuple[int, int, int]]) -> bool:
     return any(abs(r - pr) < 3 and abs(c - pc) < 3 for pr, pc, _ in preserved_patterns)
+def balance_novelty_and_familiarity(input_grid: ColoredGrid, new_grid: ColoredGrid) -> ColoredGrid:
+    rows, cols = input_grid.num_rows, input_grid.num_cols
+    for r in range(rows):
+        for c in range(cols):
+            if input_grid.values[r][c] != 0 and new_grid.values[r][c] != 8:
+                # Preserve larger patterns
+                if is_part_of_large_pattern(input_grid, r, c):
+                    new_grid.values[r][c] = input_grid.values[r][c]
+                # Ensure some color changes for novelty
+                elif (r + c) % 2 == 0 and new_grid.values[r][c] == input_grid.values[r][c]:
+                    new_grid.values[r][c] = 7 if input_grid.values[r][c] == 1 else 1
+    return new_grid
+
+def is_part_of_large_pattern(grid: ColoredGrid, r: int, c: int) -> bool:
+    color = grid.values[r][c]
+    count = 0
+    for dr in [-1, 0, 1]:
+        for dc in [-1, 0, 1]:
+            if 0 <= r + dr < grid.num_rows and 0 <= c + dc < grid.num_cols:
+                if grid.values[r + dr][c + dc] == color:
+                    count += 1
+    return count >= 5  # Consider it a large pattern if 5 or more connected cells
