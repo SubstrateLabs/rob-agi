@@ -4,12 +4,13 @@ from typing import List, Tuple
 def solve_05a7bcf2(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid according to the following rules:
-    1. Identifies a sky blue (8) barrier or uses the middle of the grid if no barrier exists.
-    2. Expands yellow (4) regions downwards/rightwards until hitting the barrier, red, or edge.
-    3. Expands red (2) regions upwards/leftwards until hitting the barrier, yellow, or edge.
-    4. Fills the top/left section with green (3) where not yellow or sky blue.
-    5. Fills remaining empty cells with sky blue (8).
-    6. Preserves the original sky blue barrier.
+    1. Identifies or creates a sky blue (8) barrier.
+    2. Completes the barrier if partial.
+    3. Expands yellow (4) regions downwards/rightwards until hitting the barrier, red, or edge.
+    4. Expands red (2) regions upwards/leftwards until hitting the barrier, yellow, or edge.
+    5. Fills the top/left section with green (3) where not yellow or sky blue.
+    6. Fills remaining cells in bottom/right with sky blue (8).
+    7. Ensures the integrity of the sky blue barrier.
 
     Args:
     input_grid (ColoredGrid): The input grid to transform.
@@ -21,13 +22,26 @@ def solve_05a7bcf2(input_grid: ColoredGrid) -> ColoredGrid:
     rows, cols = grid.get_dimensions()
 
     def find_sky_blue_barrier(grid):
-        for i in range(rows):
-            if all(cell == 8 for cell in grid.values[i]):
-                return ('horizontal', i)
-        for j in range(cols):
-            if all(grid.values[i][j] == 8 for i in range(rows)):
-                return ('vertical', j)
+        horizontal_count = max(sum(1 for cell in row if cell == 8) for row in grid.values)
+        vertical_count = max(sum(1 for row in grid.values if row[col] == 8) for col in range(cols))
+        
+        if horizontal_count >= vertical_count:
+            for i, row in enumerate(grid.values):
+                if 8 in row:
+                    return ('horizontal', i)
+        else:
+            for j in range(cols):
+                if any(grid.values[i][j] == 8 for i in range(rows)):
+                    return ('vertical', j)
+        
         return ('horizontal', rows // 2)  # Default to middle row if no barrier found
+
+    def complete_barrier(grid, orientation, pos):
+        if orientation == 'horizontal':
+            grid.values[pos] = [8] * cols
+        else:
+            for r in range(rows):
+                grid.values[r][pos] = 8
 
     def expand_color(grid, start_row, start_col, color, direction):
         if direction == 'down':
@@ -52,6 +66,7 @@ def solve_05a7bcf2(input_grid: ColoredGrid) -> ColoredGrid:
                 grid.values[start_row][c] = color
 
     orientation, barrier_pos = find_sky_blue_barrier(grid)
+    complete_barrier(grid, orientation, barrier_pos)
 
     # Store original yellow and red positions
     original_yellow = [(r, c) for r in range(rows) for c in range(cols) if grid.values[r][c] == 4]
@@ -77,7 +92,7 @@ def solve_05a7bcf2(input_grid: ColoredGrid) -> ColoredGrid:
                     grid.values[r][c] = 3
         
         # Fill remaining cells with sky blue
-        for r in range(barrier_pos, rows):
+        for r in range(barrier_pos + 1, rows):
             for c in range(cols):
                 if grid.values[r][c] not in [2, 8]:
                     grid.values[r][c] = 8
@@ -101,16 +116,12 @@ def solve_05a7bcf2(input_grid: ColoredGrid) -> ColoredGrid:
                     grid.values[r][c] = 3
         
         # Fill remaining cells with sky blue
-        for c in range(barrier_pos, cols):
+        for c in range(barrier_pos + 1, cols):
             for r in range(rows):
                 if grid.values[r][c] not in [2, 8]:
                     grid.values[r][c] = 8
 
-    # Ensure the original barrier remains unchanged
-    if orientation == 'horizontal':
-        grid.values[barrier_pos] = [8] * cols
-    else:
-        for r in range(rows):
-            grid.values[r][barrier_pos] = 8
+    # Final check to ensure barrier integrity
+    complete_barrier(grid, orientation, barrier_pos)
 
     return grid
