@@ -7,7 +7,7 @@ def solve_8fbca751(input_grid: ColoredGrid) -> ColoredGrid:
     Solve the grid transformation challenge by outlining all blue shapes with red.
     
     This function identifies all blue (8) regions in the input grid, groups them into
-    logical shapes (including nearby disconnected cells within one cell distance),
+    logical shapes (including nearby disconnected cells within a two-cell distance),
     and outlines each shape with red (2) cells. The outline includes cells immediately
     adjacent to blue cells (including diagonally). The outline does not extend beyond
     the grid boundaries or overwrite existing non-black cells. Each logical blue shape
