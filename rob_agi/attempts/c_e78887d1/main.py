@@ -1,7 +1,22 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List, Tuple, Dict
+from collections import defaultdict
 
 def solve_e78887d1(input_grid: ColoredGrid) -> ColoredGrid:
+    """
+    Transforms the input grid into a 3-row representation that captures the essence of the input patterns.
+    
+    The function performs the following steps:
+    1. Analyzes the input grid to identify color groups and their patterns.
+    2. Creates idealized 3-row representations for each color group.
+    3. Combines the representations while maintaining relative positions and prominence.
+    4. Refines the output to ensure balance, pattern completion, and aesthetic arrangement.
+    5. Makes final adjustments to optimize the 3-row representation.
+    
+    This approach focuses on distilling and idealizing the essence of the input patterns
+    rather than strict replication, allowing for creative interpretation while maintaining
+    consistency across different inputs.
+    """
     """
     Transforms the input grid into a 3-row representation that captures the essence of the input patterns.
     
@@ -29,15 +44,52 @@ def solve_e78887d1(input_grid: ColoredGrid) -> ColoredGrid:
     return output_grid
 
 def identify_color_groups(grid: ColoredGrid) -> Dict[int, List[Tuple[int, int]]]:
-    color_groups = {}
-    for r in range(grid.get_dimensions()[0]):
-        for c in range(grid.get_dimensions()[1]):
+    color_groups = defaultdict(list)
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        for c in range(cols):
             color = grid.values[r][c]
             if color != 0:
-                if color not in color_groups:
-                    color_groups[color] = []
                 color_groups[color].append((r, c))
-    return color_groups
+    return dict(color_groups)
+
+def analyze_pattern(positions: List[Tuple[int, int]], rows: int, cols: int) -> str:
+    unique_rows = len(set(r for r, _ in positions))
+    unique_cols = len(set(c for _, c in positions))
+    
+    if unique_rows == 1:
+        return "horizontal"
+    if unique_cols == 1:
+        return "vertical"
+    if len(positions) >= rows * cols / 4:
+        return "block"
+    if unique_rows == 2 and unique_cols == 2:
+        return "corner"
+    return "scattered"
+
+def create_idealized_representation(color: int, pattern: str, prominence: float) -> List[List[int]]:
+    if pattern == "vertical":
+        return [[color, 0, color], [color, 0, color], [color, 0, color]]
+    if pattern == "horizontal":
+        return [[0, color, 0], [color, color, color], [0, color, 0]]
+    if pattern == "block":
+        return [[color, color, 0], [color, color, color], [0, color, color]]
+    if pattern == "corner":
+        return [[color, color, 0], [color, 0, 0], [color, color, 0]]
+    # Scattered pattern
+    if prominence > 0.5:
+        return [[color, 0, color], [0, color, 0], [color, 0, color]]
+    else:
+        return [[color, 0, 0], [0, color, 0], [0, 0, color]]
+
+def combine_representations(representations: List[List[List[int]], cols: int) -> ColoredGrid:
+    output = [[0 for _ in range(cols)] for _ in range(3)]
+    for rep in representations:
+        for r in range(3):
+            for c in range(cols):
+                if rep[r][c] != 0 and output[r][c] == 0:
+                    output[r][c] = rep[r][c]
+    return ColoredGrid(values=output)
 
 def identify_pattern(positions: List[Tuple[int, int]], rows: int, cols: int) -> str:
     if len(set(r for r, _ in positions)) == 1:
