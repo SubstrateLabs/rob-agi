@@ -1,14 +1,16 @@
 from rob_agi.colored_grid import ColoredGrid
-from collections import deque
 
 def solve_981571dc(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the grid transformation challenge by filling black areas with colors.
     
-    The function starts from the edges of black areas and moves inward, replacing black (0) cells
-    with appropriate colors based on their non-black neighbors. This process continues
-    until no black cells remain. The algorithm uses a queue-based approach to ensure
-    that the fill progresses from the edges inward, maintaining the continuity of existing patterns.
+    The function performs three passes over the grid:
+    1. Fill from left: Extends patterns from left to right.
+    2. Fill from top: Extends patterns from top to bottom.
+    3. Final fill: Fills any remaining black cells using left or top neighbors.
+    
+    This approach ensures that patterns are extended in a consistent manner,
+    maintaining the "downward and rightward" flow of color patterns.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -16,45 +18,28 @@ def solve_981571dc(input_grid: ColoredGrid) -> ColoredGrid:
     Returns:
     ColoredGrid: The transformed grid with black areas filled.
     """
-    def get_neighbors(row, col):
-        return [(row-1, col), (row+1, col), (row, col-1), (row, col+1)]
-
-    def is_valid(row, col):
-        return 0 <= row < rows and 0 <= col < cols
-
-    def get_first_non_black_neighbor(row, col):
-        for nr, nc in get_neighbors(row, col):
-            if is_valid(nr, nc) and grid[nr][nc] != 0:
-                return grid[nr][nc]
-        return None
-
     grid = input_grid.deep_copy()
     rows, cols = len(grid.values), len(grid.values[0])
-    queue = deque()
 
-    # Identify edge cells
+    # First Pass - Fill from Left
     for r in range(rows):
-        for c in range(cols):
-            if grid.values[r][c] == 0 and any(is_valid(nr, nc) and grid.values[nr][nc] != 0 for nr, nc in get_neighbors(r, c)):
-                queue.append((r, c))
+        for c in range(1, cols):
+            if grid.values[r][c] == 0 and grid.values[r][c-1] != 0:
+                grid.values[r][c] = grid.values[r][c-1]
 
-    # Fill process
-    while queue:
-        r, c = queue.popleft()
-        if grid.values[r][c] == 0:
-            color = get_first_non_black_neighbor(r, c)
-            if color is not None:
-                grid.values[r][c] = color
-                for nr, nc in get_neighbors(r, c):
-                    if is_valid(nr, nc) and grid.values[nr][nc] == 0:
-                        queue.append((nr, nc))
+    # Second Pass - Fill from Top
+    for c in range(cols):
+        for r in range(1, rows):
+            if grid.values[r][c] == 0 and grid.values[r-1][c] != 0:
+                grid.values[r][c] = grid.values[r-1][c]
 
-    # Final check for any remaining black cells
+    # Final Pass - Fill Remaining
     for r in range(rows):
         for c in range(cols):
             if grid.values[r][c] == 0:
-                color = get_first_non_black_neighbor(r, c)
-                if color is not None:
-                    grid.values[r][c] = color
+                if c > 0 and grid.values[r][c-1] != 0:
+                    grid.values[r][c] = grid.values[r][c-1]
+                elif r > 0:
+                    grid.values[r][c] = grid.values[r-1][c]
 
     return grid
