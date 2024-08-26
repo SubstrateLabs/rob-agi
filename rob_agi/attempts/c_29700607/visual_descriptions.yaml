@@ -1,0 +1,65 @@
+example_0:
+  input: |
+    A 15x15 grid with mostly black (empty) squares. There are a few colored squares:
+    - A magenta (6) square in the top-right corner (row 0, column 5)
+    - A gray (5) square next to it (row 0, column 6)
+    - A green (3) square next to the gray (row 0, column 7)
+    - Another green (3) square in the top-right corner (row 2, column 14)
+    - A magenta (6) square in the bottom-left corner (row 4, column 0)
+    The colored squares appear to be disconnected and sparse.
+  output: |
+    The same 15x15 grid, but now with lines connecting the colored squares:
+    - A vertical magenta (6) line from the top magenta square to the bottom one
+    - A vertical gray (5) line from the top gray square to the bottom of the grid
+    - A green (3) line that goes down from the top green square, then right to connect to the other green square
+    The lines appear to use the minimum number of segments to connect all squares of the same color.
+    The lines do not overwrite each other at intersections.
+
+example_1:
+  input: |
+    A 12x12 grid with mostly black (empty) squares. There are a few colored squares:
+    - A gray (5) square in the top-left area (row 0, column 4)
+    - A green (3) square next to it (row 0, column 5)
+    - A sky blue (8) square next to the green (row 0, column 6)
+    - A gray (5) square in the left edge (row 4, column 0)
+    - A sky blue (8) square in the right edge (row 5, column 11)
+    - A green (3) square in the left edge (row 8, column 0)
+    The colored squares are disconnected and spread across the grid.
+  output: |
+    The same 12x12 grid, but now with lines connecting the colored squares:
+    - A gray (5) line that goes down from the top gray square, then left to the other gray square
+    - A green (3) line that goes down from the top green square to the bottom green square
+    - A sky blue (8) line that goes down from the top sky blue square, then right to the other sky blue square
+    The lines use the minimum number of segments to connect all squares of the same color.
+    The lines do not overwrite each other at intersections.
+
+example_2:
+  input: |
+    An 11x11 grid with mostly black (empty) squares. There are a few colored squares:
+    - A yellow (4) square in the top area (row 0, column 3)
+    - A magenta (6) square next to it (row 0, column 4)
+    - A red (2) square next to the magenta (row 0, column 5)
+    - A yellow (4) square in the left edge (row 4, column 0)
+    - A red (2) square in the right edge (row 4, column 10)
+    - A magenta (6) square in the bottom-right corner (row 9, column 10)
+    The colored squares are disconnected and spread across the grid.
+  output: |
+    The same 11x11 grid, but now with lines connecting the colored squares:
+    - A yellow (4) line that goes down from the top yellow square, then left to the other yellow square
+    - A magenta (6) line that goes down from the top magenta square to the bottom magenta square
+    - A red (2) line that goes down from the top red square, then right to the other red square
+    The lines use the minimum number of segments to connect all squares of the same color.
+    The lines do not overwrite each other at intersections.
+
+test_case_0:
+  input: |
+    An 11x11 grid with mostly black (empty) squares. There are a few colored squares:
+    - A yellow (4) square in the top area (row 0, column 3)
+    - A magenta (6) square next to it (row 0, column 4)
+    - A red (2) square next to the magenta (row 0, column 5)
+    - A yellow (4) square in the left edge (row 4, column 0)
+    - A red (2) square in the right edge (row 4, column 10)
+    - A magenta (6) square in the bottom-right corner (row 9, column 10)
+    The colored squares are disconnected and spread across the grid.
+  output: |
+    The output grid is not provided for this test case.
