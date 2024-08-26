@@ -14,6 +14,9 @@ def solve_9b365c51(input_grid: ColoredGrid) -> ColoredGrid:
        contiguous vertical section containing sky blue cells.
     5. Returns the transformed grid.
 
+    The color sequence wraps around if more colors are needed than are present
+    in the original sequence.
+
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
 
@@ -35,11 +38,11 @@ def solve_9b365c51(input_grid: ColoredGrid) -> ColoredGrid:
     color_index = 0
     for col in range(leftmost_sky_blue_col, output_grid.num_cols):
         if any(output_grid.values[row][col] == 8 for row in range(output_grid.num_rows)):
-            current_color = color_sequence[color_index]
+            current_color = color_sequence[color_index % len(color_sequence)]
             for row in range(output_grid.num_rows):
-                if output_grid.values[row][col] == 8 or is_in_sky_blue_section(output_grid, row, col):
+                if output_grid.values[row][col] == 8:
                     output_grid.values[row][col] = current_color
-            color_index = (color_index + 1) % len(color_sequence)
+            color_index += 1
 
     # Step 5: Return the transformed grid
     return output_grid
@@ -57,9 +60,3 @@ def analyze_input_grid(grid: ColoredGrid) -> Tuple[List[int], int]:
             leftmost_sky_blue_col = col
             break
     return colors, leftmost_sky_blue_col
-
-def is_in_sky_blue_section(grid: ColoredGrid, row: int, col: int) -> bool:
-    for r in range(grid.num_rows):
-        if grid.values[r][col] == 8:
-            return True
-    return False
