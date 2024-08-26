@@ -1,5 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Set
 import copy
 
 def solve_963f59bc(input_grid: ColoredGrid) -> ColoredGrid:
@@ -18,44 +18,41 @@ def solve_963f59bc(input_grid: ColoredGrid) -> ColoredGrid:
     5. Preserves original elements and grid boundaries
     6. Returns the modified grid with all valid transformations applied
     """
-    def find_primary_shape(grid: ColoredGrid) -> Dict[Tuple[int, int], int]:
+    def find_primary_shape(grid: ColoredGrid) -> Set[Tuple[int, int]]:
         largest_region = max(
             (region for color in range(1, 10) for region in grid.find_connected_regions(color)),
             key=len, default=[]
         )
-        if not largest_region:
-            return {}
-        color = grid.values[largest_region[0][0]][largest_region[0][1]]
-        return {(r, c): color for r, c in largest_region}
+        return set(largest_region)
 
-    def get_transformations(shape: Dict[Tuple[int, int], int]) -> List[Dict[Tuple[int, int], int]]:
+    def get_transformations(shape: Set[Tuple[int, int]]) -> List[Set[Tuple[int, int]]]:
         transformations = []
-    
+        
         # Original shape
         transformations.append(shape)
-    
+        
         # Rotations
         for _ in range(3):
-            shape = {(-c, r): color for (r, c), color in shape.items()}
+            shape = {(-c, r) for r, c in shape}
             transformations.append(shape)
-    
+        
         # Mirrors
-        mirror_h = {(r, -c): color for (r, c), color in shape.items()}
-        mirror_v = {(-r, c): color for (r, c), color in shape.items()}
+        mirror_h = {(r, -c) for r, c in shape}
+        mirror_v = {(-r, c) for r, c in shape}
         transformations.extend([mirror_h, mirror_v])
-    
+        
         # Rotations of mirrors
         for _ in range(3):
-            mirror_h = {(-c, r): color for (r, c), color in mirror_h.items()}
-            mirror_v = {(-c, r): color for (r, c), color in mirror_v.items()}
+            mirror_h = {(-c, r) for r, c in mirror_h}
+            mirror_v = {(-c, r) for r, c in mirror_v}
             transformations.extend([mirror_h, mirror_v])
-    
+        
         return transformations
 
-    def apply_shape(grid: List[List[int]], shape: Dict[Tuple[int, int], int], offset_r: int, offset_c: int, color: int) -> int:
+    def apply_shape(grid: List[List[int]], shape: Set[Tuple[int, int]], offset_r: int, offset_c: int, color: int) -> int:
         rows, cols = len(grid), len(grid[0])
         score = 0
-        for (r, c), _ in shape.items():
+        for r, c in shape:
             grid_r, grid_c = offset_r + r, offset_c + c
             if 0 <= grid_r < rows and 0 <= grid_c < cols:
                 if grid[grid_r][grid_c] == 0:
@@ -63,41 +60,40 @@ def solve_963f59bc(input_grid: ColoredGrid) -> ColoredGrid:
                     score += 1
         return score
 
-    def solve_963f59bc(input_grid: ColoredGrid) -> ColoredGrid:
-        primary_shape = find_primary_shape(input_grid)
-        output_grid = copy.deepcopy(input_grid.values)
-        rows, cols = input_grid.get_dimensions()
+    primary_shape = find_primary_shape(input_grid)
+    output_grid = copy.deepcopy(input_grid.values)
+    rows, cols = input_grid.get_dimensions()
 
-        isolated_squares = [
-            (r, c, input_grid.values[r][c])
-            for r in range(rows)
-            for c in range(cols)
-            if input_grid.values[r][c] != 0 and (r, c) not in primary_shape
-        ]
+    isolated_squares = [
+        (r, c, input_grid.values[r][c])
+        for r in range(rows)
+        for c in range(cols)
+        if input_grid.values[r][c] != 0 and (r, c) not in primary_shape
+    ]
 
-        transformations = get_transformations(primary_shape)
+    transformations = get_transformations(primary_shape)
 
-        for isolated_r, isolated_c, isolated_color in isolated_squares:
-            best_score = 0
-            best_placement = None
+    for isolated_r, isolated_c, isolated_color in isolated_squares:
+        best_score = 0
+        best_placement = None
 
-            for transform in transformations:
-                min_r = min(r for r, _ in transform)
-                min_c = min(c for _, c in transform)
-                max_r = max(r for r, _ in transform)
-                max_c = max(c for _, c in transform)
+        for transform in transformations:
+            min_r = min(r for r, _ in transform)
+            min_c = min(c for _, c in transform)
+            max_r = max(r for r, _ in transform)
+            max_c = max(c for _, c in transform)
 
-                for offset_r in range(-max_r, rows - min_r):
-                    for offset_c in range(-max_c, cols - min_c):
-                        if (isolated_r - offset_r, isolated_c - offset_c) in transform:
-                            temp_grid = copy.deepcopy(output_grid)
-                            score = apply_shape(temp_grid, transform, offset_r, offset_c, isolated_color)
-                            if score > best_score:
-                                best_score = score
-                                best_placement = (transform, offset_r, offset_c)
+            for offset_r in range(-max_r, rows - min_r):
+                for offset_c in range(-max_c, cols - min_c):
+                    if (isolated_r - offset_r, isolated_c - offset_c) in transform:
+                        temp_grid = copy.deepcopy(output_grid)
+                        score = apply_shape(temp_grid, transform, offset_r, offset_c, isolated_color)
+                        if score > best_score:
+                            best_score = score
+                            best_placement = (transform, offset_r, offset_c)
 
-            if best_placement:
-                transform, offset_r, offset_c = best_placement
-                apply_shape(output_grid, transform, offset_r, offset_c, isolated_color)
+        if best_placement:
+            transform, offset_r, offset_c = best_placement
+            apply_shape(output_grid, transform, offset_r, offset_c, isolated_color)
 
-        return ColoredGrid(values=output_grid)
+    return ColoredGrid(values=output_grid)
