@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    The input grid shows a large sky blue (8) rectangular shape on a black (0) background. The shape is composed of two distinct rectangles: one in the upper left corner (8x8 in size) and another larger one (12x10 in size) in the bottom right area. These rectangles are separated by black space, creating an L-shaped negative space between them.
+  output: |
+    The output grid transforms the sky blue rectangles into a colorful pattern. The upper left rectangle is divided into a 4x4 grid of smaller 2x2 squares, each filled with a different color (magenta, blue, yellow, red, green). The bottom right rectangle is similarly divided, but into a 6x5 grid of 2x2 colored squares. The color pattern is consistent: magenta in the top-left, blue in the top-right, yellow in the center, red in the bottom-left, and green in the bottom-right of each 4x4 section. The black background remains unchanged.
+
+example_1:
+  input: |
+    This input grid features two sky blue (8) rectangles on a black (0) background. The first rectangle is positioned on the left side of the grid, spanning from the top to about two-thirds down (12x10 in size). The second rectangle is smaller (8x8 in size) and located in the bottom right corner of the grid. There is black space separating these two rectangles, forming an inverted L-shape.
+  output: |
+    The output grid transforms the sky blue rectangles into a colorful pattern, similar to the previous example. The larger left rectangle is divided into a 6x5 grid of 2x2 colored squares, while the smaller bottom-right rectangle is divided into a 4x4 grid of 2x2 squares. The color pattern remains consistent: magenta in the top-left, blue in the top-right, yellow in the center, red in the bottom-left, and green in the bottom-right of each 4x4 section. The black background is preserved.
+
+test_case_0:
+  input: |
+    The input for this test case is not provided in the given code snippet.
+  output: |
+    The output for this test case is not provided in the given code snippet, as it is meant to be solved by applying the pattern observed in the examples.
