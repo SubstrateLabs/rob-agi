@@ -1,17 +1,19 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple
 
+import math
+from typing import List, Tuple
+
 def solve_7d419a02(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by changing blue (8) regions to yellow (4).
+    Transforms the input grid by changing blue (8) regions to yellow (4) based on their position and structure.
     
     The transformation follows these rules:
-    1. Blue regions are changed to yellow based on their size and position.
-    2. Larger blue regions (3x3 or larger) are more likely to be changed to yellow.
-    3. Blue regions closer to the edges are more likely to be changed to yellow.
-    4. Single-width blue lines and isolated blue cells usually remain blue.
-    5. Black (0) and magenta (6) cells remain unchanged.
-    6. The transformation is applied consistently across the entire grid.
+    1. Blue regions closer to the edges are more likely to be changed to yellow.
+    2. A blue "core" is maintained in the center of the grid.
+    3. Single-width blue lines and isolated blue cells usually remain blue.
+    4. Black (0) and magenta (6) cells remain unchanged.
+    5. The transformation is applied consistently across the entire grid.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -21,18 +23,26 @@ def solve_7d419a02(input_grid: ColoredGrid) -> ColoredGrid:
     """
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
+    center_row, center_col = (rows - 1) / 2, (cols - 1) / 2
+    threshold = max(rows, cols) * 0.3
     processed = set()
 
-    def is_edge_region(region: List[Tuple[int, int]]) -> bool:
-        return any(r == 0 or r == rows - 1 or c == 0 or c == cols - 1 for r, c in region)
+    def distance_from_center(r: int, c: int) -> float:
+        return math.sqrt((r - center_row)**2 + (c - center_col)**2)
+
+    def is_single_width_line(region: List[Tuple[int, int]]) -> bool:
+        for r, c in region:
+            non_blue_neighbors = sum(1 for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]
+                                     if 0 <= r + dr < rows and 0 <= c + dc < cols and not is_blue(grid.values[r + dr][c + dc]))
+            if non_blue_neighbors < 2:
+                return False
+        return True
 
     def should_transform(region: List[Tuple[int, int]]) -> bool:
-        size = len(region)
-        if size < 4:  # Keep 1x1 and most 2x2 regions blue
+        if is_single_width_line(region) or len(region) == 1:
             return False
-        if size >= 9:  # Always transform 3x3 or larger
-            return True
-        return is_edge_region(region) or size >= 6  # Transform 2x3 or larger edge regions
+        avg_distance = sum(distance_from_center(r, c) for r, c in region) / len(region)
+        return avg_distance > threshold
 
     for row in range(rows):
         for col in range(cols):
