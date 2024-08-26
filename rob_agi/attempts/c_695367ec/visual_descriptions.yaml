@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 3x3 grid entirely filled with green (3) squares. This forms a solid green square with no variation or pattern within it.
+  output: |
+    A 15x15 grid with a complex pattern. The overall structure consists of a green (3) cross or plus sign that divides the grid into four equal quadrants. Each arm of the cross is 3 squares wide. The spaces between the arms of the cross are filled with a pattern of green squares surrounded by black (0) squares. Specifically, in each quadrant, there are 3x3 blocks where the center square is green and the surrounding squares are black. These blocks are arranged in a 3x3 pattern within each quadrant. The result is a symmetrical, ornate design with green elements on a black background.
+
+example_1:
+  input: |
+    A 2x2 grid entirely filled with sky blue (8) squares. This forms a small, solid sky blue square.
+  output: |
+    A 15x15 grid with a repeating pattern. The pattern consists of vertical stripes of sky blue (8) that are 1 square wide, separated by 2 columns of black (0) squares. This pattern repeats across the entire width of the grid. Every third row is entirely sky blue, creating horizontal stripes that intersect with the vertical stripes. The overall effect is a grid-like pattern of sky blue squares on a black background, with larger sky blue squares where the horizontal and vertical stripes intersect.
+
+example_2:
+  input: |
+    A 4x4 grid entirely filled with red (2) squares. This forms a solid red square with no variation or pattern within it.
+  output: |
+    A 15x15 grid with a structured pattern. The pattern consists of vertical stripes of red (2) that are 1 square wide, separated by 4 columns of black (0) squares. This pattern repeats across the entire width of the grid. Every fifth row is entirely red, creating horizontal stripes that intersect with the vertical stripes. The overall effect is a grid-like pattern of red squares on a black background, with larger red squares where the horizontal and vertical stripes intersect. The spacing between the red elements is wider compared to the previous example, resulting in a more open, less dense pattern.
+
+test_case_0:
+  input: |
+    A 4x4 grid entirely filled with red (2) squares. This is identical to the input of example_2, forming a solid red square with no variation or pattern within it.
+  output: |
+    The output is not provided for this test case. Based on the pattern observed in the previous examples, we would expect a similar transformation to occur, likely resulting in a 15x15 grid with a pattern of red squares on a black background. However, the exact details of this pattern cannot be determined without seeing the actual output.
