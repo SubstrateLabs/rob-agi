@@ -3,30 +3,25 @@ from rob_agi.colored_grid import ColoredGrid
 def get_core_sequence(grid):
     sequence = []
     rows, cols = grid.get_dimensions()
-    i, j = 0, 0
-    while i < rows - 1 and j < cols - 1 and len(sequence) < 4:
-        color = grid.values[i][j]
+    for i in range(min(rows, cols)):
+        color = grid.values[i][i]
         if color not in sequence and not is_border_color(grid, color):
             sequence.append(color)
-        i += 1
-        j += 1
+        if len(sequence) == 3:  # We only need the first 3 colors of the pattern
+            break
     return sequence
 
 def is_border_color(grid, color):
     rows, cols = grid.get_dimensions()
-    return all(grid.values[i][cols-1] == color for i in range(rows)) or \
-           all(grid.values[rows-1][j] == color for j in range(cols))
+    return color in grid.values[-1] or any(row[-1] == color for row in grid.values)
 
-def rotate_sequence(sequence):
-    return sequence[1:] + [sequence[0]]
-
-def create_output_grid(input_grid, rotated_sequence):
+def create_output_grid(input_grid, sequence):
     rows, cols = input_grid.get_dimensions()
     output_values = []
     for i in range(rows):
         row = []
         for j in range(cols):
-            color = rotated_sequence[(i + j) % len(rotated_sequence)]
+            color = sequence[(i + j) % len(sequence)]
             row.append(color)
         output_values.append(row)
     return ColoredGrid(values=output_values)
@@ -37,8 +32,7 @@ def solve_50a16a69(input_grid: ColoredGrid) -> ColoredGrid:
     
     The function performs the following steps:
     1. Identifies the core sequence from the top-left diagonal of the input grid, ignoring border colors.
-    2. Rotates the sequence by moving the first color to the end.
-    3. Creates a new grid by extending the rotated sequence across the entire area.
+    2. Creates a new grid by extending the identified sequence across the entire area.
     
     This approach works for various patterns, handling different grid sizes, border colors,
     and extending the pattern to areas that were originally borders or uniform regions.
@@ -50,5 +44,4 @@ def solve_50a16a69(input_grid: ColoredGrid) -> ColoredGrid:
     ColoredGrid: The transformed grid with the extended pattern.
     """
     core_sequence = get_core_sequence(input_grid)
-    rotated_sequence = rotate_sequence(core_sequence)
-    return create_output_grid(input_grid, rotated_sequence)
+    return create_output_grid(input_grid, core_sequence)
