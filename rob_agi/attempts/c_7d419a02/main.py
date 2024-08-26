@@ -9,11 +9,12 @@ def solve_7d419a02(input_grid: ColoredGrid) -> ColoredGrid:
     The transformation follows these rules:
     1. Blue regions closer to the edges and corners are more likely to be changed to yellow.
     2. A blue "core" is maintained in the center of the grid, with a cross/plus shape for larger grids.
-    3. Line-like structures and small isolated blue regions tend to remain blue.
+    3. Line-like structures and small isolated blue regions remain blue.
     4. Black (0) and magenta (6) cells remain unchanged.
-    5. The transformation is applied consistently and symmetrically across the entire grid.
+    5. The transformation is applied symmetrically across the entire grid.
     6. Larger blue regions are more likely to be transformed than smaller ones.
     7. The central cross structure is preserved more strongly in larger grids.
+    8. The transformation is more aggressive for larger grids.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -25,7 +26,7 @@ def solve_7d419a02(input_grid: ColoredGrid) -> ColoredGrid:
     rows, cols = grid.get_dimensions()
     center_row, center_col = (rows - 1) / 2, (cols - 1) / 2
     max_distance = math.sqrt(center_row**2 + center_col**2)
-    cross_threshold = max(rows, cols) * 0.3
+    cross_threshold = max(rows, cols) * 0.25
     processed = set()
 
     def distance_from_center(r: int, c: int) -> float:
@@ -45,15 +46,16 @@ def solve_7d419a02(input_grid: ColoredGrid) -> ColoredGrid:
         return (abs(r - center_row) <= 1 or abs(c - center_col) <= 1) and distance_from_center(r, c) <= cross_threshold
 
     def should_transform(region: List[Tuple[int, int]]) -> bool:
-        if is_line_like(region) or len(region) == 1:
+        if is_line_like(region) or len(region) <= 2:
             return False
         avg_distance = sum(distance_from_center(r, c) for r, c in region) / len(region)
         edge_factor = sum(1 for r, c in region if is_edge_or_corner(r, c)) / len(region)
         size_factor = min(1, len(region) / (rows * cols * 0.05))
         cross_factor = sum(1 for r, c in region if is_part_of_cross(r, c)) / len(region)
         
-        transform_score = (avg_distance / max_distance) * 0.4 + edge_factor * 0.3 + size_factor * 0.3 - cross_factor * 0.5
-        return transform_score > 0.4
+        transform_score = (avg_distance / max_distance) * 0.4 + edge_factor * 0.3 + size_factor * 0.3 - cross_factor * 0.6
+        threshold = 0.35 - (max(rows, cols) / 100) * 0.05  # Lower threshold for larger grids
+        return transform_score > threshold
 
     def flood_fill(row: int, col: int) -> List[Tuple[int, int]]:
         stack = [(row, col)]
