@@ -29,53 +29,41 @@ def solve_9f27f097(input_grid: ColoredGrid) -> ColoredGrid:
     
     return output_grid
 
-def find_source_and_target_corners(grid: ColoredGrid, border_color: int) -> Tuple[str, str]:
-    corners = ['top_left', 'top_right', 'bottom_left', 'bottom_right']
-    corner_diversity = {corner: count_unique_colors(grid, corner, border_color) for corner in corners}
-    source_corner = max(corner_diversity, key=corner_diversity.get)
-    target_corner = get_opposite_corner(source_corner)
-    return source_corner, target_corner
+def find_most_diverse_region(grid: ColoredGrid, border_color: int) -> List[Tuple[int, int]]:
+    regions = grid.find_connected_regions(lambda x: x != border_color)
+    if not regions:
+        return [(r, c) for r in range(grid.num_rows) for c in range(grid.num_cols) if grid.values[r][c] != border_color]
+    return max(regions, key=lambda r: len(set(grid.values[y][x] for y, x in r)))
 
-def count_unique_colors(grid: ColoredGrid, corner: str, border_color: int) -> int:
-    start_row, start_col = get_corner_coordinates(corner, grid.num_rows, grid.num_cols)
-    unique_colors = set()
-    for r in range(start_row, start_row + 5):
-        for c in range(start_col, start_col + 5):
-            if 0 <= r < grid.num_rows and 0 <= c < grid.num_cols:
-                color = grid.values[r][c]
-                if color != border_color:
-                    unique_colors.add(color)
-    return len(unique_colors)
-
-def determine_source_size(grid: ColoredGrid, corner: str, border_color: int) -> int:
-    start_row, start_col = get_corner_coordinates(corner, grid.num_rows, grid.num_cols)
-    size = 0
-    while True:
-        if (start_row + size >= grid.num_rows or start_col + size >= grid.num_cols or
-            grid.values[start_row + size][start_col + size] == border_color):
-            break
-        size += 1
-    return size
-
-def apply_transformation(grid: ColoredGrid, source_region: List[Tuple[int, int]], target_region: List[Tuple[int, int]]) -> ColoredGrid:
-    output_grid = grid.deep_copy()
-    source_bounds = get_region_bounds(source_region)
-    target_bounds = get_region_bounds(target_region)
+def find_target_region(grid: ColoredGrid, border_color: int, size: int) -> Optional[List[Tuple[int, int]]]:
+    regions = grid.find_connected_regions(lambda x: x != border_color)
+    single_color_regions = [r for r in regions if len(set(grid.values[y][x] for y, x in r)) == 1]
     
-    for (sy, sx), (ty, tx) in zip(source_region, target_region):
-        output_grid.values[ty][tx] = grid.values[sy][sx]
+    if single_color_regions:
+        target = max(single_color_regions, key=len)
+        if len(target) < size:
+            return expand_region(grid, target, size, border_color)
+        return target[:size]
     
-    return output_grid
+    return max(regions, key=len)[:size] if regions else None
 
-def get_corner_coordinates(corner: str, num_rows: int, num_cols: int) -> Tuple[int, int]:
-    if corner == 'top_left':
-        return 0, 0
-    elif corner == 'top_right':
-        return 0, num_cols - 1
-    elif corner == 'bottom_left':
-        return num_rows - 1, 0
-    else:  # bottom_right
-        return num_rows - 1, num_cols - 1
+def expand_region(grid: ColoredGrid, region: List[Tuple[int, int]], target_size: int, border_color: int) -> List[Tuple[int, int]]:
+    expanded = set(region)
+    queue = list(region)
+    while len(expanded) < target_size and queue:
+        y, x = queue.pop(0)
+        for dy, dx in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            ny, nx = y + dy, x + dx
+            if 0 <= ny < grid.num_rows and 0 <= nx < grid.num_cols and (ny, nx) not in expanded and grid.values[ny][nx] != border_color:
+                expanded.add((ny, nx))
+                queue.append((ny, nx))
+                if len(expanded) == target_size:
+                    break
+    return list(expanded)
+
+def get_region_bounds(region: List[Tuple[int, int]]) -> Tuple[int, int, int, int]:
+    y_coords, x_coords = zip(*region)
+    return min(y_coords), min(x_coords), max(y_coords), max(x_coords)
 
 def identify_border_color(grid: ColoredGrid) -> int:
     rows, cols = grid.get_dimensions()
