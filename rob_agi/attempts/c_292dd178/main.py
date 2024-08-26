@@ -8,7 +8,7 @@ def solve_292dd178(input_grid: ColoredGrid) -> ColoredGrid:
     1. Creates a deep copy of the input grid.
     2. Uses a flood fill algorithm to mark all reachable cells from the grid edges.
     3. Fills all unreachable cells (except blue ones) with red (2).
-    4. Fills sky blue (8) cells adjacent to blue (1) cells with red (2).
+    4. Fills any non-blue cells adjacent to blue (1) cells with red (2).
     5. Preserves all blue (1) cells.
     
     Args:
@@ -40,18 +40,15 @@ def solve_292dd178(input_grid: ColoredGrid) -> ColoredGrid:
         flood_fill(0, c)
         flood_fill(height-1, c)
 
-    # Fill unvisited cells and handle partially enclosed sky blue cells
+    # Fill unvisited cells and handle cells adjacent to blue
     for row in range(height):
         for col in range(width):
             if grid.values[row][col] != 1:  # If not blue
-                if not visited[row][col]:  # If not reachable from edges
-                    grid.values[row][col] = 2  # Fill with red
-                elif grid.values[row][col] == 8:  # If sky blue
-                    # Check if it's adjacent to blue
-                    if (row > 0 and grid.values[row-1][col] == 1) or \
-                       (row < height-1 and grid.values[row+1][col] == 1) or \
-                       (col > 0 and grid.values[row][col-1] == 1) or \
-                       (col < width-1 and grid.values[row][col+1] == 1):
-                        grid.values[row][col] = 2  # Fill with red if adjacent to blue
+                if not visited[row][col] or \
+                   (row > 0 and grid.values[row-1][col] == 1) or \
+                   (row < height-1 and grid.values[row+1][col] == 1) or \
+                   (col > 0 and grid.values[row][col-1] == 1) or \
+                   (col < width-1 and grid.values[row][col+1] == 1):
+                    grid.values[row][col] = 2  # Fill with red if not reachable or adjacent to blue
 
     return grid
