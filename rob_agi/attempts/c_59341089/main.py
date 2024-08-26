@@ -4,10 +4,10 @@ def solve_59341089(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms a 3x3 input grid into a 3x12 output grid by repeating a specific pattern four times horizontally.
     The pattern for each 3x3 block in the output is:
-    1. The first column is the last column of the input grid.
+    1. The first column is the last column of the previous block (or the last column of the input for the first block).
     2. The second column is the first column of the input grid.
     3. The third column is the second column of the input grid.
-    This pattern is repeated four times, with a slight modification for the first and last columns of the entire output.
+    This pattern is repeated four times, with the last column of the entire output being the first column of the input.
 
     Args:
         input_grid (ColoredGrid): A 3x3 input grid
@@ -33,5 +33,9 @@ def solve_59341089(input_grid: ColoredGrid) -> ColoredGrid:
                 output[row][start_col] = output[row][start_col - 1]
             output[row][start_col + 1] = first_column[row]
             output[row][start_col + 2] = second_column[row]
+
+    # Set the last column of the output grid
+    for row in range(3):
+        output[row][11] = first_column[row]
 
     return ColoredGrid(values=output)
