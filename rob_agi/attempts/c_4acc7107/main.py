@@ -22,14 +22,14 @@ def solve_4acc7107(input_grid: ColoredGrid) -> ColoredGrid:
     color_groups = {}
     
     # Step 1: Analyze the input grid
-    for c in range(cols):
-        for r in range(rows):
+    for r in range(rows):
+        for c in range(cols):
             color = input_grid.get_cell(r, c)
             if color != 0:
                 if color not in color_groups:
-                    color_groups[color] = {'left': c, 'right': c, 'rows': set(), 'cells': []}
+                    color_groups[color] = {'left': cols, 'right': 0, 'cells': []}
+                color_groups[color]['left'] = min(color_groups[color]['left'], c)
                 color_groups[color]['right'] = max(color_groups[color]['right'], c)
-                color_groups[color]['rows'].add(r)
                 color_groups[color]['cells'].append((r, c))
     
     # Step 2 and 3: Process color groups and place in new grid
@@ -38,16 +38,13 @@ def solve_4acc7107(input_grid: ColoredGrid) -> ColoredGrid:
     
     for color, group in sorted(color_groups.items(), key=lambda x: x[1]['left']):
         width = group['right'] - group['left'] + 1
-        height = len(group['rows'])
-        bottom_row = rows - 1
+        sorted_cells = sorted(group['cells'], key=lambda x: (x[1], -x[0]))  # Sort by column, then reverse row
         
-        # Sort cells in descending order of rows for vertical flip
-        sorted_cells = sorted(group['cells'], key=lambda x: x[0], reverse=True)
-        
-        for i, (r, c) in enumerate(sorted_cells):
+        for i, (_, c) in enumerate(sorted_cells):
             new_c = current_col + (c - group['left'])
-            new_r = bottom_row - (i % height)
-            new_grid[new_r][new_c] = color
+            new_r = rows - 1 - (i % width)
+            if 0 <= new_r < rows and 0 <= new_c < cols:
+                new_grid[new_r][new_c] = color
         
         current_col += width
     
@@ -56,6 +53,9 @@ def solve_4acc7107(input_grid: ColoredGrid) -> ColoredGrid:
         column = [new_grid[r][c] for r in range(rows)]
         non_zero = [color for color in column if color != 0]
         for r in range(rows - len(non_zero), rows):
-            new_grid[r][c] = non_zero[r - (rows - len(non_zero))] if r - (rows - len(non_zero)) < len(non_zero) else 0
+            if r - (rows - len(non_zero)) < len(non_zero):
+                new_grid[r][c] = non_zero[r - (rows - len(non_zero))]
+            else:
+                new_grid[r][c] = 0
     
     return ColoredGrid(values=new_grid)
