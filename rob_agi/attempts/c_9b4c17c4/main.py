@@ -53,28 +53,27 @@ def solve_9b4c17c4(input_grid: ColoredGrid) -> ColoredGrid:
         return regions
 
     def move_regions(regions: List[List[Tuple[int, int]]], start_col: int, end_col: int, to_right: bool):
-        regions.sort(key=lambda r: max(y for y, _ in r), reverse=True)  # Sort from bottom to top
+        regions.sort(key=lambda r: min(y for y, _ in r))  # Sort from top to bottom
 
         if to_right:
             new_start = end_col
             for region in regions:
                 region_width = max(c for _, c in region) - min(c for _, c in region) + 1
-                new_start = min(new_start - 1, end_col - region_width)  # Ensure region fits within zone and leave space
-                offset = new_start - max(c for _, c in region)
-                for r, c in region:
-                    output_grid.values[r][c] = input_grid.values[r][start_col]  # Restore original background
-                    output_grid.values[r][c + offset] = 2
-                new_start = new_start - region_width - 1  # Leave one column space
-        else:
-            new_start = start_col
-            for region in regions:
-                region_width = max(c for _, c in region) - min(c for _, c in region) + 1
-                new_start = max(new_start + 1, start_col)  # Ensure region fits within zone and leave space
+                new_start = min(new_start, end_col - region_width + 1)  # Ensure region fits within zone
                 offset = new_start - min(c for _, c in region)
                 for r, c in region:
                     output_grid.values[r][c] = input_grid.values[r][start_col]  # Restore original background
                     output_grid.values[r][c + offset] = 2
-                new_start = new_start + region_width + 1  # Leave one column space
+                new_start = new_start - 1  # Move to the next available position
+        else:
+            new_start = start_col
+            for region in regions:
+                region_width = max(c for _, c in region) - min(c for _, c in region) + 1
+                offset = new_start - min(c for _, c in region)
+                for r, c in region:
+                    output_grid.values[r][c] = input_grid.values[r][start_col]  # Restore original background
+                    output_grid.values[r][c + offset] = 2
+                new_start = new_start + region_width  # Move to the next available position
 
     vertical_zones = find_vertical_zones()
     for color, start_col, end_col in vertical_zones:
