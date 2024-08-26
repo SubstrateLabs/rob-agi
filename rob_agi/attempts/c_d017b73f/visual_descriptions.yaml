@@ -1,0 +1,29 @@
+example_0:
+  input: |
+    A 3x9 grid with three distinct shapes. On the top row, there's a small red (2) horizontal line of two cells in the second column. In the middle row, there's a larger shape consisting of two parts: a red (2) horizontal line of two cells on the left, and a blue (1) horizontal line of two cells in the center, separated by a black (0) cell. On the right side of this middle row, there's another red (2) horizontal line of three cells. The rest of the grid is filled with black (0) cells.
+  output: |
+    A 3x7 grid that appears to be a compressed version of the input. The shapes are preserved but moved closer together. The top row now has the small red (2) line immediately followed by the blue (1) line. The middle row retains the red (2) shapes on both ends, with the blue (1) shape in between. The bottom row remains all black (0). The overall effect is that the colored shapes are moved left and closer together, eliminating unnecessary black space.
+
+example_1:
+  input: |
+    A 3x11 grid with several distinct colored shapes. On the top row, there's a green (3) horizontal line of two cells in the middle, and a red (2) horizontal line of two cells on the right edge. The middle row has a red (2) horizontal line of two cells on the left edge, and a blue (1) horizontal line of two cells slightly right of center. The bottom row has a single red (2) cell in the second column. The rest of the grid is filled with black (0) cells.
+  output: |
+    A 3x8 grid that is a compressed and rearranged version of the input. The bottom row now contains all the colored shapes, arranged from left to right: red (2) line, green (3) line, blue (1) line, and red (2) line. The middle row has only the leftmost red (2) shape and the rightmost red (2) shape. The top row is all black (0). The effect is that the colored shapes are moved down and to the left, eliminating unnecessary black space and grouping colors together.
+
+example_2:
+  input: |
+    A 3x11 grid with three distinct colored shapes. On the top row, there's a sky blue (8) single cell near the right side. The middle row has a red (2) horizontal line of three cells on the left edge, followed by a sky blue (8) horizontal line of three cells in the center. The bottom row has a magenta (6) horizontal line of three cells on the right edge, and a single red (2) cell in the third column. The rest of the grid is filled with black (0) cells.
+  output: |
+    A 3x9 grid that is a compressed and rearranged version of the input. The top row is all black (0). The middle row now contains the red (2) line on the left, followed by the sky blue (8) line, and then the magenta (6) line on the right. The bottom row has the single red (2) cell under the left end of the red line, and the rest of the sky blue (8) line. The effect is that the colored shapes are moved down and to the left, eliminating unnecessary black space and grouping colors together vertically.
+
+example_3:
+  input: |
+    A 3x11 grid with several blue (1) and red (2) shapes. The top row has a blue (1) horizontal line of two cells on the left, and a red (2) horizontal line of two cells on the right. The middle row has a blue (1) horizontal line of two cells on the far left, two separate red (2) horizontal lines of two cells each - one in the center and one on the right. The bottom row has a single red (2) cell in the middle. The rest of the grid is filled with black (0) cells.
+  output: |
+    A 3x8 grid that is a compressed and rearranged version of the input. The top row now has the blue (1) line on the left, immediately followed by both red (2) lines from the input's top and middle rows. The middle row retains the blue (1) line on the left, followed by the central red (2) line from the input's middle row, and then the rightmost red (2) line. The bottom row is all black (0). The effect is that the colored shapes are moved left and closer together, eliminating unnecessary black space and grouping similar colors together horizontally.
+
+test_case_0:
+  input: |
+    A 3x11 grid with several colored shapes. The top row has a yellow (4) horizontal line of two cells slightly left of center, and a red (2) horizontal line of two cells on the right edge. The middle row has a blue (1) horizontal line of two cells on the left edge, a single green (3) cell in the center, and a red (2) horizontal line of two cells on the right edge. The bottom row has a single blue (1) cell in the second column. The rest of the grid is filled with black (0) cells.
+  output: |
+    Not provided in the test case.
