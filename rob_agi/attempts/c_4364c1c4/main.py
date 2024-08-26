@@ -81,40 +81,59 @@ def find_shapes(grid: ColoredGrid, background_color: int) -> List[List[Tuple[int
                 shapes.append(shape)
     return shapes
 
-def move_shape(shape: List[Tuple[int, int]], dx: int, dy: int, max_row: int, max_col: int) -> List[Tuple[int, int]]:
-    new_shape = [(r + dy, c + dx) for r, c in shape]
-    min_r = min(r for r, _ in new_shape)
-    min_c = min(c for _, c in new_shape)
-    max_r = max(r for r, _ in new_shape)
-    max_c = max(c for _, c in new_shape)
-
-    if min_r < 0:
-        new_shape = [(r - min_r, c) for r, c in new_shape]
-    elif max_r >= max_row:
-        new_shape = [(r - (max_r - max_row + 1), c) for r, c in new_shape]
-
-    if min_c < 0:
-        new_shape = [(r, c - min_c) for r, c in new_shape]
-    elif max_c >= max_col:
-        new_shape = [(r, c - (max_c - max_col + 1)) for r, c in new_shape]
-
-    return new_shape
-
-def adjust_shape_position(grid: ColoredGrid, shape: List[Tuple[int, int]], background_color: int) -> List[Tuple[int, int]]:
-    if shape is None:
-        return None
-    
-    while any(r < 0 for r, _ in shape):
-        shape = [(r + 1, c) for r, c in shape]  # Move shape down if it's above the top edge
-    
-    while any(r >= grid.num_rows or c >= grid.num_cols or grid.values[r][c] != background_color for r, c in shape):
-        shape = [(r - 1, c) for r, c in shape]  # Move shape up if it overlaps or is out of bounds
-        if any(r < 0 for r, _ in shape):
-            return None  # Cannot place the shape without overlap
-    
-    return shape
-
 def place_shape(grid: ColoredGrid, shape: List[Tuple[int, int]], color: int):
     if shape is not None:
         for r, c in shape:
             grid.values[r][c] = color
+
+def get_shape_dimensions(shape: List[Tuple[int, int]]) -> Tuple[int, int, int, int]:
+    min_r = min(r for r, _ in shape)
+    max_r = max(r for r, _ in shape)
+    min_c = min(c for _, c in shape)
+    max_c = max(c for _, c in shape)
+    return min_r, max_r, min_c, max_c
+
+def adjust_shapes_horizontally(shapes: List[List[Tuple[int, int]]], grid: ColoredGrid, background_color: int) -> List[List[Tuple[int, int]]]:
+    adjusted_shapes = []
+    for i, shape in enumerate(shapes):
+        if i % 2 == 0:  # Move left
+            new_shape = move_shape_left(shape, grid, background_color)
+        else:  # Move right
+            new_shape = move_shape_right(shape, grid, background_color)
+        adjusted_shapes.append(new_shape)
+    return adjusted_shapes
+
+def adjust_shapes_vertically(shapes: List[List[Tuple[int, int]]], grid: ColoredGrid, background_color: int) -> List[List[Tuple[int, int]]]:
+    adjusted_shapes = []
+    for shape in shapes:
+        new_shape = adjust_vertical_position(shape, grid, background_color)
+        adjusted_shapes.append(new_shape)
+    return adjusted_shapes
+
+def solve_4364c1c4(input_grid: ColoredGrid) -> ColoredGrid:
+    """
+    Transforms the input grid by redistributing shapes towards the edges while maintaining vertical order:
+    1. Identifies the background color as the most frequent color.
+    2. Finds all distinct shapes (connected regions of non-background colors).
+    3. Sorts shapes from top to bottom.
+    4. Alternately moves shapes left and right:
+       - Odd-indexed shapes: Move left as far as possible without overlapping.
+       - Even-indexed shapes: Move right as far as possible without overlapping.
+    5. Adjusts vertical positions to close gaps while maintaining order.
+    6. Fine-tunes horizontal positions to ensure proper spacing.
+    7. Places shapes on a new grid, avoiding overlaps and staying within bounds.
+    """
+    background_color = Counter([cell for row in input_grid.values for cell in row]).most_common(1)[0][0]
+    shapes = find_shapes(input_grid, background_color)
+    shapes.sort(key=lambda shape: min(cell[0] for cell in shape))
+
+    new_grid = ColoredGrid(values=[[background_color for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
+
+    shapes = adjust_shapes_horizontally(shapes, new_grid, background_color)
+    shapes = adjust_shapes_vertically(shapes, new_grid, background_color)
+
+    for shape in shapes:
+        color = input_grid.values[shape[0][0]][shape[0][1]]
+        place_shape(new_grid, shape, color)
+
+    return new_grid
