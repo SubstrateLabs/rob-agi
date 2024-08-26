@@ -9,12 +9,13 @@ def solve_3490cc26(input_grid: ColoredGrid) -> ColoredGrid:
     The solution follows these steps:
     1. Identify all 2x2 sky blue squares in the input grid.
     2. Determine the bounding box of all sky blue squares.
-    3. Create a weighted graph representation within the bounding box.
-    4. Find the minimum spanning tree connecting all sky blue squares using Prim's algorithm.
+    3. Create a weighted graph representation within the bounding box, including sky blue squares.
+    4. Find the minimum spanning tree connecting all sky blue squares using a modified Prim's algorithm.
     5. Convert the tree to an orange path, ensuring adjacent sky blue squares are directly connected.
     6. Optimize the path by removing unnecessary branches and straightening connections.
     7. Verify connectivity of all sky blue squares.
     8. Clean up any stray orange cells and preserve original colors.
+    9. Handle special cases where sky blue squares are adjacent or paths need to go through them.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -64,21 +65,20 @@ def create_graph(grid: ColoredGrid, bbox: Tuple[int, int, int, int]) -> Dict[Tup
     graph = {}
     for r in range(min_r, max_r + 1):
         for c in range(min_c, max_c + 1):
-            if grid.get_cell(r, c) != 8:  # Include all cells except sky blue squares
-                graph[(r, c)] = []
-                for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                    nr, nc = r + dr, c + dc
-                    if min_r <= nr <= max_r and min_c <= nc <= max_c:
-                        cell_value = grid.get_cell(nr, nc)
-                        if cell_value == 0:  # Empty cell
-                            weight = 1
-                        elif cell_value == 7:  # Existing orange path
-                            weight = 0
-                        elif cell_value == 8:  # Sky blue square
-                            weight = 0
-                        else:  # Other colors
-                            weight = 1000
-                        graph[(r, c)].append((nr, nc, weight))
+            graph[(r, c)] = []
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                nr, nc = r + dr, c + dc
+                if min_r <= nr <= max_r and min_c <= nc <= max_c:
+                    cell_value = grid.get_cell(nr, nc)
+                    if cell_value == 0:  # Empty cell
+                        weight = 1
+                    elif cell_value == 7:  # Existing orange path
+                        weight = 0
+                    elif cell_value == 8:  # Sky blue square
+                        weight = 0
+                    else:  # Other colors
+                        weight = 1000
+                    graph[(r, c)].append((nr, nc, weight))
     return graph
 
 def find_minimum_spanning_tree(graph: Dict[Tuple[int, int], List[Tuple[int, int, int]]], squares: List[Tuple[int, int]]) -> Set[Tuple[Tuple[int, int], Tuple[int, int]]]:
@@ -91,7 +91,9 @@ def find_minimum_spanning_tree(graph: Dict[Tuple[int, int], List[Tuple[int, int,
     start = squares[0]
     visited.add(start)
 
-    edges = [(start, neighbor, weight) for neighbor, weight in graph[start]]
+    edges = []
+    for square in squares:
+        edges.extend([(square, neighbor, weight) for neighbor, weight in graph[square]])
     edges.sort(key=lambda x: x[2])  # Sort by weight
 
     while len(visited) < len(squares):
