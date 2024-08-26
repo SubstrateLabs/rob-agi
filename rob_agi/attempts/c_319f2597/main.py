@@ -5,11 +5,13 @@ def solve_319f2597(input_grid: ColoredGrid) -> ColoredGrid:
     Transform the input grid by creating a cross-shaped black region.
     
     The transformation follows these steps:
-    1. Find the position of the vertical stripe based on existing black squares or set to 1/3 of grid width.
-    2. Create a 2-column wide vertical black stripe from top to bottom.
-    3. Find the position of the horizontal line based on existing black squares or set to 1/2 of grid height.
-    4. Create a 2-row thick horizontal black line across the entire width.
-    5. Preserve the original grid in the other areas.
+    1. Analyze the input grid for existing black cells and determine grid dimensions.
+    2. Determine the position and width of the vertical stripe.
+    3. Determine the position and thickness of the horizontal line.
+    4. Create the vertical stripe from top to bottom.
+    5. Create the horizontal line from left to right.
+    6. Ensure the cross extends to all edges and intersects properly.
+    7. Preserve original grid values outside the cross shape.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -20,22 +22,41 @@ def solve_319f2597(input_grid: ColoredGrid) -> ColoredGrid:
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
     
-    # Find vertical stripe position
-    stripe_left = next((col for col in range(cols) if any(input_grid.get_cell(row, col) == 0 for row in range(rows))), cols // 3)
-    stripe_right = stripe_left + 1
+    # Find existing black cells
+    black_cells = [(r, c) for r in range(rows) for c in range(cols) if input_grid.get_cell(r, c) == 0]
     
-    # Find horizontal line position
-    horizontal_top = next((row for row in range(rows) if any(input_grid.get_cell(row, col) == 0 for col in range(cols))), rows // 2)
-    horizontal_bottom = horizontal_top + 1
+    # Determine vertical stripe position and width
+    if black_cells:
+        stripe_left = min(c for _, c in black_cells)
+        stripe_right = max(c for _, c in black_cells)
+    else:
+        stripe_left = cols // 3
+        stripe_right = stripe_left + 1
+    
+    # Determine horizontal line position and thickness
+    if black_cells:
+        horizontal_top = min(r for r, _ in black_cells)
+        horizontal_bottom = max(r for r, _ in black_cells)
+    else:
+        horizontal_top = rows // 2
+        horizontal_bottom = horizontal_top + 1
     
     # Create vertical stripe
     for row in range(rows):
-        output_grid.set_cell(row, stripe_left, 0)
-        output_grid.set_cell(row, stripe_right, 0)
+        for col in range(stripe_left, stripe_right + 1):
+            output_grid.set_cell(row, col, 0)
     
     # Create horizontal line
     for col in range(cols):
-        output_grid.set_cell(horizontal_top, col, 0)
-        output_grid.set_cell(horizontal_bottom, col, 0)
+        for row in range(horizontal_top, horizontal_bottom + 1):
+            output_grid.set_cell(row, col, 0)
+    
+    # Ensure cross extends to edges
+    for row in range(rows):
+        output_grid.set_cell(row, 0, 0)
+        output_grid.set_cell(row, cols - 1, 0)
+    for col in range(cols):
+        output_grid.set_cell(0, col, 0)
+        output_grid.set_cell(rows - 1, col, 0)
     
     return output_grid
