@@ -6,7 +6,7 @@ def solve_d4c90558(input_grid: ColoredGrid) -> ColoredGrid:
     Solve the d4c90558 challenge by extracting the largest contiguous width for each color.
     
     The function scans the input grid row by row, identifies the largest contiguous width
-    for each unique color (excluding black and gray), and arranges these widths in the order
+    for each unique color (excluding black), and arranges these widths in the order
     of their first appearance in the input grid. The output grid is created with each row
     representing a color, and all rows are padded to have the same length as the overall
     largest width found. The colors are arranged in order of their topmost occurrence,
@@ -22,7 +22,7 @@ def solve_d4c90558(input_grid: ColoredGrid) -> ColoredGrid:
     """
     def find_contiguous_width(row: int, col: int, color: int) -> int:
         width = 0
-        while col < cols and input_grid.get_cell(row, col) in [color, 5]:
+        while col < cols and (input_grid.get_cell(row, col) == color or input_grid.get_cell(row, col) == 5):
             width += 1
             col += 1
         return width
@@ -35,7 +35,7 @@ def solve_d4c90558(input_grid: ColoredGrid) -> ColoredGrid:
     for r in range(rows):
         for c in range(cols):
             color = input_grid.get_cell(r, c)
-            if color not in [0, 5]:
+            if color != 0:
                 if color not in color_info:
                     color_info[color] = (r, c, 0)
                     color_order.append(color)
@@ -50,8 +50,9 @@ def solve_d4c90558(input_grid: ColoredGrid) -> ColoredGrid:
 
     output_rows = []
     for color in color_order:
-        _, _, width = color_info[color]
-        row = [color] * width + [0] * (max_width - width)
-        output_rows.append(row)
+        if color != 5:  # Exclude gray from the output
+            _, _, width = color_info[color]
+            row = [color] * width + [0] * (max_width - width)
+            output_rows.append(row)
 
     return ColoredGrid(values=output_rows)
