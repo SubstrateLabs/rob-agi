@@ -4,18 +4,20 @@ import math
 
 def solve_0e671a1a(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the grid transformation challenge by connecting colored squares with a gray path.
-    
-    1. Find the three colored squares (red, yellow, green).
-    2. Sort the squares in clockwise order.
-    3. Create a clockwise path connecting all squares.
-    4. Fill the enclosed area with gray, preserving the original colored squares.
-    
+    Solve the grid transformation challenge by creating a rectangular gray path
+    that encloses all colored squares and fills the enclosed area.
+
+    1. Find the colored squares (red, yellow, green).
+    2. Determine the bounding rectangle for these squares.
+    3. Draw a gray rectangular path along the bounding rectangle.
+    4. Fill the enclosed area with gray.
+    5. Restore the original colored squares.
+
     Args:
     input_grid (ColoredGrid): The input grid with three colored squares.
-    
+
     Returns:
-    ColoredGrid: The transformed grid with the gray path connecting the colored squares.
+    ColoredGrid: The transformed grid with the gray rectangular path and filled area.
     """
     def find_colored_squares(grid: ColoredGrid) -> List[Tuple[int, int, int]]:
         squares = []
@@ -25,53 +27,22 @@ def solve_0e671a1a(input_grid: ColoredGrid) -> ColoredGrid:
                     squares.append((r, c, grid[r][c]))
         return squares
 
-    def calculate_center(squares: List[Tuple[int, int, int]]) -> Tuple[float, float]:
-        return sum(s[0] for s in squares) / 3, sum(s[1] for s in squares) / 3
-
-    def calculate_angle(point: Tuple[int, int], center: Tuple[float, float]) -> float:
-        return math.atan2(point[0] - center[0], point[1] - center[1])
-
-    def sort_squares_clockwise(squares: List[Tuple[int, int, int]]) -> List[Tuple[int, int, int]]:
-        center = calculate_center(squares)
-        return sorted(squares, key=lambda s: calculate_angle(s, center), reverse=True)
-
-    def create_path(grid: ColoredGrid, squares: List[Tuple[int, int, int]]):
-        path = set()
-        for i in range(len(squares)):
-            start = squares[i]
-            end = squares[(i + 1) % len(squares)]
-            
-            # Horizontal movement
-            for c in range(min(start[1], end[1]), max(start[1], end[1]) + 1):
-                path.add((start[0], c))
-            
-            # Vertical movement
-            for r in range(min(start[0], end[0]), max(start[0], end[0]) + 1):
-                path.add((r, end[1]))
-        
-        # Draw the path
-        for r, c in path:
-            if grid[r][c] == 0:  # Only fill if it's an empty cell
-                grid[r][c] = 5
-        return path
-
-    def flood_fill(grid: ColoredGrid, r: int, c: int, path: set):
-        stack = [(r, c)]
-        while stack:
-            r, c = stack.pop()
-            if 0 <= r < grid.num_rows and 0 <= c < grid.num_cols and grid[r][c] == 0 and (r, c) not in path:
-                grid[r][c] = 5
-                stack.extend([(r+1, c), (r-1, c), (r, c+1), (r, c-1)])
+    def get_bounding_rectangle(squares: List[Tuple[int, int, int]]) -> Tuple[int, int, int, int]:
+        min_r = min(s[0] for s in squares)
+        min_c = min(s[1] for s in squares)
+        max_r = max(s[0] for s in squares)
+        max_c = max(s[1] for s in squares)
+        return min_r, min_c, max_r, max_c
 
     output_grid = input_grid.deep_copy()
     colored_squares = find_colored_squares(output_grid)
-    sorted_squares = sort_squares_clockwise(colored_squares)
-    path = create_path(output_grid, sorted_squares)
-    
-    # Find a starting point for flood fill (just inside the path)
-    center = calculate_center(sorted_squares)
-    center_r, center_c = int(center[0]), int(center[1])
-    flood_fill(output_grid, center_r, center_c, path)
+    min_r, min_c, max_r, max_c = get_bounding_rectangle(colored_squares)
+
+    # Draw rectangular path and fill enclosed area
+    for r in range(min_r, max_r + 1):
+        for c in range(min_c, max_c + 1):
+            if r == min_r or r == max_r or c == min_c or c == max_c or (min_r < r < max_r and min_c < c < max_c):
+                output_grid[r][c] = 5  # Gray
 
     # Restore original colored squares
     for r, c, color in colored_squares:
