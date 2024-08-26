@@ -51,7 +51,7 @@ def solve_a680ac02(input_grid: ColoredGrid) -> ColoredGrid:
     Outlines are sorted by their position in the input grid (top-to-bottom, left-to-right).
     Up to 3 outlines are processed:
     - If 1 outline: 4x4 grid
-    - If 2 outlines: 8x4 grid (vertical arrangement)
+    - If 2 outlines: 4x8 grid (horizontal arrangement)
     - If 3 outlines: 4x12 grid (horizontal arrangement)
     """
     outlines: List[Tuple[int, int, int, int]] = []  # (color, row, col, size)
@@ -85,10 +85,7 @@ def solve_a680ac02(input_grid: ColoredGrid) -> ColoredGrid:
 
     # Place standardized outlines in the output grid
     for i, (color, row, col, size) in enumerate(outlines):
-        if len(outlines) == 2:
-            tgt_row, tgt_col = i * 4, 0
-        else:
-            tgt_row, tgt_col = 0, i * 4
+        tgt_row, tgt_col = 0, i * 4
         standardized = standardize_outline(color, standard_size)
         copy_subgrid(standardized, result, 0, 0, tgt_row, tgt_col, standard_size, standard_size)
 
