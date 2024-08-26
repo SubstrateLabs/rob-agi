@@ -6,39 +6,33 @@ def solve_e6de6e8f(input_grid: ColoredGrid) -> ColoredGrid:
     
     The function works as follows:
     1. Initialize an 8x7 grid with black (0) squares and a green (3) square at the top center.
-    2. Find all positions of red squares in the top input row.
-    3. Calculate branch lengths for each red square position in the top row.
-    4. Draw the branch starting from the center, moving down and right:
-       a. Move down for each branch length.
-       b. Move right after processing each red square position.
-       c. Continue straight down after the last red square position.
+    2. Find all positions of red squares in the top input row as decision points.
+    3. Process each decision point:
+       a. If the corresponding position in the bottom row is red, go straight down.
+       b. If not, go diagonally down-right.
+    4. Continue the path to the bottom of the grid.
     5. Return the completed output grid.
     """
     output = [[0 for _ in range(7)] for _ in range(8)]
     output[0][3] = 3  # Green square at top center
 
-    top_red_positions = [i for i, v in enumerate(input_grid.values[0]) if v == 2]
-
-    def get_branch_length(start_col: int) -> int:
-        return sum(1 for col in range(start_col, len(input_grid.values[1])) if input_grid.values[1][col] == 2)
-
-    branch_lengths = [get_branch_length(pos) for pos in top_red_positions]
-
+    decision_points = [i for i, v in enumerate(input_grid.values[0]) if v == 2]
     current_row, current_col = 1, 3
 
-    for i, length in enumerate(branch_lengths):
-        # Move down
-        for _ in range(length):
-            if current_row < 8:
-                output[current_row][current_col] = 2
-                current_row += 1
+    for i, decision_point in enumerate(decision_points):
+        go_straight = input_grid.values[1][decision_point] == 2
 
-        # Move right (if not the last position)
-        if i < len(branch_lengths) - 1 and current_col < 6:
+        while (i < len(decision_points) - 1 and current_col < decision_points[i+1]) or \
+              (i == len(decision_points) - 1 and current_row < 8):
+            output[current_row][current_col] = 2
+            current_row += 1
+            if not go_straight and current_col < 6:
+                current_col += 1
+
+        if i < len(decision_points) - 1 and current_col < 6:
             current_col += 1
-            output[current_row-1][current_col] = 2
 
-    # Continue straight down to the bottom
+    # Ensure the path reaches the bottom
     while current_row < 8:
         output[current_row][current_col] = 2
         current_row += 1
