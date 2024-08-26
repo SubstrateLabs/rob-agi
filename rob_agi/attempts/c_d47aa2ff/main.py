@@ -6,7 +6,7 @@ def solve_d47aa2ff(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms a 10x21 input grid into a 10x10 output grid by:
     1. Extracting the left 10x10 portion of the input grid.
     2. Preserving existing dots in the right half (columns 5-9).
-    3. Adding one blue (1) dot and one red (2) dot to the right half.
+    3. Adding two blue (1) dots and two red (2) dots to the right half.
     4. Placing the blue and red dots in balanced positions based on the existing pattern.
 
     Args:
@@ -25,53 +25,45 @@ def solve_d47aa2ff(input_grid: ColoredGrid) -> ColoredGrid:
                 output_grid.values[i][j] = input_grid.values[i][j]
     
     # Step 3 & 4: Add blue and red dots to balanced positions
-    blue_pos = find_optimal_position(output_grid)
-    output_grid.values[blue_pos[0]][blue_pos[1]] = 1  # Place blue dot
+    upper_section = [(i, j) for i in range(3, 6) for j in range(5, 10) if output_grid.values[i][j] == 0]
+    lower_section = [(i, j) for i in range(6, 10) for j in range(5, 10) if output_grid.values[i][j] == 0]
     
-    red_pos = find_red_position(output_grid, blue_pos)
-    output_grid.values[red_pos[0]][red_pos[1]] = 2  # Place red dot
+    place_dot_pair(output_grid, upper_section)
+    place_dot_pair(output_grid, lower_section)
     
     return output_grid
 
-def find_optimal_position(grid: ColoredGrid) -> Tuple[int, int]:
-    best_score = float('-inf')
-    best_pos = None
-    for i in range(3, 7):
-        for j in range(5, 10):
-            if grid.values[i][j] == 0:
-                score = calculate_balance_score(grid, i, j)
-                if score > best_score:
-                    best_score = score
-                    best_pos = (i, j)
-    return best_pos
+def place_dot_pair(grid: ColoredGrid, section: List[Tuple[int, int]]):
+    if not section:
+        return
+    
+    blue_pos = max(section, key=lambda pos: calculate_balance_score(grid, pos[0], pos[1]))
+    grid.values[blue_pos[0]][blue_pos[1]] = 1  # Place blue dot
+    
+    adjacent_positions = get_adjacent_positions(blue_pos[0], blue_pos[1])
+    valid_red_positions = [pos for pos in adjacent_positions if pos in section and grid.values[pos[0]][pos[1]] == 0]
+    
+    if valid_red_positions:
+        red_pos = max(valid_red_positions, key=lambda pos: calculate_balance_score(grid, pos[0], pos[1]))
+        grid.values[red_pos[0]][red_pos[1]] = 2  # Place red dot
+
+def get_adjacent_positions(row: int, col: int) -> List[Tuple[int, int]]:
+    return [(row+dr, col+dc) for dr in [-1, 0, 1] for dc in [-1, 0, 1] 
+            if (dr != 0 or dc != 0) and 0 <= row+dr < 10 and 5 <= col+dc < 10]
 
 def calculate_balance_score(grid: ColoredGrid, row: int, col: int) -> float:
     score = 0
-    # Distance from other dots
-    for i in range(10):
-        for j in range(5, 10):
-            if grid.values[i][j] != 0:
-                distance = abs(i - row) + abs(j - col)
-                score += 1 / (distance + 1)  # Avoid division by zero
-    
     # Vertical centrality
-    vertical_score = 4 - abs(row - 4.5)
+    vertical_score = 5 - abs(row - 6.5)
     score += vertical_score * 2
     
-    # Horizontal position
-    horizontal_score = 3 - abs(col - 7)
+    # Horizontal centrality
+    horizontal_score = 4 - abs(col - 7)
     score += horizontal_score
     
+    # Penalty for adjacent colored squares
+    for adj_row, adj_col in get_adjacent_positions(row, col):
+        if grid.values[adj_row][adj_col] != 0:
+            score -= 1
+    
     return score
-
-def find_red_position(grid: ColoredGrid, blue_pos: Tuple[int, int]) -> Tuple[int, int]:
-    row, col = blue_pos
-    diagonals = [(row-1, col+1), (row+1, col+1), (row-1, col-1), (row+1, col-1)]
-    adjacents = [(row-1, col), (row+1, col), (row, col+1), (row, col-1)]
-    
-    for r, c in diagonals + adjacents:
-        if 0 <= r < 10 and 5 <= c < 10 and grid.values[r][c] == 0:
-            return (r, c)
-    
-    # If no suitable position found, return a default position
-    return (row, col+1) if col < 9 else (row, col-1)
