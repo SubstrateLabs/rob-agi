@@ -24,10 +24,70 @@ def solve_5b692c0f(input_grid: ColoredGrid) -> ColoredGrid:
     
     regions = find_connected_regions(input_grid)
     for region in regions:
-        transformed_shape = transform_shape(region)
-        place_shape(output_grid, transformed_shape)
+        enhanced_shape = enhance_shape(region, input_grid)
+        place_shape(output_grid, enhanced_shape)
     
     return output_grid
+
+def enhance_shape(region: List[Tuple[int, int, int]], input_grid: ColoredGrid) -> List[Tuple[int, int, int]]:
+    top, left, bottom, right = get_bounding_box(region)
+    template = create_template(region, top, left, bottom, right)
+    enhanced = apply_symmetry(region, template, top, left, bottom, right)
+    enhanced = preserve_features(enhanced, region)
+    enhanced = refine_shape(enhanced, top, left, bottom, right, input_grid)
+    return enhanced
+
+def get_bounding_box(region: List[Tuple[int, int, int]]) -> Tuple[int, int, int, int]:
+    top = min(r for r, _, _ in region)
+    bottom = max(r for r, _, _ in region)
+    left = min(c for _, c, _ in region)
+    right = max(c for _, c, _ in region)
+    return top, left, bottom, right
+
+def create_template(region: List[Tuple[int, int, int]], top: int, left: int, bottom: int, right: int) -> Dict[Tuple[int, int], int]:
+    template = {}
+    mid_row, mid_col = (top + bottom) // 2, (left + right) // 2
+    for r, c, color in region:
+        if r <= mid_row and c <= mid_col:
+            template[(r - top, c - left)] = color
+    return template
+
+def apply_symmetry(region: List[Tuple[int, int, int]], template: Dict[Tuple[int, int], int], top: int, left: int, bottom: int, right: int) -> List[Tuple[int, int, int]]:
+    enhanced = region.copy()
+    height, width = bottom - top + 1, right - left + 1
+    for r in range(height):
+        for c in range(width):
+            if (r, c) in template:
+                enhanced.extend([
+                    (top + r, left + c, template[(r, c)]),
+                    (bottom - r, left + c, template[(r, c)]),
+                    (top + r, right - c, template[(r, c)]),
+                    (bottom - r, right - c, template[(r, c)])
+                ])
+    return list(set(enhanced))
+
+def preserve_features(enhanced: List[Tuple[int, int, int]], original: List[Tuple[int, int, int]]) -> List[Tuple[int, int, int]]:
+    original_set = set((r, c) for r, c, _ in original)
+    preserved = enhanced.copy()
+    for r, c, color in original:
+        if (r, c) not in original_set:
+            preserved.append((r, c, color))
+    return preserved
+
+def refine_shape(shape: List[Tuple[int, int, int]], top: int, left: int, bottom: int, right: int, input_grid: ColoredGrid) -> List[Tuple[int, int, int]]:
+    refined = shape.copy()
+    shape_dict = {(r, c): color for r, c, color in shape}
+    for r in range(top, bottom + 1):
+        for c in range(left, right + 1):
+            if (r, c) not in shape_dict:
+                neighbors = [(r+dr, c+dc) for dr in [-1, 0, 1] for dc in [-1, 0, 1] if (r+dr, c+dc) in shape_dict]
+                if len(neighbors) >= 5:
+                    color_counts = defaultdict(int)
+                    for nr, nc in neighbors:
+                        color_counts[shape_dict[(nr, nc)]] += 1
+                    most_common_color = max(color_counts, key=color_counts.get)
+                    refined.append((r, c, most_common_color))
+    return refined
 
 def find_connected_regions(grid: ColoredGrid) -> List[List[Tuple[int, int, int]]]:
     regions = []
