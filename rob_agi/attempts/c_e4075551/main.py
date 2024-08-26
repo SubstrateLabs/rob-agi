@@ -5,12 +5,13 @@ def solve_e4075551(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid into a rectangular frame pattern based on the colors present.
     
-    1. Identifies unique non-black colors in the input grid
+    1. Identifies unique non-black and non-red colors in the input grid
     2. Determines frame dimensions based on the number of unique colors
-    3. Assigns colors to different parts of the frame
-    4. Draws the frame with assigned colors
-    5. Fills the frame interior with gray
-    6. Draws a red center line
+    3. Calculates frame position to center it horizontally
+    4. Assigns colors to different parts of the frame
+    5. Draws the frame with assigned colors
+    6. Fills the frame interior with gray
+    7. Draws a red center line
     
     Returns a new ColoredGrid with the transformed pattern.
     """
@@ -18,22 +19,26 @@ def solve_e4075551(input_grid: ColoredGrid) -> ColoredGrid:
     output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
     
     unique_colors = find_unique_colors(input_grid)
-    frame_width = len(unique_colors) + 4
+    frame_width = len(unique_colors) + 1
+    frame_height = frame_width + 2
+    start_row = 1
+    start_col = (cols - frame_width) // 2
     color_assignments = assign_colors(unique_colors)
     
     # Draw horizontal lines
-    draw_line(output_grid, 1, 2, 1, frame_width + 1, color_assignments['top'])
-    draw_line(output_grid, 13, 2, 13, frame_width + 1, color_assignments['bottom'])
+    draw_line(output_grid, start_row, start_col, start_col + frame_width - 1, color_assignments['top'])
+    draw_line(output_grid, start_row + frame_height - 1, start_col, start_col + frame_width - 1, color_assignments['bottom'])
     
     # Draw vertical lines
-    draw_line(output_grid, 2, 2, 12, 2, color_assignments['left'])
-    draw_line(output_grid, 2, frame_width + 1, 12, frame_width + 1, color_assignments['right'])
+    draw_line(output_grid, start_row + 1, start_col, start_row + frame_height - 2, color_assignments['left'])
+    draw_line(output_grid, start_row + 1, start_col + frame_width - 1, start_row + frame_height - 2, color_assignments['right'])
     
     # Fill frame interior
-    fill_frame(output_grid, frame_width)
+    fill_frame(output_grid, start_row, start_col, frame_height, frame_width)
     
     # Draw center line
-    draw_line(output_grid, 7, 3, 7, frame_width, 2)  # Red center line
+    center_row = start_row + frame_height // 2
+    draw_line(output_grid, center_row, start_col + 1, start_col + frame_width - 2, 2)  # Red center line
     
     return output_grid
 
@@ -47,20 +52,24 @@ def find_unique_colors(grid: ColoredGrid) -> List[int]:
     return sorted(list(unique_colors))
 
 def assign_colors(unique_colors: List[int]) -> dict:
+    if len(unique_colors) < 4:
+        unique_colors = unique_colors * 4  # Repeat colors if less than 4
     return {
         'top': unique_colors[-1],
         'bottom': unique_colors[-2],
         'left': unique_colors[0],
-        'right': unique_colors[1] if len(unique_colors) > 1 else unique_colors[0]
+        'right': unique_colors[1]
     }
 
-def draw_line(grid: ColoredGrid, start_row: int, start_col: int, end_row: int, end_col: int, color: int):
-    for r in range(start_row, end_row + 1):
-        for c in range(start_col, end_col + 1):
-            grid.set_cell(r, c, color)
+def draw_line(grid: ColoredGrid, start_row: int, start_col: int, end: int, color: int):
+    if start_row == end:  # Horizontal line
+        for c in range(start_col, end + 1):
+            grid.set_cell(start_row, c, color)
+    else:  # Vertical line
+        for r in range(start_row, end + 1):
+            grid.set_cell(r, start_col, color)
 
-def fill_frame(grid: ColoredGrid, frame_width: int):
-    for r in range(2, 13):
-        for c in range(3, frame_width + 1):
-            if grid.get_cell(r, c) == 0:
-                grid.set_cell(r, c, 5)  # Gray
+def fill_frame(grid: ColoredGrid, start_row: int, start_col: int, frame_height: int, frame_width: int):
+    for r in range(start_row + 1, start_row + frame_height - 1):
+        for c in range(start_col + 1, start_col + frame_width - 1):
+            grid.set_cell(r, c, 5)  # Gray
