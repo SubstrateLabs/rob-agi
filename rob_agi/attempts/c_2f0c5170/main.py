@@ -103,7 +103,27 @@ def solve_2f0c5170(input_grid: ColoredGrid) -> ColoredGrid:
                                 (new_cols - optimized.num_cols + 1) // 2)
 
     # Main logic
-    black_regions = find_black_regions(input_grid)
+    non_black_regions = find_non_black_regions(input_grid)
+    if not non_black_regions:
+        return ColoredGrid(values=[[0 for _ in range(5)] for _ in range(5)])  # Return a 5x5 black grid if no regions found
+    
+    patterns = []
+    for region in non_black_regions:
+        pattern, cells, unique_colors, max_distance = extract_pattern(input_grid, region)
+        complexity_score = cells * unique_colors * max_distance
+        patterns.append((pattern, complexity_score, max_distance))
+    
+    if not patterns:
+        return ColoredGrid(values=[[0 for _ in range(5)] for _ in range(5)])  # Return a 5x5 black grid if no patterns found
+    
+    # Choose the most complex pattern
+    chosen_pattern, _, max_distance = max(patterns, key=lambda x: x[1])
+    
+    output_size = determine_output_size(chosen_pattern, max_distance)
+    centered_pattern = center_pattern(chosen_pattern, output_size)
+    optimized_pattern = optimize_grid_size(centered_pattern)
+    
+    return optimized_pattern
     if not black_regions:
         return ColoredGrid(values=[[0 for _ in range(5)] for _ in range(5)])  # Return a 5x5 black grid if no regions found
     
