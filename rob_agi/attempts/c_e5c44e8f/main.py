@@ -30,6 +30,7 @@ def solve_e5c44e8f(input_grid: ColoredGrid) -> ColoredGrid:
     fill_bottom_row(output_grid, left_column)
     connect_disconnected_parts(output_grid)
     optimize_e_shape(output_grid, left_column)
+    clean_up_e_shape(output_grid, left_column)
 
     return output_grid
 
@@ -41,10 +42,10 @@ def find_initial_green(grid: ColoredGrid) -> Optional[Tuple[int, int]]:
     return None
 
 def find_leftmost_column(grid: ColoredGrid, initial_green: Tuple[int, int]) -> int:
-    for c in range(1, initial_green[1] + 1):
+    for c in range(grid.num_cols):
         if all(grid.get_cell(r, c) != 2 for r in range(grid.num_rows)):
             return c
-    return initial_green[1]
+    return 0  # If no column is free of red cells, start from the leftmost column
 
 def create_vertical_line(grid: ColoredGrid, col: int):
     for r in range(grid.num_rows):
@@ -65,7 +66,7 @@ def create_horizontal_lines(grid: ColoredGrid, left_col: int, initial_green: Tup
     middle_row = min(initial_green[0], rows // 2)
     while middle_row > 0 and grid.get_cell(middle_row, left_col) == 2:
         middle_row -= 1
-    for c in range(left_col + 1, min(cols, left_col + cols // 2)):
+    for c in range(left_col + 1, cols):
         if grid.get_cell(middle_row, c) == 2:
             break
         grid.set_cell(middle_row, c, 3)
@@ -134,6 +135,27 @@ def optimize_e_shape(grid: ColoredGrid, left_col: int):
                 grid.set_cell(r, c, 3)
             else:
                 break
+    
+    # Try to extend vertical line to the right
+    for c in range(left_col + 1, cols):
+        if all(grid.get_cell(r, c) in [0, 3] for r in range(rows)):
+            for r in range(rows):
+                if grid.get_cell(r, c-1) == 3 and grid.get_cell(r, c) == 0:
+                    grid.set_cell(r, c, 3)
+        else:
+            break
+
+def clean_up_e_shape(grid: ColoredGrid, left_col: int):
+    rows, cols = grid.num_rows, grid.num_cols
+    
+    # Remove unnecessary green cells
+    for r in range(1, rows - 1):
+        for c in range(left_col + 1, cols - 1):
+            if grid.get_cell(r, c) == 3:
+                neighbors = sum(1 for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]
+                                if 0 <= r + dr < rows and 0 <= c + dc < cols and grid.get_cell(r + dr, c + dc) == 3)
+                if neighbors <= 1:
+                    grid.set_cell(r, c, 0)
     
     # Ensure clear spaces inside the 'E'
     for r in range(1, rows - 1):
