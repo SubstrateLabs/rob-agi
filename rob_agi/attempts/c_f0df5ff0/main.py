@@ -33,7 +33,7 @@ def solve_f0df5ff0(input_grid: ColoredGrid) -> ColoredGrid:
         for r in range(rows):
             for c in range(cols):
                 if is_boundary(r, c):
-                    heat_map[r][c] = 1
+                    heat_map[r][c] = 2
                     for nr, nc in get_neighbors(r, c):
                         heat_map[nr][nc] += 1
         return heat_map
@@ -45,10 +45,10 @@ def solve_f0df5ff0(input_grid: ColoredGrid) -> ColoredGrid:
     def generate_path(start, heat_map):
         path = set()
         visited = set()
-        queue = deque([(start, [])])
-
+        queue = [(0, start, [])]
+        
         while queue:
-            current, path_so_far = queue.popleft()
+            _, current, path_so_far = heapq.heappop(queue)
             if current not in visited:
                 visited.add(current)
                 path_so_far = path_so_far + [current]
@@ -59,12 +59,11 @@ def solve_f0df5ff0(input_grid: ColoredGrid) -> ColoredGrid:
                         path.add(p)
                         output_grid.set_cell(*p, 1)
 
-                neighbors = sorted(
-                    [n for n in get_neighbors(r, c) if n not in visited],
-                    key=lambda n: (-heat_map[n[0]][n[1]], len(path_so_far))
-                )
+                neighbors = [n for n in get_neighbors(r, c) if n not in visited]
                 for neighbor in neighbors:
-                    queue.append((neighbor, []))
+                    nr, nc = neighbor
+                    priority = -heat_map[nr][nc]
+                    heapq.heappush(queue, (priority, neighbor, []))
 
         return path
 
@@ -104,7 +103,7 @@ def solve_f0df5ff0(input_grid: ColoredGrid) -> ColoredGrid:
                     stack.extend(get_neighbors(*current))
             return region
 
-        threshold = rows * cols // 16  # Adjust this threshold as needed
+        threshold = rows * cols // 20  # Adjusted threshold
         for r in range(rows):
             for c in range(cols):
                 if (r, c) not in path:
@@ -122,11 +121,30 @@ def solve_f0df5ff0(input_grid: ColoredGrid) -> ColoredGrid:
                                 output_grid.set_cell(*next_step, 1)
                             current = next_step
 
+    def balance_path_distribution(path):
+        for r in range(rows):
+            for c in range(cols):
+                if (r, c) not in path:
+                    neighbors = get_neighbors(r, c)
+                    if any(output_grid.get_cell(*n) == 1 for n in neighbors):
+                        continue
+                    nearest_path = min(path, key=lambda p: abs(p[0]-r) + abs(p[1]-c))
+                    current = nearest_path
+                    while current != (r, c):
+                        nr, nc = current
+                        next_step = min(get_neighbors(nr, nc), key=lambda n: abs(n[0]-r) + abs(n[1]-c))
+                        if next_step not in path:
+                            path.add(next_step)
+                            output_grid.set_cell(*next_step, 1)
+                        current = next_step
+
     heat_map = create_heat_map()
     start = find_start_point(heat_map)
     path = generate_path(start, heat_map)
     ensure_edge_connections(path)
     optimize_path(path)
     handle_large_regions(path)
+    balance_path_distribution(path)
+    optimize_path(path)  # Final optimization
 
     return output_grid
