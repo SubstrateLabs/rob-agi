@@ -8,31 +8,32 @@ def solve_42918530(input_grid: ColoredGrid) -> ColoredGrid:
     The function preserves the general character and color count of each sub-grid
     while ensuring rotational symmetry. Black borders (0s) between sub-grids are preserved.
     
-    1. Analyzes the entire grid to determine standard patterns for each color
+    1. Analyzes the entire grid to determine standard patterns for each color and cell count
     2. Extracts 5x5 sub-grids from the input
     3. For each non-black sub-grid:
-       a. Identifies the primary (most frequent non-black) color
-       b. Applies the standard pattern for that color
-    4. Reassembles the full grid with transformed sub-grids
+       a. Identifies the primary color and counts non-zero cells
+       b. Applies a symmetric pattern based on the color and cell count
+    4. Ensures consistency across similar sub-grids
+    5. Reassembles the full grid with transformed sub-grids
 
     The transformation creates consistent symmetric patterns for each color
-    across all transformed sub-grids while maintaining the original color distribution.
+    across all transformed sub-grids while maintaining the original color distribution
+    and total cell count for each color.
     """
     SUBGRID_SIZE = 5
     GRID_STEP = 6
 
-    def analyze_grid(grid: List[List[int]]) -> Dict[int, List[List[int]]]:
+    def analyze_grid(grid: List[List[int]]) -> Dict[Tuple[int, int], List[List[int]]]:
         color_patterns = {}
-        color_counts = Counter()
         subgrids = extract_subgrids(grid)
         
         for subgrid in subgrids:
             if not is_subgrid_all_black(subgrid):
                 color = find_primary_color(subgrid)
                 count = count_non_black_cells(subgrid)
-                color_counts[color] += 1
-                if color not in color_patterns or count > count_non_black_cells(color_patterns[color]):
-                    color_patterns[color] = generate_symmetric_pattern(color, count)
+                key = (color, count)
+                if key not in color_patterns:
+                    color_patterns[key] = generate_symmetric_pattern(color, count)
         
         return color_patterns
 
@@ -61,21 +62,23 @@ def solve_42918530(input_grid: ColoredGrid) -> ColoredGrid:
             pattern[i][j] = color
         return pattern
 
-    def transform_subgrid(subgrid: List[List[int]], color_patterns: Dict[int, List[List[int]]]) -> List[List[int]]:
+    def transform_subgrid(subgrid: List[List[int]], color_patterns: Dict[Tuple[int, int], List[List[int]]]) -> List[List[int]]:
         if is_subgrid_all_black(subgrid):
             return subgrid
         color = find_primary_color(subgrid)
-        return color_patterns.get(color, subgrid)
+        count = count_non_black_cells(subgrid)
+        return color_patterns.get((color, count), subgrid)
 
     def reassemble_grid(subgrids: List[List[List[int]]], original_grid: List[List[int]]) -> List[List[int]]:
         new_grid = [row[:] for row in original_grid]
         subgrid_index = 0
         for i in range(0, len(original_grid), GRID_STEP):
             for j in range(0, len(original_grid[0]), GRID_STEP):
-                for x in range(SUBGRID_SIZE):
-                    for y in range(SUBGRID_SIZE):
-                        new_grid[i+x][j+y] = subgrids[subgrid_index][x][y]
-                subgrid_index += 1
+                if subgrid_index < len(subgrids):
+                    for x in range(SUBGRID_SIZE):
+                        for y in range(SUBGRID_SIZE):
+                            new_grid[i+x][j+y] = subgrids[subgrid_index][x][y]
+                    subgrid_index += 1
         return new_grid
 
     color_patterns = analyze_grid(input_grid.values)
