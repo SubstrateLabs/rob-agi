@@ -6,12 +6,11 @@ def solve_782b5218(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid based on color distribution and pattern detection.
     
     1. Identifies unique colors in the input grid.
-    2. Determines if the pattern should be horizontal banding or diagonal based on the middle row.
-    3. For horizontal banding: 
-       - Divides the grid into bands based on the number of unique colors.
-       - Fills each band with a color, sorted from top to bottom.
-       - Preserves the uniform middle row if present.
-    4. For diagonal pattern: 
+    2. Determines if the pattern should be horizontal banding or diagonal based on the number of unique colors and middle row uniformity.
+    3. For horizontal banding (only if there are exactly 3 unique colors and the middle row is uniform): 
+       - Divides the grid into three horizontal bands.
+       - Fills the top band with the lowest color, preserves the middle row, and fills the bottom band with the highest color.
+    4. For diagonal pattern (in all other cases): 
        - Fills diagonally from top-left to bottom-right with sorted colors.
     
     Returns a new ColoredGrid with the transformed pattern.
@@ -19,7 +18,7 @@ def solve_782b5218(input_grid: ColoredGrid) -> ColoredGrid:
     rows, cols = input_grid.get_dimensions()
     unique_colors = sorted(set(color for row in input_grid.values for color in row))
     
-    if has_uniform_middle_row(input_grid):
+    if len(unique_colors) == 3 and has_uniform_middle_row(input_grid):
         return create_horizontal_banding(input_grid, unique_colors)
     else:
         return create_diagonal_pattern(input_grid, unique_colors)
@@ -33,17 +32,18 @@ def create_horizontal_banding(grid: ColoredGrid, sorted_colors: List[int]) -> Co
     new_values = [[0 for _ in range(cols)] for _ in range(rows)]
     
     middle_row = rows // 2
-    num_colors = len(sorted_colors)
-    band_height = rows // num_colors
+    band_height = (rows - 1) // 3
     
-    for i, color in enumerate(sorted_colors):
-        start_row = i * band_height
-        end_row = (i + 1) * band_height if i < num_colors - 1 else rows
-        for r in range(start_row, end_row):
-            new_values[r] = [color] * cols
+    # Fill top band
+    for r in range(middle_row - band_height):
+        new_values[r] = [sorted_colors[0]] * cols
     
-    if has_uniform_middle_row(grid):
-        new_values[middle_row] = grid.values[middle_row]
+    # Preserve middle row
+    new_values[middle_row] = grid.values[middle_row]
+    
+    # Fill bottom band
+    for r in range(middle_row + 1, rows):
+        new_values[r] = [sorted_colors[2]] * cols
     
     return ColoredGrid(values=new_values)
 
