@@ -7,8 +7,8 @@ def solve_fb791726(input_grid: ColoredGrid) -> ColoredGrid:
     2. Adding green (3) separator rows and columns between the original rows and columns
     3. Copying non-black cells to their new positions:
        - Top-left quadrant stays in place
-       - Top-right quadrant moves to bottom-left
-       - Bottom-left quadrant moves to top-right
+       - Top-right quadrant stays in place
+       - Bottom-left quadrant stays in place
        - Bottom-right quadrant stays in place
     4. Filling the rest with black (0)
     """
@@ -29,14 +29,7 @@ def solve_fb791726(input_grid: ColoredGrid) -> ColoredGrid:
     for i in range(input_rows):
         for j in range(input_cols):
             if input_grid.values[i][j] != 0:
-                if i < mid_row and j < mid_col:  # Top-left quadrant
-                    new_i, new_j = 2*i, 2*j
-                elif i < mid_row and j >= mid_col:  # Top-right quadrant
-                    new_i, new_j = 2*(i + mid_row), 2*(j - mid_col)
-                elif i >= mid_row and j < mid_col:  # Bottom-left quadrant
-                    new_i, new_j = 2*(i - mid_row), 2*(j + mid_col)
-                else:  # Bottom-right quadrant
-                    new_i, new_j = 2*i, 2*j
+                new_i, new_j = 2*i, 2*j
                 output_grid.values[new_i][new_j] = input_grid.values[i][j]
 
     # Step 4: Return the completed output grid
