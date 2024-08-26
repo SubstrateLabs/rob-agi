@@ -2,33 +2,33 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_5ffb2104(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by moving all non-zero elements to the right side of the grid.
+    Transforms the input grid by moving all non-empty columns to the right side of the grid.
     
     The transformation maintains the following properties:
-    1. All non-zero elements are moved to the rightmost available columns.
+    1. All non-empty columns are moved to the rightmost available positions.
     2. The vertical order of elements within each column is preserved.
-    3. The relative horizontal order of elements is maintained.
-    4. The relative vertical positions of all elements are maintained.
+    3. The relative horizontal order of non-empty columns is maintained.
+    4. Empty columns are moved to the left side of the grid.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
     
     Returns:
-    ColoredGrid: A new grid with all non-zero elements moved to the right side.
+    ColoredGrid: A new grid with all non-empty columns moved to the right side.
     """
     rows, cols = input_grid.get_dimensions()
     new_grid = [[0 for _ in range(cols)] for _ in range(rows)]
     
-    # Collect all non-zero elements
-    non_zero_elements = []
-    for col in range(cols):
-        for row in range(rows):
-            if input_grid.values[row][col] != 0:
-                non_zero_elements.append((input_grid.values[row][col], row))
+    # Identify non-empty columns
+    non_empty_cols = [col for col in range(cols) if any(input_grid.values[row][col] != 0 for row in range(rows))]
     
-    # Place non-zero elements from right to left
-    for i, (value, row) in enumerate(reversed(non_zero_elements)):
-        new_col = cols - 1 - i
-        new_grid[row][new_col] = value
+    # Calculate new positions
+    new_start = cols - len(non_empty_cols)
+    
+    # Transfer data
+    for i, col in enumerate(non_empty_cols):
+        new_col = new_start + i
+        for row in range(rows):
+            new_grid[row][new_col] = input_grid.values[row][col]
     
     return ColoredGrid(values=new_grid)
