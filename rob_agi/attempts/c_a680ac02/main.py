@@ -42,8 +42,11 @@ def solve_a680ac02(input_grid: ColoredGrid) -> ColoredGrid:
     Solve the challenge by identifying square outlines in the input grid,
     standardizing them to 4x4 size, and arranging them in a new grid.
     The function ignores solid squares and focuses only on outlines.
-    Outlines are sorted by their position in the input grid (top-to-bottom, left-to-right)
-    and arranged horizontally if there are three or more, vertically if there are two.
+    Outlines are sorted by their position in the input grid (top-to-bottom, left-to-right).
+    Up to 3 outlines are processed:
+    - If 1 outline: 4x4 grid
+    - If 2 outlines: 8x4 grid (vertical arrangement)
+    - If 3 outlines: 4x12 grid (horizontal arrangement)
     """
     outlines: List[Tuple[int, int, int, int]] = []  # (color, row, col, size)
     standard_size = 4
@@ -59,39 +62,34 @@ def solve_a680ac02(input_grid: ColoredGrid) -> ColoredGrid:
     if not outlines:
         return ColoredGrid(values=[[0]])
 
-    # Sort outlines by position (top-to-bottom, left-to-right)
+    # Sort outlines by position (top-to-bottom, left-to-right) and limit to 3
     outlines.sort(key=lambda x: (x[1], x[2]))
+    outlines = outlines[:3]
 
-    # Determine arrangement
+    # Determine output grid dimensions
     if len(outlines) == 1:
-        output_height = 4
-        output_width = 4
+        output_height, output_width = 4, 4
     elif len(outlines) == 2:
-        output_height = 8
-        output_width = 4
+        output_height, output_width = 8, 4
     else:
-        output_height = 4
-        output_width = 4 * len(outlines)
+        output_height, output_width = 4, 12
 
     # Create output grid
     result = ColoredGrid(values=[[0 for _ in range(output_width)] for _ in range(output_height)])
 
     # Place standardized outlines in the output grid
-    for i, (color, src_row, src_col, _) in enumerate(outlines):
+    for i, (color, _, _, _) in enumerate(outlines):
         if len(outlines) == 2:
-            tgt_row = i * 4
-            tgt_col = 0
+            tgt_row, tgt_col = i * 4, 0
         else:
-            tgt_row = 0
-            tgt_col = i * 4
-        standardized = standardize_outline(input_grid, (color, src_row, src_col, standard_size), standard_size)
+            tgt_row, tgt_col = 0, i * 4
+        standardized = standardize_outline(color, standard_size)
         copy_subgrid(standardized, result, 0, 0, tgt_row, tgt_col, standard_size, standard_size)
 
     return result
 
-def standardize_outline(grid: ColoredGrid, outline: Tuple[int, int, int, int], standard_size: int) -> ColoredGrid:
-    """Create a standardized 4x4 outline from the given outline."""
-    color, row, col, _ = outline
+def standardize_outline(color: int, standard_size: int) -> ColoredGrid:
+    """Create a standardized 4x4 outline of the given color."""
     result = ColoredGrid(values=[[0 for _ in range(standard_size)] for _ in range(standard_size)])
     for i in range(standard_size):
         result.set_cell(0, i, color)
