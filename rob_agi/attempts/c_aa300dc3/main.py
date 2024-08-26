@@ -4,14 +4,15 @@ import heapq
 
 def solve_aa300dc3(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the aa300dc3 challenge by creating a diagonal line of 8 sky blue squares
+    Solve the aa300dc3 challenge by creating a path of 8 sky blue squares
     through the black region of the grid, avoiding obstacles.
 
-    1. Analyze the grid to find potential starting points near edges and corners
-    2. For each starting point, use a modified A* algorithm to find a diagonal path of exactly 8 steps
-    3. Evaluate found paths based on diagonality, grid coverage, and obstacle avoidance
-    4. Place 8 sky blue squares along the best found path
-    5. Return the modified grid or the original if no valid path is found
+    1. Identify potential starting points adjacent to the border
+    2. For each starting point, use a modified pathfinding algorithm to find paths of exactly 8 steps
+    3. Prioritize diagonal moves but allow occasional horizontal or vertical moves
+    4. Evaluate paths based on diagonality, proximity to border, and obstacle avoidance
+    5. Place 8 sky blue squares along the best found path
+    6. Return the modified grid or the original if no valid path is found
     """
     rows, cols = input_grid.get_dimensions()
     output_grid = input_grid.deep_copy()
@@ -20,13 +21,12 @@ def solve_aa300dc3(input_grid: ColoredGrid) -> ColoredGrid:
         starts = []
         for r in range(rows):
             for c in range(cols):
-                if input_grid.get_cell(r, c) == 0 and (r == 0 or r == rows-1 or c == 0 or c == cols-1 or
-                                                       (r <= 2 or r >= rows-3) or (c <= 2 or c >= cols-3)):
+                if input_grid.get_cell(r, c) == 0 and (r == 0 or r == rows-1 or c == 0 or c == cols-1):
                     starts.append((r, c))
         return starts
 
-    def heuristic(a, b):
-        return max(abs(b[0] - a[0]), abs(b[1] - a[1]))  # Diagonal distance
+    def is_border(r, c):
+        return r == 0 or r == rows-1 or c == 0 or c == cols-1
 
     def get_neighbors(pos):
         r, c = pos
@@ -39,26 +39,31 @@ def solve_aa300dc3(input_grid: ColoredGrid) -> ColoredGrid:
 
     def evaluate_path(path):
         diagonality = sum(1 for i in range(len(path)-1) if abs(path[i][0]-path[i+1][0]) == abs(path[i][1]-path[i+1][1]))
-        coverage = abs(path[0][0] - path[-1][0]) + abs(path[0][1] - path[-1][1])
-        obstacle_avoidance = sum(1 for r, c in path if any(input_grid.get_cell(nr, nc) != 0 
-                                                          for nr, nc in [(r-1,c-1), (r-1,c), (r-1,c+1), 
-                                                                         (r,c-1), (r,c+1), 
-                                                                         (r+1,c-1), (r+1,c), (r+1,c+1)] 
-                                                          if 0 <= nr < rows and 0 <= nc < cols))
-        return diagonality * 2 + coverage * 0.5 + obstacle_avoidance * 0.5
+        border_proximity = 2 if is_border(path[-1][0], path[-1][1]) else 0
+        return diagonality + border_proximity
+
+    def dfs(start, path, visited):
+        if len(path) == 8:
+            return [path] if is_border(path[-1][0], path[-1][1]) else []
+        
+        paths = []
+        for neighbor in get_neighbors(path[-1]):
+            if neighbor not in visited:
+                new_path = path + [neighbor]
+                new_visited = visited | {neighbor}
+                paths.extend(dfs(start, new_path, new_visited))
+        return paths
 
     best_path = None
     best_score = -1
 
     for start in find_potential_starts():
-        for end in find_potential_starts():
-            if start != end:
-                path = modified_a_star(input_grid, start, end)
-                if len(path) == 8:
-                    score = evaluate_path(path)
-                    if score > best_score:
-                        best_path = path
-                        best_score = score
+        paths = dfs(start, [start], {start})
+        for path in paths:
+            score = evaluate_path(path)
+            if score > best_score:
+                best_path = path
+                best_score = score
 
     if best_path:
         for r, c in best_path:
