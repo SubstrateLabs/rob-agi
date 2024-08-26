@@ -50,6 +50,20 @@ def solve_2697da3f(input_grid: ColoredGrid) -> ColoredGrid:
     # Return the final ColoredGrid
     return ColoredGrid(values=output_grid)
 
+def refine_pattern(grid: List[List[int]]) -> None:
+    """
+    Refine the pattern by filling gaps and ensuring consistency.
+    """
+    size = len(grid)
+    for r in range(1, size - 1):
+        for c in range(1, size - 1):
+            neighbors = [
+                grid[r-1][c], grid[r+1][c],
+                grid[r][c-1], grid[r][c+1]
+            ]
+            if grid[r][c] == 0 and sum(neighbors) > 0:
+                grid[r][c] = max(set(neighbors), key=neighbors.count)
+
 def extract_core_pattern(input_grid: ColoredGrid) -> List[List[int]]:
     rows, cols = input_grid.get_dimensions()
     min_row, min_col = rows, cols
