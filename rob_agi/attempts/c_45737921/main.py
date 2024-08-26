@@ -12,7 +12,7 @@ def solve_45737921(input_grid: ColoredGrid) -> ColoredGrid:
        - Separate the cells of each color into two lists.
        - Sort each list based on row-major order.
        - Reverse both sorted lists.
-       - Reassign colors to the cells based on the reversed lists.
+       - Reassign colors to the cells based on the reversed lists, maintaining the original shape.
     4. Return the modified grid.
     """
     output_grid = input_grid.deep_copy()
@@ -56,10 +56,10 @@ def reverse_colors_in_region(grid: ColoredGrid, region: List[Tuple[int, int]]) -
     
     for color_list in color_lists:
         color_list.sort(key=lambda x: (x[0], x[1]))  # Sort by row, then column
-        color_list.reverse()
     
-    for (r1, c1), (r2, c2) in zip(color_lists[0], color_lists[1]):
-        color1 = grid.get_cell(r1, c1)
-        color2 = grid.get_cell(r2, c2)
-        grid.set_cell(r1, c1, color2)
-        grid.set_cell(r2, c2, color1)
+    color_map = {tuple(cell): grid.get_cell(cell[0], cell[1]) for cell in region}
+    reversed_colors = [color for color in reversed(sum(color_lists, []))]
+    
+    for (r, c), new_color in zip(sum(color_lists, []), reversed_colors):
+        if color_map[(r, c)] != new_color:
+            grid.set_cell(r, c, new_color)
