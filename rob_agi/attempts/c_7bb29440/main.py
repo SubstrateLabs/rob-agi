@@ -11,15 +11,15 @@ class Rectangle(NamedTuple):
 
 def solve_7bb29440(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the 7bb29440 challenge by identifying the largest blue rectangle
-    containing the most special squares (yellow or magenta).
+    Solve the 7bb29440 challenge by identifying the blue rectangle
+    containing the most special squares (yellow or magenta), with largest area as a tiebreaker.
 
     The function performs the following steps:
     1. Scan the grid for special squares (yellow 4 or magenta 6).
     2. For each special square, expand to find the largest blue rectangle containing it.
     3. Select the rectangle with the most special squares.
     4. If multiple rectangles have the same number of special squares, choose the largest one.
-    5. If multiple rectangles have the same size and special square count, choose the most top-left one.
+    5. If multiple rectangles have the same special square count and size, choose the most top-left one.
     6. Construct and return the selected rectangle as a new ColoredGrid.
 
     Args:
