@@ -1,6 +1,7 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import Tuple, List, Set
 from collections import deque
+import random
 
 def solve_9772c176(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -10,11 +11,11 @@ def solve_9772c176(input_grid: ColoredGrid) -> ColoredGrid:
     1. Identify sky blue shapes using flood fill.
     2. For each sky blue shape:
        a. Create an expanded bounding box.
-       b. Generate a simplified yellow shadow based on the sky blue shape.
-       c. Apply the yellow shadow to the grid, ensuring a gap from sky blue pixels.
-    3. Refine yellow shadows by smoothing edges and creating connections.
-    4. Ensure all original sky blue pixels are unchanged.
-    5. Add finishing touches like small yellow dots and tendrils.
+       b. Generate a yellow shadow based on the sky blue shape, with focus on bottom and right sides.
+       c. Add irregularities and randomness to the shadow.
+    3. Create disconnected shadow elements (small dots and tendrils).
+    4. Refine shadows by removing isolated pixels and ensuring no direct contact with sky blue.
+    5. Add final touch-ups and verify the result.
 
     Args:
     input_grid (ColoredGrid): The input grid containing sky blue shapes.
@@ -22,6 +23,7 @@ def solve_9772c176(input_grid: ColoredGrid) -> ColoredGrid:
     Returns:
     ColoredGrid: The transformed grid with added yellow shadows.
     """
+    random.seed(42)  # Set seed for reproducibility
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
 
@@ -68,7 +70,13 @@ def solve_9772c176(input_grid: ColoredGrid) -> ColoredGrid:
         for x in range(top, bottom + 1):
             for y in range(left, right + 1):
                 if (x, y) not in shape and any((nx, ny) in shape for nx, ny in get_neighbors(x, y, diagonal=True)):
-                    shadow.add((x, y))
+                    # Higher probability for bottom and right sides
+                    if x > (top + bottom) // 2 or y > (left + right) // 2:
+                        if random.random() < 0.8:
+                            shadow.add((x, y))
+                    else:
+                        if random.random() < 0.3:
+                            shadow.add((x, y))
         return shadow
 
     def apply_shadow(shadow: Set[Tuple[int, int]]):
@@ -76,21 +84,31 @@ def solve_9772c176(input_grid: ColoredGrid) -> ColoredGrid:
             if all(output_grid.get_cell(nx, ny) != 8 for nx, ny in get_neighbors(x, y)):
                 output_grid.set_cell(x, y, 4)
 
+    def add_irregularities(shadow: Set[Tuple[int, int]]):
+        new_shadow = shadow.copy()
+        for x, y in shadow:
+            if random.random() < 0.2:
+                for nx, ny in get_neighbors(x, y):
+                    if (nx, ny) not in shadow and output_grid.get_cell(nx, ny) == 0:
+                        new_shadow.add((nx, ny))
+        return new_shadow
+
+    def add_disconnected_elements(shape: Set[Tuple[int, int]], box: Tuple[int, int, int, int]):
+        top, left, bottom, right = box
+        for _ in range((bottom - top + right - left) // 4):
+            x = random.randint(top, bottom)
+            y = random.randint(left, right)
+            if (x, y) not in shape and output_grid.get_cell(x, y) == 0:
+                if all(output_grid.get_cell(nx, ny) != 8 for nx, ny in get_neighbors(x, y)):
+                    output_grid.set_cell(x, y, 4)
+
     def refine_shadow():
         for x in range(rows):
             for y in range(cols):
                 if output_grid.get_cell(x, y) == 4:
                     yellow_neighbors = sum(1 for nx, ny in get_neighbors(x, y) if output_grid.get_cell(nx, ny) == 4)
-                    if yellow_neighbors <= 1:
+                    if yellow_neighbors == 0:
                         output_grid.set_cell(x, y, 0)
-
-    def add_finishing_touches():
-        for x in range(1, rows - 1):
-            for y in range(1, cols - 1):
-                if output_grid.get_cell(x, y) == 0:
-                    yellow_neighbors = sum(1 for nx, ny in get_neighbors(x, y) if output_grid.get_cell(nx, ny) == 4)
-                    if yellow_neighbors >= 2 and all(output_grid.get_cell(nx, ny) != 8 for nx, ny in get_neighbors(x, y)):
-                        output_grid.set_cell(x, y, 4)
 
     blue_shapes = find_blue_shapes()
     expansion = 3  # Expanded box size
@@ -99,10 +117,11 @@ def solve_9772c176(input_grid: ColoredGrid) -> ColoredGrid:
         box = get_bounding_box(shape)
         expanded_box = create_expanded_box(box, expansion)
         shadow = generate_shadow(shape, expanded_box)
+        shadow = add_irregularities(shadow)
         apply_shadow(shadow)
+        add_disconnected_elements(shape, expanded_box)
 
     refine_shadow()
-    add_finishing_touches()
 
     # Ensure no yellow pixels touch blue pixels
     for x in range(rows):
