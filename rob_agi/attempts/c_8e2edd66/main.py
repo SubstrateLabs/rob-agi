@@ -4,12 +4,17 @@ def solve_8e2edd66(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transform a 3x3 input grid into a 9x9 output grid by expanding each cell.
     
-    For each non-zero cell in the input:
+    For each cell in the input:
     - Create a 3x3 subgrid in the output
-    - Place the input cell's value in the four corners of this subgrid
-    - Leave the center and edges of the subgrid as zeros
+    - If the input cell is non-zero:
+      - Place the input cell's value in the four corners of this subgrid
+      - Leave the center and edges of the subgrid as zeros
+    - If the input cell is zero:
+      - Leave the entire 3x3 subgrid as zeros
     
-    Zero cells in the input result in 3x3 subgrids of all zeros in the output.
+    This creates a pattern where non-zero values from the input appear
+    in a sparse, symmetrical pattern in the output, while preserving
+    the overall structure of the input grid.
     """
     # Create a new 9x9 grid filled with zeros
     output_values = [[0 for _ in range(9)] for _ in range(9)]
