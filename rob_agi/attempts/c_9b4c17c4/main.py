@@ -13,6 +13,9 @@ def solve_9b4c17c4(input_grid: ColoredGrid) -> ColoredGrid:
     5. Maintains proper spacing between regions and zone edges.
     6. Handles cases where regions might already be at the correct edge.
     7. Ensures that no red region extends beyond the zone boundaries.
+    8. Processes each vertical zone independently.
+    9. Maintains the relative order of multiple regions within a zone.
+    10. Ensures regions move as close to the edge as possible while maintaining proper spacing.
     """
     rows, cols = input_grid.get_dimensions()
     output_grid = input_grid.deep_copy()
@@ -50,13 +53,13 @@ def solve_9b4c17c4(input_grid: ColoredGrid) -> ColoredGrid:
         return regions
 
     def move_regions(regions: List[List[Tuple[int, int]]], start_col: int, end_col: int, to_right: bool):
-        regions.sort(key=lambda r: min(y for y, _ in r), reverse=True)  # Sort from bottom to top
+        regions.sort(key=lambda r: max(y for y, _ in r), reverse=True)  # Sort from bottom to top
 
         if to_right:
             new_start = end_col
             for region in regions:
                 region_width = max(c for _, c in region) - min(c for _, c in region) + 1
-                new_start = min(new_start, end_col - region_width + 1)  # Ensure region fits within zone
+                new_start = min(new_start - 1, end_col - region_width)  # Ensure region fits within zone and leave space
                 offset = new_start - max(c for _, c in region)
                 for r, c in region:
                     output_grid.values[r][c] = input_grid.values[r][start_col]  # Restore original background
@@ -66,7 +69,7 @@ def solve_9b4c17c4(input_grid: ColoredGrid) -> ColoredGrid:
             new_start = start_col
             for region in regions:
                 region_width = max(c for _, c in region) - min(c for _, c in region) + 1
-                new_start = max(new_start, start_col)  # Ensure region fits within zone
+                new_start = max(new_start + 1, start_col)  # Ensure region fits within zone and leave space
                 offset = new_start - min(c for _, c in region)
                 for r, c in region:
                     output_grid.values[r][c] = input_grid.values[r][start_col]  # Restore original background
