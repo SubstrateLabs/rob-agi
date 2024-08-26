@@ -3,64 +3,43 @@ from typing import List, Tuple, Set
 
 def solve_22a4bbc2(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by changing qualifying lines to red.
+    Transforms the input grid by changing qualifying rectangles to red.
     
-    A qualifying line is a horizontal or vertical line of the same color,
-    2-3 units long. When multiple qualifying lines are adjacent, they form
-    larger red rectangles. The function identifies all such lines and
-    changes them to red (color 2).
+    A qualifying rectangle is a contiguous area of the same color (except black),
+    with dimensions 2x1, 1x2, 2x2, 3x1, 1x3, 2x3, or 3x2.
+    The function identifies all such rectangles and changes them to red (color 2).
+    Overlapping or adjacent qualifying rectangles are merged into larger red areas.
     """
     new_grid = input_grid.deep_copy()
-    qualifying_lines = find_qualifying_lines(input_grid)
-    cells_to_change = mark_cells_for_change(input_grid, qualifying_lines)
+    cells_to_change = find_qualifying_rectangles(input_grid)
     
     for row, col in cells_to_change:
         new_grid.values[row][col] = 2
     
     return new_grid
 
-def find_qualifying_lines(grid: ColoredGrid) -> List[Tuple[int, int, int, int, int]]:
-    """
-    Returns a list of tuples (row, col, length, direction, color)
-    where direction is 0 for horizontal and 1 for vertical
-    """
+def find_qualifying_rectangles(grid: ColoredGrid) -> Set[Tuple[int, int]]:
     rows, cols = grid.get_dimensions()
-    qualifying_lines = []
-
-    # Check horizontal lines
-    for r in range(rows):
-        for c in range(cols - 1):
-            color = grid.values[r][c]
-            if color == 0:  # Skip black (empty) cells
-                continue
-            length = 1
-            while c + length < cols and grid.values[r][c + length] == color:
-                length += 1
-            if 2 <= length <= 3:
-                qualifying_lines.append((r, c, length, 0, color))
-
-    # Check vertical lines
-    for c in range(cols):
-        for r in range(rows - 1):
-            color = grid.values[r][c]
-            if color == 0:  # Skip black (empty) cells
-                continue
-            length = 1
-            while r + length < rows and grid.values[r + length][c] == color:
-                length += 1
-            if 2 <= length <= 3:
-                qualifying_lines.append((r, c, length, 1, color))
-
-    return qualifying_lines
-
-def mark_cells_for_change(grid: ColoredGrid, lines: List[Tuple[int, int, int, int, int]]) -> Set[Tuple[int, int]]:
-    """
-    Returns a set of (row, col) tuples representing cells to be changed to red
-    """
     cells_to_change = set()
-    for row, col, length, direction, color in lines:
-        if direction == 0:  # Horizontal
-            cells_to_change.update((row, col + i) for i in range(length))
-        else:  # Vertical
-            cells_to_change.update((row + i, col) for i in range(length))
+    qualifying_dimensions = [(2,1), (1,2), (2,2), (3,1), (1,3), (2,3), (3,2)]
+
+    for r in range(rows):
+        for c in range(cols):
+            color = grid.values[r][c]
+            if color == 0:  # Skip black (empty) cells
+                continue
+            for height, width in qualifying_dimensions:
+                if is_qualifying_rectangle(grid, r, c, height, width, color):
+                    for i in range(height):
+                        for j in range(width):
+                            cells_to_change.add((r+i, c+j))
+
     return cells_to_change
+
+def is_qualifying_rectangle(grid: ColoredGrid, row: int, col: int, height: int, width: int, color: int) -> bool:
+    rows, cols = grid.get_dimensions()
+    if row + height > rows or col + width > cols:
+        return False
+    return all(grid.values[r][c] == color 
+               for r in range(row, row + height) 
+               for c in range(col, col + width))
