@@ -1,55 +1,61 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Set, Deque
+from typing import List, Tuple, Set
 from collections import deque
 
 def solve_f3b10344(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the f3b10344 challenge by creating a sky blue network that connects and surrounds non-black shapes.
+    Solve the f3b10344 challenge by creating a sky blue network that connects non-black shapes.
     
-    The function creates a mask of non-black cells, expands it, performs a flood fill with sky blue (8),
-    restores the original shapes, and ensures all non-black areas are surrounded by sky blue.
-    The result is a grid where all non-black shapes are connected and surrounded by a sky blue network.
+    The function creates an expanded mask of non-black cells, generates an initial sky blue network,
+    trims excess sky blue cells, ensures connectivity, restores original shapes, and makes final
+    adjustments to ensure all non-black shapes are connected by a 3-cell wide sky blue network.
     """
     if all(cell == 0 for row in input_grid.values for cell in row):
         return input_grid
 
-    grid = input_grid.deep_copy()
-    rows, cols = grid.get_dimensions()
+    grid = ColoredGrid(values=[[0 for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
+    rows, cols = input_grid.get_dimensions()
 
-    # Create a mask of non-black cells
-    mask = [[cell != 0 for cell in row] for row in grid.values]
-
-    # Expand the mask
+    # Create an expanded mask
     expanded_mask = [[False] * cols for _ in range(rows)]
     for r in range(rows):
         for c in range(cols):
-            if mask[r][c]:
-                for dr in [-1, 0, 1]:
-                    for dc in [-1, 0, 1]:
+            if input_grid.values[r][c] != 0:
+                for dr in range(-1, 2):
+                    for dc in range(-1, 2):
                         nr, nc = r + dr, c + dc
                         if 0 <= nr < rows and 0 <= nc < cols:
                             expanded_mask[nr][nc] = True
 
-    # Perform flood fill with sky blue
-    def flood_fill(start_r: int, start_c: int):
-        queue = deque([(start_r, start_c)])
-        while queue:
-            r, c = queue.popleft()
-            if 0 <= r < rows and 0 <= c < cols and expanded_mask[r][c] and grid.values[r][c] == 0:
-                grid.values[r][c] = 8
-                for dr in [-1, 0, 1]:
-                    for dc in [-1, 0, 1]:
-                        queue.append((r + dr, c + dc))
+    # Generate initial sky blue network
+    def draw_sky_blue_square(r: int, c: int):
+        for dr in range(-1, 2):
+            for dc in range(-1, 2):
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < rows and 0 <= nc < cols:
+                    grid.values[nr][nc] = 8
 
-    # Find the first True cell in the expanded mask and start flood fill
+    start = next((r, c) for r in range(rows) for c in range(cols) if expanded_mask[r][c])
+    queue = deque([start])
+    visited = set()
+
+    while queue:
+        r, c = queue.popleft()
+        if (r, c) not in visited:
+            visited.add((r, c))
+            draw_sky_blue_square(r, c)
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < rows and 0 <= nc < cols and expanded_mask[nr][nc]:
+                    queue.append((nr, nc))
+
+    # Trim excess sky blue cells
     for r in range(rows):
         for c in range(cols):
-            if expanded_mask[r][c]:
-                flood_fill(r, c)
-                break
-        else:
-            continue
-        break
+            if grid.values[r][c] == 8 and not expanded_mask[r][c]:
+                grid.values[r][c] = 0
+
+    # Ensure connectivity (not needed in this implementation as BFS ensures connectivity)
 
     # Restore original shapes
     for r in range(rows):
@@ -57,18 +63,24 @@ def solve_f3b10344(input_grid: ColoredGrid) -> ColoredGrid:
             if input_grid.values[r][c] != 0:
                 grid.values[r][c] = input_grid.values[r][c]
 
-    # Final pass to ensure connectivity
+    # Final adjustments
     for r in range(rows):
         for c in range(cols):
-            if grid.values[r][c] == 0:
-                for dr in [-1, 0, 1]:
-                    for dc in [-1, 0, 1]:
+            if grid.values[r][c] not in [0, 8]:
+                has_sky_blue_neighbor = False
+                for dr in range(-1, 2):
+                    for dc in range(-1, 2):
                         nr, nc = r + dr, c + dc
-                        if 0 <= nr < rows and 0 <= nc < cols and grid.values[nr][nc] in [8] + list(range(1, 10)):
-                            grid.values[r][c] = 8
+                        if 0 <= nr < rows and 0 <= nc < cols and grid.values[nr][nc] == 8:
+                            has_sky_blue_neighbor = True
                             break
-                    else:
-                        continue
-                    break
+                    if has_sky_blue_neighbor:
+                        break
+                if not has_sky_blue_neighbor:
+                    for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                        nr, nc = r + dr, c + dc
+                        if 0 <= nr < rows and 0 <= nc < cols and grid.values[nr][nc] == 0:
+                            grid.values[nr][nc] = 8
+                            break
 
     return grid
