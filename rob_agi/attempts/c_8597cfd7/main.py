@@ -7,7 +7,8 @@ def solve_8597cfd7(input_grid: ColoredGrid) -> ColoredGrid:
     2. Scan from right to left for vertical lines that:
        - Extend at least one square above and below the gray line
        - Choose the line with the most squares below the gray line
-       - In case of a tie, prioritize the rightmost line
+       - In case of a tie, choose the line with more squares above the gray line
+       - If still tied, prioritize the rightmost line
     3. Return a 2x2 grid filled with the color of the chosen line, or black if no line is found.
     """
     rows, cols = input_grid.get_dimensions()
@@ -17,6 +18,7 @@ def solve_8597cfd7(input_grid: ColoredGrid) -> ColoredGrid:
     
     chosen_color = 0
     max_squares_below = 0
+    max_squares_above = 0
     rightmost_col = -1
 
     # Scan for the target vertical line
@@ -26,9 +28,14 @@ def solve_8597cfd7(input_grid: ColoredGrid) -> ColoredGrid:
         
         if color_above != 0 and color_above == color_below:
             squares_below = sum(1 for r in range(gray_line_index + 1, rows) if input_grid.values[r][col] == color_below)
-            if squares_below > max_squares_below or (squares_below == max_squares_below and col > rightmost_col):
+            squares_above = sum(1 for r in range(gray_line_index) if input_grid.values[r][col] == color_above)
+            
+            if (squares_below > max_squares_below or 
+                (squares_below == max_squares_below and squares_above > max_squares_above) or
+                (squares_below == max_squares_below and squares_above == max_squares_above and col > rightmost_col)):
                 chosen_color = color_below
                 max_squares_below = squares_below
+                max_squares_above = squares_above
                 rightmost_col = col
 
     # Create the output grid
