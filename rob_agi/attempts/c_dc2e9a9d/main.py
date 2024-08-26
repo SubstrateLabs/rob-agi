@@ -2,6 +2,17 @@ from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Set, Dict
 
 def solve_dc2e9a9d(input_grid: ColoredGrid) -> ColoredGrid:
+    """
+    Transform the input grid by mirroring green shapes in blue, adding sky blue elements,
+    and enhancing overall balance and symmetry.
+
+    1. Mirror large green shapes in blue
+    2. Add sky blue shapes inspired by existing shapes
+    3. Process medium and small shapes
+    4. Fill the center if empty
+    5. Balance the composition and ensure symmetry
+    6. Clean up isolated cells
+    """
     output_grid = input_grid.deep_copy()
     shapes = categorize_shapes(input_grid)
     occupied_cells = set((r, c) for r, row in enumerate(input_grid.values) for c, val in enumerate(row) if val != 0)
@@ -12,12 +23,20 @@ def solve_dc2e9a9d(input_grid: ColoredGrid) -> ColoredGrid:
     add_sky_blue_shapes(output_grid, shapes['large'] + shapes['medium'], center_r, center_c, occupied_cells)
     process_medium_and_small_shapes(output_grid, shapes['medium'], shapes['small'], center_r, center_c, occupied_cells)
     
-    fill_center(output_grid, occupied_cells)
+    fill_empty_space(output_grid, occupied_cells)
     balance_and_ensure_symmetry(output_grid, occupied_cells)
     cleanup(output_grid, occupied_cells)
-    final_check(output_grid, input_grid)
     
     return output_grid
+
+def fill_empty_space(grid: ColoredGrid, occupied_cells: Set[Tuple[int, int]]):
+    center_r, center_c = grid.num_rows // 2, grid.num_cols // 2
+    if all((r, c) not in occupied_cells for r in range(center_r - 1, center_r + 2) for c in range(center_c - 1, center_c + 2)):
+        for r in range(center_r - 1, center_r + 2):
+            for c in range(center_c - 1, center_c + 2):
+                if (r, c) == (center_r, center_c) or (r + c) % 2 == 0:
+                    grid.set_cell(r, c, 8)
+                    occupied_cells.add((r, c))
 
 def categorize_shapes(grid: ColoredGrid) -> Dict[str, List[List[Tuple[int, int]]]]:
     all_shapes = grid.find_connected_regions(3)
