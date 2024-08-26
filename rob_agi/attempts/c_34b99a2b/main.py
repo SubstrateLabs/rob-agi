@@ -1,33 +1,127 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple
 
+from typing import List, Tuple
+import random
+
 def solve_34b99a2b(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the 5x9 input grid into a 5x4 output grid based on the following steps:
     1. Analyzes the input grid for patterns of sky (8) and gray (5) squares.
     2. Creates a 5x4 output grid with red (2) squares based on the input patterns.
-    3. Ensures a coherent pattern of red squares, focusing on the top half of the grid.
-    4. Applies rules for vertical consistency and bottom row processing.
-    5. Makes final adjustments to balance the pattern and match example outputs.
+    3. Ensures a coherent and connected pattern of red squares.
+    4. Balances the pattern and makes final adjustments.
     """
-    output = [[0 for _ in range(4)] for _ in range(5)]
+    left_half, right_half = split_grid(input_grid)
+    scores = calculate_density_scores(left_half, right_half)
     
-    analyze_input_and_create_output(input_grid, output)
-    ensure_coherent_pattern(output)
-    apply_vertical_consistency(output)
-    process_bottom_row(input_grid, output)
-    final_adjustments(output)
+    output = [[0 for _ in range(4)] for _ in range(5)]
+    total_red = random.randint(6, 10)  # Aim for 6-10 red squares
+    
+    map_inverse_density_to_output(scores, output, total_red)
+    ensure_connectivity(output)
+    balance_pattern(output, total_red)
     
     return ColoredGrid(values=output)
 
-def analyze_input_and_create_output(input_grid: ColoredGrid, output: List[List[int]]):
+def split_grid(grid: ColoredGrid) -> Tuple[List[List[int]], List[List[int]]]:
+    left_half = [row[:4] for row in grid.values]
+    right_half = [row[5:] for row in grid.values]
+    return left_half, right_half
+
+def calculate_density_scores(left_half: List[List[int]], right_half: List[List[int]]) -> List[float]:
+    scores = []
+    for half, color in [(left_half, 8), (right_half, 5)]:
+        for rows, cols in [(slice(0, 3), slice(0, 2)), (slice(0, 3), slice(2, 4)), 
+                           (slice(3, 5), slice(0, 2)), (slice(3, 5), slice(2, 4))]:
+            quadrant = [row[cols] for row in half[rows]]
+            score = sum(cell == color for row in quadrant for cell in row) / len(quadrant) / len(quadrant[0])
+            scores.append(score)
+    return scores
+
+def map_inverse_density_to_output(scores: List[float], output: List[List[int]], total_red: int):
+    inverse_scores = [1 - score for score in scores]
+    total_inverse = sum(inverse_scores)
+    quadrants = [(3, 2), (3, 0), (0, 2), (0, 0)]  # Inverse mapping
+    remaining_red = total_red
+    
+    for score, (start_row, start_col) in zip(inverse_scores, quadrants):
+        num_red = int((score / total_inverse) * total_red)
+        num_red = min(num_red, remaining_red, 4)  # Ensure we don't place too many reds
+        cells = [(r, c) for r in range(start_row, start_row + 2) for c in range(start_col, start_col + 2)]
+        for _ in range(num_red):
+            if cells:
+                r, c = cells.pop(random.randint(0, len(cells) - 1))
+                output[r][c] = 2
+                remaining_red -= 1
+    
+    # Place any remaining reds
+    while remaining_red > 0:
+        r, c = random.randint(0, 4), random.randint(0, 3)
+        if output[r][c] == 0:
+            output[r][c] = 2
+            remaining_red -= 1
+
+def ensure_connectivity(output: List[List[int]]):
+    def get_neighbors(r, c):
+        return [(r+dr, c+dc) for dr, dc in [(0,1),(1,0),(0,-1),(-1,0)]
+                if 0 <= r+dr < 5 and 0 <= c+dc < 4]
+    
+    def dfs(r, c, visited):
+        stack = [(r, c)]
+        while stack:
+            curr_r, curr_c = stack.pop()
+            if (curr_r, curr_c) not in visited:
+                visited.add((curr_r, curr_c))
+                for nr, nc in get_neighbors(curr_r, curr_c):
+                    if output[nr][nc] == 2:
+                        stack.append((nr, nc))
+    
+    red_cells = [(r, c) for r in range(5) for c in range(4) if output[r][c] == 2]
+    if not red_cells:
+        return
+    
+    visited = set()
+    dfs(red_cells[0][0], red_cells[0][1], visited)
+    
+    for r, c in red_cells:
+        if (r, c) not in visited:
+            # Connect isolated red cell to the nearest connected red cell
+            min_dist = float('inf')
+            nearest = None
+            for vr, vc in visited:
+                dist = abs(r - vr) + abs(c - vc)
+                if dist < min_dist:
+                    min_dist = dist
+                    nearest = (vr, vc)
+            if nearest:
+                nr, nc = nearest
+                for cr, cc in [(r, nc), (nr, c)]:
+                    output[cr][cc] = 2
+                dfs(r, c, visited)
+
+def balance_pattern(output: List[List[int]], total_red: int):
+    # Ensure no row or column is entirely red or black
     for r in range(5):
-        sky_count = sum(1 for c in range(3) if input_grid.values[r][c] == 8)
-        gray_count = sum(1 for c in range(5, 9) if input_grid.values[r][c] == 5)
-        if sky_count >= 2 or gray_count >= 2:
-            output[r][0] = output[r][1] = 2
-        if input_grid.values[r][4] == 4:  # Yellow column
-            output[r][2] = 2
+        if all(cell == 2 for cell in output[r]) or all(cell == 0 for cell in output[r]):
+            c = random.randint(0, 3)
+            output[r][c] = 2 if output[r][c] == 0 else 0
+    
+    for c in range(4):
+        if all(output[r][c] == 2 for r in range(5)) or all(output[r][c] == 0 for r in range(5)):
+            r = random.randint(0, 4)
+            output[r][c] = 2 if output[r][c] == 0 else 0
+    
+    # Adjust to match total_red
+    current_red = sum(sum(row) for row in output) // 2
+    while current_red != total_red:
+        r, c = random.randint(0, 4), random.randint(0, 3)
+        if current_red < total_red and output[r][c] == 0:
+            output[r][c] = 2
+            current_red += 1
+        elif current_red > total_red and output[r][c] == 2:
+            output[r][c] = 0
+            current_red -= 1
 
 def split_grid(grid: ColoredGrid) -> Tuple[List[List[int]], List[List[int]]]:
     left_half = [row[:4] for row in grid.values]
