@@ -14,6 +14,12 @@ def solve_929ab4e9(input_grid: ColoredGrid) -> ColoredGrid:
     7. Balancing color distribution
     8. Performing final symmetry and coherence checks
     9. Returning the completed grid with the reconstructed pattern
+
+    The solution maintains global symmetry, continues patterns from non-masked areas,
+    adapts the filling strategy based on specific grid characteristics, preserves
+    consistency in color distribution, and takes into account the broader context
+    of the entire grid. It handles various grid patterns and masked area configurations
+    by applying a step-by-step approach that considers both local and global features.
     """
     masked_area = identify_masked_area(input_grid)
     symmetry_mapping = create_symmetry_mapping(input_grid, masked_area)
@@ -107,17 +113,21 @@ def final_global_symmetry_check(grid: ColoredGrid) -> ColoredGrid:
     for r in range(grid.num_rows):
         for c in range(grid.num_cols):
             dr, dc = r - center_r, c - center_c
-            colors = [
-                grid.values[r][c],
-                grid.values[center_r - dr][center_c + dc],
-                grid.values[center_r + dr][center_c - dc],
-                grid.values[center_r - dr][center_c - dc]
+            colors = [grid.values[r][c]]
+            symmetric_positions = [
+                (center_r - dr, center_c + dc),
+                (center_r + dr, center_c - dc),
+                (center_r - dr, center_c - dc)
             ]
+            for sr, sc in symmetric_positions:
+                if 0 <= sr < grid.num_rows and 0 <= sc < grid.num_cols:
+                    colors.append(grid.values[sr][sc])
+            
             final_color = Counter(colors).most_common(1)[0][0]
             final_grid.values[r][c] = final_color
-            final_grid.values[center_r - dr][center_c + dc] = final_color
-            final_grid.values[center_r + dr][center_c - dc] = final_color
-            final_grid.values[center_r - dr][center_c - dc] = final_color
+            for sr, sc in symmetric_positions:
+                if 0 <= sr < grid.num_rows and 0 <= sc < grid.num_cols:
+                    final_grid.values[sr][sc] = final_color
     return final_grid
 
 def get_valid_neighbors(grid: ColoredGrid, r: int, c: int) -> List[int]:
