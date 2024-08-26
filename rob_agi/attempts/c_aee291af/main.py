@@ -1,7 +1,7 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
-def solve_aee291af(input_grid: ColoredGrid) -> ColoredGrid:
+def solve_aee291af(input_grid: ColoredGrid) -> Optional[ColoredGrid]:
     """
     Solves the grid transformation challenge by finding the largest square pattern
     of sky blue (8) outline with a specific arrangement of red (2) squares inside.
@@ -14,11 +14,15 @@ def solve_aee291af(input_grid: ColoredGrid) -> ColoredGrid:
     5. If a valid pattern is found, constructs and returns the solution grid.
     6. If no valid pattern is found, returns None.
     
+    The valid patterns include:
+    - 4x4 grid with two red squares arranged vertically or diagonally
+    - 5x5 grid with red squares forming a cross shape
+    
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
     
     Returns:
-    ColoredGrid: The transformed grid containing the largest valid pattern, or None if no pattern is found.
+    Optional[ColoredGrid]: The transformed grid containing the largest valid pattern, or None if no pattern is found.
     """
     sky_blue_coords = find_color_coords(input_grid, 8)
     red_coords = find_color_coords(input_grid, 2)
@@ -43,13 +47,13 @@ def is_valid_outline(coords: List[Tuple[int, int]], top: int, left: int, size: i
                   if r == top or r == top + size - 1 or c == left or c == left + size - 1)
     return outline.issubset(set(coords))
 
-def find_red_pattern(coords: List[Tuple[int, int]], top: int, left: int, size: int) -> List[Tuple[int, int]]:
+def find_red_pattern(coords: List[Tuple[int, int]], top: int, left: int, size: int) -> Optional[List[Tuple[int, int]]]:
     relative_coords = [(r - top, c - left) for r, c in coords if top < r < top + size - 1 and left < c < left + size - 1]
     
     patterns = [
         [(1, 1), (1, 2)],  # Vertical line (4x4)
         [(1, 1), (2, 2)],  # Diagonal (4x4)
-        [(1, 2), (2, 1), (2, 3), (3, 2)]  # Plus shape (5x5)
+        [(1, 2), (2, 1), (2, 2), (2, 3), (3, 2)]  # Cross shape (5x5)
     ]
     
     for pattern in patterns:
@@ -59,7 +63,7 @@ def find_red_pattern(coords: List[Tuple[int, int]], top: int, left: int, size: i
     return None
 
 def construct_solution(size: int, pattern: List[Tuple[int, int]]) -> ColoredGrid:
-    solution = [[8 if r == 0 or r == size - 1 or c == 0 or c == size - 1 else 8 for c in range(size)] for r in range(size)]
+    solution = [[8 for _ in range(size)] for _ in range(size)]
     for r, c in pattern:
         solution[r][c] = 2
     return ColoredGrid(values=solution)
