@@ -12,14 +12,11 @@ def solve_df8cc377(input_grid: ColoredGrid) -> ColoredGrid:
        the highest-numbered color and black (0).
     4. For 3x3 shapes, placing a single dot of the highest-numbered color at the center.
     5. For 5x3 or 3x5 shapes, placing two dots of the highest-numbered color symmetrically.
-    6. For shapes smaller than 3x3, removing them entirely.
+    6. For shapes smaller than 3x3 but closed, preserving them without filling.
     7. Clearing all cells not part of any shape's boundary or interior.
     8. Reconstructing the grid with the modified shapes.
     """
     BLACK = 0
-
-    def is_outline_color(color: int) -> bool:
-        return color != BLACK and any(input_grid.get_cell(r, c) == color for r in range(input_grid.num_rows) for c in range(input_grid.num_cols))
 
     def get_highest_fill_color(grid: ColoredGrid) -> int:
         return max((color for color in range(9, 0, -1) if any(color in row for row in grid.values)), default=0)
@@ -91,17 +88,23 @@ def solve_df8cc377(input_grid: ColoredGrid) -> ColoredGrid:
             else:
                 grid.set_cell(min_r + 1, min_c + 1, fill_color)
                 grid.set_cell(min_r + 1, min_c + 3, fill_color)
-        # For shapes smaller than 3x3, we don't fill them (they will be removed)
+        # For shapes smaller than 3x3, we don't fill them (they will be preserved as is)
 
     new_grid = ColoredGrid(values=[[BLACK for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
     shapes = find_shapes(input_grid)
     fill_color = get_highest_fill_color(input_grid)
 
     for shape_color, boundary, interior in shapes:
-        if len(boundary) + len(interior) >= 9:  # Only process shapes 3x3 or larger
-            # Add boundary to new_grid
-            for r, c in boundary:
-                new_grid.set_cell(r, c, shape_color)
+        # Add boundary to new_grid for all closed shapes
+        for r, c in boundary:
+            new_grid.set_cell(r, c, shape_color)
+        
+        # Fill interior only for shapes 3x3 or larger
+        if len(boundary) + len(interior) >= 9:
             fill_shape(new_grid, boundary, interior, shape_color, fill_color)
+        else:
+            # For smaller closed shapes, preserve the interior as is
+            for r, c in interior:
+                new_grid.set_cell(r, c, shape_color)
 
     return new_grid
