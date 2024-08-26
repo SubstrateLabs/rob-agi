@@ -1,104 +1,92 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Dict
 from collections import defaultdict
-import math
 
 def solve_16b78196(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by reorganizing color shapes into a more centralized, often vertical structure.
+    Transforms the input grid by reorganizing color shapes into a centralized vertical structure.
     
     The solution follows these steps:
-    1. Analyze the input grid to identify colors, their areas, centroids, and characteristics.
-    2. Calculate the center of mass for all non-black cells.
-    3. Determine a rough order for the colors based on their vertical positions.
-    4. Create a target area for shape placement in the center of the grid.
-    5. For each color, generate a simplified shape and position it within the target area.
-    6. Adjust the arrangement to reduce overlap and fill gaps.
-    7. Create connections between shapes to form a unified structure.
-    8. Fine-tune the result to maintain proportions and improve aesthetic appeal.
-    9. Handle special cases like scattered colors or border-touching shapes.
-    10. Validate and iterate to ensure all criteria are met.
+    1. Analyze the input grid to identify colors and their characteristics.
+    2. Identify background colors at the top and bottom of the grid.
+    3. Create a new grid with the bottom background color (if present).
+    4. Sort remaining colors based on their average vertical position.
+    5. Create a central vertical stack of 3x3 squares for each color.
+    6. Add the top background color (if present).
+    7. Ensure clean edges and fill remaining space with black.
     
     Returns a new ColoredGrid with the transformed arrangement.
     """
     # Step 1: Analyze the input grid
-    colors, total_area = analyze_grid(input_grid)
+    colors = analyze_grid(input_grid)
     
-    # Step 2: Calculate center of mass
-    center_of_mass = calculate_center_of_mass(colors)
-    
-    # Step 3: Determine color order
-    color_order = sorted(colors.keys(), key=lambda c: colors[c]['centroid'][1])
-    
-    # Step 4: Create target area
-    target_area = create_target_area(total_area, input_grid.get_dimensions())
+    # Step 2: Identify background colors
+    bottom_bg, top_bg = identify_background_colors(input_grid)
     
     # Create output grid
     output = ColoredGrid(values=[[0 for _ in range(30)] for _ in range(30)])
     
-    # Step 5-9: Generate and position shapes
-    available_space = target_area.copy()
-    for color in color_order:
-        shape = generate_shape(colors[color], available_space)
-        position_shape(output, shape, color, available_space)
-        update_available_space(available_space, shape)
+    # Step 3: Add bottom background color
+    if bottom_bg:
+        fill_bottom_background(output, bottom_bg, colors[bottom_bg]['height'])
     
-    # Step 10: Validate and iterate (simplified for this implementation)
+    # Step 4: Sort remaining colors
+    sorted_colors = sort_colors(colors, bottom_bg)
+    
+    # Step 5: Create central vertical stack
+    create_vertical_stack(output, sorted_colors, bottom_bg)
+    
+    # Step 6: Add top background color
+    if top_bg:
+        fill_top_background(output, top_bg)
+    
+    # Step 7: Final cleanup
+    cleanup_grid(output)
     
     return output
 
-def analyze_grid(grid: ColoredGrid) -> Tuple[Dict, int]:
-    colors = defaultdict(lambda: {'cells': [], 'area': 0, 'centroid': (0, 0), 'bounding_box': [30, 30, 0, 0]})
-    total_area = 0
+def analyze_grid(grid: ColoredGrid) -> Dict[int, Dict]:
+    colors = defaultdict(lambda: {'cells': [], 'avg_y': 0, 'height': 0})
     for y, row in enumerate(grid.values):
         for x, color in enumerate(row):
             if color != 0:
                 colors[color]['cells'].append((x, y))
-                colors[color]['area'] += 1
-                total_area += 1
-                update_bounding_box(colors[color]['bounding_box'], x, y)
     
+    for color, data in colors.items():
+        data['avg_y'] = sum(y for _, y in data['cells']) / len(data['cells'])
+        data['height'] = max(y for _, y in data['cells']) - min(y for _, y in data['cells']) + 1
+    
+    return colors
+
+def identify_background_colors(grid: ColoredGrid) -> Tuple[int, int]:
+    bottom_row = grid.values[-1]
+    top_row = grid.values[0]
+    bottom_bg = max(set(bottom_row), key=bottom_row.count) if any(bottom_row) else 0
+    top_bg = max(set(top_row), key=top_row.count) if any(top_row) else 0
+    return bottom_bg, top_bg
+
+def fill_bottom_background(grid: ColoredGrid, color: int, height: int):
+    for y in range(30 - height, 30):
+        for x in range(30):
+            grid.values[y][x] = color
+
+def sort_colors(colors: Dict[int, Dict], bottom_bg: int) -> List[int]:
+    return sorted([c for c in colors if c != bottom_bg], key=lambda c: colors[c]['avg_y'])
+
+def create_vertical_stack(grid: ColoredGrid, colors: List[int], bottom_bg: int):
+    start_y = 30 - 4 * len(colors) - 1 if bottom_bg else (30 - 4 * len(colors)) // 2
     for color in colors:
-        colors[color]['centroid'] = calculate_centroid(colors[color]['cells'])
-    
-    return colors, total_area
+        for y in range(3):
+            for x in range(3):
+                grid.values[start_y + y][13 + x] = color
+        start_y += 4
 
-def calculate_center_of_mass(colors: Dict) -> Tuple[float, float]:
-    total_mass = sum(data['area'] for data in colors.values())
-    cx = sum(data['centroid'][0] * data['area'] for data in colors.values()) / total_mass
-    cy = sum(data['centroid'][1] * data['area'] for data in colors.values()) / total_mass
-    return (cx, cy)
+def fill_top_background(grid: ColoredGrid, color: int):
+    top_edge = next(y for y in range(30) if any(grid.values[y]))
+    for y in range(top_edge):
+        for x in range(30):
+            grid.values[y][x] = color
 
-def create_target_area(total_area: int, grid_dimensions: Tuple[int, int]) -> List[List[int]]:
-    target_size = int(math.sqrt(total_area) * 1.5)
-    target_size = min(target_size, min(grid_dimensions))
-    start = (grid_dimensions[0] - target_size) // 2
-    end = start + target_size
-    return [[start, start, end, end]]
-
-def generate_shape(color_data: Dict, available_space: List[List[int]]) -> List[Tuple[int, int]]:
-    # Simplified shape generation - creates a rectangle based on the color's bounding box
-    bbox = color_data['bounding_box']
-    width = min(bbox[2] - bbox[0], available_space[0][2] - available_space[0][0])
-    height = min(bbox[3] - bbox[1], available_space[0][3] - available_space[0][1])
-    return [(x, y) for y in range(height) for x in range(width)]
-
-def position_shape(output: ColoredGrid, shape: List[Tuple[int, int]], color: int, available_space: List[List[int]]):
-    start_x, start_y = available_space[0][0], available_space[0][1]
-    for x, y in shape:
-        if 0 <= start_y + y < 30 and 0 <= start_x + x < 30:
-            output.values[start_y + y][start_x + x] = color
-
-def update_available_space(available_space: List[List[int]], shape: List[Tuple[int, int]]):
-    max_x = max(x for x, _ in shape)
-    max_y = max(y for _, y in shape)
-    available_space[0][1] += max_y + 1  # Move down for next shape
-
-def update_bounding_box(bbox: List[int], x: int, y: int):
-    bbox[0] = min(bbox[0], x)
-    bbox[1] = min(bbox[1], y)
-    bbox[2] = max(bbox[2], x)
-    bbox[3] = max(bbox[3], y)
-
-def calculate_centroid(cells: List[Tuple[int, int]]) -> Tuple[float, float]:
-    return (sum(x for x, _ in cells) / len(cells), sum(y for _, y in cells) / len(cells))
+def cleanup_grid(grid: ColoredGrid):
+    # Ensure clean edges (simplified implementation)
+    pass
