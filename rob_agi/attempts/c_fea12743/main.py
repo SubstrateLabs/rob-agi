@@ -3,41 +3,91 @@ from typing import List, Tuple, Dict
 
 def solve_fea12743(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the fea12743 challenge by identifying four distinct colored regions,
-    determining their order, finding the starting red region, and applying color
-    changes clockwise. The solution maintains the original black cells and
+    Solves the fea12743 challenge by identifying distinct colored regions,
+    analyzing their adjacencies, and applying color transformations based on
+    the main pattern. The solution maintains the original black cells and
     transforms the colored regions according to the pattern:
-    - Starting red region remains unchanged
-    - Next region clockwise changes to green
-    - Next two regions change to sky blue
+    - The main connected component is identified
+    - Within it, the most connected region remains red
+    - One adjacent region becomes green
+    - Other regions in the main component become sky blue
+    - Disconnected regions remain red
     """
-    # Step 1: Identify the four distinct colored regions
+    # Step 1: Identify distinct regions
     regions = find_regions(input_grid)
     
-    # Step 2: Determine the order of the regions
-    ordered_regions = order_regions(regions, input_grid.get_dimensions())
+    # Step 2 & 3: Analyze region adjacencies and identify the main pattern
+    adjacency_graph = build_adjacency_graph(regions)
+    main_component = find_largest_component(adjacency_graph)
     
-    # Step 3: Find the starting point (the red region that remains unchanged)
-    start_index = next((i for i, r in enumerate(ordered_regions) if r['color'] == 2), 0)
+    # Step 4: Select the starting red region
+    start_region = max(main_component, key=lambda r: len(adjacency_graph[r]))
     
-    # Step 4 & 5: Apply the color changes and copy black cells
+    # Step 5: Apply color transformations
     new_grid = ColoredGrid(values=[[0 for _ in range(input_grid.get_dimensions()[1])] 
                                    for _ in range(input_grid.get_dimensions()[0])])
     
-    new_colors = [2, 3, 8, 8]  # red, green, sky blue, sky blue
-    for i in range(4):
-        region = ordered_regions[(start_index + i) % 4]
-        new_color = new_colors[i]
-        for x, y in region['cells']:
-            new_grid.values[x][y] = new_color
+    green_region = next(iter(adjacency_graph[start_region]))
     
-    # Copy black cells
+    for region in regions:
+        if region == start_region:
+            color = 2  # red
+        elif region == green_region:
+            color = 3  # green
+        elif region in main_component:
+            color = 8  # sky blue
+        else:
+            color = 2  # disconnected regions remain red
+        
+        for x, y in region['cells']:
+            new_grid.values[x][y] = color
+    
+    # Step 7: Preserve black cells
     for x in range(input_grid.get_dimensions()[0]):
         for y in range(input_grid.get_dimensions()[1]):
             if input_grid.values[x][y] == 0:
                 new_grid.values[x][y] = 0
     
     return new_grid
+
+def build_adjacency_graph(regions):
+    graph = {r: set() for r in regions}
+    for i, r1 in enumerate(regions):
+        for r2 in regions[i+1:]:
+            if are_adjacent(r1, r2):
+                graph[r1].add(r2)
+                graph[r2].add(r1)
+    return graph
+
+def are_adjacent(region1, region2):
+    for x1, y1 in region1['cells']:
+        for x2, y2 in region2['cells']:
+            if abs(x1 - x2) + abs(y1 - y2) == 1:
+                return True
+    return False
+
+def find_largest_component(graph):
+    visited = set()
+    largest_component = []
+    
+    def dfs(node):
+        component = []
+        stack = [node]
+        while stack:
+            current = stack.pop()
+            if current not in visited:
+                visited.add(current)
+                component.append(current)
+                stack.extend(graph[current] - visited)
+        return component
+    
+    for node in graph:
+        if node not in visited:
+            component = dfs(node)
+            if len(component) > len(largest_component):
+                largest_component = component
+    
+    return largest_component
 
 def find_regions(grid: ColoredGrid) -> List[Dict]:
     regions = []
