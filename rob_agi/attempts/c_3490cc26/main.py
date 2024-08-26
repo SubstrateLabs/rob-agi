@@ -17,6 +17,11 @@ def solve_3490cc26(input_grid: ColoredGrid) -> ColoredGrid:
     8. Clean up any stray orange cells and preserve original colors.
     9. Handle special cases where sky blue squares are adjacent or paths need to go through them.
     
+    The algorithm prioritizes efficiency by using a minimum spanning tree approach, while also
+    ensuring that the resulting path adheres to the specific rules of the challenge, such as
+    preserving original non-empty cells and maintaining direct connections between adjacent
+    sky blue squares.
+    
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
     
@@ -93,7 +98,7 @@ def find_minimum_spanning_tree(graph: Dict[Tuple[int, int], List[Tuple[int, int,
 
     edges = []
     for square in squares:
-        edges.extend([(square, neighbor, weight) for neighbor, weight in graph[square]])
+        edges.extend([(square, neighbor[0], neighbor[1]) for neighbor in graph[square]])
     edges.sort(key=lambda x: x[2])  # Sort by weight
 
     while len(visited) < len(squares):
@@ -104,7 +109,7 @@ def find_minimum_spanning_tree(graph: Dict[Tuple[int, int], List[Tuple[int, int,
             if node2 in squares:
                 visited.add(node2)
             mst.add((node1, node2))
-            edges.extend((node2, neighbor, weight) for neighbor, weight in graph[node2] if neighbor not in visited)
+            edges.extend((node2, neighbor[0], neighbor[1]) for neighbor in graph[node2] if neighbor[0] not in visited)
             edges.sort(key=lambda x: x[2])
             break
 
