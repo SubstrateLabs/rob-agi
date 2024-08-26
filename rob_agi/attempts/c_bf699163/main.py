@@ -51,7 +51,11 @@ def solve_bf699163(input_grid: ColoredGrid) -> Optional[ColoredGrid]:
     if not valid_patterns:
         return None
 
-    most_central = min(valid_patterns, key=lambda x: (x[3], x[2]))
+    # Sort valid patterns by centrality (ascending) and then by color (ascending)
+    sorted_patterns = sorted(valid_patterns, key=lambda x: (x[3], x[2]))
+    
+    # Select the most central pattern (with lowest color in case of tie)
+    most_central = sorted_patterns[0]
     color = most_central[2]
 
     return ColoredGrid(values=[
