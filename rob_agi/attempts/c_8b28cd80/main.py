@@ -5,10 +5,10 @@ def solve_8b28cd80(input_grid: ColoredGrid) -> ColoredGrid:
     Transform a 3x3 input grid into a 9x9 output grid by drawing a 7-segment digit.
     The position of the non-zero color in the input determines which digit to draw and its alignment.
     The non-zero color is used to draw the digit, its border, and additional lines if required.
-    The output includes a partial border and additional lines based on the digit and its position.
-    For top row inputs, digits 1, 3, and 7 have specific additional horizontal lines.
-    For bottom row inputs, two vertical lines are added on the right and content is moved up.
-    For middle-right input, an additional vertical line is added on the far right for digit 6.
+    The output includes a full border and additional lines based on the digit and its position.
+    For top row inputs, digits 1 and 3 have specific additional horizontal lines.
+    For bottom row inputs, the content is moved up and additional horizontal lines are added.
+    For middle-right input (digit 6), no additional lines are needed.
     """
     # Position to digit mapping
     position_to_digit = {
@@ -45,13 +45,10 @@ def solve_8b28cd80(input_grid: ColoredGrid) -> ColoredGrid:
 
     def draw_border(color):
         for i in range(9):
-            if i < 3 or i > 5:
-                output_grid[0][i] = color  # Top border with gap
-        for i in range(9):
+            output_grid[0][i] = color  # Top border
+            output_grid[8][i] = color  # Bottom border
             output_grid[i][0] = color  # Left border
             output_grid[i][8] = color  # Right border
-        for i in range(9):
-            output_grid[8][i] = color  # Bottom border
 
     def add_lines(digit, color, row, col):
         if row == 0:  # Top row input
@@ -59,20 +56,14 @@ def solve_8b28cd80(input_grid: ColoredGrid) -> ColoredGrid:
                 output_grid[4] = [color] * 9
                 output_grid[6] = [color] * 9
                 output_grid[8] = [color] * 9
-            elif digit == 7:
-                for i in range(5, 9):
-                    output_grid[i] = [color] * 9
         elif row == 2:  # Bottom row input
-            for i in range(9):
-                output_grid[i][6] = color
-                output_grid[i][8] = color
             # Move content up
             for i in range(4):
-                output_grid[i+1] = output_grid[i+5]
-                output_grid[i+5] = [0] * 9
-        elif row == 1 and col == 2:  # Middle-right input (digit 6)
-            for i in range(9):
-                output_grid[i][8] = color
+                output_grid[i] = output_grid[i+4]
+            # Add horizontal lines
+            output_grid[4] = [color] * 9
+            output_grid[6] = [color] * 9
+            output_grid[8] = [color] * 9
 
     # Find non-zero color and its position
     color, position = next((input_grid.values[i][j], (i, j)) 
