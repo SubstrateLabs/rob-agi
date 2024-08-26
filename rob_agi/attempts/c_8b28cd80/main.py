@@ -26,16 +26,17 @@ def solve_8b28cd80(input_grid: ColoredGrid) -> ColoredGrid:
 
     def draw_segment(grid, segment, color, offset_x, offset_y):
         coords = {
-            0: [(i, 1) for i in range(1, 6)],
-            1: [(1, i) for i in range(2, 7)],
-            2: [(5, i) for i in range(2, 7)],
-            3: [(i, 1) for i in range(6, 11)],
-            4: [(5, i) for i in range(-3, 2)],
-            5: [(1, i) for i in range(-3, 2)],
-            6: [(3, i) for i in range(1, 6)]
+            0: [(i, 0) for i in range(1, 5)],
+            1: [(0, i) for i in range(1, 5)],
+            2: [(4, i) for i in range(1, 5)],
+            3: [(i, 4) for i in range(1, 5)],
+            4: [(4, i) for i in range(5, 9)],
+            5: [(0, i) for i in range(5, 9)],
+            6: [(i, 2) for i in range(1, 5)]
         }
         for x, y in coords[segment]:
-            grid[y + offset_y][x + offset_x] = color
+            if 0 <= y + offset_y < 9 and 0 <= x + offset_x < 9:
+                grid[y + offset_y][x + offset_x] = color
 
     def draw_digit(digit, color, offset_x, offset_y):
         for segment in segments[digit]:
