@@ -4,7 +4,7 @@ def solve_d5c634a2(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid into a 3x6 output grid based on the following rules:
     1. Divides the input grid into 3 horizontal thirds.
-    2. For each third:
+    2. For each third (except the middle):
        - Checks the left half for a horizontal line of 3+ red squares. If found, sets output[third][0] to green (3).
        - Checks the right half for a horizontal line of 3+ red squares. If found, sets output[third][2] to green (3).
        - Checks the middle third vertically for any red squares. If found, sets output[third][3] to blue (1).
@@ -21,14 +21,13 @@ def solve_d5c634a2(input_grid: ColoredGrid) -> ColoredGrid:
             continue
         start_row = third * third_height
         end_row = min((third + 1) * third_height, input_height)
-        mid_col = input_width // 2
 
         # Process left half
-        if has_horizontal_line(input_grid, start_row, end_row, 0, mid_col):
+        if has_horizontal_line(input_grid, start_row, end_row, 0, input_width // 2):
             output[third][0] = 3
 
         # Process right half
-        if has_horizontal_line(input_grid, start_row, end_row, mid_col, input_width):
+        if has_horizontal_line(input_grid, start_row, end_row, input_width // 2, input_width):
             output[third][2] = 3
 
         # Process middle third vertically
