@@ -2,46 +2,48 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_8a371977(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by coloring regions in a concentric ring pattern.
+    Transforms the input grid by coloring regions in a concentric pattern.
     
     The solution works as follows:
-    1. Identifies the blue (1) grid structure and black (0) regions.
-    2. Determines the number of concentric rings based on the grid dimensions.
-    3. Colors the regions in alternating red (2) and green (3) rings from outside to inside.
-    4. Handles the center region(s) specially based on whether the grid has odd or even dimensions.
-    
-    The outermost ring is always red, and rings alternate between red and green moving inward.
-    The center is colored based on the total number of rings and grid dimensions.
+    1. Identifies the grid structure (1x1 checkered or larger regions).
+    2. Calculates the distance of each cell from the edge.
+    3. Colors the regions based on their distance and grid structure:
+       - Outermost layer is always red (2).
+       - For larger regions, alternates between red (2) and green (3).
+       - For 1x1 checkered, inner cells are green (3) except for the four innermost corners.
+    4. Handles special cases for center regions in different grid sizes.
     """
     rows, cols = input_grid.get_dimensions()
     output_grid = input_grid.deep_copy()
     
-    # Calculate the number of regions and rings
-    horizontal_regions = (cols - 1) // 2
-    vertical_regions = (rows - 1) // 2
-    total_rings = (min(horizontal_regions, vertical_regions) + 1) // 2
+    def is_checkered_pattern():
+        center_r, center_c = rows // 2, cols // 2
+        return (input_grid.values[center_r][center_c] == 1 and
+                input_grid.values[center_r][center_c+1] == 0 and
+                input_grid.values[center_r+1][center_c] == 0 and
+                input_grid.values[center_r+1][center_c+1] == 1)
     
-    def get_region_color(r, c):
-        # Determine which ring the region belongs to
-        ring = min(r // 2, c // 2, (rows - 1 - r) // 2, (cols - 1 - c) // 2)
-        if ring < total_rings - 1:
-            return 2 if ring % 2 == 0 else 3
-        
-        # Handle the center region(s)
-        if horizontal_regions % 2 == 1 and vertical_regions % 2 == 1:
-            return 2 if total_rings % 2 == 1 else 3
-        else:
-            is_corner = (r in (vertical_regions - 1, vertical_regions) and 
-                         c in (horizontal_regions - 1, horizontal_regions))
-            if total_rings % 2 == 1:
-                return 2 if is_corner else 3
-            else:
+    checkered = is_checkered_pattern()
+    
+    def get_distance(r, c):
+        return min(r, c, rows-1-r, cols-1-c)
+    
+    def get_color(r, c, dist):
+        if dist == 0:
+            return 2
+        if checkered:
+            if dist == 1:
                 return 2
+            if (r in (1, rows-2) and c in (1, cols-2)) or (r in (2, rows-3) and c in (2, cols-3)):
+                return 2
+            return 3
+        else:
+            return 2 if dist % 2 == 0 else 3
     
-    # Color the regions
     for r in range(rows):
         for c in range(cols):
             if input_grid.values[r][c] == 0:
-                output_grid.values[r][c] = get_region_color(r // 2, c // 2)
+                dist = get_distance(r, c)
+                output_grid.values[r][c] = get_color(r, c, dist)
     
     return output_grid
