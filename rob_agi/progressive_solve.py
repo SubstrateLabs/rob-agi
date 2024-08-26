@@ -72,7 +72,7 @@ class Solver:
             llm_history_file=self.challenge_root / f".aider.llm.history{ef}.md",
         )
         io.yes = False
-        auto_commits = kwargs.pop("auto_commits", True)
+        auto_commits = kwargs.pop("auto_commits", False)
         coder: Coder = Coder.create(
             main_model=Model("claude-3-5-sonnet-20240620"),
             io=io,
