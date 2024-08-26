@@ -10,7 +10,7 @@ def solve_f823c43c(input_grid: ColoredGrid) -> ColoredGrid:
     2. Creates a new grid filled with the background color.
     3. Applies the pattern color in a regular grid:
        - On every other row, starting from the second row (index 1 if 0-indexed)
-       - Every third column in these rows, starting from the second column (index 1 if 0-indexed)
+       - Every other column in these rows, starting from the second column (index 1 if 0-indexed)
     4. Returns the new grid as a ColoredGrid object.
     """
     # Analyze the input grid
@@ -26,7 +26,7 @@ def solve_f823c43c(input_grid: ColoredGrid) -> ColoredGrid:
 
     # Apply the pattern color
     for row in range(1, rows, 2):
-        for col in range(1, cols, 3):
+        for col in range(1, cols, 2):
             new_grid[row][col] = pattern_color
 
     # Convert to ColoredGrid and return
