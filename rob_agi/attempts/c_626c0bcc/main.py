@@ -10,8 +10,8 @@ def solve_626c0bcc(input_grid: ColoredGrid) -> ColoredGrid:
     2. Sort regions based on their top-left coordinate.
     3. For each region:
        a. Place a 2x2 blue (1) square in the top-left corner if possible.
-       b. Place yellow (4) to the right of the blue area.
-       c. Place green (3) below the blue area.
+       b. Place green (3) to the left of the blue area.
+       c. Place yellow (4) to the right of the blue area.
        d. Fill remaining cells with red (2), ensuring no adjacent cells have the same color.
     4. Resolve any remaining color conflicts.
     
@@ -29,19 +29,20 @@ def solve_626c0bcc(input_grid: ColoredGrid) -> ColoredGrid:
 
 def color_region(grid: ColoredGrid, region: List[Tuple[int, int]]):
     start_row, start_col = min(region)
+    end_row, end_col = max(region)
+    width = end_col - start_col + 1
+    height = end_row - start_row + 1
     
     # Place blue square
     place_shape(grid, region, (2, 2), 1, start_row, start_col)
     
-    # Place yellow to the right
-    yellow_start = find_next_uncolored(grid, region, start_row, start_col + 2)
-    if yellow_start:
-        place_shape(grid, region, (2, 2), 4, *yellow_start)
+    # Place green to the left
+    if width > 2:
+        place_shape(grid, region, (2, width - 2), 3, start_row, start_col + 2)
     
-    # Place green below
-    green_start = find_next_uncolored(grid, region, start_row + 2, start_col)
-    if green_start:
-        place_shape(grid, region, (2, 2), 3, *green_start)
+    # Place yellow below
+    if height > 2:
+        place_shape(grid, region, (height - 2, 2), 4, start_row + 2, start_col)
     
     # Fill remaining with red
     fill_gaps(grid, region, 2)
