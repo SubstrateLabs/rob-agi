@@ -4,10 +4,9 @@ def solve_ad7e01d0(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transform the input grid into a larger grid using a recursive, fractal-like approach:
     1. The output grid size is the square of the input grid size.
-    2. Apply the input pattern recursively to create a fractal-like structure.
-    3. For odd-sized inputs, fill the center and middle edges with the pattern.
-    4. For even-sized inputs, fill the edges with the pattern and recurse on the center.
-    5. Leave the remaining areas as zeros (black).
+    2. For odd-sized inputs, apply the pattern only to the center column and row.
+    3. For even-sized inputs, apply the pattern to the corners and recurse on the center.
+    4. Leave the remaining areas as zeros (black).
     """
     n = len(input_grid.values)
     output_size = n * n
@@ -21,28 +20,17 @@ def solve_ad7e01d0(input_grid: ColoredGrid) -> ColoredGrid:
     def apply_pattern(top: int, left: int, size: int):
         if size == n:
             copy_pattern(top, left)
-        else:
+        elif n % 2 == 1:  # Odd-sized input
+            mid = size // 2 - n // 2
+            # Apply pattern only to center column and row
+            apply_pattern(top + mid, left + mid, n)
+        else:  # Even-sized input
             # Apply pattern to corners
             apply_pattern(top, left, n)
             apply_pattern(top, left + size - n, n)
             apply_pattern(top + size - n, left, n)
             apply_pattern(top + size - n, left + size - n, n)
-            
-            if n % 2 == 1:  # Odd-sized input
-                # Apply pattern to middle of edges and center
-                mid = (size - n) // 2
-                apply_pattern(top + mid, left, n)
-                apply_pattern(top + mid, left + size - n, n)
-                apply_pattern(top, left + mid, n)
-                apply_pattern(top + size - n, left + mid, n)
-                apply_pattern(top + mid, left + mid, n)
-            elif size > 2 * n:  # Even-sized input, continue recursion
-                # Apply pattern to all edge blocks
-                for i in range(1, size // n - 1):
-                    apply_pattern(top, left + i * n, n)
-                    apply_pattern(top + size - n, left + i * n, n)
-                    apply_pattern(top + i * n, left, n)
-                    apply_pattern(top + i * n, left + size - n, n)
+            if size > 2 * n:
                 # Recurse on center
                 apply_pattern(top + n, left + n, size - 2 * n)
     
