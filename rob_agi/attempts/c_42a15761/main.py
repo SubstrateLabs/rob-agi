@@ -7,7 +7,7 @@ def solve_42a15761(input_grid: ColoredGrid) -> ColoredGrid:
     1. Top bars and vertical segments of 'E's are always full.
     2. Middle and bottom bars alternate between full and partial (missing the rightmost square).
     3. The pattern starts with a full middle bar and partial bottom bar in the top-left 'E'.
-    4. The pattern alternates both horizontally and vertically.
+    4. The pattern alternates diagonally, creating a checkerboard effect.
     5. Black vertical separating lines remain unchanged.
     """
     rows, cols = input_grid.get_dimensions()
@@ -31,7 +31,7 @@ def solve_42a15761(input_grid: ColoredGrid) -> ColoredGrid:
             
             # Fix middle bar
             middle_row = e_top + 1
-            new_grid.values[middle_row][e_start:e_start+e_width] = [2, 2, 2] if is_full_middle else [2, 2, 0]
+            new_grid.values[middle_row][e_start:e_start+e_width] = [2, 2, 2] if is_full_middle else [2, 0, 2]
             
             # Fix bottom bar
             bottom_row = e_top + 2
