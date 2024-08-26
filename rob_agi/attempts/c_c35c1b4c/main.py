@@ -6,9 +6,10 @@ def solve_c35c1b4c(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the c35c1b4c challenge by enhancing the most significant shape in the grid.
     
-    This function identifies the most significant shape based on size, position, and regularity,
-    then enhances it by filling gaps, smoothing edges, and expanding in a controlled manner.
-    The enhancement respects other significant structures in the grid and maintains overall balance.
+    This function identifies the largest contiguous shape, creates an enhancement map,
+    and carefully expands the shape while respecting other significant structures.
+    It uses a priority-based approach to fill gaps, smooth edges, and expand in a
+    controlled manner, maintaining the overall balance of the grid.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -18,37 +19,27 @@ def solve_c35c1b4c(input_grid: ColoredGrid) -> ColoredGrid:
     """
     rows, cols = input_grid.get_dimensions()
     
-    # Step 1: Analyze the grid and identify the most significant shape
+    # Step 1: Identify the largest contiguous shape
     regions = {}
     for color in range(10):
         regions[color] = input_grid.find_connected_regions(color)
     
-    def shape_significance(region):
-        size = len(region)
-        center_x = sum(x for x, y in region) / size
-        center_y = sum(y for x, y in region) / size
-        centrality = 1 - (abs(center_x - rows/2) / (rows/2) + abs(center_y - cols/2) / (cols/2)) / 2
-        compactness = size / ((max(x for x, y in region) - min(x for x, y in region) + 1) *
-                              (max(y for x, y in region) - min(y for x, y in region) + 1))
-        return size * centrality * compactness
-
-    significant_shape = max(
-        ((color, region) for color, color_regions in regions.items() for region in color_regions),
-        key=lambda x: shape_significance(x[1])
-    )
-    expanding_color, largest_region = significant_shape
-
-    # Step 2: Create an enhancement map
+    largest_region = max((region for color_regions in regions.values() for region in color_regions), key=len)
+    expanding_color = input_grid.values[largest_region[0][0]][largest_region[0][1]]
+    
+    # Step 2: Create enhancement map
     enhancement_map = [[0 for _ in range(cols)] for _ in range(rows)]
     
     def calculate_enhancement_priority(x, y):
         if (x, y) in largest_region:
             return 0
+        adjacent = any((x+dx, y+dy) in largest_region for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)])
+        if adjacent:
+            return 3  # High priority for adjacent cells
         distance = min(abs(x-rx) + abs(y-ry) for rx, ry in largest_region)
-        priority = 100 / (distance + 1)
-        if input_grid.values[x][y] == 0:  # Higher priority for black cells
-            priority *= 1.5
-        return priority
+        if distance <= 2:
+            return 2  # Medium priority for nearby cells
+        return 1  # Low priority for other cells
     
     for x in range(rows):
         for y in range(cols):
@@ -65,29 +56,18 @@ def solve_c35c1b4c(input_grid: ColoredGrid) -> ColoredGrid:
     
     # Step 4: Enhancement process
     grid = input_grid.deep_copy()
-    cells_to_enhance = [(enhancement_map[x][y], x, y) for x in range(rows) for y in range(cols) if (x, y) not in largest_region]
-    heapq.heapify(cells_to_enhance)
+    cells_to_enhance = [(enhancement_map[x][y], x, y) for x in range(rows) for y in range(cols) if enhancement_map[x][y] > 0]
+    cells_to_enhance.sort(reverse=True)
     
-    enhancement_limit = min(rows * cols * 0.7, len(largest_region) * 1.5)
-    while cells_to_enhance and len(largest_region) < enhancement_limit:
-        priority, x, y = heapq.heappop(cells_to_enhance)
-        
-        if (x, y) in protected_regions and priority < 80:
+    for priority, x, y in cells_to_enhance:
+        if (x, y) in protected_regions:
             continue
         
-        if priority < 20:  # Lower threshold for enhancement
-            break
+        neighbors = sum(1 for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                        if 0 <= x+dx < rows and 0 <= y+dy < cols and grid.values[x+dx][y+dy] == expanding_color)
         
-        grid.values[x][y] = expanding_color
-        largest_region.append((x, y))
-        
-        # Update priority for adjacent cells
-        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            nx, ny = x + dx, y + dy
-            if 0 <= nx < rows and 0 <= ny < cols and (nx, ny) not in largest_region:
-                new_priority = calculate_enhancement_priority(nx, ny)
-                enhancement_map[nx][ny] = new_priority
-                heapq.heappush(cells_to_enhance, (new_priority, nx, ny))
+        if neighbors >= 2 or (neighbors == 1 and priority == 3):
+            grid.values[x][y] = expanding_color
     
     # Step 5: Smoothing pass
     for x in range(rows):
