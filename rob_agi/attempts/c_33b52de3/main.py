@@ -7,65 +7,61 @@ def solve_33b52de3(input_grid: ColoredGrid) -> ColoredGrid:
     
     The solution follows these steps:
     1. Identify the "key" area (small colored pattern in any corner of the grid).
-    2. Generate a coloring sequence based on the key area.
+    2. Extract and expand the key pattern.
     3. Map the gray patterns in the grid.
-    4. Apply the coloring sequence to the gray patterns.
+    4. Apply the expanded pattern to the gray areas.
     5. Preserve existing colored areas and pattern structure.
     
-    If no key is found, a default color sequence is used.
-    The coloring sequence is applied to patterns, repeating if necessary.
-    The structure of each pattern is maintained, only changing gray (5) to the new color.
+    The expanded pattern is applied across the grid, maintaining the 3x3 structure
+    of the original gray blocks and preserving existing non-gray colors.
     """
     
-    def find_key_area(grid: ColoredGrid) -> List[List[int]]:
+    def find_key_area(grid: ColoredGrid) -> Tuple[List[List[int]], Tuple[int, int]]:
         rows, cols = grid.get_dimensions()
-        corners = [(0, 0), (0, cols-5), (rows-5, 0), (rows-5, cols-5)]
+        corners = [(0, 0), (0, cols-6), (rows-6, 0), (rows-6, cols-6)]
         for top, left in corners:
             key_area = []
-            for r in range(top, top+5):
+            for r in range(top, min(top+6, rows)):
                 row = []
-                for c in range(left, left+5):
+                for c in range(left, min(left+6, cols)):
                     if grid.get_cell(r, c) not in [0, 5]:
                         row.append(grid.get_cell(r, c))
                 if row:
                     key_area.append(row)
             if key_area:
-                return key_area
-        return []  # Return empty list if no key found
+                return key_area, (top, left)
+        return [], (0, 0)  # Return empty list and default position if no key found
 
-    def generate_color_sequence(key_area: List[List[int]]) -> List[int]:
+    def expand_key_pattern(key_area: List[List[int]]) -> List[List[int]]:
         if not key_area:
-            return [1, 2, 3, 4]  # Default sequence if no key found
-        return [color for row in key_area for color in row if color != 0]
+            return [[1, 2], [3, 4]]  # Default pattern if no key found
+        
+        # Expand horizontally
+        expanded_h = [row * 2 for row in key_area]
+        
+        # Expand vertically
+        expanded_v = expanded_h * 2
+        
+        return expanded_v
 
-    def map_patterns(grid: ColoredGrid) -> List[Tuple[int, int, int, int]]:
-        rows, cols = grid.get_dimensions()
-        patterns = []
-        for r in range(rows):
-            for c in range(cols):
-                if grid.get_cell(r, c) == 5:
-                    if not patterns or r > patterns[-1][2] or c > patterns[-1][3]:
-                        patterns.append((r, c, r+2, c+2))
-        return patterns
-
-    def apply_color_sequence(grid: ColoredGrid, patterns: List[Tuple[int, int, int, int]], color_sequence: List[int]) -> ColoredGrid:
-        if not color_sequence:
-            return grid  # Return original grid if color sequence is empty
+    def apply_expanded_pattern(grid: ColoredGrid, expanded_pattern: List[List[int]], key_pos: Tuple[int, int]) -> ColoredGrid:
         new_grid = grid.deep_copy()
-        for i, (top, left, bottom, right) in enumerate(patterns):
-            color = color_sequence[i % len(color_sequence)]
-            for r in range(top, bottom+1):
-                for c in range(left, right+1):
-                    if grid.get_cell(r, c) == 5:
-                        new_grid.set_cell(r, c, color)
-            # Color the single square above the pattern, if it exists
-            if top > 0 and grid.get_cell(top-1, left+1) == 5:
-                new_grid.set_cell(top-1, left+1, color)
+        rows, cols = new_grid.get_dimensions()
+        pattern_rows, pattern_cols = len(expanded_pattern), len(expanded_pattern[0])
+        
+        start_row = key_pos[0] + 6 if key_pos[0] == 0 else 0
+        start_col = key_pos[1] + 6 if key_pos[1] == 0 else 0
+        
+        for r in range(start_row, rows):
+            for c in range(start_col, cols):
+                if new_grid.get_cell(r, c) == 5:
+                    pattern_r, pattern_c = (r - start_row) % pattern_rows, (c - start_col) % pattern_cols
+                    new_grid.set_cell(r, c, expanded_pattern[pattern_r][pattern_c])
+        
         return new_grid
 
-    key_area = find_key_area(input_grid)
-    color_sequence = generate_color_sequence(key_area)
-    patterns = map_patterns(input_grid)
-    output_grid = apply_color_sequence(input_grid, patterns, color_sequence)
+    key_area, key_pos = find_key_area(input_grid)
+    expanded_pattern = expand_key_pattern(key_area)
+    output_grid = apply_expanded_pattern(input_grid, expanded_pattern, key_pos)
 
     return output_grid
