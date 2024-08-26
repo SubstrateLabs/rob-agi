@@ -6,7 +6,7 @@ def solve_f0afb749(input_grid: ColoredGrid) -> ColoredGrid:
     1. Doubling the grid size
     2. Expanding non-black squares into 2x2 blocks
     3. Adding blue squares (1s) diagonally from top-left to bottom-right
-       in the entire grid, starting from the top-left corner
+       in the entire grid, starting from the second row and second column
     4. Preserving the expanded non-black squares when adding the blue diagonal
     """
     # Step 1: Initialize the output grid
@@ -25,10 +25,10 @@ def solve_f0afb749(input_grid: ColoredGrid) -> ColoredGrid:
                 output_grid[r*2+1][c*2+1] = color
 
     # Step 3: Add blue diagonal
-    for i in range(output_rows):
-        for j in range(output_cols):
-            if i == j and output_grid[i][j] == 0:
-                output_grid[i][j] = 1  # Set to blue
+    for i in range(1, output_rows):
+        j = i - 1
+        if j < output_cols and output_grid[i][j] == 0:
+            output_grid[i][j] = 1  # Set to blue
 
     # Step 4: Create and return the final ColoredGrid
     return ColoredGrid(values=output_grid)
