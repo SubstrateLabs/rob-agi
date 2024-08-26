@@ -1,5 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Dict, Set
+from typing import List, Tuple, Dict
 import math
 
 def solve_55783887(input_grid: ColoredGrid) -> ColoredGrid:
@@ -9,37 +9,28 @@ def solve_55783887(input_grid: ColoredGrid) -> ColoredGrid:
     The solution follows these steps:
     1. Identify the background color and all non-background colored dots.
     2. For each color:
-       a. If there's only one dot, leave it as is.
-       b. If there are two dots, connect them with a diagonal line.
-       c. If there are more than two dots:
-          - Find the bounding rectangle of the dots.
-          - Create a zigzag path through all dots within the bounding rectangle.
-          - Optimize the path by smoothing unnecessary zigzags.
-    3. Extend lines to grid edges where appropriate.
-    4. Ensure all dots are connected and there are no isolated segments.
+       a. Sort the dot positions from top-left to bottom-right.
+       b. Create a path starting from the top-left corner, through all dots, to the bottom-right corner.
+       c. Connect the points in the path using diagonal movements, creating zigzags when necessary.
+    3. Draw all paths on the output grid.
+    4. Ensure all original dots are preserved.
     
-    The result creates continuous lines for each color while respecting the original dot positions.
+    The result creates continuous diagonal lines for each color, extending from corner to corner,
+    while connecting all dots of the same color and allowing intersections between different colors.
     """
-    output_grid = ColoredGrid(values=[[0 for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
     background_color = find_background_color(input_grid)
     colored_dots = find_colored_dots(input_grid, background_color)
-    
-    for r in range(input_grid.num_rows):
-        for c in range(input_grid.num_cols):
-            output_grid.set_cell(r, c, background_color)
+    output_grid = ColoredGrid(values=[[background_color for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
     
     for color, dots in colored_dots.items():
-        if len(dots) == 1:
-            r, c = dots[0]
-            output_grid.set_cell(r, c, color)
-        elif len(dots) == 2:
-            path = get_diagonal_path(dots[0], dots[1])
-            draw_path(output_grid, path, color)
-        else:
-            path = create_zigzag_path(dots)
-            optimized_path = optimize_path(path, dots)
-            extended_path = extend_to_edges(optimized_path, input_grid.num_rows, input_grid.num_cols)
-            draw_path(output_grid, extended_path, color)
+        path = create_full_path(dots, input_grid.num_rows - 1, input_grid.num_cols - 1)
+        connected_path = connect_points(path)
+        draw_path(output_grid, connected_path, color)
+    
+    # Ensure all original dots are preserved
+    for color, dots in colored_dots.items():
+        for dot in dots:
+            output_grid.set_cell(dot[0], dot[1], color)
     
     return output_grid
 
@@ -57,73 +48,33 @@ def find_colored_dots(grid: ColoredGrid, background_color: int) -> Dict[int, Lis
                 dots[color].append((r, c))
     return dots
 
+def create_full_path(dots: List[Tuple[int, int]], max_row: int, max_col: int) -> List[Tuple[int, int]]:
+    path = [(0, 0)] + sorted(dots) + [(max_row, max_col)]
+    return path
+
+def connect_points(path: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
+    connected_path = []
+    for i in range(len(path) - 1):
+        connected_path.extend(get_diagonal_path(path[i], path[i+1]))
+    return connected_path
+
 def get_diagonal_path(start: Tuple[int, int], end: Tuple[int, int]) -> List[Tuple[int, int]]:
     path = []
-    r, c = start
-    dr = 1 if end[0] > r else -1 if end[0] < r else 0
-    dc = 1 if end[1] > c else -1 if end[1] < c else 0
-    while (r, c) != end:
-        path.append((r, c))
-        r, c = r + dr, c + dc
+    current = start
+    while current != end:
+        path.append(current)
+        dx = end[1] - current[1]
+        dy = end[0] - current[0]
+        if abs(dx) > abs(dy):
+            current = (current[0] + sign(dy), current[1] + sign(dx))
+        else:
+            current = (current[0] + sign(dy), current[1] + sign(dx))
     path.append(end)
     return path
+
+def sign(x: int) -> int:
+    return 1 if x > 0 else -1 if x < 0 else 0
 
 def draw_path(grid: ColoredGrid, path: List[Tuple[int, int]], color: int):
     for r, c in path:
         grid.set_cell(r, c, color)
-
-def create_zigzag_path(dots: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
-    min_r = min(r for r, _ in dots)
-    max_r = max(r for r, _ in dots)
-    min_c = min(c for _, c in dots)
-    max_c = max(c for _, c in dots)
-    
-    path = []
-    r, c = min_r, min_c
-    going_right = True
-    
-    while r <= max_r:
-        while min_c <= c <= max_c:
-            if (r, c) in dots:
-                path.append((r, c))
-            if going_right and c == max_c:
-                break
-            if not going_right and c == min_c:
-                break
-            c += 1 if going_right else -1
-        r += 1
-        going_right = not going_right
-    
-    return path
-
-def optimize_path(path: List[Tuple[int, int]], dots: Set[Tuple[int, int]]) -> List[Tuple[int, int]]:
-    optimized = [path[0]]
-    for i in range(1, len(path) - 1):
-        prev, curr, next = path[i-1], path[i], path[i+1]
-        if curr in dots or not is_straight_line(prev, curr, next):
-            optimized.append(curr)
-    optimized.append(path[-1])
-    return optimized
-
-def is_straight_line(p1: Tuple[int, int], p2: Tuple[int, int], p3: Tuple[int, int]) -> bool:
-    return (p3[1] - p1[1]) * (p2[0] - p1[0]) == (p2[1] - p1[1]) * (p3[0] - p1[0])
-
-def extend_to_edges(path: List[Tuple[int, int]], max_r: int, max_c: int) -> List[Tuple[int, int]]:
-    start, end = path[0], path[-1]
-    
-    # Extend start
-    while start[0] > 0 and start[1] > 0:
-        new_start = (start[0] - 1, start[1] - 1)
-        path.insert(0, new_start)
-        start = new_start
-    
-    # Extend end
-    while end[0] < max_r - 1 and end[1] < max_c - 1:
-        new_end = (end[0] + 1, end[1] + 1)
-        path.append(new_end)
-        end = new_end
-    
-    return path
-
-def distance(p1: Tuple[int, int], p2: Tuple[int, int]) -> float:
-    return math.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
