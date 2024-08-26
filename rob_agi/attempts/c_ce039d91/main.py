@@ -1,5 +1,6 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple
+import itertools
 
 def solve_ce039d91(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -16,59 +17,70 @@ def solve_ce039d91(input_grid: ColoredGrid) -> ColoredGrid:
     This approach considers both local and global patterns, allowing for context-dependent 
     transformations while maintaining the overall structure and logic of the original pattern.
     """
-    def find_connected_regions(grid: List[List[int]], color: int) -> List[List[Tuple[int, int]]]:
+    def find_gray_cells(grid: List[List[int]]) -> List[Tuple[int, int]]:
+        return [(r, c) for r, row in enumerate(grid) for c, val in enumerate(row) if val == 5]
+
+    def calculate_structural_importance(grid: List[List[int]], cell: Tuple[int, int]) -> int:
+        r, c = cell
         rows, cols = len(grid), len(grid[0])
-        visited = set()
-        regions = []
-        
-        def dfs(r: int, c: int) -> List[Tuple[int, int]]:
-            if (r, c) in visited or r < 0 or r >= rows or c < 0 or c >= cols or grid[r][c] != color:
-                return []
-            visited.add((r, c))
-            region = [(r, c)]
-            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]:
-                region.extend(dfs(r + dr, c + dc))
-            return region
-        
-        for r in range(rows):
-            for c in range(cols):
-                if grid[r][c] == color and (r, c) not in visited:
-                    regions.append(dfs(r, c))
-        return regions
+        score = 0
+        for dr in [-1, 0, 1]:
+            for dc in [-1, 0, 1]:
+                if dr == 0 and dc == 0:
+                    continue
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < rows and 0 <= nc < cols and grid[nr][nc] == 5:
+                    score += 1
+        return score
 
-    def calculate_connectivity_score(grid: List[List[int]], region: List[Tuple[int, int]]) -> List[Tuple[Tuple[int, int], int]]:
-        scores = []
-        for r, c in region:
-            score = sum(1 for dr in [-1, 0, 1] for dc in [-1, 0, 1]
-                        if (dr != 0 or dc != 0) and 
-                        0 <= r + dr < len(grid) and 
-                        0 <= c + dc < len(grid[0]) and 
-                        grid[r + dr][c + dc] == 5)
-            scores.append(((r, c), score))
-        return scores
+    def is_junction_point(grid: List[List[int]], cell: Tuple[int, int]) -> bool:
+        r, c = cell
+        rows, cols = len(grid), len(grid[0])
+        gray_neighbors = 0
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols and grid[nr][nc] == 5:
+                gray_neighbors += 1
+        return gray_neighbors > 2
 
-    def determine_threshold(scores: List[Tuple[Tuple[int, int], int]], region_size: int) -> float:
-        avg_score = sum(score for _, score in scores) / len(scores)
-        return max(1, min(2, avg_score * 0.8 * (1 - 0.1 * (region_size < 5))))
-
-    def is_linear(region: List[Tuple[int, int]]) -> bool:
-        if len(region) <= 3:
+    def is_linear_shape(cells: List[Tuple[int, int]]) -> bool:
+        if len(cells) <= 3:
             return True
-        r_coords, c_coords = zip(*region)
+        r_coords, c_coords = zip(*cells)
         return len(set(r_coords)) == 1 or len(set(c_coords)) == 1
 
-    new_grid = [row[:] for row in input_grid.values]
-    gray_regions = find_connected_regions(new_grid, 5)
+    def is_2x2_square(grid: List[List[int]], cell: Tuple[int, int]) -> bool:
+        r, c = cell
+        rows, cols = len(grid), len(grid[0])
+        if r + 1 < rows and c + 1 < cols:
+            return all(grid[r+dr][c+dc] == 5 for dr in [0, 1] for dc in [0, 1])
+        return False
 
-    for region in gray_regions:
-        if len(region) <= 3 or is_linear(region):
-            for r, c in region:
-                new_grid[r][c] = 1
-        else:
-            scores = calculate_connectivity_score(new_grid, region)
-            threshold = determine_threshold(scores, len(region))
-            for (r, c), score in scores:
-                if score >= threshold:
-                    new_grid[r][c] = 1
+    new_grid = [row[:] for row in input_grid.values]
+    gray_cells = find_gray_cells(new_grid)
+    
+    # Calculate structural importance for each gray cell
+    cell_scores = {cell: calculate_structural_importance(new_grid, cell) for cell in gray_cells}
+    
+    # Identify key structural elements
+    junction_points = [cell for cell in gray_cells if is_junction_point(new_grid, cell)]
+    linear_shapes = [shape for shape in [list(group) for _, group in itertools.groupby(sorted(gray_cells))] if is_linear_shape(shape)]
+    
+    # Transform cells based on structural importance
+    threshold = sum(cell_scores.values()) / len(cell_scores) if cell_scores else 0
+    for cell in gray_cells:
+        if cell in junction_points or is_2x2_square(new_grid, cell):
+            continue  # Keep these cells gray
+        if cell_scores[cell] < threshold or any(cell in shape for shape in linear_shapes):
+            new_grid[cell[0]][cell[1]] = 1  # Change to blue
+    
+    # Consistency check and fine-tuning
+    for r in range(len(new_grid)):
+        for c in range(len(new_grid[0])):
+            if new_grid[r][c] == 1:
+                # If a blue cell is surrounded by gray, change it back to gray
+                if all(0 <= r+dr < len(new_grid) and 0 <= c+dc < len(new_grid[0]) and new_grid[r+dr][c+dc] == 5 
+                       for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]):
+                    new_grid[r][c] = 5
 
     return ColoredGrid(values=new_grid)
