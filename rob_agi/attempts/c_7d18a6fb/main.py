@@ -11,9 +11,9 @@ def solve_7d18a6fb(input_grid: ColoredGrid) -> ColoredGrid:
     3. For each quadrant:
        a. Identifies distinct color regions using a flood fill algorithm.
        b. Selects the most significant region based on size, color uniqueness, and position.
-    4. Compresses each selected region into a 3x3 representation.
+    4. Extracts the shape of each selected region while maintaining its original position within the quadrant.
     5. Creates a 7x7 output grid:
-       a. Places compressed regions in the corners corresponding to their original quadrants.
+       a. Places extracted shapes in the corners corresponding to their original quadrants.
        b. Fills the central cross with the background color to separate quadrants.
     
     Returns a 7x7 ColoredGrid with the arranged patterns.
@@ -71,34 +71,28 @@ def select_significant_region(regions: List[Tuple[int, List[Tuple[int, int]]]], 
     scored_regions = [(region, score_region(region, quadrant_size, color_rarity)) for region in regions]
     return max(scored_regions, key=lambda x: x[1])[0]
 
-def compress_region(region: Tuple[int, List[Tuple[int, int]]]) -> List[List[int]]:
+def extract_shape(region: Tuple[int, List[Tuple[int, int]]], quadrant_size: Tuple[int, int]) -> List[List[int]]:
     color, cells = region
-    min_r = min(r for r, _ in cells)
-    max_r = max(r for r, _ in cells)
-    min_c = min(c for _, c in cells)
-    max_c = max(c for _, c in cells)
+    rows, cols = quadrant_size
+    shape = [[0 for _ in range(3)] for _ in range(3)]
     
-    compressed = [[0 for _ in range(3)] for _ in range(3)]
-    for r in range(3):
-        for c in range(3):
-            r_start = min_r + (max_r - min_r + 1) * r // 3
-            r_end = min_r + (max_r - min_r + 1) * (r + 1) // 3
-            c_start = min_c + (max_c - min_c + 1) * c // 3
-            c_end = min_c + (max_c - min_c + 1) * (c + 1) // 3
-            cells_in_section = [(rr, cc) for rr, cc in cells if r_start <= rr <= r_end and c_start <= cc <= c_end]
-            compressed[r][c] = color if cells_in_section else 0
+    for r, c in cells:
+        shape_r = r * 3 // rows
+        shape_c = c * 3 // cols
+        shape[shape_r][shape_c] = color
     
-    return compressed
+    return shape
 
-def create_output_grid(compressed_regions: List[Optional[List[List[int]]]], background: int) -> ColoredGrid:
+def create_output_grid(extracted_shapes: List[Optional[List[List[int]]]], background: int) -> ColoredGrid:
     output = [[background for _ in range(7)] for _ in range(7)]
     quadrants = [(0, 0), (0, 4), (4, 0), (4, 4)]
     
-    for region, (qr, qc) in zip(compressed_regions, quadrants):
-        if region:
+    for shape, (qr, qc) in zip(extracted_shapes, quadrants):
+        if shape:
             for r in range(3):
                 for c in range(3):
-                    output[qr + r][qc + c] = region[r][c]
+                    if shape[r][c] != 0:
+                        output[qr + r][qc + c] = shape[r][c]
     
     # Fill central cross
     for i in range(7):
@@ -123,13 +117,13 @@ def solve_7d18a6fb(input_grid: ColoredGrid) -> ColoredGrid:
     total_cells = rows * cols
     color_rarity = {color: 1 - (count / total_cells) for color, count in color_counts.items()}
     
-    compressed_regions = []
+    extracted_shapes = []
     for quadrant in quadrants:
         regions = identify_regions(quadrant, background)
         significant_region = select_significant_region(regions, quadrant.get_dimensions(), color_rarity)
         if significant_region:
-            compressed_regions.append(compress_region(significant_region))
+            extracted_shapes.append(extract_shape(significant_region, quadrant.get_dimensions()))
         else:
-            compressed_regions.append(None)
+            extracted_shapes.append(None)
     
-    return create_output_grid(compressed_regions, background)
+    return create_output_grid(extracted_shapes, background)
