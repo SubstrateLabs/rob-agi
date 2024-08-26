@@ -22,6 +22,9 @@ def solve_aee291af(input_grid: ColoredGrid) -> Optional[ColoredGrid]:
     Returns:
     Optional[ColoredGrid]: The transformed grid containing the largest valid pattern, or None if no pattern is found.
     """
+    if input_grid.num_rows < 4 or input_grid.num_cols < 4:
+        return None  # Grid is too small to contain any valid pattern
+
     sky_blue_coords = set(find_color_coords(input_grid, 8))
     red_coords = set(find_color_coords(input_grid, 2))
     
