@@ -7,7 +7,7 @@ def solve_45bbe264(input_grid: ColoredGrid) -> ColoredGrid:
     1. Draw vertical lines for all non-zero colors in the input grid.
     2. Draw horizontal lines for all non-zero colors in the input grid.
     3. When a horizontal line intersects with a different-colored vertical line,
-       change the color to red (2) for this cell and all remaining cells in the row.
+       change the color to red (2) for this cell and stop drawing the horizontal line.
     
     Returns a new ColoredGrid with the transformed pattern.
     """
@@ -25,17 +25,22 @@ def solve_45bbe264(input_grid: ColoredGrid) -> ColoredGrid:
 
     # Step 2 & 3: Draw horizontal lines and handle intersections
     for r in range(rows):
+        left_color = 0
+        left_col = -1
+        right_col = -1
         for c in range(cols):
             if input_grid.values[r][c] != 0:
-                color = input_grid.values[r][c]
-                for col in range(cols):
-                    if output_grid.values[r][col] != 0 and output_grid.values[r][col] != color:
-                        # We've hit an intersection, fill rest of row with red
-                        for remaining_col in range(col, cols):
-                            output_grid.values[r][remaining_col] = 2
-                        break
-                    else:
-                        output_grid.values[r][col] = color
-                break  # Move to next row after handling first non-zero
+                if left_color == 0:
+                    left_color = input_grid.values[r][c]
+                    left_col = c
+                right_col = c
+        
+        if left_col != -1 and right_col != -1:
+            for c in range(left_col, right_col + 1):
+                if output_grid.values[r][c] == 0:
+                    output_grid.values[r][c] = left_color
+                elif output_grid.values[r][c] != left_color:
+                    output_grid.values[r][c] = 2
+                    break  # Stop drawing the horizontal line
 
     return output_grid
