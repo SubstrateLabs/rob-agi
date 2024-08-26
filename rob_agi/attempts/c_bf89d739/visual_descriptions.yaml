@@ -1,0 +1,83 @@
+example_0:
+  input: |
+    A 19x13 grid mostly filled with black (0). There are five red (2) dots scattered across the grid:
+    - One at row 3, column 8
+    - One at row 6, column 4
+    - One at row 6, column 12
+    - One at row 9, column 10
+    - One at row 11, column 7
+    These red dots appear to be isolated with no clear pattern or connection between them.
+  output: |
+    The same 19x13 grid, but now with green (3) lines connecting the red (2) dots. The red dots remain in their original positions. The green lines form a shape resembling an irregular pentagon:
+    - A vertical line from (3,8) to (6,8)
+    - A horizontal line from (6,4) to (6,12)
+    - A diagonal line from (6,12) to (9,10)
+    - A vertical line from (9,10) to (11,10)
+    - A diagonal line from (11,7) to (6,4)
+    The green lines appear to be the shortest path connecting all red dots.
+
+example_1:
+  input: |
+    A 16x12 grid mostly filled with black (0). There are five red (2) dots scattered across the grid:
+    - One at row 2, column 5
+    - One at row 6, column 2
+    - One at row 7, column 10
+    - One at row 10, column 8
+    - One at row 12, column 5
+    These red dots appear to be isolated with no clear pattern or connection between them.
+  output: |
+    The same 16x12 grid, but now with green (3) lines connecting the red (2) dots. The red dots remain in their original positions. The green lines form a shape resembling an irregular pentagon:
+    - A vertical line from (2,5) to (12,5)
+    - A horizontal line from (6,2) to (6,5)
+    - A diagonal line from (6,5) to (7,10)
+    - A vertical line from (7,10) to (10,10)
+    - A horizontal line from (10,8) to (10,10)
+    The green lines appear to be the shortest path connecting all red dots, forming a tree-like structure.
+
+example_2:
+  input: |
+    A 14x10 grid mostly filled with black (0). There are four red (2) dots scattered across the grid:
+    - One at row 7, column 4
+    - One at row 9, column 2
+    - One at row 9, column 7
+    - One at row 11, column 5
+    These red dots appear to be isolated with no clear pattern or connection between them.
+  output: |
+    The same 14x10 grid, but now with green (3) lines connecting the red (2) dots. The red dots remain in their original positions. The green lines form a shape resembling an irregular quadrilateral:
+    - A vertical line from (7,4) to (9,4)
+    - A horizontal line from (9,2) to (9,7)
+    - A diagonal line from (9,4) to (11,5)
+    The green lines appear to be the shortest path connecting all red dots, forming a tree-like structure.
+
+example_3:
+  input: |
+    A 14x15 grid mostly filled with black (0). There are eight red (2) dots scattered across the grid:
+    - One at row 1, column 4
+    - One at row 3, column 6
+    - One at row 5, column 0
+    - One at row 6, column 8
+    - One at row 8, column 1
+    - One at row 10, column 2
+    - One at row 12, column 4
+    These red dots appear to be isolated with no clear pattern or connection between them.
+  output: |
+    The same 14x15 grid, but now with green (3) lines connecting the red (2) dots. The red dots remain in their original positions. The green lines form a complex tree-like structure:
+    - A vertical line from (1,4) to (12,4)
+    - A horizontal line from (3,4) to (3,6)
+    - A diagonal line from (5,0) to (5,4)
+    - A diagonal line from (6,4) to (6,8)
+    - A diagonal line from (8,1) to (8,4)
+    - A diagonal line from (10,2) to (10,4)
+    The green lines appear to be the shortest path connecting all red dots, forming a tree-like structure with the vertical line from top to bottom acting as a main "trunk".
+
+test_case_0:
+  input: |
+    A 19x13 grid mostly filled with black (0). There are five red (2) dots scattered across the grid:
+    - One at row 3, column 8
+    - One at row 6, column 4
+    - One at row 6, column 12
+    - One at row 9, column 10
+    - One at row 11, column 7
+    These red dots appear to be isolated with no clear pattern or connection between them. This input is identical to example_0.
+  output: |
+    The output is not provided for this test case.
