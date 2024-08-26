@@ -14,7 +14,7 @@ def get_next_color():
 def solve_604001fa(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by:
-    1. Removing all orange (7) shapes
+    1. Ignoring all orange (7) shapes
     2. Identifying blue (1) shapes
     3. Sorting blue shapes based on their top-left position and a global counter
     4. Transforming blue shapes into a sequence of colors: green (3), magenta (6), yellow (4), sky (8)
@@ -22,13 +22,6 @@ def solve_604001fa(input_grid: ColoredGrid) -> ColoredGrid:
     """
     global blue_shape_counter
     grid = input_grid.deep_copy()
-    
-    # Remove orange shapes
-    rows, cols = grid.get_dimensions()
-    for r in range(rows):
-        for c in range(cols):
-            if grid.values[r][c] == 7:
-                grid.values[r][c] = 0
     
     # Identify blue shapes
     blue_regions = grid.find_connected_regions(1)
@@ -48,5 +41,12 @@ def solve_604001fa(input_grid: ColoredGrid) -> ColoredGrid:
         color = get_next_color()
         for r, c in region:
             grid.values[r][c] = color
+    
+    # Remove all non-transformed colors (set to 0)
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        for c in range(cols):
+            if grid.values[r][c] not in color_cycle:
+                grid.values[r][c] = 0
     
     return grid
