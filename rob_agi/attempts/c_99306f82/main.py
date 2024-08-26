@@ -8,6 +8,7 @@ def solve_99306f82(input_grid: ColoredGrid) -> ColoredGrid:
     2. Collects the color sequence from the top-left corner diagonally.
     3. Fills the interior of the blue rectangle with concentric layers of colors
        from the collected sequence, starting from the outermost layer and moving inward.
+    4. Fills the innermost area with the last color in the sequence.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -33,27 +34,38 @@ def solve_99306f82(input_grid: ColoredGrid) -> ColoredGrid:
         return sequence
 
     def fill_rectangle(grid: List[List[int]], top: int, left: int, bottom: int, right: int, sequence: List[int]) -> None:
-        def fill_layer(r: int, c: int, color: int) -> None:
-            while grid[r][c] == 0:
-                grid[r][c] = color
-                if r < bottom - 1 and grid[r + 1][c] == 0:
-                    r += 1
-                elif c < right - 1 and grid[r][c + 1] == 0:
-                    c += 1
-                elif r > top + 1 and grid[r - 1][c] == 0:
-                    r -= 1
-                elif c > left + 1 and grid[r][c - 1] == 0:
-                    c -= 1
-                else:
-                    break
+        n = len(sequence)
+        curr_top, curr_left = top + 1, left + 1
+        curr_bottom, curr_right = bottom - 1, right - 1
 
-        r, c = top + 1, left + 1
-        seq_index = 0
-        while r <= bottom - 1 and c <= right - 1 and grid[r][c] == 0:
-            fill_layer(r, c, sequence[seq_index % len(sequence)])
-            r += 1
-            c += 1
-            seq_index += 1
+        for i in range(n - 1):  # All but the last color
+            color = sequence[i]
+            # Fill top row
+            for c in range(curr_left, curr_right + 1):
+                grid[curr_top][c] = color
+            # Fill bottom row
+            for c in range(curr_left, curr_right + 1):
+                grid[curr_bottom][c] = color
+            # Fill left column
+            for r in range(curr_top + 1, curr_bottom):
+                grid[r][curr_left] = color
+            # Fill right column
+            for r in range(curr_top + 1, curr_bottom):
+                grid[r][curr_right] = color
+
+            curr_top += 1
+            curr_left += 1
+            curr_bottom -= 1
+            curr_right -= 1
+
+            if curr_top > curr_bottom or curr_left > curr_right:
+                break
+
+        # Fill the innermost area
+        last_color = sequence[-1]
+        for r in range(curr_top, curr_bottom + 1):
+            for c in range(curr_left, curr_right + 1):
+                grid[r][c] = last_color
 
     # Main logic
     output_grid = input_grid.deep_copy()
