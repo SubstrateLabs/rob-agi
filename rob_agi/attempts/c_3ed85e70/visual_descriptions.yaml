@@ -1,93 +1,156 @@
 example_0:
   input: |
-    The grid is 30x30. The top-left 7x7 area is filled with green (3), with a 4x4 blue (1) square in its center. This blue square has a 2x2 sky blue (8) square in its center. Below this, there's a horizontal strip of black (0) spanning the entire width. The rest of the grid contains various patterns:
-    - A 3x3 blue square in the upper left of the black area
-    - A 3x3 red square with a yellow center, slightly to the right of the blue square
-    - Several 2x2 sky blue squares scattered around
-    - A 3x3 red square in the bottom right
-    - Various 2x2 yellow squares
-    - A 3x3 blue square in the bottom right corner
+    Grid size: 30x30
+    Key features:
+    1. Green area (color 3):
+       - 7x7 square in top-left corner
+       - Contains a 4x4 blue (1) square with a 2x2 sky blue (8) center
+    2. Black strip (color 0):
+       - Horizontal, full width, below green area
+    3. Colored patterns in black area:
+       - 3x3 blue square (upper left)
+       - 3x3 red square with yellow center (right of blue square)
+       - Multiple 2x2 sky blue squares (scattered)
+       - 3x3 red square (bottom right)
+       - Multiple 2x2 yellow squares (scattered)
+       - 3x3 blue square (bottom right corner)
+    Note: Focus on sizes, colors, and relative positions of patterns.
+
   output: |
-    The grid maintains its 30x30 size and the green 7x7 area in the top-left corner. The main changes are:
-    - All previously isolated 2x2 squares (sky blue, yellow) are now surrounded by a border, forming 4x4 squares
-    - The 3x3 squares (blue, red) are expanded to 5x5 squares, maintaining their original centers
-    - The 3x3 red square with yellow center is now a 5x5 red square with a 3x3 yellow center
-    - New connections are formed:
-      - A blue border connects the large blue square in the top-left to the blue square below
-      - A red border connects the central red square to the bottom-right red square
-      - A yellow border connects the central yellow square to the bottom-right yellow square
-    - The overall effect is that all colored elements are now larger and interconnected
+    Grid size: Unchanged (30x30)
+    Key transformations:
+    1. Green area (color 3):
+       - Unchanged 7x7 square in top-left corner
+    2. Expansion of small squares:
+       - All 2x2 squares (sky blue, yellow) -> 4x4 squares with same-color border
+    3. Growth of 3x3 squares:
+       - All 3x3 squares -> 5x5 squares, preserving original centers
+    4. Special case:
+       - 3x3 red square with yellow center -> 5x5 red square with 3x3 yellow center
+    5. New connections:
+       - Blue squares connected by blue border
+       - Red squares connected by red border
+       - Yellow squares connected by yellow border
+    6. Overall effect:
+       - All colored elements enlarged
+       - Previously isolated elements now interconnected
+    Note: Observe how different sized elements grow and how same-color regions connect.
 
 example_1:
   input: |
-    The grid is 30x30. The top-left 6x6 area is filled with green (3). Within this green area:
-    - A 3x3 red square in the top-left corner
-    - A 2x2 blue square below the red square
-    - A 2x2 red square to the right of the blue square
-    Below the green area, the grid is mostly black (0) with scattered patterns:
-    - A 4x4 sky blue square in the upper left of the black area
-    - Two 2x2 yellow squares below the sky blue square
-    - A 3x3 red square in the middle right
-    - Several 2x2 sky blue squares scattered around
-    - A 2x2 yellow square in the bottom left
-    - A 3x3 blue square in the bottom right corner
+    Grid size: 30x30
+    Key features:
+    1. Green area (color 3):
+       - 6x6 square in top-left corner
+       - Contains: 3x3 red square (top-left), 2x2 blue square (below red), 2x2 red square (right of blue)
+    2. Black area (color 0):
+       - Majority of grid below green area
+    3. Colored patterns in black area:
+       - 4x4 sky blue square (upper left)
+       - Two 2x2 yellow squares (below sky blue)
+       - 3x3 red square (middle right)
+       - Multiple 2x2 sky blue squares (scattered)
+       - 2x2 yellow square (bottom left)
+       - 3x3 blue square (bottom right corner)
+    Note: Pay attention to the arrangement within the green area and the variety of patterns in the black area.
+
   output: |
-    The grid maintains its 30x30 size and the green 6x6 area in the top-left corner. The main changes are:
-    - All previously isolated 2x2 squares (sky blue, yellow, blue, red in green area) are now surrounded by a border of their color, forming 4x4 squares
-    - The 3x3 squares (red in green area, red in black area, blue in bottom right) are expanded to 5x5 squares, maintaining their original centers
-    - The 4x4 sky blue square remains unchanged
-    - New connections are formed:
-      - A red border connects the top-left red square to the central red square
-      - A blue border connects the blue square in the green area to the bottom-right blue square
-      - A yellow border connects the two yellow squares on the left side
-    - The overall effect is that all colored elements are now larger and some are interconnected
+    Grid size: Unchanged (30x30)
+    Key transformations:
+    1. Green area (color 3):
+       - Unchanged 6x6 square in top-left corner
+       - Internal patterns grow while respecting green boundaries
+    2. Expansion of small squares:
+       - All 2x2 squares -> 4x4 squares with same-color border
+    3. Growth of 3x3 squares:
+       - All 3x3 squares -> 5x5 squares, preserving original centers
+    4. Preservation of larger squares:
+       - 4x4 sky blue square remains unchanged
+    5. New connections:
+       - Red squares connected (including one in green area)
+       - Blue squares connected (including one in green area)
+       - Yellow squares on left side connected
+    6. Overall effect:
+       - All colored elements enlarged, except 4x4 sky blue
+       - Many previously isolated elements now interconnected
+    Note: Observe how patterns within the green area interact with the expansion rules.
 
 example_2:
   input: |
-    The grid is 30x30. The top-left 6x6 area is filled with green (3). Within this green area:
-    - A 3x3 area in the top-left with red, blue, and yellow squares arranged in a pattern
-    - A 4x4 sky blue square in the bottom-right corner
-    Below the green area, the grid is mostly black (0) with scattered patterns:
-    - Two 2x2 yellow squares in the upper middle
-    - Two 2x2 magenta squares with 2x2 sky blue squares inside them, one pair on each side
-    - Several 2x2 sky blue, red, and yellow squares scattered around
-    - A 3x3 blue square in the bottom left corner
-    - A 2x2 red square near the center bottom
+    Grid size: 30x30
+    Key features:
+    1. Green area (color 3):
+       - 6x6 square in top-left corner
+       - Contains: 3x3 area with red, blue, yellow pattern (top-left), 4x4 sky blue square (bottom-right)
+    2. Black area (color 0):
+       - Majority of grid below green area
+    3. Colored patterns in black area:
+       - Two 2x2 yellow squares (upper middle)
+       - Two 2x2 magenta squares, each containing 2x2 sky blue square (one pair on each side)
+       - Multiple 2x2 sky blue, red, and yellow squares (scattered)
+       - 3x3 blue square (bottom left corner)
+       - 2x2 red square (near center bottom)
+    Note: Focus on the complex pattern within the green area and the nested magenta-sky blue squares.
+
   output: |
-    The grid maintains its 30x30 size and the green 6x6 area in the top-left corner. The main changes are:
-    - The 3x3 pattern in the top-left of the green area is maintained but expanded to a 5x5 area
-    - The 4x4 sky blue square in the green area remains unchanged
-    - All previously isolated 2x2 squares (sky blue, yellow, red) are now surrounded by a border of their color, forming 4x4 squares
-    - The magenta squares with sky blue centers are expanded to 6x6 magenta squares with 4x4 sky blue centers
-    - The 3x3 blue square in the bottom left is expanded to a 5x5 square
-    - New connections are formed:
-      - A yellow border connects the two yellow squares in the upper middle
-      - A sky blue border connects several sky blue squares, forming a large connected structure
-      - A red border connects the red squares in the bottom half
-    - The overall effect is that all colored elements are now larger and many are interconnected
+    Grid size: Unchanged (30x30)
+    Key transformations:
+    1. Green area (color 3):
+       - Unchanged 6x6 square in top-left corner
+       - 3x3 pattern expands to 5x5, maintaining internal structure
+       - 4x4 sky blue square remains unchanged
+    2. Expansion of small squares:
+       - All isolated 2x2 squares -> 4x4 squares with same-color border
+    3. Growth of 3x3 squares:
+       - 3x3 blue square -> 5x5 square
+    4. Special case for nested squares:
+       - 2x2 magenta squares with 2x2 sky blue centers -> 6x6 magenta squares with 4x4 sky blue centers
+    5. New connections:
+       - Yellow squares in upper middle connected
+       - Sky blue squares form large connected structure
+       - Red squares in bottom half connected
+    6. Overall effect:
+       - Most colored elements enlarged
+       - Many previously isolated elements now interconnected
+    Note: Pay attention to how nested structures grow and how the solution handles complex patterns within the green area.
 
 test_case_0:
   input: |
-    The grid is 30x30. The top-left 6x6 area is filled with green (3). Within this green area:
-    - A 3x3 area in the top-left with red, blue, and yellow squares arranged in a pattern
-    - A 4x4 sky blue square in the bottom-right corner
-    Below the green area, the grid is mostly black (0) with scattered patterns:
-    - A 3x3 blue square in the upper left of the black area
-    - Two 2x2 yellow squares to the right of the blue square
-    - Several 2x2 sky blue squares scattered around
-    - Two 2x2 magenta squares with 2x2 sky blue squares inside them in the upper right
-    - A 3x3 red square near the bottom left
-    - A 2x2 yellow square near the bottom right
-    - A 3x3 blue square in the bottom right corner
+    Grid size: 30x30
+    Key features:
+    1. Green area (color 3):
+       - 6x6 square in top-left corner
+       - Contains: 3x3 area with red, blue, yellow pattern (top-left), 4x4 sky blue square (bottom-right)
+    2. Black area (color 0):
+       - Majority of grid below green area
+    3. Colored patterns in black area:
+       - 3x3 blue square (upper left)
+       - Two 2x2 yellow squares (right of blue square)
+       - Multiple 2x2 sky blue squares (scattered)
+       - Two 2x2 magenta squares, each containing 2x2 sky blue square (upper right)
+       - 3x3 red square (near bottom left)
+       - 2x2 yellow square (near bottom right)
+       - 3x3 blue square (bottom right corner)
+    Note: This combines elements from previous examples. Pay attention to how different patterns interact.
+
   output: |
-    Based on the pattern observed in the examples, we can expect the following changes:
-    - The 3x3 pattern in the top-left of the green area will be maintained but expanded to a 5x5 area
-    - The 4x4 sky blue square in the green area will remain unchanged
-    - All isolated 2x2 squares (sky blue, yellow) will be surrounded by a border of their color, forming 4x4 squares
-    - The 3x3 squares (blue in upper left, red near bottom left, blue in bottom right) will be expanded to 5x5 squares
-    - The magenta squares with sky blue centers will be expanded to 6x6 magenta squares with 4x4 sky blue centers
-    - New connections will likely be formed:
-      - A blue border may connect the blue squares
-      - A yellow border may connect the yellow squares
-      - A sky blue border may connect several sky blue squares
-    - The overall effect will be that all colored elements are now larger and many are interconnected
+    Grid size: Unchanged (30x30)
+    Expected transformations:
+    1. Green area (color 3):
+       - Remains unchanged 6x6 square
+       - 3x3 pattern likely expands to 5x5, maintaining internal structure
+       - 4x4 sky blue square likely remains unchanged
+    2. Expansion of small squares:
+       - All isolated 2x2 squares (sky blue, yellow) -> 4x4 squares with same-color border
+    3. Growth of 3x3 squares:
+       - All 3x3 squares (blue in upper left, red near bottom left, blue in bottom right) -> 5x5 squares
+    4. Special case for nested squares:
+       - 2x2 magenta squares with 2x2 sky blue centers -> Likely 6x6 magenta squares with 4x4 sky blue centers
+    5. Potential new connections:
+       - Blue squares may connect
+       - Yellow squares may connect
+       - Sky blue squares may form larger connected structures
+    6. Overall effect:
+       - Most colored elements enlarged
+       - Many previously isolated elements likely interconnected
+    Note: Consider how the solution balances growth of different patterns and handles potential conflicts between expanding regions.
