@@ -33,11 +33,8 @@ def solve_770cc55f(input_grid: ColoredGrid) -> ColoredGrid:
         return output_grid
     
     # Determine the position of the yellow rectangle
-    if len(overlap) == 1:
-        left_col = right_col = next(iter(overlap))
-    else:
-        right_col = max(overlap)
-        left_col = right_col - 1
+    right_col = max(overlap)
+    left_col = right_col - 1
     
     # Create yellow rectangle
     start_row = red_line_row + 1
