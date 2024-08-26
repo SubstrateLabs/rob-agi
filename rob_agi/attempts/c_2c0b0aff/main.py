@@ -1,89 +1,119 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Set
-from collections import deque
 
 def solve_2c0b0aff(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the 2c0b0aff challenge by identifying and extracting the fundamental repeating pattern from the input grid.
+    Solves the 2c0b0aff challenge by identifying and extracting the largest complete pattern from the input grid.
     
     The function performs the following steps:
-    1. Identifies non-black regions in the input grid
-    2. Creates a bounding box around all non-black cells
-    3. Analyzes the structure of the pattern for symmetries and recurring sub-patterns
-    4. Extracts potential core patterns of various sizes
-    5. Optimizes the pattern by removing redundant parts
-    6. Verifies and refines the pattern
+    1. Identifies non-black cells in the input grid
+    2. Finds contiguous regions using flood fill
+    3. Extracts candidate patterns from each region
+    4. Validates patterns by checking if they appear completely in other regions
+    5. Selects the largest valid pattern
+    6. Optimizes the pattern by removing black edges
     7. Returns the optimized pattern as a compact ColoredGrid
     
     Args:
     input_grid (ColoredGrid): The input grid containing partial pattern information
     
     Returns:
-    ColoredGrid: A compact grid containing the extracted fundamental repeating pattern
+    ColoredGrid: A compact grid containing the extracted largest complete pattern
     """
-    # Step 1: Identify non-black regions
     non_black_cells = find_non_black_cells(input_grid)
     
     if not non_black_cells:
         return ColoredGrid(values=[[]])
     
-    # Step 2: Create bounding box
-    min_r, min_c, max_r, max_c = get_bounding_box(non_black_cells)
+    regions = find_contiguous_regions(input_grid, non_black_cells)
+    candidate_patterns = extract_candidate_patterns(input_grid, regions)
+    valid_patterns = validate_patterns(input_grid, candidate_patterns)
+    best_pattern = select_best_pattern(valid_patterns)
+    optimized_pattern = optimize_pattern(best_pattern)
     
-    # Step 3 & 4: Analyze structure and extract potential core patterns
-    pattern = find_optimal_pattern(input_grid, min_r, min_c, max_r, max_c)
-    
-    # Step 5 & 6: Optimize, verify, and refine the pattern
-    optimized_pattern = optimize_pattern(pattern)
-    
-    # Step 7: Return the optimized pattern
-    return optimized_pattern
+    return ColoredGrid(values=optimized_pattern)
 
 def find_non_black_cells(grid: ColoredGrid) -> Set[Tuple[int, int]]:
     return {(r, c) for r in range(grid.num_rows) for c in range(grid.num_cols) if grid.get_cell(r, c) != 0}
 
-def get_bounding_box(cells: Set[Tuple[int, int]]) -> Tuple[int, int, int, int]:
-    min_r = min(r for r, _ in cells)
-    min_c = min(c for _, c in cells)
-    max_r = max(r for r, _ in cells)
-    max_c = max(c for _, c in cells)
-    return min_r, min_c, max_r, max_c
+def find_contiguous_regions(grid: ColoredGrid, non_black_cells: Set[Tuple[int, int]]) -> List[Set[Tuple[int, int]]]:
+    regions = []
+    visited = set()
+    
+    def flood_fill(start_x: int, start_y: int) -> Set[Tuple[int, int]]:
+        region = set()
+        stack = [(start_x, start_y)]
+        while stack:
+            x, y = stack.pop()
+            if (x, y) not in region and (x, y) in non_black_cells:
+                region.add((x, y))
+                for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                    new_x, new_y = x + dx, y + dy
+                    if 0 <= new_x < grid.num_rows and 0 <= new_y < grid.num_cols:
+                        stack.append((new_x, new_y))
+        return region
+    
+    for cell in non_black_cells:
+        if cell not in visited:
+            region = flood_fill(*cell)
+            regions.append(region)
+            visited.update(region)
+    
+    return regions
 
-def find_optimal_pattern(grid: ColoredGrid, min_r: int, min_c: int, max_r: int, max_c: int) -> ColoredGrid:
-    height = max_r - min_r + 1
-    width = max_c - min_c + 1
-    best_pattern = None
-    best_score = float('inf')
+def extract_candidate_patterns(grid: ColoredGrid, regions: List[Set[Tuple[int, int]]]) -> List[Tuple[List[List[int]], Tuple[int, int]]]:
+    candidate_patterns = []
     
-    for pattern_height in range(1, height + 1):
-        for pattern_width in range(1, width + 1):
-            pattern = grid.extract_subgrid(min_r, min_c, pattern_height, pattern_width)
-            score = pattern_score(grid, pattern, min_r, min_c, max_r, max_c)
-            if score < best_score:
-                best_score = score
-                best_pattern = pattern
+    for region in regions:
+        min_x = min(x for x, _ in region)
+        max_x = max(x for x, _ in region)
+        min_y = min(y for _, y in region)
+        max_y = max(y for _, y in region)
+        
+        pattern = []
+        for x in range(min_x, max_x + 1):
+            row = []
+            for y in range(min_y, max_y + 1):
+                row.append(grid.get_cell(x, y))
+            pattern.append(row)
+        
+        candidate_patterns.append((pattern, (max_x - min_x + 1, max_y - min_y + 1)))
     
-    return best_pattern
+    return candidate_patterns
 
-def pattern_score(grid: ColoredGrid, pattern: ColoredGrid, min_r: int, min_c: int, max_r: int, max_c: int) -> float:
-    p_rows, p_cols = pattern.get_dimensions()
-    mismatches = 0
-    total_cells = (max_r - min_r + 1) * (max_c - min_c + 1)
+def validate_patterns(grid: ColoredGrid, candidate_patterns: List[Tuple[List[List[int]], Tuple[int, int]]]) -> List[List[List[int]]]:
+    valid_patterns = []
     
-    for r in range(min_r, max_r + 1):
-        for c in range(min_c, max_c + 1):
-            if grid.get_cell(r, c) != pattern.get_cell((r - min_r) % p_rows, (c - min_c) % p_cols):
-                mismatches += 1
+    for pattern, dimensions in candidate_patterns:
+        if is_valid_pattern(pattern, dimensions, grid):
+            valid_patterns.append(pattern)
     
-    return mismatches / total_cells + (p_rows * p_cols) / 100  # Add pattern size penalty
+    return valid_patterns
 
-def optimize_pattern(pattern: ColoredGrid) -> ColoredGrid:
-    rows, cols = pattern.get_dimensions()
+def is_valid_pattern(pattern: List[List[int]], dimensions: Tuple[int, int], grid: ColoredGrid) -> bool:
+    pattern_height, pattern_width = dimensions
+    for start_x in range(grid.num_rows - pattern_height + 1):
+        for start_y in range(grid.num_cols - pattern_width + 1):
+            if all(grid.get_cell(start_x + x, start_y + y) == pattern[x][y]
+                   for x in range(pattern_height)
+                   for y in range(pattern_width)):
+                return True
+    return False
+
+def select_best_pattern(valid_patterns: List[List[List[int]]]) -> List[List[int]]:
+    return max(valid_patterns, key=lambda p: len(p) * len(p[0]))
+
+def optimize_pattern(pattern: List[List[int]]) -> List[List[int]]:
+    # Remove black rows from top and bottom
+    while pattern and all(cell == 0 for cell in pattern[0]):
+        pattern = pattern[1:]
+    while pattern and all(cell == 0 for cell in pattern[-1]):
+        pattern = pattern[:-1]
     
-    # Remove black rows and columns from the edges
-    top = next(r for r in range(rows) if any(pattern.get_cell(r, c) != 0 for c in range(cols)))
-    bottom = next(r for r in range(rows - 1, -1, -1) if any(pattern.get_cell(r, c) != 0 for c in range(cols)))
-    left = next(c for c in range(cols) if any(pattern.get_cell(r, c) != 0 for r in range(rows)))
-    right = next(c for c in range(cols - 1, -1, -1) if any(pattern.get_cell(r, c) != 0 for r in range(rows)))
+    # Remove black columns from left and right
+    while pattern and all(row[0] == 0 for row in pattern):
+        pattern = [row[1:] for row in pattern]
+    while pattern and all(row[-1] == 0 for row in pattern):
+        pattern = [row[:-1] for row in pattern]
     
-    return pattern.extract_subgrid(top, left, bottom - top + 1, right - left + 1)
+    return pattern
