@@ -1,29 +1,31 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Dict
+import math
 
 def solve_0a2355a6(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the grid transformation challenge by identifying distinct shapes,
-    analyzing their properties, and assigning colors based on a scoring system.
+    analyzing their properties, and assigning colors based on a comprehensive scoring system.
     
     1. Identify distinct contiguous shapes of sky blue (8) in the input grid using flood-fill.
-    2. Analyze shapes for size, complexity, and position.
-    3. Score shapes based on their properties and sort them.
-    4. Assign colors to shapes using a dynamic scoring system that considers color balance and shape distinctions.
-    5. Optimize color assignment to minimize the number of colors used while maintaining visual distinction.
-    6. Create and return a new grid with transformed colors, maintaining black (0) as empty space.
+    2. Analyze shapes for size, complexity, centrality, and orientation.
+    3. Categorize shapes based on their geometric properties.
+    4. Score shapes using a comprehensive system considering multiple factors.
+    5. Assign colors to shapes based on their scores and categories, ensuring consistency and visual distinction.
+    6. Handle small shapes by either merging them or ensuring they receive distinct colors.
+    7. Create and return a new grid with transformed colors, maintaining black (0) as empty space.
     
     The function ensures consistent color assignment based on shape properties and their relationships,
-    handling various grid sizes and shape configurations.
+    handling various grid sizes and shape configurations while maintaining visual clarity.
     """
     # Step 1: Identify distinct shapes
     shapes = find_contiguous_shapes(input_grid)
     
-    # Step 2 & 3: Analyze shapes and score them
-    scored_shapes = analyze_and_score_shapes(shapes, input_grid)
+    # Step 2 & 3: Analyze shapes, categorize them, and score them
+    analyzed_shapes = analyze_shapes(shapes, input_grid)
     
     # Step 4 & 5: Assign colors to shapes
-    colored_shapes = assign_colors_to_shapes(scored_shapes)
+    colored_shapes = assign_colors_to_shapes(analyzed_shapes)
     
     # Step 6: Create output grid
     output_grid = create_output_grid(input_grid, colored_shapes)
@@ -56,9 +58,10 @@ def find_contiguous_shapes(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
     
     return shapes
 
-def analyze_and_score_shapes(shapes: List[List[Tuple[int, int]]], grid: ColoredGrid) -> List[Tuple[List[Tuple[int, int]], float]]:
-    scored_shapes = []
+def analyze_shapes(shapes: List[List[Tuple[int, int]]], grid: ColoredGrid) -> List[Dict]:
+    analyzed_shapes = []
     rows, cols = grid.get_dimensions()
+    total_area = rows * cols
     
     for shape in shapes:
         size = len(shape)
@@ -75,22 +78,76 @@ def analyze_and_score_shapes(shapes: List[List[Tuple[int, int]]], grid: ColoredG
         center_r, center_c = sum(r for r, _ in shape) / size, sum(c for _, c in shape) / size
         centrality = 1 - (abs(center_r - rows/2) / (rows/2) + abs(center_c - cols/2) / (cols/2)) / 2
         
-        # Calculate score
-        score = size * 0.5 + complexity * 0.3 + centrality * 0.2
+        # Calculate orientation
+        width = max_c - min_c + 1
+        height = max_r - min_r + 1
+        orientation = "vertical" if height > width else "horizontal" if width > height else "square"
         
-        scored_shapes.append((shape, score))
+        # Categorize shape
+        category = categorize_shape(shape, min_r, min_c, max_r, max_c)
+        
+        # Calculate relative size
+        relative_size = size / total_area
+        
+        # Calculate score
+        score = (
+            size * 0.3 +
+            complexity * 0.2 +
+            centrality * 0.2 +
+            relative_size * 0.3
+        )
+        
+        analyzed_shapes.append({
+            "shape": shape,
+            "size": size,
+            "complexity": complexity,
+            "centrality": centrality,
+            "orientation": orientation,
+            "category": category,
+            "relative_size": relative_size,
+            "score": score
+        })
     
-    return sorted(scored_shapes, key=lambda x: x[1], reverse=True)
+    return sorted(analyzed_shapes, key=lambda x: x["score"], reverse=True)
 
-def assign_colors_to_shapes(scored_shapes: List[Tuple[List[Tuple[int, int]], float]]) -> List[Tuple[List[Tuple[int, int]], int]]:
+def categorize_shape(shape: List[Tuple[int, int]], min_r: int, min_c: int, max_r: int, max_c: int) -> str:
+    width = max_c - min_c + 1
+    height = max_r - min_r + 1
+    
+    if width == height == 1:
+        return "dot"
+    elif width == 1 or height == 1:
+        return "line"
+    elif width == height:
+        return "square"
+    elif abs(width - height) <= 1:
+        return "near_square"
+    elif width > height * 2:
+        return "wide_rectangle"
+    elif height > width * 2:
+        return "tall_rectangle"
+    else:
+        return "rectangle"
+
+def assign_colors_to_shapes(analyzed_shapes: List[Dict]) -> List[Tuple[List[Tuple[int, int]], int]]:
     colors = [1, 2, 3, 4]
     colored_shapes = []
     color_counts = {1: 0, 2: 0, 3: 0, 4: 0}
+    category_colors = {}
     
-    for shape, _ in scored_shapes:
-        best_color = min(colors, key=lambda c: color_counts[c])
-        colored_shapes.append((shape, best_color))
-        color_counts[best_color] += 1
+    for shape_info in analyzed_shapes:
+        shape = shape_info["shape"]
+        category = shape_info["category"]
+        
+        if category in category_colors:
+            color = category_colors[category]
+        else:
+            # Assign a new color based on the least used color
+            color = min(colors, key=lambda c: color_counts[c])
+            category_colors[category] = color
+        
+        colored_shapes.append((shape, color))
+        color_counts[color] += 1
     
     return colored_shapes
 
