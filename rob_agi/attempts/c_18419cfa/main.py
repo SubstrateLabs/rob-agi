@@ -6,12 +6,10 @@ def solve_18419cfa(input_grid: ColoredGrid) -> ColoredGrid:
     Solve the 18419cfa challenge by expanding red (2) patterns within sky blue (8) regions.
     
     The function identifies connected sky blue regions, analyzes red patterns within them,
-    and expands these patterns based on their shape and available space. It handles various
-    patterns including single pixels, L-shapes, crosses, and complex shapes. The expansion
-    creates filled shapes for simple patterns and maintains the overall structure for complex
-    ones, filling gaps where possible. The expanded pattern is then repeated vertically to
-    fill the sky blue region, maintaining symmetry. The expansion is contained within the
-    bounds of each sky blue region, and non-sky blue areas are preserved.
+    and expands these patterns based on their shape and available space. It creates a
+    symmetrical template from the red pattern, which is then repeated vertically to fill
+    the sky blue region. The expansion maintains symmetry and is contained within the
+    bounds of each sky blue region. Non-sky blue areas are preserved.
     """
     grid = input_grid.deep_copy()
     sky_blue_regions = find_connected_regions(grid, 8)
@@ -56,7 +54,7 @@ def expand_region(grid: ColoredGrid, region: Set[Tuple[int, int]]):
     if not red_pixels:
         return
 
-    template = create_expansion_template(red_pixels, min_r, min_c, max_r, max_c)
+    template = create_symmetrical_template(red_pixels, min_r, min_c, max_r, max_c)
     
     template_height = len(template)
     repetitions = height // template_height
@@ -70,6 +68,14 @@ def expand_region(grid: ColoredGrid, region: Set[Tuple[int, int]]):
                 if template[r][c] == 2 and (start_r + i * template_height + r, min_c + c) in region:
                     grid.set_cell(start_r + i * template_height + r, min_c + c, 2)
 
+    # Handle partial repetition at the bottom
+    remaining_rows = height - (repetitions * template_height)
+    if remaining_rows > 0:
+        for r in range(min(remaining_rows, template_height)):
+            for c in range(width):
+                if template[r][c] == 2 and (start_r + repetitions * template_height + r, min_c + c) in region:
+                    grid.set_cell(start_r + repetitions * template_height + r, min_c + c, 2)
+
 def get_region_bounds(region: Set[Tuple[int, int]]) -> Tuple[int, int, int, int]:
     min_r = min(r for r, _ in region)
     max_r = max(r for r, _ in region)
@@ -77,25 +83,23 @@ def get_region_bounds(region: Set[Tuple[int, int]]) -> Tuple[int, int, int, int]
     max_c = max(c for _, c in region)
     return min_r, max_r, min_c, max_c
 
-def create_expansion_template(red_pixels: Set[Tuple[int, int]], min_r: int, min_c: int, max_r: int, max_c: int) -> List[List[int]]:
+def create_symmetrical_template(red_pixels: Set[Tuple[int, int]], min_r: int, min_c: int, max_r: int, max_c: int) -> List[List[int]]:
     height = max_r - min_r + 1
     width = max_c - min_c + 1
-    template = [[0 for _ in range(width)] for _ in range(height)]
+    template = [[0 for _ in range(width)] for _ in range(height * 2)]
     
-    # Determine if it's a complex shape
-    is_complex = len(red_pixels) > 4 or (max(r for r, _ in red_pixels) - min(r for r, _ in red_pixels) > 2) or (max(c for _, c in red_pixels) - min(c for _, c in red_pixels) > 2)
-    
+    # Create the top half of the template
     for r, c in red_pixels:
         r, c = r - min_r, c - min_c
-        for dr in range(-1, 2):
-            for dc in range(-1, 2):
-                nr, nc = r + dr, c + dc
-                if 0 <= nr < height and 0 <= nc < width:
-                    if is_complex and (dr == 0 and dc == 0):
-                        template[nr][nc] = 2  # Fill center for complex shapes
-                    elif not is_complex and (dr == 0 and dc == 0) and len(red_pixels) > 1:
-                        template[nr][nc] = 0  # Hollow center for simple shapes with multiple pixels
-                    else:
-                        template[nr][nc] = 2
+        template[r][c] = 2
+    
+    # Mirror the top half to create the bottom half
+    for r in range(height):
+        template[height * 2 - 1 - r] = template[r].copy()
+    
+    # If the template height is odd, add an extra row in the middle
+    if height % 2 == 1:
+        middle_row = [2 if any(template[height-1][c] == 2 or template[height][c] == 2 else 0 for c in range(width)]
+        template.insert(height, middle_row)
     
     return template
