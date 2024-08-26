@@ -9,6 +9,7 @@ def solve_62ab2642(input_grid: ColoredGrid) -> ColoredGrid:
     3. Preserve all original gray (5) cells.
 
     The function uses an iterative flood fill for both the sky blue and orange areas, with a comparison to choose the larger sky blue area.
+    Isolated black areas are identified by checking if they are completely surrounded by gray cells or the grid edge.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -55,7 +56,7 @@ def solve_62ab2642(input_grid: ColoredGrid) -> ColoredGrid:
         for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
             nx, ny = x + dx, y + dy
             if 0 <= nx < cols and 0 <= ny < rows:
-                if output_grid.values[ny][nx] not in [5, 7]:
+                if output_grid.values[ny][nx] not in [5]:
                     return False
             # Edge of grid counts as gray
         return True
