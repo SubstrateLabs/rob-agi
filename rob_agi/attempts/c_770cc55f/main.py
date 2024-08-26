@@ -9,7 +9,7 @@ def solve_770cc55f(input_grid: ColoredGrid) -> ColoredGrid:
     2. Finds overlapping columns between top and bottom lines.
     3. If overlap exists and a red line is present, creates a yellow rectangle:
        - Width is exactly 2 columns, positioned at the rightmost overlap.
-       - Extends from just below the red line to just above the bottom colored line.
+       - Extends from just below the red line to just above the bottom of the grid.
     4. Returns the modified grid with the yellow rectangle added, or the original grid if conditions aren't met.
     """
     rows, cols = input_grid.get_dimensions()
@@ -29,16 +29,19 @@ def solve_770cc55f(input_grid: ColoredGrid) -> ColoredGrid:
     # Find overlapping columns
     overlap = top_line.intersection(bottom_line)
     
-    if len(overlap) < 2 or red_line_row is None:
+    if len(overlap) < 1 or red_line_row is None:
         return output_grid
     
-    # Find the rightmost pair of overlapping columns
-    right_col = max(overlap)
-    left_col = right_col - 1
+    # Determine the position of the yellow rectangle
+    if len(overlap) == 1:
+        left_col = right_col = next(iter(overlap))
+    else:
+        right_col = max(overlap)
+        left_col = right_col - 1
     
     # Create yellow rectangle
     start_row = red_line_row + 1
-    end_row = rows - 1  # Just above the bottom line
+    end_row = rows - 1  # Just above the bottom of the grid
     
     for row in range(start_row, end_row):
         output_grid[row][left_col] = 4
