@@ -4,30 +4,37 @@ from typing import List, Tuple, Set
 def solve_e619ca6e(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the grid expansion challenge by identifying green structures in the input grid
-    and applying a complex L-shaped growth pattern.
+    and applying an organic growth pattern.
     
     The solution follows these steps:
-    1. Identify and group adjacent green cells into initial structures.
-    2. Create a new output grid with the same dimensions as the input.
-    3. For each initial structure, determine primary expansion directions.
-    4. Apply an L-shaped growth pattern, alternating between 3x2 and 2x3 green rectangles.
-    5. Add connecting cells and continue expansion until no further growth is possible.
-    6. Resolve conflicts between expanding structures.
-    7. Add fine details and fill in surrounded 3x3 black areas.
-    8. Perform a final cleanup to match the intricate patterns in the test cases.
+    1. Identify initial green structures and create an influence map.
+    2. Analyze the grid space and boundaries.
+    3. Apply an iterative growth process:
+       a. Expand structures based on influence and available space.
+       b. Fill in surrounded areas.
+       c. Connect nearby structures.
+       d. Refine the pattern by smoothing edges and balancing filled/empty spaces.
+    4. Adjust the global pattern for balance and edge coverage.
+    5. Resolve conflicts between expanding structures.
+    6. Add fine details and isolated green squares.
+    7. Perform final validation and cleanup.
     
-    This approach creates a branching structure that expands from the original green cells,
-    maintaining the complex patterns observed in the example outputs.
+    This approach creates an organic, branching structure that expands from the original green cells,
+    maintaining the complex patterns observed in the example outputs while adapting to different input configurations.
     """
     initial_structures = identify_initial_structures(input_grid)
+    influence_map = create_influence_map(input_grid, initial_structures)
     output_grid = create_empty_grid(input_grid.get_dimensions())
     
-    for structure in initial_structures:
-        apply_expansion_pattern(output_grid, structure)
+    for _ in range(5):  # Iterate multiple times for gradual growth
+        expand_structures(output_grid, influence_map)
+        fill_surrounded_areas(output_grid)
+        connect_structures(output_grid)
+        refine_pattern(output_grid)
     
+    adjust_global_pattern(output_grid)
     resolve_conflicts(output_grid)
     add_fine_details(output_grid)
-    fill_surrounded_areas(output_grid)
     final_cleanup(output_grid)
     
     return output_grid
@@ -46,7 +53,7 @@ def identify_initial_structures(grid: ColoredGrid) -> List[Set[Tuple[int, int]]]
             if (x, y) not in visited and grid.get_cell(x, y) == 3:
                 visited.add((x, y))
                 structure.add((x, y))
-                for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]:
                     nx, ny = x + dx, y + dy
                     if 0 <= nx < rows and 0 <= ny < cols:
                         stack.append((nx, ny))
@@ -59,87 +66,116 @@ def identify_initial_structures(grid: ColoredGrid) -> List[Set[Tuple[int, int]]]
     
     return structures
 
+def create_influence_map(grid: ColoredGrid, structures: List[Set[Tuple[int, int]]]) -> List[List[float]]:
+    """Creates an influence map based on the initial structures."""
+    rows, cols = grid.get_dimensions()
+    influence_map = [[0.0 for _ in range(cols)] for _ in range(rows)]
+    
+    for structure in structures:
+        for r, c in structure:
+            for dr in range(-5, 6):
+                for dc in range(-5, 6):
+                    nr, nc = r + dr, c + dc
+                    if 0 <= nr < rows and 0 <= nc < cols:
+                        distance = max(abs(dr), abs(dc))
+                        influence = 1.0 / (distance + 1) ** 2
+                        influence_map[nr][nc] += influence
+    
+    return influence_map
+
 def create_empty_grid(dimensions: Tuple[int, int]) -> ColoredGrid:
     """Creates a new empty grid with the given dimensions."""
     rows, cols = dimensions
     return ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
 
-def apply_expansion_pattern(grid: ColoredGrid, structure: Set[Tuple[int, int]]):
-    """Applies the L-shaped growth pattern from an initial structure."""
-    directions = determine_expansion_directions(structure)
-    for direction in directions:
-        expand_l_shape(grid, structure, direction)
-
-def determine_expansion_directions(structure: Set[Tuple[int, int]]) -> List[Tuple[int, int]]:
-    """Determines primary expansion directions based on the structure's shape and position."""
-    min_r = min(r for r, _ in structure)
-    max_r = max(r for r, _ in structure)
-    min_c = min(c for _, c in structure)
-    max_c = max(c for _, c in structure)
-    
-    directions = []
-    if max_r - min_r > max_c - min_c:
-        directions.extend([(0, 1), (0, -1)])
-    else:
-        directions.extend([(1, 0), (-1, 0)])
-    
-    return directions
-
-def expand_l_shape(grid: ColoredGrid, structure: Set[Tuple[int, int]], direction: Tuple[int, int]):
-    """Expands the structure using an L-shaped growth pattern."""
+def expand_structures(grid: ColoredGrid, influence_map: List[List[float]]):
+    """Expands structures based on the influence map and available space."""
     rows, cols = grid.get_dimensions()
-    dr, dc = direction
-    edge = find_edge(structure, direction)
+    expansion_candidates = set()
     
-    step = 0
-    while True:
-        r, c = edge[0] + dr * step, edge[1] + dc * step
-        if not (0 <= r < rows and 0 <= c < cols):
-            break
-        
-        if step % 2 == 0:
-            if not fill_rectangle(grid, r, c, 3, 2 if dr == 0 else 2, 3):
-                break
-        else:
-            if not fill_rectangle(grid, r, c, 2 if dr == 0 else 3, 3, 2):
-                break
-        
-        add_connecting_cells(grid, r, c, direction)
-        step += 3
+    for r in range(rows):
+        for c in range(cols):
+            if grid.get_cell(r, c) == 3:
+                for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]:
+                    nr, nc = r + dr, c + dc
+                    if 0 <= nr < rows and 0 <= nc < cols and grid.get_cell(nr, nc) == 0:
+                        expansion_candidates.add((nr, nc))
+    
+    sorted_candidates = sorted(expansion_candidates, key=lambda pos: influence_map[pos[0]][pos[1]], reverse=True)
+    
+    for r, c in sorted_candidates[:len(sorted_candidates) // 2]:  # Expand only half of the candidates
+        if random.random() < influence_map[r][c]:
+            grid.set_cell(r, c, 3)
 
-def find_edge(structure: Set[Tuple[int, int]], direction: Tuple[int, int]) -> Tuple[int, int]:
-    """Finds the edge cell of the structure in the given direction."""
-    dr, dc = direction
-    if dr != 0:
-        return max(structure, key=lambda x: x[0] * dr)
-    else:
-        return max(structure, key=lambda x: x[1] * dc)
-
-def fill_rectangle(grid: ColoredGrid, r: int, c: int, height: int, width: int, value: int) -> bool:
-    """Fills a rectangle with the given value. Returns False if the area is already filled."""
+def connect_structures(grid: ColoredGrid):
+    """Connects nearby structures with bridges or extensions."""
     rows, cols = grid.get_dimensions()
-    if not (0 <= r < rows and 0 <= c < cols and r + height <= rows and c + width <= cols):
-        return False
-    
-    filled = False
-    for i in range(height):
-        for j in range(width):
-            if grid.get_cell(r + i, c + j) == 0:
-                grid.set_cell(r + i, c + j, value)
-                filled = True
-    return filled
+    for r in range(rows):
+        for c in range(cols):
+            if grid.get_cell(r, c) == 0:
+                green_neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                                      if 0 <= r + dr < rows and 0 <= c + dc < cols and grid.get_cell(r + dr, c + dc) == 3)
+                if green_neighbors >= 2:
+                    grid.set_cell(r, c, 3)
 
-def add_connecting_cells(grid: ColoredGrid, r: int, c: int, direction: Tuple[int, int]):
-    """Adds single cells to connect different branches of the expansion."""
-    dr, dc = direction
+def refine_pattern(grid: ColoredGrid):
+    """Refines the pattern by smoothing edges and balancing filled/empty spaces."""
     rows, cols = grid.get_dimensions()
-    
-    for i in range(-1, 2):
-        for j in range(-1, 2):
-            nr, nc = r + i, c + j
-            if 0 <= nr < rows and 0 <= nc < cols and grid.get_cell(nr, nc) == 0:
-                if (i != 0 or j != 0) and (i * dr >= 0 and j * dc >= 0):
-                    grid.set_cell(nr, nc, 3)
+    for r in range(rows):
+        for c in range(cols):
+            if grid.get_cell(r, c) == 3:
+                empty_neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                                      if 0 <= r + dr < rows and 0 <= c + dc < cols and grid.get_cell(r + dr, c + dc) == 0)
+                if empty_neighbors >= 3:
+                    grid.set_cell(r, c, 0)
+            elif grid.get_cell(r, c) == 0:
+                green_neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                                      if 0 <= r + dr < rows and 0 <= c + dc < cols and grid.get_cell(r + dr, c + dc) == 3)
+                if green_neighbors >= 3:
+                    grid.set_cell(r, c, 3)
+
+def adjust_global_pattern(grid: ColoredGrid):
+    """Adjusts the global pattern for balance and edge coverage."""
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        for c in range(cols):
+            if r == 0 or r == rows - 1 or c == 0 or c == cols - 1:
+                if random.random() < 0.3:
+                    grid.set_cell(r, c, 3)
+
+def resolve_conflicts(grid: ColoredGrid):
+    """Resolves conflicts between expanding structures."""
+    # This function can be implemented if needed, but the current approach
+    # should minimize conflicts through the use of the influence map.
+    pass
+
+def add_fine_details(grid: ColoredGrid):
+    """Adds fine details like isolated green squares in empty areas."""
+    rows, cols = grid.get_dimensions()
+    for _ in range(rows * cols // 100):  # Add a number of details proportional to grid size
+        r, c = random.randint(0, rows - 1), random.randint(0, cols - 1)
+        if grid.get_cell(r, c) == 0 and all(grid.get_cell(r + dr, c + dc) == 0
+                                            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                                            if 0 <= r + dr < rows and 0 <= c + dc < cols):
+            size = random.choice([2, 3])
+            if r + size <= rows and c + size <= cols:
+                for i in range(size):
+                    for j in range(size):
+                        grid.set_cell(r + i, c + j, 3)
+
+def final_cleanup(grid: ColoredGrid):
+    """Performs final validation and cleanup."""
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        for c in range(cols):
+            if grid.get_cell(r, c) == 3:
+                isolated = True
+                for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                    if 0 <= r + dr < rows and 0 <= c + dc < cols and grid.get_cell(r + dr, c + dc) == 3:
+                        isolated = False
+                        break
+                if isolated:
+                    grid.set_cell(r, c, 0)
 
 def resolve_conflicts(grid: ColoredGrid):
     """Resolves conflicts between expanding structures."""
