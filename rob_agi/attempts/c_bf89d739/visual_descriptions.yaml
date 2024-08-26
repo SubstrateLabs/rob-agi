@@ -1,83 +1,94 @@
 example_0:
   input: |
-    A 19x13 grid mostly filled with black (0). There are five red (2) dots scattered across the grid:
-    - One at row 3, column 8
-    - One at row 6, column 4
-    - One at row 6, column 12
-    - One at row 9, column 10
-    - One at row 11, column 7
-    These red dots appear to be isolated with no clear pattern or connection between them.
+    A 19x13 grid with black (0) background. Five red (2) dots are scattered:
+    - (3,8), (6,4), (6,12), (9,10), (11,7)
+    Key observations:
+    - Leftmost red dot is at column 4
+    - Rightmost red dot is at column 12
+    - Topmost red dot is at row 3
+    - Bottommost red dot is at row 11
+    - Two red dots share the same row (row 6)
   output: |
-    The same 19x13 grid, but now with green (3) lines connecting the red (2) dots. The red dots remain in their original positions. The green lines form a shape resembling an irregular pentagon:
-    - A vertical line from (3,8) to (6,8)
-    - A horizontal line from (6,4) to (6,12)
-    - A diagonal line from (6,12) to (9,10)
-    - A vertical line from (9,10) to (11,10)
-    - A diagonal line from (11,7) to (6,4)
-    The green lines appear to be the shortest path connecting all red dots.
+    The 19x13 grid now includes green (3) lines connecting all red (2) dots:
+    - A vertical green "spine" from (3,8) to (11,8)
+    - Horizontal green lines connect off-spine red dots to the spine:
+      (6,4) to (6,8), (6,12) to (6,8), (9,10) to (9,8), (11,7) to (11,8)
+    Key features:
+    - The spine is in column 8, which is the leftmost column with a red dot after the first
+    - All red dots are connected to the spine directly or indirectly
+    - The structure forms a tree with the spine as the main trunk
 
 example_1:
   input: |
-    A 16x12 grid mostly filled with black (0). There are five red (2) dots scattered across the grid:
-    - One at row 2, column 5
-    - One at row 6, column 2
-    - One at row 7, column 10
-    - One at row 10, column 8
-    - One at row 12, column 5
-    These red dots appear to be isolated with no clear pattern or connection between them.
+    A 16x12 grid with black (0) background. Five red (2) dots are scattered:
+    - (2,5), (6,2), (7,10), (10,8), (12,5)
+    Key observations:
+    - Leftmost red dot is at column 2
+    - Rightmost red dot is at column 10
+    - Topmost red dot is at row 2
+    - Bottommost red dot is at row 12
+    - Two red dots share the same column (column 5)
   output: |
-    The same 16x12 grid, but now with green (3) lines connecting the red (2) dots. The red dots remain in their original positions. The green lines form a shape resembling an irregular pentagon:
-    - A vertical line from (2,5) to (12,5)
-    - A horizontal line from (6,2) to (6,5)
-    - A diagonal line from (6,5) to (7,10)
-    - A vertical line from (7,10) to (10,10)
-    - A horizontal line from (10,8) to (10,10)
-    The green lines appear to be the shortest path connecting all red dots, forming a tree-like structure.
+    The 16x12 grid now includes green (3) lines connecting all red (2) dots:
+    - A vertical green "spine" from (2,5) to (12,5)
+    - Horizontal green lines connect off-spine red dots to the spine:
+      (6,2) to (6,5), (7,10) to (7,5), (10,8) to (10,5)
+    Key features:
+    - The spine is in column 5, which contains the topmost red dot
+    - All red dots are connected to the spine directly or indirectly
+    - The structure forms a tree with the spine as the main trunk
 
 example_2:
   input: |
-    A 14x10 grid mostly filled with black (0). There are four red (2) dots scattered across the grid:
-    - One at row 7, column 4
-    - One at row 9, column 2
-    - One at row 9, column 7
-    - One at row 11, column 5
-    These red dots appear to be isolated with no clear pattern or connection between them.
+    A 14x10 grid with black (0) background. Four red (2) dots are scattered:
+    - (7,4), (9,2), (9,7), (11,5)
+    Key observations:
+    - Leftmost red dot is at column 2
+    - Rightmost red dot is at column 7
+    - Topmost red dot is at row 7
+    - Bottommost red dot is at row 11
+    - Two red dots share the same row (row 9)
   output: |
-    The same 14x10 grid, but now with green (3) lines connecting the red (2) dots. The red dots remain in their original positions. The green lines form a shape resembling an irregular quadrilateral:
-    - A vertical line from (7,4) to (9,4)
-    - A horizontal line from (9,2) to (9,7)
-    - A diagonal line from (9,4) to (11,5)
-    The green lines appear to be the shortest path connecting all red dots, forming a tree-like structure.
+    The 14x10 grid now includes green (3) lines connecting all red (2) dots:
+    - A vertical green "spine" from (7,4) to (11,4)
+    - Horizontal green lines connect off-spine red dots to the spine:
+      (9,2) to (9,4), (9,7) to (9,4)
+    Key features:
+    - The spine is in column 4, which contains the topmost red dot
+    - All red dots are connected to the spine directly or indirectly
+    - The structure forms a tree with the spine as the main trunk
 
 example_3:
   input: |
-    A 14x15 grid mostly filled with black (0). There are eight red (2) dots scattered across the grid:
-    - One at row 1, column 4
-    - One at row 3, column 6
-    - One at row 5, column 0
-    - One at row 6, column 8
-    - One at row 8, column 1
-    - One at row 10, column 2
-    - One at row 12, column 4
-    These red dots appear to be isolated with no clear pattern or connection between them.
+    A 14x15 grid with black (0) background. Seven red (2) dots are scattered:
+    - (1,4), (3,6), (5,0), (6,8), (8,1), (10,2), (12,4)
+    Key observations:
+    - Leftmost red dot is at column 0
+    - Rightmost red dot is at column 8
+    - Topmost red dot is at row 1
+    - Bottommost red dot is at row 12
+    - Two red dots share the same column (column 4)
   output: |
-    The same 14x15 grid, but now with green (3) lines connecting the red (2) dots. The red dots remain in their original positions. The green lines form a complex tree-like structure:
-    - A vertical line from (1,4) to (12,4)
-    - A horizontal line from (3,4) to (3,6)
-    - A diagonal line from (5,0) to (5,4)
-    - A diagonal line from (6,4) to (6,8)
-    - A diagonal line from (8,1) to (8,4)
-    - A diagonal line from (10,2) to (10,4)
-    The green lines appear to be the shortest path connecting all red dots, forming a tree-like structure with the vertical line from top to bottom acting as a main "trunk".
+    The 14x15 grid now includes green (3) lines connecting all red (2) dots:
+    - A vertical green "spine" from (1,4) to (12,4)
+    - Horizontal green lines connect off-spine red dots to the spine:
+      (3,6) to (3,4), (5,0) to (5,4), (6,8) to (6,4), (8,1) to (8,4), (10,2) to (10,4)
+    Key features:
+    - The spine is in column 4, which contains the topmost red dot
+    - All red dots are connected to the spine directly or indirectly
+    - The structure forms a tree with the spine as the main trunk
 
 test_case_0:
   input: |
-    A 19x13 grid mostly filled with black (0). There are five red (2) dots scattered across the grid:
-    - One at row 3, column 8
-    - One at row 6, column 4
-    - One at row 6, column 12
-    - One at row 9, column 10
-    - One at row 11, column 7
-    These red dots appear to be isolated with no clear pattern or connection between them. This input is identical to example_0.
+    A 19x13 grid with black (0) background. Five red (2) dots are scattered:
+    - (3,8), (6,4), (6,12), (9,10), (11,7)
+    Key observations:
+    - Identical to example_0
+    - Leftmost red dot is at column 4
+    - Rightmost red dot is at column 12
+    - Topmost red dot is at row 3
+    - Bottommost red dot is at row 11
+    - Two red dots share the same row (row 6)
   output: |
-    The output is not provided for this test case.
+    The output is not provided for this test case, but based on the pattern observed in previous examples, 
+    we would expect a similar tree-like structure with a vertical spine and horizontal connections.
