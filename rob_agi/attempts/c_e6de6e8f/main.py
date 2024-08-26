@@ -9,7 +9,7 @@ def solve_e6de6e8f(input_grid: ColoredGrid) -> ColoredGrid:
     2. Identify decision points as red squares in the top input row.
     3. Start the path from the top center.
     4. For each decision point:
-       a. Move diagonally down-right once.
+       a. Move diagonally down-right once if possible.
        b. If the corresponding position in the bottom row is red, go straight down until the next decision point or bottom.
     5. After processing all decision points or reaching the rightmost column, continue the path to the bottom-right.
     6. Ensure the path ends at the bottom of the grid in the rightmost possible column.
@@ -25,14 +25,17 @@ def solve_e6de6e8f(input_grid: ColoredGrid) -> ColoredGrid:
         if current_col >= 6:  # Stop if we've reached the rightmost valid column
             break
 
-        output[current_row][current_col] = 2
-        current_row += 1
-        current_col += 1
+        if current_row < 8 and current_col < 6:
+            output[current_row][current_col] = 2
+            current_row += 1
+            current_col += 1
 
         if input_grid.values[1][decision_point] == 2:
-            while current_row < 8 and (decision_point == decision_points[-1] or current_col < decision_points[decision_points.index(decision_point) + 1]):
+            while current_row < 8 and current_col < 7:
                 output[current_row][current_col] = 2
                 current_row += 1
+                if decision_point != decision_points[-1] and current_col == decision_points[decision_points.index(decision_point) + 1]:
+                    break
 
     # Complete the path to the bottom-right
     while current_row < 8 and current_col < 6:
