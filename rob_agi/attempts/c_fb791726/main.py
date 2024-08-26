@@ -12,32 +12,32 @@ def solve_fb791726(input_grid: ColoredGrid) -> ColoredGrid:
        - Bottom-right quadrant stays in place
     4. Filling the rest with black (0)
     """
-    # Step 1: Initialize the output grid
     input_rows, input_cols = input_grid.get_dimensions()
     output_rows, output_cols = input_rows * 2, input_cols * 2
     output_grid = ColoredGrid(values=[[0 for _ in range(output_cols)] for _ in range(output_rows)])
 
-    # Step 2: Add green separators
+    # Add green separators
     for i in range(1, output_rows, 2):
         output_grid.values[i] = [3] * output_cols
     for j in range(1, output_cols, 2):
         for i in range(output_rows):
             output_grid.values[i][j] = 3
 
-    # Step 3: Copy and transform the input grid
+    # Copy and transform the input grid
     mid_row, mid_col = input_rows // 2, input_cols // 2
     for i in range(input_rows):
         for j in range(input_cols):
             if input_grid.values[i][j] != 0:
-                if i < mid_row and j < mid_col:  # Top-left quadrant
-                    new_i, new_j = 2*i, 2*j
-                elif i < mid_row and j >= mid_col:  # Top-right quadrant
-                    new_i, new_j = 2*(i + mid_row), 2*j
-                elif i >= mid_row and j < mid_col:  # Bottom-left quadrant
-                    new_i, new_j = 2*(i - mid_row), 2*(j + mid_col)
-                else:  # Bottom-right quadrant
-                    new_i, new_j = 2*i, 2*j
+                if i < mid_row:
+                    if j < mid_col:  # Top-left quadrant
+                        new_i, new_j = 2*i, 2*j
+                    else:  # Top-right quadrant
+                        new_i, new_j = 2*(i + mid_row), 2*j
+                else:
+                    if j < mid_col:  # Bottom-left quadrant
+                        new_i, new_j = 2*(i - mid_row), 2*(j + mid_col)
+                    else:  # Bottom-right quadrant
+                        new_i, new_j = 2*i, 2*j
                 output_grid.values[new_i][new_j] = input_grid.values[i][j]
 
-    # Step 4: Return the completed output grid
     return output_grid
