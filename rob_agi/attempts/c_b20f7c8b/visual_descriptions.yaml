@@ -1,23 +1,73 @@
 example_0:
   input: |
-    The grid is 22x18. The left side (6 columns) is mostly filled with sky blue (8) squares, with some magenta (6), gray (5), and yellow (4) squares forming small patterns within. The middle section (7 columns) is mostly black (0), with two 5x5 red (2) squares containing blue (1) patterns inside. The right side (9 columns) is mostly black (0), with two 5x5 red (2) squares similar to the middle section. There are also some green (3) squares at the bottom left of the sky blue section.
+    Grid size: 22x18
+    Left region (columns 1-6): Mostly sky blue (8), with small patterns of magenta (6), gray (5), and yellow (4).
+    Middle region (columns 7-13): Mostly black (0), with two 5x5 blocks:
+      - Top block (rows 1-5, columns 8-12): Red (2) with blue (1) pattern
+      - Bottom block (rows 9-13, columns 8-12): Red (2) with blue (1) pattern
+    Right region (columns 14-22): Mostly black (0), with two 5x5 blocks:
+      - Top block (rows 1-5, columns 16-20): Red (2) with blue (1) pattern
+      - Bottom block (rows 9-13, columns 16-20): Red (2) with blue (1) pattern
+    Note: Green (3) squares at the bottom-left of the sky blue section.
   output: |
-    The grid layout remains 22x18. The left side (6 columns) is unchanged, still mostly sky blue (8) with the same patterns. The middle and right sections have changed significantly. The two 5x5 squares in the middle are now solid green (3) and gray (5). The two 5x5 squares on the right are now solid yellow (4) and magenta (6). All other black (0) spaces remain unchanged.
+    Grid size: 22x18
+    Left region (columns 1-6): Unchanged
+    Middle region (columns 7-13): Two transformed 5x5 blocks:
+      - Top block (rows 1-5, columns 8-12): Solid green (3)
+      - Bottom block (rows 9-13, columns 8-12): Solid gray (5)
+    Right region (columns 14-22): Two transformed 5x5 blocks:
+      - Top block (rows 1-5, columns 16-20): Solid yellow (4)
+      - Bottom block (rows 9-13, columns 16-20): Solid magenta (6)
+    All other black (0) spaces remain unchanged.
 
 example_1:
   input: |
-    The grid is 22x18. The right side (6 columns) is mostly filled with sky blue (8), with some red (2), green (3), yellow (4), and orange (7) squares forming small patterns within. The left and middle sections (16 columns total) are mostly black (0), with four 5x5 squares. Two of these squares are red (2) with blue (1) patterns inside, one is solid green (3), and one contains a mix of red (2) and blue (1) squares.
+    Grid size: 22x18
+    Right region (columns 17-22): Mostly sky blue (8), with small patterns of red (2), green (3), yellow (4), and orange (7).
+    Left and middle regions (columns 1-16): Mostly black (0), with four 5x5 blocks:
+      - Top-left block (rows 2-6, columns 1-5): Red (2) with blue (1) pattern
+      - Bottom-left block (rows 10-14, columns 1-5): Mix of red (2) and blue (1)
+      - Top-middle block (rows 2-6, columns 8-12): Red (2) with blue (1) pattern
+      - Bottom-middle block (rows 10-14, columns 8-12): Solid green (3)
   output: |
-    The grid layout remains 22x18. The right side (6 columns) is unchanged, still mostly sky blue (8) with the same patterns. The left and middle sections have changed significantly. The two 5x5 squares on the left are now solid red (2) and solid yellow (4). The two 5x5 squares in the middle are now solid green (2) and solid magenta (4). All other black (0) spaces remain unchanged.
+    Grid size: 22x18
+    Right region (columns 17-22): Unchanged
+    Left and middle regions (columns 1-16): Four transformed 5x5 blocks:
+      - Top-left block (rows 2-6, columns 1-5): Solid red (2)
+      - Bottom-left block (rows 10-14, columns 1-5): Solid yellow (4)
+      - Top-middle block (rows 2-6, columns 8-12): Solid green (2)
+      - Bottom-middle block (rows 10-14, columns 8-12): Solid magenta (4)
+    All other black (0) spaces remain unchanged.
 
 example_2:
   input: |
-    The grid is 22x18. The left side (6 columns) is mostly filled with sky blue (8), with some blue (1), green (3), magenta (6), and yellow (4) squares forming small patterns within. The middle and right sections (16 columns total) are mostly black (0), with four 5x5 squares. Two of these squares are red (2) with blue (1) patterns inside, one is solid magenta (6), and one is solid blue (1).
+    Grid size: 22x18
+    Left region (columns 1-6): Mostly sky blue (8), with small patterns of blue (1), green (3), magenta (6), and yellow (4).
+    Middle and right regions (columns 7-22): Mostly black (0), with four 5x5 blocks:
+      - Top-middle block (rows 1-5, columns 8-12): Red (2) with blue (1) pattern
+      - Bottom-middle block (rows 9-13, columns 8-12): Red (2) with blue (1) pattern
+      - Top-right block (rows 1-5, columns 16-20): Solid blue (1)
+      - Bottom-right block (rows 9-13, columns 16-20): Solid magenta (6)
   output: |
-    The grid layout remains 22x18. The left side (6 columns) is unchanged, still mostly sky blue (8) with the same patterns. The middle and right sections have changed significantly. The two 5x5 squares in the middle are now solid green (3) and solid red (2). The two 5x5 squares on the right are now solid yellow (4) and solid magenta (4). All other black (0) spaces remain unchanged.
+    Grid size: 22x18
+    Left region (columns 1-6): Unchanged
+    Middle and right regions (columns 7-22): Four transformed 5x5 blocks:
+      - Top-middle block (rows 1-5, columns 8-12): Solid green (3)
+      - Bottom-middle block (rows 9-13, columns 8-12): Solid red (2)
+      - Top-right block (rows 1-5, columns 16-20): Solid yellow (4)
+      - Bottom-right block (rows 9-13, columns 16-20): Solid magenta (4)
+    All other black (0) spaces remain unchanged.
 
 test_case_0:
   input: |
-    The grid is 22x18. The left side (6 columns) is mostly filled with sky blue (8), with some magenta (6), gray (5), and yellow (4) squares forming small patterns within. The middle section (7 columns) is mostly black (0), with two 5x5 red (2) squares containing blue (1) patterns inside. The right side (9 columns) is mostly black (0), with two 5x5 red (2) squares similar to the middle section. There are also some green (3) squares at the bottom left of the sky blue section.
+    Grid size: 22x18
+    Left region (columns 1-6): Mostly sky blue (8), with small patterns of magenta (6), gray (5), and yellow (4).
+    Middle region (columns 7-13): Mostly black (0), with two 5x5 blocks:
+      - Top block (rows 1-5, columns 8-12): Red (2) with blue (1) pattern
+      - Bottom block (rows 9-13, columns 8-12): Red (2) with blue (1) pattern
+    Right region (columns 14-22): Mostly black (0), with two 5x5 blocks:
+      - Top block (rows 1-5, columns 16-20): Red (2) with blue (1) pattern
+      - Bottom block (rows 9-13, columns 16-20): Red (2) with blue (1) pattern
+    Note: Green (3) squares at the bottom-left of the sky blue section.
   output: |
     The output grid is not provided for this test case.
