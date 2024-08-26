@@ -1,77 +1,79 @@
 from rob_agi.colored_grid import ColoredGrid
 
+def count_twos_in_row(grid, row_index):
+    return grid.values[row_index].count(2)
+
+def count_twos_in_column(grid, col_index):
+    return sum(1 for row in grid.values if row[col_index] == 2)
+
+def count_twos_in_main_diagonal(grid):
+    rows, cols = grid.get_dimensions()
+    return sum(1 for i in range(min(rows, cols)) if grid.values[i][i] == 2)
+
+def count_twos_in_other_diagonal(grid):
+    rows, cols = grid.get_dimensions()
+    return sum(1 for i in range(min(rows, cols)) if grid.values[i][cols-1-i] == 2)
+
+def find_line_with_most_twos(grid):
+    rows, cols = grid.get_dimensions()
+    counts = {
+        'main_diagonal': count_twos_in_main_diagonal(grid),
+        'other_diagonal': count_twos_in_other_diagonal(grid),
+        'rows': [count_twos_in_row(grid, i) for i in range(rows)],
+        'columns': [count_twos_in_column(grid, i) for i in range(cols)]
+    }
+    
+    max_count = max(counts['main_diagonal'], counts['other_diagonal'], max(counts['rows']), max(counts['columns']))
+    
+    if counts['main_diagonal'] == max_count:
+        return 'main_diagonal', None
+    elif counts['other_diagonal'] == max_count:
+        return 'other_diagonal', None
+    elif max_count in counts['rows']:
+        return 'row', counts['rows'].index(max_count)
+    else:
+        return 'column', counts['columns'].index(max_count)
+
+def modify_diagonal(grid, is_main_diagonal):
+    rows, cols = grid.get_dimensions()
+    color = 2
+    for i in range(min(rows, cols)):
+        if is_main_diagonal:
+            grid.values[i][i] = color
+        else:
+            grid.values[i][cols-1-i] = color
+        color = 5 - color  # Toggle between 2 and 3
+
+def modify_row(grid, row_index):
+    color = 2
+    for col in range(len(grid.values[row_index])):
+        grid.values[row_index][col] = color
+        color = 5 - color  # Toggle between 2 and 3
+
+def modify_column(grid, col_index):
+    color = 2
+    for row in range(len(grid.values)):
+        grid.values[row][col_index] = color
+        color = 5 - color  # Toggle between 2 and 3
+
 def solve_bcb3040b(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the bcb3040b challenge by identifying the line (row, column, or diagonal)
-    with the most non-zero values and modifying it to create an alternating pattern
-    of red (2) and green (3) squares. If there's a tie, it prioritizes the line with
-    the most blue (1) squares, and then in the order: row, column, diagonal.
+    with the most red (2) values and modifying it to create an alternating pattern
+    of red (2) and green (3) squares. If there's a tie, it prioritizes in the order:
+    main diagonal, other diagonal, topmost row, leftmost column.
     The rest of the grid remains unchanged.
     """
-    # Step 1: Analyze the grid
-    rows, cols = input_grid.get_dimensions()
-    counts = {
-        'rows': [sum(1 for cell in row if cell != 0) for row in input_grid.values],
-        'cols': [sum(1 for row in input_grid.values if row[i] != 0) for i in range(cols)],
-        'diag1': sum(1 for i in range(min(rows, cols)) if input_grid.values[i][i] != 0),
-        'diag2': sum(1 for i in range(min(rows, cols)) if input_grid.values[i][cols-1-i] != 0)
-    }
-
-    # Step 2: Identify the line to modify
-    max_count = max(max(counts['rows']), max(counts['cols']), counts['diag1'], counts['diag2'])
-    candidates = []
-    
-    for i, count in enumerate(counts['rows']):
-        if count == max_count:
-            candidates.append(('row', i))
-    for i, count in enumerate(counts['cols']):
-        if count == max_count:
-            candidates.append(('col', i))
-    if counts['diag1'] == max_count:
-        candidates.append(('diag1', 0))
-    if counts['diag2'] == max_count:
-        candidates.append(('diag2', 0))
-
-    # If there's a tie, choose based on number of '1' values
-    if len(candidates) > 1:
-        blue_counts = []
-        for line_type, index in candidates:
-            if line_type == 'row':
-                blue_count = input_grid.values[index].count(1)
-            elif line_type == 'col':
-                blue_count = sum(1 for row in input_grid.values if row[index] == 1)
-            elif line_type == 'diag1':
-                blue_count = sum(1 for i in range(min(rows, cols)) if input_grid.values[i][i] == 1)
-            else:  # diag2
-                blue_count = sum(1 for i in range(min(rows, cols)) if input_grid.values[i][cols-1-i] == 1)
-            blue_counts.append((blue_count, line_type, index))
-        
-        line_to_modify = max(blue_counts, key=lambda x: (x[0], {'row': 2, 'col': 1, 'diag1': 0, 'diag2': 0}[x[1]]))
-        line_type, index = line_to_modify[1], line_to_modify[2]
-    else:
-        line_type, index = candidates[0]
-
-    # Step 3: Create a new grid
+    line_type, index = find_line_with_most_twos(input_grid)
     new_grid = input_grid.deep_copy()
-
-    # Step 4: Modify the identified line
-    color = 2
-    if line_type == 'row':
-        for col in range(cols):
-            new_grid.values[index][col] = color
-            color = 5 - color  # Toggle between 2 and 3
-    elif line_type == 'col':
-        for row in range(rows):
-            new_grid.values[row][index] = color
-            color = 5 - color
-    elif line_type == 'diag1':
-        for i in range(min(rows, cols)):
-            new_grid.values[i][i] = color
-            color = 5 - color
-    else:  # diag2
-        for i in range(min(rows, cols)):
-            new_grid.values[i][cols-1-i] = color
-            color = 5 - color
-
-    # Step 5: Return the modified grid
+    
+    if line_type == 'main_diagonal':
+        modify_diagonal(new_grid, True)
+    elif line_type == 'other_diagonal':
+        modify_diagonal(new_grid, False)
+    elif line_type == 'row':
+        modify_row(new_grid, index)
+    else:  # column
+        modify_column(new_grid, index)
+    
     return new_grid
