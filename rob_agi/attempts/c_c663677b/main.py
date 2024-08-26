@@ -1,6 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
-import math
+from typing import List, Tuple, Dict
 
 def solve_c663677b(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -8,12 +7,11 @@ def solve_c663677b(input_grid: ColoredGrid) -> ColoredGrid:
     and applying it to the entire grid, including black (0) areas.
 
     The solution follows these steps:
-    1. Analyze the input grid to find non-zero patterns in rows and columns.
-    2. Identify the full repeating pattern by finding the longest repeating
-       sequence in both horizontal and vertical directions.
-    3. Reconstruct the full pattern based on the identified sequences.
-    4. Validate the pattern against non-zero areas in the input grid.
-    5. Create the output grid by applying the full pattern to all cells.
+    1. Analyze the input grid to find non-black cells and the largest contiguous non-black region.
+    2. Determine the pattern size by checking for repeating units.
+    3. Extract the base pattern from the input grid.
+    4. Validate the pattern against non-black areas in the input grid.
+    5. Generate the output grid by applying the validated pattern to all cells.
 
     Args:
         input_grid (ColoredGrid): The input grid with partial pattern and black areas.
@@ -22,54 +20,57 @@ def solve_c663677b(input_grid: ColoredGrid) -> ColoredGrid:
         ColoredGrid: The solved grid with the full pattern applied to all cells.
     """
     # Step 1: Analyze the grid
-    horizontal_patterns = analyze_patterns(input_grid.values)
-    vertical_patterns = analyze_patterns(list(zip(*input_grid.values)))
+    non_black_map, max_region = analyze_grid(input_grid)
 
-    # Step 2: Identify full pattern
-    h_pattern = find_longest_repeating_pattern(horizontal_patterns)
-    v_pattern = find_longest_repeating_pattern(vertical_patterns)
-    full_pattern_size = math.lcm(len(h_pattern), len(v_pattern))
-    full_pattern = reconstruct_full_pattern(h_pattern, v_pattern, full_pattern_size)
+    # Step 2: Determine pattern size
+    pattern_size = find_pattern_size(input_grid, non_black_map, max_region)
 
-    # Step 3: Validate pattern
-    while not is_pattern_valid(input_grid, full_pattern):
-        full_pattern_size *= 2
-        full_pattern = reconstruct_full_pattern(h_pattern, v_pattern, full_pattern_size)
+    # Step 3: Extract base pattern
+    base_pattern = extract_base_pattern(input_grid, pattern_size)
 
-    # Step 4: Create output grid
+    # Step 4: Validate pattern
+    while not validate_pattern(input_grid, base_pattern, pattern_size):
+        pattern_size = (pattern_size[0] * 2, pattern_size[1] * 2)
+        base_pattern = extract_base_pattern(input_grid, pattern_size)
+
+    # Step 5: Generate output grid
+    output_grid = generate_output_grid(base_pattern, pattern_size, input_grid.get_dimensions())
+
+    return output_grid
+
+def analyze_grid(grid: ColoredGrid) -> Tuple[Dict[Tuple[int, int], int], Tuple[int, int]]:
+    non_black_map = {}
+    max_region = (0, 0)
+    rows, cols = grid.get_dimensions()
+    
+    for r in range(rows):
+        for c in range(cols):
+            if grid.values[r][c] != 0:
+                non_black_map[(r, c)] = grid.values[r][c]
+                max_region = max(max_region, (r+1, c+1))
+    
+    return non_black_map, max_region
+
+def find_pattern_size(grid: ColoredGrid, non_black_map: Dict[Tuple[int, int], int], max_region: Tuple[int, int]) -> Tuple[int, int]:
+    rows, cols = grid.get_dimensions()
+    for size in range(1, min(rows, cols) + 1):
+        if all(grid.values[r][c] == grid.values[r % size][c % size] for (r, c) in non_black_map):
+            return (size, size)
+    return max_region
+
+def extract_base_pattern(grid: ColoredGrid, pattern_size: Tuple[int, int]) -> List[List[int]]:
+    return [[grid.values[r][c] for c in range(pattern_size[1])] for r in range(pattern_size[0])]
+
+def validate_pattern(grid: ColoredGrid, pattern: List[List[int]], pattern_size: Tuple[int, int]) -> bool:
+    rows, cols = grid.get_dimensions()
+    return all(
+        grid.values[r][c] == 0 or grid.values[r][c] == pattern[r % pattern_size[0]][c % pattern_size[1]]
+        for r in range(rows) for c in range(cols)
+    )
+
+def generate_output_grid(pattern: List[List[int]], pattern_size: Tuple[int, int], grid_size: Tuple[int, int]) -> ColoredGrid:
     output_values = [
-        [full_pattern[r % len(full_pattern)][c % len(full_pattern[0])] 
-         for c in range(len(input_grid.values[0]))]
-        for r in range(len(input_grid.values))
+        [pattern[r % pattern_size[0]][c % pattern_size[1]] for c in range(grid_size[1])]
+        for r in range(grid_size[0])
     ]
-
     return ColoredGrid(values=output_values)
-
-def analyze_patterns(sequences: List[List[int]]) -> List[Tuple[List[int], int]]:
-    patterns = []
-    for seq in sequences:
-        non_zero_seq = [color for color in seq if color != 0]
-        if non_zero_seq:
-            patterns.append((non_zero_seq, seq.index(non_zero_seq[0])))
-    return patterns
-
-def find_longest_repeating_pattern(patterns: List[Tuple[List[int], int]]) -> List[int]:
-    longest_pattern = []
-    for pattern, _ in patterns:
-        if len(pattern) > len(longest_pattern):
-            longest_pattern = pattern
-    return longest_pattern
-
-def reconstruct_full_pattern(h_pattern: List[int], v_pattern: List[int], size: int) -> List[List[int]]:
-    full_pattern = [[0 for _ in range(size)] for _ in range(size)]
-    for r in range(size):
-        for c in range(size):
-            full_pattern[r][c] = h_pattern[c % len(h_pattern)]
-    return full_pattern
-
-def is_pattern_valid(grid: ColoredGrid, pattern: List[List[int]]) -> bool:
-    for r in range(len(grid.values)):
-        for c in range(len(grid.values[0])):
-            if grid.values[r][c] != 0 and grid.values[r][c] != pattern[r % len(pattern)][c % len(pattern[0])]:
-                return False
-    return True
