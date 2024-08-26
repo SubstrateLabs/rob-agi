@@ -11,92 +11,81 @@ def solve_f9a67cb5(input_grid: ColoredGrid) -> ColoredGrid:
     2. Create a graph representation of blue segments and existing red squares.
     3. Find the Minimum Spanning Tree (MST) to connect all elements.
     4. Convert the MST to a grid structure, adding red squares as needed.
-    5. Optimize the red structure by removing unnecessary red squares.
-    6. Validate the final structure to ensure all blue squares and existing red squares are connected.
+    5. Connect any existing red squares to the structure.
+    6. Optimize the red structure by removing unnecessary red squares.
+    7. Validate the final structure to ensure all blue squares and existing red squares are connected.
     
     Returns a new grid with the minimal red structure added while preserving all blue squares and existing red squares.
     """
     output_grid = input_grid.deep_copy()
     elements = find_elements(input_grid)
     graph = create_graph(elements)
-    mst = minimum_spanning_tree(graph, len(elements[2]) + len(elements[8]))
+    mst = minimum_spanning_tree(graph)
     add_red_structure(output_grid, mst, elements)
-    connect_existing_red(output_grid, input_grid)
+    connect_existing_red(output_grid, elements[2])
     optimize_red_structure(output_grid)
     return output_grid
 
-def find_elements(grid: ColoredGrid) -> Dict[int, List[Tuple[int, int, int, int]]]:
+def find_elements(grid: ColoredGrid) -> Dict[int, List[Tuple[int, int]]]:
     rows, cols = grid.get_dimensions()
     elements = {2: [], 8: []}
-    visited = set()
     
     for r in range(rows):
         for c in range(cols):
-            if grid.values[r][c] in {2, 8} and (r, c) not in visited:
-                segment = get_segment(grid, r, c, visited)
-                elements[grid.values[r][c]].append(segment)
+            if grid.values[r][c] in {2, 8}:
+                elements[grid.values[r][c]].append((r, c))
     
     return elements
 
-def get_segment(grid: ColoredGrid, start_r: int, start_c: int, visited: Set[Tuple[int, int]]) -> Tuple[int, int, int, int]:
-    rows, cols = grid.get_dimensions()
-    queue = deque([(start_r, start_c)])
-    min_r, min_c, max_r, max_c = start_r, start_c, start_r, start_c
-    color = grid.values[start_r][start_c]
-    
-    while queue:
-        r, c = queue.popleft()
-        if (r, c) not in visited and grid.values[r][c] == color:
-            visited.add((r, c))
-            min_r, min_c = min(min_r, r), min(min_c, c)
-            max_r, max_c = max(max_r, r), max(max_c, c)
-            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                nr, nc = r + dr, c + dc
-                if 0 <= nr < rows and 0 <= nc < cols:
-                    queue.append((nr, nc))
-    
-    return (min_r, min_c, max_r, max_c)
-
-def create_graph(elements: Dict[int, List[Tuple[int, int, int, int]]]) -> List[Tuple[int, int, int]]:
+def create_graph(elements: Dict[int, List[Tuple[int, int]]]) -> List[Tuple[int, int, int]]:
     graph = []
     all_elements = elements[2] + elements[8]
-    for i, (r1, c1, r2, c2) in enumerate(all_elements):
-        for j, (r3, c3, r4, c4) in enumerate(all_elements[i+1:], i+1):
-            dist = abs(r2 - r3) + abs(c2 - c3)
+    for i, (r1, c1) in enumerate(all_elements):
+        for j, (r2, c2) in enumerate(all_elements[i+1:], i+1):
+            dist = abs(r1 - r2) + abs(c1 - c2)
             graph.append((dist, i, j))
     return graph
 
-def minimum_spanning_tree(graph: List[Tuple[int, int, int]], num_elements: int) -> List[Tuple[int, int, int]]:
+def minimum_spanning_tree(graph: List[Tuple[int, int, int]]) -> List[Tuple[int, int, int]]:
     graph.sort()
-    parent = list(range(num_elements))
-    
+    parent = {}
+    rank = {}
+
     def find(x):
+        if x not in parent:
+            parent[x] = x
+            rank[x] = 0
         if parent[x] != x:
             parent[x] = find(parent[x])
         return parent[x]
-    
+
     def union(x, y):
-        parent[find(x)] = find(y)
-    
+        xroot, yroot = find(x), find(y)
+        if rank[xroot] < rank[yroot]:
+            parent[xroot] = yroot
+        elif rank[xroot] > rank[yroot]:
+            parent[yroot] = xroot
+        else:
+            parent[yroot] = xroot
+            rank[xroot] += 1
+
     mst = []
     for w, u, v in graph:
         if find(u) != find(v):
             union(u, v)
             mst.append((w, u, v))
-    
+
     return mst
 
-def add_red_structure(grid: ColoredGrid, mst: List[Tuple[int, int, int]], elements: Dict[int, List[Tuple[int, int, int, int]]]):
+def add_red_structure(grid: ColoredGrid, mst: List[Tuple[int, int, int]], elements: Dict[int, List[Tuple[int, int]]]):
     all_elements = elements[2] + elements[8]
     for _, u, v in mst:
-        r1, c1, r2, c2 = all_elements[u]
-        r3, c3, r4, c4 = all_elements[v]
-        connect_segments(grid, r1, c1, r2, c2, r3, c3, r4, c4)
+        r1, c1 = all_elements[u]
+        r2, c2 = all_elements[v]
+        connect_points(grid, r1, c1, r2, c2)
 
-def connect_segments(grid: ColoredGrid, r1: int, c1: int, r2: int, c2: int, r3: int, c3: int, r4: int, c4: int):
-    start = ((r1 + r2) // 2, (c1 + c2) // 2)
-    end = ((r3 + r4) // 2, (c3 + c4) // 2)
-    path = find_path(grid, start, end)
+def connect_points(grid: ColoredGrid, r1: int, c1: int, r2: int, c2: int):
+    path = find_path(grid, (r1, c1), (r2, c2))
     for r, c in path:
         if grid.values[r][c] == 0:
             grid.values[r][c] = 2
@@ -120,19 +109,17 @@ def find_path(grid: ColoredGrid, start: Tuple[int, int], end: Tuple[int, int]) -
     
     return []
 
-def connect_existing_red(output_grid: ColoredGrid, input_grid: ColoredGrid):
-    rows, cols = input_grid.get_dimensions()
-    for r in range(rows):
-        for c in range(cols):
-            if input_grid.values[r][c] == 2 and output_grid.values[r][c] != 2:
-                nearest_red = find_nearest_red(output_grid, r, c)
-                if nearest_red:
-                    path = find_path(output_grid, (r, c), nearest_red)
-                    for pr, pc in path:
-                        if output_grid.values[pr][pc] == 0:
-                            output_grid.values[pr][pc] = 2
+def connect_existing_red(grid: ColoredGrid, red_squares: List[Tuple[int, int]]):
+    for r, c in red_squares:
+        if grid.values[r][c] != 2:
+            nearest_red = find_nearest_red(grid, r, c)
+            if nearest_red:
+                path = find_path(grid, (r, c), nearest_red)
+                for pr, pc in path:
+                    if grid.values[pr][pc] == 0:
+                        grid.values[pr][pc] = 2
 
-def find_nearest_red(grid: ColoredGrid, r: int, c: int) -> Tuple[int, int]:
+def find_nearest_red(grid: ColoredGrid, r: int, c: int) -> Optional[Tuple[int, int]]:
     rows, cols = grid.get_dimensions()
     queue = deque([(r, c, 0)])
     visited = set()
