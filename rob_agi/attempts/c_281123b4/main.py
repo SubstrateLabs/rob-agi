@@ -1,18 +1,17 @@
 from rob_agi.colored_grid import ColoredGrid
 from collections import Counter
-from typing import List, Tuple
+import random
 
 def solve_281123b4(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms a 19x4 input grid into a 4x4 output grid through a multi-step process:
-    1. Color analysis: Analyzes color frequencies in the entire input grid, ignoring green separators.
+    1. Color analysis: Analyzes color frequencies in the input grid, excluding green separators.
     2. Color hierarchy: Establishes a color priority based on frequency and predefined importance.
-    3. Pattern determination: Selects a dominant pattern based on color prevalence.
-    4. Grid construction: Builds a 4x4 grid using the dominant pattern and color hierarchy.
-    5. Color incorporation: Ensures representation of top colors while maintaining balance.
-    6. Refinement: Adjusts for symmetry, balance, and visual appeal.
-    7. Validation: Verifies color representation and overall grid character.
-    The final 4x4 grid reflects the essence of the input while creating a coherent and visually interesting output.
+    3. Palette creation: Selects top colors to form the output palette.
+    4. Grid construction: Builds a 4x4 grid using the color palette and various patterns.
+    5. Balance and refinement: Adjusts the grid for visual interest and color representation.
+    6. Validation: Ensures the output captures the essence of the input while maintaining flexibility.
+    The final 4x4 grid reflects the character of the input while creating a visually interesting output.
     """
     rows, cols = input_grid.get_dimensions()
     if rows != 4 or cols != 19:
@@ -28,60 +27,54 @@ def solve_281123b4(input_grid: ColoredGrid) -> ColoredGrid:
     color_weights = {9: 4, 4: 3, 8: 2, 5: 1}  # Brown, Yellow, Sky, Gray
     color_ranking = sorted(color_counts.items(), key=lambda x: (color_weights.get(x[0], 0), x[1]), reverse=True)
 
-    # Pattern determination
-    dominant_color = color_ranking[0][0]
-    if color_percentages[dominant_color] > 0.4:
-        pattern = "extended"
-    elif color_percentages[dominant_color] > 0.25:
-        pattern = "c_shape"
-    else:
-        pattern = "diagonal"
+    # Palette creation
+    palette = [color for color, _ in color_ranking[:3]]
+    if black_percentage > 0.15:
+        palette.append(0)
+    if len(palette) < 4:
+        palette.append(color_ranking[3][0])
 
     # Grid construction
     output = [[0 for _ in range(4)] for _ in range(4)]
+    dominant_color = palette[0]
     
-    if pattern == "extended":
+    # Apply dominant color pattern
+    if color_percentages[dominant_color] > 0.4:
         for i in range(4):
             output[0][i] = output[3][i] = dominant_color
         output[1][0] = output[2][0] = dominant_color
-    elif pattern == "c_shape":
-        for i in range(4):
-            output[0][i] = output[3][i] = dominant_color
-        output[1][0] = output[2][0] = dominant_color
-    else:  # diagonal
+    else:
         for i in range(4):
             output[i][i] = dominant_color
+            output[i][3-i] = dominant_color
 
-    # Color incorporation
-    secondary_color = color_ranking[1][0]
-    for i in range(4):
-        for j in range(4):
-            if output[i][j] == 0:
-                output[i][j] = secondary_color
+    # Distribute other colors
+    remaining_cells = [(r, c) for r in range(4) for c in range(4) if output[r][c] == 0]
+    random.shuffle(remaining_cells)
+    for i, color in enumerate(palette[1:]):
+        cells_to_fill = len(remaining_cells) // (len(palette) - 1)
+        for _ in range(cells_to_fill):
+            if remaining_cells:
+                r, c = remaining_cells.pop()
+                output[r][c] = color
 
-    # Ensure top colors are represented
-    for color, _ in color_ranking[2:4]:
+    # Fill any remaining cells
+    for r, c in remaining_cells:
+        output[r][c] = random.choice(palette)
+
+    # Balance and refinement
+    for _ in range(2):
+        for r in range(4):
+            for c in range(4):
+                neighbors = [output[nr][nc] for nr, nc in [(r-1, c), (r+1, c), (r, c-1), (r, c+1)]
+                             if 0 <= nr < 4 and 0 <= nc < 4]
+                if all(output[r][c] == neighbor for neighbor in neighbors):
+                    output[r][c] = random.choice([color for color in palette if color != output[r][c]])
+
+    # Ensure all palette colors are represented
+    for color in palette:
         if all(color not in row for row in output):
-            for i in range(4):
-                if len(set(output[i])) > 2:
-                    least_common = min(set(output[i]), key=lambda x: color_counts.get(x, 0))
-                    output[i][output[i].index(least_common)] = color
-                    break
-
-    # Refinement
-    for i in range(4):
-        if len(set(output[i])) == 1 and i != 0 and i != 3:
-            output[i][1] = color_ranking[2][0]
-        if len(set(row[i] for row in output)) == 1:
-            output[1][i] = color_ranking[2][0]
-
-    # Include black if significant
-    if black_percentage > 0.2:
-        if 0 not in [cell for row in output for cell in row]:
-            output[2][2] = 0
-
-    # Final symmetry check
-    if output[0] != output[3]:
-        output[3] = output[0]
+            r, c = random.choice([(r, c) for r in range(4) for c in range(4)])
+            output[r][c] = color
 
     return ColoredGrid(values=output)
