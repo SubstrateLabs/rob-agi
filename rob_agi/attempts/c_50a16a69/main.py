@@ -14,7 +14,7 @@ def solve_50a16a69(input_grid: ColoredGrid) -> ColoredGrid:
     The function performs the following steps:
     1. Extracts the pattern from the non-border area of the input grid.
     2. Finds the smallest repeating subsequence in this pattern.
-    3. Generates a new grid by extending the identified pattern across the entire area.
+    3. Generates a new grid by extending the identified pattern across the entire area, starting from the top-left corner.
     
     This approach works for various patterns, handling different grid sizes and border colors,
     and extending the pattern to areas that were originally borders or uniform regions.
@@ -29,8 +29,8 @@ def solve_50a16a69(input_grid: ColoredGrid) -> ColoredGrid:
     
     # Extract the pattern from non-border area
     pattern = []
-    for r in range(1, rows - 1):
-        for c in range(1, cols - 1):
+    for r in range(min(2, rows - 1)):
+        for c in range(min(2, cols - 1)):
             pattern.append(input_grid.values[r][c])
     
     # Find the smallest repeating pattern
@@ -45,5 +45,7 @@ def solve_50a16a69(input_grid: ColoredGrid) -> ColoredGrid:
             row.append(smallest_pattern[pattern_index])
             pattern_index = (pattern_index + 1) % len(smallest_pattern)
         output_values.append(row)
+        # Ensure each row starts with the correct pattern element
+        pattern_index = (r + 1) % len(smallest_pattern)
     
     return ColoredGrid(values=output_values)
