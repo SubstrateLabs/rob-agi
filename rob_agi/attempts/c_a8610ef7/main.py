@@ -20,42 +20,28 @@ def get_checkerboard_color(row, col):
 def solve_a8610ef7(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transform the input grid by replacing sky blue (8) regions with red (2) and gray (5) colors.
-    The algorithm uses a virtual checkerboard pattern as a starting point, then adjusts based on
-    adjacent colors and local context. It ensures a consistent alternating pattern while
-    respecting the existing structure of non-8 colors in the input grid.
+    The algorithm preserves the original structure of non-8 colors and replaces 8s with a pattern
+    that maintains connectivity of regions while alternating colors.
     """
-    grid_2d = input_grid.values
-    rows, cols = len(grid_2d), len(grid_2d[0])
-    
-    checkerboard = create_checkerboard(rows, cols)
-    output_grid = [[cell if cell != 8 else 0 for cell in row] for row in grid_2d]
-    
-    # First pass: color most 8s
-    for r in range(rows):
-        for c in range(cols):
-            if grid_2d[r][c] == 8:
-                counts = count_adjacent_colors(output_grid, r, c)
-                if counts[2] > counts[5]:
-                    output_grid[r][c] = 5
-                elif counts[5] > counts[2]:
-                    output_grid[r][c] = 2
+    output = []
+    for r, row in enumerate(input_grid.values):
+        new_row = []
+        for c, cell in enumerate(row):
+            if cell == 0:
+                new_row.append(0)
+            elif cell == 8:
+                # Check if we're at the edge of an 8-region
+                is_edge = any(
+                    0 <= nr < len(input_grid.values) and 0 <= nc < len(row) and input_grid.values[nr][nc] != 8
+                    for nr, nc in [(r-1, c), (r+1, c), (r, c-1), (r, c+1)]
+                )
+                if is_edge:
+                    # Use 5 for even sum of coordinates, 2 for odd
+                    new_row.append(5 if (r + c) % 2 == 0 else 2)
                 else:
-                    checkerboard_color = get_checkerboard_color(r, c)
-                    if checkerboard_color not in counts:
-                        output_grid[r][c] = checkerboard_color
-                    else:
-                        output_grid[r][c] = 7 - checkerboard_color  # 7 - 2 = 5, 7 - 5 = 2
-    
-    # Second pass: handle any remaining uncolored cells
-    for r in range(rows):
-        for c in range(cols):
-            if output_grid[r][c] == 0:
-                counts = count_adjacent_colors(output_grid, r, c)
-                if counts[2] > counts[5]:
-                    output_grid[r][c] = 5
-                elif counts[5] > counts[2]:
-                    output_grid[r][c] = 2
-                else:
-                    output_grid[r][c] = get_checkerboard_color(r, c)
-    
-    return ColoredGrid(values=output_grid)
+                    # For interior cells, use the opposite pattern
+                    new_row.append(2 if (r + c) % 2 == 0 else 5)
+            else:
+                new_row.append(cell)
+        output.append(new_row)
+    return ColoredGrid(values=output)
