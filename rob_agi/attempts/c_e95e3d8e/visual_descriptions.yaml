@@ -1,23 +1,60 @@
 example_0:
   input: |
-    The input grid shows a complex, repeating pattern with various colors. The dominant feature is a 5x5 square pattern that repeats across the grid. This pattern consists of colored squares arranged in a specific order, with black (0) squares interspersed. The black squares form distinct shapes within the pattern, including L-shapes and small rectangles. The colors used are blue (1), red (2), green (3), yellow (4), and gray (5). The pattern is not complete across the entire grid; there are areas where the pattern is interrupted by larger black regions, particularly in the center-left, top-left, and bottom-right corners of the grid.
+    The input grid displays a repeating 5x5 pattern with colors 1-5. Black (0) regions interrupt the pattern in several areas, notably the center-left, top-left, and bottom-right. Key observations:
+    1. Pattern size: 5x5
+    2. Colors used: 1 (blue), 2 (red), 3 (green), 4 (yellow), 5 (gray)
+    3. Black regions: Irregular shapes, including L-shapes and rectangles
+    4. Pattern visibility: Clearly visible in some areas, partially obscured in others
+    5. Grid size: 22x22
   output: |
-    The output grid displays the same complex pattern as the input, but now it covers the entire grid without any interruptions or black regions. The 5x5 square pattern is repeated consistently across all rows and columns. The colors and their arrangement within each 5x5 unit remain the same as in the input grid: blue (1), red (2), green (3), yellow (4), and gray (5). The pattern now fills all the areas that were previously black in the input grid, creating a uniform and complete design across the entire 22x22 grid.
+    The output grid shows the complete 5x5 pattern filling the entire 22x22 grid. Key changes:
+    1. No black (0) regions remain
+    2. Pattern consistently repeats across all rows and columns
+    3. Colors and their arrangement within each 5x5 unit are preserved from the input
+    4. Previously black areas are now filled with the appropriate pattern elements
 
 example_1:
   input: |
-    This input grid shows another repeating pattern, but with a different structure compared to the previous example. The dominant feature is a 3x3 square pattern that repeats across most of the grid. The colors used are blue (1), red (3), gray (5), and orange (7). Black (0) squares are present in various parts of the grid, creating irregular shapes and interrupting the pattern. There are notable black regions in the top-left corner, center, and scattered across the right side of the grid. The pattern itself consists of alternating colors in a specific arrangement within each 3x3 unit.
+    This grid features a repeating 3x3 pattern using colors 1, 3, 5, and 7. Black (0) regions interrupt the pattern in various areas. Key observations:
+    1. Pattern size: 3x3
+    2. Colors used: 1 (blue), 3 (red), 5 (gray), 7 (orange)
+    3. Black regions: Prominent in top-left, center, and scattered on the right
+    4. Pattern visibility: Clear in most areas, obscured by black regions
+    5. Grid size: 22x22
   output: |
-    The output grid displays the same 3x3 pattern as the input, but now it covers the entire grid without any interruptions or black regions. The pattern is repeated consistently across all rows and columns. The colors and their arrangement within each 3x3 unit remain the same as in the input grid: blue (1), red (3), gray (5), and orange (7). The pattern now fills all the areas that were previously black in the input grid, creating a uniform and complete design across the entire 22x22 grid. The result is a visually consistent and repetitive pattern throughout the grid.
+    The output grid displays the complete 3x3 pattern across the entire 22x22 grid. Key changes:
+    1. All black (0) regions are replaced with pattern elements
+    2. Pattern repeats uniformly across all rows and columns
+    3. Colors and their 3x3 arrangement are maintained from the input
+    4. Consistent repetition creates a visually uniform design
 
 example_2:
   input: |
-    This input grid presents a more complex and varied pattern compared to the previous examples. The grid uses a wider range of colors, including blue (1), red (2), green (3), yellow (4), gray (5), magenta (6), and orange (7). The pattern appears to be based on a 7x7 square unit that repeats, but with significant interruptions. There are large black (0) regions scattered throughout the grid, particularly in the center, top-right, and bottom-left areas. These black regions create irregular shapes within the overall pattern. The colored squares form intricate arrangements within each pattern unit, with no obvious simple geometric shapes.
+    This grid shows a complex 7x7 pattern using colors 1-7. Large black (0) regions significantly interrupt the pattern. Key observations:
+    1. Pattern size: 7x7
+    2. Colors used: 1 (blue), 2 (red), 3 (green), 4 (yellow), 5 (gray), 6 (magenta), 7 (orange)
+    3. Black regions: Large areas in center, top-right, and bottom-left
+    4. Pattern visibility: Partially visible, with significant interruptions
+    5. Grid size: 22x22
   output: |
-    The output grid shows the same complex 7x7 pattern as the input, but now it covers the entire grid without any interruptions or black regions. The pattern is repeated consistently across all rows and columns. All seven colors (blue, red, green, yellow, gray, magenta, and orange) are used in the same arrangement as in the visible parts of the input pattern. The pattern now fills all the areas that were previously black in the input grid, creating a uniform and complete design across the entire 22x22 grid. The result is a visually rich and consistently repeating pattern throughout the grid, showcasing the full complexity of the original design without any gaps or interruptions.
+    The output grid reveals the complete 7x7 pattern filling the entire 22x22 grid. Key changes:
+    1. All black (0) regions are filled with appropriate pattern elements
+    2. Pattern consistently repeats across all rows and columns
+    3. All seven colors are used in the same complex arrangement as visible in the input
+    4. The full intricacy of the pattern is now apparent throughout the grid
 
 test_case_0:
   input: |
-    This test case presents an input grid with a pattern similar to the previous examples, but with its own unique characteristics. The grid appears to be based on a repeating unit, likely 7x7 or larger. It uses a range of colors including blue (1), red (2), green (3), yellow (4), gray (5), magenta (6), and orange (7). The pattern is interrupted by significant black (0) regions, particularly in the center, forming irregular shapes. There are also smaller black areas scattered throughout the grid. The colored squares form complex arrangements within each visible pattern unit, with no obvious simple geometric shapes. The pattern seems to be partially visible in some areas and completely obscured in others.
+    This test case presents a grid with a complex pattern, likely 7x7 or larger, using colors 1-7. Key observations:
+    1. Pattern size: At least 7x7, possibly larger
+    2. Colors used: 1 (blue), 2 (red), 3 (green), 4 (yellow), 5 (gray), 6 (magenta), 7 (orange)
+    3. Black regions: Significant interruptions, especially in the center
+    4. Pattern visibility: Partially visible, with some areas completely obscured
+    5. Grid size: 22x22
   output: |
-    The expected output for this test case is not provided in the test file. Based on the pattern observed in the previous examples, it's likely that the output would show the complete pattern without any black regions or interruptions. The pattern visible in the input would likely be extended to fill the entire 22x22 grid, creating a uniform and consistent design. All colors present in the input would be used in the same arrangement, repeating across the grid to form a complete and uninterrupted pattern. However, without the actual expected output, this is an educated guess based on the behavior seen in the previous examples.
+    The expected output is not provided. Based on previous examples, it would likely show:
+    1. The complete pattern filling the entire 22x22 grid
+    2. No remaining black (0) regions
+    3. Consistent repetition of the pattern across all rows and columns
+    4. All colors from the input used in the same arrangement
+    5. A uniform and uninterrupted design revealing the full complexity of the pattern
