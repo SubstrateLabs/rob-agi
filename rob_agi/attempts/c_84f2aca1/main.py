@@ -3,15 +3,15 @@ from typing import List, Tuple, Set
 
 def solve_84f2aca1(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by filling the centers of shapes with specific colors.
+    Transforms the input grid by filling the holes in shapes with specific colors.
     
-    The function identifies all shapes in the grid and fills their centers based on the following rules:
-    - For shapes with odd dimensions (including 3x3): Fill the single center cell with gray (5)
-    - For shapes with even dimensions in either width or height: Fill a 2x2 or 1x2 or 2x1 area in the center with orange (7)
+    The function identifies all shapes in the grid and fills their holes based on the following rules:
+    - For shapes with a single-cell hole: Fill the hole with gray (5)
+    - For shapes with larger holes (2x2, 2x1, or 1x2): Fill the hole with orange (7)
     
     The function uses a flood fill algorithm to identify connected regions of the same color,
-    calculates the dimensions of each shape, and applies the appropriate fill.
-    Only cells that were part of the original shape are filled.
+    calculates the dimensions of each shape, identifies holes, and applies the appropriate fill.
+    Only cells that were originally empty (color 0) and surrounded by the shape are filled.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -31,6 +31,14 @@ def solve_84f2aca1(input_grid: ColoredGrid) -> ColoredGrid:
                     queue.append((curr_r + dr, curr_c + dc))
         return shape
 
+    def find_hole(shape: List[Tuple[int, int]], min_r: int, max_r: int, min_c: int, max_c: int) -> List[Tuple[int, int]]:
+        hole = []
+        for r in range(min_r, max_r + 1):
+            for c in range(min_c, max_c + 1):
+                if (r, c) not in shape and output_grid.get_cell(r, c) == 0:
+                    hole.append((r, c))
+        return hole
+
     for r in range(rows):
         for c in range(cols):
             if (r, c) not in processed and output_grid.get_cell(r, c) != 0:
@@ -41,25 +49,15 @@ def solve_84f2aca1(input_grid: ColoredGrid) -> ColoredGrid:
                     min_c = min(coord[1] for coord in shape)
                     max_c = max(coord[1] for coord in shape)
                     
-                    height = max_r - min_r + 1
-                    width = max_c - min_c + 1
+                    hole = find_hole(shape, min_r, max_r, min_c, max_c)
                     
-                    center_r = (min_r + max_r) // 2
-                    center_c = (min_c + max_c) // 2
-                    
-                    if height % 2 == 1 and width % 2 == 1:
-                        # Odd dimensions: fill single center with gray
-                        if (center_r, center_c) in shape:
-                            output_grid.set_cell(center_r, center_c, 5)
-                    else:
-                        # Even dimensions in at least one direction: fill with orange
-                        fill_height = 2 if height % 2 == 0 else 1
-                        fill_width = 2 if width % 2 == 0 else 1
-                        fill_start_r = center_r - (fill_height // 2)
-                        fill_start_c = center_c - (fill_width // 2)
-                        for dr in range(fill_height):
-                            for dc in range(fill_width):
-                                if (fill_start_r + dr, fill_start_c + dc) in shape:
-                                    output_grid.set_cell(fill_start_r + dr, fill_start_c + dc, 7)
+                    if len(hole) == 1:
+                        # Single-cell hole: fill with gray
+                        hr, hc = hole[0]
+                        output_grid.set_cell(hr, hc, 5)
+                    elif len(hole) > 1:
+                        # Larger hole: fill with orange
+                        for hr, hc in hole:
+                            output_grid.set_cell(hr, hc, 7)
 
     return output_grid
