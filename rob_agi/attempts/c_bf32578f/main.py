@@ -9,7 +9,8 @@ def solve_bf32578f(input_grid: ColoredGrid) -> ColoredGrid:
     2. A 4x4 cross/plus pattern if the non-zero color doesn't touch any edge.
     
     The resulting shape is centered in the output grid. For 6x6 grids, it ensures
-    the shape is positioned with one empty row at the top and bottom.
+    the shape is positioned with one empty row at the top and bottom. For other sizes,
+    the shape is perfectly centered.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -43,8 +44,7 @@ def solve_bf32578f(input_grid: ColoredGrid) -> ColoredGrid:
         output = [[0 for _ in range(len(input_grid[0]))] for _ in range(len(input_grid))]
         for i in range(4):
             for j in range(4):
-                if 0 <= top+i < len(output) and 0 <= left+j < len(output[0]):
-                    output[top+i][left+j] = shape[i][j]
+                output[top+i][left+j] = shape[i][j]
         return output
 
     color, touches_edge = analyze_grid(input_grid)
