@@ -1,0 +1,30 @@
+example_0:
+  input: |
+    A 22x22 grid mostly filled with black (0) squares. There are scattered blue (1) and sky (8) squares throughout. In the center-left area, there's a distinct 3x3 pattern: a yellow (4) square surrounded by blue (1) squares, with sky (8) in the center. This pattern stands out as the only use of yellow in the grid.
+  output: |
+    The grid is largely unchanged from the input. The main difference is in the bottom-right corner, where the 3x3 pattern from the center-left has been replicated. This new pattern is identical: yellow (4) surrounded by blue (1), with sky (8) in the center.
+
+example_1:
+  input: |
+    A 22x22 grid with a mix of black (0), blue (1), and sky (8) squares. There's a distinctive 3x3 pattern in the center: sky (8) in the corners, blue (1) in the middle of each side, and yellow (4) in the center. This pattern appears once in the grid.
+  output: |
+    The grid is mostly the same as the input, but with two key changes:
+    1. The original 3x3 pattern in the center remains.
+    2. A new copy of this 3x3 pattern has been added in the top-right quadrant of the grid, overlapping with some existing blue (1) and sky (8) squares.
+
+example_2:
+  input: |
+    A 22x22 grid primarily composed of black (0) squares with scattered blue (1) and sky (8) squares. In the top-left quadrant, there's a unique 3x3 pattern: yellow (4) squares forming a cross shape, with sky (8) squares in the corners.
+  output: |
+    The grid is largely unchanged, except for two significant modifications:
+    1. The original 3x3 pattern in the top-left quadrant remains.
+    2. Two new copies of this 3x3 pattern have been added:
+       - One in the center-right area of the grid.
+       - Another in the bottom-left quadrant of the grid.
+    Both new patterns maintain the same structure: yellow (4) squares in a cross shape with sky (8) squares in the corners.
+
+test_case_0:
+  input: |
+    A 22x22 grid mostly filled with black (0) squares. There are scattered blue (1) and sky (8) squares throughout. In the top-left quadrant, there's a distinct 3x3 pattern: yellow (4) squares forming an inverted L-shape, with sky (8) squares filling the remaining spaces.
+  output: |
+    The output grid is not provided for the test case, as it is meant to be solved based on the pattern observed in the examples.
