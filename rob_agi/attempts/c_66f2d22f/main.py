@@ -1,22 +1,18 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List
 
 def solve_66f2d22f(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by analyzing 4x2 sections and marking columns of interest.
-    
-    The function works as follows:
-    1. Creates a new 4x7 output grid, initially filled with black (0).
-    2. Analyzes each 4x2 section of the input grid (corresponding to 1 column in the output).
-    3. Counts the number of colored squares (red or green) in each row of the section.
-    4. If any row in the section has 2 colored squares, or if the total colored squares in the section is >= 5,
-       marks the corresponding cell in the output grid as gray (5).
-    5. Additionally, if there's a continuous vertical line of 3 or more colored squares in the section,
-       marks the entire column in the output grid as gray (5).
-    
-    This process effectively detects and highlights the presence of significant
-    colored regions and patterns in the input grid, simplifying the complex color patterns
-    into a binary representation.
+    Transforms the input 4x14 grid into a 4x7 output grid based on the following rules:
+    1. Divides the input grid into seven 4x2 sections.
+    2. For each section:
+       a. If any row has two or more colored cells (2 or 3), mark the corresponding cell in the output column as gray (5).
+       b. If there's a vertical line of three or more colored cells, mark the entire output column as gray (5).
+       c. If the total number of colored cells in the section is 5 or more, mark the entire output column as gray (5).
+    3. Returns the resulting 4x7 grid with black (0) and gray (5) cells.
+
+    This process simplifies complex color patterns into a binary representation,
+    highlighting significant colored regions and vertical patterns.
     """
     output_grid = ColoredGrid(values=[[0 for _ in range(7)] for _ in range(4)])
     
@@ -24,15 +20,20 @@ def solve_66f2d22f(input_grid: ColoredGrid) -> ColoredGrid:
         result = [False] * 4
         total_colored = sum(cell in [2, 3] for row in section for cell in row)
         
+        # Check rows for two or more colored cells
         for r in range(4):
-            row_colored = sum(1 for cell in section[r] if cell in [2, 3])
-            if row_colored == 2 or total_colored >= 5:
-                result[r] = True
+            if sum(1 for cell in section[r] if cell in [2, 3]) >= 2:
+                result = [True] * 4
+                break
         
-        # Check for vertical line
+        # Check for vertical line of three or more colored cells
         for c in range(2):
             if sum(1 for r in range(4) if section[r][c] in [2, 3]) >= 3:
                 return [True] * 4
+        
+        # Check if total colored cells is 5 or more
+        if total_colored >= 5:
+            return [True] * 4
         
         return result
 
