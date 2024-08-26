@@ -52,8 +52,8 @@ def find_replacement_color(grid: ColoredGrid) -> int:
             if cell not in [0, 5]:
                 color_frequency[cell] = color_frequency.get(cell, 0) + 1
     
-    for color in range(9, 0, -1):  # Check colors from 9 to 1 in descending order
-        if color_frequency.get(color) == 1:
-            return color
+    unique_colors = [color for color, freq in color_frequency.items() if freq == 1]
+    if unique_colors:
+        return max(unique_colors)
     
     return 4  # Default to yellow (4) if no color appears exactly once
