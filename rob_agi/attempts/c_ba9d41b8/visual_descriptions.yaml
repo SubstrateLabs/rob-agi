@@ -1,0 +1,36 @@
+example_0:
+  input: |
+    A 16x15 grid with a large red (2) rectangular region in the center, surrounded by black (0) space. The red rectangle is 11x8 in size, positioned from row 4 to 11 and column 4 to 14. The rest of the grid is filled with black (0).
+  output: |
+    The same 16x15 grid, but the large red rectangle has been transformed. The outer border of the rectangle remains red (2), but the interior has been filled with a checkerboard pattern of red (2) and black (0). The pattern starts with red in the top-left corner of the interior and alternates. The bottom row and rightmost column of the rectangle remain solid red.
+
+example_1:
+  input: |
+    A 13x15 grid with two distinct colored regions. In the top-left, there's a 5x5 blue (1) square from rows 0 to 4 and columns 0 to 4. In the bottom-right, there's a 6x10 sky blue (8) rectangle from rows 6 to 11 and columns 4 to 13. The rest of the grid is filled with black (0).
+  output: |
+    The same 13x15 grid, but both colored regions have been transformed:
+    1. The blue square now has a checkerboard pattern of blue (1) and black (0), starting with blue in the top-left corner. The bottom row and rightmost column remain solid blue.
+    2. The sky blue rectangle has a similar checkerboard pattern of sky blue (8) and black (0), also starting with sky blue in the top-left corner. The bottom row and rightmost column remain solid sky blue.
+
+example_2:
+  input: |
+    A 17x16 grid with three distinct colored regions:
+    1. A green (3) 8x7 rectangle in the top-left, from rows 1 to 7 and columns 2 to 9.
+    2. A yellow (4) 8x8 square in the bottom-left, from rows 9 to 16 and columns 0 to 7.
+    3. A sky blue (8) 6x5 rectangle in the bottom-right, from rows 9 to 14 and columns 10 to 15.
+    The rest of the grid is filled with black (0).
+  output: |
+    The same 17x16 grid, but all three colored regions have been transformed:
+    1. The green rectangle now has a checkerboard pattern of green (3) and black (0), starting with green in the top-left corner. The bottom row and rightmost column remain solid green.
+    2. The yellow square has a similar checkerboard pattern of yellow (4) and black (0), starting with yellow in the top-left corner. The bottom row and rightmost column remain solid yellow.
+    3. The sky blue rectangle also has a checkerboard pattern of sky blue (8) and black (0), starting with sky blue in the top-left corner. The bottom row and rightmost column remain solid sky blue.
+
+test_case_0:
+  input: |
+    A 17x16 grid with three distinct colored regions:
+    1. A green (3) 8x7 rectangle in the top-left, from rows 1 to 7 and columns 2 to 9.
+    2. A yellow (4) 8x8 square in the bottom-left, from rows 9 to 16 and columns 0 to 7.
+    3. A sky blue (8) 6x5 rectangle in the bottom-right, from rows 9 to 14 and columns 10 to 15.
+    The rest of the grid is filled with black (0).
+  output: |
+    The output is not provided for this test case.
