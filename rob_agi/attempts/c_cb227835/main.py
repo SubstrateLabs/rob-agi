@@ -43,6 +43,8 @@ def solve_cb227835(input_grid: ColoredGrid) -> ColoredGrid:
                     current = (x + dx, y)
                 elif dy != 0:
                     current = (x, y + dy)
+                else:
+                    break  # We've reached the end
             path.append(current)
             move_diagonal = not move_diagonal
         return path
