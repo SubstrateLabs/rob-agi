@@ -7,35 +7,37 @@ def solve_5289ad53(input_grid: ColoredGrid) -> ColoredGrid:
     
     The solution works as follows:
     1. Detect all horizontal red and green lines in the input grid.
-    2. Categorize lines by length: short (1-3), medium (4-6), and long (7+).
-    3. Analyze the presence of colors (red and green) and line lengths.
-    4. Create a 2x3 output grid where:
-       - Top row is always [3, 3, X], where X is 2 if red lines are present, 3 if only green lines are present, 0 otherwise.
+    2. Analyze the presence of colors (red and green) and line lengths.
+    3. Create a 2x3 output grid where:
+       - Top row is always [3, 3, X], where X is 2 if red lines are present and no green line is longer than the longest red line, 3 if green lines are present and either no red lines exist or a green line is longer than the longest red line, 0 otherwise.
        - Bottom row is [Y, Z, W], where:
          Y is 2 if any red lines exist, 3 if only green lines exist, 0 if no lines exist.
-         Z is 2 if medium lines exist (of either color), 0 otherwise.
-         W is 2 if long lines exist (of either color), 0 otherwise.
+         Z is 2 if any lines (red or green) of length 4 or more exist, 0 otherwise.
+         W is 2 if any lines (red or green) of length 5 or more exist, 0 otherwise.
     """
     # Step 1: Detect lines
     lines = input_grid.detect_lines()
     red_lines = [line for line in lines if line[0] == 2]
     green_lines = [line for line in lines if line[0] == 3]
 
-    # Step 2: Categorize lines
-    medium_lines = [line for line in red_lines + green_lines if 4 <= len(line[1]) <= 6]
-    long_lines = [line for line in red_lines + green_lines if len(line[1]) >= 7]
-
-    # Step 3: Analyze presence of colors and line lengths
+    # Step 2: Analyze presence of colors and line lengths
     has_red = len(red_lines) > 0
     has_green = len(green_lines) > 0
-    has_medium = len(medium_lines) > 0
-    has_long = len(long_lines) > 0
+    longest_red = max([len(line[1]) for line in red_lines], default=0)
+    longest_green = max([len(line[1]) for line in green_lines], default=0)
+    has_line_4_or_more = any(len(line[1]) >= 4 for line in red_lines + green_lines)
+    has_line_5_or_more = any(len(line[1]) >= 5 for line in red_lines + green_lines)
 
-    # Step 4: Create output grid
+    # Step 3: Create output grid
+    top_right = 2 if has_red and longest_red >= longest_green else (3 if has_green else 0)
+    bottom_left = 2 if has_red else (3 if has_green else 0)
+    bottom_middle = 2 if has_line_4_or_more else 0
+    bottom_right = 2 if has_line_5_or_more else 0
+
     output = [
-        [3, 3, 2 if has_red else (3 if has_green else 0)],
-        [2 if has_red else (3 if has_green else 0), 2 if has_medium else 0, 2 if has_long else 0]
+        [3, 3, top_right],
+        [bottom_left, bottom_middle, bottom_right]
     ]
 
-    # Step 5: Return new ColoredGrid
+    # Step 4: Return new ColoredGrid
     return ColoredGrid(values=output)
