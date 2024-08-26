@@ -66,4 +66,31 @@ def solve_62ab2642(input_grid: ColoredGrid) -> ColoredGrid:
             if is_surrounded_by_gray(x, y):
                 flood_fill(x, y, 0, 7)
 
+    # Additional step: Fill isolated black areas that are not corner-connected
+    def is_isolated_black_area(x, y):
+        if output_grid.values[y][x] != 0:
+            return False
+        visited = set()
+        stack = [(x, y)]
+        while stack:
+            cx, cy = stack.pop()
+            if (cx, cy) in visited:
+                continue
+            visited.add((cx, cy))
+            for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                nx, ny = cx + dx, cy + dy
+                if 0 <= nx < cols and 0 <= ny < rows:
+                    if output_grid.values[ny][nx] == 0:
+                        stack.append((nx, ny))
+                    elif output_grid.values[ny][nx] not in [5, 8]:
+                        return False
+                elif (nx == -1 and ny == 0) or (nx == cols and ny == rows - 1):
+                    return False
+        return True
+
+    for y in range(rows):
+        for x in range(cols):
+            if is_isolated_black_area(x, y):
+                flood_fill(x, y, 0, 7)
+
     return output_grid
