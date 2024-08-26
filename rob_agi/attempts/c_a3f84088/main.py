@@ -9,8 +9,8 @@ def solve_a3f84088(input_grid: ColoredGrid) -> ColoredGrid:
     1. Preserves the outer gray (5) outline from the input grid.
     2. Creates nested frames of alternating colors (red and gray) moving inward.
     3. Handles the center area based on the remaining space size:
-       - For 3x3 or smaller center, fills it with black (0).
-       - For 4x4 or larger centers, continues the alternating pattern.
+       - For 2x2 or smaller center, fills it with the current color.
+       - For 3x3 or larger centers, continues the alternating pattern.
     4. Returns the transformed grid.
 
     The pattern consists of the original outer gray outline, followed by
@@ -39,12 +39,11 @@ def solve_a3f84088(input_grid: ColoredGrid) -> ColoredGrid:
     # Handle center area
     center_height = bottom - top + 1
     center_width = right - left + 1
-    if center_height <= 3 and center_width <= 3:
-        fill_area(new_grid, top, left, bottom, right, 0)  # Fill with black
+    if center_height <= 2 and center_width <= 2:
+        fill_area(new_grid, top, left, bottom, right, current_color)
     else:
-        # Continue the pattern for 4x4 or larger centers
         draw_outline(new_grid, top, left, bottom, right, current_color)
-        if center_height > 4 and center_width > 4:
+        if center_height > 3 and center_width > 3:
             fill_area(new_grid, top+1, left+1, bottom-1, right-1, previous_color)
     
     return new_grid
