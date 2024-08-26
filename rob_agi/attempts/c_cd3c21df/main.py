@@ -13,6 +13,9 @@ def solve_cd3c21df(input_grid: ColoredGrid) -> ColoredGrid:
     and calculating its significance score based on color transitions, symmetry, and pattern complexity.
     It focuses on finding patterns that are structurally significant rather than just simple or small.
     
+    The solution prioritizes solid color blocks that are unique within the grid, with a preference for
+    larger and more structurally significant patterns.
+    
     Args:
     input_grid (ColoredGrid): The input grid to analyze
 
@@ -46,38 +49,23 @@ def solve_cd3c21df(input_grid: ColoredGrid) -> ColoredGrid:
         significance = 0
         
         # Prefer larger subgrids
-        significance += height * width
+        significance += height * width * 2
         
-        # Check for color diversity
-        unique_colors = len(set(color for row in subgrid.values for color in row))
-        significance += unique_colors * 2
+        # Check for color uniformity (solid color blocks)
+        unique_colors = set(color for row in subgrid.values for color in row if color != 0)
+        if len(unique_colors) == 1:
+            significance += 100  # Highly prioritize solid color blocks
+        else:
+            significance -= 50  # Penalize non-solid color blocks
         
-        # Check for patterns
-        for i in range(height):
-            if len(set(subgrid.values[i])) > 1:  # Row has multiple colors
-                significance += 3
-        for j in range(width):
-            if len(set(subgrid.values[r][j] for r in range(height))) > 1:  # Column has multiple colors
-                significance += 3
-        
-        # Check for symmetry
-        if all(subgrid.values[i] == subgrid.values[-i-1] for i in range(height//2)):
-            significance += 5
-        if all(subgrid.values[i][j] == subgrid.values[i][-j-1] for i in range(height) for j in range(width//2)):
-            significance += 5
-        
-        # Check for alternating patterns
-        for row in subgrid.values:
-            if len(set(row[::2])) == 1 and len(set(row[1::2])) == 1 and row[0] != row[1]:
-                significance += 4
-        for col in zip(*subgrid.values):
-            if len(set(col[::2])) == 1 and len(set(col[1::2])) == 1 and col[0] != col[1]:
-                significance += 4
+        # Penalize subgrids with black (empty) cells
+        black_cells = sum(row.count(0) for row in subgrid.values)
+        significance -= black_cells * 10
         
         return significance
 
     best_subgrid = None
-    best_score = -1
+    best_score = float('-inf')
 
     for height in range(2, min(rows, cols) + 1):
         for width in range(2, min(rows, cols) + 1):
