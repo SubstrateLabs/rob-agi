@@ -8,7 +8,7 @@ def solve_27a77e38(input_grid: ColoredGrid) -> ColoredGrid:
     1. Find the middle column of the grid.
     2. Identify all unique colors in the top row, preserving their order.
     3. Scan the entire middle column from top to bottom.
-    4. Choose the first color from the top row that appears in the middle column.
+    4. Choose the leftmost color from the top row that appears in the middle column.
     5. If no match is found, choose the leftmost color from the top row.
     6. Place the chosen color in the bottom row of the middle column.
     
@@ -30,16 +30,11 @@ def solve_27a77e38(input_grid: ColoredGrid) -> ColoredGrid:
         if color not in top_row_colors:
             top_row_colors.append(color)
     
-    # Scan the entire middle column and find the first matching color from the top row
-    chosen_color = None
-    for color in top_row_colors:
-        if color in [input_grid.values[row][middle_col] for row in range(num_rows)]:
-            chosen_color = color
-            break
+    # Get all colors in the middle column
+    middle_column_colors = [input_grid.values[row][middle_col] for row in range(num_rows)]
     
-    # If no match was found, choose the leftmost color from the top row
-    if chosen_color is None:
-        chosen_color = top_row_colors[0]
+    # Choose the leftmost color from the top row that appears in the middle column
+    chosen_color = next((color for color in top_row_colors if color in middle_column_colors), top_row_colors[0])
     
     # Create a deep copy of the input grid
     new_grid = input_grid.deep_copy()
