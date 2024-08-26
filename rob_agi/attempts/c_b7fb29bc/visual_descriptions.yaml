@@ -1,40 +1,43 @@
 example_0:
   input: |
-    A green (3) rectangular frame or border, 9x7 cells in size, centered in a 15x15 black (0) grid. The interior of the frame is filled with black (0), except for a single green (3) cell in the center of the frame.
+    A 15x15 grid with a green (3) rectangular frame, 9x7 cells, centered. The frame's interior is black (0), except for a single green (3) cell at its center (row 7, column 7). The area outside the frame is black (0).
   output: |
-    The same green (3) rectangular frame as in the input. The interior is now filled with a pattern:
-    - A yellow (4) border just inside the green frame
-    - A red (2) rectangle inside the yellow border
-    - The red rectangle has a yellow cross shape dividing it into four sections
-    - The center of the cross retains the green (3) cell from the input
+    The green (3) frame remains unchanged. The interior now has a pattern:
+    - A yellow (4) border, one cell thick, just inside the green frame
+    - The remaining interior is filled with red (2), except for:
+      - A yellow (4) cross shape, one cell thick, dividing the red area into four quadrants
+      - The original green (3) cell at the center, preserved from the input
+    This pattern demonstrates a complex fill algorithm that respects the original green cells and creates a structured interior design.
 
 example_1:
   input: |
-    A green (3) rectangular frame, 9x7 cells, centered in a 15x15 black grid. The interior is black except for a single green (3) cell in the bottom left corner of the frame's interior.
+    A 15x15 grid with a green (3) rectangular frame, 9x7 cells, centered. The frame's interior is black (0), except for a single green (3) cell in the bottom-left corner of the interior (row 9, column 4). The area outside the frame is black (0).
   output: |
-    The same green frame as the input. The interior now has a pattern:
-    - A yellow border just inside the green frame
-    - The left half of the interior is filled with alternating red (2) and yellow (4) vertical stripes
-    - The right half has two rows: top row is red, bottom row is yellow
-    - The green cell from the input remains in the bottom left corner
+    The green (3) frame remains unchanged. The interior now has a pattern:
+    - A yellow (4) border, one cell thick, just inside the green frame
+    - The left half of the interior has alternating vertical stripes of red (2) and yellow (4), starting with red on the left
+    - The right half is divided horizontally:
+      - Upper part (3 rows) is red (2)
+      - Lower part (2 rows) is yellow (4)
+    - The original green (3) cell in the bottom-left corner is preserved
+    This pattern shows adaptation to the position of the original green cell and demonstrates a left-right split in the filling algorithm.
 
 example_2:
   input: |
-    A green rectangular frame, 9x7 cells, centered in a 15x15 black grid. The interior is black except for a green cell in the top right corner of the frame's interior.
+    A 15x15 grid with a green (3) rectangular frame, 9x7 cells, centered. The frame's interior is black (0), except for a single green (3) cell in the top-right corner of the interior (row 3, column 10). The area outside the frame is black (0).
   output: |
-    The same green frame as the input. The interior now has a complex pattern:
-    - Alternating horizontal stripes of yellow (4) and red (2)
-    - The stripes are not uniform:
-      - Top row: YRYRY (Y=Yellow, R=Red)
-      - Second row: YYYYY
-      - Third row: RRRRR
-      - Fourth row: YYYY
-      - Fifth row: RRR
-      - Bottom two rows: YY
-    - The green cell from the input remains in the top right corner
+    The green (3) frame remains unchanged. The interior now has a complex pattern of horizontal stripes:
+    - Row 1 (top): Yellow (4), Red (2), Yellow (4), Red (2), Yellow (4)
+    - Row 2: All Yellow (4)
+    - Row 3: All Red (2)
+    - Row 4: All Yellow (4)
+    - Row 5: Red (2) for the left 3 cells, Yellow (4) for the right 2 cells
+    - Rows 6-7 (bottom): All Yellow (4)
+    - The original green (3) cell in the top-right corner is preserved
+    This pattern demonstrates a complex filling algorithm that varies by row and adapts to the position of the original green cell.
 
 test_case_0:
   input: |
-    A green rectangular frame, 9x7 cells, centered in a 15x15 black grid. The interior is entirely black with no additional colored cells.
+    A 15x15 grid with a green (3) rectangular frame, 9x7 cells, centered. The frame's interior is entirely black (0) with no additional colored cells. The area outside the frame is black (0).
   output: |
-    This is a test case, so no output is provided in the test file.
+    [Description not provided in test files. The solution should apply a consistent filling algorithm based on the patterns observed in the examples.]
