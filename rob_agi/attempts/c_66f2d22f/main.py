@@ -8,7 +8,7 @@ def solve_66f2d22f(input_grid: ColoredGrid) -> ColoredGrid:
     2. For each section:
        a. If a row has two colored cells (2 or 3), mark the corresponding cell in the output column as gray (5).
        b. If there's a vertical line of three or more colored cells, mark the corresponding cells in the output column as gray (5).
-       c. If the total number of colored cells in the section is 5 or more, mark the entire output column as gray (5).
+       c. If the total number of colored cells in the section is 3 or more, mark the entire output column as gray (5).
     3. Post-process the output grid to connect adjacent gray cells and fill small gaps.
     4. Returns the resulting 4x7 grid with black (0) and gray (5) cells.
 
@@ -33,8 +33,8 @@ def solve_66f2d22f(input_grid: ColoredGrid) -> ColoredGrid:
                 for r in colored_cells:
                     result[r] = 5
         
-        # Check if total colored cells is 5 or more
-        if total_colored >= 5:
+        # Check if total colored cells is 3 or more
+        if total_colored >= 3:
             return [5] * 4
         
         return result
