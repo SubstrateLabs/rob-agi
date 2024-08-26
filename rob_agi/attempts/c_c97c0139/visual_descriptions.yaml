@@ -1,26 +1,67 @@
 example_0:
   input: |
-    The input grid is 19x17 in size. It consists mostly of black (0) squares, representing empty space. There is a single horizontal red (2) line in the middle of the grid, specifically in row 7. This red line spans from column 2 to column 16, making it 15 squares long. The rest of the grid is entirely black.
+    Grid size: 19x17
+    Key features:
+    - Single horizontal red (2) line in row 7, spanning columns 2-16 (15 units long)
+    - All other cells are black (0)
+    Observations:
+    - The red line is centered vertically in the grid
+    - There's equal space (5 rows) above and below the red line
+    - The red line starts and ends 2 columns from the grid edges
+
   output: |
-    The output grid maintains the same 19x17 size. The red horizontal line from the input remains unchanged in row 7. Above and below this red line, a symmetrical diamond-like shape has been formed using sky blue (8) squares. This sky blue diamond extends 6 rows above and 6 rows below the red line, with its widest point aligning with the ends of the red line. The diamond shape tapers to a point at the top and bottom, creating a symmetrical pattern. The rest of the grid remains black (0).
+    Grid size: 19x17 (unchanged)
+    Key features:
+    - Original red (2) line remains unchanged
+    - Sky blue (8) diamond shape surrounding the red line
+    Diamond properties:
+    - Extends 7 rows above and below the red line (total height: 15 rows)
+    - Widest point aligns with the ends of the red line (15 units wide)
+    - Tapers symmetrically to a point at top and bottom
+    - Each row of the diamond is 2 units shorter than the one below/above it
+    Observations:
+    - The diamond's height matches the red line's length
+    - The diamond is perfectly centered in the grid
+    - Black (0) cells fill all areas outside the diamond
 
 example_1:
   input: |
-    The input grid is 21x19 in size. It contains two distinct red (2) lines:
-    1. A vertical line in column 4, spanning from row 2 to row 6 (5 squares tall).
-    2. A horizontal line in row 12, spanning from column 9 to column 17 (9 squares wide).
-    The rest of the grid is filled with black (0) squares, representing empty space.
+    Grid size: 21x19
+    Key features:
+    1. Vertical red (2) line:
+       - In column 4
+       - Spans rows 2-6 (5 units tall)
+    2. Horizontal red (2) line:
+       - In row 12
+       - Spans columns 9-17 (9 units wide)
+    - All other cells are black (0)
+    Observations:
+    - The two red lines do not intersect
+    - The vertical line is closer to the left edge
+    - The horizontal line is slightly below the vertical midpoint of the grid
+
   output: |
-    The output grid maintains the 21x19 size. Both red lines from the input remain unchanged:
-    1. The vertical red line in column 4, rows 2-6.
-    2. The horizontal red line in row 12, columns 9-17.
-    Around each red line, a small sky blue (8) diamond shape has been added:
-    1. For the vertical line, the diamond is 3 squares wide at its widest point (centered on the red line) and extends one square above and below the red line.
-    2. For the horizontal line, the diamond is 7 squares tall at its tallest point (centered on the red line) and extends four squares to the left and right of the red line's ends.
-    These diamond shapes taper to points at their extremities. The rest of the grid remains black (0).
+    Grid size: 21x19 (unchanged)
+    Key features:
+    - Both original red (2) lines remain unchanged
+    - Two distinct sky blue (8) diamond shapes, one around each red line
+    Diamond properties:
+    1. Around vertical line:
+       - 3 units wide at its widest (centered on the red line)
+       - Extends 1 unit above and below the red line
+       - Total height: 7 units (matching the line's length)
+    2. Around horizontal line:
+       - 7 units tall at its tallest (centered on the red line)
+       - Extends 4 units left and right of the line's ends
+       - Total width: 17 units (matching the line's length)
+    Observations:
+    - Diamond size correlates with the length of the corresponding red line
+    - Diamonds taper symmetrically to points at their extremities
+    - No overlap between the two diamond shapes
+    - Black (0) cells fill all areas outside the diamonds
 
 test_case_0:
   input: |
-    The input for the test case is not provided in the given code snippet.
+    Not provided in the given information.
   output: |
-    The expected output for the test case is not provided in the given code snippet.
+    Not provided in the given information.
