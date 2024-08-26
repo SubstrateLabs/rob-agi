@@ -32,10 +32,10 @@ def solve_f3e62deb(input_grid: ColoredGrid) -> ColoredGrid:
         return input_grid  # No valid square found, return input grid unchanged
 
     # Determine new position based on priority order
-    if left < 7:
-        new_left, new_top = 7, top  # Move to right edge
-    elif top > 0:
+    if left < 7 and top > 0:
         new_left, new_top = left, 0  # Move to top edge
+    elif left < 7:
+        new_left, new_top = 7, top  # Move to right edge
     elif top < 7:
         new_left, new_top = left, 7  # Move to bottom edge
     else:
