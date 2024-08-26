@@ -3,16 +3,14 @@ from typing import List, Tuple
 
 def solve_64a7c07e(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the grid transformation challenge by shifting shapes and individual cells horizontally towards the center.
+    Solve the grid transformation challenge by optimally distributing shapes across the horizontal space.
     
-    The function identifies connected shapes and individual cells, calculates their positions,
-    and shifts them towards the horizontal center of the grid.
-    The vertical positions and internal structure of all shapes are preserved.
-    Shapes and cells maintain their relative order and do not overlap.
+    The function identifies connected shapes, calculates their optimal positions,
+    and shifts them horizontally while maintaining their vertical positions and internal structure.
+    Shapes are distributed evenly across the available space, preserving their left-to-right order.
     """
     height, width = input_grid.get_dimensions()
     new_grid = ColoredGrid(values=[[0 for _ in range(width)] for _ in range(height)])
-    grid_center = width // 2
     
     def find_shapes() -> List[List[Tuple[int, int]]]:
         shapes = []
@@ -40,9 +38,11 @@ def solve_64a7c07e(input_grid: ColoredGrid) -> ColoredGrid:
         return shapes
     
     shapes = find_shapes()
-    
-    # Sort shapes by their leftmost x-coordinate
     shapes.sort(key=lambda shape: min(c for _, c in shape))
+    
+    total_shape_width = sum(max(c for _, c in shape) - min(c for _, c in shape) + 1 for shape in shapes)
+    available_space = width - total_shape_width
+    ideal_gap = available_space // (len(shapes) + 1) if shapes else 0
     
     left_boundary = 0
     for shape in shapes:
@@ -50,11 +50,7 @@ def solve_64a7c07e(input_grid: ColoredGrid) -> ColoredGrid:
         shape_right = max(c for _, c in shape)
         shape_width = shape_right - shape_left + 1
         
-        # Calculate the ideal center position for the shape
-        ideal_center = (grid_center + left_boundary) // 2
-        
-        # Calculate the new left boundary for the shape
-        new_left = max(left_boundary, ideal_center - shape_width // 2)
+        new_left = left_boundary + ideal_gap
         
         # Ensure the shape doesn't go beyond the right edge of the grid
         if new_left + shape_width > width:
