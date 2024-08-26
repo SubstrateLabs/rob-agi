@@ -9,30 +9,39 @@ def find_anchor_side(grid: ColoredGrid) -> str:
         return "right"
     raise ValueError("No anchor side found")
 
-def process_bottom_anchor(input_grid: ColoredGrid, new_grid: ColoredGrid):
+def process_column(input_grid: ColoredGrid, new_grid: ColoredGrid, col: int, anchor_side: str):
     rows, cols = input_grid.get_dimensions()
-    for c in range(cols):
-        non_zeros = [input_grid.values[r][c] for r in range(rows-1) if input_grid.values[r][c] != 0]
-        for r, value in enumerate(reversed(non_zeros), start=rows-1-len(non_zeros)):
-            new_grid.values[r][c] = value
-    new_grid.values[-1] = input_grid.values[-1]  # Copy anchor line
-
-def process_left_anchor(input_grid: ColoredGrid, new_grid: ColoredGrid):
-    rows, cols = input_grid.get_dimensions()
-    for c in range(1, cols):
-        non_zeros = [input_grid.values[r][c] for r in range(rows) if input_grid.values[r][c] != 0]
-        for r, value in enumerate(non_zeros):
-            new_grid.values[r][c] = value
-    for r in range(rows):
-        new_grid.values[r][0] = input_grid.values[r][0]  # Copy anchor line
-
-def process_right_anchor(input_grid: ColoredGrid, new_grid: ColoredGrid):
-    rows, cols = input_grid.get_dimensions()
-    for r in range(rows):
-        non_zeros = [input_grid.values[r][c] for c in range(cols-1) if input_grid.values[r][c] != 0]
-        for c, value in enumerate(non_zeros, start=cols-1-len(non_zeros)):
-            new_grid.values[r][c] = value
-        new_grid.values[r][-1] = input_grid.values[r][-1]  # Copy anchor line
+    non_zeros = []
+    start_row = 0 if anchor_side != "bottom" else 0
+    end_row = rows if anchor_side != "bottom" else rows - 1
+    
+    # Collect non-zero values
+    for r in range(start_row, end_row):
+        if input_grid.values[r][col] != 0:
+            if not non_zeros or input_grid.values[r][col] != non_zeros[-1][0]:
+                non_zeros.append((input_grid.values[r][col], 1))
+            else:
+                non_zeros[-1] = (non_zeros[-1][0], non_zeros[-1][1] + 1)
+    
+    # Place non-zero values in the new grid
+    if anchor_side == "bottom":
+        new_row = rows - 1 - sum(count for _, count in non_zeros)
+        for value, count in non_zeros:
+            for _ in range(count):
+                new_grid.values[new_row][col] = value
+                new_row += 1
+    elif anchor_side == "left":
+        new_row = 0
+        for value, count in non_zeros:
+            for _ in range(count):
+                new_grid.values[new_row][col] = value
+                new_row += 1
+    elif anchor_side == "right":
+        new_row = rows - sum(count for _, count in non_zeros)
+        for value, count in non_zeros:
+            for _ in range(count):
+                new_grid.values[new_row][col] = value
+                new_row += 1
 
 def solve_6ad5bdfd(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -43,27 +52,32 @@ def solve_6ad5bdfd(input_grid: ColoredGrid) -> ColoredGrid:
 
     1. Identify the anchor side (bottom, left, or right).
     2. Create a new empty grid with the same dimensions.
-    3. Copy the anchor line to the new grid.
-    4. Move objects towards the anchor side:
-       - For bottom anchor: move down, preserving columns
-       - For left anchor: move left, preserving columns
-       - For right anchor: move right, preserving columns
-    5. Maintain the vertical order of elements within each column.
-    6. Fill any remaining spaces with zeros.
-    7. Return the transformed grid.
+    3. Process each column independently:
+       - Collect non-zero values, preserving multi-color objects.
+       - Place these values in the new grid according to the anchor side.
+    4. Copy the anchor line to the new grid.
+    5. Fill any remaining spaces with zeros.
+    6. Return the transformed grid.
 
     This implementation handles bottom, left, and right anchors, ensuring that objects are moved
-    correctly towards the anchor side while maintaining their relative positions within each column.
+    correctly towards the anchor side while maintaining their relative positions within each column
+    and preserving multi-color objects.
     """
     anchor_side = find_anchor_side(input_grid)
     rows, cols = input_grid.get_dimensions()
     new_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
     
+    for c in range(cols):
+        process_column(input_grid, new_grid, c, anchor_side)
+    
+    # Copy anchor line
     if anchor_side == "bottom":
-        process_bottom_anchor(input_grid, new_grid)
+        new_grid.values[-1] = input_grid.values[-1]
     elif anchor_side == "left":
-        process_left_anchor(input_grid, new_grid)
+        for r in range(rows):
+            new_grid.values[r][0] = input_grid.values[r][0]
     elif anchor_side == "right":
-        process_right_anchor(input_grid, new_grid)
+        for r in range(rows):
+            new_grid.values[r][-1] = input_grid.values[r][-1]
     
     return new_grid
