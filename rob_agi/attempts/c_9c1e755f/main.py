@@ -7,10 +7,10 @@ def solve_9c1e755f(input_grid: ColoredGrid) -> ColoredGrid:
     Solve the grid transformation challenge by expanding patterns within rectangular regions.
     
     This function identifies seed patterns on the edges of the grid and uses them to define
-    and fill rectangular regions. It expands patterns horizontally or vertically, alternating
-    patterns when necessary. The process is repeated iteratively, creating and filling new
-    regions until no more expansions are possible. Finally, it fills any remaining black cells
-    adjacent to colored cells.
+    and fill rectangular regions. It expands patterns horizontally or vertically, respecting
+    existing colored regions and grid boundaries. The process is repeated iteratively until
+    no more expansions are possible. Finally, it fills any remaining black cells adjacent to
+    colored cells.
 
     Args:
         input_grid (ColoredGrid): The input grid to be transformed.
@@ -19,33 +19,32 @@ def solve_9c1e755f(input_grid: ColoredGrid) -> ColoredGrid:
         ColoredGrid: The transformed grid with expanded patterns within regions.
     """
     grid = input_grid.deep_copy()
-    processed = set()
     
     while True:
-        seed_patterns = identify_seed_patterns(grid, processed)
+        seed_patterns = identify_seed_patterns(grid)
         if not seed_patterns:
             break
         for pattern in seed_patterns:
-            expand_and_fill(grid, pattern, processed)
+            expand_and_fill(grid, pattern)
     
     fill_remaining(grid)
     return grid
 
-def identify_seed_patterns(grid: ColoredGrid, processed: set) -> List[Dict]:
+def identify_seed_patterns(grid: ColoredGrid) -> List[Dict]:
     rows, cols = grid.get_dimensions()
     patterns = []
     
     # Check top and bottom edges
     for r in [0, rows-1]:
         for c in range(cols):
-            if (r, c) not in processed and grid.get_cell(r, c) != 0:
+            if grid.get_cell(r, c) != 0:
                 pattern = get_horizontal_pattern(grid, r, c)
                 patterns.append({'edge': 'top' if r == 0 else 'bottom', 'pattern': pattern, 'row': r, 'col': c})
     
     # Check left and right edges
     for c in [0, cols-1]:
         for r in range(rows):
-            if (r, c) not in processed and grid.get_cell(r, c) != 0:
+            if grid.get_cell(r, c) != 0:
                 pattern = get_vertical_pattern(grid, r, c)
                 patterns.append({'edge': 'left' if c == 0 else 'right', 'pattern': pattern, 'row': r, 'col': c})
     
@@ -71,7 +70,7 @@ def get_vertical_pattern(grid: ColoredGrid, start_r: int, c: int) -> List[int]:
         pattern.append(color)
     return pattern
 
-def expand_and_fill(grid: ColoredGrid, seed: Dict, processed: set):
+def expand_and_fill(grid: ColoredGrid, seed: Dict):
     rows, cols = grid.get_dimensions()
     
     if seed['edge'] in ['top', 'bottom']:
@@ -79,19 +78,17 @@ def expand_and_fill(grid: ColoredGrid, seed: Dict, processed: set):
         start_row = 0 if seed['edge'] == 'top' else seed['row']
         end_row = seed['row'] if seed['edge'] == 'top' else rows
         for r in range(start_row, end_row):
-            for c in range(seed['col'], seed['col'] + len(seed['pattern'])):
-                if (r, c) not in processed and grid.get_cell(r, c) == 0:
+            for c in range(seed['col'], min(cols, seed['col'] + len(seed['pattern']))):
+                if grid.get_cell(r, c) == 0:
                     grid.set_cell(r, c, seed['pattern'][c - seed['col']])
-                    processed.add((r, c))
     else:
         # Expand horizontally
         start_col = 0 if seed['edge'] == 'left' else seed['col']
         end_col = seed['col'] if seed['edge'] == 'left' else cols
         for c in range(start_col, end_col):
-            for r in range(seed['row'], seed['row'] + len(seed['pattern'])):
-                if (r, c) not in processed and grid.get_cell(r, c) == 0:
+            for r in range(seed['row'], min(rows, seed['row'] + len(seed['pattern']))):
+                if grid.get_cell(r, c) == 0:
                     grid.set_cell(r, c, seed['pattern'][r - seed['row']])
-                    processed.add((r, c))
 
 def fill_remaining(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
