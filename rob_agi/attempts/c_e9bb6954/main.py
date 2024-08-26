@@ -4,12 +4,13 @@ from typing import List, Tuple
 def solve_e9bb6954(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the grid transformation challenge by following these steps:
-    1. Scan the input grid to identify all 3x3 squares of the same color.
-    2. Determine line directions based on the position of 3x3 squares.
-    3. Sort the 3x3 squares by color and position.
-    4. Create an output grid as a copy of the input grid.
-    5. Draw lines for each 3x3 square, respecting color precedence and original non-zero values.
-    6. Return the transformed grid with these lines drawn.
+    1. Identify all 3x3 squares of the same non-zero color in the input grid.
+    2. Sort the 3x3 squares by color (ascending) to establish precedence.
+    3. For each 3x3 square:
+       a. Draw a horizontal line across the entire grid at the square's center row.
+       b. Draw a vertical line from the square's center, extending up or down based on its position.
+    4. Preserve all original non-zero values from the input grid.
+    5. Return the transformed grid with these lines drawn.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = input_grid.get_dimensions()
@@ -20,33 +21,41 @@ def solve_e9bb6954(input_grid: ColoredGrid) -> ColoredGrid:
             for c in range(cols - 2):
                 if all(grid.get_cell(r+i, c+j) == grid.get_cell(r, c) != 0 
                        for i in range(3) for j in range(3)):
-                    squares.append((r, c, grid.get_cell(r, c)))
-        return squares
+                    squares.append((grid.get_cell(r, c), r+1, c+1))  # (color, center_row, center_col)
+        return sorted(squares)  # Sort by color (ascending)
 
-    def is_vertical(col):
-        return col < 3 or col >= cols - 3
+    def draw_lines(color, center_row, center_col):
+        # Draw horizontal line
+        for col in range(cols):
+            if output_grid.get_cell(center_row, col) == 0 or output_grid.get_cell(center_row, col) > color:
+                output_grid.set_cell(center_row, col, color)
+        
+        # Determine vertical line direction
+        if center_row < rows / 2:
+            direction = "down"
+        elif center_row > rows / 2:
+            direction = "up"
+        else:
+            direction = "both"
+        
+        # Draw vertical line
+        if direction in ["down", "both"]:
+            for row in range(center_row, rows):
+                if output_grid.get_cell(row, center_col) == 0 or output_grid.get_cell(row, center_col) > color:
+                    output_grid.set_cell(row, center_col, color)
+        if direction in ["up", "both"]:
+            for row in range(center_row, -1, -1):
+                if output_grid.get_cell(row, center_col) == 0 or output_grid.get_cell(row, center_col) > color:
+                    output_grid.set_cell(row, center_col, color)
 
     squares = find_3x3_squares(input_grid)
-    squares.sort(key=lambda x: (x[2], x[0], x[1]))  # Sort by color, then position
+    for color, center_row, center_col in squares:
+        draw_lines(color, center_row, center_col)
 
-    def draw_line(square, is_vertical):
-        r, c, color = square
-        if is_vertical:
-            center_col = c + 1
-            for row in range(rows):
-                if output_grid.get_cell(row, center_col) < color and input_grid.get_cell(row, center_col) == 0:
-                    output_grid.set_cell(row, center_col, color)
-        else:
-            center_row = r + 1
-            for col in range(cols):
-                if output_grid.get_cell(center_row, col) < color and input_grid.get_cell(center_row, col) == 0:
-                    output_grid.set_cell(center_row, col, color)
-
-    processed_colors = set()
-    for square in squares:
-        color = square[2]
-        if color not in processed_colors:
-            draw_line(square, is_vertical(square[1]))
-            processed_colors.add(color)
+    # Preserve original non-zero values
+    for r in range(rows):
+        for c in range(cols):
+            if input_grid.get_cell(r, c) != 0:
+                output_grid.set_cell(r, c, input_grid.get_cell(r, c))
 
     return output_grid
