@@ -1,17 +1,17 @@
 example_0:
   input: |
-    A 30x30 grid mostly filled with black (0). There are several yellow dots (4) scattered across the grid. In the center, there's a small 2x2 red square (2).
+    A 30x30 grid predominantly black (0). Yellow cells (4) are sparsely distributed across the grid. A small 2x2 red square (2) is located near the center. Yellow cells appear isolated, not touching each other or the red square.
   output: |
-    The 30x30 grid remains mostly black (0). The yellow dots (4) are in the same positions. The 2x2 red square (2) in the center has expanded. There are now several 2x2 red squares scattered across the grid, always adjacent to yellow dots.
+    The 30x30 grid maintains its black (0) background. Yellow cells (4) remain unchanged in position. The central 2x2 red square (2) is preserved. New 3x3 red regions have appeared around each yellow cell, with one corner always remaining black. These new red regions do not overlap with existing red or yellow cells.
 
 example_1:
   input: |
-    A 26x26 grid mostly filled with black (0). There are multiple yellow dots (4) scattered across the grid. Near the top left, there's an irregular red shape (2) resembling an 'L' or backwards 'J'.
+    A 26x26 grid with a black (0) background. Multiple yellow cells (4) are scattered throughout. Near the top-left, there's a red (2) shape resembling an 'L' or backwards 'J'. Yellow cells are not adjacent to this red shape or to each other.
   output: |
-    The 26x26 grid remains mostly black (0). The yellow dots (4) are in the same positions. The irregular red shape near the top left remains unchanged. There are now several new 2x2 red squares scattered across the grid, always adjacent to yellow dots.
+    The 26x26 grid retains its black (0) backdrop. Yellow cells (4) maintain their original positions. The 'L'-shaped red structure in the top-left is unchanged. New 3x3 red regions have formed around each yellow cell, each missing one corner. These new red areas do not interfere with the existing red shape or yellow cells.
 
 example_2:
   input: |
-    A 25x25 grid mostly filled with black (0). There are multiple yellow dots (4) scattered across the grid. Near the top left, there's an irregular red shape (2) resembling a sideways 'T'.
+    A 25x25 grid primarily black (0). Yellow cells (4) are distributed across the grid. In the top-left quadrant, there's a red (2) formation shaped like a sideways 'T'. Yellow cells are isolated from this red shape and from each other.
   output: |
-    The 25x25 grid remains mostly black (0). The yellow dots (4) are in the same positions. The irregular red shape near the top left remains unchanged. There are now several new 2x2 red squares scattered across the grid, always adjacent to yellow dots. Some of these new red squares connect to form larger irregular shapes.
+    The 25x25 grid keeps its black (0) background. Yellow cells (4) are unmoved. The sideways 'T' red structure in the top-left remains intact. New 3x3 red regions have emerged around each yellow cell, consistently missing one corner. These new red areas connect in some places, forming larger irregular shapes, but do not overlap with pre-existing red or yellow cells.
