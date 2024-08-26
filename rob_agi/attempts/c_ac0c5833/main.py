@@ -1,26 +1,63 @@
 from rob_agi.colored_grid import ColoredGrid
+from typing import List, Tuple, Set
 
 def solve_ac0c5833(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by applying the following rule:
-    For each 3x3 block in the grid, if any cell in the block contains red (2),
-    fill the entire block with red (2), except for yellow (4) cells which remain unchanged.
-    The grid is processed in 3x3 blocks, handling edge cases where grid dimensions
-    are not multiples of 3.
+    Transforms the input grid by expanding red (2) regions and creating new red regions around yellow (4) cells
+    adjacent to red. The process continues until no further expansion is possible. Yellow cells act as barriers
+    and remain unchanged. The expansion occurs in all eight directions (including diagonals).
     """
-    output_grid = input_grid.deep_copy()
-    rows, cols = output_grid.get_dimensions()
+    grid = input_grid.deep_copy()
+    red_cells, yellow_cells = identify_colored_cells(grid)
+    
+    # Initial expansion
+    for red_cell in red_cells:
+        flood_fill(grid, red_cell)
+    
+    # Expand around yellow cells
+    while True:
+        new_red_cells = identify_yellow_adjacent_to_red(grid, yellow_cells)
+        if not new_red_cells:
+            break
+        for cell in new_red_cells:
+            expand_around_yellow(grid, cell)
+    
+    return grid
 
-    for i in range(0, rows, 3):
-        for j in range(0, cols, 3):
-            has_red = any(output_grid.values[x][y] == 2 
-                          for x in range(i, min(i+3, rows)) 
-                          for y in range(j, min(j+3, cols)))
-            
-            if has_red:
-                for x in range(i, min(i+3, rows)):
-                    for y in range(j, min(j+3, cols)):
-                        if output_grid.values[x][y] != 4:
-                            output_grid.values[x][y] = 2
+def identify_colored_cells(grid: ColoredGrid) -> Tuple[List[Tuple[int, int]], List[Tuple[int, int]]]:
+    red_cells = []
+    yellow_cells = []
+    for i in range(grid.num_rows):
+        for j in range(grid.num_cols):
+            if grid.values[i][j] == 2:
+                red_cells.append((i, j))
+            elif grid.values[i][j] == 4:
+                yellow_cells.append((i, j))
+    return red_cells, yellow_cells
 
-    return output_grid
+def flood_fill(grid: ColoredGrid, start: Tuple[int, int]):
+    stack = [start]
+    while stack:
+        x, y = stack.pop()
+        for dx, dy in [(-1,-1), (-1,0), (-1,1), (0,-1), (0,1), (1,-1), (1,0), (1,1)]:
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < grid.num_rows and 0 <= ny < grid.num_cols and grid.values[nx][ny] == 0:
+                grid.values[nx][ny] = 2
+                stack.append((nx, ny))
+
+def identify_yellow_adjacent_to_red(grid: ColoredGrid, yellow_cells: List[Tuple[int, int]]) -> Set[Tuple[int, int]]:
+    new_red_cells = set()
+    for x, y in yellow_cells:
+        for dx, dy in [(-1,-1), (-1,0), (-1,1), (0,-1), (0,1), (1,-1), (1,0), (1,1)]:
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < grid.num_rows and 0 <= ny < grid.num_cols and grid.values[nx][ny] == 2:
+                new_red_cells.add((x, y))
+                break
+    return new_red_cells
+
+def expand_around_yellow(grid: ColoredGrid, yellow_cell: Tuple[int, int]):
+    x, y = yellow_cell
+    for dx, dy in [(-1,-1), (-1,0), (-1,1), (0,-1), (0,1), (1,-1), (1,0), (1,1)]:
+        nx, ny = x + dx, y + dy
+        if 0 <= nx < grid.num_rows and 0 <= ny < grid.num_cols and grid.values[nx][ny] == 0:
+            flood_fill(grid, (nx, ny))
