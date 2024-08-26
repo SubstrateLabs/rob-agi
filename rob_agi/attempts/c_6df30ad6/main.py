@@ -7,7 +7,10 @@ def solve_6df30ad6(input_grid: ColoredGrid) -> ColoredGrid:
     
     1. Finds the largest connected region of gray (5) in the input grid.
     2. Identifies the highest-valued color that is not gray (5) or black (0) and appears in the input grid.
-    3. Creates a new grid with the largest gray region filled with the identified color.
+    3. Creates a new grid with all cells set to black (0).
+    4. Fills the largest gray region in the new grid with the identified highest-valued color.
+    
+    If no non-gray, non-black colors are present in the input, the largest gray region is replaced with black (0).
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -50,4 +53,4 @@ def find_replacement_color(grid: ColoredGrid) -> int:
         for cell in row:
             if cell not in [0, 5]:
                 colors.add(cell)
-    return max(colors) if colors else 0
+    return max(colors, default=0)
