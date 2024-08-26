@@ -7,8 +7,8 @@ def solve_3b4c2228(input_grid: ColoredGrid) -> ColoredGrid:
     
     The transformation follows these rules:
     1. If any quadrant contains a 2x2 square of the same non-black color, set output[0][0] to blue (1).
-    2. If exactly two diagonally opposite quadrants (top-left and bottom-right, or top-right and bottom-left) 
-       contain 2x2 squares, set output[1][1] to blue (1).
+    2. If the top-left and bottom-right quadrants both contain 2x2 squares, or if the top-right and bottom-left
+       quadrants both contain 2x2 squares, set output[1][1] to blue (1). This is independent of other quadrants.
     3. If all quadrants contain 2x2 squares, set output[2][2] to blue (1).
     
     The input grid is divided into four quadrants, and the presence of 2x2 squares in these quadrants 
@@ -39,8 +39,7 @@ def solve_3b4c2228(input_grid: ColoredGrid) -> ColoredGrid:
     if any(has_square):
         output_grid[0][0] = 1
 
-    if (has_square[0] and has_square[3] and not has_square[1] and not has_square[2]) or \
-       (has_square[1] and has_square[2] and not has_square[0] and not has_square[3]):
+    if (has_square[0] and has_square[3]) or (has_square[1] and has_square[2]):
         output_grid[1][1] = 1
 
     if all(has_square):
