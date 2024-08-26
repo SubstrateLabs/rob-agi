@@ -5,14 +5,13 @@ from collections import deque
 def solve_e681b708(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid based on the following rules:
-    1. Identifies the main structure (largest connected component of blue cells).
-    2. Finds endpoints of the structure and their colors.
-    3. Divides the grid into regions based on the main structure.
-    4. Assigns colors to regions in a specific order: red (2), green (3), sky blue (8).
-    5. Transforms scattered blue dots to the color of their region.
+    1. Identifies the main structure (connected blue cells and colored endpoints).
+    2. Divides the grid into regions based on horizontal and vertical blue lines.
+    3. Assigns colors to regions based on their position and proximity to endpoints.
+    4. Transforms scattered dots to the color of their region.
+    5. Handles special cases near endpoints and structure.
     6. Merges adjacent transformed dots of the same color.
-    7. Handles special cases where endpoint colors influence nearby areas.
-    8. Maintains the integrity of the main structure and original colored endpoints.
+    7. Preserves the main structure and original colored endpoints.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -20,57 +19,44 @@ def solve_e681b708(input_grid: ColoredGrid) -> ColoredGrid:
     Returns:
     ColoredGrid: The transformed grid.
     """
-    main_structure = find_main_structure(input_grid)
-    endpoints = find_endpoints(input_grid, main_structure)
+    main_structure, endpoints = find_main_structure_and_endpoints(input_grid)
     regions = divide_into_regions(input_grid, main_structure)
-    region_colors = assign_colors_to_regions(regions, endpoints)
+    region_colors = assign_colors_to_regions(input_grid, regions, endpoints)
     
     output_grid = input_grid.deep_copy()
-    transform_scattered_dots(output_grid, main_structure, region_colors)
+    transform_scattered_dots(output_grid, main_structure, regions, region_colors)
     handle_special_cases(output_grid, endpoints, main_structure)
     merge_adjacent_dots(output_grid, main_structure)
+    preserve_blue_dots_near_structure(output_grid, input_grid, main_structure)
     
     return output_grid
 
-def find_main_structure(grid: ColoredGrid) -> Set[Tuple[int, int]]:
+def find_main_structure_and_endpoints(grid: ColoredGrid) -> Tuple[Set[Tuple[int, int]], List[Tuple[int, int, int]]]:
     rows, cols = grid.get_dimensions()
-    visited = set()
-    main_structure = set()
+    structure = set()
+    endpoints = []
     
-    def dfs(r: int, c: int, component: Set[Tuple[int, int]]):
-        if (r, c) in visited or grid.values[r][c] != 1:
+    def dfs(r: int, c: int):
+        if (r, c) in structure or grid.values[r][c] not in [1, 2, 3, 6, 8]:
             return
-        visited.add((r, c))
-        component.add((r, c))
+        structure.add((r, c))
+        if grid.values[r][c] != 1:
+            endpoints.append((r, c, grid.values[r][c]))
         for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
             nr, nc = r + dr, c + dc
             if 0 <= nr < rows and 0 <= nc < cols:
-                dfs(nr, nc, component)
+                dfs(nr, nc)
     
     for r in range(rows):
         for c in range(cols):
-            if grid.values[r][c] == 1 and (r, c) not in visited:
-                component = set()
-                dfs(r, c, component)
-                if len(component) > len(main_structure):
-                    main_structure = component
+            if grid.values[r][c] in [1, 2, 3, 6, 8] and (r, c) not in structure:
+                dfs(r, c)
     
-    return main_structure
+    return structure, endpoints
 
-def find_endpoints(grid: ColoredGrid, structure: Set[Tuple[int, int]]) -> List[Tuple[int, int, int]]:
+def divide_into_regions(grid: ColoredGrid, structure: Set[Tuple[int, int]]) -> List[Set[Tuple[int, int]]]:
     rows, cols = grid.get_dimensions()
-    endpoints = []
-    for r, c in structure:
-        neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
-                        if 0 <= r + dr < rows and 0 <= c + dc < cols and (r + dr, c + dc) in structure)
-        if neighbors == 1 or grid.values[r][c] != 1:
-            endpoints.append((r, c, grid.values[r][c]))
-    return endpoints
-
-def divide_into_regions(grid: ColoredGrid, structure: Set[Tuple[int, int]]) -> Dict[int, Set[Tuple[int, int]]]:
-    rows, cols = grid.get_dimensions()
-    regions = {}
-    region_id = 0
+    regions = []
     visited = set(structure)
     
     def flood_fill(r: int, c: int, region: Set[Tuple[int, int]]):
@@ -88,34 +74,45 @@ def divide_into_regions(grid: ColoredGrid, structure: Set[Tuple[int, int]]) -> D
             if (r, c) not in visited:
                 new_region = set()
                 flood_fill(r, c, new_region)
-                regions[region_id] = new_region
-                region_id += 1
+                regions.append(new_region)
     
     return regions
 
-def assign_colors_to_regions(regions: Dict[int, Set[Tuple[int, int]]], endpoints: List[Tuple[int, int, int]]) -> Dict[int, int]:
-    colors = [2, 3, 8]  # red, green, sky blue
+def assign_colors_to_regions(grid: ColoredGrid, regions: List[Set[Tuple[int, int]]], endpoints: List[Tuple[int, int, int]]) -> Dict[Tuple[int, int], int]:
+    rows, cols = grid.get_dimensions()
     region_colors = {}
-    for i, region_id in enumerate(regions.keys()):
-        region_colors[region_id] = colors[i % len(colors)]
+    
+    def distance_to_endpoint(r: int, c: int, endpoint: Tuple[int, int, int]) -> float:
+        return ((r - endpoint[0])**2 + (c - endpoint[1])**2)**0.5
+    
+    for region in regions:
+        center_r = sum(r for r, _ in region) / len(region)
+        center_c = sum(c for _, c in region) / len(region)
+        
+        nearest_endpoint = min(endpoints, key=lambda e: distance_to_endpoint(center_r, center_c, e))
+        
+        if center_r < rows / 2:
+            color = 2 if nearest_endpoint[2] != 8 else 8  # Red or Sky Blue
+        else:
+            color = 3 if nearest_endpoint[2] != 8 else 8  # Green or Sky Blue
+        
+        for r, c in region:
+            region_colors[(r, c)] = color
+    
     return region_colors
 
-def transform_scattered_dots(grid: ColoredGrid, structure: Set[Tuple[int, int]], region_colors: Dict[int, int]):
-    rows, cols = grid.get_dimensions()
-    for r in range(rows):
-        for c in range(cols):
-            if grid.values[r][c] == 1 and (r, c) not in structure:
-                region_id = next(rid for rid, region in region_colors.items() if (r, c) in region)
-                grid.values[r][c] = region_colors[region_id]
+def transform_scattered_dots(grid: ColoredGrid, structure: Set[Tuple[int, int]], regions: List[Set[Tuple[int, int]]], region_colors: Dict[Tuple[int, int], int]):
+    for r, c in grid.get_dimensions():
+        if (r, c) not in structure and grid.values[r][c] == 1:
+            grid.values[r][c] = region_colors.get((r, c), 1)
 
 def handle_special_cases(grid: ColoredGrid, endpoints: List[Tuple[int, int, int]], structure: Set[Tuple[int, int]]):
     rows, cols = grid.get_dimensions()
     for er, ec, color in endpoints:
-        if color != 1:
-            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                nr, nc = er + dr, ec + dc
-                if 0 <= nr < rows and 0 <= nc < cols and (nr, nc) not in structure:
-                    grid.values[nr][nc] = color
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]:
+            nr, nc = er + dr, ec + dc
+            if 0 <= nr < rows and 0 <= nc < cols and (nr, nc) not in structure:
+                grid.values[nr][nc] = color
 
 def merge_adjacent_dots(grid: ColoredGrid, structure: Set[Tuple[int, int]]):
     rows, cols = grid.get_dimensions()
@@ -132,5 +129,14 @@ def merge_adjacent_dots(grid: ColoredGrid, structure: Set[Tuple[int, int]]):
     
     for r in range(rows):
         for c in range(cols):
-            if (r, c) not in visited and (r, c) not in structure and grid.values[r][c] != 1:
+            if (r, c) not in visited and (r, c) not in structure and grid.values[r][c] not in [0, 1]:
                 dfs_merge(r, c, grid.values[r][c])
+
+def preserve_blue_dots_near_structure(output_grid: ColoredGrid, input_grid: ColoredGrid, structure: Set[Tuple[int, int]]):
+    rows, cols = output_grid.get_dimensions()
+    for r, c in structure:
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols and (nr, nc) not in structure:
+                if input_grid.values[nr][nc] == 1:
+                    output_grid.values[nr][nc] = 1
