@@ -11,6 +11,9 @@ def solve_c658a4bd(input_grid: ColoredGrid) -> ColoredGrid:
     The output grid size is determined by the number of distinct colors,
     and each color forms a complete frame around the inner colors, with the innermost
     color being a 2x2 square in the center if there are at least 4 colors, or a single cell otherwise.
+    
+    The algorithm ignores small, isolated color patches and completes frames even if
+    the input regions are incomplete. The background color (black/0) is ignored in calculations.
     """
     def analyze_grid(grid):
         regions = []
@@ -39,7 +42,7 @@ def solve_c658a4bd(input_grid: ColoredGrid) -> ColoredGrid:
         return [r['color'] for r in sorted_regions]
 
     def create_output_grid(ordered_colors):
-        size = 2 * len(ordered_colors)
+        size = 2 * len(ordered_colors) - 1
         output = ColoredGrid(values=[[0 for _ in range(size)] for _ in range(size)])
         
         for i, color in enumerate(ordered_colors):
@@ -52,10 +55,10 @@ def solve_c658a4bd(input_grid: ColoredGrid) -> ColoredGrid:
         # Fill the center
         if len(ordered_colors) >= 4:
             center = len(ordered_colors) - 1
+            output.values[center-1][center-1] = ordered_colors[-1]
+            output.values[center-1][center] = ordered_colors[-1]
+            output.values[center][center-1] = ordered_colors[-1]
             output.values[center][center] = ordered_colors[-1]
-            output.values[center][center+1] = ordered_colors[-1]
-            output.values[center+1][center] = ordered_colors[-1]
-            output.values[center+1][center+1] = ordered_colors[-1]
         elif ordered_colors:
             center = len(ordered_colors) - 1
             output.values[center][center] = ordered_colors[-1]
