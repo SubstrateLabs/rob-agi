@@ -1,23 +1,54 @@
 example_0:
   input: |
-    A 10x14 grid mostly filled with black (0). In the bottom left corner, there's a small 2x2 pattern: red (2) and green (3) in the top row, and two blue (1) squares below them.
+    A 10x14 grid predominantly black (0). In the bottom-left corner, there's a crucial 2x2 pattern:
+    - Top row: red (2) | green (3)
+    - Bottom row: blue (1) | blue (1)
+    This 2x2 pattern is the key to understanding the transformation.
   output: |
-    A 10x14 grid with a distinct pattern. The bottom half contains a blue (1) rectangle spanning the full width and 4 rows tall. Above it, there's a 4x8 rectangle split diagonally - the top-left half is red (2), and the bottom-right half is green (3). The rest of the grid remains black (0).
+    A 10x14 grid with a transformed pattern:
+    1. Bottom half (5 rows x 14 columns): Solid blue (1) rectangle.
+    2. Top-right quadrant (5 rows x 8 columns): Checkerboard pattern of red (2) and green (3).
+    3. Remaining area: Unchanged, black (0).
+    Note: The 2x2 input pattern expands to fill 2/3 of the width and 1/2 of the height.
 
 example_1:
   input: |
-    A 10x14 grid mostly filled with black (0). In the bottom left corner, there's a small 2x2 pattern: red (2) and gray (5) in the top row, and gray (5) and green (3) below them.
+    A 10x14 grid predominantly black (0). In the bottom-left corner, there's a crucial 2x2 pattern:
+    - Top row: red (2) | gray (5)
+    - Bottom row: gray (5) | green (3)
+    This 2x2 pattern is the key to understanding the transformation.
   output: |
-    A 10x14 grid with a distinct pattern. The bottom half contains a 4x8 rectangle split diagonally - the top-left half is gray (5), and the bottom-right half is green (3). Above it, there's another 4x8 rectangle split diagonally - the top-left half is red (2), and the bottom-right half is gray (5). The rest of the grid remains black (0).
+    A 10x14 grid with a transformed pattern:
+    1. Bottom half (5 rows x 8 columns): Checkerboard pattern of gray (5) and green (3).
+    2. Top-right quadrant (5 rows x 8 columns): Checkerboard pattern of red (2) and gray (5).
+    3. Remaining area: Unchanged, black (0).
+    Note: The 2x2 input pattern expands to fill 2/3 of the width and 1/2 of the height.
 
 example_2:
   input: |
-    A 16x30 grid mostly filled with black (0). In the bottom left corner, there's a small 2x2 pattern: blue (1) and red (2) in the top row, and green (3) and yellow (4) below them.
+    A 16x30 grid predominantly black (0). In the bottom-left corner, there's a crucial 2x2 pattern:
+    - Top row: blue (1) | red (2)
+    - Bottom row: green (3) | yellow (4)
+    This 2x2 pattern is the key to understanding the transformation.
   output: |
-    A 16x30 grid with a distinct pattern. The right two-thirds of the grid is filled with four 8x8 squares arranged in a 2x2 pattern. The top-left square is blue (1), top-right is red (2), bottom-left is green (3), and bottom-right is yellow (4). The left third of the grid remains black (0), creating a stark contrast with the colored pattern.
+    A 16x30 grid with a transformed pattern:
+    1. Right two-thirds (16 rows x 20 columns): Four 8x8 squares in a 2x2 arrangement:
+       - Top-left: blue (1)
+       - Top-right: red (2)
+       - Bottom-left: green (3)
+       - Bottom-right: yellow (4)
+    2. Remaining area: Unchanged, black (0).
+    Note: The 2x2 input pattern expands to fill 2/3 of the width and 1/2 of the height.
 
 test_case_0:
   input: |
-    A 16x30 grid mostly filled with black (0). In the bottom left corner, there's a small 2x2 pattern: blue (1) and red (2) in the top row, and green (3) and yellow (4) below them.
+    A 16x30 grid predominantly black (0). In the bottom-left corner, there's a crucial 2x2 pattern:
+    - Top row: blue (1) | red (2)
+    - Bottom row: green (3) | yellow (4)
+    This 2x2 pattern is the key to understanding the transformation.
   output: |
-    Not provided in the test case. The output grid is what needs to be determined based on the pattern observed in the examples.
+    Not provided. The challenge is to determine the output based on the pattern observed in the examples.
+    Key observations:
+    1. The 2x2 pattern always expands to fill 2/3 of the width and 1/2 of the height.
+    2. The expansion method depends on whether the bottom row colors in the 2x2 pattern match.
+    3. The top half of the expansion always uses a checkerboard pattern of the top row colors.
