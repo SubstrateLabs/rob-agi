@@ -8,7 +8,7 @@ def analyze_quadrant(grid: ColoredGrid, top: int, left: int, bottom: int, right:
         for j in range(left, right + 1):
             color = grid.values[i][j]
             if color != 0:
-                regions.append((color, i, j, i, j))
+                regions.append((color, i - top, j - left, i - top, j - left))
     
     # Merge adjacent regions of the same color
     merged = True
@@ -33,24 +33,32 @@ def is_quadrant_non_empty(grid: ColoredGrid, top: int, left: int, bottom: int, r
     """Check if a quadrant is non-empty."""
     return any(grid.values[i][j] != 0 for i in range(top, bottom+1) for j in range(left, right+1))
 
-def replicate_pattern(source: ColoredGrid, target: ColoredGrid, regions: List[Tuple[int, int, int, int, int]], 
-                      src_top: int, src_left: int, tgt_top: int, tgt_left: int):
-    """Replicate the pattern from source to target quadrant."""
-    for color, top, left, bottom, right in regions:
-        rel_top, rel_left = top - src_top, left - src_left
-        rel_bottom, rel_right = bottom - src_top, right - src_left
-        for i in range(rel_top, rel_bottom + 1):
-            for j in range(rel_left, rel_right + 1):
-                target.values[tgt_top + i][tgt_left + j] = color
+def flip_pattern(pattern: List[Tuple[int, int, int, int, int]], horizontal: bool, vertical: bool, size: int) -> List[Tuple[int, int, int, int, int]]:
+    """Flip a pattern horizontally and/or vertically."""
+    flipped = []
+    for color, top, left, bottom, right in pattern:
+        if horizontal:
+            left, right = size - 1 - right, size - 1 - left
+        if vertical:
+            top, bottom = size - 1 - bottom, size - 1 - top
+        flipped.append((color, top, left, bottom, right))
+    return flipped
+
+def apply_pattern(grid: ColoredGrid, pattern: List[Tuple[int, int, int, int, int]], top: int, left: int):
+    """Apply a pattern to a specific position in the grid."""
+    for color, r_top, r_left, r_bottom, r_right in pattern:
+        for i in range(r_top, r_bottom + 1):
+            for j in range(r_left, r_right + 1):
+                grid.values[top + i][left + j] = color
 
 def solve_40f6cd08(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the challenge by analyzing patterns in non-empty quadrants and replicating them appropriately.
+    Solve the challenge by analyzing patterns in non-empty quadrants, transforming them, and applying them to create a symmetric output.
     
-    1. Analyze each non-empty quadrant to identify colored regions
-    2. Create a new output grid
-    3. For each non-empty quadrant, replicate its pattern to the corresponding position
-    4. For empty quadrants, replicate the pattern from the most complex non-empty quadrant
+    1. Analyze each quadrant to identify colored regions
+    2. Determine the base pattern from the non-empty quadrant(s)
+    3. Create transformed patterns for each quadrant using horizontal and vertical flips
+    4. Apply the transformed patterns to their respective quadrants in the output grid
     5. Ensure the central cross (rows and columns 14 and 15) remains black (0)
     6. Return the resulting transformed grid
     
@@ -64,25 +72,31 @@ def solve_40f6cd08(input_grid: ColoredGrid) -> ColoredGrid:
         ((16, 16), (29, 29))   # Bottom-right
     ]
     
-    # Analyze non-empty quadrants
-    non_empty_quadrants = []
-    for i, ((top, left), (bottom, right)) in enumerate(quadrants):
+    # Analyze quadrants and find the base pattern
+    base_pattern = None
+    for (top, left), (bottom, right) in quadrants:
         if is_quadrant_non_empty(input_grid, top, left, bottom, right):
-            regions = analyze_quadrant(input_grid, top, left, bottom, right)
-            non_empty_quadrants.append((i, regions))
+            base_pattern = analyze_quadrant(input_grid, top, left, bottom, right)
+            break
+    
+    if base_pattern is None:
+        return input_grid  # If all quadrants are empty, return the input grid
     
     # Create output grid
     output = ColoredGrid(values=[[0 for _ in range(30)] for _ in range(30)])
     
-    # Replicate patterns
-    for i, ((top, left), (bottom, right)) in enumerate(quadrants):
-        if any(q[0] == i for q in non_empty_quadrants):
-            regions = next(q[1] for q in non_empty_quadrants if q[0] == i)
-        else:
-            # For empty quadrants, use the most complex non-empty quadrant
-            regions = max(non_empty_quadrants, key=lambda x: len(x[1]))[1]
-        
-        replicate_pattern(input_grid, output, regions, top, left, top, left)
+    # Apply transformed patterns to each quadrant
+    quadrant_size = 14
+    transformations = [
+        (False, False),  # Top-left: no transformation
+        (True, False),   # Top-right: horizontal flip
+        (False, True),   # Bottom-left: vertical flip
+        (True, True)     # Bottom-right: both flips
+    ]
+    
+    for ((top, left), _), (flip_h, flip_v) in zip(quadrants, transformations):
+        pattern = flip_pattern(base_pattern, flip_h, flip_v, quadrant_size)
+        apply_pattern(output, pattern, top, left)
     
     # Ensure central cross remains black
     for i in range(30):
