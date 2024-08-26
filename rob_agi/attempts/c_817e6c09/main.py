@@ -17,27 +17,34 @@ def is_red_rectangle(row, col, grid):
 def solve_817e6c09(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transform the input grid by changing 2x2 red rectangles to sky blue,
-    except for those in the top row or rightmost column.
+    except for those touching the corners of the grid.
     
     The function works as follows:
     1. Create a deep copy of the input grid.
     2. Iterate through each cell in the grid, considering it as the top-left corner of a 2x2 rectangle.
     3. For each cell, if it's part of a 2x2 red rectangle:
-       - If the rectangle is in the top row, keep it red.
-       - If the rectangle is in the rightmost column, keep it red.
+       - If the rectangle touches any corner of the grid, keep it red.
        - Otherwise, change it to sky blue.
     4. Return the modified grid.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = input_grid.get_dimensions()
 
-    for row in range(rows - 1):  # -1 because we're checking 2x2 rectangles
+    def is_red_rectangle(row, col):
+        if row + 1 >= rows or col + 1 >= cols:
+            return False
+        return all(input_grid.values[r][c] == 2 for r in range(row, row + 2) for c in range(col, col + 2))
+
+    def touches_corner(row, col):
+        return (row == 0 and col == 0) or \
+               (row == 0 and col == cols - 2) or \
+               (row == rows - 2 and col == 0) or \
+               (row == rows - 2 and col == cols - 2)
+
+    for row in range(rows - 1):
         for col in range(cols - 1):
-            if is_red_rectangle(row, col, input_grid):
-                if row == 0 or col == cols - 2:
-                    continue  # Keep red if in top row or rightmost column
-                else:
-                    # Change to sky blue
+            if is_red_rectangle(row, col):
+                if not touches_corner(row, col):
                     for r in range(row, row + 2):
                         for c in range(col, col + 2):
                             output_grid.values[r][c] = 8
