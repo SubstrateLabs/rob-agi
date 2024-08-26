@@ -7,11 +7,11 @@ def solve_f8be4b64(input_grid: ColoredGrid) -> ColoredGrid:
     
     1. Identifies colored centers (non-green, non-black cells adjacent to green cells).
     2. Creates vertical lines for each colored center.
-    3. Fills territories between vertical lines.
-    4. Creates horizontal lines for each colored center.
+    3. Creates horizontal lines for each colored center.
+    4. Fills territories between lines.
     5. Preserves original green cells.
     6. Removes isolated green cells.
-    7. Ensures vertical lines extend fully and horizontal lines respect boundaries.
+    7. Ensures all non-edge cells have a non-black color.
     
     Args:
     input_grid (ColoredGrid): The input grid to transform.
@@ -23,21 +23,30 @@ def solve_f8be4b64(input_grid: ColoredGrid) -> ColoredGrid:
     new_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
     colored_centers = find_colored_centers(input_grid)
     
+    if not colored_centers:
+        default_color = max(max(row) for row in input_grid.values)
+        colored_centers = [(0, 0, default_color)]
+    
     # Sort colored centers by color value in descending order
     colored_centers.sort(key=lambda x: x[2], reverse=True)
     
-    # Create vertical lines and fill territories
+    # Create vertical lines
     create_vertical_lines(new_grid, colored_centers)
-    fill_territories(new_grid)
     
     # Create horizontal lines
     create_horizontal_lines(new_grid, colored_centers)
+    
+    # Fill territories
+    fill_territories(new_grid)
     
     # Preserve original green cells
     preserve_green_cells(new_grid, input_grid)
     
     # Remove isolated green cells
     remove_isolated_green_cells(new_grid)
+    
+    # Ensure all non-edge cells have a non-black color
+    fill_remaining_black_cells(new_grid)
     
     return new_grid
 
@@ -65,16 +74,6 @@ def create_vertical_lines(grid: ColoredGrid, centers: List[Tuple[int, int, int]]
             if grid.values[r][c] == 0 or color > grid.values[r][c]:
                 grid.values[r][c] = color
 
-def fill_territories(grid: ColoredGrid):
-    rows, cols = grid.get_dimensions()
-    for r in range(rows):
-        current_color = 0
-        for c in range(cols):
-            if grid.values[r][c] != 0:
-                current_color = grid.values[r][c]
-            elif current_color != 0:
-                grid.values[r][c] = current_color
-
 def create_horizontal_lines(grid: ColoredGrid, centers: List[Tuple[int, int, int]]):
     rows, cols = grid.get_dimensions()
     for r, c, color in centers:
@@ -90,6 +89,16 @@ def create_horizontal_lines(grid: ColoredGrid, centers: List[Tuple[int, int, int
                 grid.values[r][col] = color
             else:
                 break
+
+def fill_territories(grid: ColoredGrid):
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        current_color = 0
+        for c in range(cols):
+            if grid.values[r][c] != 0:
+                current_color = grid.values[r][c]
+            elif current_color != 0:
+                grid.values[r][c] = current_color
 
 def preserve_green_cells(new_grid: ColoredGrid, input_grid: ColoredGrid):
     rows, cols = input_grid.get_dimensions()
@@ -109,3 +118,13 @@ def remove_isolated_green_cells(grid: ColoredGrid):
                                        if 0 <= r + dr < rows and 0 <= c + dc < cols and grid.values[r + dr][c + dc] != 0]
                     if adjacent_colors:
                         grid.values[r][c] = max(adjacent_colors)
+
+def fill_remaining_black_cells(grid: ColoredGrid):
+    rows, cols = grid.get_dimensions()
+    for r in range(1, rows - 1):
+        for c in range(1, cols - 1):
+            if grid.values[r][c] == 0:
+                adjacent_colors = [grid.values[r + dr][c + dc] for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                                   if grid.values[r + dr][c + dc] != 0]
+                if adjacent_colors:
+                    grid.values[r][c] = max(adjacent_colors)
