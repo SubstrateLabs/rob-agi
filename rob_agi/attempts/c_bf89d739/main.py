@@ -6,8 +6,9 @@ def solve_bf89d739(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the grid transformation challenge by connecting red dots with green lines.
     
-    The function identifies red dots, creates a vertical spine through the center of mass,
-    connects all red dots to the spine, and optimizes the connections to form a tree-like structure.
+    The function identifies red dots, creates a vertical spine through the optimal column,
+    connects all red dots to the spine or to each other, and optimizes the connections
+    to form a minimal tree-like structure.
     
     Args:
     input_grid (ColoredGrid): The input grid containing red dots to be connected.
@@ -23,8 +24,7 @@ def solve_bf89d739(input_grid: ColoredGrid) -> ColoredGrid:
 
     spine_col = find_optimal_spine(red_dots)
     create_vertical_spine(result_grid, red_dots, spine_col)
-    connect_dots_to_spine(result_grid, red_dots, spine_col)
-    optimize_connections(result_grid, red_dots, spine_col)
+    connect_dots_optimally(result_grid, red_dots, spine_col)
 
     return result_grid
 
@@ -40,22 +40,29 @@ def create_vertical_spine(grid: ColoredGrid, red_dots: List[Tuple[int, int]], sp
     max_row = max(r for r, _ in red_dots)
     draw_line(grid, (min_row, spine_col), (max_row, spine_col), True)
 
-def connect_dots_to_spine(grid: ColoredGrid, red_dots: List[Tuple[int, int]], spine_col: int):
-    for r, c in red_dots:
-        if c != spine_col:
-            draw_line(grid, (r, c), (r, spine_col), False)
+def connect_dots_optimally(grid: ColoredGrid, red_dots: List[Tuple[int, int]], spine_col: int):
+    sorted_dots = sorted(red_dots, key=lambda x: (x[0], abs(x[1] - spine_col)))  # Sort by row, then by distance to spine
+    connected = set()
 
-def optimize_connections(grid: ColoredGrid, red_dots: List[Tuple[int, int]], spine_col: int):
-    sorted_dots = sorted(red_dots, key=lambda x: x[0])  # Sort by row
-    for i in range(len(sorted_dots) - 1):
-        current_dot = sorted_dots[i]
-        next_dot = sorted_dots[i + 1]
-        if current_dot[1] == next_dot[1]:  # Same column
-            draw_line(grid, current_dot, next_dot, True)
-        elif abs(current_dot[1] - spine_col) > abs(next_dot[1] - spine_col):
-            # If the next dot is closer to the spine, connect through it
-            draw_line(grid, current_dot, (current_dot[0], next_dot[1]), False)
-            draw_line(grid, (current_dot[0], next_dot[1]), next_dot, True)
+    for i, dot in enumerate(sorted_dots):
+        if dot not in connected:
+            connect_dot(grid, dot, sorted_dots[i+1:], spine_col, connected)
+
+def connect_dot(grid: ColoredGrid, dot: Tuple[int, int], remaining_dots: List[Tuple[int, int]], spine_col: int, connected: set):
+    connected.add(dot)
+    r, c = dot
+
+    # Try to connect to the closest dot
+    closest_dot = min(remaining_dots, key=lambda x: manhattan_distance(dot, x), default=None)
+    if closest_dot and manhattan_distance(dot, closest_dot) <= abs(c - spine_col):
+        draw_line(grid, dot, closest_dot, False)
+        connect_dot(grid, closest_dot, [d for d in remaining_dots if d != closest_dot], spine_col, connected)
+    else:
+        # Connect to spine if no close dot
+        draw_line(grid, (r, c), (r, spine_col), False)
+
+def manhattan_distance(p1: Tuple[int, int], p2: Tuple[int, int]) -> int:
+    return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
 
 def draw_line(grid: ColoredGrid, start: Tuple[int, int], end: Tuple[int, int], is_vertical: bool):
     y1, x1 = start
@@ -66,6 +73,20 @@ def draw_line(grid: ColoredGrid, start: Tuple[int, int], end: Tuple[int, int], i
             if grid.values[y][x1] == 0:  # Only fill black cells
                 grid.values[y][x1] = 3  # Green
     else:
-        for x in range(min(x1, x2), max(x1, x2) + 1):
-            if grid.values[y1][x] == 0:  # Only fill black cells
-                grid.values[y1][x] = 3  # Green
+        if y1 == y2:  # Horizontal line
+            for x in range(min(x1, x2), max(x1, x2) + 1):
+                if grid.values[y1][x] == 0:  # Only fill black cells
+                    grid.values[y1][x] = 3  # Green
+        else:  # Diagonal line
+            x, y = x1, y1
+            dx = 1 if x2 > x1 else -1
+            dy = 1 if y2 > y1 else -1
+            while (x, y) != (x2, y2):
+                if grid.values[y][x] == 0:  # Only fill black cells
+                    grid.values[y][x] = 3  # Green
+                if x != x2:
+                    x += dx
+                if y != y2:
+                    y += dy
+            if grid.values[y2][x2] == 0:
+                grid.values[y2][x2] = 3  # Ensure end point is marked
