@@ -11,7 +11,7 @@ def solve_42918530(input_grid: ColoredGrid) -> ColoredGrid:
     1. Extracts 5x5 sub-grids from the input
     2. For each non-black sub-grid:
        a. Identifies the primary color and counts non-zero cells
-       b. Analyzes the 2x2 quadrants to determine the representative pattern
+       b. Analyzes the existing pattern and determines the most representative quadrant
        c. Creates a rotationally symmetric pattern based on the representative quadrant
     3. Ensures consistency across similar sub-grids
     4. Reassembles the full grid with transformed sub-grids
@@ -19,6 +19,8 @@ def solve_42918530(input_grid: ColoredGrid) -> ColoredGrid:
 
     The transformation maintains the original color distribution and total cell count
     for each color while creating rotationally symmetric patterns for each sub-grid.
+    Edge cases like equal distribution of colors or unique patterns in each quadrant
+    are handled to ensure consistent results.
     """
     SUBGRID_SIZE = 5
     GRID_STEP = 6
@@ -40,7 +42,7 @@ def solve_42918530(input_grid: ColoredGrid) -> ColoredGrid:
         colors = [cell for row in subgrid for cell in row if cell != 0]
         return max(set(colors), key=colors.count) if colors else 0
 
-    def analyze_quadrants(subgrid: List[List[int]]) -> List[List[int]]:
+    def analyze_quadrants(subgrid: List[List[int]]) -> List[int]:
         quadrants = [
             [subgrid[i][j] for i in range(2) for j in range(2)],
             [subgrid[i][j] for i in range(2) for j in range(3, 5)],
@@ -54,7 +56,7 @@ def solve_42918530(input_grid: ColoredGrid) -> ColoredGrid:
         for i in range(2):
             for j in range(2):
                 pattern[i][j] = pattern[i][4-j] = pattern[4-i][j] = pattern[4-i][4-j] = quadrant[i*2 + j]
-        pattern[0][2] = pattern[2][0] = pattern[4][2] = pattern[2][4] = quadrant[1]
+        pattern[0][2] = pattern[2][0] = pattern[4][2] = pattern[2][4] = color
         pattern[2][2] = center
         return pattern
 
