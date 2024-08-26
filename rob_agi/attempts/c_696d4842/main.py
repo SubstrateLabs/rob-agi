@@ -11,6 +11,7 @@ def solve_696d4842(input_grid: ColoredGrid) -> ColoredGrid:
     5. Resolve intersections between extended lines based on line length.
     6. Iterate the process until stability or a maximum number of iterations.
     7. Apply final edge transformations.
+    8. Handle corner cases and ensure proper color propagation.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -84,12 +85,28 @@ def solve_696d4842(input_grid: ColoredGrid) -> ColoredGrid:
                                 output_grid.values[i][c] = output_grid.values[r][c]
 
     def apply_edge_transformations():
+        # Transform left edge
         for i in range(rows):
             if output_grid.values[i][0] != 0:
-                output_grid.values[i][0] = color_cycle[output_grid.values[i][0]]
+                output_grid.values[i][0] = color_cycle.get(output_grid.values[i][0], output_grid.values[i][0])
+        
+        # Transform top edge
         for j in range(cols):
             if output_grid.values[0][j] != 0:
-                output_grid.values[0][j] = color_cycle[output_grid.values[0][j]]
+                output_grid.values[0][j] = color_cycle.get(output_grid.values[0][j], output_grid.values[0][j])
+
+    def propagate_colors():
+        changed = True
+        while changed:
+            changed = False
+            for r in range(rows):
+                for c in range(cols):
+                    if output_grid.values[r][c] != 0:
+                        for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                            nr, nc = r + dr, c + dc
+                            if 0 <= nr < rows and 0 <= nc < cols and output_grid.values[nr][nc] == 0:
+                                output_grid.values[nr][nc] = output_grid.values[r][c]
+                                changed = True
 
     iterations = 0
     while iterations < 10:  # Maximum 10 iterations
@@ -112,12 +129,15 @@ def solve_696d4842(input_grid: ColoredGrid) -> ColoredGrid:
                 extend_line(r, c, 'right')
         
         resolve_intersections()
+        apply_edge_transformations()
+        propagate_colors()
         
         if output_grid.values == old_grid.values:
             break
         iterations += 1
 
-    # Apply final edge transformations
+    # Final pass to ensure all transformations are applied
     apply_edge_transformations()
+    propagate_colors()
 
     return output_grid
