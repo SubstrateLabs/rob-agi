@@ -11,6 +11,12 @@ def solve_e760a62e(input_grid: ColoredGrid) -> ColoredGrid:
     5. Creates magenta (6) where red and green overlap.
     6. Preserves original structure and colors of non-expanding squares.
 
+    The expansion follows these rules:
+    - Red expands horizontally within its section and upwards to the top of its section.
+    - Green expands vertically across the entire grid and horizontally within its section.
+    - Where red and green expansions overlap, magenta (6) is created.
+    - Sky blue lines and original colored squares are preserved.
+
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
 
