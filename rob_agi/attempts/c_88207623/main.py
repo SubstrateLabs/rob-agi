@@ -1,5 +1,6 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Set
+from typing import List, Tuple, Set, Dict
+from collections import defaultdict
 
 def solve_88207623(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -12,6 +13,8 @@ def solve_88207623(input_grid: ColoredGrid) -> ColoredGrid:
     
     The expansion fills available space in all directions, stopping at existing borders, 
     other colors, or grid edges. Expansions are based on proximity to the nearest main shape.
+    Single pixels expand to form territories around their nearest yellow shape, with closer
+    pixels taking precedence over more distant ones.
     """
     def find_main_shapes(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
         return grid.find_connected_regions(4)  # Yellow color
@@ -36,22 +39,21 @@ def solve_88207623(input_grid: ColoredGrid) -> ColoredGrid:
         return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
 
     def associate_pixels_to_shapes(pixels: List[Tuple[int, int, int]], shapes: List[List[Tuple[int, int]]]) -> Dict[int, List[Tuple[int, int, int]]]:
-        pixel_shape_mapping = {i: [] for i in range(len(shapes))}
+        pixel_shape_mapping = defaultdict(list)
         for pixel in pixels:
             distances = [min(manhattan_distance(pixel[:2], cell) for cell in shape) for shape in shapes]
             nearest_shape = distances.index(min(distances))
-            pixel_shape_mapping[nearest_shape].append(pixel)
-        return pixel_shape_mapping
+            pixel_shape_mapping[nearest_shape].append((pixel, min(distances)))
+        return {k: sorted(v, key=lambda x: x[1]) for k, v in pixel_shape_mapping.items()}
 
-    def expand_color(grid: ColoredGrid, start: Tuple[int, int], color: int, shape: List[Tuple[int, int]]) -> None:
+    def expand_territory(grid: ColoredGrid, start: Tuple[int, int], color: int, shape_set: Set[Tuple[int, int]]) -> None:
         rows, cols = grid.get_dimensions()
         queue = [start]
         visited = set()
-        shape_set = set(shape)
 
         while queue:
             r, c = queue.pop(0)
-            if (r, c) in visited or grid.values[r][c] in {2, 4} or (r, c) in shape_set:
+            if (r, c) in visited or grid.values[r][c] != 0 or (r, c) in shape_set:
                 continue
         
             grid.values[r][c] = color
@@ -59,7 +61,7 @@ def solve_88207623(input_grid: ColoredGrid) -> ColoredGrid:
 
             for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
                 nr, nc = r + dr, c + dc
-                if 0 <= nr < rows and 0 <= nc < cols and grid.values[nr][nc] == 0:
+                if 0 <= nr < rows and 0 <= nc < cols:
                     queue.append((nr, nc))
 
     # Main solving process
@@ -68,19 +70,22 @@ def solve_88207623(input_grid: ColoredGrid) -> ColoredGrid:
     single_color_pixels = find_single_color_pixels(input_grid)
     pixel_shape_mapping = associate_pixels_to_shapes(single_color_pixels, main_shapes)
 
+    shape_set = set()
+    for shape in main_shapes:
+        shape_set.update(shape)
+        for r, c in shape:
+            if input_grid.values[r][c] == 2:  # Add red borders to shape_set
+                shape_set.add((r, c))
+
     for shape_index, pixels in pixel_shape_mapping.items():
-        for r, c, color in pixels:
-            expand_color(result_grid, (r, c), color, main_shapes[shape_index])
+        for (r, c, color), _ in pixels:
+            if result_grid.values[r][c] == 0:  # Only expand if the cell is still black
+                expand_territory(result_grid, (r, c), color, shape_set)
 
     # Preserve original shapes and borders
-    for shape in main_shapes:
-        for r, c in shape:
-            result_grid.values[r][c] = input_grid.values[r][c]
-
-    rows, cols = input_grid.get_dimensions()
-    for r in range(rows):
-        for c in range(cols):
-            if input_grid.values[r][c] == 2:  # Red border
-                result_grid.values[r][c] = 2
+    for r in range(input_grid.num_rows):
+        for c in range(input_grid.num_cols):
+            if input_grid.values[r][c] in {2, 4}:  # Red border or yellow shape
+                result_grid.values[r][c] = input_grid.values[r][c]
 
     return result_grid
