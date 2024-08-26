@@ -3,14 +3,14 @@ from typing import List, Tuple, Set
 
 def solve_4b6b68e5(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the grid transformation challenge by filling enclosed regions with sky blue (8) or magenta (6).
+    Solves the grid transformation challenge by filling enclosed regions with the highest-valued color
+    present within the region or adjacent to it, excluding black (0).
     
     The solution follows these steps:
     1. Identify all enclosed regions in the grid for each non-zero color.
     2. For each enclosed region:
-       a. If it contains or is adjacent to sky blue (8), fill the entire region with 8.
-       b. If it contains or is adjacent to magenta (6), fill the entire region with 6.
-       c. If neither 8 nor 6 is present, leave the region unchanged.
+       a. Determine the highest-valued color within the region or adjacent to it (excluding black).
+       b. Fill the entire region with this highest-valued color.
     3. Return the modified grid.
     
     Args:
@@ -41,16 +41,17 @@ def solve_4b6b68e5(input_grid: ColoredGrid) -> ColoredGrid:
         for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
             flood_fill(r + dr, c + dc, old_color, new_color)
 
-    def region_contains_or_adjacent(region: Set[Tuple[int, int]], target_color: int) -> bool:
+    def get_highest_color(region: Set[Tuple[int, int]], color: int) -> int:
+        highest_color = color
         for r, c in region:
-            if input_grid.get_cell(r, c) == target_color:
-                return True
+            highest_color = max(highest_color, input_grid.get_cell(r, c))
             for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
                 nr, nc = r + dr, c + dc
                 if 0 <= nr < rows and 0 <= nc < cols:
-                    if input_grid.get_cell(nr, nc) == target_color:
-                        return True
-        return False
+                    neighbor_color = input_grid.get_cell(nr, nc)
+                    if neighbor_color != 0:  # Exclude black
+                        highest_color = max(highest_color, neighbor_color)
+        return highest_color
 
     colors = set(color for row in input_grid.values for color in row if color != 0)
     
@@ -58,11 +59,8 @@ def solve_4b6b68e5(input_grid: ColoredGrid) -> ColoredGrid:
         regions = input_grid.find_connected_regions(color)
         for region in regions:
             if is_enclosed(region, color):
-                if region_contains_or_adjacent(region, 8):
-                    r, c = next(iter(region))
-                    flood_fill(r, c, color, 8)
-                elif region_contains_or_adjacent(region, 6):
-                    r, c = next(iter(region))
-                    flood_fill(r, c, color, 6)
+                highest_color = get_highest_color(region, color)
+                r, c = next(iter(region))
+                flood_fill(r, c, color, highest_color)
     
     return output_grid
