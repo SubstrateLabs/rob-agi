@@ -3,18 +3,16 @@ import numpy as np
 
 def solve_e345f17b(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms an 8x4 input grid into a 4x4 output grid based on the interaction
-    between magenta (6) and gray (5) areas.
+    Transforms an 8x4 input grid into a 4x4 output grid based on the distribution
+    of magenta (6) and gray (5) squares.
 
     The algorithm works as follows:
-    1. Divides the input grid into two 4x4 halves (left and right).
-    2. For each half, calculates the weighted centers of mass for magenta and gray areas.
-    3. Determines the relative positions and strengths of magenta and gray concentrations.
-    4. Places yellow (4) squares in the output grid to balance the color distributions.
-    5. The placement of yellow squares follows these rules:
-       - Strong concentrations of a color are balanced by yellows on the opposite side.
-       - Balanced color distributions result in more centralized yellow placements.
-       - Sparse color distributions may result in diagonal yellow placements.
+    1. Divides the 8x4 input grid into four 4x2 quadrants.
+    2. Counts the number of magenta and gray squares in each quadrant.
+    3. Determines the number of yellow squares to place (3 or 4) based on total colored squares.
+    4. Analyzes horizontal and vertical color distributions.
+    5. Places yellow squares in the 4x4 output grid to balance the input color distribution.
+    6. Adjusts placement for even distributions and edge preferences.
 
     Args:
     input_grid (ColoredGrid): An 8x4 grid representing the input pattern.
@@ -26,45 +24,46 @@ def solve_e345f17b(input_grid: ColoredGrid) -> ColoredGrid:
     magenta, gray, yellow = 6, 5, 4
     output = np.zeros((4, 4), dtype=int)
 
-    def calculate_weighted_com(half_grid, color):
-        positions = np.argwhere(half_grid == color)
-        weights = np.sum(half_grid == color, axis=1)
-        return np.average(positions, axis=0, weights=weights) if len(positions) > 0 else None
+    # Count colored squares in each quadrant
+    q1 = np.sum((input_array[:2, :4] == magenta) | (input_array[:2, :4] == gray))
+    q2 = np.sum((input_array[:2, 4:] == magenta) | (input_array[:2, 4:] == gray))
+    q3 = np.sum((input_array[2:, :4] == magenta) | (input_array[2:, :4] == gray))
+    q4 = np.sum((input_array[2:, 4:] == magenta) | (input_array[2:, 4:] == gray))
 
-    def place_yellow(quadrant, strength, position):
-        row, col = int(position[0] >= 2), int(position[1] >= 2)
-        if strength > 0.6:
-            output[2*row + (1-row), 2*quadrant + (1-col)] = yellow
-        elif 0.3 < strength <= 0.6:
-            output[2*row + (1-row), 2*quadrant + col] = yellow
+    total_colored = q1 + q2 + q3 + q4
+    num_yellow = 4 if total_colored > 16 else 3
 
-    for half in range(2):
-        half_grid = input_array[:, half*4:(half+1)*4]
-        magenta_com = calculate_weighted_com(half_grid, magenta)
-        gray_com = calculate_weighted_com(half_grid, gray)
+    # Analyze horizontal and vertical distributions
+    left_sum = q1 + q3
+    right_sum = q2 + q4
+    top_sum = q1 + q2
+    bottom_sum = q3 + q4
 
-        magenta_strength = np.sum(half_grid == magenta) / 16
-        gray_strength = np.sum(half_grid == gray) / 16
+    # Place yellow squares
+    yellow_positions = []
+    if left_sum > right_sum * 1.5:
+        yellow_positions.extend([(1, 3), (2, 3)])
+    elif right_sum > left_sum * 1.5:
+        yellow_positions.extend([(1, 0), (2, 0)])
+    
+    if top_sum > bottom_sum * 1.5:
+        yellow_positions.extend([(3, 1), (3, 2)])
+    elif bottom_sum > top_sum * 1.5:
+        yellow_positions.extend([(0, 1), (0, 2)])
 
-        if magenta_com is not None and gray_com is not None:
-            if abs(magenta_com[0] - gray_com[0]) > abs(magenta_com[1] - gray_com[1]):
-                # Vertical separation
-                place_yellow(half, magenta_strength, (3 - magenta_com[0], magenta_com[1]))
-                place_yellow(half, gray_strength, (3 - gray_com[0], gray_com[1]))
-            else:
-                # Horizontal separation or mixed
-                place_yellow(half, magenta_strength, (magenta_com[0], 3 - magenta_com[1]))
-                place_yellow(half, gray_strength, (gray_com[0], 3 - gray_com[1]))
-        elif magenta_com is not None:
-            place_yellow(half, magenta_strength, (3 - magenta_com[0], 3 - magenta_com[1]))
-        elif gray_com is not None:
-            place_yellow(half, gray_strength, (3 - gray_com[0], 3 - gray_com[1]))
+    # Adjust for even distributions
+    if not yellow_positions:
+        yellow_positions = [(0, 0), (0, 3), (3, 0), (3, 3)]
 
-    # Ensure at least 3 yellow squares
-    if np.sum(output == yellow) < 3:
-        empty_positions = list(zip(*np.where(output == 0)))
-        np.random.shuffle(empty_positions)
-        for pos in empty_positions[:3 - np.sum(output == yellow)]:
-            output[pos] = yellow
+    # Ensure correct number of yellow squares
+    yellow_positions = yellow_positions[:num_yellow]
+    while len(yellow_positions) < num_yellow:
+        new_pos = (np.random.randint(4), np.random.randint(4))
+        if new_pos not in yellow_positions:
+            yellow_positions.append(new_pos)
+
+    # Place yellow squares in output grid
+    for pos in yellow_positions:
+        output[pos] = yellow
 
     return ColoredGrid(values=output.tolist())
