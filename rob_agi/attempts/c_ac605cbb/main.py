@@ -5,13 +5,13 @@ def solve_ac605cbb(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid based on the following rules:
     1. Expands colored cells (6, 3, 2, 1) in specific patterns.
-    2. Magenta (6) and Green (3) expand vertically to the grid edges.
-    3. Red (2) expands horizontally to the grid edges.
-    4. Blue (1) creates an L-shape by moving diagonally and then expanding.
-    5. Uses gray (5) for expansions and connections.
-    6. Uses yellow (4) for diagonal connections and conflict resolution.
-    7. Maintains color hierarchy and creates connections between expansions.
-    8. Balances the grid and fills isolated areas.
+    2. Magenta (6) expands vertically to both edges, placing Magenta at ends and Gray (5) in between.
+    3. Green (3) expands vertically downwards with Gray (5).
+    4. Red (2) expands horizontally to both edges, placing Red at ends and Gray (5) in between.
+    5. Blue (1) creates an L-shape by moving one step and then expanding perpendicularly.
+    6. Uses Gray (5) for expansions and orthogonal connections.
+    7. Uses Yellow (4) for diagonal connections when needed.
+    8. Fills isolated areas and resolves conflicts based on color priority.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -22,8 +22,10 @@ def solve_ac605cbb(input_grid: ColoredGrid) -> ColoredGrid:
     
     # Primary expansion
     for r, c, color in colored_cells:
-        if color == 6 or color == 3:  # Magenta or Green
-            expand_vertical(output_grid, r, c, color)
+        if color == 6:  # Magenta
+            expand_magenta(output_grid, r, c)
+        elif color == 3:  # Green
+            expand_green(output_grid, r, c)
         elif color == 2:  # Red
             expand_horizontal(output_grid, r, c, color)
         elif color == 1:  # Blue
@@ -40,17 +42,21 @@ def solve_ac605cbb(input_grid: ColoredGrid) -> ColoredGrid:
     
     return output_grid
 
-def expand_vertical(grid: ColoredGrid, r: int, c: int, color: int):
+def expand_magenta(grid: ColoredGrid, r: int, c: int):
     rows, _ = grid.get_dimensions()
-    for i in range(rows):
-        if i == r:
-            continue
+    grid.set_cell(0, c, 6)  # Place Magenta at the top
+    grid.set_cell(rows-1, c, 6)  # Place Magenta at the bottom
+    for i in range(1, rows-1):
+        if i != r and grid.get_cell(i, c) == 0:
+            grid.set_cell(i, c, 5)  # Fill with Gray
+
+def expand_green(grid: ColoredGrid, r: int, c: int):
+    rows, _ = grid.get_dimensions()
+    for i in range(r+1, rows):
         if grid.get_cell(i, c) == 0:
             grid.set_cell(i, c, 5)
-        elif grid.get_cell(i, c) != color:
+        else:
             break
-    grid.set_cell(0, c, color)
-    grid.set_cell(rows-1, c, color)
 
 def expand_horizontal(grid: ColoredGrid, r: int, c: int, color: int):
     _, cols = grid.get_dimensions()
