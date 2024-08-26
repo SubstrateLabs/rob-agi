@@ -4,13 +4,14 @@ from typing import List, Tuple
 def solve_009d5c81(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by changing the color of the larger shape (color 8)
-    based on its characteristics, removing the smaller shape (color 1),
-    and keeping the rest of the grid black (color 0).
+    based on its characteristics and position relative to the smaller shape (color 1).
+    The smaller shape is removed, and the rest of the grid remains black (color 0).
 
     The new color of the larger shape is determined as follows:
-    - Red (2) if the shape resembles mechanical or man-made objects
-    - Green (3) if the shape resembles natural or organic forms
-    - Orange (7) if the shape is abstract or particularly complex
+    - Green (3) if the smaller shape is below and to the left of the larger shape
+    - Orange (7) if the larger shape is complex (multiple disconnected parts or high perimeter-to-area ratio)
+    - Red (2) if the larger shape has more straight lines and right angles
+    - Green (3) if the larger shape has more curved features
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed
@@ -21,28 +22,48 @@ def solve_009d5c81(input_grid: ColoredGrid) -> ColoredGrid:
     rows, cols = input_grid.get_dimensions()
     output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
 
-    # Extract the larger shape (color 8)
-    connected_regions = input_grid.find_connected_regions(8)
-    larger_shape = [cell for region in connected_regions for cell in region]
+    # Extract the shapes
+    larger_shape = input_grid.find_connected_regions(8)[0]
+    smaller_shape = input_grid.find_connected_regions(1)[0]
 
-    # Analyze shape characteristics
-    mechanical_score = analyze_mechanical_features(input_grid, larger_shape)
-    natural_score = analyze_natural_features(input_grid, larger_shape)
-    complexity_score = analyze_complexity(input_grid, larger_shape)
+    # Determine the bounding box of the larger shape
+    min_r = min(r for r, _ in larger_shape)
+    max_r = max(r for r, _ in larger_shape)
+    min_c = min(c for _, c in larger_shape)
+    max_c = max(c for _, c in larger_shape)
 
-    # Determine the new color based on shape characteristics
-    if complexity_score > max(mechanical_score, natural_score):
-        new_color = 7  # Orange for abstract or complex shapes
-    elif mechanical_score > natural_score:
-        new_color = 2  # Red for mechanical/man-made shapes
+    # Analyze the relative position of the smaller shape
+    smaller_r, smaller_c = smaller_shape[0]
+    if smaller_r > max_r and smaller_c < min_c:
+        new_color = 3  # Green
     else:
-        new_color = 3  # Green for natural/organic shapes
+        # Analyze the larger shape
+        complexity = analyze_complexity(larger_shape)
+        if complexity > 0.2:  # Threshold for complexity
+            new_color = 7  # Orange
+        else:
+            mechanical_score = analyze_mechanical_features(larger_shape)
+            natural_score = analyze_natural_features(larger_shape)
+            new_color = 2 if mechanical_score > natural_score else 3
 
     # Transform the grid
     for r, c in larger_shape:
         output_grid.values[r][c] = new_color
 
     return output_grid
+
+def analyze_complexity(shape: List[Tuple[int, int]]) -> float:
+    perimeter = calculate_perimeter(shape)
+    area = len(shape)
+    return perimeter / (area ** 0.5)  # Normalized complexity measure
+
+def analyze_mechanical_features(shape: List[Tuple[int, int]]) -> float:
+    straight_lines = sum(1 for r, c in shape if sum((r+1, c) in shape, (r-1, c) in shape, (r, c+1) in shape, (r, c-1) in shape) == 2)
+    return straight_lines / len(shape)
+
+def analyze_natural_features(shape: List[Tuple[int, int]]) -> float:
+    curves = sum(1 for r, c in shape if sum((r+1, c) in shape, (r-1, c) in shape, (r, c+1) in shape, (r, c-1) in shape) > 2)
+    return curves / len(shape)
 
 def analyze_mechanical_features(grid: ColoredGrid, shape: List[Tuple[int, int]]) -> float:
     lines = grid.detect_lines()
