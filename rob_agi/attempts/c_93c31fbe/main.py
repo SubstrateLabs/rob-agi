@@ -3,14 +3,13 @@ from typing import List, Tuple, Set
 
 def solve_93c31fbe(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by completing and extending blue (1) structures while respecting other colored elements.
-    The solution:
-    1. Identifies existing blue structures (lines, L-shapes, squares).
-    2. Completes partial structures by adding blue pixels.
-    3. Extends structures to create larger patterns.
-    4. Ensures connectivity between blue structures.
-    5. Maintains balance and symmetry in the overall pattern.
-    6. Respects existing non-blue elements.
+    Transforms the input grid by creating a balanced and symmetric pattern of blue (1) pixels
+    while respecting other colored elements. The solution:
+    1. Identifies all non-black structures in the grid.
+    2. Creates connections between structures of the same color, prioritizing diagonal paths.
+    3. Balances the overall pattern by mirroring blue pixel placements.
+    4. Completes partial blue structures without interfering with existing non-black pixels.
+    5. Ensures connectivity and symmetry in the final blue pixel pattern.
     """
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
@@ -18,68 +17,81 @@ def solve_93c31fbe(input_grid: ColoredGrid) -> ColoredGrid:
     def is_valid(r: int, c: int) -> bool:
         return 0 <= r < rows and 0 <= c < cols
 
-    def get_blue_pixels() -> Set[Tuple[int, int]]:
-        return {(r, c) for r in range(rows) for c in range(cols) if grid.values[r][c] == 1}
-
-    def get_neighbors(r: int, c: int) -> List[Tuple[int, int]]:
-        return [(r+dr, c+dc) for dr, dc in [(0,1), (1,0), (0,-1), (-1,0)] if is_valid(r+dr, c+dc)]
-
-    def identify_structures(blue_pixels: Set[Tuple[int, int]]) -> List[Set[Tuple[int, int]]]:
-        structures = []
+    def get_structures() -> Dict[int, List[Set[Tuple[int, int]]]]:
+        structures = {color: [] for color in range(1, 10)}  # Exclude black (0)
         visited = set()
-        for pixel in blue_pixels:
-            if pixel not in visited:
-                structure = set()
-                stack = [pixel]
-                while stack:
-                    current = stack.pop()
-                    if current not in visited:
-                        visited.add(current)
-                        structure.add(current)
-                        stack.extend(neighbor for neighbor in get_neighbors(*current) if neighbor in blue_pixels)
-                structures.append(structure)
+
+        for r in range(rows):
+            for c in range(cols):
+                if (r, c) not in visited and grid.values[r][c] != 0:
+                    color = grid.values[r][c]
+                    structure = set()
+                    stack = [(r, c)]
+                    while stack:
+                        cr, cc = stack.pop()
+                        if (cr, cc) not in visited and grid.values[cr][cc] == color:
+                            visited.add((cr, cc))
+                            structure.add((cr, cc))
+                            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]:
+                                nr, nc = cr + dr, cc + dc
+                                if is_valid(nr, nc):
+                                    stack.append((nr, nc))
+                    structures[color].append(structure)
         return structures
 
-    def complete_structure(structure: Set[Tuple[int, int]]) -> Set[Tuple[int, int]]:
-        completion = set()
-        for r, c in structure:
-            for nr, nc in get_neighbors(r, c):
-                if grid.values[nr][nc] == 0:
-                    blue_neighbors = sum(1 for nnr, nnc in get_neighbors(nr, nc) if (nnr, nnc) in structure)
-                    if blue_neighbors >= 2:
-                        completion.add((nr, nc))
-        return completion
+    def find_connection_points(structures: Dict[int, List[Set[Tuple[int, int]]]]) -> List[Tuple[int, int, int, int]]:
+        connections = []
+        for color, color_structures in structures.items():
+            for i, struct1 in enumerate(color_structures):
+                for j, struct2 in enumerate(color_structures[i+1:], start=i+1):
+                    min_dist = float('inf')
+                    best_connection = None
+                    for r1, c1 in struct1:
+                        for r2, c2 in struct2:
+                            dist = max(abs(r2 - r1), abs(c2 - c1))
+                            if dist < min_dist:
+                                min_dist = dist
+                                best_connection = (r1, c1, r2, c2)
+                    if best_connection:
+                        connections.append(best_connection)
+        return sorted(connections, key=lambda x: max(abs(x[2] - x[0]), abs(x[3] - x[1])))
 
-    def extend_structure(structure: Set[Tuple[int, int]]) -> Set[Tuple[int, int]]:
-        extension = set()
-        for r, c in structure:
-            for nr, nc in get_neighbors(r, c):
-                if grid.values[nr][nc] == 0:
-                    blue_neighbors = sum(1 for nnr, nnc in get_neighbors(nr, nc) if (nnr, nnc) in structure)
-                    if blue_neighbors == 1:
-                        extension.add((nr, nc))
-        return extension
+    def connect_points(r1: int, c1: int, r2: int, c2: int):
+        dr = 1 if r2 > r1 else -1 if r2 < r1 else 0
+        dc = 1 if c2 > c1 else -1 if c2 < c1 else 0
+        r, c = r1, c1
+        while (r, c) != (r2, c2):
+            if grid.values[r][c] == 0:
+                grid.values[r][c] = 1
+            if r != r2:
+                r += dr
+            if c != c2:
+                c += dc
 
-    def apply_changes(changes: Set[Tuple[int, int]]):
-        for r, c in changes:
-            grid.values[r][c] = 1
+    def mirror_placement(r: int, c: int):
+        mirror_r, mirror_c = rows - 1 - r, cols - 1 - c
+        if is_valid(mirror_r, mirror_c) and grid.values[mirror_r][mirror_c] == 0:
+            grid.values[mirror_r][mirror_c] = 1
+
+    def complete_structures():
+        for r in range(rows):
+            for c in range(cols):
+                if grid.values[r][c] == 1:
+                    for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]:
+                        nr, nc = r + dr, c + dc
+                        if is_valid(nr, nc) and grid.values[nr][nc] == 0:
+                            blue_neighbors = sum(1 for d in [(0, 1), (1, 0), (0, -1), (-1, 0)] if is_valid(nr+d[0], nc+d[1]) and grid.values[nr+d[0]][nc+d[1]] == 1)
+                            if blue_neighbors >= 2:
+                                grid.values[nr][nc] = 1
+                                mirror_placement(nr, nc)
 
     # Main execution
-    blue_pixels = get_blue_pixels()
-    structures = identify_structures(blue_pixels)
+    structures = get_structures()
+    connections = find_connection_points(structures)
 
-    for _ in range(3):  # Iterate a few times to allow for multi-step completions
-        for structure in structures:
-            completion = complete_structure(structure)
-            apply_changes(completion)
-            structure.update(completion)
+    for r1, c1, r2, c2 in connections:
+        connect_points(r1, c1, r2, c2)
 
-        for structure in structures:
-            extension = extend_structure(structure)
-            apply_changes(extension)
-            structure.update(extension)
-
-        blue_pixels = get_blue_pixels()
-        structures = identify_structures(blue_pixels)
+    complete_structures()
 
     return grid
