@@ -33,10 +33,10 @@ def solve_d282b262(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by moving all non-zero shapes to the right side of the grid.
     
     1. Identifies and extracts all non-zero shapes from the input grid.
-    2. Sorts shapes based on their original top position and size.
-    3. Places shapes on the right side of the grid, starting from the top-right corner.
-    4. Adjusts positions to avoid overlap and maximize space usage.
-    5. Performs final adjustments to compact the arrangement and align shapes to the right.
+    2. Sorts shapes based on their original top position.
+    3. Places shapes on the right side of the grid, maintaining vertical order.
+    4. Compacts the arrangement vertically and horizontally.
+    5. Ensures shapes are aligned to the right as much as possible.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -53,8 +53,7 @@ def solve_d282b262(input_grid: ColoredGrid) -> ColoredGrid:
     for r in range(rows):
         for c in range(cols):
             if grid[r][c] != 0 and (r, c) not in visited:
-                color = grid[r][c]
-                region = input_grid.find_connected_regions(color)[0]
+                region = input_grid.find_connected_regions(grid[r][c])[0]
                 visited.update(region)
                 top = min(x for x, _ in region)
                 left = min(y for _, y in region)
@@ -63,43 +62,44 @@ def solve_d282b262(input_grid: ColoredGrid) -> ColoredGrid:
                 shape = extract_shape(grid, top, left, bottom, right)
                 shapes.append(Shape(shape, top, left))
 
-    # Step 2: Sort shapes based on original top position and size
-    shapes.sort(key=lambda s: (s.top, -s.height, -s.width))
+    # Step 2: Sort shapes based on original top position
+    shapes.sort(key=lambda s: s.top)
 
-    # Step 3 & 4: Place shapes and adjust for overlap
+    # Step 3 & 4: Place shapes and compact
     new_grid = [[0 for _ in range(cols)] for _ in range(rows)]
+    current_row = 0
     for shape in shapes:
         placed = False
-        for col in range(cols - 1, -1, -1):
-            for row in range(rows):
-                if can_place_shape(new_grid, shape.colors, row, col):
-                    place_shape(new_grid, shape.colors, row, col)
-                    placed = True
-                    break
-            if placed:
+        for col in range(cols - shape.width, -1, -1):
+            if can_place_shape(new_grid, shape.colors, current_row, col):
+                place_shape(new_grid, shape.colors, current_row, col)
+                placed = True
+                current_row += shape.height + 1  # Add a gap of 1 row
                 break
         if not placed:
             raise ValueError("Not enough space to place all shapes")
 
-    # Step 5: Final adjustments
-    # Compact vertically
-    for col in range(cols - 1, -1, -1):
-        non_zero = [row for row in range(rows) if new_grid[row][col] != 0]
-        if non_zero:
-            for i, row in enumerate(non_zero):
-                for r in range(row, 0, -1):
-                    if all(new_grid[r-1][c] == 0 for c in range(col, cols)):
-                        new_grid[r-1][col:], new_grid[r][col:] = new_grid[r][col:], new_grid[r-1][col:]
-                    else:
-                        break
-
-    # Compact horizontally
-    for col in range(cols - 2, -1, -1):
-        if all(new_grid[row][col] == 0 for row in range(rows)):
-            for c in range(col, cols - 1):
-                for row in range(rows):
-                    new_grid[row][c] = new_grid[row][c + 1]
-            for row in range(rows):
-                new_grid[row][-1] = 0
+    # Step 5: Compact vertically and align to right
+    compact_vertically(new_grid)
+    align_right(new_grid)
 
     return ColoredGrid(values=new_grid)
+
+def compact_vertically(grid):
+    rows, cols = len(grid), len(grid[0])
+    for col in range(cols - 1, -1, -1):
+        non_zero = [row for row in range(rows) if grid[row][col] != 0]
+        if non_zero:
+            for i, row in enumerate(non_zero):
+                while row > i and all(grid[row-1][c] == 0 for c in range(col, cols)):
+                    grid[row-1][col:], grid[row][col:] = grid[row][col:], grid[row-1][col:]
+                    row -= 1
+
+def align_right(grid):
+    rows, cols = len(grid), len(grid[0])
+    for row in range(rows):
+        non_zero = [col for col in range(cols) if grid[row][col] != 0]
+        if non_zero:
+            shift = cols - max(non_zero) - 1
+            if shift > 0:
+                grid[row] = [0] * shift + grid[row][:-shift]
