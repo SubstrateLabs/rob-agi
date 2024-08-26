@@ -5,15 +5,14 @@ def solve_ac3e2b04(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by adding blue (1) structures that complement
     existing red (2) and green (3) patterns. The function creates a symmetrical
-    blue structure extending from green squares and balancing red lines.
+    blue structure extending from green squares and connecting red lines.
 
     1. Identifies green squares (3x3 areas with a red center)
-    2. Creates vertical blue lines extending from the center of green squares
-    3. Adds horizontal blue lines to balance and connect with red structures
-    4. Ensures symmetry across both vertical and horizontal axes
-    5. Extends blue lines to create a balanced structure
-    6. Handles intersections and fills gaps in the blue structure
-    7. Preserves all original red and green cells
+    2. Creates initial blue structure based on green squares and red lines
+    3. Ensures symmetry across both vertical and horizontal axes
+    4. Extends blue structure to create a connected network
+    5. Handles intersections and fills gaps in the blue structure
+    6. Performs final symmetry check and preserves original red and green cells
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed
@@ -24,14 +23,14 @@ def solve_ac3e2b04(input_grid: ColoredGrid) -> ColoredGrid:
     output_grid = input_grid.deep_copy()
     green_squares = find_green_squares(output_grid)
     
-    create_vertical_blue_lines(output_grid, green_squares)
-    add_horizontal_blue_lines(output_grid)
+    create_initial_blue_structure(output_grid, green_squares)
     ensure_symmetry(output_grid)
     extend_blue_structure(output_grid)
     handle_intersections(output_grid)
     fill_gaps(output_grid)
     final_symmetry_check(output_grid)
     preserve_original_colors(output_grid, input_grid)
+    connect_blue_networks(output_grid)
     
     return output_grid
 
@@ -45,18 +44,22 @@ def find_green_squares(grid: ColoredGrid) -> List[Tuple[int, int]]:
                 green_squares.append((r, c))
     return green_squares
 
-def create_vertical_blue_lines(grid: ColoredGrid, green_squares: List[Tuple[int, int]]):
+def create_initial_blue_structure(grid: ColoredGrid, green_squares: List[Tuple[int, int]]):
     rows, cols = grid.get_dimensions()
     for r, c in green_squares:
-        center_col = c
+        # Vertical lines from green squares
         for row in range(rows):
-            if grid.get_cell(row, center_col) == 0:
-                grid.set_cell(row, center_col, 1)
-
-def add_horizontal_blue_lines(grid: ColoredGrid):
-    rows, cols = grid.get_dimensions()
+            if grid.get_cell(row, c) == 0:
+                grid.set_cell(row, c, 1)
+        
+        # Horizontal lines from green squares
+        for col in range(cols):
+            if grid.get_cell(r, col) == 0:
+                grid.set_cell(r, col, 1)
+    
+    # Add horizontal blue lines along red lines
     for r in range(rows):
-        if any(grid.get_cell(r, c) == 2 for c in range(cols)):  # Check for red in the row
+        if any(grid.get_cell(r, c) == 2 for c in range(cols)):
             for c in range(cols):
                 if grid.get_cell(r, c) == 0:
                     grid.set_cell(r, c, 1)
@@ -64,16 +67,11 @@ def add_horizontal_blue_lines(grid: ColoredGrid):
 def ensure_symmetry(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
     for r in range(rows):
-        for c in range(cols // 2):
-            if grid.get_cell(r, c) == 1 or grid.get_cell(r, cols - 1 - c) == 1:
-                grid.set_cell(r, c, 1)
+        for c in range(cols):
+            if grid.get_cell(r, c) == 1:
                 grid.set_cell(r, cols - 1 - c, 1)
-    
-    for c in range(cols):
-        for r in range(rows // 2):
-            if grid.get_cell(r, c) == 1 or grid.get_cell(rows - 1 - r, c) == 1:
-                grid.set_cell(r, c, 1)
                 grid.set_cell(rows - 1 - r, c, 1)
+                grid.set_cell(rows - 1 - r, cols - 1 - c, 1)
 
 def extend_blue_structure(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
@@ -131,3 +129,18 @@ def preserve_original_colors(output_grid: ColoredGrid, input_grid: ColoredGrid):
         for c in range(cols):
             if input_grid.get_cell(r, c) != 0:
                 output_grid.set_cell(r, c, input_grid.get_cell(r, c))
+def connect_blue_networks(grid: ColoredGrid):
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        blue_cells = [c for c in range(cols) if grid.get_cell(r, c) == 1]
+        if len(blue_cells) > 1:
+            for c in range(min(blue_cells), max(blue_cells) + 1):
+                if grid.get_cell(r, c) == 0:
+                    grid.set_cell(r, c, 1)
+    
+    for c in range(cols):
+        blue_cells = [r for r in range(rows) if grid.get_cell(r, c) == 1]
+        if len(blue_cells) > 1:
+            for r in range(min(blue_cells), max(blue_cells) + 1):
+                if grid.get_cell(r, c) == 0:
+                    grid.set_cell(r, c, 1)
