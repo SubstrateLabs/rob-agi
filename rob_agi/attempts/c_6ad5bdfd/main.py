@@ -18,7 +18,7 @@ def solve_6ad5bdfd(input_grid: ColoredGrid) -> ColoredGrid:
 
     1. Identify the anchor side (bottom, left, or right).
     2. Create a new empty grid with the same dimensions.
-    3. Move objects towards the anchor side, maintaining their order.
+    3. Move objects towards the anchor side, maintaining their order and vertical alignment.
     4. Copy the anchor line to the new grid.
     5. Return the transformed grid.
     """
@@ -34,12 +34,14 @@ def solve_6ad5bdfd(input_grid: ColoredGrid) -> ColoredGrid:
         new_grid.values[-1] = input_grid.values[-1]  # Copy anchor line
     
     elif anchor_side in ["left", "right"]:
-        for r in range(rows):
-            non_zeros = [v for v in input_grid.values[r] if v != 0]
+        for c in range(cols):
+            non_zeros = [(r, input_grid.values[r][c]) for r in range(rows) if input_grid.values[r][c] != 0]
             if anchor_side == "left":
-                new_grid.values[r][:len(non_zeros)] = non_zeros
+                for i, (r, value) in enumerate(non_zeros):
+                    new_grid.values[r][i] = value
             else:  # right
-                new_grid.values[r][-len(non_zeros):] = non_zeros
+                for i, (r, value) in enumerate(reversed(non_zeros), start=cols-len(non_zeros)):
+                    new_grid.values[r][i] = value
         
         # Copy anchor line
         if anchor_side == "left":
