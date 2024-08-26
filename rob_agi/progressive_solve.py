@@ -117,9 +117,8 @@ class Solver:
         prompt = f"{prefix}\n\n<VALIDATION_OUTPUT>\n{current_result['error']}\n{current_result['output']}</VALIDATION_OUTPUT>\n"
         prompt += f"\n<VISUAL_DESCRIPTIONS>\n{desc}\n</VISUAL_DESCRIPTIONS>\n"
         prompt += "Examine all the information you have, state your understanding of the challenge, and propose a detailed solution to the challenge in words. Any solution must always apply to every case, not just the failing exception here.\n"
-        ask_coder.run(prompt)
-
-        prompt = "Now reflect on your idea. Look very closely and notice if there are any other patterns or discrepancies worth noting. Remember this is about identifying abstract, intuitive ideas about what is happening.\n"
+        # ask_coder.run(prompt)
+        prompt = "Then reflect on your idea. Look very closely and notice if there are any other patterns or discrepancies worth noting. Remember this is about identifying abstract, intuitive ideas about what is happening.\n"
         prompt += f"Explicitly consider how your idea applies to each of the examples and test cases in attempts/{self.challenge_id}/test.py. To check your thinking, illustrate how your idea either works or doesn't for each case.\n"
         prompt += f"If the rule(s) you came up with does not apply to any specific case, call it out and think about a more general idea that does apply in every case. Be meticulous and careful in your reflection. Sometimes you need to zoom out to see how a single idea can apply to all cases.\n"
         ask_coder.run(prompt)
