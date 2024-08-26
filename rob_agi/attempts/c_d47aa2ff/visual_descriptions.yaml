@@ -1,0 +1,54 @@
+example_0:
+  input: |
+    The input grid is 10x21 in size. The most prominent feature is a vertical gray (5) line running down the center of the grid, dividing it into two halves. On either side of this line, there are several colored squares scattered symmetrically:
+    - Two magenta (6) squares in the 2nd and 5th rows
+    - Four green (3) squares in the 3rd row and 9th row
+    - One magenta (6) square in the 9th row
+    The rest of the grid is filled with black (0), which can be considered empty space.
+  output: |
+    The output grid is 10x10, exactly half the width of the input. It appears to be the left half of the input grid with two key changes:
+    - A blue (1) square has been placed in the 7th row, 7th column
+    - A red (2) square has been placed in the 6th row, 7th column
+    All other colored squares from the left half of the input remain in their original positions. The central gray line is no longer present.
+
+example_1:
+  input: |
+    The input grid is 10x21. Like the previous example, there's a central vertical gray (5) line. The grid is symmetrical on both sides of this line, with various colored squares:
+    - Yellow (4) squares in the 1st and 5th rows
+    - Sky blue (8) squares in the 2nd and 8th rows
+    - Brown (9) squares in the 4th and 6th rows
+    - Yellow (4) square in the 5th row
+    The rest is black (0) empty space.
+  output: |
+    The output grid is 10x10, representing the left half of the input. The key changes are:
+    - A blue (1) square in the 4th row, 5th column
+    - A red (2) square in the 4th row, 6th column
+    - Another blue (1) square in the 7th row, 7th column
+    - Another red (2) square in the 9th row, 8th column
+    All other colored squares from the left half of the input remain in their original positions. The central gray line is removed.
+
+example_2:
+  input: |
+    This 10x21 grid also has a central vertical gray (5) line. The grid is symmetrical, with these colored squares:
+    - Sky blue (8) squares in the 2nd, 3rd, and 9th rows
+    - Green (3) squares in the 4th row, with additional ones at the edges
+    - One green (3) square in the 5th row
+    - Magenta (6) squares in the 6th, 7th, and 9th rows
+    The rest is black (0) empty space.
+  output: |
+    The output is a 10x10 grid, representing the left half of the input. The changes are:
+    - A blue (1) square in the 4th row, 7th column
+    - A red (2) square in the 5th row, 6th column
+    - Another blue (1) square in the 7th row, 8th column
+    - Another red (2) square in the 9th row, 8th column
+    All other colored squares from the left half of the input remain in their original positions. The central gray line is removed.
+
+test_case_0:
+  input: |
+    This is identical to example_0's input. It's a 10x21 grid with a central vertical gray (5) line, and symmetrically placed colored squares on either side:
+    - Two magenta (6) squares in the 2nd and 5th rows
+    - Four green (3) squares in the 3rd row and 9th row
+    - One magenta (6) square in the 9th row
+    The rest is black (0) empty space.
+  output: |
+    The output is not provided for this test case.
