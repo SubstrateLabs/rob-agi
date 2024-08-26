@@ -29,7 +29,7 @@ def process_right_anchor(input_grid: ColoredGrid, new_grid: ColoredGrid):
     rows, cols = input_grid.get_dimensions()
     for r in range(rows):
         non_zeros = [input_grid.values[r][c] for c in range(cols-1) if input_grid.values[r][c] != 0]
-        for c, value in enumerate(reversed(non_zeros), start=cols-1-len(non_zeros)):
+        for c, value in enumerate(non_zeros, start=cols-1-len(non_zeros)):
             new_grid.values[r][c] = value
         new_grid.values[r][-1] = input_grid.values[r][-1]  # Copy anchor line
 
@@ -44,7 +44,11 @@ def solve_6ad5bdfd(input_grid: ColoredGrid) -> ColoredGrid:
     2. Create a new empty grid with the same dimensions.
     3. Move objects towards the anchor side, maintaining their order and alignment perpendicular to the movement direction.
     4. Copy the anchor line to the new grid.
-    5. Return the transformed grid.
+    5. Fill any remaining spaces with zeros.
+    6. Return the transformed grid.
+
+    This implementation handles bottom, left, and right anchors, ensuring that objects are moved
+    correctly towards the anchor side while maintaining their relative positions within each row or column.
     """
     anchor_side = find_anchor_side(input_grid)
     rows, cols = input_grid.get_dimensions()
