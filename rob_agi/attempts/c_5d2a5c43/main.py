@@ -34,25 +34,25 @@ def solve_5d2a5c43(input_grid: ColoredGrid) -> ColoredGrid:
         col_candidates = [pos for pos in candidates if pos[1] == col]
         if col_candidates:
             black_positions.append(col_candidates[0])
-            candidates = [pos for pos in candidates if pos[1] != col]
+            candidates = [pos for pos in candidates if pos != col_candidates[0]]
 
     # Add additional black squares
-    while len(black_positions) < 6 and candidates:
-        for candidate in candidates:
-            row_count = sum(1 for pos in black_positions if pos[0] == candidate[0])
+    while len(black_positions) < 6:
+        for row in range(rows):
+            row_count = sum(1 for pos in black_positions if pos[0] == row)
             if row_count < 2:
-                black_positions.append(candidate)
-                candidates.remove(candidate)
-                if len(black_positions) == 6:
-                    break
+                available_cols = [c for c in range(4) if not any(pos[1] == c for pos in black_positions if pos[0] == row)]
+                if available_cols:
+                    black_positions.append((row, available_cols[0]))
+                    if len(black_positions) == 6:
+                        break
 
     # Ensure each row has at least one black square
     for row in range(rows):
         if not any(pos[0] == row for pos in black_positions):
-            for col in range(4):
-                if not any(pos[1] == col for pos in black_positions):
-                    black_positions.append((row, col))
-                    break
+            available_cols = [c for c in range(4) if not any(pos[1] == c for pos in black_positions)]
+            if available_cols:
+                black_positions.append((row, available_cols[0]))
 
     # Apply black squares to the output grid
     for r, c in black_positions:
