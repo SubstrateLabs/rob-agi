@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid is 30x30. There are two blue (1) rectangular shapes in the upper left quadrant, each 7x7 squares. They are separated by 3 columns of black (0) squares. In the lower right quadrant, there are two green (3) rectangular shapes, also 7x7 squares, separated by 3 columns of black squares. The rest of the grid is filled with black (0) squares.
+  output: |
+    The grid layout is mostly the same as the input, with the addition of a sky blue (8) connection between the shapes. A 3-cell wide sky blue bridge connects the bottom of the upper left blue shape to the top of the lower right green shape. This bridge runs vertically through the center of the grid, then horizontally to connect to the green shape.
+
+example_1:
+  input: |
+    The grid is 30x30. In the upper left quadrant, there's a red (2) 7x7 square shape. To its right, separated by 3 columns, is a magenta (6) 5x5 square. Below this magenta square is another 5x5 magenta square. In the lower left quadrant, there's a 4x4 red square. In the upper right quadrant, there's a 5x6 magenta rectangle. The rest of the grid is filled with black (0) squares.
+  output: |
+    The layout is similar to the input, with the addition of sky blue (8) connections. A 3-cell wide sky blue bridge connects the right side of the upper left red square to the left side of the upper magenta square. Another sky blue bridge connects the bottom of this magenta square to the top of the one below it. A third bridge connects the bottom right of the lower magenta square to the top left of the red square in the lower left. Finally, a bridge connects the right side of this red square to the left side of the magenta rectangle in the upper right.
+
+example_2:
+  input: |
+    The grid is 30x30. In the upper left quadrant, there's a yellow (4) 7x7 square, with a 6x6 yellow square to its right, separated by 3 columns. In the upper right, there's a 3x5 yellow rectangle. In the lower left, there's a 3x5 yellow rectangle. In the center right, there's a 6x3 magenta (6) rectangle. In the lower right, there's a 3x3 magenta square. The rest of the grid is black (0).
+  output: |
+    The layout is similar to the input, with the addition of sky blue (8) connections. A 3-cell wide sky blue bridge connects the right side of the upper left yellow square to the left side of the upper right yellow square. Another bridge connects the bottom of the upper right yellow square to the top of the magenta rectangle in the center right. A third bridge connects the bottom of this magenta rectangle to the top of the magenta square in the lower right. A fourth bridge connects the left side of the lower left yellow rectangle to the left side of the upper left yellow square. Finally, a fifth bridge connects the right side of the lower left yellow rectangle to the left side of the lower right magenta square.
+
+test_case_0:
+  input: |
+    The grid is 30x30. There are no visible shapes or patterns. The entire grid is filled with black (0) squares.
+  output: |
+    The output is not provided for the test case.
