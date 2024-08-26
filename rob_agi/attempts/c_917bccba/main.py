@@ -5,8 +5,8 @@ def solve_917bccba(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by rearranging a cross and shape pattern:
     1. Identifies the cross color and shape color
     2. Moves the shape to the left side of the grid
-    3. Moves the vertical line of the cross to the right edge of the shape
-    4. Adds a horizontal line of the cross color at the middle of the shape,
+    3. Moves the vertical line of the cross to one column right of the shape's right edge
+    4. Adds a horizontal line of the cross color at the top of the shape,
        extending to the edges of the grid
     5. Preserves the vertical parts of the cross outside the shape
     """
@@ -34,7 +34,6 @@ def solve_917bccba(input_grid: ColoredGrid) -> ColoredGrid:
         cross_color, shape_color = shape_color, cross_color
     
     shape_width = shape_right - shape_left + 1
-    shape_height = shape_bottom - shape_top + 1
     
     # Fill the shape (moved to the left)
     for r in range(shape_top, shape_bottom + 1):
@@ -42,18 +41,18 @@ def solve_917bccba(input_grid: ColoredGrid) -> ColoredGrid:
             new_grid.values[r][c] = shape_color
     
     # Draw the transformed cross
-    # Vertical line at the right edge of the shape
+    # Vertical line one column right of the shape's right edge
+    vertical_line_col = shape_width
     for r in range(rows):
-        new_grid.values[r][shape_width - 1] = cross_color
+        new_grid.values[r][vertical_line_col] = cross_color
     
-    # Horizontal line at the middle of the shape
-    middle_row = shape_top + shape_height // 2
+    # Horizontal line at the top of the shape
     for c in range(cols):
-        new_grid.values[middle_row][c] = cross_color
+        new_grid.values[shape_top][c] = cross_color
     
     # Preserve original vertical cross parts outside the shape
     for r in range(rows):
         if r < shape_top or r > shape_bottom:
-            new_grid.values[r][shape_width - 1] = cross_color
+            new_grid.values[r][vertical_line_col] = cross_color
     
     return new_grid
