@@ -15,12 +15,12 @@ def solve_f9d67f8b(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the grid transformation challenge by:
     1. Identifying all brown (9) cells.
-    2. Replacing brown cells with sky blue (8) if adjacent, or the first non-brown color found.
-    3. Repeating the process until all brown cells are replaced.
+    2. Iteratively replacing brown cells with adjacent colors, prioritizing sky blue (8).
+    3. If no sky blue is adjacent, use the first non-brown color found.
+    4. Repeat until all brown cells are replaced.
 
-    This approach prioritizes the expansion of sky blue areas and allows other patterns
-    to naturally fill in when there's no sky blue, preserving the original patterns by
-    only modifying brown cells.
+    This approach ensures the expansion of existing patterns, particularly sky blue areas,
+    while preserving the original structure by only modifying brown cells.
 
     Args:
         input_grid (ColoredGrid): The input grid to transform.
@@ -30,20 +30,18 @@ def solve_f9d67f8b(input_grid: ColoredGrid) -> ColoredGrid:
     """
     new_grid = input_grid.deep_copy()
     rows, cols = new_grid.get_dimensions()
-    brown_cells: Set[Tuple[int, int]] = {(r, c) for r in range(rows) for c in range(cols) if new_grid.get_cell(r, c) == 9}
+    brown_cells = set((r, c) for r in range(rows) for c in range(cols) if new_grid.get_cell(r, c) == 9)
+
+    if not brown_cells:
+        return new_grid  # Return unchanged if no brown cells
 
     while brown_cells:
-        update_list: List[Tuple[int, int, int]] = []
+        update_list = []
         for r, c in brown_cells:
             adjacent_cells = get_adjacent_cells(new_grid, r, c)
-            new_color = None
-            for nr, nc in adjacent_cells:
-                adj_color = new_grid.get_cell(nr, nc)
-                if adj_color == 8:  # Sky blue
-                    new_color = 8
-                    break
-                elif adj_color != 9:  # First non-brown color
-                    new_color = adj_color
+            new_color = next((new_grid.get_cell(nr, nc) for nr, nc in adjacent_cells if new_grid.get_cell(nr, nc) == 8), None)
+            if new_color is None:
+                new_color = next((new_grid.get_cell(nr, nc) for nr, nc in adjacent_cells if new_grid.get_cell(nr, nc) != 9), None)
             if new_color is not None:
                 update_list.append((r, c, new_color))
         
