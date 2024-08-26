@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 22x22 grid mostly filled with black (0). There's a sky-colored (8) cross or plus sign in the center. The cross is 7 squares wide and 7 squares tall, with the center square being black instead of sky-colored.
+  output: |
+    A complex 22x22 grid with a large sky-colored (8) frame or border. Inside this frame is an intricate maze-like pattern of sky-colored paths on a black background. The pattern is symmetrical and consists of concentric frames or borders, with various offshoots and connections. The center retains a sky-colored cross shape, but it's now part of a larger, more complex structure.
+
+example_1:
+  input: |
+    A 12x12 grid mostly filled with black (0). There's a small sky-colored (8) shape in the center resembling an upside-down 'T' or a small cross. It's 3 squares wide and 3 squares tall.
+  output: |
+    A 12x12 grid with a complex sky-colored (8) pattern on a black background. The pattern forms a large, asymmetrical maze-like structure. It has a thick border on the top, right, and bottom edges, with various internal paths and chambers. The left side is more open, with the pattern extending inwards from the top and bottom.
+
+example_2:
+  input: |
+    A 16x16 grid mostly filled with black (0). There's a sky-colored (8) shape in the center resembling a plus sign or cross. The vertical part of the cross is 5 squares tall, while the horizontal part is 5 squares wide.
+  output: |
+    A 16x16 grid with an intricate sky-colored (8) pattern on a black background. The pattern forms a large, asymmetrical maze-like structure. It has a thick border on the left, bottom, and right edges, with various internal paths and chambers. The top side is more open, with the pattern extending downwards. The original cross shape is still visible in the center, but it's now integrated into a much larger and more complex structure.
+
+test_case_0:
+  input: |
+    A 16x16 grid mostly filled with black (0). There's a sky-colored (8) shape in the center resembling a plus sign or cross. The vertical part of the cross is 5 squares tall, while the horizontal part is 5 squares wide.
+  output: |
+    This is a test case, so no output is provided to describe.
