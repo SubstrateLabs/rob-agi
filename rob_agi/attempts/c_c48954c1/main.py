@@ -14,11 +14,11 @@ def solve_c48954c1(input_grid: ColoredGrid) -> ColoredGrid:
     def rotate_180(grid):
         return [row[::-1] for row in grid[::-1]]
 
-    def mirror_horizontal(grid):
-        return [row[::-1] for row in grid]
-
-    def mirror_vertical(grid):
+    def flip_horizontal(grid):
         return grid[::-1]
+
+    def flip_vertical(grid):
+        return [row[::-1] for row in grid]
 
     new_grid = [[0 for _ in range(9)] for _ in range(9)]
 
@@ -36,13 +36,13 @@ def solve_c48954c1(input_grid: ColoredGrid) -> ColoredGrid:
         new_grid[i+6][6:] = rotated[i]
 
     # Fill edge quadrants
-    horizontal_mirror = mirror_horizontal(input_grid.values)
-    vertical_mirror = mirror_vertical(input_grid.values)
+    horizontal_flip = flip_horizontal(input_grid.values)
+    vertical_flip = flip_vertical(input_grid.values)
 
     for i in range(3):
-        new_grid[i][3:6] = horizontal_mirror[i]
-        new_grid[i+6][3:6] = horizontal_mirror[i]
-        new_grid[i+3][:3] = vertical_mirror[i]
-        new_grid[i+3][6:] = vertical_mirror[i]
+        new_grid[i][3:6] = horizontal_flip[i]
+        new_grid[i+6][3:6] = horizontal_flip[i]
+        new_grid[3+i][:3] = vertical_flip[i]
+        new_grid[3+i][6:] = vertical_flip[i]
 
     return ColoredGrid(values=new_grid)
