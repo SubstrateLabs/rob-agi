@@ -6,76 +6,90 @@ def solve_2546ccf6(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by identifying patterns and applying transformations.
     
     1. Identifies dividing lines and sections in the grid.
-    2. Locates the focus section with the most non-zero, non-divider elements.
-    3. Extracts the pattern from the focus section.
-    4. Generates transformed patterns (flipped and rotated).
-    5. Applies transformed patterns to adjacent sections.
-    6. Clears remaining elements in non-focus, non-adjacent sections.
-    7. Preserves all dividing lines.
+    2. Analyzes each section for non-empty patterns.
+    3. Applies vertical mirroring within non-empty sections.
+    4. Mirrors patterns horizontally and vertically to adjacent sections.
+    5. Clears unused sections.
+    6. Preserves all dividing lines.
     
-    Returns a new grid with the transformed pattern.
+    Returns a new grid with the transformed patterns.
     """
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
     
-    # Find vertical dividing lines
-    dividers = [i for i in range(cols) if grid.values[0][i] in [2, 6]]
-    if len(dividers) < 2:
-        return grid  # Not enough dividers, return original grid
+    # Find dividing lines
+    h_dividers = [r for r in range(rows) if all(grid.values[r][c] in [2, 6] for c in range(cols))]
+    v_dividers = [c for c in range(cols) if all(grid.values[r][c] in [2, 6] for r in range(rows))]
     
     # Identify sections
-    sections = [(dividers[i], dividers[i+1]) for i in range(len(dividers)-1)]
+    sections = []
+    for i in range(len(h_dividers) - 1):
+        for j in range(len(v_dividers) - 1):
+            sections.append((h_dividers[i], v_dividers[j], h_dividers[i+1], v_dividers[j+1]))
     
-    # Find focus section
-    focus_section = max(sections, key=lambda s: sum(1 for r in range(rows) for c in range(s[0], s[1]) if grid.values[r][c] not in [0, 2, 6]))
-    
-    # Extract pattern from focus section
-    pattern = extract_pattern(grid, focus_section, rows)
-    
-    # Generate transformed patterns
-    flipped_vertical = flip_pattern_vertical(pattern)
-    flipped_horizontal = flip_pattern_horizontal(pattern)
-    rotated = rotate_pattern_180(pattern)
-    
-    # Apply transformed patterns to adjacent sections
+    # Analyze and transform sections
     for section in sections:
-        if section == focus_section:
-            continue
-        if section[0] < focus_section[0]:
-            apply_pattern(grid, section, flipped_horizontal, rows)
-        elif section[1] > focus_section[1]:
-            apply_pattern(grid, section, flipped_horizontal, rows)
+        if is_section_non_empty(grid, section):
+            mirror_within_section(grid, section)
+            mirror_to_adjacent_sections(grid, section, sections)
     
-    # Clear remaining elements in non-focus, non-adjacent sections
+    # Clear unused sections
     for section in sections:
-        if section != focus_section and not is_adjacent(section, focus_section):
-            clear_section(grid, section, rows)
+        if not is_section_non_empty(grid, section) and not has_adjacent_non_empty(grid, section, sections):
+            clear_section(grid, section)
     
     return grid
 
-def extract_pattern(grid: ColoredGrid, section: Tuple[int, int], rows: int) -> List[List[int]]:
-    return [[grid.values[r][c] for c in range(section[0], section[1])] for r in range(rows)]
+def is_section_non_empty(grid: ColoredGrid, section: Tuple[int, int, int, int]) -> bool:
+    top, left, bottom, right = section
+    return any(grid.values[r][c] not in [0, 2, 6] for r in range(top, bottom) for c in range(left, right))
 
-def flip_pattern_vertical(pattern: List[List[int]]) -> List[List[int]]:
-    return pattern[::-1]
+def mirror_within_section(grid: ColoredGrid, section: Tuple[int, int, int, int]):
+    top, left, bottom, right = section
+    mid = (top + bottom) // 2
+    for r in range(top, mid):
+        for c in range(left, right):
+            if grid.values[r][c] not in [2, 6]:
+                grid.values[bottom - 1 - (r - top)][c] = grid.values[r][c]
 
-def flip_pattern_horizontal(pattern: List[List[int]]) -> List[List[int]]:
-    return [row[::-1] for row in pattern]
+def mirror_to_adjacent_sections(grid: ColoredGrid, section: Tuple[int, int, int, int], all_sections: List[Tuple[int, int, int, int]]):
+    for adj_section in all_sections:
+        if is_adjacent_horizontal(section, adj_section):
+            mirror_horizontal(grid, section, adj_section)
+        elif is_adjacent_vertical(section, adj_section):
+            mirror_vertical(grid, section, adj_section)
 
-def rotate_pattern_180(pattern: List[List[int]]) -> List[List[int]]:
-    return [row[::-1] for row in pattern[::-1]]
+def is_adjacent_horizontal(section1: Tuple[int, int, int, int], section2: Tuple[int, int, int, int]) -> bool:
+    return section1[2] == section2[2] and section1[3] == section2[1]
 
-def apply_pattern(grid: ColoredGrid, section: Tuple[int, int], pattern: List[List[int]], rows: int):
-    for r in range(rows):
-        for c, val in enumerate(pattern[r % len(pattern)]):
-            if grid.values[r][section[0] + c] not in [2, 6]:
-                grid.values[r][section[0] + c] = val
+def is_adjacent_vertical(section1: Tuple[int, int, int, int], section2: Tuple[int, int, int, int]) -> bool:
+    return section1[1] == section2[1] and section1[2] == section2[0]
 
-def clear_section(grid: ColoredGrid, section: Tuple[int, int], rows: int):
-    for r in range(rows):
-        for c in range(section[0], section[1]):
+def mirror_horizontal(grid: ColoredGrid, source: Tuple[int, int, int, int], target: Tuple[int, int, int, int]):
+    s_top, s_left, s_bottom, s_right = source
+    t_top, t_left, t_bottom, t_right = target
+    for r in range(s_top, s_bottom):
+        for c in range(s_left, s_right):
+            if grid.values[r][c] not in [2, 6]:
+                grid.values[r][t_right - 1 - (c - s_left)] = grid.values[r][c]
+
+def mirror_vertical(grid: ColoredGrid, source: Tuple[int, int, int, int], target: Tuple[int, int, int, int]):
+    s_top, s_left, s_bottom, s_right = source
+    t_top, t_left, t_bottom, t_right = target
+    for r in range(s_top, s_bottom):
+        for c in range(s_left, s_right):
+            if grid.values[r][c] not in [2, 6]:
+                grid.values[t_bottom - 1 - (r - s_top)][c] = grid.values[r][c]
+
+def clear_section(grid: ColoredGrid, section: Tuple[int, int, int, int]):
+    top, left, bottom, right = section
+    for r in range(top, bottom):
+        for c in range(left, right):
             if grid.values[r][c] not in [2, 6]:
                 grid.values[r][c] = 0
 
-def is_adjacent(section1: Tuple[int, int], section2: Tuple[int, int]) -> bool:
-    return section1[1] == section2[0] or section2[1] == section1[0]
+def has_adjacent_non_empty(grid: ColoredGrid, section: Tuple[int, int, int, int], all_sections: List[Tuple[int, int, int, int]]) -> bool:
+    return any(
+        (is_adjacent_horizontal(section, adj) or is_adjacent_vertical(section, adj)) and is_section_non_empty(grid, adj)
+        for adj in all_sections if adj != section
+    )
