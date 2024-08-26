@@ -3,33 +3,26 @@ from typing import List, Tuple, Dict
 
 def solve_782b5218(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid based on color weights and pattern detection.
+    Transforms the input grid based on color distribution and pattern detection.
     
-    1. Analyzes the input grid to calculate color weights.
-    2. Determines if the pattern should be horizontal banding or diagonal.
-    3. Creates a new grid with colors arranged based on their weights.
-    4. For horizontal banding: fills from top to bottom with sorted colors.
-    5. For diagonal pattern: fills diagonally from top-left to bottom-right.
+    1. Identifies unique colors in the input grid.
+    2. Determines if the pattern should be horizontal banding or diagonal based on the middle row.
+    3. For horizontal banding: 
+       - Divides the grid into bands based on the number of unique colors.
+       - Fills each band with a color, sorted from top to bottom.
+       - Preserves the uniform middle row if present.
+    4. For diagonal pattern: 
+       - Fills diagonally from top-left to bottom-right with sorted colors.
     
     Returns a new ColoredGrid with the transformed pattern.
     """
     rows, cols = input_grid.get_dimensions()
-    color_weights = calculate_color_weights(input_grid)
-    sorted_colors = sorted(color_weights.keys(), key=lambda c: color_weights[c])
+    unique_colors = sorted(set(color for row in input_grid.values for color in row))
     
     if has_uniform_middle_row(input_grid):
-        return create_horizontal_banding(input_grid, sorted_colors)
+        return create_horizontal_banding(input_grid, unique_colors)
     else:
-        return create_diagonal_pattern(input_grid, sorted_colors)
-
-def calculate_color_weights(grid: ColoredGrid) -> Dict[int, float]:
-    weights = {}
-    for r, row in enumerate(grid.values):
-        for color in row:
-            if color not in weights:
-                weights[color] = []
-            weights[color].append(r)
-    return {color: sum(rows) / len(rows) for color, rows in weights.items()}
+        return create_diagonal_pattern(input_grid, unique_colors)
 
 def has_uniform_middle_row(grid: ColoredGrid) -> bool:
     middle_row = len(grid.values) // 2
@@ -40,16 +33,17 @@ def create_horizontal_banding(grid: ColoredGrid, sorted_colors: List[int]) -> Co
     new_values = [[0 for _ in range(cols)] for _ in range(rows)]
     
     middle_row = rows // 2
-    top_color = sorted_colors[0]
-    bottom_color = sorted_colors[-1]
+    num_colors = len(sorted_colors)
+    band_height = rows // num_colors
     
-    for r in range(rows):
-        if r < middle_row:
-            new_values[r] = [top_color] * cols
-        elif r == middle_row and has_uniform_middle_row(grid):
-            new_values[r] = grid.values[r]
-        else:
-            new_values[r] = [bottom_color] * cols
+    for i, color in enumerate(sorted_colors):
+        start_row = i * band_height
+        end_row = (i + 1) * band_height if i < num_colors - 1 else rows
+        for r in range(start_row, end_row):
+            new_values[r] = [color] * cols
+    
+    if has_uniform_middle_row(grid):
+        new_values[middle_row] = grid.values[middle_row]
     
     return ColoredGrid(values=new_values)
 
