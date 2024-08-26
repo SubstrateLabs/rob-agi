@@ -26,7 +26,7 @@ def solve_e5c44e8f(input_grid: ColoredGrid) -> ColoredGrid:
     create_vertical_line(output_grid, left_column)
     create_horizontal_lines(output_grid, left_column, initial_green)
     ensure_two_edge_contact(output_grid, left_column)
-    optimize_e_shape(output_grid, left_column)
+    optimize_e_shape(output_grid, left_column, initial_green)
     clean_up_e_shape(output_grid)
     connect_disconnected_parts(output_grid)
 
@@ -82,29 +82,32 @@ def create_vertical_line(grid: ColoredGrid, col: int):
 
 def create_horizontal_lines(grid: ColoredGrid, left_col: int, initial_green: Tuple[int, int]):
     rows, cols = grid.num_rows, grid.num_cols
-    
+    initial_row, _ = initial_green
+
     # Top line
-    top_row = 0 if grid.get_cell(0, left_col) != 2 else 1
+    top_row = min(r for r in range(rows) if grid.get_cell(r, left_col) != 2)
     for c in range(left_col + 1, cols):
         if grid.get_cell(top_row, c) == 2:
             break
         grid.set_cell(top_row, c, 3)
-    
+
     # Middle line
-    middle_row = initial_green[0]
     for c in range(left_col + 1, cols):
-        if grid.get_cell(middle_row, c) == 2:
+        if grid.get_cell(initial_row, c) == 2:
             break
-        grid.set_cell(middle_row, c, 3)
-    
+        grid.set_cell(initial_row, c, 3)
+
     # Bottom line
-    bottom_row = rows - 1
-    while bottom_row > middle_row and (grid.get_cell(bottom_row, left_col) == 2 or all(grid.get_cell(bottom_row, c) == 0 for c in range(cols))):
-        bottom_row -= 1
+    bottom_row = max(r for r in range(rows) if grid.get_cell(r, left_col) != 2)
     for c in range(left_col + 1, cols):
         if grid.get_cell(bottom_row, c) == 2:
             break
         grid.set_cell(bottom_row, c, 3)
+
+    # Fill in the vertical line
+    for r in range(top_row, bottom_row + 1):
+        if grid.get_cell(r, left_col) == 0:
+            grid.set_cell(r, left_col, 3)
 
 def ensure_two_edge_contact(grid: ColoredGrid, left_col: int):
     rows, cols = grid.num_rows, grid.num_cols
@@ -142,22 +145,36 @@ def connect_disconnected_parts(grid: ColoredGrid):
                         if grid.get_cell(i, c) == 0:
                             grid.set_cell(i, c, 3)
 
-def optimize_e_shape(grid: ColoredGrid, left_col: int):
+def optimize_e_shape(grid: ColoredGrid, left_col: int, initial_green: Tuple[int, int]):
     rows, cols = grid.num_rows, grid.num_cols
-    
-    # Try to extend horizontal lines
-    for r in range(rows):
-        if grid.get_cell(r, left_col) == 3:
-            for c in range(cols - 1, left_col, -1):
-                if all(grid.get_cell(r, i) == 3 for i in range(left_col, c)) and grid.get_cell(r, c) == 0:
-                    grid.set_cell(r, c, 3)
-                else:
-                    break
-    
+    initial_row, initial_col = initial_green
+
+    # Determine the extent of the vertical line
+    top_row = min(r for r in range(rows) if grid.get_cell(r, left_col) == 3)
+    bottom_row = max(r for r in range(rows) if grid.get_cell(r, left_col) == 3)
+
+    # Optimize top horizontal line
+    for c in range(left_col + 1, cols):
+        if grid.get_cell(top_row, c) == 2:
+            break
+        grid.set_cell(top_row, c, 3)
+
+    # Optimize middle horizontal line
+    for c in range(left_col + 1, cols):
+        if grid.get_cell(initial_row, c) == 2:
+            break
+        grid.set_cell(initial_row, c, 3)
+
+    # Optimize bottom horizontal line
+    for c in range(left_col + 1, cols):
+        if grid.get_cell(bottom_row, c) == 2:
+            break
+        grid.set_cell(bottom_row, c, 3)
+
     # Try to extend vertical line to the right
     for c in range(left_col + 1, cols):
-        if all(grid.get_cell(r, c) in [0, 3] for r in range(rows)):
-            for r in range(rows):
+        if all(grid.get_cell(r, c) in [0, 3] for r in range(top_row, bottom_row + 1)):
+            for r in range(top_row, bottom_row + 1):
                 if grid.get_cell(r, c-1) == 3 and grid.get_cell(r, c) == 0:
                     grid.set_cell(r, c, 3)
         else:
