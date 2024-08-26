@@ -3,10 +3,10 @@ from typing import List, Tuple
 
 def solve_6df30ad6(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by finding the largest gray region and replacing it with the highest-valued non-gray, non-black color.
+    Transforms the input grid by finding the largest gray region and replacing it with the highest-valued non-gray, non-black color that appears in the input.
     
     1. Finds the largest connected region of gray (5) in the input grid.
-    2. Identifies the highest-valued color that is not gray (5) or black (0) in the input grid.
+    2. Identifies the highest-valued color that is not gray (5) or black (0) and appears in the input grid.
     3. Creates a new grid with the largest gray region filled with the identified color.
     
     Args:
@@ -45,9 +45,9 @@ def find_largest_gray_region(grid: ColoredGrid) -> List[Tuple[int, int]]:
     return largest_region
 
 def find_replacement_color(grid: ColoredGrid) -> int:
-    max_color = 0
+    colors = set()
     for row in grid.values:
         for cell in row:
-            if cell not in [0, 5] and cell > max_color:
-                max_color = cell
-    return max_color
+            if cell not in [0, 5]:
+                colors.add(cell)
+    return max(colors) if colors else 0
