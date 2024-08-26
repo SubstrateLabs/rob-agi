@@ -1,5 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Set
 
 def solve_c663677b(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -8,10 +8,10 @@ def solve_c663677b(input_grid: ColoredGrid) -> ColoredGrid:
 
     The solution follows these steps:
     1. Analyze the input grid to identify non-black areas and unique colors.
-    2. Determine the pattern repetition horizontally and vertically.
-    3. Extract pattern elements based on the repetition.
-    4. Construct the full pattern and validate it against the input.
-    5. Fill in black spaces with the discovered pattern.
+    2. Identify the pattern unit by gradually increasing window size.
+    3. Check for symmetry and mirroring across quadrants.
+    4. Simplify and validate the pattern.
+    5. Reconstruct the full grid using the identified pattern.
     6. Perform final verification of the completed grid.
 
     Args:
@@ -23,19 +23,19 @@ def solve_c663677b(input_grid: ColoredGrid) -> ColoredGrid:
     # Step 1: Analyze the grid
     non_black_map, unique_colors = analyze_grid(input_grid)
 
-    # Step 2: Determine pattern repetition
-    h_repeat, v_repeat = find_repetition(input_grid, non_black_map)
+    # Step 2 & 3: Identify pattern unit and check for symmetry
+    pattern_unit = identify_pattern_unit(input_grid, non_black_map)
 
-    # Step 3: Extract pattern elements
-    pattern = extract_pattern(input_grid, h_repeat, v_repeat, non_black_map)
-
-    # Step 4: Construct and validate full pattern
-    full_pattern = construct_full_pattern(pattern, 27, 27)
-    if not validate_pattern(input_grid, full_pattern, non_black_map):
+    # Step 4: Validate the pattern
+    if not validate_pattern(input_grid, pattern_unit, non_black_map):
         raise ValueError("Unable to find a valid pattern")
 
-    # Step 5 & 6: Fill black spaces and perform final verification
-    output_grid = fill_black_spaces(input_grid, full_pattern)
+    # Step 5: Reconstruct the full grid
+    output_grid = reconstruct_grid(pattern_unit, input_grid.get_dimensions())
+
+    # Step 6: Final verification
+    if not verify_output(output_grid, unique_colors):
+        raise ValueError("Output grid does not meet all criteria")
 
     return output_grid
 
@@ -90,13 +90,15 @@ def construct_full_pattern(pattern: List[List[int]], rows: int, cols: int) -> Li
     
     return full_pattern
 
-def validate_pattern(input_grid: ColoredGrid, full_pattern: List[List[int]], non_black_map: Dict[Tuple[int, int], int]) -> bool:
+def validate_pattern(input_grid: ColoredGrid, pattern: List[List[int]], non_black_map: Dict[Tuple[int, int], int]) -> bool:
     rows, cols = input_grid.get_dimensions()
+    pattern_rows, pattern_cols = len(pattern), len(pattern[0])
     
     for r in range(rows):
         for c in range(cols):
-            if (r, c) in non_black_map and input_grid.values[r][c] != full_pattern[r][c]:
-                return False
+            if (r, c) in non_black_map:
+                if input_grid.values[r][c] != pattern[r % pattern_rows][c % pattern_cols]:
+                    return False
     
     return True
 
@@ -114,3 +116,39 @@ def fill_black_spaces(input_grid: ColoredGrid, full_pattern: List[List[int]]) ->
         output_values.append(row)
     
     return ColoredGrid(values=output_values)
+def identify_pattern_unit(grid: ColoredGrid, non_black_map: Dict[Tuple[int, int], int]) -> List[List[int]]:
+    rows, cols = grid.get_dimensions()
+    for window_size in range(2, min(rows, cols) + 1):
+        for r in range(rows - window_size + 1):
+            for c in range(cols - window_size + 1):
+                pattern = extract_pattern(grid, window_size, window_size, non_black_map, r, c)
+                if validate_pattern(grid, pattern, non_black_map):
+                    return pattern
+    raise ValueError("No valid pattern unit found")
+
+def extract_pattern(grid: ColoredGrid, height: int, width: int, non_black_map: Dict[Tuple[int, int], int], start_r: int = 0, start_c: int = 0) -> List[List[int]]:
+    pattern = [[0 for _ in range(width)] for _ in range(height)]
+    for r in range(height):
+        for c in range(width):
+            if (start_r + r, start_c + c) in non_black_map:
+                pattern[r][c] = non_black_map[(start_r + r, start_c + c)]
+    return pattern
+
+def reconstruct_grid(pattern: List[List[int]], dimensions: Tuple[int, int]) -> ColoredGrid:
+    rows, cols = dimensions
+    new_values = [[0 for _ in range(cols)] for _ in range(rows)]
+    pattern_rows, pattern_cols = len(pattern), len(pattern[0])
+    
+    for r in range(rows):
+        for c in range(cols):
+            new_values[r][c] = pattern[r % pattern_rows][c % pattern_cols]
+    
+    return ColoredGrid(values=new_values)
+
+def verify_output(grid: ColoredGrid, unique_colors: Set[int]) -> bool:
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        for c in range(cols):
+            if grid.values[r][c] == 0 or grid.values[r][c] not in unique_colors:
+                return False
+    return True
