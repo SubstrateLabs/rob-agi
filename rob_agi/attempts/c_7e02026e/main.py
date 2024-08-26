@@ -1,53 +1,43 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
 
 def solve_7e02026e(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by identifying and coloring the largest 'L'-shaped region
-    of black (0) squares to green (3). The algorithm follows these steps:
-    1. Find all potential 'L' shapes in the grid
-    2. Select the largest 'L' shape
-    3. Color the chosen 'L' shape green (3)
+    to green (3). The algorithm follows these steps:
+    1. Scan the grid from bottom to top, right to left.
+    2. For each black (0) cell, calculate the largest possible 'L' shape.
+    3. Keep track of the best 'L' shape (largest, and lowest/rightmost in case of ties).
+    4. Color the best 'L' shape green (3).
 
-    The transformation aims to create a single, large green 'L' shape while maintaining
-    the overall structure of the grid. The 'L' shape is defined by its bottom-right corner,
-    extending upwards and to the left as far as possible within black cells.
+    The 'L' shape is defined by its bottom-right corner (which must be black),
+    extending upwards and to the left as far as possible, potentially including non-black cells.
     """
     output_grid = input_grid.deep_copy()
+    rows, cols = output_grid.get_dimensions()
+    best_l = (0, (-1, -1), 0, 0)  # (size, (row, col), vertical_length, horizontal_length)
 
-    def find_l_shapes(grid):
-        rows, cols = grid.get_dimensions()
-        l_shapes = []
-        for r in range(rows):
-            for c in range(cols):
-                if grid.get_cell(r, c) == 0:  # If it's a black cell
-                    vertical_length = 1
-                    horizontal_length = 1
-                    # Extend upwards
-                    while r - vertical_length >= 0 and grid.get_cell(r - vertical_length, c) == 0:
-                        vertical_length += 1
-                    # Extend left
-                    while c - horizontal_length >= 0 and grid.get_cell(r, c - horizontal_length) == 0:
-                        horizontal_length += 1
-                    l_size = vertical_length + horizontal_length - 1
-                    l_shapes.append(((r, c), l_size, vertical_length, horizontal_length))
-        return l_shapes
+    for r in range(rows - 1, -1, -1):
+        for c in range(cols - 1, -1, -1):
+            if output_grid.get_cell(r, c) == 0:  # If it's a black cell
+                vertical_length = 1
+                while r - vertical_length >= 0:
+                    vertical_length += 1
+                vertical_length -= 1
 
-    def select_best_l_shape(l_shapes):
-        return max(l_shapes, key=lambda x: (x[1], x[2], x[0][0], x[0][1]))
+                horizontal_length = 1
+                while c - horizontal_length >= 0:
+                    horizontal_length += 1
+                horizontal_length -= 1
 
-    def color_l_shape(grid, corner, vertical_length, horizontal_length):
-        r, c = corner
-        # Color vertically
-        for i in range(vertical_length):
-            grid.set_cell(r - i, c, 3)
-        # Color horizontally
-        for i in range(1, horizontal_length):  # Start from 1 to avoid double-coloring the corner
-            grid.set_cell(r, c - i, 3)
+                l_size = vertical_length + horizontal_length - 1
+                if l_size > best_l[0] or (l_size == best_l[0] and (r, c) > best_l[1]):
+                    best_l = (l_size, (r, c), vertical_length, horizontal_length)
 
-    l_shapes = find_l_shapes(output_grid)
-    if l_shapes:
-        best_l = select_best_l_shape(l_shapes)
-        color_l_shape(output_grid, best_l[0], best_l[2], best_l[3])
+    if best_l[0] > 0:
+        r, c = best_l[1]
+        for i in range(best_l[2]):
+            output_grid.set_cell(r - i, c, 3)
+        for i in range(1, best_l[3]):  # Start from 1 to avoid double-coloring the corner
+            output_grid.set_cell(r, c - i, 3)
 
     return output_grid
