@@ -6,11 +6,11 @@ def solve_b7fb29bc(input_grid: ColoredGrid) -> ColoredGrid:
     
     The pattern consists of:
     1. A yellow (4) border just inside the green (3) border
-    2. A complex flow pattern of red (2) and yellow (4) in the interior
-    3. A rightmost column of yellow (4)
+    2. A complex pattern of red (2) and yellow (4) in the interior
+    3. Alternating columns of red and yellow, with more red on the left and more yellow on the right
     4. Preservation of any original green (3) cells within the border
-    5. Special handling for small interiors and edge cases
-    6. A gradual transition from more red on the left to more yellow on the right
+    5. Special handling for small interiors
+    6. A bottom row of red (2) cells
     """
     # Step 1: Identify the green border
     rows, cols = input_grid.get_dimensions()
@@ -33,18 +33,15 @@ def solve_b7fb29bc(input_grid: ColoredGrid) -> ColoredGrid:
         for c in range(inner_left, inner_right + 1):
             if r == inner_top or r == inner_bottom or c == inner_left or c == inner_right:
                 result.set_cell(r, c, 4)  # Yellow border
-            elif c == inner_right - 1:
-                result.set_cell(r, c, 4)  # Second rightmost column is yellow
+            elif r == inner_bottom - 1:
+                result.set_cell(r, c, 2)  # Bottom row is red
             else:
-                # Complex flow pattern
+                # Alternating columns with transition
                 column_index = c - inner_left
-                row_index = r - inner_top
-                if column_index < inner_width // 3:
-                    result.set_cell(r, c, 2 if column_index % 2 == 0 else 4)
-                elif column_index < 2 * inner_width // 3:
-                    result.set_cell(r, c, 2 if (column_index + row_index) % 3 == 0 else 4)
+                if column_index % 2 == 0:
+                    result.set_cell(r, c, 2 if column_index < inner_width // 2 else 4)
                 else:
-                    result.set_cell(r, c, 2 if (column_index + row_index) % 4 == 0 else 4)
+                    result.set_cell(r, c, 4)
 
     # Step 5: Handle small interiors
     if inner_width <= 3 or inner_height <= 3:
