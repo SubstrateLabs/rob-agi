@@ -45,7 +45,8 @@ def solve_7d419a02(input_grid: ColoredGrid) -> ColoredGrid:
         return (r_max - r_min <= 1) or (c_max - c_min <= 1)
 
     def is_part_of_cross(r: int, c: int) -> bool:
-        return (abs(r - center_row) <= 1 or abs(c - center_col) <= 1) and distance_from_center(r, c) <= cross_threshold
+        cross_width = max(1, min(rows, cols) // 10)
+        return (abs(r - center_row) <= cross_width or abs(c - center_col) <= cross_width) and distance_from_center(r, c) <= cross_threshold
 
     def calculate_transform_score(region: List[Tuple[int, int]]) -> float:
         avg_distance = sum(distance_from_center(r, c) for r, c in region) / len(region)
@@ -53,13 +54,13 @@ def solve_7d419a02(input_grid: ColoredGrid) -> ColoredGrid:
         size_factor = min(1, len(region) / (rows * cols * 0.05))
         cross_factor = sum(1 for r, c in region if is_part_of_cross(r, c)) / len(region)
         
-        return (avg_distance / max_distance) * 0.4 + edge_factor * 0.3 + size_factor * 0.3 - cross_factor * 0.6
+        return (avg_distance / max_distance) * 0.4 + edge_factor * 0.3 + size_factor * 0.3 - cross_factor * 0.8
 
-    def should_transform(region: List[Tuple[int, int]], context_score: float) -> bool:
+    def should_transform(region: List[Tuple[int, int]], context_score: float, yellow_ratio: float) -> bool:
         if is_line_like(region) or len(region) <= 2:
             return False
         transform_score = calculate_transform_score(region) + context_score
-        threshold = 0.4 - (max(rows, cols) / 100) * 0.05  # Lower threshold for larger grids
+        threshold = 0.5 - (max(rows, cols) / 100) * 0.05 + yellow_ratio * 0.2  # Adjust threshold based on current yellow ratio
         return transform_score > threshold
 
     def flood_fill(row: int, col: int) -> List[Tuple[int, int]]:
@@ -87,6 +88,9 @@ def solve_7d419a02(input_grid: ColoredGrid) -> ColoredGrid:
         yellow_count = sum(1 for r, c in context_cells if grid.values[r][c] == 4)
         return yellow_count / len(context_cells) if context_cells else 0
 
+    def apply_symmetry(r: int, c: int) -> List[Tuple[int, int]]:
+        return [(r, c), (rows - 1 - r, c), (r, cols - 1 - c), (rows - 1 - r, cols - 1 - c)]
+
     regions = []
     for row in range(rows):
         for col in range(cols):
@@ -99,10 +103,24 @@ def solve_7d419a02(input_grid: ColoredGrid) -> ColoredGrid:
 
     for region in regions:
         context_score = get_context_score(region)
-        if should_transform(region, context_score) and yellow_ratio < 0.6:
+        if should_transform(region, context_score, yellow_ratio) and yellow_ratio < 0.6:
+            symmetric_cells = set()
             for r, c in region:
-                grid.values[r][c] = 4  # Change to yellow
+                symmetric_cells.update(apply_symmetry(r, c))
+            for r, c in symmetric_cells:
+                if is_blue(grid.values[r][c]):
+                    grid.values[r][c] = 4  # Change to yellow
             yellow_ratio = sum(row.count(4) for row in grid.values) / (rows * cols)
+
+    # Post-processing for consistency
+    for r in range(rows):
+        for c in range(cols):
+            if grid.values[r][c] == 8:
+                neighbors = [(r+dr, c+dc) for dr, dc in [(-1,0), (1,0), (0,-1), (0,1)]
+                             if 0 <= r+dr < rows and 0 <= c+dc < cols]
+                yellow_neighbors = sum(1 for nr, nc in neighbors if grid.values[nr][nc] == 4)
+                if yellow_neighbors >= 3:
+                    grid.values[r][c] = 4
 
     return grid
 
