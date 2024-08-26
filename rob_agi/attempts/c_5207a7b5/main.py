@@ -51,6 +51,6 @@ def solve_5207a7b5(input_grid: ColoredGrid) -> ColoredGrid:
             if gray_line_column + col < width:
                 new_grid.values[row][gray_line_column + col] = 6
         if row % 2 == 1 and row < gray_line_length - 1:
-            magenta_width = max(1, magenta_width - 1)
+            magenta_width = max(0, magenta_width - 1)
 
     return new_grid
