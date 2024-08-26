@@ -72,9 +72,10 @@ def place_group(output_grid: ColoredGrid, group: List[Tuple[int, int, int]]):
     rows, cols = output_grid.get_dimensions()
     group_height = max(r for r, _, _ in group) - min(r for r, _, _ in group) + 1
     group_width = max(c for _, c, _ in group) - min(c for _, c, _ in group) + 1
+    min_col = min(c for _, c, _ in group)
     
     for placement_row in range(rows - 2, -1, -1):  # Start from second to last row
-        for placement_col in range(cols):
+        for placement_col in range(min_col, cols):  # Start from the original leftmost position
             if can_place_group(output_grid, group, placement_row, placement_col, group_height, group_width):
                 for r, c, color in group:
                     rel_r, rel_c = r - min(r for r, _, _ in group), c - min(c for _, c, _ in group)
@@ -99,7 +100,8 @@ def handle_single_cells(input_grid: ColoredGrid, output_grid: ColoredGrid):
     
     for c in range(cols):
         if input_grid.values[second_last_row][c] != 0 and output_grid.values[second_last_row][c] == 0:
-            for new_c in range(cols):
+            color = input_grid.values[second_last_row][c]
+            for new_c in range(c, cols):
                 if output_grid.values[second_last_row][new_c] == 0:
-                    output_grid.values[second_last_row][new_c] = input_grid.values[second_last_row][c]
+                    output_grid.values[second_last_row][new_c] = color
                     break
