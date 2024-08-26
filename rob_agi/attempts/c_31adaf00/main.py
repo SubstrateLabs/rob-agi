@@ -9,7 +9,7 @@ def solve_31adaf00(input_grid: ColoredGrid) -> ColoredGrid:
     The algorithm works as follows:
     1. Analyzes the input grid to count gray squares and calculate the target number of blue squares.
     2. Creates a heatmap to identify optimal areas for blue square placement.
-    3. Places blue squares in phases, starting with larger blocks (2x2, 3x3) in strategic locations.
+    3. Places blue squares in phases, starting with larger blocks (3x3, 2x2) in strategic locations.
     4. Fills remaining areas with smaller blocks and individual squares.
     5. Performs balance checks and adjustments to ensure the correct number of blue squares.
     6. Makes final adjustments for visual balance and symmetry.
@@ -22,13 +22,11 @@ def solve_31adaf00(input_grid: ColoredGrid) -> ColoredGrid:
     target_blue = (rows * cols - gray_count) // 2
     
     heatmap = create_heatmap(input_grid)
-    potential_regions = get_potential_regions(output_grid)
+    potential_regions = get_potential_regions(output_grid, heatmap)
     blue_count = place_blue_regions(output_grid, potential_regions, target_blue)
     
     if blue_count < target_blue:
-        blue_count = fill_remaining_squares(output_grid, blue_count, target_blue)
-    elif blue_count > target_blue:
-        remove_excess_blue(output_grid, blue_count, target_blue)
+        blue_count = fill_remaining_squares(output_grid, heatmap, blue_count, target_blue)
     
     final_balance_adjustment(output_grid, target_blue)
     
@@ -260,31 +258,30 @@ def place_blue_regions(grid: ColoredGrid, potential_regions: List[Tuple[float, T
         if blue_count >= target_blue:
             break
     return blue_count
-def get_potential_regions(grid: ColoredGrid) -> List[Tuple[float, Tuple[int, int, int, int]]]:
+def get_potential_regions(grid: ColoredGrid, heatmap: List[List[float]]) -> List[Tuple[float, Tuple[int, int, int, int]]]:
     rows, cols = grid.get_dimensions()
     potential_regions = []
-    region_sizes = [(2,2), (3,3), (2,3), (3,2)]
+    region_sizes = [(3,3), (2,2), (2,3), (3,2)]
     
     for r in range(rows):
         for c in range(cols):
             for width, height in region_sizes:
                 if is_valid_blue_area(grid, r, c, width, height):
-                    score = score_region(grid, r, c, width, height)
+                    score = score_region(grid, heatmap, r, c, width, height)
                     potential_regions.append((score, (r, c, width, height)))
     
     return sorted(potential_regions, key=lambda x: x[0], reverse=True)
 
-def score_region(grid: ColoredGrid, r: int, c: int, width: int, height: int) -> float:
+def score_region(grid: ColoredGrid, heatmap: List[List[float]], r: int, c: int, width: int, height: int) -> float:
     rows, cols = grid.get_dimensions()
-    center_r, center_c = rows // 2, cols // 2
-    distance_from_center = ((r + height/2 - center_r)**2 + (c + width/2 - center_c)**2)**0.5
+    heatmap_score = sum(heatmap[r+dr][c+dc] for dr in range(height) for dc in range(width) if r+dr < rows and c+dc < cols)
     
     gray_proximity = sum(1 for dr in range(-1, height+1) for dc in range(-1, width+1)
                          if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 5)
     
     edge_score = 1 if r == 0 or r + height == rows or c == 0 or c + width == cols else 0
     
-    return (1 / (1 + distance_from_center)) + (0.5 * gray_proximity) + edge_score
+    return heatmap_score + (0.5 * gray_proximity) + edge_score
 
 def place_blue_regions(grid: ColoredGrid, potential_regions: List[Tuple[float, Tuple[int, int, int, int]]], target_blue: int) -> int:
     blue_count = 0
@@ -292,6 +289,6 @@ def place_blue_regions(grid: ColoredGrid, potential_regions: List[Tuple[float, T
         if blue_count + (width * height) <= target_blue and is_valid_blue_area(grid, r, c, width, height):
             fill_area(grid, r, c, width, height, 1)
             blue_count += width * height
-        if blue_count >= target_blue:
+        if blue_count >= target_blue * 0.8:  # Stop at 80% to avoid overfilling
             break
     return blue_count
