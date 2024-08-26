@@ -4,65 +4,65 @@ from typing import List, Tuple
 def solve_ed74f2f2(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms a 9x5 input grid into a 3x3 output grid based on the following rules:
-    1. Divides the input grid into nine 3x3 sections (with some overlap for the bottom row).
-    2. Analyzes each section for the presence of gray (5) cells.
-    3. Creates a 3x3 boolean grid marking sections with sufficient gray cells.
-    4. Counts the number of True values in the boolean grid.
-    5. Determines the final color based on the count:
-       - If count is 1, 2, or 9, use green (3)
-       - If count is 3 or 4, use red (2)
-       - If count is between 5 and 8 (inclusive), use blue (1)
-    6. Creates an initial 3x3 ColoredGrid output with the determined color.
-    7. Removes "internal" cells (cells surrounded by the same color on all sides) by setting them to black (0).
-    8. Returns the final 3x3 ColoredGrid output.
+    1. Creates a density grid by analyzing 3x3 sections of the input grid.
+    2. Determines the output color based on the density and distribution of gray cells.
+    3. Creates an initial shape based on the density grid and chosen color.
+    4. Applies smoothing rules to remove isolated cells and fill gaps.
+    5. Makes final adjustments to ensure a valid and interesting output.
+    6. Returns the final 3x3 ColoredGrid output.
     """
-    boolean_grid = analyze_grid(input_grid)
-    count = count_true_cells(boolean_grid)
-    color = determine_color(count)
-    initial_output = create_initial_output(boolean_grid, color)
-    return remove_internal_cells(initial_output)
+    density_grid = create_density_grid(input_grid)
+    color = determine_color(density_grid)
+    initial_shape = create_initial_shape(density_grid, color)
+    smoothed_shape = smooth_grid(initial_shape, color)
+    final_shape = final_adjustments(smoothed_shape, color)
+    return ColoredGrid(values=final_shape)
 
-def analyze_grid(grid: ColoredGrid) -> List[List[bool]]:
-    boolean_grid = []
+def create_density_grid(input_grid: ColoredGrid) -> List[List[int]]:
+    density = [[0 for _ in range(3)] for _ in range(3)]
     for i in range(3):
-        row = []
         for j in range(3):
-            section = grid.extract_subgrid(i*2, j*3, 3, 3)
-            row.append(analyze_section(section))
-        boolean_grid.append(row)
-    return boolean_grid
+            section = input_grid.extract_subgrid(i*2, j*3, 3, 3)
+            density[i][j] = sum(cell == 5 for row in section.values for cell in row)
+    return density
 
-def analyze_section(section: ColoredGrid) -> bool:
-    return sum(cell == 5 for row in section.values for cell in row) >= 2
-
-def count_true_cells(boolean_grid: List[List[bool]]) -> int:
-    return sum(sum(row) for row in boolean_grid)
-
-def determine_color(count: int) -> int:
-    if count in [1, 2, 9]:
-        return 3  # Green
-    elif count in [3, 4]:
+def determine_color(density: List[List[int]]) -> int:
+    total_sum = sum(sum(row) for row in density)
+    non_zero = sum(1 for row in density for cell in row if cell > 0)
+    if total_sum < 10 or non_zero <= 3:
         return 2  # Red
+    elif total_sum < 15 and non_zero <= 6:
+        return 3  # Green
     else:
         return 1  # Blue
 
-def create_initial_output(boolean_grid: List[List[bool]], color: int) -> ColoredGrid:
-    return ColoredGrid(values=[[color if cell else 0 for cell in row] for row in boolean_grid])
+def create_initial_shape(density: List[List[int]], color: int) -> List[List[int]]:
+    threshold = sum(sum(row) for row in density) / 9
+    return [[color if cell >= threshold else 0 for cell in row] for row in density]
 
-def remove_internal_cells(grid: ColoredGrid) -> ColoredGrid:
-    new_values = [row[:] for row in grid.values]
-    for r in range(3):
-        for c in range(3):
-            if is_internal_cell(grid, r, c):
-                new_values[r][c] = 0
-    return ColoredGrid(values=new_values)
+def smooth_grid(grid: List[List[int]], color: int) -> List[List[int]]:
+    new_grid = [row[:] for row in grid]
+    for i in range(3):
+        for j in range(3):
+            if new_grid[i][j] == color and not has_adjacent_color(new_grid, i, j, color):
+                new_grid[i][j] = 0
+            elif new_grid[i][j] == 0 and is_surrounded_by_color(new_grid, i, j, color):
+                new_grid[i][j] = color
+    return new_grid
 
-def is_internal_cell(grid: ColoredGrid, r: int, c: int) -> bool:
-    if grid.values[r][c] == 0:
-        return False
-    color = grid.values[r][c]
-    neighbors = get_neighbors(r, c)
-    return all(0 <= nr < 3 and 0 <= nc < 3 and grid.values[nr][nc] == color for nr, nc in neighbors)
+def has_adjacent_color(grid: List[List[int]], i: int, j: int, color: int) -> bool:
+    for di, dj in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+        ni, nj = i + di, j + dj
+        if 0 <= ni < 3 and 0 <= nj < 3 and grid[ni][nj] == color:
+            return True
+    return False
 
-def get_neighbors(r: int, c: int) -> List[Tuple[int, int]]:
-    return [(r-1, c), (r+1, c), (r, c-1), (r, c+1)]
+def is_surrounded_by_color(grid: List[List[int]], i: int, j: int, color: int) -> bool:
+    return all(grid[i+di][j+dj] == color for di, dj in [(-1, 0), (1, 0), (0, -1), (0, 1)] if 0 <= i+di < 3 and 0 <= j+dj < 3)
+
+def final_adjustments(grid: List[List[int]], color: int) -> List[List[int]]:
+    if all(cell == 0 for row in grid for cell in row):
+        grid[1][1] = color
+    elif all(cell == color for row in grid for cell in row):
+        grid[1][1] = 0
+    return grid
