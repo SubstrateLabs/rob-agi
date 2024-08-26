@@ -15,7 +15,7 @@ def solve_62ab2642(input_grid: ColoredGrid) -> ColoredGrid:
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
 
-    def flood_fill(x: int, y: int, target_color: int, replacement_color: int, count_only: bool = False):
+    def flood_fill(x: int, y: int, target_color: int, replacement_color: int, count_only: bool = False, diagonal: bool = True):
         if output_grid.values[y][x] != target_color:
             return 0, set()
         
@@ -34,7 +34,11 @@ def solve_62ab2642(input_grid: ColoredGrid) -> ColoredGrid:
                 if not count_only:
                     output_grid.values[cy][cx] = replacement_color
                 
-                for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]:
+                directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                if diagonal:
+                    directions += [(1, 1), (1, -1), (-1, 1), (-1, -1)]
+                
+                for dx, dy in directions:
                     nx, ny = cx + dx, cy + dy
                     if 0 <= nx < cols and 0 <= ny < rows and output_grid.values[ny][nx] == target_color:
                         stack.append((nx, ny))
@@ -65,6 +69,6 @@ def solve_62ab2642(input_grid: ColoredGrid) -> ColoredGrid:
     for y in range(rows):
         for x in range(cols):
             if is_surrounded_by_gray(x, y):
-                flood_fill(x, y, 0, 7)
+                flood_fill(x, y, 0, 7, diagonal=False)
 
     return output_grid
