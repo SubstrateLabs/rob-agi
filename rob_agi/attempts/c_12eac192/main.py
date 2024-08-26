@@ -14,6 +14,7 @@ def solve_12eac192(input_grid: ColoredGrid) -> ColoredGrid:
     4. Ensures the path is continuous and simple, avoiding unnecessary complexity.
     5. Preserves orange (7) cells and maintains the overall structure of the original grid.
     6. Adapts behavior based on grid size, with more complete coverage for smaller grids.
+    7. Ensures all blue cells are connected, even if it means creating a less snake-like path.
 
     Args:
         input_grid (ColoredGrid): The input grid to be transformed.
@@ -28,7 +29,7 @@ def solve_12eac192(input_grid: ColoredGrid) -> ColoredGrid:
         return [(r+dr, c+dc) for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)] if is_valid_cell(r+dr, c+dc)]
 
     def get_cell_priority(color: int) -> int:
-        return {1: 4, 5: 3, 8: 2, 0: 1}.get(color, 0)
+        return {1: 5, 5: 4, 8: 3, 0: 2}.get(color, 1)
 
     def create_path(start: Tuple[int, int]) -> List[Tuple[int, int]]:
         path = [start]
@@ -36,19 +37,24 @@ def solve_12eac192(input_grid: ColoredGrid) -> ColoredGrid:
         current = start
         corners = set([(0, 0), (0, cols-1), (rows-1, 0), (rows-1, cols-1)])
 
-        while len(path) < rows * cols // 2 and (corners or blue_cells - visited):
+        while blue_cells - visited:
             neighbors = get_neighbors(*current)
             next_cell = max(
                 neighbors,
                 key=lambda x: (
+                    x in blue_cells - visited,
                     x in corners,
-                    x in blue_cells,
                     get_cell_priority(grid[x[0]][x[1]]),
                     x not in visited
                 )
             )
             if next_cell in visited:
-                break
+                # If stuck, find the nearest unvisited blue cell
+                unvisited_blue = blue_cells - visited
+                if unvisited_blue:
+                    next_cell = min(unvisited_blue, key=lambda x: abs(x[0]-current[0]) + abs(x[1]-current[1]))
+                else:
+                    break
             path.append(next_cell)
             visited.add(next_cell)
             current = next_cell
@@ -70,16 +76,15 @@ def solve_12eac192(input_grid: ColoredGrid) -> ColoredGrid:
         if grid[r][c] != 7:  # Preserve orange cells
             grid.set_cell(r, c, 3)
 
-    # For small grids, ensure all blue cells are connected
-    if rows * cols <= 25:
-        for br, bc in blue_cells:
-            if grid[br][bc] == 1:
-                nearest_green = min((abs(br-r) + abs(bc-c), (r, c)) for r, c in path if grid[r][c] == 3)
-                r, c = nearest_green[1]
-                while (r, c) != (br, bc):
-                    if grid[r][c] not in [3, 7]:
-                        grid.set_cell(r, c, 3)
-                    r += 1 if br > r else -1 if br < r else 0
-                    c += 1 if bc > c else -1 if bc < c else 0
+    # Ensure all blue cells are connected
+    for br, bc in blue_cells:
+        if grid[br][bc] == 1:
+            nearest_green = min((abs(br-r) + abs(bc-c), (r, c)) for r, c in path if grid[r][c] == 3)
+            r, c = nearest_green[1]
+            while (r, c) != (br, bc):
+                if grid[r][c] not in [3, 7]:
+                    grid.set_cell(r, c, 3)
+                r += 1 if br > r else -1 if br < r else 0
+                c += 1 if bc > c else -1 if bc < c else 0
 
     return grid
