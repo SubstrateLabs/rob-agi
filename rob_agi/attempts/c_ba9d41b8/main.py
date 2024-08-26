@@ -4,7 +4,7 @@ from typing import List, Tuple
 def solve_ba9d41b8(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by applying a checkerboard pattern to non-black regions.
-    The outer border of each region remains unchanged, as well as the rightmost column and bottom row.
+    The outer border of each region remains unchanged, as well as the bottom-right cell of each region.
     The inner part is filled with a checkerboard pattern using the original color and black (0).
     
     The checkerboard pattern is applied based on the relative position within each region,
@@ -55,7 +55,7 @@ def process_region(grid: ColoredGrid, color: int, region: List[Tuple[int, int]])
     for r, c in region:
         if r == top or r == bottom or c == left or c == right:
             continue  # Leave border cells unchanged
-        if r == bottom or c == right:
-            continue  # Leave bottom row and rightmost column unchanged
+        if r == bottom and c == right:
+            continue  # Leave bottom-right cell unchanged
         if (r - top + c - left) % 2 == 1:
             grid.set_cell(r, c, 0)  # Set to black
