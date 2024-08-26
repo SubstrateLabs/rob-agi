@@ -9,8 +9,9 @@ def solve_5a5a2103(input_grid: ColoredGrid) -> ColoredGrid:
     1. Identifies the dividing lines in the grid.
     2. For each row of sections:
        a. Finds the first non-zero, non-dividing-line color in the leftmost section.
-       b. Generates a 4x4 pattern for this color.
+       b. If a color is found, generates a 4x4 pattern for this color.
        c. Applies this pattern across the entire row, respecting dividing lines.
+       d. If no color is found, leaves the row unchanged.
     3. Preserves the original dividing lines in the output.
     
     Args:
@@ -34,14 +35,12 @@ def solve_5a5a2103(input_grid: ColoredGrid) -> ColoredGrid:
             [color, 0, 0, color]
         ]
     
-    def apply_pattern(grid: List[List[int]], pattern: List[List[int]], start_row: int, start_col: int,
+    def apply_pattern(grid: List[List[int]], pattern: List[List[int]], start_row: int,
                       divider_color: int, vertical_lines: List[int]) -> None:
         for i in range(4):
-            for j in range(4):
-                row, col = start_row + i, start_col + j
-                if row < len(grid) and col < len(grid[0]) and col not in vertical_lines:
-                    if grid[row][col] != divider_color:
-                        grid[row][col] = pattern[i][j]
+            for col in range(len(grid[0])):
+                if col not in vertical_lines and grid[start_row + i][col] != divider_color:
+                    grid[start_row + i][col] = pattern[i][col % 4]
     
     # Find dividing lines
     divider_color, horizontal_lines, vertical_lines = find_dividing_lines(input_grid.values)
@@ -53,13 +52,15 @@ def solve_5a5a2103(input_grid: ColoredGrid) -> ColoredGrid:
     for section_start in range(0, len(new_grid), 5):
         if section_start in horizontal_lines:
             continue
-        
+    
         # Find the color for this row of sections
-        section_color = next(color for color in new_grid[section_start] if color not in [0, divider_color])
-        pattern = generate_pattern(section_color)
+        section_color = next((color for color in new_grid[section_start] if color not in [0, divider_color]), None)
         
-        # Apply the pattern across the row
-        for col in range(0, len(new_grid[0]), 5):
-            apply_pattern(new_grid, pattern, section_start, col, divider_color, vertical_lines)
+        if section_color is not None:
+            pattern = generate_pattern(section_color)
+            
+            # Apply the pattern across the row
+            for row in range(section_start, min(section_start + 4, len(new_grid))):
+                apply_pattern(new_grid, pattern, row, divider_color, vertical_lines)
     
     return ColoredGrid(values=new_grid)
