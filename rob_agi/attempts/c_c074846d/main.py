@@ -8,7 +8,9 @@ def solve_c074846d(input_grid: ColoredGrid) -> ColoredGrid:
     2. Changes the red squares to green (3).
     3. Adds new red squares perpendicular to the original red line,
        extending away from the gray square, with the same length as the original line.
-    4. Ensures all transformations stay within the grid boundaries.
+    4. For a single red square, the new red square is placed in the first available
+       position rotating clockwise from the original position.
+    5. Ensures all transformations stay within the grid boundaries.
     """
     rows, cols = input_grid.get_dimensions()
     new_grid = input_grid.deep_copy()
@@ -30,10 +32,15 @@ def solve_c074846d(input_grid: ColoredGrid) -> ColoredGrid:
         else:  # Vertical
             new_red_squares = [(gray_pos[0], gray_pos[1] + i + 1) for i in range(len(red_line))]
     else:  # Single red square
-        if red_line[0][0] == gray_pos[0]:  # Horizontal
-            new_red_squares = [(gray_pos[0] - 1, gray_pos[1])]
-        else:  # Vertical
-            new_red_squares = [(gray_pos[0], gray_pos[1] + 1)]
+        directions = [(0, 1), (-1, 0), (0, -1), (1, 0)]  # Right, Up, Left, Down
+        original_dir = (red_line[0][0] - gray_pos[0], red_line[0][1] - gray_pos[1])
+        start_index = directions.index(original_dir)
+        for i in range(4):
+            new_dir = directions[(start_index + i + 1) % 4]
+            new_r, new_c = gray_pos[0] + new_dir[0], gray_pos[1] + new_dir[1]
+            if 0 <= new_r < rows and 0 <= new_c < cols:
+                new_red_squares = [(new_r, new_c)]
+                break
     
     # Place new red squares within bounds
     for r, c in new_red_squares:
