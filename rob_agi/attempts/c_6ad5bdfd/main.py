@@ -42,13 +42,17 @@ def solve_6ad5bdfd(input_grid: ColoredGrid) -> ColoredGrid:
 
     1. Identify the anchor side (bottom, left, or right).
     2. Create a new empty grid with the same dimensions.
-    3. Move objects towards the anchor side, maintaining their order and alignment perpendicular to the movement direction.
-    4. Copy the anchor line to the new grid.
-    5. Fill any remaining spaces with zeros.
-    6. Return the transformed grid.
+    3. Copy the anchor line to the new grid.
+    4. Move objects towards the anchor side:
+       - For bottom anchor: move down, preserving columns
+       - For left anchor: move left, preserving columns
+       - For right anchor: move right, preserving columns
+    5. Maintain the vertical order of elements within each column.
+    6. Fill any remaining spaces with zeros.
+    7. Return the transformed grid.
 
     This implementation handles bottom, left, and right anchors, ensuring that objects are moved
-    correctly towards the anchor side while maintaining their relative positions within each row or column.
+    correctly towards the anchor side while maintaining their relative positions within each column.
     """
     anchor_side = find_anchor_side(input_grid)
     rows, cols = input_grid.get_dimensions()
