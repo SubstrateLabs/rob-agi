@@ -2,27 +2,33 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_9ddd00f0(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the grid transformation challenge by extending patterns both horizontally and vertically.
+    Solves the grid transformation challenge by mirroring non-zero values horizontally.
     
     The function processes the grid as follows:
-    1. Keeps the bottom-right quadrant of the grid unchanged.
-    2. Mirrors the bottom-right quadrant horizontally to fill the bottom-left quadrant.
-    3. Mirrors the entire bottom half vertically to fill the top half of the grid.
+    1. Identifies the leftmost column with any non-zero value as the dividing point.
+    2. Keeps the "source" part (from dividing point to right edge) unchanged.
+    3. Mirrors non-zero values from the "source" part to fill the "mirror" part (left edge to dividing point).
+    4. Preserves zero values in their original positions.
     
-    This creates a pattern where both horizontal and vertical symmetry is achieved,
-    with the bottom-right quadrant serving as the source for the entire grid's pattern.
+    This creates a pattern where horizontal symmetry is achieved for non-zero values,
+    while maintaining the original structure and preserving zero values.
     """
     height, width = input_grid.get_dimensions()
     output_grid = input_grid.deep_copy()
-    mid_row, mid_col = height // 2, width // 2
 
-    # Step 1: Mirror bottom-right to bottom-left
-    for row in range(mid_row, height):
-        for col in range(mid_col):
-            output_grid.values[row][col] = input_grid.values[row][width - 1 - col]
+    # Find the dividing point (leftmost non-zero column)
+    dividing_point = width
+    for row in input_grid.values:
+        for col, value in enumerate(row):
+            if value != 0:
+                dividing_point = min(dividing_point, col)
+                break
 
-    # Step 2: Mirror bottom half to top half
-    for row in range(mid_row):
-        output_grid.values[row] = output_grid.values[height - 1 - row].copy()
+    # Fill the "mirror" part
+    for row in range(height):
+        for col in range(dividing_point):
+            mirror_col = width - 1 - col
+            if input_grid.values[row][col] != 0:
+                output_grid.values[row][col] = input_grid.values[row][mirror_col]
 
     return output_grid
