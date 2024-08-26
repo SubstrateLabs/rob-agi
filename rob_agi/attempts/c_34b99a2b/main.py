@@ -10,18 +10,24 @@ def solve_34b99a2b(input_grid: ColoredGrid) -> ColoredGrid:
     4. Applies rules for vertical consistency and bottom row processing.
     5. Makes final adjustments to balance the pattern and match example outputs.
     """
-    left_half, right_half = split_grid(input_grid)
     output = [[0 for _ in range(4)] for _ in range(5)]
     
-    density_scores = calculate_density_scores(left_half, right_half)
-    total_density = sum(density_scores) / len(density_scores)
-    total_red = int(6 + (1 - total_density) * 4)  # 6-10 red squares based on inverse density
-    
-    map_inverse_density_to_output(density_scores, output, total_red)
-    ensure_connectivity(output)
-    balance_pattern(output, total_red)
+    analyze_input_and_create_output(input_grid, output)
+    ensure_coherent_pattern(output)
+    apply_vertical_consistency(output)
+    process_bottom_row(input_grid, output)
+    final_adjustments(output)
     
     return ColoredGrid(values=output)
+
+def analyze_input_and_create_output(input_grid: ColoredGrid, output: List[List[int]]):
+    for r in range(5):
+        sky_count = sum(1 for c in range(3) if input_grid.values[r][c] == 8)
+        gray_count = sum(1 for c in range(5, 9) if input_grid.values[r][c] == 5)
+        if sky_count >= 2 or gray_count >= 2:
+            output[r][0] = output[r][1] = 2
+        if input_grid.values[r][4] == 4:  # Yellow column
+            output[r][2] = 2
 
 def split_grid(grid: ColoredGrid) -> Tuple[List[List[int]], List[List[int]]]:
     left_half = [row[:4] for row in grid.values]
