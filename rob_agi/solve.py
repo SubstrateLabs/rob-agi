@@ -908,7 +908,7 @@ def distill_solved():
         full_str
         + "\n\nAbove is a list of various plans to solve ARC Challenges. Distill all the strategies into a single bullet list of common steps and approaches. The list should not be longer than about 30 items, try to capture the most important or frequently used ideas."
     )
-    res = solver.get_ask_coder([]).run(prompt)
+    res = solver.get_modify_coder([Path("distilled_solves.txt")]).run(prompt)
     with open("distilled_solves.txt", "w") as f:
         f.write(res)
 

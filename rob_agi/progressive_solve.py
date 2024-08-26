@@ -93,8 +93,9 @@ class Solver:
             fnames = [self.file_paths["main"], self.file_paths["test"]]
         return self.get_coder(edit_format="ask", fnames=fnames)
 
-    def get_modify_coder(self):
-        fnames = [self.file_paths["main"], self.file_paths["visual_descriptions"]]
+    def get_modify_coder(self, fnames):
+        if fnames is None:
+            fnames = [self.file_paths["main"], self.file_paths["visual_descriptions"]]
         read_only_fnames = [self.file_paths["test"], project_root / "rob_agi/colored_grid.py"]
         return self.get_coder(fnames=fnames, read_only_fnames=read_only_fnames, auto_commits=True)
 
