@@ -34,8 +34,9 @@ def solve_14754a24(input_grid: ColoredGrid) -> ColoredGrid:
                         if (dr1, dc1) != (dr2, dc2) and (dr1, dc1) != (-dr2, -dc2):
                             shape = [(r + dr1*i, c + dc1*i) for i in range(length1)] + \
                                     [(r + dr2*i, c + dc2*i) for i in range(1, length2)]
-                            if all(0 <= nr < rows and 0 <= nc < cols and grid.values[nr][nc] in [0, 4, 5] for nr, nc in shape):
-                                shapes.append(shape)
+                            if all(0 <= nr < rows and 0 <= nc < cols for nr, nc in shape):
+                                if all(grid.values[nr][nc] in [0, 4, 5] or (nr, nc) == (r, c) for nr, nc in shape):
+                                    shapes.append(shape)
         return shapes
     
     def score_l_shape(shape: List[Tuple[int, int]]) -> int:
@@ -44,11 +45,13 @@ def solve_14754a24(input_grid: ColoredGrid) -> ColoredGrid:
         adjacent_red = sum(1 for r, c in shape for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
                            if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 2)
         connected_yellows = len(set((r, c) for r, c in shape if grid.values[r][c] == 4))
-        return score + yellow_count * 3 + adjacent_red + connected_yellows * 2
+        adjacent_yellows = sum(1 for r, c in shape for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                               if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 4)
+        return score + yellow_count * 5 + adjacent_red * 2 + connected_yellows * 3 + adjacent_yellows * 2
     
     def apply_l_shape(shape: List[Tuple[int, int]]) -> None:
         for r, c in shape:
-            if grid.values[r][c] != 4:  # Don't convert yellow squares
+            if grid.values[r][c] in [0, 5]:  # Only convert black or gray squares
                 grid.values[r][c] = 2
     
     def process_yellow_squares() -> None:
@@ -65,12 +68,12 @@ def solve_14754a24(input_grid: ColoredGrid) -> ColoredGrid:
             _, shape = heapq.heappop(all_shapes)
             yellows_in_shape = set((r, c) for r, c in shape if grid.values[r][c] == 4)
             if yellows_in_shape - covered_yellows:
-                if not any(grid.values[r][c] == 2 for r, c in shape if grid.values[r][c] != 4):
+                if not any(grid.values[r][c] == 2 for r, c in shape if grid.values[r][c] not in [2, 4]):
                     apply_l_shape(shape)
                     covered_yellows.update(yellows_in_shape)
     
     def optimize_pattern() -> None:
-        for _ in range(3):  # Multiple optimization passes
+        for _ in range(5):  # Increased optimization passes
             for r in range(rows):
                 for c in range(cols):
                     if grid.values[r][c] == 2:
@@ -84,8 +87,10 @@ def solve_14754a24(input_grid: ColoredGrid) -> ColoredGrid:
                 for c in range(cols):
                     if grid.values[r][c] == 4:
                         for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                            if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 0:
-                                grid.values[r+dr][c+dc] = 2  # Extend L-shape
+                            if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] in [0, 5]:
+                                if any(grid.values[r+dr+dr2][c+dc+dc2] in [2, 4] for dr2, dc2 in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                                       if 0 <= r+dr+dr2 < rows and 0 <= c+dc+dc2 < cols):
+                                    grid.values[r+dr][c+dc] = 2  # Extend L-shape
     
     def verify_and_extend_l_shapes() -> bool:
         valid = True
