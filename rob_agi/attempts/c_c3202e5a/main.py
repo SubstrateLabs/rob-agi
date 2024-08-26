@@ -6,11 +6,11 @@ def solve_c3202e5a(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms an input grid into a simplified output grid based on color patterns.
 
     1. Identifies the dividing color that forms continuous lines in the input grid.
-    2. Determines the section layout (4x4 or 5x5) and calculates section size.
-    3. Identifies the focus color by analyzing color distribution and patterns within sections.
+    2. Determines the section layout and calculates section size.
+    3. Identifies the focus color by analyzing color distribution within sections.
     4. Analyzes the focus color's placement patterns across all sections.
-    5. Generates an output grid (5x5 if input has 4x4 sections, 3x3 if input has 5x5 sections).
-    6. Translates the most common focus color pattern into an L-shape or diagonal in the output grid.
+    5. Generates an output grid (5x5 for 4x4 or 5x5 input sections).
+    6. Translates the focus color pattern into a representative shape in the output grid.
 
     The transformation simplifies complex input patterns into a representative geometric shape,
     capturing the essence of the focus color's distribution in the input grid.
@@ -25,16 +25,9 @@ def solve_c3202e5a(input_grid: ColoredGrid) -> ColoredGrid:
     section_size = get_section_size(input_grid, dividing_color)
     focus_color = get_focus_color(input_grid, dividing_color)
     
-    quadrant_patterns = analyze_quadrant_patterns(input_grid, dividing_color, focus_color, section_size)
+    section_patterns = analyze_section_patterns(input_grid, dividing_color, focus_color, section_size)
     
-    if section_size == 3:
-        output_size = 5
-        output_values = expand_pattern(quadrant_patterns, focus_color)
-    elif section_size == 4:
-        output_size = 3
-        output_values = contract_pattern(quadrant_patterns, focus_color)
-    else:
-        raise ValueError(f"Unexpected section size: {section_size}")
+    output_values = generate_output_pattern(section_patterns, focus_color)
 
     return ColoredGrid(values=output_values)
 
@@ -64,63 +57,61 @@ def get_focus_color(grid: ColoredGrid, dividing_color: int) -> int:
                 color_counts[cell] = color_counts.get(cell, 0) + 1
     return max(color_counts, key=color_counts.get)
 
-def analyze_quadrant_patterns(grid: ColoredGrid, dividing_color: int, focus_color: int, section_size: int) -> Dict[Tuple[int, int], int]:
-    """Analyzes the distribution of the focus color in each section's quadrants."""
-    quadrant_patterns = {}
+def analyze_section_patterns(grid: ColoredGrid, dividing_color: int, focus_color: int, section_size: int) -> List[List[int]]:
+    """Analyzes the distribution of the focus color in each section."""
     sections = [row for row in grid.values if row[0] != dividing_color]
+    pattern = []
     
     for i in range(0, len(sections), section_size):
+        row_pattern = []
         for j in range(0, len(sections[0]), section_size):
             section = [row[j:j+section_size] for row in sections[i:i+section_size]]
-            quadrants = {(0,0): 0, (0,1): 0, (1,0): 0, (1,1): 0}
-            
-            for r, row in enumerate(section):
-                for c, cell in enumerate(row):
-                    if cell == focus_color:
-                        quadrants[(r//(section_size//2), c//(section_size//2))] += 1
-            
-            sorted_quadrants = tuple(sorted(quadrants.items(), key=lambda x: x[1], reverse=True)[:2])
-            quadrant_patterns[sorted_quadrants] = quadrant_patterns.get(sorted_quadrants, 0) + 1
+            focus_count = sum(cell == focus_color for row in section for cell in row)
+            row_pattern.append(focus_count)
+        pattern.append(row_pattern)
     
-    return quadrant_patterns
+    return pattern
 
-def expand_pattern(quadrant_patterns: Dict[Tuple[int, int], int], focus_color: int) -> List[List[int]]:
-    """Expands the pattern from 3x3 sections to a 5x5 grid."""
+def find_dividing_lines(grid: ColoredGrid) -> int:
+    """Identifies the color of the dividing lines."""
+    rows, cols = grid.get_dimensions()
+    for color in range(1, 10):
+        if any(all(cell == color for cell in row) for row in grid.values):
+            return color
+    raise ValueError("No dividing lines found")
+
+def get_section_size(grid: ColoredGrid, dividing_color: int) -> int:
+    """Calculates the size of individual sections."""
+    section_size = 0
+    for row in grid.values:
+        if row[0] == dividing_color:
+            return section_size
+        section_size += 1
+    raise ValueError("Could not determine section size")
+
+def get_focus_color(grid: ColoredGrid, dividing_color: int) -> int:
+    """Determines the most frequent non-zero, non-dividing color in the grid."""
+    color_counts = {}
+    for row in grid.values:
+        for cell in row:
+            if cell != 0 and cell != dividing_color:
+                color_counts[cell] = color_counts.get(cell, 0) + 1
+    return max(color_counts, key=color_counts.get)
+def generate_output_pattern(section_patterns: List[List[int]], focus_color: int) -> List[List[int]]:
+    """Generates the output pattern based on the section patterns."""
     output = [[0 for _ in range(5)] for _ in range(5)]
-    most_common_pattern = max(quadrant_patterns, key=quadrant_patterns.get)
-    
-    if most_common_pattern[0][0] == most_common_pattern[1][0]:
-        # Adjacent quadrants - L-shape
-        q = most_common_pattern[0][0]
-        output[q[0]*4][q[1]*4] = focus_color
-        output[q[0]*4][2] = focus_color
-        output[2][q[1]*4] = focus_color
-        output[4-q[0]*4][4-q[1]*4] = focus_color
-        output[2][2] = focus_color
-    else:
-        # Diagonal quadrants
-        output[0][0] = focus_color
-        output[0][4] = focus_color
-        output[4][0] = focus_color
-        output[4][4] = focus_color
-        output[2][2] = focus_color
-    
-    return output
+    max_count = max(max(row) for row in section_patterns)
+    threshold = max_count // 2
 
-def contract_pattern(quadrant_patterns: Dict[Tuple[int, int], int], focus_color: int) -> List[List[int]]:
-    """Contracts the pattern from 4x4 sections to a 3x3 grid."""
-    output = [[0 for _ in range(3)] for _ in range(3)]
-    most_common_pattern = max(quadrant_patterns, key=quadrant_patterns.get)
-    
-    # Determine the dominant diagonal
-    if (most_common_pattern[0][0] == (0,0) and most_common_pattern[1][0] == (1,1)) or \
-       (most_common_pattern[0][0] == (1,1) and most_common_pattern[1][0] == (0,0)):
-        output[0][0] = focus_color
-        output[2][2] = focus_color
-    else:
-        output[0][2] = focus_color
-        output[2][0] = focus_color
-    
-    output[1][1] = focus_color  # Always fill the center
-    
+    for i, row in enumerate(section_patterns):
+        for j, count in enumerate(row):
+            if count > threshold:
+                output[i][j] = focus_color
+
+    # Ensure at least one cell is filled
+    if sum(sum(row) for row in output) == 0:
+        max_pos = max(((i, j) for i, row in enumerate(section_patterns) for j, count in enumerate(row)),
+                      key=lambda pos: section_patterns[pos[0]][pos[1]])
+        output[max_pos[0]][max_pos[1]] = focus_color
+
     return output
