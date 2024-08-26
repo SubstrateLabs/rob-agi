@@ -4,25 +4,36 @@ def solve_ed98d772(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transform a 3x3 input grid into a 6x6 output grid by:
     1. Copying the input to the top-left quadrant.
-    2. Mirroring the top-left quadrant horizontally to create the top-right quadrant.
-    3. Mirroring the entire top half vertically to create the bottom half.
+    2. Creating a frame around the grid using non-zero colors from the input.
+    3. Filling the interior with a pattern based on the input's zero and non-zero values.
+    4. Ensuring symmetry in the resulting pattern.
     """
     # Create the initial 6x6 output grid
     output_grid = [[0 for _ in range(6)] for _ in range(6)]
 
-    # Copy input to top-left quadrant
+    # Step 1: Copy input to top-left quadrant
     for r in range(3):
         for c in range(3):
             output_grid[r][c] = input_grid.values[r][c]
 
-    # Mirror top-left to top-right
-    for r in range(3):
-        for c in range(3):
-            output_grid[r][5-c] = output_grid[r][c]
+    # Step 2: Create the frame
+    for i in range(6):
+        output_grid[0][i] = output_grid[0][i] if i < 3 else output_grid[0][5-i]
+        output_grid[5][i] = output_grid[0][i]
+        output_grid[i][0] = output_grid[i][0] if i < 3 else output_grid[5-i][0]
+        output_grid[i][5] = output_grid[i][0]
 
-    # Mirror top half to bottom half
-    for r in range(3):
-        for c in range(6):
-            output_grid[5-r][c] = output_grid[r][c]
+    # Step 3 & 4: Fill the interior and ensure symmetry
+    for r in range(1, 5):
+        for c in range(1, 5):
+            if r == 1 or r == 4 or c == 1 or c == 4:
+                # Inner frame
+                output_grid[r][c] = output_grid[0][c] if output_grid[r][0] == 0 else 0
+            elif output_grid[r % 3][c % 3] != 0:
+                # Non-zero values from input create "holes"
+                output_grid[r][c] = 0
+            else:
+                # Fill with the corresponding frame color
+                output_grid[r][c] = output_grid[0][c]
 
     return ColoredGrid(values=output_grid)
