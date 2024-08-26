@@ -8,25 +8,31 @@ def solve_0a2355a6(input_grid: ColoredGrid) -> ColoredGrid:
     analyzing their properties, and assigning colors based on shape characteristics and relationships.
     
     1. Identify distinct contiguous shapes of sky blue (8) in the input grid using flood-fill.
-    2. Analyze shapes for size, form, and relative position.
-    3. Categorize shapes based on their geometric properties and relationships.
-    4. Assign colors to shapes based on their categories and relative importance, ensuring consistency across the grid.
-    5. Handle nested shapes and maintain proper color relationships.
-    6. Create and return a new grid with transformed colors, maintaining black (0) as empty space.
+    2. Analyze shapes for size, form, complexity, and relative position.
+    3. Create a hierarchy of shapes, identifying nested relationships.
+    4. Rank shapes based on their characteristics and global patterns.
+    5. Assign colors to shapes based on their rank, ensuring consistency and visual distinction.
+    6. Handle nested shapes by assigning contrasting colors.
+    7. Balance color distribution across the grid.
+    8. Create and return a new grid with transformed colors, maintaining black (0) as empty space.
     
-    The function ensures consistent color assignment based on shape properties and their relationships,
-    prioritizing larger and more complex shapes while maintaining visual clarity and pattern consistency.
+    The function ensures consistent color assignment based on shape properties, their relationships,
+    and global patterns, prioritizing larger and more complex shapes while maintaining visual clarity
+    and pattern consistency across different grid layouts.
     """
     # Step 1: Identify distinct shapes
     shapes = find_contiguous_shapes(input_grid)
     
-    # Step 2 & 3: Analyze and categorize shapes
-    analyzed_shapes = analyze_and_categorize_shapes(shapes, input_grid)
+    # Step 2 & 3: Analyze shapes and create hierarchy
+    analyzed_shapes = analyze_shapes(shapes, input_grid)
     
-    # Step 4: Assign colors to shapes
-    colored_shapes = assign_colors_to_shapes(analyzed_shapes)
+    # Step 4: Rank shapes
+    ranked_shapes = rank_shapes(analyzed_shapes)
     
-    # Step 5 & 6: Create output grid
+    # Step 5, 6 & 7: Assign colors to shapes
+    colored_shapes = assign_colors_to_shapes(ranked_shapes)
+    
+    # Step 8: Create output grid
     output_grid = create_output_grid(input_grid, colored_shapes)
     
     return output_grid
@@ -57,7 +63,7 @@ def find_contiguous_shapes(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
     
     return shapes
 
-def analyze_and_categorize_shapes(shapes: List[List[Tuple[int, int]]], grid: ColoredGrid) -> List[Dict]:
+def analyze_shapes(shapes: List[List[Tuple[int, int]]], grid: ColoredGrid) -> List[Dict]:
     analyzed_shapes = []
     rows, cols = grid.get_dimensions()
     
@@ -68,27 +74,27 @@ def analyze_and_categorize_shapes(shapes: List[List[Tuple[int, int]]], grid: Col
         max_r = max(r for r, _ in shape)
         max_c = max(c for _, c in shape)
         
-        # Calculate form
         width = max_c - min_c + 1
         height = max_r - min_r + 1
         form = categorize_shape(shape, min_r, min_c, max_r, max_c)
         
-        # Check if the shape contains a hole
         has_hole = any(grid.get_cell(r, c) == 0 for r in range(min_r, max_r+1) for c in range(min_c, max_c+1) if (r, c) not in shape)
         
-        # Calculate position (top, middle, bottom)
-        position = "top" if max_r < rows / 3 else "bottom" if min_r > 2 * rows / 3 else "middle"
+        complexity = calculate_complexity(shape)
+        
+        position = calculate_position(min_r, max_r, min_c, max_c, rows, cols)
         
         analyzed_shapes.append({
             "shape": shape,
             "size": size,
             "form": form,
             "has_hole": has_hole,
+            "complexity": complexity,
             "position": position,
             "bounding_box": (min_r, min_c, max_r, max_c)
         })
     
-    return sorted(analyzed_shapes, key=lambda x: (-x["size"], x["form"], x["position"]))
+    return analyzed_shapes
 
 def categorize_shape(shape: List[Tuple[int, int]], min_r: int, min_c: int, max_r: int, max_c: int) -> str:
     width = max_c - min_c + 1
@@ -109,28 +115,50 @@ def categorize_shape(shape: List[Tuple[int, int]], min_r: int, min_c: int, max_r
     else:
         return "rectangle"
 
-def assign_colors_to_shapes(analyzed_shapes: List[Dict]) -> List[Tuple[List[Tuple[int, int]], int]]:
+def calculate_complexity(shape: List[Tuple[int, int]]) -> int:
+    # Count the number of corners as a measure of complexity
+    corners = 0
+    for r, c in shape:
+        neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)] if (r+dr, c+dc) in shape)
+        if neighbors <= 2:
+            corners += 1
+    return corners
+
+def calculate_position(min_r: int, max_r: int, min_c: int, max_c: int, rows: int, cols: int) -> str:
+    center_r = (min_r + max_r) / 2
+    center_c = (min_c + max_c) / 2
+    
+    vertical = "top" if center_r < rows / 3 else "bottom" if center_r > 2 * rows / 3 else "middle"
+    horizontal = "left" if center_c < cols / 3 else "right" if center_c > 2 * cols / 3 else "center"
+    
+    return f"{vertical}-{horizontal}"
+
+def rank_shapes(analyzed_shapes: List[Dict]) -> List[Dict]:
+    def rank_key(shape):
+        return (
+            shape["size"],
+            shape["complexity"],
+            -abs(int(shape["position"].split("-")[0] == "middle")),  # Prefer shapes in the middle
+            -abs(int(shape["position"].split("-")[1] == "center")),  # Prefer shapes in the center
+            shape["has_hole"],
+        )
+    
+    return sorted(analyzed_shapes, key=rank_key, reverse=True)
+
+def assign_colors_to_shapes(ranked_shapes: List[Dict]) -> List[Tuple[List[Tuple[int, int]], int]]:
     colors = [1, 2, 3]
     colored_shapes = []
     used_colors = set()
-    form_colors = {}
     
-    for shape_info in analyzed_shapes:
+    for i, shape_info in enumerate(ranked_shapes):
         shape = shape_info["shape"]
-        form = shape_info["form"]
         
-        if form in form_colors:
-            color = form_colors[form]
+        if i < 3:
+            color = colors[i]
         else:
-            # Assign a new color based on the shape's characteristics
-            if shape_info["has_hole"] or shape_info["form"] in ["square", "near_square"]:
-                color = 1  # Blue for shapes with holes or square-like shapes
-            elif shape_info["position"] == "bottom" or shape_info["form"] in ["wide_rectangle", "tall_rectangle"]:
-                color = 3  # Green for shapes at the bottom or elongated rectangles
-            else:
-                color = 2  # Red for other shapes
-            
-            form_colors[form] = color
+            # For shapes beyond the top 3, assign colors based on similarity to top shapes
+            similarities = [shape_similarity(shape_info, ranked_shapes[j]) for j in range(3)]
+            color = colors[similarities.index(max(similarities))]
         
         colored_shapes.append((shape, color))
         used_colors.add(color)
@@ -144,6 +172,16 @@ def assign_colors_to_shapes(analyzed_shapes: List[Dict]) -> List[Tuple[List[Tupl
                     break
     
     return colored_shapes
+
+def shape_similarity(shape1: Dict, shape2: Dict) -> float:
+    # Calculate a similarity score between two shapes based on their properties
+    form_similarity = int(shape1["form"] == shape2["form"])
+    size_similarity = 1 - abs(shape1["size"] - shape2["size"]) / max(shape1["size"], shape2["size"])
+    complexity_similarity = 1 - abs(shape1["complexity"] - shape2["complexity"]) / max(shape1["complexity"], shape2["complexity"])
+    position_similarity = int(shape1["position"] == shape2["position"])
+    hole_similarity = int(shape1["has_hole"] == shape2["has_hole"])
+    
+    return (form_similarity + size_similarity + complexity_similarity + position_similarity + hole_similarity) / 5
 
 def create_output_grid(input_grid: ColoredGrid, colored_shapes: List[Tuple[List[Tuple[int, int]], int]]) -> ColoredGrid:
     output_grid = input_grid.deep_copy()
