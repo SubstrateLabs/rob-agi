@@ -48,6 +48,7 @@ from rob_agi.solver_functions import (
     run_eval,
 )
 from rob_agi.progressive_solve import Solver
+from rob_agi.test_factory import read_meta_file
 
 api_key = os.environ.get("SUBSTRATE_API_KEY")
 substrate = Substrate(api_key=api_key, timeout=60 * 4, additional_headers={})
@@ -75,7 +76,7 @@ remote_pip_deps = [
     "git+https://github.com/SubstrateLabs/rob-agi.git@673d3e5",
     "numpy",
 ]
-max_tries_per_challenge = 3
+max_tries_per_challenge = 0
 
 all_challenges = list(challenges.values())
 random.shuffle(all_challenges)
@@ -899,6 +900,7 @@ def distill_solved():
         challenge_id = gp.id
         solver = Solver(gp)
         solved, latest_plan, total_attempts = read_meta_file(solver.challenge_root)
+        print(solved, total_attempts)
         if solved and latest_plan:
             all_solves.append({"id": challenge_id, "latest_plan": latest_plan})
     print(all_solves)
@@ -937,10 +939,10 @@ async def main():
     # research_loop(prev_event=last)
 
     # distill_research()
-    distill_solved()
+    # distill_solved()
 
-    # for i in range(1):
-    #     await solve_loop(max_concurrent=20)
+    for i in range(1):
+        await solve_loop(max_concurrent=20)
     # await solve_loop(max_concurrent=4, max_challenges=8)
 
 

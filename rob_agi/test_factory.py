@@ -48,7 +48,7 @@ def setup_files(gp: GridProblem, cr: Optional[ComputedResult], path: Path):
     path.mkdir(parents=True, exist_ok=True)
     write_test_file(gp, path, cr)
     write_main_file(gp, path)
-    write_meta_file(path)
+    ensure_meta_file(path)
     # write_init_file(path)
 
 
@@ -69,10 +69,17 @@ total_attempts = {total_attempts}
         f.write(content)
 
 
+def ensure_meta_file(path: Path):
+    target_file = path / "meta.py"
+    if target_file.exists():
+        return
+    else:
+        write_meta_file(path)
+
+
 def read_meta_file(base_path: Path) -> tuple[bool, Optional[str], int]:
     target_file = base_path / "meta.py"
-    if not target_file.exists():
-        write_meta_file(base_path)
+    ensure_meta_file(base_path)
 
     with open(target_file, "r") as f:
         content = f.read()

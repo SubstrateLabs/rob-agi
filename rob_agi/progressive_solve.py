@@ -31,7 +31,7 @@ default_max_tries = 1
 
 
 class Solver:
-    def __init__(self, challenge: GridProblem, solution: Optional[ComputedResult]):
+    def __init__(self, challenge: GridProblem, solution: Optional[ComputedResult] = None):
         self.challenge_id = challenge.id
         self.challenge = challenge
         self.solution = solution
@@ -178,10 +178,19 @@ class Solver:
 
     def run_solve(self, max_tries=default_max_tries, prev_solution=None) -> bool:
         t0 = time.perf_counter()
-        local_tries = 0
         current_result = self.run_tests()
-        is_failing = not current_result["success"]
+        if current_result["success"]:
+            logger.info(f"Tests are passing. No need to run the solver. ({time.perf_counter() - t0:.2f}s)")
+            write_meta_file(
+                self.challenge_root,
+                solved=True,
+                latest_plan=self.latest_plan,
+                total_attempts=self.total_attempts,
+            )
+            return True
 
+        is_failing = not current_result["success"]
+        local_tries = 0
         while is_failing and local_tries < max_tries:
             logger.info(f"-------------------- ATTEMPT {local_tries+1}/{max_tries} --------------------------\n")
             if prev_solution:
@@ -201,7 +210,6 @@ class Solver:
                 latest_plan=plan,
                 total_attempts=self.total_attempts,
             )
-
         logger.info(f"Total time: {time.perf_counter() - t0:.2f}s")
         return current_result["success"]
 
