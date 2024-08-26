@@ -7,6 +7,7 @@ def solve_62ab2642(input_grid: ColoredGrid) -> ColoredGrid:
     1. Fill the largest corner-connected area of black (0) cells with sky blue (8), starting from either the top-right or bottom-right corner.
     2. Identify isolated black areas completely surrounded by gray (5) cells or the grid edge and fill them with orange (7).
     3. Preserve all original gray (5) cells.
+    4. Leave any remaining black (0) cells unchanged.
 
     The function uses an iterative flood fill for both the sky blue and orange areas, with a comparison to choose the larger sky blue area.
     Isolated black areas are identified by checking if they are completely surrounded by gray cells or the grid edge.
@@ -41,8 +42,8 @@ def solve_62ab2642(input_grid: ColoredGrid) -> ColoredGrid:
         return count, filled
 
     # Determine and fill largest corner-connected area
-    top_right_count, top_right_cells = flood_fill(cols-1, 0, 0, 8, count_only=True)
-    bottom_right_count, bottom_right_cells = flood_fill(cols-1, rows-1, 0, 8, count_only=True)
+    top_right_count, _ = flood_fill(cols-1, 0, 0, 8, count_only=True)
+    bottom_right_count, _ = flood_fill(cols-1, rows-1, 0, 8, count_only=True)
 
     if top_right_count >= bottom_right_count:
         flood_fill(cols-1, 0, 0, 8)
@@ -64,33 +65,6 @@ def solve_62ab2642(input_grid: ColoredGrid) -> ColoredGrid:
     for y in range(rows):
         for x in range(cols):
             if is_surrounded_by_gray(x, y):
-                flood_fill(x, y, 0, 7)
-
-    # Additional step: Fill isolated black areas that are not corner-connected
-    def is_isolated_black_area(x, y):
-        if output_grid.values[y][x] != 0:
-            return False
-        visited = set()
-        stack = [(x, y)]
-        while stack:
-            cx, cy = stack.pop()
-            if (cx, cy) in visited:
-                continue
-            visited.add((cx, cy))
-            for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                nx, ny = cx + dx, cy + dy
-                if 0 <= nx < cols and 0 <= ny < rows:
-                    if output_grid.values[ny][nx] == 0:
-                        stack.append((nx, ny))
-                    elif output_grid.values[ny][nx] not in [5, 8]:
-                        return False
-                elif (nx == -1 and ny == 0) or (nx == cols and ny == rows - 1):
-                    return False
-        return True
-
-    for y in range(rows):
-        for x in range(cols):
-            if is_isolated_black_area(x, y):
                 flood_fill(x, y, 0, 7)
 
     return output_grid
