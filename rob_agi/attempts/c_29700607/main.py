@@ -6,31 +6,28 @@ def solve_29700607(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by drawing lines connecting colored squares.
     
     For each color:
-    1. Determines if the line should be horizontal or vertical based on the positions of the colored squares.
-    2. For horizontal lines, draws in the row with the most instances of that color, from leftmost to rightmost occurrence.
-    3. For vertical lines, draws in the column with the most instances of that color, from topmost to bottommost occurrence.
+    1. Determines if the line should be horizontal or vertical based on the spread of colored squares.
+    2. For horizontal lines, draws in the topmost row where the color appears, from leftmost to rightmost occurrence.
+    3. For vertical lines, draws in the leftmost column where the color appears, from topmost to bottommost occurrence.
     
     Returns a new ColoredGrid with the drawn lines.
     """
     output_grid = input_grid.deep_copy()
-    rows, cols = input_grid.get_dimensions()
-    
     color_positions = get_color_positions(input_grid)
     
     for color, positions in color_positions.items():
-        direction = determine_direction(positions)
+        direction = determine_line_direction(positions)
         if direction == 'horizontal':
-            draw_horizontal_line(color, positions, output_grid)
+            draw_horizontal_line(output_grid, color, positions)
         else:
-            draw_vertical_line(color, positions, output_grid)
+            draw_vertical_line(output_grid, color, positions)
     
     return output_grid
 
 def get_color_positions(grid: ColoredGrid) -> Dict[int, List[Tuple[int, int]]]:
     color_positions = {}
-    rows, cols = grid.get_dimensions()
-    for row in range(rows):
-        for col in range(cols):
+    for row in range(len(grid.values)):
+        for col in range(len(grid.values[0])):
             color = grid.values[row][col]
             if color != 0:
                 if color not in color_positions:
@@ -38,21 +35,22 @@ def get_color_positions(grid: ColoredGrid) -> Dict[int, List[Tuple[int, int]]]:
                 color_positions[color].append((row, col))
     return color_positions
 
-def determine_direction(positions: List[Tuple[int, int]]) -> str:
-    rows = set(pos[0] for pos in positions)
-    cols = set(pos[1] for pos in positions)
-    return 'horizontal' if len(rows) < len(cols) else 'vertical'
+def determine_line_direction(positions: List[Tuple[int, int]]) -> str:
+    rows, cols = zip(*positions)
+    horizontal_spread = max(cols) - min(cols)
+    vertical_spread = max(rows) - min(rows)
+    return 'horizontal' if horizontal_spread >= vertical_spread else 'vertical'
 
-def draw_horizontal_line(color: int, positions: List[Tuple[int, int]], output_grid: ColoredGrid):
-    row = max(set(pos[0] for pos in positions), key=lambda r: sum(1 for p in positions if p[0] == r))
-    left = min(pos[1] for pos in positions if pos[0] == row)
-    right = max(pos[1] for pos in positions if pos[0] == row)
-    for col in range(left, right + 1):
-        output_grid.values[row][col] = color
+def draw_horizontal_line(grid: ColoredGrid, color: int, positions: List[Tuple[int, int]]):
+    rows, cols = zip(*positions)
+    top_row = min(rows)
+    left_col, right_col = min(cols), max(cols)
+    for col in range(left_col, right_col + 1):
+        grid.values[top_row][col] = color
 
-def draw_vertical_line(color: int, positions: List[Tuple[int, int]], output_grid: ColoredGrid):
-    col = max(set(pos[1] for pos in positions), key=lambda c: sum(1 for p in positions if p[1] == c))
-    top = min(pos[0] for pos in positions if pos[1] == col)
-    bottom = max(pos[0] for pos in positions if pos[1] == col)
-    for row in range(top, bottom + 1):
-        output_grid.values[row][col] = color
+def draw_vertical_line(grid: ColoredGrid, color: int, positions: List[Tuple[int, int]]):
+    rows, cols = zip(*positions)
+    left_col = min(cols)
+    top_row, bottom_row = min(rows), max(rows)
+    for row in range(top_row, bottom_row + 1):
+        grid.values[row][left_col] = color
