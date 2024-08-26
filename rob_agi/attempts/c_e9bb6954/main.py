@@ -4,54 +4,49 @@ from typing import List, Tuple
 def solve_e9bb6954(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the grid transformation challenge by following these steps:
-    1. For each color from 1 to 9:
-       a. Find all connected regions of the current color.
-       b. Identify the largest region.
-    2. For the largest region of each color:
-       a. Calculate the center of mass.
-       b. Determine whether to draw a horizontal or vertical line based on the region's shape.
-       c. Draw the line through the center of mass, respecting color precedence.
-    3. Process colors in ascending order to ensure proper precedence.
-    4. Return the transformed grid with these lines drawn.
+    1. Scan the input grid to identify all 3x3 squares of the same color.
+    2. Determine line directions based on the position of 3x3 squares.
+    3. Sort the 3x3 squares by color and position.
+    4. Create an output grid as a copy of the input grid.
+    5. Draw lines for each 3x3 square, respecting color precedence and original non-zero values.
+    6. Return the transformed grid with these lines drawn.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = input_grid.get_dimensions()
 
-    def find_largest_region(color: int) -> List[Tuple[int, int]]:
-        regions = input_grid.find_connected_regions(color)
-        return max(regions, key=len) if regions else []
+    def find_3x3_squares(grid):
+        squares = []
+        for r in range(rows - 2):
+            for c in range(cols - 2):
+                if all(grid.get_cell(r+i, c+j) == grid.get_cell(r, c) != 0 
+                       for i in range(3) for j in range(3)):
+                    squares.append((r, c, grid.get_cell(r, c)))
+        return squares
 
-    def calculate_center_of_mass(region: List[Tuple[int, int]]) -> Tuple[int, int]:
-        if not region:
-            return (0, 0)
-        avg_row = sum(r for r, _ in region) // len(region)
-        avg_col = sum(c for _, c in region) // len(region)
-        return (avg_row, avg_col)
+    def is_vertical(col):
+        return col < 3 or col >= cols - 3
 
-    def determine_line_direction(region: List[Tuple[int, int]]) -> str:
-        if not region:
-            return "horizontal"
-        min_row, max_row = min(r for r, _ in region), max(r for r, _ in region)
-        min_col, max_col = min(c for _, c in region), max(c for _, c in region)
-        height = max_row - min_row
-        width = max_col - min_col
-        return "vertical" if height > width else "horizontal"
+    squares = find_3x3_squares(input_grid)
+    squares.sort(key=lambda x: (x[2], x[0], x[1]))  # Sort by color, then position
 
-    def draw_line(color: int, center: Tuple[int, int], direction: str):
-        if direction == "horizontal":
-            for c in range(cols):
-                if output_grid.get_cell(center[0], c) < color:
-                    output_grid.set_cell(center[0], c, color)
+    def draw_line(square, is_vertical):
+        r, c, color = square
+        if is_vertical:
+            center_col = c + 1
+            for row in range(rows):
+                if output_grid.get_cell(row, center_col) < color and input_grid.get_cell(row, center_col) == 0:
+                    output_grid.set_cell(row, center_col, color)
         else:
-            for r in range(rows):
-                if output_grid.get_cell(r, center[1]) < color:
-                    output_grid.set_cell(r, center[1], color)
+            center_row = r + 1
+            for col in range(cols):
+                if output_grid.get_cell(center_row, col) < color and input_grid.get_cell(center_row, col) == 0:
+                    output_grid.set_cell(center_row, col, color)
 
-    for color in range(1, 10):  # Colors 1 to 9
-        largest_region = find_largest_region(color)
-        if largest_region:
-            center = calculate_center_of_mass(largest_region)
-            direction = determine_line_direction(largest_region)
-            draw_line(color, center, direction)
+    processed_colors = set()
+    for square in squares:
+        color = square[2]
+        if color not in processed_colors:
+            draw_line(square, is_vertical(square[1]))
+            processed_colors.add(color)
 
     return output_grid
