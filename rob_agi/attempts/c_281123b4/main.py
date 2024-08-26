@@ -6,11 +6,11 @@ def solve_281123b4(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms a 19x4 input grid into a 4x4 output grid through a multi-step process:
     1. Section division: Divides each row into 4 sections, ignoring the green (3) separator columns.
-    2. Color analysis: Analyzes color frequencies in each section and globally, prioritizing brown (9) and yellow (4).
-    3. Pattern recognition: Identifies color patterns within sections, across sections, and diagonally.
-    4. Output construction: Builds a 4x4 grid based on color priorities, patterns, and global color distribution.
+    2. Color analysis: Analyzes color frequencies and patterns in each section and globally.
+    3. Output construction: Builds a 4x4 grid based on color priorities, patterns, and global color distribution.
+    4. Pattern enhancement: Creates diagonal patterns and ensures color balance.
     5. Refinement: Adjusts the output to create balanced, symmetric patterns and preserve key characteristics of the input.
-    The final 4x4 grid reflects the most prominent colors and patterns from the input while maintaining coherence.
+    The final 4x4 grid reflects the most prominent colors and patterns from the input while maintaining coherence and aesthetic appeal.
     """
     rows, cols = input_grid.get_dimensions()
     if rows != 4 or cols != 19:
@@ -35,7 +35,7 @@ def solve_281123b4(input_grid: ColoredGrid) -> ColoredGrid:
             global_counts.update(counts)
 
     # Global color ranking
-    color_weights = {9: 3, 4: 2, 8: 1, 5: 1}  # Brown, Yellow, Sky, Gray
+    color_weights = {9: 4, 4: 3, 8: 2, 5: 1}  # Brown, Yellow, Sky, Gray
     global_ranking = sorted(global_counts.items(), key=lambda x: (color_weights.get(x[0], 0), x[1]), reverse=True)
 
     # Output construction
@@ -50,20 +50,15 @@ def solve_281123b4(input_grid: ColoredGrid) -> ColoredGrid:
             alt_color = max(set(secondary_colors), key=secondary_colors.count) if secondary_colors else 0
             
             for row in range(4):
-                if row == 0 or row == 2:
+                if row == 0 or row == 3:
                     output[row][col] = main_color
                 else:
                     output[row][col] = alt_color if alt_color != 0 else main_color
 
-    # Pattern enhancement and refinement
-    for row in range(4):
-        row_colors = Counter(output[row])
-        if len(row_colors) == 1:
-            # Introduce variation based on global ranking
-            for alt_color, _ in global_ranking:
-                if alt_color not in row_colors:
-                    output[row][1] = alt_color  # Change second column for variation
-                    break
+    # Pattern enhancement
+    diagonal_color = global_ranking[0][0]
+    for i in range(4):
+        output[i][i] = diagonal_color
 
     # Ensure all prominent colors are represented
     prominent_colors = [color for color, _ in global_ranking[:4]]
@@ -76,11 +71,20 @@ def solve_281123b4(input_grid: ColoredGrid) -> ColoredGrid:
                     output[r][output[r].index(least_common)] = color
                     break
 
-    # Final balance check
+    # Final balance and symmetry check
     for col in range(4):
         col_colors = [output[r][col] for r in range(4)]
         if len(set(col_colors)) == 1:
             # Introduce variation in the column
             output[1][col] = prominent_colors[1] if prominent_colors[1] != col_colors[0] else prominent_colors[2]
+        
+        # Ensure symmetry in columns
+        if output[0][col] != output[3][col]:
+            output[3][col] = output[0][col]
+
+    # Ensure black (0) is represented if it was prominent in the input
+    if global_counts[0] > sum(global_counts.values()) / 5:  # If black was more than 20% of non-green cells
+        if 0 not in [cell for row in output for cell in row]:
+            output[2][2] = 0  # Place black in the center-right position
 
     return ColoredGrid(values=output)
