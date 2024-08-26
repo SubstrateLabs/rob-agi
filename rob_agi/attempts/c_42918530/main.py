@@ -1,5 +1,6 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Dict
+from collections import Counter
 
 def solve_42918530(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -7,27 +8,40 @@ def solve_42918530(input_grid: ColoredGrid) -> ColoredGrid:
     The function preserves the general character and color count of each sub-grid
     while ensuring rotational symmetry. Black borders (0s) between sub-grids are preserved.
     
-    1. Extracts 5x5 sub-grids from the input
-    2. For each non-black sub-grid:
+    1. Analyzes the entire grid to determine standard patterns for each color
+    2. Extracts 5x5 sub-grids from the input
+    3. For each non-black sub-grid:
        a. Identifies the primary (most frequent non-black) color
-       b. Counts the total number of non-black cells
-       c. Creates a new symmetric pattern with the same color count
-    3. Reassembles the full grid with transformed sub-grids
+       b. Applies the standard pattern for that color
+    4. Reassembles the full grid with transformed sub-grids
 
-    The transformation applies to all colors equally, creating a consistent
-    symmetric pattern across all transformed sub-grids while maintaining
-    the original color count.
+    The transformation creates consistent symmetric patterns for each color
+    across all transformed sub-grids while maintaining the original color distribution.
     """
     SUBGRID_SIZE = 5
     GRID_STEP = 6
 
+    def analyze_grid(grid: List[List[int]]) -> Dict[int, List[List[int]]]:
+        color_patterns = {}
+        color_counts = Counter()
+        subgrids = extract_subgrids(grid)
+        
+        for subgrid in subgrids:
+            if not is_subgrid_all_black(subgrid):
+                color = find_primary_color(subgrid)
+                count = count_non_black_cells(subgrid)
+                color_counts[color] += 1
+                if color not in color_patterns or count > count_non_black_cells(color_patterns[color]):
+                    color_patterns[color] = generate_symmetric_pattern(color, count)
+        
+        return color_patterns
+
     def extract_subgrids(grid: List[List[int]]) -> List[List[List[int]]]:
-        subgrids = []
-        for i in range(0, len(grid), GRID_STEP):
-            for j in range(0, len(grid[0]), GRID_STEP):
-                subgrid = [row[j:j+SUBGRID_SIZE] for row in grid[i:i+SUBGRID_SIZE]]
-                subgrids.append(subgrid)
-        return subgrids
+        return [
+            [row[j:j+SUBGRID_SIZE] for row in grid[i:i+SUBGRID_SIZE]]
+            for i in range(0, len(grid), GRID_STEP)
+            for j in range(0, len(grid[0]), GRID_STEP)
+        ]
 
     def is_subgrid_all_black(subgrid: List[List[int]]) -> bool:
         return all(cell == 0 for row in subgrid for cell in row)
@@ -47,12 +61,11 @@ def solve_42918530(input_grid: ColoredGrid) -> ColoredGrid:
             pattern[i][j] = color
         return pattern
 
-    def transform_subgrid(subgrid: List[List[int]]) -> List[List[int]]:
+    def transform_subgrid(subgrid: List[List[int]], color_patterns: Dict[int, List[List[int]]]) -> List[List[int]]:
         if is_subgrid_all_black(subgrid):
             return subgrid
         color = find_primary_color(subgrid)
-        count = count_non_black_cells(subgrid)
-        return generate_symmetric_pattern(color, count)
+        return color_patterns.get(color, subgrid)
 
     def reassemble_grid(subgrids: List[List[List[int]]], original_grid: List[List[int]]) -> List[List[int]]:
         new_grid = [row[:] for row in original_grid]
@@ -65,8 +78,9 @@ def solve_42918530(input_grid: ColoredGrid) -> ColoredGrid:
                 subgrid_index += 1
         return new_grid
 
+    color_patterns = analyze_grid(input_grid.values)
     subgrids = extract_subgrids(input_grid.values)
-    transformed_subgrids = [transform_subgrid(subgrid) for subgrid in subgrids]
+    transformed_subgrids = [transform_subgrid(subgrid, color_patterns) for subgrid in subgrids]
     new_grid_values = reassemble_grid(transformed_subgrids, input_grid.values)
     
     return ColoredGrid(values=new_grid_values)
