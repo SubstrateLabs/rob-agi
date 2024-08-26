@@ -8,6 +8,7 @@ def solve_31d5ba1a(input_grid: ColoredGrid) -> ColoredGrid:
        - If EITHER cell in rows 2-3 contains 9 (brown), set the corresponding cell in the second row of the output to 6 (magenta).
        - If EITHER cell in rows 4-5 contains 4 (yellow), set the corresponding cell in the third row of the output to 6 (magenta).
     2. All other cells in the output grid remain 0 (black).
+    3. Each column in the output is determined independently based on the corresponding column in the input.
     """
     # Initialize the output grid
     output_grid = ColoredGrid(values=[[0 for _ in range(5)] for _ in range(3)])
