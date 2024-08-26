@@ -9,8 +9,8 @@ def solve_c658a4bd(input_grid: ColoredGrid) -> ColoredGrid:
     and creates a new grid with concentric frames of these colors.
     
     The output grid size is determined by the number of distinct colors,
-    and each color forms a frame around the inner colors, with the innermost
-    color being a single cell in the center.
+    and each color forms a complete frame around the inner colors, with the innermost
+    color being a 2x2 square in the center if there are at least 4 colors, or a single cell otherwise.
     """
     def analyze_grid(grid):
         regions = []
@@ -33,13 +33,13 @@ def solve_c658a4bd(input_grid: ColoredGrid) -> ColoredGrid:
         def priority(region):
             bbox = region['bounding_box']
             distance_from_edge = min(bbox[0], bbox[1], grid_size - bbox[2] - 1, grid_size - bbox[3] - 1)
-            return (-distance_from_edge, -region['size'], bbox[0], bbox[1])
+            return (distance_from_edge, -region['size'], bbox[0], bbox[1])
         
         sorted_regions = sorted(regions, key=priority)
         return [r['color'] for r in sorted_regions]
 
     def create_output_grid(ordered_colors):
-        size = 2 * len(ordered_colors) - 1
+        size = 2 * len(ordered_colors)
         output = ColoredGrid(values=[[0 for _ in range(size)] for _ in range(size)])
         
         for i, color in enumerate(ordered_colors):
@@ -50,7 +50,13 @@ def solve_c658a4bd(input_grid: ColoredGrid) -> ColoredGrid:
                         output.values[i + y][i + x] = color
         
         # Fill the center
-        if ordered_colors:
+        if len(ordered_colors) >= 4:
+            center = len(ordered_colors) - 1
+            output.values[center][center] = ordered_colors[-1]
+            output.values[center][center+1] = ordered_colors[-1]
+            output.values[center+1][center] = ordered_colors[-1]
+            output.values[center+1][center+1] = ordered_colors[-1]
+        elif ordered_colors:
             center = len(ordered_colors) - 1
             output.values[center][center] = ordered_colors[-1]
         
