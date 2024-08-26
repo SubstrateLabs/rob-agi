@@ -1,0 +1,39 @@
+example_0:
+  input: |
+    A 19x18 grid predominantly filled with gray (5) and black (0) squares. There are several yellow (4) squares scattered throughout, mostly in the middle and lower sections. The yellow squares appear in small clusters or individually.
+  output: |
+    The grid maintains its overall structure, but some changes are noticeable:
+    1. Most yellow (4) squares remain unchanged.
+    2. A few yellow squares have been converted to red (2).
+    3. Red squares appear to form small L-shaped patterns, usually adjacent to remaining yellow squares.
+    4. The changes are concentrated in the middle and lower sections of the grid where the yellow squares were originally located.
+
+example_1:
+  input: |
+    A 16x18 grid with a mix of gray (5), black (0), and yellow (4) squares. Yellow squares are more prevalent in the middle and lower right sections, often appearing in small clusters.
+  output: |
+    The grid structure is largely maintained, but with these changes:
+    1. Several yellow (4) squares have been converted to red (2).
+    2. Red squares form small L-shaped patterns, often connected to or near remaining yellow squares.
+    3. Some yellow squares remain unchanged, particularly those that are isolated or in the center of clusters.
+    4. The transformations are most noticeable in areas where yellow squares were originally clustered.
+
+example_2:
+  input: |
+    A 15x14 grid with a mix of gray (5), black (0), and yellow (4) squares. Yellow squares are scattered throughout, with some clustering in the upper left and middle sections.
+  output: |
+    The grid maintains its overall structure, but with these alterations:
+    1. Several yellow (4) squares have been converted to red (2).
+    2. Red squares form small L-shaped patterns, often adjacent to or near remaining yellow squares.
+    3. Some yellow squares, particularly those in the center of clusters or isolated, remain unchanged.
+    4. The changes are most prominent in areas where yellow squares were originally grouped together.
+
+example_3:
+  input: |
+    A 15x14 grid dominated by gray (5) and black (0) squares, with several yellow (4) squares scattered throughout. Yellow squares appear in small clusters, particularly in the middle and lower sections of the grid.
+  output: |
+    The grid's overall structure is preserved, but with these modifications:
+    1. Many yellow (4) squares have been converted to red (2).
+    2. Red squares form small L-shaped patterns, often connected to or near remaining yellow squares.
+    3. Some yellow squares, especially those in the center of clusters or isolated, remain unchanged.
+    4. The transformations are most noticeable in areas where yellow squares were originally grouped together, particularly in the middle and lower sections of the grid.
