@@ -25,9 +25,11 @@ def solve_94414823(input_grid: ColoredGrid) -> ColoredGrid:
     # Fill the interior of the frame
     for r in range(3, 7):
         for c in range(3, 7):
-            if r < 5:
-                output_grid[r][c] = top_color if c < 5 else bottom_color
+            quad_row = (r - 3) // 2
+            quad_col = (c - 3) // 2
+            if quad_row == quad_col:
+                output_grid[r][c] = top_color
             else:
-                output_grid[r][c] = bottom_color if c < 5 else top_color
+                output_grid[r][c] = bottom_color
     
     return output_grid
