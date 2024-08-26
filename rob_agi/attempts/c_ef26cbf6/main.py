@@ -4,10 +4,11 @@ from typing import List, Tuple
 def solve_ef26cbf6(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by applying the following rules:
-    1. Identifies yellow (4) lines that divide the grid into rows of sections.
-    2. For each row of sections:
-       - Finds the leftmost non-zero, non-yellow color.
-       - Applies this color to all non-zero, non-yellow cells in the row's sections.
+    1. Identifies yellow (4) lines that divide the grid into sections.
+    2. For each section:
+       - For each column in the section:
+         * Finds the topmost non-zero, non-yellow color.
+         * Propagates this color downwards in the column within the section.
     3. Preserves yellow lines and originally empty (black) cells.
     4. Maintains the original pattern of filled and empty spaces in each section.
 
@@ -19,38 +20,41 @@ def solve_ef26cbf6(input_grid: ColoredGrid) -> ColoredGrid:
     """
     grid = input_grid.deep_copy()
     yellow_lines = find_yellow_lines(grid)
-    rows = get_rows(grid, yellow_lines)
+    sections = get_sections(grid, yellow_lines)
     
-    for row in rows:
-        leftmost_color = find_leftmost_color(grid, row)
-        if leftmost_color:
-            apply_color_to_row(grid, row, leftmost_color)
+    for section in sections:
+        process_section(grid, section)
     
     return grid
 
 def find_yellow_lines(grid: ColoredGrid) -> List[int]:
     return [r for r, row in enumerate(grid.values) if all(cell == 4 for cell in row)]
 
-def get_rows(grid: ColoredGrid, yellow_lines: List[int]) -> List[Tuple[int, int]]:
-    rows = []
+def get_sections(grid: ColoredGrid, yellow_lines: List[int]) -> List[Tuple[int, int]]:
+    sections = []
     start = 0
     for line in yellow_lines + [len(grid.values)]:
         if line > start:
-            rows.append((start, line))
+            sections.append((start, line))
         start = line + 1
-    return rows
+    return sections
 
-def find_leftmost_color(grid: ColoredGrid, row: Tuple[int, int]) -> int:
-    start, end = row
+def process_section(grid: ColoredGrid, section: Tuple[int, int]):
+    start, end = section
+    for col in range(len(grid.values[0])):
+        top_color = find_top_color(grid, section, col)
+        if top_color:
+            propagate_color(grid, section, col, top_color)
+
+def find_top_color(grid: ColoredGrid, section: Tuple[int, int], col: int) -> int:
+    start, end = section
     for r in range(start, end):
-        for cell in grid.values[r]:
-            if cell not in [0, 4]:
-                return cell
+        if grid.values[r][col] not in [0, 4]:
+            return grid.values[r][col]
     return 0
 
-def apply_color_to_row(grid: ColoredGrid, row: Tuple[int, int], color: int):
-    start, end = row
+def propagate_color(grid: ColoredGrid, section: Tuple[int, int], col: int, color: int):
+    start, end = section
     for r in range(start, end):
-        for c, cell in enumerate(grid.values[r]):
-            if cell not in [0, 4]:
-                grid.values[r][c] = color
+        if grid.values[r][col] not in [0, 4]:
+            grid.values[r][col] = color
