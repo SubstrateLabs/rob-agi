@@ -36,11 +36,11 @@ def solve_9def23fe(input_grid: ColoredGrid) -> ColoredGrid:
     horizontal_bars = calculate_horizontal_bars(original_rect)
 
     # Step 4: Draw vertical and horizontal bars
-    draw_vertical_bars(new_grid, vertical_bars)
-    draw_horizontal_bars(new_grid, horizontal_bars)
+    draw_vertical_bars(new_grid, vertical_bars, original_rect[0])
+    draw_horizontal_bars(new_grid, horizontal_bars, vertical_bars)
 
     # Step 5: Fill expanded rectangle
-    fill_expanded_rectangle(new_grid, original_rect, vertical_bars, horizontal_bars)
+    fill_expanded_rectangle(new_grid, original_rect, vertical_bars)
 
     # Step 6: Preserve scattered dots
     preserve_scattered_dots(new_grid, scattered_dots)
@@ -96,30 +96,34 @@ def calculate_horizontal_bars(rect: Tuple[int, int, int, int]) -> List[int]:
         bars.append((top + bottom) // 2)
     return sorted(bars)
 
-def draw_vertical_bars(grid: List[List[int]], bars: List[int]):
+def draw_vertical_bars(grid: List[List[int]], bars: List[int], top: int):
     for c in bars:
-        for r in range(len(grid)):
+        for r in range(top, len(grid)):
             grid[r][c] = 2
 
-def draw_horizontal_bars(grid: List[List[int]], bars: List[int]):
+def draw_horizontal_bars(grid: List[List[int]], bars: List[int], vertical_bars: List[int]):
+    left, right = min(vertical_bars), max(vertical_bars)
     for r in bars:
-        grid[r] = [2] * len(grid[0])
+        for c in range(left, right + 1):
+            grid[r][c] = 2
 
-def fill_expanded_rectangle(grid: List[List[int]], rect: Tuple[int, int, int, int], vertical_bars: List[int], horizontal_bars: List[int]):
-    top, _, _, _ = rect
+def fill_expanded_rectangle(grid: List[List[int]], rect: Tuple[int, int, int, int], vertical_bars: List[int]):
+    top, _, bottom, _ = rect
     rows, cols = len(grid), len(grid[0])
     left, right = min(vertical_bars), max(vertical_bars)
-    for r in range(rows):
-        if r >= top and (r in horizontal_bars or r == rows - 1):
-            grid[r] = [2] * cols
-        elif r >= top:
+    for r in range(top, rows):
+        if r == top or r == bottom or r == rows - 1:
             for c in range(left, right + 1):
+                grid[r][c] = 2
+        else:
+            for c in vertical_bars:
                 grid[r][c] = 2
 
 def extend_top_row(grid: List[List[int]], vertical_bars: List[int]):
     max_width = max(sum(1 for cell in row if cell == 2) for row in grid)
     left = min(vertical_bars)
-    grid[0] = [2 if left <= c < left + max_width else 0 for c in range(len(grid[0]))]
+    for c in range(left, min(left + max_width, len(grid[0]))):
+        grid[0][c] = 2
 
 def preserve_scattered_dots(grid: List[List[int]], dots: List[Tuple[int, int, int]]):
     for r, c, value in dots:
