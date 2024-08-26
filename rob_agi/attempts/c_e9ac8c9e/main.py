@@ -8,12 +8,13 @@ def solve_e9ac8c9e(input_grid: ColoredGrid) -> ColoredGrid:
     2. Identify the four colored squares in the quadrants around the gray area, searching outward from each corner.
     3. Create a new grid where the gray area is replaced by an expanded formation of the surrounding colors,
        each color occupying a quarter of the space previously taken by the gray area.
-    4. The new formation is placed exactly where the gray area was, maintaining its size and position.
+    4. The new formation is placed in the center of the grid, maintaining the size of the original gray area.
     5. Clear the original positions of the surrounding colors and any remaining gray cells.
     6. Handle cases where the gray area might touch the grid boundaries or have odd dimensions.
     
     The gray area is removed in the output, and the surrounding colored squares are expanded
     to fill the space in a compact, symmetrical arrangement, regardless of their original distances from the gray area.
+    The new arrangement is always centered in the grid.
     """
     # Find the gray area
     gray_top, gray_left, gray_height, gray_width = find_gray_area(input_grid)
@@ -22,11 +23,17 @@ def solve_e9ac8c9e(input_grid: ColoredGrid) -> ColoredGrid:
     colors = find_colors(input_grid, gray_top, gray_left, gray_height, gray_width)
     
     # Create the output grid as a copy of the input
-    output = input_grid.deep_copy()
+    output = ColoredGrid(values=[[0 for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
     
     # Calculate the new block dimensions
     block_height = (gray_height + 1) // 2
     block_width = (gray_width + 1) // 2
+    
+    # Calculate the center position for the new formation
+    center_row = input_grid.num_rows // 2
+    center_col = input_grid.num_cols // 2
+    new_top = center_row - gray_height // 2
+    new_left = center_col - gray_width // 2
     
     # Fill the new formation
     for i in range(2):
@@ -34,14 +41,7 @@ def solve_e9ac8c9e(input_grid: ColoredGrid) -> ColoredGrid:
             color = colors[i * 2 + j]
             for r in range(block_height):
                 for c in range(block_width):
-                    if gray_top + i * block_height + r < output.num_rows and gray_left + j * block_width + c < output.num_cols:
-                        output.values[gray_top + i * block_height + r][gray_left + j * block_width + c] = color
-    
-    # Clear original color positions and any remaining gray cells
-    for r in range(input_grid.num_rows):
-        for c in range(input_grid.num_cols):
-            if input_grid.values[r][c] in colors or input_grid.values[r][c] == 5:
-                output.values[r][c] = 0
+                    output.values[new_top + i * block_height + r][new_left + j * block_width + c] = color
     
     return output
 
@@ -60,26 +60,16 @@ def find_gray_area(grid: ColoredGrid) -> tuple:
 
 def find_colors(grid: ColoredGrid, top: int, left: int, height: int, width: int) -> list:
     colors = [0, 0, 0, 0]  # TL, TR, BL, BR
-    mid_row = top + height // 2
-    mid_col = left + width // 2
+    directions = [(-1, -1), (-1, 1), (1, -1), (1, 1)]  # TL, TR, BL, BR
     
-    # Define quadrant boundaries
-    quadrants = [
-        (0, 0, top, 0, left, mid_row, mid_col),  # Top-left
-        (1, 0, top, mid_col, left + width, mid_row, grid.num_cols),  # Top-right
-        (2, mid_row, top + height, 0, left, grid.num_rows, mid_col),  # Bottom-left
-        (3, mid_row, top + height, mid_col, left + width, grid.num_rows, grid.num_cols)  # Bottom-right
-    ]
-    
-    for index, start_row, end_row, start_col, end_col, max_row, max_col in quadrants:
-        for r in range(start_row, end_row):
-            for c in range(start_col, end_col):
-                if r < max_row and c < max_col:
-                    color = grid.values[r][c]
-                    if color != 0 and color != 5:
-                        colors[index] = color
-                        break
-            if colors[index] != 0:
+    for i, (dr, dc) in enumerate(directions):
+        r, c = top + (height - 1) * max(0, dr), left + (width - 1) * max(0, dc)
+        while 0 <= r < grid.num_rows and 0 <= c < grid.num_cols:
+            color = grid.values[r][c]
+            if color != 0 and color != 5:
+                colors[i] = color
                 break
+            r += dr
+            c += dc
     
     return colors
