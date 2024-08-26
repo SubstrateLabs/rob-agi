@@ -2,11 +2,11 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_a59b95c0(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transform the input grid by repeating it to create the smallest square grid larger than 5x5.
+    Transform the input grid by repeating it to create the smallest square grid of at least 9x9.
     
     The function calculates a repetition factor that ensures:
     1. The output grid is square.
-    2. Both dimensions of the output grid are greater than 5.
+    2. Both dimensions of the output grid are at least 9.
     3. The input pattern is repeated to fill the entire output grid.
     
     This approach works for any input grid size and produces the correct output
@@ -21,8 +21,8 @@ def solve_a59b95c0(input_grid: ColoredGrid) -> ColoredGrid:
     input_rows, input_cols = input_grid.get_dimensions()
     
     repetition_factor = 1
-    while (input_rows * repetition_factor <= 5 or 
-           input_cols * repetition_factor <= 5 or 
+    while (input_rows * repetition_factor < 9 or 
+           input_cols * repetition_factor < 9 or 
            input_rows * repetition_factor != input_cols * repetition_factor):
         repetition_factor += 1
     
