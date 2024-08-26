@@ -1,11 +1,11 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple
 
-def analyze_top_left(grid: ColoredGrid) -> List[Tuple[int, int, int, int, int]]:
-    """Analyze the top-left quadrant and return a list of colored regions."""
+def analyze_quadrant(grid: ColoredGrid, top: int, left: int, bottom: int, right: int) -> List[Tuple[int, int, int, int, int]]:
+    """Analyze a quadrant and return a list of colored regions."""
     regions = []
-    for i in range(14):
-        for j in range(14):
+    for i in range(top, bottom + 1):
+        for j in range(left, right + 1):
             color = grid.values[i][j]
             if color != 0:
                 regions.append((color, i, j, i, j))
@@ -45,37 +45,44 @@ def replicate_pattern(source: ColoredGrid, target: ColoredGrid, regions: List[Tu
 
 def solve_40f6cd08(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the challenge by analyzing the top-left quadrant pattern and replicating it to other non-empty quadrants.
+    Solve the challenge by analyzing patterns in non-empty quadrants and replicating them appropriately.
     
-    1. Analyze the top-left quadrant (0,0 to 13,13) to identify colored regions
-    2. Create a new output grid and copy the top-left quadrant
-    3. For each other quadrant, check if it's non-empty
-    4. If a quadrant is non-empty, replicate the top-left pattern to it
+    1. Analyze each non-empty quadrant to identify colored regions
+    2. Create a new output grid
+    3. For each non-empty quadrant, replicate its pattern to the corresponding position
+    4. For empty quadrants, replicate the pattern from the most complex non-empty quadrant
     5. Ensure the central cross (rows and columns 14 and 15) remains black (0)
     6. Return the resulting transformed grid
     
     Returns a new 30x30 ColoredGrid with the transformed pattern.
     """
-    # Analyze top-left quadrant
-    regions = analyze_top_left(input_grid)
+    # Define quadrants
+    quadrants = [
+        ((0, 0), (13, 13)),    # Top-left
+        ((0, 16), (13, 29)),   # Top-right
+        ((16, 0), (29, 13)),   # Bottom-left
+        ((16, 16), (29, 29))   # Bottom-right
+    ]
+    
+    # Analyze non-empty quadrants
+    non_empty_quadrants = []
+    for i, ((top, left), (bottom, right)) in enumerate(quadrants):
+        if is_quadrant_non_empty(input_grid, top, left, bottom, right):
+            regions = analyze_quadrant(input_grid, top, left, bottom, right)
+            non_empty_quadrants.append((i, regions))
     
     # Create output grid
     output = ColoredGrid(values=[[0 for _ in range(30)] for _ in range(30)])
     
-    # Copy top-left quadrant
-    replicate_pattern(input_grid, output, regions, 0, 0, 0, 0)
-    
-    # Define quadrants
-    quadrants = [
-        ((0, 16), (13, 29)),  # Top-right
-        ((16, 0), (29, 13)),  # Bottom-left
-        ((16, 16), (29, 29))  # Bottom-right
-    ]
-    
-    # Process other quadrants
-    for (top, left), (bottom, right) in quadrants:
-        if is_quadrant_non_empty(input_grid, top, left, bottom, right):
-            replicate_pattern(input_grid, output, regions, 0, 0, top, left)
+    # Replicate patterns
+    for i, ((top, left), (bottom, right)) in enumerate(quadrants):
+        if any(q[0] == i for q in non_empty_quadrants):
+            regions = next(q[1] for q in non_empty_quadrants if q[0] == i)
+        else:
+            # For empty quadrants, use the most complex non-empty quadrant
+            regions = max(non_empty_quadrants, key=lambda x: len(x[1]))[1]
+        
+        replicate_pattern(input_grid, output, regions, top, left, top, left)
     
     # Ensure central cross remains black
     for i in range(30):
