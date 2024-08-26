@@ -4,11 +4,11 @@ from typing import List, Tuple
 def solve_50aad11f(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by identifying magenta shapes, assigning them colors
-    based on single-pixel color indicators in clockwise order, and arranging them
+    based on adjacent single-pixel color indicators, and arranging them
     in a new grid.
     
     1. Identifies connected magenta regions in the input grid.
-    2. Finds single-pixel color indicators in clockwise order.
+    2. Finds single-pixel color indicators adjacent to each magenta region.
     3. Assigns colors to magenta regions based on the indicators.
     4. Creates a new grid with the colored shapes arranged horizontally.
     5. Compresses shapes vertically if needed to fit in 4 rows.
@@ -39,23 +39,28 @@ def solve_50aad11f(input_grid: ColoredGrid) -> ColoredGrid:
                     visited.update(region)
         return sorted(regions, key=lambda x: (min(c for _, c in x), min(r for r, _ in x)))
 
-    def find_color_indicators() -> List[Tuple[int, int, int]]:
+    def find_color_indicators(regions: List[List[Tuple[int, int]]]) -> List[int]:
         indicators = []
         rows, cols = input_grid.get_dimensions()
-        # Top row
-        indicators.extend((input_grid.get_cell(0, c), 0, c) for c in range(cols) if input_grid.get_cell(0, c) not in [0, 6])
-        # Right column
-        indicators.extend((input_grid.get_cell(r, cols-1), r, cols-1) for r in range(1, rows) if input_grid.get_cell(r, cols-1) not in [0, 6])
-        # Bottom row
-        indicators.extend((input_grid.get_cell(rows-1, c), rows-1, c) for c in range(cols-2, -1, -1) if input_grid.get_cell(rows-1, c) not in [0, 6])
-        # Left column
-        indicators.extend((input_grid.get_cell(r, 0), r, 0) for r in range(rows-2, 0, -1) if input_grid.get_cell(r, 0) not in [0, 6])
+        for region in regions:
+            for x, y in region:
+                for dx in [-1, 0, 1]:
+                    for dy in [-1, 0, 1]:
+                        nx, ny = x + dx, y + dy
+                        if 0 <= nx < rows and 0 <= ny < cols:
+                            cell_color = input_grid.get_cell(nx, ny)
+                            if cell_color not in [0, 6]:
+                                indicators.append(cell_color)
+                                break
+                    if indicators[-1] != 6:
+                        break
+                if indicators[-1] != 6:
+                    break
         return indicators
 
-    def assign_colors(regions: List[List[Tuple[int, int]]], indicators: List[Tuple[int, int, int]]) -> List[Tuple[int, List[Tuple[int, int]]]]:
+    def assign_colors(regions: List[List[Tuple[int, int]]], indicators: List[int]) -> List[Tuple[int, List[Tuple[int, int]]]]:
         colored_regions = []
-        for i, region in enumerate(regions):
-            color = indicators[i % len(indicators)][0]
+        for region, color in zip(regions, indicators):
             colored_regions.append((color, region))
         return colored_regions
 
@@ -76,7 +81,7 @@ def solve_50aad11f(input_grid: ColoredGrid) -> ColoredGrid:
         return compressed_shape
 
     magenta_regions = find_magenta_regions()
-    color_indicators = find_color_indicators()
+    color_indicators = find_color_indicators(magenta_regions)
     colored_regions = assign_colors(magenta_regions, color_indicators)
 
     max_height = 4
