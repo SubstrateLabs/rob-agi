@@ -4,30 +4,29 @@ from typing import List, Tuple
 import math
 from typing import List, Tuple, Set
 
+from typing import List, Tuple, Set
+import math
+
 def solve_1c56ad9f(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transform the input grid to create a dynamic wave-like effect on shapes.
     The transformation follows these rules:
     1. Identify all non-zero connected shapes in the grid.
     2. For each shape:
-       a. Apply a wave function to determine horizontal shifts for each point.
-       b. Shifts are larger near the center and smaller near the top and bottom.
-       c. Allow slight modifications to top and bottom rows.
-       d. Create outward bulges on left and right edges where space permits.
-    3. Maintain vertical and horizontal connectivity within shapes.
-    4. Preserve internal structure of shapes (e.g., holes, lines).
-    5. Retain the original background (black/0 areas).
-    6. Ensure consistent application of the wave-like effect across different colors and shape sizes.
-    7. Handle edge cases to prevent out-of-bounds errors and maintain shape integrity.
-    This creates a dynamic, wave-like effect on the shapes while preserving their overall structure, connectivity, and internal features.
+       a. Preserve the overall structure, including internal holes and lines.
+       b. Apply a wave-like transformation that shifts columns left and right.
+       c. The wave effect is more pronounced in the middle and less at the top and bottom.
+       d. Maintain connectivity of all parts of the shape.
+    3. Retain the original background (black/0 areas).
+    4. Ensure consistent application of the wave-like effect across different colors and shape sizes.
+    5. Handle edge cases to prevent out-of-bounds errors and maintain shape integrity.
+    This creates a dynamic, wave-like effect on the shapes while preserving their overall structure and internal features.
     """
     result = input_grid.deep_copy()
     shapes = find_shapes(input_grid)
     
     for shape in shapes:
         process_shape(result, shape)
-    
-    maintain_connectivity(result, shapes)
     
     return result
 
@@ -65,62 +64,44 @@ def flood_fill(grid: ColoredGrid, row: int, col: int, visited: set) -> Tuple[int
 def process_shape(grid: ColoredGrid, shape: Tuple[int, int, int, int, int, Set[Tuple[int, int]]]):
     """Process a single shape according to the transformation rules."""
     min_row, max_row, min_col, max_col, color, shape_points = shape
-    center_row = (min_row + max_row) / 2
-    center_col = (min_col + max_col) / 2
     height = max_row - min_row + 1
     width = max_col - min_col + 1
     
-    new_points = {}
-    for row, col in shape_points:
-        shift = wave_function(row - center_row, col - center_col, height, width)
-        new_col = col + shift
-        if min_col - 1 <= new_col <= max_col + 1:  # Allow slight outward expansion
-            new_points[(row, col)] = (row, new_col)
+    # Create a temporary grid for the shape
+    temp_grid = [[0 for _ in range(width)] for _ in range(height)]
+    for r, c in shape_points:
+        temp_grid[r - min_row][c - min_col] = 1
     
-    # Apply shifts while preserving internal structure
-    internal_structure = find_internal_structure(grid, shape)
-    for old, new in new_points.items():
-        if grid.values[new[0]][new[1]] == 0 and not conflicts_with_internal_structure(new, internal_structure):
-            grid.values[new[0]][new[1]] = color
-            if old != new:
-                grid.values[old[0]][old[1]] = 0
+    # Apply wave transformation
+    transformed_grid = apply_wave_transform(temp_grid, height, width)
+    
+    # Transfer the transformed shape back to the main grid
+    for r in range(height):
+        for c in range(width):
+            if transformed_grid[r][c] == 1:
+                new_r, new_c = r + min_row, c + min_col
+                if 0 <= new_r < grid.num_rows and 0 <= new_c < grid.num_cols:
+                    grid.values[new_r][new_c] = color
+            elif (r + min_row, c + min_col) in shape_points:
+                grid.values[r + min_row][c + min_col] = 0
 
-def wave_function(dy: float, dx: float, height: int, width: int) -> int:
-    """Calculate the horizontal shift based on the point's position within the shape."""
-    vertical_factor = 1 - abs(2 * dy / height)
-    horizontal_factor = math.sin(2 * math.pi * dx / width)
-    shift = int(round(3 * vertical_factor * horizontal_factor))
-    return max(-3, min(3, shift))  # Allow slightly larger shifts
-
-def find_internal_structure(grid: ColoredGrid, shape: Tuple[int, int, int, int, int, Set[Tuple[int, int]]]) -> Set[Tuple[int, int]]:
-    """Identify internal structure (holes, lines) within a shape."""
-    min_row, max_row, min_col, max_col, color, shape_points = shape
-    internal_structure = set()
-    for row in range(min_row, max_row + 1):
-        for col in range(min_col, max_col + 1):
-            if (row, col) not in shape_points and is_internal_point(row, col, shape_points):
-                internal_structure.add((row, col))
-    return internal_structure
-
-def is_internal_point(row: int, col: int, shape_points: Set[Tuple[int, int]]) -> bool:
-    """Check if a point is internal to the shape."""
-    return all((row + dr, col + dc) in shape_points for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)])
-
-def conflicts_with_internal_structure(point: Tuple[int, int], internal_structure: Set[Tuple[int, int]]) -> bool:
-    """Check if a point conflicts with the internal structure."""
-    return point in internal_structure or any(abs(point[0] - i[0]) + abs(point[1] - i[1]) <= 1 for i in internal_structure)
-
-def maintain_connectivity(grid: ColoredGrid, shapes: List[Tuple[int, int, int, int, int, Set[Tuple[int, int]]]]):
-    """Ensure shapes remain connected after transformation."""
-    for shape in shapes:
-        min_row, max_row, min_col, max_col, color, _ = shape
-        for row in range(max(0, min_row - 1), min(grid.num_rows, max_row + 2)):
-            for col in range(max(0, min_col - 1), min(grid.num_cols, max_col + 2)):
-                if grid.values[row][col] == color:
-                    neighbors = [(row-1, col), (row+1, col), (row, col-1), (row, col+1)]
-                    for nr, nc in neighbors:
-                        if 0 <= nr < grid.num_rows and 0 <= nc < grid.num_cols:
-                            if grid.values[nr][nc] == 0:
-                                if any(0 <= r < grid.num_rows and 0 <= c < grid.num_cols and grid.values[r][c] == color 
-                                       for r, c in [(nr-1, nc), (nr+1, nc), (nr, nc-1), (nr, nc+1)] if (r, c) != (row, col)):
-                                    grid.values[nr][nc] = color
+def apply_wave_transform(grid: List[List[int]], height: int, width: int) -> List[List[int]]:
+    """Apply a wave-like transformation to the grid."""
+    result = [[0 for _ in range(width)] for _ in range(height)]
+    center_row = height // 2
+    
+    for r in range(height):
+        vertical_factor = 1 - abs(r - center_row) / center_row
+        for c in range(width):
+            shift = int(3 * vertical_factor * math.sin(2 * math.pi * c / width))
+            new_c = (c + shift) % width
+            if grid[r][c] == 1:
+                result[r][new_c] = 1
+    
+    # Ensure vertical connectivity
+    for c in range(width):
+        for r in range(1, height - 1):
+            if result[r][c] == 0 and result[r-1][c] == 1 and result[r+1][c] == 1:
+                result[r][c] = 1
+    
+    return result
