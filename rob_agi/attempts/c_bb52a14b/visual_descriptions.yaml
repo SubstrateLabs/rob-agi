@@ -1,30 +1,67 @@
 example_0:
   input: |
-    A 22x22 grid mostly filled with black (0) squares. There are scattered blue (1) and sky (8) squares throughout. In the center-left area, there's a distinct 3x3 pattern: a yellow (4) square surrounded by blue (1) squares, with sky (8) in the center. This pattern stands out as the only use of yellow in the grid.
+    A 22x22 grid predominantly filled with black (0) squares. Scattered blue (1) and sky (8) squares appear throughout. The key feature is a unique 3x3 pattern in the center-left area:
+    [1, 1, 1]
+    [1, 8, 1]
+    [1, 4, 1]
+    This pattern is the only instance of yellow (4) in the entire grid, making it highly distinctive.
+
   output: |
-    The grid is largely unchanged from the input. The main difference is in the bottom-right corner, where the 3x3 pattern from the center-left has been replicated. This new pattern is identical: yellow (4) surrounded by blue (1), with sky (8) in the center.
+    The grid remains largely unchanged, with one crucial modification:
+    1. The original 3x3 pattern in the center-left area is preserved.
+    2. An exact replica of this pattern appears in the bottom-right corner:
+    [1, 1, 1]
+    [1, 8, 1]
+    [1, 4, 1]
+    This replication maintains all existing non-black colors in the target area.
 
 example_1:
   input: |
-    A 22x22 grid with a mix of black (0), blue (1), and sky (8) squares. There's a distinctive 3x3 pattern in the center: sky (8) in the corners, blue (1) in the middle of each side, and yellow (4) in the center. This pattern appears once in the grid.
+    A 22x22 grid with a mix of black (0), blue (1), and sky (8) squares. The focal point is a distinctive 3x3 pattern in the center:
+    [8, 1, 8]
+    [1, 4, 1]
+    [8, 1, 8]
+    This is the only occurrence of yellow (4) in the grid, surrounded symmetrically by blue (1) and sky (8).
+
   output: |
-    The grid is mostly the same as the input, but with two key changes:
-    1. The original 3x3 pattern in the center remains.
-    2. A new copy of this 3x3 pattern has been added in the top-right quadrant of the grid, overlapping with some existing blue (1) and sky (8) squares.
+    The grid shows two key changes while preserving the original structure:
+    1. The central 3x3 pattern remains intact.
+    2. An exact copy of the 3x3 pattern is added in the top-right quadrant:
+    [8, 1, 8]
+    [1, 4, 1]
+    [8, 1, 8]
+    This replication respects existing non-black colors, integrating seamlessly with surrounding blue (1) and sky (8) squares.
 
 example_2:
   input: |
-    A 22x22 grid primarily composed of black (0) squares with scattered blue (1) and sky (8) squares. In the top-left quadrant, there's a unique 3x3 pattern: yellow (4) squares forming a cross shape, with sky (8) squares in the corners.
+    A 22x22 grid dominated by black (0) squares, interspersed with blue (1) and sky (8). The standout feature is a unique 3x3 pattern in the top-left quadrant:
+    [8, 4, 8]
+    [4, 4, 4]
+    [8, 4, 8]
+    This cross-shaped yellow (4) pattern with sky (8) corners is the only instance of yellow in the grid.
+
   output: |
-    The grid is largely unchanged, except for two significant modifications:
-    1. The original 3x3 pattern in the top-left quadrant remains.
-    2. Two new copies of this 3x3 pattern have been added:
-       - One in the center-right area of the grid.
-       - Another in the bottom-left quadrant of the grid.
-    Both new patterns maintain the same structure: yellow (4) squares in a cross shape with sky (8) squares in the corners.
+    The grid undergoes three significant changes while maintaining its overall structure:
+    1. The original 3x3 pattern in the top-left quadrant is preserved.
+    2. Two exact replicas of the pattern are added:
+       - One in the center-right area
+       - Another in the bottom-left quadrant
+    Both new patterns maintain the exact structure:
+    [8, 4, 8]
+    [4, 4, 4]
+    [8, 4, 8]
+    These replications respect all existing non-black colors in their respective areas.
 
 test_case_0:
   input: |
-    A 22x22 grid mostly filled with black (0) squares. There are scattered blue (1) and sky (8) squares throughout. In the top-left quadrant, there's a distinct 3x3 pattern: yellow (4) squares forming an inverted L-shape, with sky (8) squares filling the remaining spaces.
+    A 22x22 grid primarily composed of black (0) squares, with scattered blue (1) and sky (8) squares. The key element is a distinct 3x3 pattern in the top-left quadrant:
+    [8, 8, 8]
+    [8, 4, 4]
+    [8, 4, 0]
+    This inverted L-shaped yellow (4) pattern with sky (8) filling is the only occurrence of yellow in the grid.
+
   output: |
-    The output grid is not provided for the test case, as it is meant to be solved based on the pattern observed in the examples.
+    The output grid is not provided, as it's meant to be solved. Based on the examples, one would expect:
+    1. The original pattern to remain unchanged.
+    2. Up to two exact replications of the 3x3 pattern in suitable areas of the grid.
+    3. Any replication to preserve existing non-black colors in the target areas.
