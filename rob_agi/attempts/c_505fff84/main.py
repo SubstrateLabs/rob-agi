@@ -31,6 +31,7 @@ def extract_features(binary_grid: np.ndarray) -> dict:
     features['col_density'] = np.mean(binary_grid, axis=0)
     features['largest_component'] = largest_connected_component(binary_grid)
     features['frame'] = detect_frame(binary_grid)
+    features['symmetry'] = detect_symmetry(binary_grid)
     return features
 
 def largest_connected_component(binary_grid: np.ndarray) -> List[Tuple[int, int]]:
@@ -61,35 +62,38 @@ def detect_frame(binary_grid: np.ndarray) -> bool:
     right = np.any(binary_grid[:, -1])
     return (top and bottom and left and right)
 
+def detect_symmetry(binary_grid: np.ndarray) -> Tuple[bool, bool]:
+    vertical_symmetry = np.all(binary_grid == np.fliplr(binary_grid))
+    horizontal_symmetry = np.all(binary_grid == np.flipud(binary_grid))
+    return vertical_symmetry, horizontal_symmetry
+
 def determine_output_size(binary_grid: np.ndarray, features: dict) -> Tuple[int, int]:
     input_rows, input_cols = binary_grid.shape
     aspect_ratio = input_cols / input_rows
     
     if aspect_ratio > 2:
-        return (1, 7)
+        return (1, min(7, input_cols))
     elif aspect_ratio < 0.5:
-        return (5, 1)
-    elif input_rows <= 5 and input_cols <= 5:
+        return (min(5, input_rows), 1)
+    elif input_rows <= 5 and input_cols <= 6:
         return (input_rows, input_cols)
     else:
-        return (3, 4) if aspect_ratio > 1 else (4, 3)
+        rows = min(3, input_rows)
+        cols = min(6, input_cols)
+        return (rows, cols)
 
 def create_abstract_pattern(binary_grid: np.ndarray, features: dict, output_size: Tuple[int, int]) -> np.ndarray:
     output = np.zeros(output_size, dtype=int)
+    input_rows, input_cols = binary_grid.shape
+    output_rows, output_cols = output_size
     
-    # Map largest component
-    if features['largest_component']:
-        component = np.array(features['largest_component'])
-        min_i, min_j = np.min(component, axis=0)
-        max_i, max_j = np.max(component, axis=0)
-        component_height, component_width = max_i - min_i + 1, max_j - min_j + 1
-        scale_i = output_size[0] / component_height
-        scale_j = output_size[1] / component_width
-        for i, j in component:
-            new_i = int((i - min_i) * scale_i)
-            new_j = int((j - min_j) * scale_j)
-            if 0 <= new_i < output_size[0] and 0 <= new_j < output_size[1]:
-                output[new_i, new_j] = 1
+    # Map significant features
+    for i in range(output_rows):
+        for j in range(output_cols):
+            input_i = int(i * input_rows / output_rows)
+            input_j = int(j * input_cols / output_cols)
+            region = binary_grid[input_i:input_i+input_rows//output_rows, input_j:input_j+input_cols//output_cols]
+            output[i, j] = 1 if np.mean(region) > 0.3 else 0
     
     # Represent frame if detected
     if features['frame']:
@@ -97,6 +101,13 @@ def create_abstract_pattern(binary_grid: np.ndarray, features: dict, output_size
         output[-1, :] = 1
         output[:, 0] = 1
         output[:, -1] = 1
+    
+    # Maintain symmetry if detected
+    vertical_sym, horizontal_sym = features['symmetry']
+    if vertical_sym:
+        output = (output + np.fliplr(output)) // 2
+    if horizontal_sym:
+        output = (output + np.flipud(output)) // 2
     
     return output
 
