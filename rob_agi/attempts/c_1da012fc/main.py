@@ -1,42 +1,45 @@
 from rob_agi.colored_grid import ColoredGrid
-from collections import Counter
-from itertools import cycle
+from typing import List, Tuple
 
 def solve_1da012fc(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the grid transformation challenge by:
-    1. Identifying the gray area and extracting the color sequence within it.
-    2. Finding the most common non-zero, non-gray color outside the gray area.
-    3. Identifying connected regions of this target color.
-    4. Sorting regions by their top-left coordinate.
-    5. Transforming each region to a new color based on the cyclic sequence of colors from the gray area.
+    1. Identifying the gray area and extracting the color key within it.
+    2. Identifying non-gray, non-black regions in the grid.
+    3. Sorting regions by their top-left coordinate.
+    4. Mapping each region to a new color based on the color key from the gray area.
+    5. Transforming the grid by applying the new colors to each region.
     6. Returning the transformed grid.
     """
-    # Step 1: Identify the gray area and extract color sequence
+    # Step 1: Identify gray area and extract color key
     gray_area = [(r, c) for r, row in enumerate(input_grid.values) for c, val in enumerate(row) if val == 5]
-    color_sequence = []
+    color_key = []
     for r, c in sorted(gray_area):
         color = input_grid.values[r][c]
-        if color != 5 and color not in color_sequence:
-            color_sequence.append(color)
-    color_cycle = cycle(color_sequence)
+        if color not in [0, 5] and color not in color_key:
+            color_key.append(color)
 
-    # Step 2: Find the most common non-zero, non-gray color outside the gray area
-    color_counts = Counter(cell for r, row in enumerate(input_grid.values) 
-                           for c, cell in enumerate(row) 
-                           if cell not in [0, 5] and (r, c) not in gray_area)
-    target_color = color_counts.most_common(1)[0][0]
+    # Step 2: Identify non-gray, non-black regions
+    regions = []
+    visited = set()
+    for r, row in enumerate(input_grid.values):
+        for c, val in enumerate(row):
+            if val not in [0, 5] and (r, c) not in visited:
+                region = input_grid.find_connected_regions(val)[0]
+                regions.append(region)
+                visited.update(region)
 
-    # Step 3: Find connected regions of the target color
-    regions = input_grid.find_connected_regions(target_color)
-
-    # Step 4: Sort regions by top-left coordinate
+    # Step 3: Sort regions
     regions.sort(key=lambda region: min(region))
 
-    # Step 5: Transform regions
+    # Step 4: Create color mapping
+    if len(regions) != len(color_key):
+        raise ValueError("Number of regions doesn't match number of colors in gray area")
+    color_mapping = {tuple(sorted(region)): new_color for region, new_color in zip(regions, color_key)}
+
+    # Step 5: Transform the grid
     output_grid = input_grid.deep_copy()
-    for region in regions:
-        new_color = next(color_cycle)
+    for region, new_color in color_mapping.items():
         for r, c in region:
             output_grid.values[r][c] = new_color
 
