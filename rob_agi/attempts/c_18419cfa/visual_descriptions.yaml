@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 22x16 grid with a large sky blue (8) frame-like structure in the top left quadrant. The frame has a hollow center. Inside this frame, there's a small red (2) L-shaped pattern in the upper left corner. On the right side of the grid, there's another sky blue structure that looks like a backwards 'F'. Inside this structure, there's a small red T-shaped pattern.
+  output: |
+    The same 22x16 grid with the sky blue structures unchanged. The red patterns inside both structures have been expanded and made symmetrical. In the left structure, the red L-shape has become a larger symmetrical pattern. In the right structure, the red T-shape has been mirrored vertically to create a symmetrical pattern within the confines of the blue structure.
+
+example_1:
+  input: |
+    A 17x18 grid with a large sky blue (8) rectangular frame in the center. Inside this frame, there's a small red (2) L-shaped pattern in the upper left corner.
+  output: |
+    The same 17x18 grid with the sky blue frame unchanged. The red L-shaped pattern inside has been expanded into a larger, symmetrical pattern that fills more of the frame's interior. The pattern now resembles a square with its corners touching the frame's inner edges.
+
+example_2:
+  input: |
+    A 16x24 grid with a sky blue (8) structure resembling an elaborate picture frame or window. Inside this structure, there's a red (2) pattern that looks like a cross with extra dots on three of its arms.
+  output: |
+    The same 16x24 grid with the sky blue structure unchanged. The red pattern inside has been expanded vertically. The cross shape is now repeated three times vertically, creating a symmetrical pattern that fills more of the frame's interior. Each cross maintains the extra dots on its arms.
+
+test_case_0:
+  input: |
+    A 16x24 grid with a sky blue (8) structure resembling an elaborate picture frame or window. Inside this structure, there's a red (2) pattern that looks like a cross with extra dots on three of its arms.
+  output: |
+    The output grid is not provided for this test case.
