@@ -6,10 +6,12 @@ def solve_7d419a02(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by changing blue (8) regions to yellow (4).
     
     The transformation follows these rules:
-    1. Blue regions of 2x2 or larger are changed to yellow.
-    2. Single-width blue lines and isolated blue cells remain blue.
-    3. Black (0) and magenta (6) cells remain unchanged.
-    4. The transformation is applied consistently across the entire grid.
+    1. Blue regions are changed to yellow based on their size and position.
+    2. Larger blue regions (3x3 or larger) are more likely to be changed to yellow.
+    3. Blue regions closer to the edges are more likely to be changed to yellow.
+    4. Single-width blue lines and isolated blue cells usually remain blue.
+    5. Black (0) and magenta (6) cells remain unchanged.
+    6. The transformation is applied consistently across the entire grid.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -21,11 +23,22 @@ def solve_7d419a02(input_grid: ColoredGrid) -> ColoredGrid:
     rows, cols = grid.get_dimensions()
     processed = set()
 
+    def is_edge_region(region: List[Tuple[int, int]]) -> bool:
+        return any(r == 0 or r == rows - 1 or c == 0 or c == cols - 1 for r, c in region)
+
+    def should_transform(region: List[Tuple[int, int]]) -> bool:
+        size = len(region)
+        if size < 4:  # Keep 1x1 and most 2x2 regions blue
+            return False
+        if size >= 9:  # Always transform 3x3 or larger
+            return True
+        return is_edge_region(region) or size >= 6  # Transform 2x3 or larger edge regions
+
     for row in range(rows):
         for col in range(cols):
             if is_blue(grid.values[row][col]) and (row, col) not in processed:
                 region = flood_fill(grid, row, col, processed)
-                if len(region) >= 4:  # 2x2 or larger
+                if should_transform(region):
                     for r, c in region:
                         grid.values[r][c] = 4  # Change to yellow
 
