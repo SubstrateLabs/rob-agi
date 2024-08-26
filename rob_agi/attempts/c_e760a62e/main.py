@@ -4,10 +4,10 @@ from typing import List, Tuple
 def solve_e760a62e(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by expanding colored squares according to specific rules:
-    1. Expands green (3) squares horizontally and vertically across the entire grid, stopping only at sky blue (8) lines.
-    2. Expands red (2) squares horizontally within sections and vertically upward, overwriting green.
+    1. Expands green (3) squares vertically across the entire grid and horizontally within sections.
+    2. Expands red (2) squares horizontally within sections and vertically upward.
     3. Creates magenta (6) squares where expanded red overlaps with expanded green in sections that originally contained green.
-    4. Respects sky blue (8) grid lines as boundaries throughout the process.
+    4. Respects sky blue (8) grid lines as boundaries for horizontal expansion.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -17,21 +17,21 @@ def solve_e760a62e(input_grid: ColoredGrid) -> ColoredGrid:
     """
     output_grid = input_grid.deep_copy()
     sections = find_sections(output_grid)
+    green_mask = [[False for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)]
+    red_mask = [[False for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)]
     
     # Green Expansion
-    for y in range(output_grid.num_rows):
-        for x in range(output_grid.num_cols):
+    for y in range(input_grid.num_rows):
+        for x in range(input_grid.num_cols):
             if input_grid.values[y][x] == 3:
-                expand_green(output_grid, x, y)
+                expand_green(output_grid, green_mask, x, y, sections)
     
     # Red Expansion
-    for y in range(output_grid.num_rows):
-        for x in range(output_grid.num_cols):
-            if input_grid.values[y][x] == 2:
-                expand_red(output_grid, sections, x, y)
+    for section in sections:
+        expand_red_in_section(input_grid, output_grid, red_mask, section)
     
-    # Magenta Creation
-    create_magenta(input_grid, output_grid, sections)
+    # Final Color Assignment and Magenta Creation
+    assign_colors(input_grid, output_grid, green_mask, red_mask)
     
     return output_grid
 
@@ -54,37 +54,48 @@ def find_sections(grid: ColoredGrid) -> List[Tuple[int, int, int, int]]:
 
     return sections
 
-def expand_green(grid: ColoredGrid, x: int, y: int):
-    """Expands green horizontally and vertically across the entire grid, stopping at sky blue lines."""
-    # Horizontal expansion
-    for c in range(grid.num_cols):
-        if grid.values[y][c] != 8:
-            grid.values[y][c] = 3
-    
+def expand_green(grid: ColoredGrid, green_mask: List[List[bool]], x: int, y: int, sections: List[Tuple[int, int, int, int]]):
+    """Expands green vertically across the entire grid and horizontally within its section."""
     # Vertical expansion
     for r in range(grid.num_rows):
-        if grid.values[r][x] != 8:
-            grid.values[r][x] = 3
-
-def expand_red(grid: ColoredGrid, sections: List[Tuple[int, int, int, int]], x: int, y: int):
-    """Expands red horizontally within its section and vertically upward, overwriting green."""
+        green_mask[r][x] = True
+    
+    # Horizontal expansion within section
     section = next((s for s in sections if s[0] <= y <= s[2] and s[1] <= x <= s[3]), None)
     if section:
-        top, left, bottom, right = section
-        # Horizontal expansion within section
+        _, left, _, right = section
         for c in range(left, right + 1):
-            grid.values[y][c] = 2
-        # Vertical expansion upward
-        for r in range(top, y + 1):
-            if grid.values[r][x] != 8:
-                grid.values[r][x] = 2
+            green_mask[y][c] = True
 
-def create_magenta(input_grid: ColoredGrid, output_grid: ColoredGrid, sections: List[Tuple[int, int, int, int]]):
-    """Creates magenta where expanded red overlaps with expanded green in sections that originally contained green."""
-    for section in sections:
-        top, left, bottom, right = section
-        if any(input_grid.values[r][c] == 3 for r in range(top, bottom + 1) for c in range(left, right + 1)):
-            for r in range(top, bottom + 1):
-                for c in range(left, right + 1):
-                    if output_grid.values[r][c] == 2 and any(input_grid.values[rr][c] == 3 for rr in range(top, bottom + 1)):
-                        output_grid.values[r][c] = 6
+def expand_red_in_section(input_grid: ColoredGrid, output_grid: ColoredGrid, red_mask: List[List[bool]], section: Tuple[int, int, int, int]):
+    """Expands red horizontally within its section and vertically upward."""
+    top, left, bottom, right = section
+    red_squares = [(r, c) for r in range(top, bottom + 1) for c in range(left, right + 1) if input_grid.values[r][c] == 2]
+    
+    if len(red_squares) == 1:
+        r, c = red_squares[0]
+        for col in range(max(left, c - 1), min(right + 1, c + 2)):
+            red_mask[r][col] = True
+        for row in range(top, r + 1):
+            red_mask[row][c] = True
+    elif len(red_squares) > 1:
+        for r in range(top, bottom + 1):
+            for c in range(left, right + 1):
+                if input_grid.values[r][c] != 8:
+                    red_mask[r][c] = True
+
+def assign_colors(input_grid: ColoredGrid, output_grid: ColoredGrid, green_mask: List[List[bool]], red_mask: List[List[bool]]):
+    """Assigns final colors based on the influence masks and creates magenta where appropriate."""
+    for r in range(input_grid.num_rows):
+        for c in range(input_grid.num_cols):
+            if output_grid.values[r][c] == 8:
+                continue
+            elif red_mask[r][c] and green_mask[r][c]:
+                if any(input_grid.values[rr][c] == 3 for rr in range(input_grid.num_rows)):
+                    output_grid.values[r][c] = 6  # Magenta
+                else:
+                    output_grid.values[r][c] = 2  # Red
+            elif red_mask[r][c]:
+                output_grid.values[r][c] = 2  # Red
+            elif green_mask[r][c]:
+                output_grid.values[r][c] = 3  # Green
