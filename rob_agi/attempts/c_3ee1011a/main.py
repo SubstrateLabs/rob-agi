@@ -5,12 +5,12 @@ def solve_3ee1011a(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms an input grid into an output grid based on the following rules:
     1. Identifies the longest continuous line of a single color in the input.
-    2. Creates an output grid with dimensions equal to this longest line.
+    2. Creates an output grid with dimensions equal to this longest line (minimum 5x5).
     3. Fills the output grid with concentric squares of colors found in the input.
     4. The outermost color is that of the longest line.
-    5. Inner colors are added based on their first appearance in the input.
-    6. The innermost color is from the smallest group (single square or 2x2) in the input.
-    7. If the innermost color formed a 2-square group in the input, it becomes a 2x2 square in the output center.
+    5. Inner colors are ordered based on the size of their largest continuous group.
+    6. The innermost color is from the smallest group in the input.
+    7. If the innermost color formed a 2-pixel group in the input, it becomes a 2x2 square in the output center.
     """
     
     def find_longest_line(grid: ColoredGrid) -> Tuple[int, int]:
@@ -34,7 +34,7 @@ def solve_3ee1011a(input_grid: ColoredGrid) -> ColoredGrid:
                     if length > longest:
                         longest = length
                         color = grid.values[r][c]
-        return longest, color
+        return max(longest, 5), color  # Ensure minimum size of 5
 
     def analyze_input(grid: ColoredGrid) -> Dict[int, Dict]:
         color_info = {}
@@ -44,9 +44,21 @@ def solve_3ee1011a(input_grid: ColoredGrid) -> ColoredGrid:
                 color = grid.values[r][c]
                 if color != 0:
                     if color not in color_info:
-                        color_info[color] = {"first": (r, c), "count": 1}
-                    else:
-                        color_info[color]["count"] += 1
+                        color_info[color] = {"first": (r, c), "max_group": 1, "has_2_group": False}
+                    # Check horizontal group
+                    length = 1
+                    while c + length < cols and grid.values[r][c + length] == color:
+                        length += 1
+                    color_info[color]["max_group"] = max(color_info[color]["max_group"], length)
+                    if length == 2:
+                        color_info[color]["has_2_group"] = True
+                    # Check vertical group
+                    length = 1
+                    while r + length < rows and grid.values[r + length][c] == color:
+                        length += 1
+                    color_info[color]["max_group"] = max(color_info[color]["max_group"], length)
+                    if length == 2:
+                        color_info[color]["has_2_group"] = True
         return color_info
 
     def create_output_grid(size: int, colors: List[int]) -> ColoredGrid:
@@ -68,25 +80,20 @@ def solve_3ee1011a(input_grid: ColoredGrid) -> ColoredGrid:
     
     # Determine the color order
     color_order = [outer_color]
-    for color in sorted(color_info, key=lambda x: color_info[x]["first"]):
+    for color in sorted(color_info, key=lambda x: (-color_info[x]["max_group"], color_info[x]["first"])):
         if color != outer_color:
             color_order.append(color)
-    
-    # Ensure the smallest group is last
-    smallest_color = min(color_info, key=lambda x: color_info[x]["count"])
-    if smallest_color != color_order[-1]:
-        color_order.remove(smallest_color)
-        color_order.append(smallest_color)
     
     # Create the output grid
     output_grid = create_output_grid(size, color_order)
     
     # Handle 2x2 center if needed
-    if color_info[smallest_color]["count"] == 2 and size >= 2:
+    innermost_color = color_order[-1]
+    if color_info[innermost_color]["has_2_group"] and size >= 4:
         center = size // 2 - 1
-        output_grid.values[center][center] = smallest_color
-        output_grid.values[center][center+1] = smallest_color
-        output_grid.values[center+1][center] = smallest_color
-        output_grid.values[center+1][center+1] = smallest_color
+        output_grid.values[center][center] = innermost_color
+        output_grid.values[center][center+1] = innermost_color
+        output_grid.values[center+1][center] = innermost_color
+        output_grid.values[center+1][center+1] = innermost_color
     
     return output_grid
