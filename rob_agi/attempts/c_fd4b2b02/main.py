@@ -9,6 +9,7 @@ def solve_fd4b2b02(input_grid: ColoredGrid) -> ColoredGrid:
     4. Preserve the original input shape or integrate its essence into the pattern.
     5. Add small accents of the complementary color if space allows.
     6. Ensure symmetry by mirroring the pattern in all four quadrants.
+    7. Adjust the pattern size and element placement based on the input grid size.
 
     Args:
     input_grid (ColoredGrid): The input grid to transform
@@ -40,8 +41,8 @@ def solve_fd4b2b02(input_grid: ColoredGrid) -> ColoredGrid:
     shape_height = max_row - min_row + 1
 
     # Calculate pattern dimensions
-    corner_size = min(3, min(shape_width, shape_height)) if rows <= 20 else min(4, min(shape_width, shape_height))
-    side_size = max(shape_width, shape_height)
+    corner_size = min(3, min(shape_width, shape_height, rows // 4, cols // 4))
+    side_size = min(max(shape_width, shape_height), (min(rows, cols) - 2 * corner_size) // 2)
 
     # Create the basic pattern
     pattern_size = 2 * corner_size + side_size
@@ -57,7 +58,8 @@ def solve_fd4b2b02(input_grid: ColoredGrid) -> ColoredGrid:
     for r, c in [(0, corner_size), (corner_size, 0), (pattern_size-corner_size, corner_size), (corner_size, pattern_size-corner_size)]:
         for dr in range(side_size):
             for dc in range(side_size):
-                pattern[r + dr][c + dc] = comp_color
+                if r + dr < pattern_size and c + dc < pattern_size:
+                    pattern[r + dr][c + dc] = comp_color
 
     # Center the pattern in the output grid
     offset_r = (rows - pattern_size) // 2
@@ -78,8 +80,9 @@ def solve_fd4b2b02(input_grid: ColoredGrid) -> ColoredGrid:
 
     # Add accent in bottom-right if space allows
     if rows > pattern_size + 2 and cols > pattern_size + 2:
-        for r in range(rows - 2, rows):
-            for c in range(cols - 3, cols):
+        accent_size = min(3, rows - pattern_size - 2, cols - pattern_size - 2)
+        for r in range(rows - accent_size, rows):
+            for c in range(cols - accent_size, cols):
                 output_grid.values[r][c] = comp_color
 
     # Ensure symmetry
