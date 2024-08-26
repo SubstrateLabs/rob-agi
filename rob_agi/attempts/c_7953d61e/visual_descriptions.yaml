@@ -1,29 +1,29 @@
 example_0:
   input: |
-    A 4x4 grid with a distinct pattern. The corners are yellow (4), creating a frame-like effect. Inside this frame, there's a diagonal line of brown (9) squares from top-left to bottom-right. The remaining squares are filled with blue (1) and magenta (6), alternating in a checkerboard-like pattern.
+    A 4x4 grid with a distinct pattern. The corners are yellow (4). A diagonal line of brown (9) runs from top-left to bottom-right. The remaining squares alternate between blue (1) and magenta (6) in a checkerboard pattern. This creates a symmetrical design with rotational properties.
   output: |
-    An 8x8 grid that appears to be an expanded version of the input. The original 4x4 grid is replicated four times to create this larger grid. The pattern is maintained, with yellow corners, brown diagonals, and alternating blue and magenta squares. The replication creates a symmetrical, kaleidoscope-like effect.
+    An 8x8 grid composed of four transformed versions of the input. Top-left: original 4x4 grid. Top-right: horizontally flipped. Bottom-left: vertically flipped. Bottom-right: 90-degree clockwise rotation followed by a horizontal flip. The resulting pattern maintains symmetry but with interesting variations in each quadrant.
 
 example_1:
   input: |
-    A 4x4 grid with a mix of colors. The top row alternates magenta (6) and red (2). The second row is mostly magenta with gray (5) in the right half. The third row is predominantly blue (1) with a red square at the end. The bottom row has gray, blue, red, and blue squares.
+    A 4x4 grid with varied colors. Top row: magenta (6), red (2), magenta, red. Second row: magenta, magenta, gray (5), gray. Third row: blue (1), blue, blue, red. Bottom row: gray, blue, red, blue. Note the partial symmetry and color groupings.
   output: |
-    An 8x8 grid that expands on the input. The original 4x4 grid is replicated and transformed. The top-left quadrant is the original grid. The top-right quadrant appears to be a horizontal flip of the original. The bottom-left quadrant looks like a vertical flip of the original. The bottom-right quadrant seems to be both horizontally and vertically flipped.
+    An 8x8 grid showcasing four transformations of the input. Top-left: original. Top-right: horizontal flip, swapping left-right colors. Bottom-left: vertical flip, inverting top-bottom colors. Bottom-right: 90-degree clockwise rotation then horizontal flip, creating a distinct pattern. Observe how color groupings and symmetries change in each quadrant.
 
 example_2:
   input: |
-    A 4x4 grid with a distinct pattern. The top row alternates magenta (6) and orange (7). The second row is similar but starts with orange. The third row has brown (9) on the left, then blue (1) and magenta. The bottom row is similar to the third but ends with blue instead of magenta.
+    A 4x4 grid with a structured pattern. Top row: magenta (6), orange (7), magenta, orange. Second row: orange, blue (1), magenta, magenta. Third and fourth rows mirror this pattern with brown (9) replacing orange in the left column. This creates a balance between repetition and variation.
   output: |
-    An 8x8 grid that expands the input pattern. The original 4x4 grid is in the top-left quadrant. The top-right quadrant appears to be a horizontal flip of the original. The bottom-left quadrant looks like a vertical flip of the original. The bottom-right quadrant seems to be both horizontally and vertically flipped from the original.
+    An 8x8 grid demonstrating four transformations. Top-left: original pattern. Top-right: horizontal flip, reversing left-right color order. Bottom-left: vertical flip, inverting top-bottom colors. Bottom-right: 90-degree clockwise rotation followed by horizontal flip, producing a unique arrangement. Notice how the brown squares and color patterns shift in each quadrant.
 
 example_3:
   input: |
-    A 4x4 grid with a mix of colors. The top row alternates yellow (4), brown (9), blue (1), and sky (8). The second row follows a similar pattern but starts with sky. The third row has yellow, sky, sky, and blue. The bottom row is mostly blue with a sky square at the end.
+    A 4x4 grid with a complex color arrangement. Top row: yellow (4), brown (9), blue (1), sky (8). Second row: sky, yellow, blue, sky. Third row: yellow, sky, sky, blue. Bottom row: blue, blue, blue, sky. Observe the distribution of colors and potential for symmetry.
   output: |
-    An 8x8 grid that expands the input pattern. The original 4x4 grid is in the top-left quadrant. The top-right quadrant appears to be a horizontal flip of the original. The bottom-left quadrant looks like a vertical flip of the original. The bottom-right quadrant seems to be both horizontally and vertically flipped from the original.
+    An 8x8 grid showcasing four versions of the input. Top-left: original 4x4 grid. Top-right: horizontal flip, reversing color order in each row. Bottom-left: vertical flip, inverting row order. Bottom-right: 90-degree clockwise rotation then horizontal flip, creating a new color distribution. Pay attention to how the yellow corners and sky blue sections transform in each quadrant.
 
 example_4:
   input: |
-    A 4x4 grid with a mix of colors. The top row alternates blue (1) and red (2). The second row is mostly magenta (6) with orange (7) in the third column. The third row has orange, magenta, red, and blue. The bottom row alternates blue and magenta with red in the third column.
+    A 4x4 grid with alternating colors. Top row: blue (1), red (2), blue, red. Second row: magenta (6), magenta, orange (7), magenta. Third row: orange, magenta, red, blue. Bottom row: blue, magenta, red, magenta. Note the diagonal and alternating color patterns.
   output: |
-    An 8x8 grid that expands the input pattern. The original 4x4 grid is in the top-left quadrant. The top-right quadrant appears to be a horizontal flip of the original. The bottom-left quadrant looks like a vertical flip of the original. The bottom-right quadrant seems to be both horizontally and vertically flipped from the original.
+    An 8x8 grid displaying four transformations of the input. Top-left: original pattern. Top-right: horizontal flip, reversing colors in each row. Bottom-left: vertical flip, inverting row order. Bottom-right: 90-degree clockwise rotation followed by horizontal flip, producing a unique arrangement. Observe how the diagonal patterns and color distributions change across the quadrants.
