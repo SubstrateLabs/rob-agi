@@ -19,6 +19,7 @@ def solve_642d658d(input_grid: ColoredGrid) -> ColoredGrid:
        - Multi-scale significance
        - Contextual significance (centrality)
        - Color relationships
+       - Structural importance
     4. Compute overall significance scores
     5. Select the color with the highest significance score
     6. Return a 1x1 grid with the selected color
@@ -64,17 +65,19 @@ def calculate_color_scores(grid: ColoredGrid, color_components: Dict[int, List[L
         multi_scale_score = calculate_multi_scale_score(grid, color, grid_dimensions)
         centrality_score = calculate_centrality_score(components, grid_dimensions)
         relationship_score = calculate_relationship_score(grid, color, background_color)
+        structural_score = calculate_structural_score(grid, color, background_color)
         
         # Combine scores with weights
         scores[color] = (
             coverage_score * 0.15 +
-            component_score * 0.15 +
-            shape_score * 0.15 +
+            component_score * 0.1 +
+            shape_score * 0.1 +
             contrast_score * 0.1 +
             pattern_score * 0.15 +
             multi_scale_score * 0.1 +
             centrality_score * 0.1 +
-            relationship_score * 0.1
+            relationship_score * 0.1 +
+            structural_score * 0.1
         )
     
     return scores
@@ -112,9 +115,36 @@ def calculate_contrast_score(color: int, background_color: int) -> float:
 
 def calculate_pattern_score(components: List[List[Tuple[int, int]]], grid_dimensions: Tuple[int, int]) -> float:
     """Calculate a score based on repeating patterns and symmetries."""
-    # This is a simplified version. A more complex implementation would look for actual patterns.
-    largest_component = max(components, key=len)
-    return len(largest_component) / (grid_dimensions[0] * grid_dimensions[1])
+    pattern_score = 0
+    for component in components:
+        # Check for symmetry
+        symmetry_score = calculate_symmetry_score(component, grid_dimensions)
+        # Check for repeating patterns
+        repeat_score = calculate_repeat_score(component, grid_dimensions)
+        pattern_score += max(symmetry_score, repeat_score)
+    return min(pattern_score / len(components), 1) if components else 0
+
+def calculate_symmetry_score(component: List[Tuple[int, int]], grid_dimensions: Tuple[int, int]) -> float:
+    """Calculate a symmetry score for a component."""
+    rows, cols = grid_dimensions
+    center_row, center_col = rows / 2, cols / 2
+    symmetry_count = 0
+    for x, y in component:
+        if (2*center_row - x, y) in component:  # Horizontal symmetry
+            symmetry_count += 1
+        if (x, 2*center_col - y) in component:  # Vertical symmetry
+            symmetry_count += 1
+    return symmetry_count / (2 * len(component))
+
+def calculate_repeat_score(component: List[Tuple[int, int]], grid_dimensions: Tuple[int, int]) -> float:
+    """Calculate a score for repeating patterns in a component."""
+    rows, cols = grid_dimensions
+    repeat_count = 0
+    for dx in range(1, cols // 2):
+        for dy in range(1, rows // 2):
+            if all((x+dx, y+dy) in component for x, y in component if x+dx < cols and y+dy < rows):
+                repeat_count += 1
+    return min(repeat_count / (rows * cols), 1)
 
 def calculate_multi_scale_score(grid: ColoredGrid, color: int, grid_dimensions: Tuple[int, int]) -> float:
     """Calculate a score based on the presence of the color at multiple scales."""
@@ -182,3 +212,25 @@ def calculate_relationship_score(grid: ColoredGrid, color: int, background_color
         return 0
     
     return len(adjacent_colors) / 9  # Normalize by total possible colors
+
+def calculate_structural_score(grid: ColoredGrid, color: int, background_color: int) -> float:
+    """Calculate a score based on the structural importance of the color."""
+    rows, cols = grid.get_dimensions()
+    total_cells = rows * cols
+    color_cells = sum(row.count(color) for row in grid.values)
+    
+    # Create a copy of the grid with the color removed
+    grid_without_color = ColoredGrid(values=[[cell if cell != color else background_color for cell in row] for row in grid.values])
+    
+    # Calculate the difference in connected components
+    original_components = sum(len(grid.find_connected_regions(c)) for c in set(cell for row in grid.values for cell in row) if c != background_color)
+    new_components = sum(len(grid_without_color.find_connected_regions(c)) for c in set(cell for row in grid_without_color.values for cell in row) if c != background_color)
+    
+    component_difference = abs(original_components - new_components)
+    
+    # Normalize the scores
+    color_coverage = color_cells / total_cells
+    component_impact = component_difference / original_components if original_components > 0 else 0
+    
+    # Combine the scores
+    return (color_coverage + component_impact) / 2
