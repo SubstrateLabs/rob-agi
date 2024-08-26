@@ -9,12 +9,12 @@ def solve_aee291af(input_grid: ColoredGrid) -> Optional[ColoredGrid]:
     The function works as follows:
     1. Identifies all sky blue and red squares in the input grid.
     2. Finds all 2x2 red squares as potential centers for patterns.
-    3. For each 2x2 red square, checks for valid 5x5 and 4x4 patterns.
+    3. For each 2x2 red square, checks for valid 5x5 patterns first, then 4x4 patterns.
     4. Returns the largest valid pattern found, or None if no valid pattern exists.
     
     Valid patterns:
     - 5x5 grid: Sky blue outline with a red cross in the center (5 red squares)
-    - 4x4 grid: Sky blue outline with a 2x2 red square in the center
+    - 4x4 grid: Sky blue outline with a 2x2 red square in any of the 4 positions inside
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -27,18 +27,17 @@ def solve_aee291af(input_grid: ColoredGrid) -> Optional[ColoredGrid]:
     
     red_2x2_squares = find_2x2_squares(red_coords)
     
-    best_solution = None
-    
     for center in red_2x2_squares:
         solution_5x5 = check_5x5_pattern(center, sky_blue_coords, red_coords)
         if solution_5x5:
             return solution_5x5
-        
+    
+    for center in red_2x2_squares:
         solution_4x4 = check_4x4_pattern(center, sky_blue_coords, red_coords)
         if solution_4x4:
-            best_solution = solution_4x4
+            return solution_4x4
     
-    return best_solution
+    return None
 
 def find_color_coords(grid: ColoredGrid, color: int) -> List[Tuple[int, int]]:
     return [(r, c) for r in range(grid.num_rows) for c in range(grid.num_cols) if grid.values[r][c] == color]
@@ -74,11 +73,12 @@ def check_4x4_pattern(center: Tuple[int, int], sky_blue_coords: Set[Tuple[int, i
                (r+1, c-1), (r+1, c+2),
                (r+2, c-1), (r+2, c), (r+2, c+1), (r+2, c+2)}
     
-    red_square = {(r, c), (r, c+1), (r+1, c), (r+1, c+1)}
-    
-    if outline.issubset(sky_blue_coords) and red_square.issubset(red_coords):
-        solution = [[8 for _ in range(4)] for _ in range(4)]
-        for rr, cc in red_square:
-            solution[rr-r+1][cc-c+1] = 2
-        return ColoredGrid(values=solution)
+    if outline.issubset(sky_blue_coords):
+        for dr, dc in [(0, 0), (0, 1), (1, 0), (1, 1)]:
+            red_square = {(r+dr, c+dc), (r+dr, c+dc+1), (r+dr+1, c+dc), (r+dr+1, c+dc+1)}
+            if red_square.issubset(red_coords):
+                solution = [[8 for _ in range(4)] for _ in range(4)]
+                for rr, cc in red_square:
+                    solution[rr-r+1][cc-c+1] = 2
+                return ColoredGrid(values=solution)
     return None
