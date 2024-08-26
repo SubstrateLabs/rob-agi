@@ -1,14 +1,14 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import Set, Tuple
+from typing import Set, Tuple, List
 
 def solve_8fbca751(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the grid transformation challenge by outlining all blue shapes with red.
     
-    This function identifies all blue (8) cells in the input grid, then outlines them
-    collectively with red (2) cells. The outline includes diagonally adjacent cells
-    but does not extend beyond the grid boundaries or overwrite existing non-black cells.
-    All blue shapes are enclosed in a single outline, regardless of their connectivity.
+    This function identifies all contiguous blue (8) regions in the input grid,
+    then outlines each region separately with red (2) cells. The outline includes
+    diagonally adjacent cells but does not extend beyond the grid boundaries or
+    overwrite existing non-black cells. Each blue shape is enclosed in its own outline.
     
     Args:
         input_grid (ColoredGrid): The input grid to be transformed.
@@ -18,26 +18,38 @@ def solve_8fbca751(input_grid: ColoredGrid) -> ColoredGrid:
     """
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
-    outline_cells = set()
+    visited = set()
 
-    # Step 1: Identify all cells that should be part of the outline
-    for r in range(rows):
-        for c in range(cols):
-            if grid.values[r][c] == 8:  # Blue cell
+    def flood_fill(r: int, c: int) -> Set[Tuple[int, int]]:
+        stack = [(r, c)]
+        region = set()
+        while stack:
+            r, c = stack.pop()
+            if (r, c) not in visited and 0 <= r < rows and 0 <= c < cols and grid.values[r][c] == 8:
+                visited.add((r, c))
+                region.add((r, c))
                 for dr in [-1, 0, 1]:
                     for dc in [-1, 0, 1]:
-                        if dr == 0 and dc == 0:
-                            continue
-                        nr, nc = r + dr, c + dc
-                        if 0 <= nr < rows and 0 <= nc < cols:
-                            outline_cells.add((nr, nc))
+                        stack.append((r + dr, c + dc))
+        return region
 
-    # Step 2: Remove blue cells from the outline set
-    outline_cells = {(r, c) for r, c in outline_cells if grid.values[r][c] != 8}
+    def get_outline(region: Set[Tuple[int, int]]) -> Set[Tuple[int, int]]:
+        outline = set()
+        for r, c in region:
+            for dr in [-1, 0, 1]:
+                for dc in [-1, 0, 1]:
+                    nr, nc = r + dr, c + dc
+                    if (nr, nc) not in region and 0 <= nr < rows and 0 <= nc < cols:
+                        outline.add((nr, nc))
+        return outline
 
-    # Step 3: Apply the outline to the grid
-    for r, c in outline_cells:
-        if grid.values[r][c] == 0:  # Only change black cells to red
-            grid.values[r][c] = 2
+    for r in range(rows):
+        for c in range(cols):
+            if grid.values[r][c] == 8 and (r, c) not in visited:
+                blue_region = flood_fill(r, c)
+                outline = get_outline(blue_region)
+                for or_, oc in outline:
+                    if grid.values[or_][oc] == 0:  # Only change black cells to red
+                        grid.values[or_][oc] = 2
 
     return grid
