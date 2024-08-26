@@ -8,8 +8,8 @@ def solve_94414823(input_grid: ColoredGrid) -> ColoredGrid:
     1. Identifies a top color from the second row and a bottom color from the second-to-last row.
     2. Creates a deep copy of the input grid.
     3. Fills the interior of the gray frame with a 2x2 pattern using the identified colors:
-       - Top-left and bottom-right quadrants use the top color
-       - Top-right and bottom-left quadrants use the bottom color
+       - Top-left and bottom-right quadrants use the bottom color
+       - Top-right and bottom-left quadrants use the top color
     
     Returns the modified grid with the interior of the frame filled according to the pattern.
     """
@@ -28,8 +28,8 @@ def solve_94414823(input_grid: ColoredGrid) -> ColoredGrid:
             quad_row = (r - 3) // 2
             quad_col = (c - 3) // 2
             if quad_row == quad_col:
-                output_grid[r][c] = top_color
-            else:
                 output_grid[r][c] = bottom_color
+            else:
+                output_grid[r][c] = top_color
     
     return output_grid
