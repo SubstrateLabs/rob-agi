@@ -16,6 +16,7 @@ def solve_9772c176(input_grid: ColoredGrid) -> ColoredGrid:
     3. Create disconnected shadow elements (small dots and tendrils).
     4. Refine shadows by removing isolated pixels and ensuring no direct contact with sky blue.
     5. Add final touch-ups and verify the result.
+    6. Apply a directional shadow effect, emphasizing the bottom-right direction.
 
     Args:
     input_grid (ColoredGrid): The input grid containing sky blue shapes.
@@ -67,16 +68,15 @@ def solve_9772c176(input_grid: ColoredGrid) -> ColoredGrid:
     def generate_shadow(shape: Set[Tuple[int, int]], box: Tuple[int, int, int, int]) -> Set[Tuple[int, int]]:
         top, left, bottom, right = box
         shadow = set()
+        center_x, center_y = (top + bottom) // 2, (left + right) // 2
         for x in range(top, bottom + 1):
             for y in range(left, right + 1):
                 if (x, y) not in shape and any((nx, ny) in shape for nx, ny in get_neighbors(x, y, diagonal=True)):
                     # Higher probability for bottom and right sides
-                    if x > (top + bottom) // 2 or y > (left + right) // 2:
-                        if random.random() < 0.9:
-                            shadow.add((x, y))
-                    else:
-                        if random.random() < 0.5:
-                            shadow.add((x, y))
+                    dx, dy = x - center_x, y - center_y
+                    prob = 0.9 if dx > 0 and dy > 0 else 0.7 if dx > 0 or dy > 0 else 0.5
+                    if random.random() < prob:
+                        shadow.add((x, y))
         return shadow
 
     def apply_shadow(shadow: Set[Tuple[int, int]]):
@@ -87,7 +87,7 @@ def solve_9772c176(input_grid: ColoredGrid) -> ColoredGrid:
     def add_irregularities(shadow: Set[Tuple[int, int]]):
         new_shadow = shadow.copy()
         for x, y in shadow:
-            if random.random() < 0.3:
+            if random.random() < 0.2:
                 for nx, ny in get_neighbors(x, y):
                     if (nx, ny) not in shadow and output_grid.get_cell(nx, ny) == 0:
                         new_shadow.add((nx, ny))
@@ -95,10 +95,11 @@ def solve_9772c176(input_grid: ColoredGrid) -> ColoredGrid:
 
     def add_disconnected_elements(shape: Set[Tuple[int, int]], box: Tuple[int, int, int, int]):
         top, left, bottom, right = box
-        for _ in range((bottom - top + right - left) // 3):
-            x = random.randint(top, bottom)
-            y = random.randint(left, right)
-            if (x, y) not in shape and output_grid.get_cell(x, y) == 0:
+        center_x, center_y = (top + bottom) // 2, (left + right) // 2
+        for _ in range((bottom - top + right - left) // 4):
+            x = random.randint(center_x, bottom + 2)
+            y = random.randint(center_y, right + 2)
+            if 0 <= x < rows and 0 <= y < cols and (x, y) not in shape and output_grid.get_cell(x, y) == 0:
                 if all(output_grid.get_cell(nx, ny) != 8 for nx, ny in get_neighbors(x, y)):
                     output_grid.set_cell(x, y, 4)
 
@@ -110,16 +111,18 @@ def solve_9772c176(input_grid: ColoredGrid) -> ColoredGrid:
                     if yellow_neighbors == 0:
                         output_grid.set_cell(x, y, 0)
 
-    def add_final_touches():
-        for x in range(rows):
-            for y in range(cols):
-                if output_grid.get_cell(x, y) == 0:
-                    if any(output_grid.get_cell(nx, ny) == 4 for nx, ny in get_neighbors(x, y, diagonal=True)):
-                        if random.random() < 0.2:
+    def add_directional_shadow(shape: Set[Tuple[int, int]], box: Tuple[int, int, int, int]):
+        top, left, bottom, right = box
+        center_x, center_y = (top + bottom) // 2, (left + right) // 2
+        for x in range(center_x, bottom + 3):
+            for y in range(center_y, right + 3):
+                if 0 <= x < rows and 0 <= y < cols and (x, y) not in shape and output_grid.get_cell(x, y) == 0:
+                    if any(output_grid.get_cell(nx, ny) == 8 for nx, ny in get_neighbors(x, y, diagonal=True)):
+                        if random.random() < 0.7:
                             output_grid.set_cell(x, y, 4)
 
     blue_shapes = find_blue_shapes()
-    expansion = 4  # Increased expanded box size
+    expansion = 3
 
     for shape in blue_shapes:
         box = get_bounding_box(shape)
@@ -128,9 +131,9 @@ def solve_9772c176(input_grid: ColoredGrid) -> ColoredGrid:
         shadow = add_irregularities(shadow)
         apply_shadow(shadow)
         add_disconnected_elements(shape, expanded_box)
+        add_directional_shadow(shape, expanded_box)
 
     refine_shadow()
-    add_final_touches()
 
     # Ensure no yellow pixels touch blue pixels
     for x in range(rows):
