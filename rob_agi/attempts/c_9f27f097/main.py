@@ -4,29 +4,82 @@ from typing import List, Tuple, Optional
 def solve_9f27f097(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the grid transformation challenge by identifying a source region with diverse colors,
-    finding a target region (usually single-color), and copying the source to the target
+    finding a target region (usually single-color or empty), and copying the source to the target
     with a 180-degree rotation.
     
     1. Identify the border color
-    2. Find the source region (5x5 corner with the most diverse colors)
+    2. Find the source region (corner with the most diverse colors)
     3. Find the target region (opposite corner to the source)
-    4. Apply 180-degree rotation from source to target
-    5. Copy the transformed source region to the target region
+    4. Determine the size of the source region
+    5. Apply 180-degree rotation from source to target
+    6. Handle target region expansion if necessary
     """
     # Step 1: Identify border color
     border_color = identify_border_color(input_grid)
     
-    # Step 2: Find source region
-    source_corner = find_most_diverse_corner(input_grid, border_color)
+    # Step 2 & 3: Find source and target regions
+    source_corner, target_corner = find_source_and_target_corners(input_grid, border_color)
     
-    # Step 3: Find target region
-    target_corner = get_opposite_corner(source_corner)
+    # Step 4: Determine size of source region
+    source_size = determine_source_size(input_grid, source_corner, border_color)
     
-    # Step 4 & 5: Apply 180-degree rotation and copy
-    output_grid = input_grid.deep_copy()
-    copy_with_rotation(input_grid, output_grid, source_corner, target_corner)
+    # Step 5 & 6: Apply rotation and handle expansion
+    output_grid = apply_transformation(input_grid, source_corner, target_corner, source_size, border_color)
     
     return output_grid
+
+def find_source_and_target_corners(grid: ColoredGrid, border_color: int) -> Tuple[str, str]:
+    corners = ['top_left', 'top_right', 'bottom_left', 'bottom_right']
+    corner_diversity = {corner: count_unique_colors(grid, corner, border_color) for corner in corners}
+    source_corner = max(corner_diversity, key=corner_diversity.get)
+    target_corner = get_opposite_corner(source_corner)
+    return source_corner, target_corner
+
+def count_unique_colors(grid: ColoredGrid, corner: str, border_color: int) -> int:
+    start_row, start_col = get_corner_coordinates(corner, grid.num_rows, grid.num_cols)
+    unique_colors = set()
+    for r in range(start_row, start_row + 5):
+        for c in range(start_col, start_col + 5):
+            if 0 <= r < grid.num_rows and 0 <= c < grid.num_cols:
+                color = grid.values[r][c]
+                if color != border_color:
+                    unique_colors.add(color)
+    return len(unique_colors)
+
+def determine_source_size(grid: ColoredGrid, corner: str, border_color: int) -> int:
+    start_row, start_col = get_corner_coordinates(corner, grid.num_rows, grid.num_cols)
+    size = 0
+    while True:
+        if (start_row + size >= grid.num_rows or start_col + size >= grid.num_cols or
+            grid.values[start_row + size][start_col + size] == border_color):
+            break
+        size += 1
+    return size
+
+def apply_transformation(grid: ColoredGrid, source_corner: str, target_corner: str, size: int, border_color: int) -> ColoredGrid:
+    output_grid = grid.deep_copy()
+    source_row, source_col = get_corner_coordinates(source_corner, grid.num_rows, grid.num_cols)
+    target_row, target_col = get_corner_coordinates(target_corner, grid.num_rows, grid.num_cols)
+    
+    for r in range(size):
+        for c in range(size):
+            source_value = grid.values[source_row + r][source_col + c]
+            new_r = target_row + (size - 1 - r)
+            new_c = target_col + (size - 1 - c)
+            if 0 <= new_r < grid.num_rows and 0 <= new_c < grid.num_cols:
+                output_grid.values[new_r][new_c] = source_value
+    
+    return output_grid
+
+def get_corner_coordinates(corner: str, num_rows: int, num_cols: int) -> Tuple[int, int]:
+    if corner == 'top_left':
+        return 0, 0
+    elif corner == 'top_right':
+        return 0, num_cols - 1
+    elif corner == 'bottom_left':
+        return num_rows - 1, 0
+    else:  # bottom_right
+        return num_rows - 1, num_cols - 1
 
 def identify_border_color(grid: ColoredGrid) -> int:
     rows, cols = grid.get_dimensions()
