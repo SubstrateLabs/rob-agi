@@ -13,6 +13,7 @@ def solve_9f27f097(input_grid: ColoredGrid) -> ColoredGrid:
     4. Determine the size of the source region
     5. Apply 180-degree rotation from source to target
     6. Handle target region expansion if necessary
+    7. If no suitable target region is found, create one in the opposite corner
     """
     # Step 1: Identify border color
     border_color = identify_border_color(input_grid)
@@ -23,6 +24,11 @@ def solve_9f27f097(input_grid: ColoredGrid) -> ColoredGrid:
     # Step 3 & 4: Find target region and determine size
     source_size = len(source_region)
     target_region = find_target_region(input_grid, border_color, source_size)
+    
+    # If no suitable target region is found, create one in the opposite corner
+    if not target_region:
+        source_bounds = get_region_bounds(source_region)
+        target_region = create_opposite_corner_region(input_grid, source_bounds, border_color)
     
     # Step 5 & 6: Apply rotation and handle expansion
     output_grid = apply_transformation(input_grid, source_region, target_region)
@@ -48,15 +54,25 @@ def find_most_diverse_region(grid: ColoredGrid, border_color: int) -> List[Tuple
 
 def find_target_region(grid: ColoredGrid, border_color: int, size: int) -> Optional[List[Tuple[int, int]]]:
     regions = grid.find_connected_regions(lambda x: x != border_color)
-    single_color_regions = [r for r in regions if len(set(grid.values[y][x] for y, x in r)) == 1]
     
+    # First, look for black regions
+    black_regions = [r for r in regions if all(grid.values[y][x] == 0 for y, x in r)]
+    if black_regions:
+        target = max(black_regions, key=len)
+        if len(target) >= size:
+            return target[:size]
+        return expand_region(grid, target, size, border_color)
+    
+    # If no black regions, look for single color regions
+    single_color_regions = [r for r in regions if len(set(grid.values[y][x] for y, x in r)) == 1]
     if single_color_regions:
         target = max(single_color_regions, key=len)
-        if len(target) < size:
-            return expand_region(grid, target, size, border_color)
-        return target[:size]
+        if len(target) >= size:
+            return target[:size]
+        return expand_region(grid, target, size, border_color)
     
-    return max(regions, key=len)[:size] if regions else None
+    # If no suitable region found, return None
+    return None
 
 def expand_region(grid: ColoredGrid, region: List[Tuple[int, int]], target_size: int, border_color: int) -> List[Tuple[int, int]]:
     expanded = set(region)
@@ -220,3 +236,18 @@ def transform(y: int, x: int, source_bounds: Tuple[int, int, int, int], target_b
     tx = tx_min + new_x
     
     return ty, tx
+def create_opposite_corner_region(grid: ColoredGrid, source_bounds: Tuple[int, int, int, int], border_color: int) -> List[Tuple[int, int]]:
+    sy_min, sx_min, sy_max, sx_max = source_bounds
+    rows, cols = grid.get_dimensions()
+    
+    # Determine if the source is in the top-left or bottom-right quadrant
+    if sy_min < rows // 2 and sx_min < cols // 2:
+        # Source is in top-left, create target in bottom-right
+        ty_min, tx_min = rows - (sy_max - sy_min) - 1, cols - (sx_max - sx_min) - 1
+    else:
+        # Source is in bottom-right, create target in top-left
+        ty_min, tx_min = 1, 1
+    
+    ty_max, tx_max = ty_min + (sy_max - sy_min), tx_min + (sx_max - sx_min)
+    
+    return [(y, x) for y in range(ty_min, ty_max + 1) for x in range(tx_min, tx_max + 1) if grid.values[y][x] != border_color]
