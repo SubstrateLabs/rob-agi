@@ -5,30 +5,22 @@ def solve_0607ce86(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by identifying and regularizing patterns in three vertical sections.
     
-    1. Analyzes the input grid to find three main vertical sections.
-    2. For each section, identifies the most common rectangular pattern.
-    3. Creates a "perfect" version of this pattern, removing imperfections.
-    4. Repeats the perfect pattern four times vertically in each section.
-    5. Adds a consistent bottom element if it exists in the majority of rectangles.
-    6. Ensures proper spacing between sections and patterns.
-    7. Cleans up the grid by setting all areas outside patterns to black (0).
+    1. Identifies three vertical sections separated by black columns.
+    2. Analyzes the pattern structure in each section (top part and main pattern).
+    3. Creates a perfect pattern by choosing the most common color for each position.
+    4. Generates an output grid with the perfect pattern repeated three times vertically in each section.
+    5. Ensures consistent spacing between sections and pattern repetitions.
+    6. Cleans up the grid by setting all areas outside the main pattern to black (0).
     
-    Returns a new grid with regularized and aligned patterns.
+    Returns a new grid with regularized and aligned patterns across all three sections.
     """
     rows, cols = input_grid.get_dimensions()
     output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
     
-    # Find the three vertical sections
     sections = find_vertical_sections(input_grid)
+    perfect_pattern = create_perfect_pattern(input_grid, sections)
     
     for section_start, section_end in sections:
-        # Identify the most common pattern in the section
-        pattern = identify_pattern(input_grid, section_start, section_end)
-        
-        # Create a perfect version of the pattern
-        perfect_pattern = create_perfect_pattern(pattern)
-        
-        # Repeat the pattern four times in the section
         repeat_pattern(output_grid, perfect_pattern, section_start, section_end)
     
     return output_grid
@@ -47,33 +39,32 @@ def find_vertical_sections(grid: ColoredGrid) -> List[Tuple[int, int]]:
         sections.append((start, cols))
     return sections[:3]  # Ensure we only return three sections
 
-def identify_pattern(grid: ColoredGrid, start: int, end: int) -> ColoredGrid:
-    """Identifies the most common rectangular pattern in a section."""
-    patterns = {}
-    for top in range(0, grid.num_rows - 3):
-        for bottom in range(top + 4, grid.num_rows):
-            pattern = grid.extract_subgrid(top, start, bottom - top, end - start)
-            pattern_key = tuple(tuple(row) for row in pattern.values)
-            patterns[pattern_key] = patterns.get(pattern_key, 0) + 1
+def create_perfect_pattern(grid: ColoredGrid, sections: List[Tuple[int, int]]) -> ColoredGrid:
+    """Creates a perfect pattern based on the most common colors across all sections."""
+    pattern_height = find_pattern_height(grid, sections[0])
+    pattern_width = sections[0][1] - sections[0][0]
+    perfect_pattern = ColoredGrid(values=[[0 for _ in range(pattern_width)] for _ in range(pattern_height)])
     
-    most_common_pattern = max(patterns, key=patterns.get)
-    return ColoredGrid(values=[list(row) for row in most_common_pattern])
+    for row in range(pattern_height):
+        for col in range(pattern_width):
+            colors = [grid.get_cell(row, section[0] + col) for section in sections]
+            most_common_color = max(set(colors), key=colors.count)
+            perfect_pattern.set_cell(row, col, most_common_color)
+    
+    return perfect_pattern
 
-def create_perfect_pattern(pattern: ColoredGrid) -> ColoredGrid:
-    """Creates a perfect version of the pattern by removing imperfections."""
-    perfect = pattern.deep_copy()
-    for color in range(1, 10):  # Exclude black (0)
-        regions = perfect.find_connected_regions(color)
-        if regions:
-            main_region = max(regions, key=len)
-            for row, col in main_region:
-                perfect.set_cell(row, col, color)
-    return perfect
+def find_pattern_height(grid: ColoredGrid, section: Tuple[int, int]) -> int:
+    """Determines the height of one complete pattern in a section."""
+    start, end = section
+    for row in range(1, grid.num_rows // 3):
+        if all(grid.get_cell(row, col) == 0 for col in range(start, end)):
+            return row
+    return grid.num_rows // 3  # Fallback if no clear separator is found
 
 def repeat_pattern(output_grid: ColoredGrid, pattern: ColoredGrid, start: int, end: int):
-    """Repeats the pattern four times in the section."""
+    """Repeats the pattern three times vertically in the section."""
     pattern_height = pattern.num_rows
-    for i in range(4):
+    for i in range(3):
         top = i * (pattern_height + 1)  # +1 for spacing
         for row in range(pattern_height):
             for col in range(start, end):
