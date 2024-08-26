@@ -44,4 +44,10 @@ def solve_319f2597(input_grid: ColoredGrid) -> ColoredGrid:
         for col in range(stripe_left):
             output_grid.set_cell(row, col, 0)
     
+    # Fill the intersection of vertical and horizontal stripes
+    output_grid.set_cell(horizontal_top, stripe_left, 0)
+    output_grid.set_cell(horizontal_top, stripe_right, 0)
+    output_grid.set_cell(horizontal_bottom, stripe_left, 0)
+    output_grid.set_cell(horizontal_bottom, stripe_right, 0)
+    
     return output_grid
