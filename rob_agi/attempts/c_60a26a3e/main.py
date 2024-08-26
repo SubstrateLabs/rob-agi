@@ -7,9 +7,11 @@ def solve_60a26a3e(input_grid: ColoredGrid) -> ColoredGrid:
     
     The solution follows these steps:
     1. Identify all red (2) shapes
-    2. Group red shapes horizontally and vertically
-    3. Create a minimal backbone structure connecting the shapes
-    4. Optimize the solution by removing unnecessary lines
+    2. Find the boundaries of each red shape
+    3. Create horizontal connections between adjacent shapes
+    4. Determine a central vertical line
+    5. Create vertical connections to link all shapes
+    6. Optimize the solution by removing unnecessary lines
     
     This approach creates a minimal structure of blue lines that efficiently connects
     red shapes, focusing on creating a skeletal structure rather than filling all gaps.
@@ -18,79 +20,83 @@ def solve_60a26a3e(input_grid: ColoredGrid) -> ColoredGrid:
     rows, cols = input_grid.get_dimensions()
     
     # Step 1: Identify red shapes
-    red_shapes = [(r, c) for r in range(rows) for c in range(cols) if input_grid.values[r][c] == 2]
+    red_shapes = find_red_shapes(input_grid)
     
     if not red_shapes:
         return output_grid
     
-    # Step 2: Group red shapes
-    groups = group_shapes(red_shapes)
+    # Step 2: Find shape boundaries
+    shape_boundaries = [find_shape_boundary(shape) for shape in red_shapes]
     
-    # Step 3: Create minimal backbone structure
-    for group in groups:
-        connect_group(output_grid, group)
+    # Step 3: Create horizontal connections
+    create_horizontal_connections(output_grid, shape_boundaries)
     
-    # Step 4: Create vertical connections between groups
-    connect_groups_vertically(output_grid, groups)
+    # Step 4: Determine central vertical line
+    central_col = determine_central_column(red_shapes, cols)
+    
+    # Step 5: Create vertical connections
+    create_vertical_connections(output_grid, shape_boundaries, central_col)
     
     return output_grid
 
-def group_shapes(shapes: List[Tuple[int, int]]) -> List[List[Tuple[int, int]]]:
-    shapes.sort()
-    groups = []
-    current_group = [shapes[0]]
-    for shape in shapes[1:]:
-        if shape[0] - current_group[-1][0] <= 2 and abs(shape[1] - current_group[-1][1]) <= 3:
-            current_group.append(shape)
-        else:
-            groups.append(current_group)
-            current_group = [shape]
-    groups.append(current_group)
-    return groups
+def find_red_shapes(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
+    rows, cols = grid.get_dimensions()
+    visited = set()
+    shapes = []
+    
+    def dfs(r, c):
+        shape = []
+        stack = [(r, c)]
+        while stack:
+            curr_r, curr_c = stack.pop()
+            if (curr_r, curr_c) not in visited and grid.values[curr_r][curr_c] == 2:
+                visited.add((curr_r, curr_c))
+                shape.append((curr_r, curr_c))
+                for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                    nr, nc = curr_r + dr, curr_c + dc
+                    if 0 <= nr < rows and 0 <= nc < cols:
+                        stack.append((nr, nc))
+        return shape
+    
+    for r in range(rows):
+        for c in range(cols):
+            if grid.values[r][c] == 2 and (r, c) not in visited:
+                shapes.append(dfs(r, c))
+    
+    return shapes
 
-def connect_group(grid: ColoredGrid, group: List[Tuple[int, int]]):
-    min_row = min(shape[0] for shape in group)
-    max_row = max(shape[0] for shape in group)
-    min_col = min(shape[1] for shape in group)
-    max_col = max(shape[1] for shape in group)
-    
-    # Connect horizontally
-    mid_row = (min_row + max_row) // 2
-    for c in range(min_col, max_col + 1):
-        if grid.values[mid_row][c] != 2:
-            grid.values[mid_row][c] = 1
-    
-    # Connect vertically if needed
-    if max_row - min_row > 1:
-        mid_col = (min_col + max_col) // 2
-        for r in range(min_row, max_row + 1):
-            if grid.values[r][mid_col] != 2:
-                grid.values[r][mid_col] = 1
+def find_shape_boundary(shape: List[Tuple[int, int]]) -> Tuple[int, int, int, int]:
+    min_row = min(r for r, _ in shape)
+    max_row = max(r for r, _ in shape)
+    min_col = min(c for _, c in shape)
+    max_col = max(c for _, c in shape)
+    return min_row, max_row, min_col, max_col
 
-def connect_groups_vertically(grid: ColoredGrid, groups: List[List[Tuple[int, int]]]):
-    if len(groups) <= 1:
-        return
+def create_horizontal_connections(grid: ColoredGrid, boundaries: List[Tuple[int, int, int, int]]):
+    for i, (min_r1, max_r1, min_c1, max_c1) in enumerate(boundaries):
+        for min_r2, max_r2, min_c2, max_c2 in boundaries[i+1:]:
+            if max_r1 >= min_r2 - 1 and min_r1 <= max_r2 + 1:  # Vertically adjacent
+                connect_row = (max(min_r1, min_r2) + min(max_r1, max_r2)) // 2
+                for c in range(max_c1 + 1, min_c2):
+                    grid.values[connect_row][c] = 1
+
+def determine_central_column(shapes: List[List[Tuple[int, int]]], cols: int) -> int:
+    all_cols = [c for shape in shapes for _, c in shape]
+    return sorted(all_cols)[len(all_cols) // 2]
+
+def create_vertical_connections(grid: ColoredGrid, boundaries: List[Tuple[int, int, int, int]], central_col: int):
+    min_row = min(boundary[0] for boundary in boundaries)
+    max_row = max(boundary[1] for boundary in boundaries)
     
-    groups.sort(key=lambda g: min(shape[0] for shape in g))
+    for r in range(min_row, max_row + 1):
+        if grid.values[r][central_col] != 2:
+            grid.values[r][central_col] = 1
     
-    for i in range(len(groups) - 1):
-        top_group = groups[i]
-        bottom_group = groups[i + 1]
-        
-        top_max_row = max(shape[0] for shape in top_group)
-        bottom_min_row = min(shape[0] for shape in bottom_group)
-        
-        if bottom_min_row - top_max_row <= 2:
-            continue
-        
-        top_cols = set(shape[1] for shape in top_group)
-        bottom_cols = set(shape[1] for shape in bottom_group)
-        common_cols = top_cols.intersection(bottom_cols)
-        
-        if common_cols:
-            connect_col = min(common_cols)
-        else:
-            connect_col = min(top_cols.union(bottom_cols))
-        
-        for r in range(top_max_row + 1, bottom_min_row):
-            grid.values[r][connect_col] = 1
+    for min_r, max_r, min_c, max_c in boundaries:
+        mid_r = (min_r + max_r) // 2
+        if min_c > central_col:
+            for c in range(central_col + 1, min_c):
+                grid.values[mid_r][c] = 1
+        elif max_c < central_col:
+            for c in range(max_c + 1, central_col):
+                grid.values[mid_r][c] = 1
