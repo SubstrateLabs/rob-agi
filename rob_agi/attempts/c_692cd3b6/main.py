@@ -3,19 +3,17 @@ from typing import List, Tuple, Set
 
 def solve_692cd3b6(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the challenge by connecting two 'C' shapes with yellow, extending to specific grid edges.
+    Solve the challenge by connecting two 'C' shapes with yellow, extending to grid edges when necessary.
     
     1. Identify the two 'C' shapes (red color 2 with gray color 5 inside).
-    2. Determine which C-shape is top-left and which is bottom-right.
-    3. Create a bounding box for the yellow connecting path, extending slightly beyond C-shape openings.
-    4. Fill the connecting area with yellow.
-    5. Extend yellow to top and left edges for the top-left C-shape.
-    6. Extend yellow to bottom and right edges for the bottom-right C-shape.
-    7. Clean up any unnecessary yellow areas not connected to the main path.
-    8. Preserve the original 'C' shapes.
+    2. Create a bounding rectangle that encompasses both C-shapes.
+    3. Fill the connecting rectangle with yellow, preserving the C-shapes.
+    4. Extend yellow to grid edges if a C-shape touches an edge.
+    5. Clean up any disconnected yellow areas.
+    6. Preserve the original 'C' shapes.
     
     This approach ensures the correct yellow path between the C-shapes
-    and extends to the appropriate grid edges based on C-shape positions.
+    and extends to the appropriate grid edges only when a C-shape touches an edge.
     """
     # Step 1 & 2: Identify 'C' shapes and determine their positions
     c_shapes = find_c_shapes(input_grid)
