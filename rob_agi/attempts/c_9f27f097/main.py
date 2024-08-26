@@ -29,6 +29,17 @@ def solve_9f27f097(input_grid: ColoredGrid) -> ColoredGrid:
     
     return output_grid
 
+def apply_transformation(input_grid: ColoredGrid, source_region: List[Tuple[int, int]], target_region: List[Tuple[int, int]]) -> ColoredGrid:
+    output_grid = input_grid.deep_copy()
+    source_bounds = get_region_bounds(source_region)
+    target_bounds = get_region_bounds(target_region)
+    
+    for i, (sy, sx) in enumerate(source_region):
+        ty, tx = transform(sy, sx, source_bounds, target_bounds, "rotate_180")
+        output_grid.values[ty][tx] = input_grid.values[sy][sx]
+    
+    return output_grid
+
 def find_most_diverse_region(grid: ColoredGrid, border_color: int) -> List[Tuple[int, int]]:
     regions = grid.find_connected_regions(lambda x: x != border_color)
     if not regions:
@@ -64,6 +75,22 @@ def expand_region(grid: ColoredGrid, region: List[Tuple[int, int]], target_size:
 def get_region_bounds(region: List[Tuple[int, int]]) -> Tuple[int, int, int, int]:
     y_coords, x_coords = zip(*region)
     return min(y_coords), min(x_coords), max(y_coords), max(x_coords)
+
+def transform(y: int, x: int, source_bounds: Tuple[int, int, int, int], target_bounds: Tuple[int, int, int, int], transformation: str) -> Tuple[int, int]:
+    sy_min, sx_min, sy_max, sx_max = source_bounds
+    ty_min, tx_min, ty_max, tx_max = target_bounds
+    
+    if transformation == "rotate_180":
+        new_y = sy_max - (y - sy_min)
+        new_x = sx_max - (x - sx_min)
+    else:  # no_change
+        new_y = y - sy_min
+        new_x = x - sx_min
+    
+    ty = ty_min + (new_y - sy_min)
+    tx = tx_min + (new_x - sx_min)
+    
+    return ty, tx
 
 def identify_border_color(grid: ColoredGrid) -> int:
     rows, cols = grid.get_dimensions()
