@@ -9,8 +9,8 @@ def solve_626c0bcc(input_grid: ColoredGrid) -> ColoredGrid:
     The algorithm works as follows:
     1. Identify all connected sky-colored regions.
     2. Color each region using a specific pattern:
-       - Place 2x2 blue (1) squares in corners where possible.
-       - Fill remaining cells with a repeating pattern of red (2), green (3), yellow (4).
+       - Place a 2x2 blue (1) square in the top-left corner if possible.
+       - Fill remaining cells with a specific pattern of red (2), green (3), yellow (4).
     3. Resolve any remaining color conflicts.
     
     This approach ensures no adjacent cells (including diagonally) have the same non-black color,
@@ -52,21 +52,20 @@ def color_region(grid: ColoredGrid, region: List[Tuple[int, int]]):
     min_row, min_col = min(region)
     max_row, max_col = max(region)
     
-    # Place 2x2 blue squares in corners where possible
-    corners = [(min_row, min_col), (min_row, max_col-1), (max_row-1, min_col), (max_row-1, max_col-1)]
-    for corner_r, corner_c in corners:
-        if all((r, c) in region for r in range(corner_r, corner_r+2) for c in range(corner_c, corner_c+2)):
-            for r in range(corner_r, corner_r+2):
-                for c in range(corner_c, corner_c+2):
-                    grid.set_cell(r, c, 1)  # Blue
+    # Place 2x2 blue square in the top-left corner if possible
+    if all((r, c) in region for r in range(min_row, min_row+2) for c in range(min_col, min_col+2)):
+        for r in range(min_row, min_row+2):
+            for c in range(min_col, min_col+2):
+                grid.set_cell(r, c, 1)  # Blue
     
-    # Fill remaining cells with repeating pattern
+    # Fill remaining cells with specific pattern
     colors = [2, 3, 4]  # Red, Green, Yellow
     color_index = 0
-    for r, c in region:
-        if grid.get_cell(r, c) == 0:
-            grid.set_cell(r, c, colors[color_index])
-            color_index = (color_index + 1) % 3
+    for r in range(min_row, max_row + 1):
+        for c in range(min_col, max_col + 1):
+            if (r, c) in region and grid.get_cell(r, c) == 0:
+                grid.set_cell(r, c, colors[color_index])
+                color_index = (color_index + 1) % 3
 
 def resolve_all_conflicts(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
