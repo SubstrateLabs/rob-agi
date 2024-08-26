@@ -11,8 +11,9 @@ def solve_5207a7b5(input_grid: ColoredGrid) -> ColoredGrid:
        - Continue until the shape narrows to a single column or reaches the bottom of the grid.
     3. Preserve the gray line in its original position and length.
     4. Add a magenta (color 6) shape to the right of the gray line:
-       - Width is 1 column.
+       - Initial width is min(3, remaining columns after the gray line).
        - Height is equal to the gray line's length.
+       - Decrease width by 1 every two rows.
     5. Leave all other cells black (color 0).
 
     Args:
@@ -44,8 +45,12 @@ def solve_5207a7b5(input_grid: ColoredGrid) -> ColoredGrid:
         new_grid.values[row][gray_line_column] = 5
 
     # Add magenta shape
+    magenta_width = min(3, width - gray_line_column - 1)
     for row in range(gray_line_length):
-        if gray_line_column + 1 < width:
-            new_grid.values[row][gray_line_column + 1] = 6
+        for col in range(1, magenta_width + 1):
+            if gray_line_column + col < width:
+                new_grid.values[row][gray_line_column + col] = 6
+        if row % 2 == 1:
+            magenta_width = max(1, magenta_width - 1)
 
     return new_grid
