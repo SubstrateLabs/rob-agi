@@ -6,27 +6,26 @@ import numpy as np
 def solve_f4081712(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the f4081712 challenge by analyzing the input grid and generating a condensed
-    representation that captures key color relationships and patterns.
+    representation that captures key color relationships, patterns, and structural elements.
     
     The solution involves the following steps:
-    1. Analyze the entire input grid, focusing on the central area and key patterns.
-    2. Identify the most significant colors and their relationships.
-    3. Determine the appropriate output size based on the complexity of the input.
-    4. Extract the core pattern from the central area of the input grid.
+    1. Analyze the entire input grid, detecting symmetry, regions, and patterns.
+    2. Identify key structural elements and color relationships.
+    3. Create an abstract representation of the input grid.
+    4. Determine the appropriate output size and structure.
     5. Generate a smaller output grid that preserves the essence of the input pattern.
-    6. Ensure the output maintains key color relationships and relative positions.
+    6. Refine the output to ensure it captures the most important features of the input.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
     
     Returns:
-    ColoredGrid: A condensed representation of the input grid, capturing its essential pattern.
+    ColoredGrid: A condensed representation of the input grid, capturing its essential pattern and structure.
     """
     analysis = analyze_grid(input_grid)
-    key_colors = identify_key_colors(analysis)
+    abstract_rep = create_abstract_representation(input_grid, analysis)
     output_size = determine_output_size(analysis)
-    core_pattern = extract_core_pattern(input_grid, analysis)
-    output_values = generate_output_grid(core_pattern, key_colors, output_size, analysis)
+    output_values = generate_output_grid(abstract_rep, output_size, analysis)
     return ColoredGrid(values=output_values)
 
 def analyze_grid(grid: ColoredGrid) -> Dict:
@@ -37,7 +36,9 @@ def analyze_grid(grid: ColoredGrid) -> Dict:
         'full_freq': Counter(cell for row in grid.values for cell in row),
         'central_freq': Counter(cell for row in central_area for cell in row),
         'transitions': Counter(),
-        'edge_colors': set(grid.values[0] + grid.values[-1] + [row[0] for row in grid.values] + [row[-1] for row in grid.values])
+        'edge_colors': set(grid.values[0] + grid.values[-1] + [row[0] for row in grid.values] + [row[-1] for row in grid.values]),
+        'symmetry': detect_symmetry(grid),
+        'regions': detect_regions(grid),
     }
     
     for i in range(rows):
@@ -49,78 +50,94 @@ def analyze_grid(grid: ColoredGrid) -> Dict:
     
     return analysis
 
-def identify_key_colors(analysis: Dict) -> List[int]:
-    combined_freq = analysis['central_freq'] + Counter({color: count // 2 for color, count in analysis['full_freq'].items()})
-    return [color for color, _ in combined_freq.most_common(6)]  # Increased to top 6 colors
+def detect_symmetry(grid: ColoredGrid) -> Dict[str, bool]:
+    rows, cols = len(grid.values), len(grid.values[0])
+    horizontal = all(grid.values[i] == grid.values[rows-1-i] for i in range(rows//2))
+    vertical = all(grid.values[i][j] == grid.values[i][cols-1-j] for i in range(rows) for j in range(cols//2))
+    return {'horizontal': horizontal, 'vertical': vertical}
+
+def detect_regions(grid: ColoredGrid) -> List[Dict]:
+    rows, cols = len(grid.values), len(grid.values[0])
+    visited = set()
+    regions = []
+    
+    def dfs(r, c, color):
+        if (r, c) in visited or r < 0 or r >= rows or c < 0 or c >= cols or grid.values[r][c] != color:
+            return []
+        visited.add((r, c))
+        region = [(r, c)]
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            region.extend(dfs(r+dr, c+dc, color))
+        return region
+    
+    for r in range(rows):
+        for c in range(cols):
+            if (r, c) not in visited:
+                region = dfs(r, c, grid.values[r][c])
+                if region:
+                    regions.append({'color': grid.values[r][c], 'cells': region})
+    
+    return regions
+
+def create_abstract_representation(grid: ColoredGrid, analysis: Dict) -> Dict:
+    abstract_rep = {
+        'key_colors': [color for color, _ in analysis['full_freq'].most_common(5)],
+        'central_pattern': extract_central_pattern(grid),
+        'edge_pattern': extract_edge_pattern(grid),
+        'symmetry': analysis['symmetry'],
+        'major_regions': sorted(analysis['regions'], key=lambda r: len(r['cells']), reverse=True)[:3]
+    }
+    return abstract_rep
+
+def extract_central_pattern(grid: ColoredGrid) -> List[List[int]]:
+    rows, cols = len(grid.values), len(grid.values[0])
+    return [row[cols//4:3*cols//4] for row in grid.values[rows//4:3*rows//4]]
+
+def extract_edge_pattern(grid: ColoredGrid) -> List[int]:
+    rows, cols = len(grid.values), len(grid.values[0])
+    return grid.values[0] + [row[-1] for row in grid.values[1:-1]] + grid.values[-1][::-1] + [row[0] for row in grid.values[-2:0:-1]]
 
 def determine_output_size(analysis: Dict) -> Tuple[int, int]:
     unique_colors = len(analysis['central_freq'])
-    size = max(4, min(6, unique_colors))  # Adjusted to produce slightly larger outputs
+    size = max(5, min(7, unique_colors))
     return (size, size)
 
-def extract_core_pattern(grid: ColoredGrid, analysis: Dict) -> List[List[int]]:
-    rows, cols = len(grid.values), len(grid.values[0])
-    central_area = [row[cols//4:3*cols//4] for row in grid.values[rows//4:3*rows//4]]
-    
-    # Convert to numpy array for easier manipulation
-    central_array = np.array(central_area)
-    
-    # Find the most common color in the central area
-    most_common_color = max(analysis['central_freq'], key=analysis['central_freq'].get)
-    
-    # Create a binary mask of the most common color
-    mask = (central_array == most_common_color)
-    
-    # Find the largest contiguous area of the most common color
-    labeled_array, num_features = np.zeros_like(mask), 0
-    for i in range(mask.shape[0]):
-        for j in range(mask.shape[1]):
-            if mask[i, j] and labeled_array[i, j] == 0:
-                num_features += 1
-                stack = [(i, j)]
-                while stack:
-                    x, y = stack.pop()
-                    if 0 <= x < mask.shape[0] and 0 <= y < mask.shape[1] and mask[x, y] and labeled_array[x, y] == 0:
-                        labeled_array[x, y] = num_features
-                        stack.extend([(x-1, y), (x+1, y), (x, y-1), (x, y+1)])
-    
-    # Find the largest labeled area
-    largest_label = max(range(1, num_features + 1), key=lambda x: np.sum(labeled_array == x))
-    largest_area_mask = (labeled_array == largest_label)
-    
-    # Extract the bounding box of the largest area
-    rows, cols = np.where(largest_area_mask)
-    top, bottom, left, right = rows.min(), rows.max(), cols.min(), cols.max()
-    
-    # Extract the core pattern
-    core_pattern = central_array[top:bottom+1, left:right+1].tolist()
-    
-    return core_pattern
-
-def generate_output_grid(core_pattern: List[List[int]], key_colors: List[int], output_size: Tuple[int, int], analysis: Dict) -> List[List[int]]:
+def generate_output_grid(abstract_rep: Dict, output_size: Tuple[int, int], analysis: Dict) -> List[List[int]]:
     rows, cols = output_size
     output = [[0] * cols for _ in range(rows)]
     
-    # Scale the core pattern to fit the output size
-    scale_factor = min(rows / len(core_pattern), cols / len(core_pattern[0]))
-    scaled_pattern = [[core_pattern[int(i/scale_factor)][int(j/scale_factor)] 
-                       for j in range(cols)] for i in range(rows)]
-    
-    # Place the scaled pattern in the output grid
+    # Place central pattern
+    central_pattern = abstract_rep['central_pattern']
+    scale_factor = min(rows / len(central_pattern), cols / len(central_pattern[0]))
     for r in range(rows):
         for c in range(cols):
-            output[r][c] = scaled_pattern[r][c]
+            output[r][c] = central_pattern[int(r/scale_factor)][int(c/scale_factor)]
     
-    # Ensure all key colors are present
-    for color in key_colors:
+    # Add edge colors
+    edge_colors = abstract_rep['edge_pattern']
+    for i in range(rows):
+        output[i][0] = edge_colors[i % len(edge_colors)]
+        output[i][-1] = edge_colors[(i + len(edge_colors)//2) % len(edge_colors)]
+    for j in range(cols):
+        output[0][j] = edge_colors[(j + len(edge_colors)//4) % len(edge_colors)]
+        output[-1][j] = edge_colors[(j + 3*len(edge_colors)//4) % len(edge_colors)]
+    
+    # Ensure key colors are present
+    for color in abstract_rep['key_colors']:
         if color not in [cell for row in output for cell in row]:
-            # Find a suitable position to place the missing color
-            for r in range(rows):
-                for c in range(cols):
-                    if output[r][c] not in key_colors:
-                        output[r][c] = color
-                        break
-                if color in [cell for row in output for cell in row]:
-                    break
+            r, c = rows//2, cols//2
+            while output[r][c] in abstract_rep['key_colors']:
+                r = (r + 1) % rows
+                c = (c + 1) % cols
+            output[r][c] = color
+    
+    # Apply symmetry if detected
+    if abstract_rep['symmetry']['horizontal']:
+        for r in range(rows//2):
+            output[rows-1-r] = output[r].copy()
+    if abstract_rep['symmetry']['vertical']:
+        for r in range(rows):
+            for c in range(cols//2):
+                output[r][cols-1-c] = output[r][c]
     
     return output
