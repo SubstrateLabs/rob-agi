@@ -4,20 +4,20 @@ import math
 
 def solve_0e671a1a(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the grid transformation challenge by creating a rectangular gray path
-    that encloses all colored squares and fills the enclosed area.
+    Solve the grid transformation challenge by creating an optimal gray path
+    that connects all colored squares and partially fills the enclosed area.
 
     1. Find the colored squares (red, yellow, green).
-    2. Determine the bounding rectangle for these squares.
-    3. Draw a gray rectangular path along the bounding rectangle.
-    4. Fill the enclosed area with gray.
-    5. Restore the original colored squares.
+    2. Determine the optimal path connecting these squares.
+    3. Draw the gray path along the determined route.
+    4. Partially fill the enclosed area with gray, stopping at colored squares.
+    5. Preserve the original colored squares.
 
     Args:
     input_grid (ColoredGrid): The input grid with three colored squares.
 
     Returns:
-    ColoredGrid: The transformed grid with the gray rectangular path and filled area.
+    ColoredGrid: The transformed grid with the optimal gray path and partially filled area.
     """
     def find_colored_squares(grid: ColoredGrid) -> List[Tuple[int, int, int]]:
         squares = []
@@ -27,25 +27,34 @@ def solve_0e671a1a(input_grid: ColoredGrid) -> ColoredGrid:
                     squares.append((r, c, grid[r][c]))
         return squares
 
-    def get_bounding_rectangle(squares: List[Tuple[int, int, int]]) -> Tuple[int, int, int, int]:
-        min_r = min(s[0] for s in squares)
-        min_c = min(s[1] for s in squares)
-        max_r = max(s[0] for s in squares)
-        max_c = max(s[1] for s in squares)
-        return min_r, min_c, max_r, max_c
-
     output_grid = input_grid.deep_copy()
     colored_squares = find_colored_squares(output_grid)
-    min_r, min_c, max_r, max_c = get_bounding_rectangle(colored_squares)
 
-    # Draw rectangular path and fill enclosed area
-    for r in range(min_r, max_r + 1):
-        for c in range(min_c, max_c + 1):
-            if r == min_r or r == max_r or c == min_c or c == max_c or (min_r < r < max_r and min_c < c < max_c):
-                output_grid[r][c] = 5  # Gray
+    # Determine the optimal path
+    left = min(square[1] for square in colored_squares)
+    right = max(square[1] for square in colored_squares)
+    top = min(square[0] for square in colored_squares)
+    bottom = max(square[0] for square in colored_squares)
 
-    # Restore original colored squares
-    for r, c, color in colored_squares:
-        output_grid[r][c] = color
+    # Draw the path and fill the enclosed area
+    for r in range(top, bottom + 1):
+        left_edge = right
+        right_edge = left
+        for c in range(left, right + 1):
+            if output_grid[r][c] in [2, 3, 4, 5]:
+                left_edge = min(left_edge, c)
+                right_edge = max(right_edge, c)
+        
+        for c in range(left_edge, right_edge + 1):
+            if output_grid[r][c] == 0:
+                output_grid[r][c] = 5
+            elif output_grid[r][c] in [2, 3, 4]:
+                break
+
+    # Draw vertical lines
+    for c in [left, right]:
+        for r in range(top, bottom + 1):
+            if output_grid[r][c] == 0:
+                output_grid[r][c] = 5
 
     return output_grid
