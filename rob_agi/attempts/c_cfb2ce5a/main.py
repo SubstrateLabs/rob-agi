@@ -1,6 +1,7 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Dict
 from collections import deque, Counter
+import random
 
 def solve_cfb2ce5a(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -18,7 +19,9 @@ def solve_cfb2ce5a(input_grid: ColoredGrid) -> ColoredGrid:
        d. Check and Adjust: Adjust expansion priorities based on current vs target frequencies.
     5. Maintain the black border throughout the process.
     6. Make final adjustments for symmetry and color balance.
-    7. Return the transformed grid.
+    7. Enhance connectivity for isolated color instances.
+    8. Perform iterative refinement to balance color distribution.
+    9. Return the transformed grid.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -102,16 +105,49 @@ def solve_cfb2ce5a(input_grid: ColoredGrid) -> ColoredGrid:
         for r, c in empty_cells:
             neighbors = [grid.values[r+dr][c+dc] for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)] if 0 < r+dr < rows-1 and 0 < c+dc < cols-1]
             if neighbors:
-                grid.values[r][c] = random.choices(colors, weights=weights)[0]
+                neighbor_colors = [color for color in neighbors if color != 0]
+                if neighbor_colors:
+                    grid.values[r][c] = max(set(neighbor_colors), key=neighbor_colors.count)
+                else:
+                    grid.values[r][c] = random.choices(colors, weights=weights)[0]
 
     def adjust_symmetry():
-        # Simple vertical symmetry adjustment
+        # Improved vertical symmetry adjustment
         for r in range(1, rows - 1):
             for c in range(1, cols // 2):
-                if random.random() < 0.5:
-                    grid.values[r][cols - 1 - c] = grid.values[r][c]
-                else:
-                    grid.values[r][c] = grid.values[r][cols - 1 - c]
+                left_color = grid.values[r][c]
+                right_color = grid.values[r][cols - 1 - c]
+                if left_color != right_color:
+                    if random.random() < 0.5:
+                        grid.values[r][cols - 1 - c] = left_color
+                    else:
+                        grid.values[r][c] = right_color
+
+    def enhance_connectivity():
+        for color in colors:
+            positions = get_color_positions(color)
+            if len(positions) > 1:
+                for i in range(len(positions) - 1):
+                    start = positions[i]
+                    end = positions[i + 1]
+                    path = find_path(start, end)
+                    for r, c in path:
+                        if grid.values[r][c] == 0:
+                            grid.values[r][c] = color
+
+    def find_path(start: Tuple[int, int], end: Tuple[int, int]) -> List[Tuple[int, int]]:
+        queue = deque([(start, [start])])
+        visited = set([start])
+        while queue:
+            (r, c), path = queue.popleft()
+            if (r, c) == end:
+                return path
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                nr, nc = r + dr, c + dc
+                if 1 <= nr < rows - 1 and 1 <= nc < cols - 1 and (nr, nc) not in visited:
+                    visited.add((nr, nc))
+                    queue.append(((nr, nc), path + [(nr, nc)]))
+        return []
 
     def maintain_border():
         for r in range(rows):
@@ -131,8 +167,13 @@ def solve_cfb2ce5a(input_grid: ColoredGrid) -> ColoredGrid:
             handle_boundary_interaction(color, target_frequencies)
         
         fill_empty_spaces(target_frequencies)
+        enhance_connectivity()
+        adjust_symmetry()
         maintain_border()
 
+    # Final adjustments
+    fill_empty_spaces(target_frequencies)
+    enhance_connectivity()
     adjust_symmetry()
     maintain_border()
 
