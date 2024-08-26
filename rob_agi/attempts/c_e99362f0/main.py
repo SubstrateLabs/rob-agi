@@ -8,11 +8,10 @@ def solve_e99362f0(input_grid: ColoredGrid) -> ColoredGrid:
     Transform the input 11x9 grid into a 5x4 output grid by following these steps:
     1. Analyze the top and bottom halves of the input grid separately.
     2. Identify dominant colors and their spatial distribution in each half.
-    3. Initialize the output grid.
-    4. Place dominant colors from the input into corresponding areas of the output.
-    5. Create transitions and balance color distribution.
-    6. Maintain spatial relationships and introduce variety.
-    7. Make final adjustments for visual appeal and pattern representation.
+    3. Create a color palette based on the input grid's color distribution.
+    4. Generate the output grid using the color palette, maintaining spatial relationships.
+    5. Ensure color variety and balance in the output grid.
+    6. Make final adjustments for visual appeal and pattern representation.
     """
     
     def analyze_half(grid: List[List[int]], start_row: int, end_row: int) -> Dict[int, int]:
@@ -26,29 +25,25 @@ def solve_e99362f0(input_grid: ColoredGrid) -> ColoredGrid:
     top_count = analyze_half(input_grid.values, 0, 5)
     bottom_count = analyze_half(input_grid.values, 6, 11)
 
-    def get_main_colors(count_dict: Dict[int, int], n: int) -> List[int]:
-        return [color for color, _ in sorted(count_dict.items(), key=lambda x: x[1], reverse=True)[:n]]
+    def get_color_palette(top_count: Dict[int, int], bottom_count: Dict[int, int]) -> List[int]:
+        all_colors = set(top_count.keys()) | set(bottom_count.keys())
+        palette = []
+        for color in all_colors:
+            weight = top_count.get(color, 0) + bottom_count.get(color, 0)
+            palette.extend([color] * weight)
+        return palette
 
-    top_colors = get_main_colors(top_count, 3)
-    bottom_colors = get_main_colors(bottom_count, 3)
-    all_colors = list(set(top_colors + bottom_colors))
+    color_palette = get_color_palette(top_count, bottom_count)
 
     output = [[0 for _ in range(4)] for _ in range(5)]
 
-    # Place top colors
-    for r in range(2):
+    # Fill the output grid
+    for r in range(5):
         for c in range(4):
-            output[r][c] = random.choice(top_colors)
+            output[r][c] = random.choice(color_palette)
 
-    # Place bottom colors
-    for r in range(3, 5):
-        for c in range(4):
-            output[r][c] = random.choice(bottom_colors)
-
-    # Create transitions in the middle row
-    output[2] = [random.choice(all_colors) for _ in range(4)]
-
-    # Ensure all main colors are represented
+    # Ensure color variety
+    all_colors = set(color_palette)
     for color in all_colors:
         if color not in [cell for row in output for cell in row]:
             r, c = random.randint(0, 4), random.randint(0, 3)
@@ -62,17 +57,23 @@ def solve_e99362f0(input_grid: ColoredGrid) -> ColoredGrid:
     
     for r in range(5):
         for c in range(4):
-            if color_count[output[r][c]] > 3:
+            if color_count[output[r][c]] > 4:
                 less_common = min(color_count, key=color_count.get)
                 if color_count[less_common] < 2:
                     output[r][c] = less_common
                     color_count[output[r][c]] -= 1
                     color_count[less_common] += 1
 
+    # Maintain spatial relationships
+    top_dominant = max(top_count, key=top_count.get)
+    bottom_dominant = max(bottom_count, key=bottom_count.get)
+    output[0][0] = top_dominant
+    output[4][3] = bottom_dominant
+
     # Final adjustments
-    if output[0] == output[1]:
-        output[1][1], output[1][2] = output[1][2], output[1][1]
-    if output[3] == output[4]:
-        output[4][1], output[4][2] = output[4][2], output[4][1]
+    if len(set(output[0])) < 2:
+        output[0][1] = random.choice([c for c in all_colors if c != output[0][0]])
+    if len(set(output[4])) < 2:
+        output[4][2] = random.choice([c for c in all_colors if c != output[4][3]])
 
     return ColoredGrid(values=output)
