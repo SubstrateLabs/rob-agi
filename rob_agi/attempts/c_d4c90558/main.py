@@ -10,7 +10,8 @@ def solve_d4c90558(input_grid: ColoredGrid) -> ColoredGrid:
     of their first appearance in the input grid. The output grid is created with each row
     representing a color, and all rows are padded to have the same length as the overall
     largest width found. The colors are arranged in order of their topmost occurrence,
-    with ties broken by leftmost position.
+    with ties broken by leftmost position. Gray (5) is treated as a continuation of the
+    current color when calculating contiguous widths.
     
     Args:
     input_grid (ColoredGrid): The input grid to process.
