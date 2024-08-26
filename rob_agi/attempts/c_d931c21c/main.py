@@ -12,7 +12,7 @@ def solve_d931c21c(input_grid: ColoredGrid) -> ColoredGrid:
     3. Blue cells remain unchanged.
     4. If no closed shapes are found, the original grid is returned.
     5. Handles nested shapes correctly by processing them in order of discovery.
-    6. Considers shapes touching the grid edge as potentially closed.
+    6. Considers shapes touching the grid edge as closed if they enclose space.
 
     The transformation is applied only once, not iteratively.
     """
@@ -41,12 +41,28 @@ def solve_d931c21c(input_grid: ColoredGrid) -> ColoredGrid:
         return shape
 
     def is_closed_shape(shape: Set[Tuple[int, int]]) -> bool:
+        inside_cells = set()
         for r, c in shape:
             for nr, nc in get_neighbors(r, c):
                 if (nr, nc) not in shape and new_grid.get_cell(nr, nc) == 0:  # Black
-                    if 0 < nr < rows - 1 and 0 < nc < cols - 1:
-                        return True
-        return False
+                    inside_cells.add((nr, nc))
+        
+        if not inside_cells:
+            return False
+
+        # Check if all inside cells are connected
+        start = next(iter(inside_cells))
+        connected = set()
+        queue = deque([start])
+        while queue:
+            r, c = queue.popleft()
+            if (r, c) not in connected:
+                connected.add((r, c))
+                for nr, nc in get_neighbors(r, c):
+                    if (nr, nc) in inside_cells and (nr, nc) not in connected:
+                        queue.append((nr, nc))
+        
+        return len(connected) == len(inside_cells)
 
     def flood_fill(start_row: int, start_col: int, target_color: int, replacement_color: int) -> None:
         if target_color == replacement_color:
