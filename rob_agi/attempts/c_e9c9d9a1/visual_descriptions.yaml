@@ -1,0 +1,50 @@
+example_0:
+  input: |
+    The input grid is 19x12 in size. It consists of mostly black (0) squares with a pattern of green (3) lines. There are three horizontal green lines spanning the full width of the grid at rows 5, 8, and 13. There are also two vertical green lines running the full height of the grid at columns 4 and 7. This creates a grid-like structure dividing the space into nine sections.
+  output: |
+    The output grid maintains the same green (3) line structure as the input. The nine sections created by the green lines are now filled with different colors:
+    1. Top-left section (3x4): filled with red (2)
+    2. Top-middle section (3x3): remains black (0)
+    3. Top-right section (3x5): filled with yellow (4)
+    4. Middle-left section (3x4): remains black (0)
+    5. Center section (3x3): filled with orange (7)
+    6. Middle-right section (3x5): remains black (0)
+    7. Bottom-left section (6x4): filled with blue (1)
+    8. Bottom-middle section (6x3): remains black (0)
+    9. Bottom-right section (6x5): filled with sky blue (8)
+
+example_1:
+  input: |
+    The input grid is 15x12 in size. It consists of mostly black (0) squares with a pattern of green (3) lines. There are two horizontal green lines spanning the full width of the grid at rows 4 and 11. There are also two vertical green lines running the full height of the grid at columns 4 and 8. This creates a grid-like structure dividing the space into nine sections.
+  output: |
+    The output grid maintains the same green (3) line structure as the input. The nine sections created by the green lines are now filled with different colors:
+    1. Top-left section (4x4): filled with red (2)
+    2. Top-middle section (4x4): remains black (0)
+    3. Top-right section (4x4): filled with yellow (4)
+    4. Middle-left section (7x4): remains black (0)
+    5. Center section (7x4): filled with orange (7)
+    6. Middle-right section (7x4): remains black (0)
+    7. Bottom-left section (4x4): filled with blue (1)
+    8. Bottom-middle section (4x4): remains black (0)
+    9. Bottom-right section (4x4): filled with sky blue (8)
+
+example_2:
+  input: |
+    The input grid is 18x16 in size. It consists of mostly black (0) squares with a pattern of green (3) lines. There are four horizontal green lines spanning the full width of the grid at rows 3, 8, 11, and 14. There are also four vertical green lines running the full height of the grid at columns 4, 8, 12, and 15. This creates a grid-like structure dividing the space into 25 sections.
+  output: |
+    The output grid maintains the same green (3) line structure as the input. The 25 sections created by the green lines are now filled with different colors:
+    1. Top-left corner (3x4): filled with red (2)
+    2. Top edge sections (3x4 each, 3 sections): remain black (0)
+    3. Top-right corner (3x1): filled with yellow (4)
+    4. Left edge sections (5x4 each, 3 sections): remain black (0)
+    5. Internal sections (5x4 each, 9 sections): filled with orange (7)
+    6. Right edge sections (5x1 each, 3 sections): remain black (0)
+    7. Bottom-left corner (4x4): filled with blue (1)
+    8. Bottom edge sections (4x4 each, 3 sections): remain black (0)
+    9. Bottom-right corner (4x1): filled with sky blue (8)
+
+test_case_0:
+  input: |
+    The input grid is 18x16 in size. It consists of mostly black (0) squares with a pattern of green (3) lines. There are four horizontal green lines spanning the full width of the grid at rows 3, 8, 11, and 14. There are also four vertical green lines running the full height of the grid at columns 4, 8, 12, and 15. This creates a grid-like structure dividing the space into 25 sections.
+  output: |
+    The output is not provided for the test case.
