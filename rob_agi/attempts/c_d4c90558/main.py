@@ -38,10 +38,12 @@ def solve_d4c90558(input_grid: ColoredGrid) -> ColoredGrid:
     for r in range(rows):
         for c in range(cols):
             color = input_grid.get_cell(r, c)
-            if color not in [0, 5] and color not in color_sizes:
+            if color not in [0, 5]:
+                if color not in color_sizes:
+                    color_order.append(color)
+                    color_sizes[color] = 0
                 size = find_largest_square(r, c, color)
-                color_sizes[color] = size
-                color_order.append(color)
+                color_sizes[color] = max(color_sizes[color], size)
 
     max_size = max(color_sizes.values()) if color_sizes else 0
     output_rows = []
