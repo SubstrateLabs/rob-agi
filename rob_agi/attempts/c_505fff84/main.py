@@ -11,16 +11,15 @@ def solve_505fff84(input_grid: ColoredGrid) -> ColoredGrid:
     2. Analyzes the distribution and structure of red squares
     3. Determines the appropriate output size based on input characteristics
     4. Creates an abstract pattern that captures the essence of the input
-    5. Refines and balances the pattern to match input density and structure
-    6. Adjusts the pattern to ensure it starts with a non-red square if possible
+    5. Refines the pattern to match input structure, focusing on frame-like patterns
+    6. Balances the pattern to match input density
     7. Returns the final pattern as a new ColoredGrid
     """
     binary_grid = convert_to_binary(input_grid)
     features = extract_features(binary_grid)
     output_size = determine_output_size(binary_grid, features)
-    abstract_pattern = create_abstract_pattern(binary_grid, features, output_size)
+    abstract_pattern = create_frame_pattern(binary_grid, features, output_size)
     final_pattern = refine_and_balance_pattern(abstract_pattern, features)
-    final_pattern = adjust_pattern_start(final_pattern)
     return ColoredGrid(values=final_pattern)
 
 def adjust_pattern_start(pattern: List[List[int]]) -> List[List[int]]:
@@ -84,71 +83,62 @@ def determine_output_size(binary_grid: np.ndarray, features: dict) -> Tuple[int,
         return (1, min(7, input_cols))
     elif aspect_ratio < 0.5:
         return (min(5, input_rows), 1)
-    elif input_rows <= 5 and input_cols <= 6:
-        return (input_rows, input_cols)
     else:
-        rows = min(3, input_rows)
-        cols = min(6, input_cols)
-        return (rows, cols)
+        return (5, 5)  # Use a fixed 5x5 grid for most cases
 
-def create_abstract_pattern(binary_grid: np.ndarray, features: dict, output_size: Tuple[int, int]) -> np.ndarray:
+def create_frame_pattern(binary_grid: np.ndarray, features: dict, output_size: Tuple[int, int]) -> np.ndarray:
     output = np.zeros(output_size, dtype=int)
     input_rows, input_cols = binary_grid.shape
     output_rows, output_cols = output_size
     
-    # Map significant features
-    for i in range(output_rows):
-        for j in range(output_cols):
-            input_i = int(i * input_rows / output_rows)
-            input_j = int(j * input_cols / output_cols)
-            region = binary_grid[input_i:input_i+input_rows//output_rows, input_j:input_j+input_cols//output_cols]
-            output[i, j] = 1 if np.mean(region) > 0.2 else 0
+    # Create frame
+    output[0, :] = 1
+    output[-1, :] = 1
+    output[:, 0] = 1
+    output[:, -1] = 1
     
-    # Represent frame if detected
-    if features['frame']:
-        output[0, :] = 1
-        output[-1, :] = 1
-        output[:, 0] = 1
-        output[:, -1] = 1
+    # Fill interior based on input density
+    interior_density = np.mean(binary_grid[1:-1, 1:-1])
+    interior_threshold = 0.3
+    if interior_density > interior_threshold:
+        output[1:-1, 1:-1] = 1
     
-    # Maintain symmetry if detected
-    vertical_sym, horizontal_sym = features['symmetry']
-    if vertical_sym:
-        output = (output + np.fliplr(output)) // 2
-    if horizontal_sym:
-        output = (output + np.flipud(output)) // 2
-    
-    # Ensure at least one red square
-    if np.sum(output) == 0:
-        output[0, -1] = 1  # Place a red square at the top-right corner
+    # Adjust corners based on input
+    if not np.any(binary_grid[0:input_rows//3, 0:input_cols//3]):
+        output[0, 0] = 0
+    if not np.any(binary_grid[0:input_rows//3, -input_cols//3:]):
+        output[0, -1] = 0
+    if not np.any(binary_grid[-input_rows//3:, 0:input_cols//3]):
+        output[-1, 0] = 0
+    if not np.any(binary_grid[-input_rows//3:, -input_cols//3:]):
+        output[-1, -1] = 0
     
     return output
 
 def refine_and_balance_pattern(pattern: np.ndarray, features: dict) -> List[List[int]]:
     target_density = features['density']
     current_density = np.mean(pattern)
-    total_cells = pattern.size
-    target_red_cells = int(round(target_density * total_cells))
-    current_red_cells = np.sum(pattern)
     
-    while current_red_cells != target_red_cells:
-        if current_red_cells < target_red_cells:
-            # Add a red square
-            zero_indices = np.where(pattern == 0)
-            if len(zero_indices[0]) > 0:
-                idx = np.random.randint(len(zero_indices[0]))
-                pattern[zero_indices[0][idx], zero_indices[1][idx]] = 1
-                current_red_cells += 1
-        else:
-            # Remove a red square
-            one_indices = np.where(pattern == 1)
-            if len(one_indices[0]) > 0:
-                idx = np.random.randint(len(one_indices[0]))
-                pattern[one_indices[0][idx], one_indices[1][idx]] = 0
-                current_red_cells -= 1
+    # Adjust density
+    if current_density > target_density:
+        # Remove red squares from the interior
+        interior = pattern[1:-1, 1:-1]
+        interior_ones = np.where(interior == 1)
+        num_to_remove = int((current_density - target_density) * pattern.size)
+        for _ in range(min(num_to_remove, len(interior_ones[0]))):
+            idx = np.random.randint(len(interior_ones[0]))
+            pattern[1 + interior_ones[0][idx], 1 + interior_ones[1][idx]] = 0
+    elif current_density < target_density:
+        # Add red squares to the interior
+        interior = pattern[1:-1, 1:-1]
+        interior_zeros = np.where(interior == 0)
+        num_to_add = int((target_density - current_density) * pattern.size)
+        for _ in range(min(num_to_add, len(interior_zeros[0]))):
+            idx = np.random.randint(len(interior_zeros[0]))
+            pattern[1 + interior_zeros[0][idx], 1 + interior_zeros[1][idx]] = 1
     
     # Ensure at least one red square
     if np.sum(pattern) == 0:
-        pattern[-1, -1] = 1  # Place a red square at the bottom-right corner
+        pattern[0, 0] = 1  # Place a red square at the top-left corner
     
     return [[2 if cell else 0 for cell in row] for row in pattern]
