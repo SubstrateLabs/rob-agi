@@ -3,12 +3,16 @@ from typing import List, Tuple
 
 def solve_11e1fe23(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by connecting the three colored dots with a zigzag line.
+    Transforms the input grid by connecting the top three colored dots with a Z-shaped zigzag line.
     
     1. Identifies all colored dots in the grid.
-    2. Sorts the dots based on their vertical position (top to bottom).
-    3. Creates a zigzag path connecting these dots.
-    4. Draws the path on a copy of the input grid.
+    2. Selects the top three dots based on their vertical position.
+    3. Creates a Z-shaped zigzag path connecting these dots:
+       - Vertical line from top dot to midpoint
+       - Horizontal line across midpoint
+       - Vertical line from midpoint to bottom dot
+    4. Calculates a new color for the middle segment of the zigzag.
+    5. Draws the path on a copy of the input grid.
     
     Returns the new grid with the added zigzag path.
     """
@@ -21,21 +25,22 @@ def solve_11e1fe23(input_grid: ColoredGrid) -> ColoredGrid:
     if len(colored_dots) < 3:
         return input_grid  # Not enough dots to form a zigzag
     
-    # Step 2: Sort dots vertically
-    sorted_dots = sorted(colored_dots, key=lambda x: x[0])
+    # Step 2: Sort dots vertically and select top 3
+    sorted_dots = sorted(colored_dots, key=lambda x: x[0])[:3]
     
     # Step 3: Create zigzag path
-    path = []
-    for i in range(len(sorted_dots) - 1):
-        start = sorted_dots[i]
-        end = sorted_dots[i + 1]
-        mid_row = (start[0] + end[0]) // 2
-        path.extend([
-            (start[0], start[1], start[2]),
-            (mid_row, start[1], start[2]),
-            (mid_row, end[1], end[2]),
-            (end[0], end[1], end[2])
-        ])
+    dot1, dot2, dot3 = sorted_dots
+    midpoint_row = (dot1[0] + dot3[0]) // 2
+    middle_color = (dot1[2] + dot2[2]) % 10
+    
+    path = [
+        (dot1[0], dot1[1], dot1[2]),
+        (midpoint_row, dot1[1], dot1[2]),
+        (midpoint_row, dot1[1], middle_color),
+        (midpoint_row, dot3[1], middle_color),
+        (midpoint_row, dot3[1], dot3[2]),
+        (dot3[0], dot3[1], dot3[2])
+    ]
     
     # Step 4: Draw the path
     new_grid = input_grid.deep_copy()
