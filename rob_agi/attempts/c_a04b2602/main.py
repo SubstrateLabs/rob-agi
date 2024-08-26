@@ -7,16 +7,17 @@ def solve_a04b2602(input_grid: ColoredGrid) -> ColoredGrid:
     Transform the input grid by applying complex blue patterns to green regions.
     
     The transformation follows these steps:
-    1. Identify contiguous green (3) regions.
-    2. For each green region:
-       a. Find red (2) dots within the region.
-       b. Create initial blue (1) patterns around red dots.
-       c. Expand blue patterns organically within the green area.
-       d. Connect blue areas in larger regions.
+    1. Identify contiguous green (3) regions using flood fill.
+    2. Analyze red (2) dot distribution within each green region.
+    3. For each green region:
+       a. Initialize transformation parameters based on region size and red dot density.
+       b. Create blue (1) patterns starting from red dots, expanding organically.
+       c. Adjust blue formation probability based on distance from red dots and region edges.
+       d. Ensure connectivity of blue areas in larger regions.
        e. Preserve some green cells, especially near edges and as islands.
-    3. Handle small green regions differently.
-    4. Preserve original red dots and areas outside green regions.
-    5. Fine-tune the balance between blue and green areas.
+    4. Handle small green regions differently, with simpler patterns.
+    5. Fine-tune patterns to reduce isolated cells and improve organic appearance.
+    6. Preserve original red dots and areas outside green regions.
     
     Returns a new ColoredGrid with the transformed pattern.
     """
