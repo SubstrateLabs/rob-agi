@@ -9,7 +9,8 @@ def solve_a57f2f04(input_grid: ColoredGrid) -> ColoredGrid:
     The function identifies non-sky blue regions in the input grid and replaces them
     with specific patterns based on the color of non-black elements:
     - For green (3): 3x3 pattern with color in corners and center.
-    - For all other colors: 2x2 checkerboard pattern, starting with the color.
+    - For red (2): 3x3 pattern with specific arrangement.
+    - For other colors: 2x2 checkerboard pattern, starting with the color.
     The sky blue (8) background remains unchanged.
     
     Args:
@@ -63,6 +64,8 @@ def determine_color(grid: ColoredGrid, region: List[Tuple[int, int]]) -> Optiona
 def generate_pattern(color: int) -> List[List[int]]:
     if color == 3:  # Green
         return [[3, 0, 3], [0, 3, 0], [3, 0, 3]]
+    elif color == 2:  # Red
+        return [[0, 2, 0], [2, 2, 2], [0, 2, 0]]
     else:
         return [[color, 0], [0, color]]
 
