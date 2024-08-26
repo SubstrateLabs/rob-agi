@@ -4,25 +4,18 @@ from typing import List, Tuple
 def solve_aa4ec2a5(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by applying the following rules:
-    1. Initializes the output grid with yellow (4) background and red (2) outer border.
+    1. Preserves the yellow (4) background where no blue regions exist.
     2. Identifies and classifies blue (1) regions based on size.
-    3. Creates a primary segmentation structure with red (2) lines every 5 cells.
-    4. Processes large regions (>9 cells): outlines with red (2), fills with sky blue (8), and adds internal structure with blue (1) and magenta (6).
-    5. Processes medium regions (4-9 cells): outlines with red (2), fills with blue (1), and adds simple internal structure.
-    6. Processes small regions (1-3 cells): creates special structures with red (2) outline and blue (1) fill.
-    7. Adjusts intersections and corners to ensure proper connectivity of red lines.
-    8. Refines color distribution in large regions for balance.
-    9. Preserves background structure and handles special cases.
-    10. Performs a final pass to ensure consistency and proper integration with borders.
-    11. Validates the output to meet all criteria of a valid ColoredGrid.
+    3. Processes large regions (>9 cells): outlines with red (2), fills with sky blue (8), and adds internal structure.
+    4. Processes medium regions (4-9 cells): outlines with red (2), fills with blue (1).
+    5. Processes small regions (1-3 cells): creates special structures with red (2) outline and blue (1) or sky blue (8) fill.
+    6. Adds a red (2) border around transformed regions and at grid edges.
+    7. Creates a subtle grid structure with red (2) lines every 5 cells in untransformed areas.
+    8. Adjusts intersections and corners to ensure proper connectivity of red lines.
+    9. Performs a final pass to ensure consistency and proper integration of all elements.
     """
     def initialize_grid(input_grid: ColoredGrid) -> ColoredGrid:
-        new_grid = ColoredGrid(values=[[4 for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
-        for y in range(new_grid.num_rows):
-            new_grid.values[y][0] = new_grid.values[y][-1] = 2
-        for x in range(new_grid.num_cols):
-            new_grid.values[0][x] = new_grid.values[-1][x] = 2
-        return new_grid
+        return ColoredGrid(values=[row[:] for row in input_grid.values])
 
     def find_blue_regions(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
         visited = set()
