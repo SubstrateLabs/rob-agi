@@ -1,26 +1,35 @@
 example_0:
   input: |
-    A 20x20 grid with a green (3) cross shape. The cross is formed by a vertical line in column 7 and a horizontal line in row 5. The rest of the grid is filled with black (0).
+    A 20x20 grid with a green (3) cross shape. The cross is formed by a vertical line in column 7 and a horizontal line in row 5. All other cells are black (0).
   output: |
-    The same 20x20 grid with the green (3) cross maintained. Additionally, a complex yellow (4) pattern has been added. This pattern consists of:
-    1. A yellow border around the entire grid, except where it intersects with the green cross.
-    2. Yellow rectangles of varying sizes in each quadrant created by the green cross.
-    3. These rectangles are nested, with the largest ones near the cross and smaller ones towards the corners.
-    4. The spaces between the yellow rectangles remain black (0).
+    The 20x20 grid maintains the green (3) cross. A yellow (4) pattern is added:
+    1. Border: Yellow cells alternate with black, starting with yellow at top-left and bottom-right corners.
+    2. Quadrants: Each quadrant formed by the green cross contains a distinct pattern:
+       a. Top-left and bottom-right: L-shaped yellow structures grow outward from the cross.
+       b. Top-right and bottom-left: Inverted L-shaped yellow structures grow outward from the cross.
+    3. Pattern growth: In each quadrant, the yellow structures start small near the cross and increase in size towards the corners.
+    4. Symmetry: The pattern is symmetrical across both the horizontal and vertical green lines, with a half-cell offset due to the alternating border.
+    5. Black spaces: Areas between yellow structures remain black (0), creating a maze-like appearance.
 
 example_1:
   input: |
-    A 10x10 grid with a green (3) cross shape. The cross is formed by a vertical line in column 6 and a horizontal line in row 4. The rest of the grid is filled with black (0).
+    A 10x10 grid with a green (3) cross shape. The cross is formed by a vertical line in column 6 and a horizontal line in row 4. All other cells are black (0).
   output: |
-    The same 10x10 grid with the green (3) cross maintained. A yellow (4) pattern has been added:
-    1. A yellow border around the entire grid, except where it intersects with the green cross.
-    2. In each quadrant created by the green cross, there are nested yellow rectangles.
-    3. The largest rectangle is adjacent to the cross, with smaller ones inside it.
-    4. The spaces between the yellow rectangles and inside the innermost rectangle remain black (0).
-    5. The pattern is symmetrical across both the horizontal and vertical axes of the cross.
+    The 10x10 grid preserves the green (3) cross. A yellow (4) pattern is added:
+    1. Border: Yellow cells alternate with black, starting with yellow at top-left and bottom-right corners.
+    2. Quadrants: Each quadrant created by the green cross contains:
+       a. Top-left: Two L-shaped yellow structures, growing larger away from the cross.
+       b. Top-right: Two inverted L-shaped yellow structures, growing larger towards the corner.
+       c. Bottom-left and bottom-right: Similar patterns to top-right and top-left, respectively.
+    3. Pattern growth: Yellow structures increase in size as they move away from the cross in each quadrant.
+    4. Symmetry: The pattern is symmetrical across both green lines, with a half-cell offset due to the alternating border.
+    5. Black spaces: Areas between yellow structures and inside the innermost structures remain black (0).
 
-test_case_0:
-  input: |
-    There is no test case provided in the given test file. The file only contains two example cases.
-  output: |
-    As there is no test case provided, there is no output to describe.
+general_observations:
+  pattern_rules: |
+    1. The green cross always remains unchanged from the input.
+    2. The border alternates between yellow and black, with specific starting points.
+    3. Each quadrant has a unique fill pattern based on its position relative to the cross.
+    4. The yellow structures grow in size as they move away from the cross.
+    5. The overall pattern maintains rotational symmetry, with a half-cell offset.
+    6. The pattern scales consistently regardless of grid size, filling available space in each quadrant.
