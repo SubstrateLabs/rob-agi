@@ -8,12 +8,13 @@ def solve_da515329(input_grid: ColoredGrid) -> ColoredGrid:
     
     The solution involves the following steps:
     1. Analyze the input grid to find the central structure
-    2. Create the outer frame
-    3. Implement a growth algorithm to generate an asymmetrical pattern
-    4. Ensure connectivity of all sky-colored pixels
-    5. Balance the pattern across quadrants
-    6. Add structural elements to large empty areas
-    7. Perform final adjustments
+    2. Create a new grid with a border frame
+    3. Copy the central structure from the input grid
+    4. Implement a growth algorithm to generate an asymmetrical pattern
+    5. Ensure connectivity of all sky-colored pixels
+    6. Balance the pattern across quadrants
+    7. Add structural elements to large empty areas
+    8. Perform final adjustments
     
     Args:
     input_grid (ColoredGrid): The input grid containing a central structure
@@ -25,7 +26,7 @@ def solve_da515329(input_grid: ColoredGrid) -> ColoredGrid:
     new_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
     
     center = analyze_input(input_grid)
-    create_outer_frame(new_grid)
+    create_border_frame(new_grid)
     copy_central_structure(new_grid, input_grid)
     growth_algorithm(new_grid, center)
     ensure_connectivity(new_grid, center)
@@ -40,13 +41,14 @@ def analyze_input(grid: ColoredGrid) -> tuple:
     sky_pixels = [(r, c) for r in range(rows) for c in range(cols) if grid.values[r][c] == 8]
     return (sum(r for r, _ in sky_pixels) // len(sky_pixels), sum(c for _, c in sky_pixels) // len(sky_pixels))
 
-def create_outer_frame(grid: ColoredGrid):
+def create_border_frame(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
     for r in range(rows):
-        grid.values[r][0] = grid.values[r][cols-1] = 8
+        grid.values[r][-1] = 8  # Right border
     for c in range(cols):
-        grid.values[0][c] = grid.values[rows-1][c] = 8
-    grid.values[0][0] = 0  # Keep top-left corner black
+        grid.values[-1][c] = 8  # Bottom border
+    for c in range(1, cols):
+        grid.values[0][c] = 8  # Top border (except top-left corner)
 
 def copy_central_structure(new_grid: ColoredGrid, input_grid: ColoredGrid):
     rows, cols = new_grid.get_dimensions()
@@ -64,10 +66,11 @@ def growth_algorithm(grid: ColoredGrid, center: tuple):
         r, c = queue.popleft()
         for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
             nr, nc = r + dr, c + dc
-            if 0 < nr < rows-1 and 0 < nc < cols-1 and (nr, nc) not in visited:
+            if 0 <= nr < rows and 0 <= nc < cols and (nr, nc) not in visited:
                 distance_factor = 1 - (((nr - center[0])**2 + (nc - center[1])**2)**0.5) / (rows + cols)
-                density_factor = 1 - sum(grid.values[nr+i][nc+j] == 8 for i in [-1, 0, 1] for j in [-1, 0, 1]) / 9
-                if random.random() < 0.3 * distance_factor + 0.3 * density_factor + 0.4:
+                density_factor = 1 - sum(grid.values[nr+i][nc+j] == 8 for i in [-1, 0, 1] for j in [-1, 0, 1] if 0 <= nr+i < rows and 0 <= nc+j < cols) / 9
+                direction_bias = 0.1 if dr > 0 or dc > 0 else 0  # Slight bias towards bottom and right
+                if random.random() < 0.3 * distance_factor + 0.3 * density_factor + 0.3 + direction_bias:
                     grid.values[nr][nc] = 8
                     queue.append((nr, nc))
                 visited.add((nr, nc))
@@ -130,7 +133,7 @@ def balance_pattern(grid: ColoredGrid):
 
 def add_structural_elements(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
-    for _ in range(rows * cols // 200):  # Add about 0.5% of grid size as structural elements
+    for _ in range(rows * cols // 100):  # Add about 1% of grid size as structural elements
         r, c = random.randint(1, rows-3), random.randint(1, cols-3)
         if all(grid.values[r+i][c+j] == 0 for i in range(2) for j in range(2)):
             for i in range(2):
@@ -139,3 +142,8 @@ def add_structural_elements(grid: ColoredGrid):
 
 def final_adjustments(grid: ColoredGrid):
     grid.values[0][0] = 0  # Ensure top-left corner is black
+    rows, cols = grid.get_dimensions()
+    for r in range(1, rows-1):
+        for c in range(1, cols-1):
+            if grid.values[r][c] == 0 and sum(grid.values[r+i][c+j] == 8 for i in [-1, 0, 1] for j in [-1, 0, 1]) >= 7:
+                grid.values[r][c] = 8
