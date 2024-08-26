@@ -9,7 +9,7 @@ def solve_b20f7c8b(input_grid: ColoredGrid) -> ColoredGrid:
        - If solid, new_color = (original_color + 1) % 10
        - If patterned, fill with the color of the top-left pixel
     2. For right regions:
-       - If solid, new_color = (original_color + 1) % 10
+       - If solid, new_color = (original_color + 3) % 10
        - If patterned, fill with gray (5)
     
     The function identifies 5x5 regions in the middle and right side of the grid,
@@ -18,13 +18,13 @@ def solve_b20f7c8b(input_grid: ColoredGrid) -> ColoredGrid:
     output_grid = input_grid.deep_copy()
     
     transformation_regions = [
-        (1, 6), (9, 6),  # Left regions
+        (1, 8), (9, 8),  # Left regions
         (1, 16), (9, 16)  # Right regions
     ]
     
     for row, col in transformation_regions:
         block = output_grid.extract_subgrid(row, col, 5, 5)
-        is_left = col == 6
+        is_left = col == 8
         transformed_block = transform_block(block, is_left)
         replace_5x5_block(output_grid, row, col, transformed_block)
     
@@ -36,7 +36,7 @@ def is_solid_block(block: ColoredGrid) -> bool:
 def transform_block(block: ColoredGrid, is_left: bool) -> ColoredGrid:
     if is_solid_block(block):
         original_color = block.values[0][0]
-        new_color = (original_color + 1) % 10
+        new_color = (original_color + 1) % 10 if is_left else (original_color + 3) % 10
     else:
         new_color = block.values[0][0] if is_left else 5
     
