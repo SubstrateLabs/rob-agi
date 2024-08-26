@@ -33,20 +33,22 @@ def solve_4364c1c4(input_grid: ColoredGrid) -> ColoredGrid:
 
     return new_grid
 
-def move_shape_left(shape: List[Tuple[int, int]], grid: ColoredGrid, background_color: int) -> List[Tuple[int, int]]:
+def move_shape_left(shape: List[Tuple[int, int]], grid: ColoredGrid, background_color: int, leave_space: bool = False) -> List[Tuple[int, int]]:
     min_col = min(c for _, c in shape)
     for col in range(min_col, -1, -1):
         new_shape = [(r, c - (min_col - col)) for r, c in shape]
         if all(0 <= r < grid.num_rows and 0 <= c < grid.num_cols and grid.values[r][c] == background_color for r, c in new_shape):
-            return new_shape
+            if not leave_space or col > 0:
+                return new_shape
     return shape
 
-def move_shape_right(shape: List[Tuple[int, int]], grid: ColoredGrid, background_color: int) -> List[Tuple[int, int]]:
+def move_shape_right(shape: List[Tuple[int, int]], grid: ColoredGrid, background_color: int, leave_space: bool = False) -> List[Tuple[int, int]]:
     max_col = max(c for _, c in shape)
     for col in range(max_col, grid.num_cols):
         new_shape = [(r, c + (col - max_col)) for r, c in shape]
         if all(0 <= r < grid.num_rows and 0 <= c < grid.num_cols and grid.values[r][c] == background_color for r, c in new_shape):
-            return new_shape
+            if not leave_space or col < grid.num_cols - 1:
+                return new_shape
     return shape
 
 def adjust_vertical_position(shape: List[Tuple[int, int]], grid: ColoredGrid, background_color: int) -> List[Tuple[int, int]]:
@@ -122,18 +124,30 @@ def solve_4364c1c4(input_grid: ColoredGrid) -> ColoredGrid:
     5. Adjusts vertical positions to close gaps while maintaining order.
     6. Fine-tunes horizontal positions to ensure proper spacing.
     7. Places shapes on a new grid, avoiding overlaps and staying within bounds.
+    8. Handles special cases for small shapes and maintains background color frame.
     """
     background_color = Counter([cell for row in input_grid.values for cell in row]).most_common(1)[0][0]
     shapes = find_shapes(input_grid, background_color)
-    shapes.sort(key=lambda shape: min(cell[0] for cell in shape))
+    shapes.sort(key=lambda shape: (min(cell[0] for cell in shape), min(cell[1] for cell in shape)))
 
     new_grid = ColoredGrid(values=[[background_color for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
 
-    shapes = adjust_shapes_horizontally(shapes, new_grid, background_color)
-    shapes = adjust_shapes_vertically(shapes, new_grid, background_color)
-
-    for shape in shapes:
+    for i, shape in enumerate(shapes):
         color = input_grid.values[shape[0][0]][shape[0][1]]
-        place_shape(new_grid, shape, color)
+        if len(shape) <= 3:  # Special handling for small shapes
+            new_shape = move_small_shape(shape, i, new_grid, background_color)
+        else:
+            if i % 2 == 0:  # Move left
+                new_shape = move_shape_left(shape, new_grid, background_color)
+            else:  # Move right
+                new_shape = move_shape_right(shape, new_grid, background_color)
+        
+        new_shape = adjust_vertical_position(new_shape, new_grid, background_color)
+        place_shape(new_grid, new_shape, color)
 
     return new_grid
+def move_small_shape(shape: List[Tuple[int, int]], index: int, grid: ColoredGrid, background_color: int) -> List[Tuple[int, int]]:
+    if index % 2 == 0:  # Move left but not to the edge
+        return move_shape_left(shape, grid, background_color, leave_space=True)
+    else:  # Move right but not to the edge
+        return move_shape_right(shape, grid, background_color, leave_space=True)
