@@ -83,18 +83,16 @@ def grow_blue_regions(grid: ColoredGrid, heatmap: List[List[int]], target: int) 
     
     return blue_count
 
-def fill_remaining_squares(grid: ColoredGrid, blue_count: int, target: int) -> int:
+def fill_remaining_squares(grid: ColoredGrid, heatmap: List[List[float]], blue_count: int, target: int) -> int:
     rows, cols = grid.get_dimensions()
-    center_r, center_c = rows // 2, cols // 2
-    cells = [(r, c) for r in range(rows) for c in range(cols)]
-    cells.sort(key=lambda pos: (abs(pos[0] - center_r) + abs(pos[1] - center_c), -count_adjacent_blue(grid, pos[0], pos[1])))
+    cells = [(r, c) for r in range(rows) for c in range(cols) if grid.values[r][c] == 0]
+    cells.sort(key=lambda pos: (-heatmap[pos[0]][pos[1]], -count_adjacent_blue(grid, pos[0], pos[1])))
     
     for r, c in cells:
         if blue_count >= target:
-            return blue_count
-        if grid.values[r][c] == 0:
-            grid.values[r][c] = 1
-            blue_count += 1
+            break
+        grid.values[r][c] = 1
+        blue_count += 1
     return blue_count
 
 def count_adjacent_blue(grid: ColoredGrid, r: int, c: int) -> int:
