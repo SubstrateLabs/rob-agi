@@ -1,17 +1,17 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import Tuple, List
+import random
 
 def solve_9772c176(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by adding yellow (4) paths around and through sky blue (8) shapes.
+    Transforms the input grid by adding a yellow (4) path that responds to sky blue (8) shapes.
     
     The solution follows these steps:
-    1. Find sky blue shapes in the grid.
-    2. Outline each shape with yellow, prioritizing top and left sides.
-    3. Draw a diagonal yellow line through each shape.
-    4. Connect shapes with yellow paths.
-    5. Add yellow extensions or "rays" from the outlines.
-    6. Ensure a continuous yellow path from top-left to bottom-right of the grid.
+    1. Create a continuous yellow path from top-left to bottom-right.
+    2. The path follows the edges of sky blue shapes when encountered.
+    3. Add "rays" and additional yellow pixels to create visual interest.
+    4. Handle empty or near-empty grids with a meandering path.
+    5. Ensure all yellow pixels are connected in the final result.
 
     Args:
     input_grid (ColoredGrid): The input grid containing sky blue shapes.
@@ -21,91 +21,75 @@ def solve_9772c176(input_grid: ColoredGrid) -> ColoredGrid:
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
+    
+    def is_valid_move(x: int, y: int) -> bool:
+        return 0 <= x < rows and 0 <= y < cols and output_grid.get_cell(x, y) != 8
 
-    def find_sky_blue_pixel() -> Tuple[int, int]:
-        for r in range(rows):
-            for c in range(cols):
-                if output_grid.get_cell(r, c) == 8:
-                    return r, c
-        return -1, -1
+    def get_neighbors(x: int, y: int) -> List[Tuple[int, int]]:
+        return [(x+dx, y+dy) for dx, dy in [(-1,-1), (-1,0), (-1,1), (0,-1), (0,1), (1,-1), (1,0), (1,1)]
+                if is_valid_move(x+dx, y+dy)]
 
-    def is_valid(r: int, c: int) -> bool:
-        return 0 <= r < rows and 0 <= c < cols
+    def is_adjacent_to_blue(x: int, y: int) -> bool:
+        return any(0 <= x+dx < rows and 0 <= y+dy < cols and output_grid.get_cell(x+dx, y+dy) == 8
+                   for dx, dy in [(-1,0), (1,0), (0,-1), (0,1)])
 
-    def add_yellow_pixel(r: int, c: int):
-        if is_valid(r, c) and output_grid.get_cell(r, c) == 0:
-            output_grid.set_cell(r, c, 4)
+    def choose_move(x: int, y: int, target_x: int, target_y: int) -> Tuple[int, int]:
+        neighbors = get_neighbors(x, y)
+        if not neighbors:
+            return x, y  # Stay in place if no valid moves
+        
+        # Prioritize moves along blue shapes
+        blue_adjacent = [n for n in neighbors if is_adjacent_to_blue(*n)]
+        if blue_adjacent:
+            return random.choice(blue_adjacent)
+        
+        # Otherwise, move towards the target
+        dx = target_x - x
+        dy = target_y - y
+        preferred = [n for n in neighbors if (n[0]-x)*dx + (n[1]-y)*dy > 0]
+        return random.choice(preferred) if preferred else random.choice(neighbors)
 
-    def outline_shape(start_r: int, start_c: int):
-        stack = [(start_r, start_c)]
-        visited = set()
+    def create_path():
+        x, y = 0, 0
+        output_grid.set_cell(x, y, 4)
+        while (x, y) != (rows-1, cols-1):
+            nx, ny = choose_move(x, y, rows-1, cols-1)
+            if (nx, ny) != (x, y):
+                output_grid.set_cell(nx, ny, 4)
+            x, y = nx, ny
 
-        while stack:
-            r, c = stack.pop()
-            if (r, c) in visited:
-                continue
-            visited.add((r, c))
+    def add_rays():
+        for x in range(rows):
+            for y in range(cols):
+                if output_grid.get_cell(x, y) == 4:
+                    for _ in range(2):  # Add up to 2 rays per yellow pixel
+                        nx, ny = random.choice(get_neighbors(x, y))
+                        if output_grid.get_cell(nx, ny) == 0:
+                            output_grid.set_cell(nx, ny, 4)
 
-            for dr, dc in [(-1, 0), (0, -1), (1, 0), (0, 1)]:
-                nr, nc = r + dr, c + dc
-                if is_valid(nr, nc):
-                    if output_grid.get_cell(nr, nc) == 8:
-                        stack.append((nr, nc))
-                    elif output_grid.get_cell(nr, nc) == 0:
-                        add_yellow_pixel(nr, nc)
+    def ensure_connectivity():
+        def dfs(x, y):
+            stack = [(x, y)]
+            visited = set()
+            while stack:
+                cx, cy = stack.pop()
+                if (cx, cy) in visited:
+                    continue
+                visited.add((cx, cy))
+                for nx, ny in get_neighbors(cx, cy):
+                    if output_grid.get_cell(nx, ny) == 4:
+                        stack.append((nx, ny))
+            return visited
 
-    def draw_diagonal(start_r: int, start_c: int, end_r: int, end_c: int):
-        dx = abs(end_c - start_c)
-        dy = abs(end_r - start_r)
-        sx = 1 if start_c < end_c else -1
-        sy = 1 if start_r < end_r else -1
-        err = dx - dy
+        connected = dfs(0, 0)
+        for x in range(rows):
+            for y in range(cols):
+                if output_grid.get_cell(x, y) == 4 and (x, y) not in connected:
+                    output_grid.set_cell(x, y, 0)  # Remove disconnected yellow pixels
 
-        while start_r != end_r or start_c != end_c:
-            add_yellow_pixel(start_r, start_c)
-            e2 = 2 * err
-            if e2 > -dy:
-                err -= dy
-                start_c += sx
-            if e2 < dx:
-                err += dx
-                start_r += sy
-
-    def connect_shapes(shapes: List[Tuple[int, int]]):
-        for i in range(len(shapes) - 1):
-            start_r, start_c = shapes[i]
-            end_r, end_c = shapes[i + 1]
-            draw_diagonal(start_r, start_c, end_r, end_c)
-
-    def add_rays(r: int, c: int):
-        for dr, dc in [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]:
-            nr, nc = r + dr, c + dc
-            if is_valid(nr, nc) and output_grid.get_cell(nr, nc) == 0:
-                add_yellow_pixel(nr, nc)
-
-    # Find all sky blue shapes
-    shapes = []
-    for r in range(rows):
-        for c in range(cols):
-            if output_grid.get_cell(r, c) == 8 and all(output_grid.get_cell(r+dr, c+dc) != 8 for dr, dc in [(-1, 0), (0, -1)] if is_valid(r+dr, c+dc)):
-                shapes.append((r, c))
-
-    # Process each shape
-    for shape_start in shapes:
-        outline_shape(*shape_start)
-        shape_end = max((r, c) for r in range(rows) for c in range(cols) if output_grid.get_cell(r, c) == 8)
-        draw_diagonal(*shape_start, *shape_end)
-
-    # Connect shapes
-    connect_shapes(shapes)
-
-    # Add rays and ensure path continuity
-    for r in range(rows):
-        for c in range(cols):
-            if output_grid.get_cell(r, c) == 4:
-                add_rays(r, c)
-
-    # Ensure path from top-left to bottom-right
-    draw_diagonal(0, 0, rows-1, cols-1)
+    # Main execution
+    create_path()
+    add_rays()
+    ensure_connectivity()
 
     return output_grid
