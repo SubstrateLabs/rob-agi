@@ -9,8 +9,8 @@ def solve_4364c1c4(input_grid: ColoredGrid) -> ColoredGrid:
     2. Finds all distinct shapes (connected regions of non-background colors).
     3. Sorts shapes from top to bottom.
     4. Moves shapes:
-       - Odd-numbered shapes: Move left with increasing amounts (1, 2, 3, ...)
-       - Even-numbered shapes: Move right and down with increasing amounts (1, 2, 3, ...)
+       - Even-indexed shapes (0, 2, 4, ...): Move left with increasing amounts (1, 2, 3, ...)
+       - Odd-indexed shapes (1, 3, 5, ...): Move right and down with increasing amounts (1, 2, 3, ...)
     5. Applies movements while keeping shapes within grid bounds and preventing overlaps.
     """
     background_color = Counter([cell for row in input_grid.values for cell in row]).most_common(1)[0][0]
@@ -19,20 +19,17 @@ def solve_4364c1c4(input_grid: ColoredGrid) -> ColoredGrid:
 
     new_grid = ColoredGrid(values=[[background_color for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
 
-    movement_counter = 1
     for i, shape in enumerate(shapes):
-        if i % 2 == 0:  # Odd-numbered shapes (0-indexed)
-            dx, dy = -movement_counter, 0
-        else:  # Even-numbered shapes
-            dx, dy = movement_counter, movement_counter
+        movement = (i // 2) + 1
+        if i % 2 == 0:  # Even-indexed shapes (0, 2, 4, ...)
+            dx, dy = -movement, 0
+        else:  # Odd-indexed shapes (1, 3, 5, ...)
+            dx, dy = movement, movement
 
         new_shape = move_shape(shape, dx, dy, new_grid.num_rows, new_grid.num_cols)
         color = input_grid.values[shape[0][0]][shape[0][1]]
         new_shape = adjust_shape_position(new_grid, new_shape, background_color)
         place_shape(new_grid, new_shape, color)
-
-        if i % 2 == 1:  # Increment counter after each pair
-            movement_counter += 1
 
     return new_grid
 
@@ -77,7 +74,7 @@ def move_shape(shape: List[Tuple[int, int]], dx: int, dy: int, max_row: int, max
     return new_shape
 
 def adjust_shape_position(grid: ColoredGrid, shape: List[Tuple[int, int]], background_color: int) -> List[Tuple[int, int]]:
-    while any(grid.values[r][c] != background_color for r, c in shape):
+    while any(r < 0 or r >= grid.num_rows or c < 0 or c >= grid.num_cols or grid.values[r][c] != background_color for r, c in shape):
         shape = [(r - 1, c) for r, c in shape]  # Move shape up
         if any(r < 0 for r, _ in shape):
             return None  # Cannot place the shape without overlap
