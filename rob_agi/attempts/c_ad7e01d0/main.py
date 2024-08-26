@@ -4,10 +4,10 @@ def solve_ad7e01d0(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transform the input grid into a larger grid based on the following rules:
     1. The output grid size is the square of the input grid size.
-    2. For odd-sized inputs, repeat the pattern n times vertically and horizontally.
-    3. For even-sized inputs, repeat the pattern n/2 times in the top-left quadrant,
-       fill other quadrants partially, and fill the center with the most common border color.
-    4. Handle special cases for bottom row and rightmost column.
+    2. Repeat the input pattern in the top-left quadrant.
+    3. Extend the pattern along the top and left edges.
+    4. Fill the center with the most common border color for even-sized inputs.
+    5. Ensure the bottom and right edges match the input pattern.
     """
     n = len(input_grid.values)
     output_size = n * n
@@ -20,29 +20,33 @@ def solve_ad7e01d0(input_grid: ColoredGrid) -> ColoredGrid:
     )
     fill_color = max(set(border_colors), key=border_colors.count)
     
-    # Fill the output grid
-    for i in range(output_size):
-        for j in range(output_size):
-            if n % 2 == 1:  # Odd-sized input
-                output_values[i][j] = input_grid.values[i % n][j % n]
-            else:  # Even-sized input
-                if i < n * (n // 2) and j < n * (n // 2):
-                    # Top-left quadrant
-                    output_values[i][j] = input_grid.values[i % n][j % n]
-                elif (i >= n * (n // 2) and j < n) or (i < n and j >= n * (n // 2)):
-                    # Top-right and bottom-left quadrants
-                    output_values[i][j] = input_grid.values[i % n][j % n]
-                elif i >= output_size - n and j >= output_size - n:
-                    # Bottom-right corner
-                    output_values[i][j] = input_grid.values[i % n][j % n]
-                else:
-                    # Center and remaining areas
-                    output_values[i][j] = fill_color
+    # Fill the top-left quadrant
+    for i in range(n):
+        for j in range(n):
+            output_values[i][j] = input_grid.values[i][j]
     
-    # Special treatment for bottom row and rightmost column
+    # Extend the pattern horizontally in the top n rows
+    for i in range(n):
+        for j in range(n, output_size):
+            output_values[i][j] = output_values[i][j % n]
+    
+    # Extend the pattern vertically in the leftmost n columns
+    for i in range(n, output_size):
+        for j in range(n):
+            output_values[i][j] = output_values[i % n][j]
+    
+    # Fill the center for even-sized inputs
     if n % 2 == 0:
-        for i in range(output_size):
-            output_values[i][-1] = input_grid.values[i % n][-1]
-            output_values[-1][i] = input_grid.values[-1][i % n]
+        for i in range(n, output_size - n):
+            for j in range(n, output_size - n):
+                output_values[i][j] = fill_color
+    
+    # Ensure the bottom and right edges match the input pattern
+    for i in range(output_size - n, output_size):
+        for j in range(output_size):
+            output_values[i][j] = input_grid.values[i % n][j % n]
+    for i in range(output_size):
+        for j in range(output_size - n, output_size):
+            output_values[i][j] = input_grid.values[i % n][j % n]
     
     return ColoredGrid(values=output_values)
