@@ -13,10 +13,10 @@ def solve_103eff5b(input_grid: ColoredGrid) -> ColoredGrid:
     1. Preserve the existing colored pattern.
     2. Identify all connected regions of color 8.
     3. For each color 8 region:
-       a. Find its bounding box.
+       a. Calculate its bounding box.
        b. Divide the region into sections:
-          - Top third: color 2 (red)
-          - Bottom third: color 3 (green)
+          - Top quarter: color 2 (red)
+          - Bottom quarter: color 3 (green)
           - Middle section: left half color 4 (yellow), right half color 1 (blue)
     4. Transform the grid by applying the color mapping to each color 8 region.
     5. Return the transformed grid.
@@ -29,17 +29,20 @@ def solve_103eff5b(input_grid: ColoredGrid) -> ColoredGrid:
         height = max_y - min_y + 1
         width = max_x - min_x + 1
         
-        top_height = (height + 2) // 3  # Round up
-        bottom_height = (height + 2) // 3  # Round up
+        top_height = height // 4
+        bottom_height = height // 4
         middle_height = height - top_height - bottom_height
         
         for y, x in region:
-            if y - min_y < top_height:
+            relative_y = y - min_y
+            relative_x = x - min_x
+            
+            if relative_y < top_height:
                 new_color = 2  # Top: red
-            elif y - min_y >= height - bottom_height:
+            elif relative_y >= height - bottom_height:
                 new_color = 3  # Bottom: green
             else:
-                if x - min_x < width // 2:
+                if relative_x < width // 2:
                     new_color = 4  # Middle-left: yellow
                 else:
                     new_color = 1  # Middle-right: blue
