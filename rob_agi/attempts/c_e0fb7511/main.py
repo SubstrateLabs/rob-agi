@@ -5,8 +5,7 @@ import random
 def solve_e0fb7511(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transform the input grid by creating a meandering structure of sky blue (8) squares
-    that starts from a random edge, grows towards areas with more black squares,
-    and forms an organic pattern while preserving some original black squares.
+    that forms an organic pattern while preserving some original black squares.
 
     The function performs the following steps:
     1. Analyze the input grid to create a heat map of black square density
@@ -17,8 +16,9 @@ def solve_e0fb7511(input_grid: ColoredGrid) -> ColoredGrid:
     6. Ensure connectivity of all sky blue cells
     7. Smooth and refine the structure
     8. Preserve some original black squares
-    9. Balance the final composition
-    10. Validate and adjust the result
+    9. Balance the final composition by ensuring the pattern reaches multiple edges
+    10. Fine-tune the pattern by converting some sky blue cells back to blue
+    11. Validate and adjust the result to meet size and connectivity requirements
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed
@@ -164,6 +164,7 @@ def solve_e0fb7511(input_grid: ColoredGrid) -> ColoredGrid:
                     break
 
     def fine_tune_pattern(structure):
+        to_remove = set()
         for r in range(rows):
             for c in range(cols):
                 if grid.get_cell(r, c) == 8:
@@ -171,7 +172,8 @@ def solve_e0fb7511(input_grid: ColoredGrid) -> ColoredGrid:
                     blue_neighbors = sum(1 for nr, nc in neighbors if grid.get_cell(nr, nc) == 1)
                     if blue_neighbors >= 3:
                         grid.set_cell(r, c, 1)
-                        structure.remove((r, c))
+                        to_remove.add((r, c))
+        structure.difference_update(to_remove)
 
     # Main algorithm
     grid = input_grid.deep_copy()
