@@ -5,7 +5,7 @@ def solve_5783df64(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms an input grid of any size into a 3x3 grid containing the first 9 unique non-zero colors
     encountered in the input grid, preserving their order of appearance.
 
-    The function scans the input grid from left to right, top to bottom, collecting unique non-zero colors.
+    The function scans the input grid from top to bottom, left to right, collecting unique non-zero colors.
     These colors are then used to fill a new 3x3 grid in the order they were found, filling row by row.
     If fewer than 9 unique colors are present, the remaining cells in the output grid are filled with 0 (black).
 
@@ -19,8 +19,8 @@ def solve_5783df64(input_grid: ColoredGrid) -> ColoredGrid:
     rows, cols = len(input_grid.values), len(input_grid.values[0])
     
     # Scan the input grid
-    for c in range(cols):
-        for r in range(rows):
+    for r in range(rows):
+        for c in range(cols):
             color = input_grid.values[r][c]
             if color != 0 and color not in color_order:
                 color_order.append(color)
