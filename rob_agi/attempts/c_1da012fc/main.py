@@ -5,12 +5,11 @@ from collections import deque
 def extract_color_key(grid):
     color_key = []
     for row in grid:
-        for cell in row:
-            if cell == 5:  # Found the gray area
-                for c in row:
-                    if c != 0 and c != 5 and c not in color_key:
-                        color_key.append(c)
-                return color_key
+        if 5 in row:  # Found the gray area
+            for c in row:
+                if c != 0 and c != 5 and c not in color_key:
+                    color_key.append(c)
+            return color_key
     return color_key
 
 def get_sorted_regions(grid):
@@ -38,8 +37,7 @@ def get_sorted_regions(grid):
     
     return sorted(regions, key=lambda r: (min(r)[0], min(r)[1]))
 
-def transform_grid(input_grid):
-    color_key = extract_color_key(input_grid)
+def transform_grid(input_grid, color_key):
     sorted_regions = get_sorted_regions(input_grid)
     
     new_grid = [row[:] for row in input_grid]  # Create a deep copy of the input grid
@@ -60,6 +58,11 @@ def solve_1da012fc(input_grid: ColoredGrid) -> ColoredGrid:
     3. Assigning new colors to the sorted regions cyclically using the extracted color key.
     4. Creating a new grid with the transformed colors while preserving the original structure.
     5. Returning the transformed grid.
+
+    If no color key is found, the function returns the input grid unchanged.
     """
-    transformed_values = transform_grid(input_grid.values)
+    color_key = extract_color_key(input_grid.values)
+    if not color_key:
+        return input_grid  # Return unchanged if no color key is found
+    transformed_values = transform_grid(input_grid.values, color_key)
     return ColoredGrid(values=transformed_values)
