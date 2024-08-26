@@ -9,7 +9,7 @@ def solve_84db8fc4(input_grid: ColoredGrid) -> ColoredGrid:
 
     1. Find all black (0) squares on the edges of the grid.
     2. For each black edge square, find the longest path to a different edge.
-    3. If multiple paths of the same maximum length are found, prefer the one that's more centrally located.
+    3. Among the longest paths, choose the one that's more centrally located.
     4. Turn the chosen path gray (5).
     5. Change all other black squares to red (2).
     6. Leave all other colored squares unchanged.
@@ -58,23 +58,23 @@ def solve_84db8fc4(input_grid: ColoredGrid) -> ColoredGrid:
         return []
 
     def path_centrality(path: List[Tuple[int, int]]) -> float:
-        center_r, center_c = rows / 2, cols / 2
+        if not path:
+            return float('inf')  # Return infinity for empty paths
+        center_r, center_c = rows / 2 - 0.5, cols / 2 - 0.5
         return sum(abs(r - center_r) + abs(c - center_c) for r, c in path) / len(path)
 
-    longest_paths = []
-    max_length = 0
+    all_paths = []
     for r in range(rows):
         for c in range(cols):
             if is_edge(r, c) and input_grid.values[r][c] == 0:
                 start_edge = get_edge(r, c)
                 path = dfs(r, c, start_edge, set())
-                if len(path) > max_length:
-                    longest_paths = [path]
-                    max_length = len(path)
-                elif len(path) == max_length:
-                    longest_paths.append(path)
+                if path:
+                    all_paths.append(path)
 
-    if longest_paths:
+    if all_paths:
+        max_length = max(len(path) for path in all_paths)
+        longest_paths = [path for path in all_paths if len(path) == max_length]
         chosen_path = min(longest_paths, key=path_centrality)
         chosen_path_set = set(chosen_path)
 
