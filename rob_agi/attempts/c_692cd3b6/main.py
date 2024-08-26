@@ -3,18 +3,19 @@ from typing import List, Tuple, Set
 
 def solve_692cd3b6(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the challenge by connecting two 'C' shapes with yellow, extending to grid edges when necessary.
+    Solve the challenge by connecting two 'C' shapes with yellow, extending to grid edges only when necessary.
     
     1. Identify the two 'C' shapes (red color 2 with gray color 5 inside).
-    2. Create a bounding rectangle that encompasses both C-shapes.
+    2. Create a minimal bounding rectangle that encompasses both C-shapes.
     3. Fill the connecting rectangle with yellow, preserving the C-shapes.
-    4. Extend yellow to grid edges if a C-shape touches an edge.
+    4. Extend yellow to grid edges only if a C-shape touches an edge within the bounding rectangle.
     5. Clean up any disconnected yellow areas.
-    6. Preserve the original 'C' shapes.
+    6. Preserve the original 'C' shapes and all areas outside the connecting rectangle.
     7. Ensure yellow forms a single connected region.
     
     This approach ensures the correct yellow path between the C-shapes
-    and extends to the appropriate grid edges only when a C-shape touches an edge.
+    and extends to the appropriate grid edges only when necessary, while
+    preserving the original layout outside the connecting area.
     """
     # Step 1: Identify 'C' shapes
     c_shapes = find_c_shapes(input_grid)
@@ -86,29 +87,28 @@ def fill_yellow(grid: ColoredGrid, left: int, top: int, right: int, bottom: int)
             if grid.values[r][c] == 0:
                 grid.values[r][c] = 4
 
-def extend_to_edges(grid: ColoredGrid, shape1: List[Tuple[int, int]], shape2: List[Tuple[int, int]]):
+def extend_to_edges(grid: ColoredGrid, shape1: List[Tuple[int, int]], shape2: List[Tuple[int, int]], connecting_rectangle: Tuple[int, int, int, int]):
     rows, cols = grid.get_dimensions()
-    bbox1 = get_bounding_box(shape1)
-    bbox2 = get_bounding_box(shape2)
+    left, top, right, bottom = connecting_rectangle
     
-    # Extend to left edge if any shape touches it
-    if bbox1[1] == 0 or bbox2[1] == 0:
-        for r in range(rows):
+    # Extend to left edge if any shape touches it within the connecting rectangle
+    if any(c == left and left == 0 for _, c in shape1 + shape2):
+        for r in range(top, bottom + 1):
             grid.values[r][0] = 4
     
-    # Extend to right edge if any shape touches it
-    if bbox1[3] == cols - 1 or bbox2[3] == cols - 1:
-        for r in range(rows):
+    # Extend to right edge if any shape touches it within the connecting rectangle
+    if any(c == right and right == cols - 1 for _, c in shape1 + shape2):
+        for r in range(top, bottom + 1):
             grid.values[r][cols - 1] = 4
     
-    # Extend to top edge if any shape touches it
-    if bbox1[0] == 0 or bbox2[0] == 0:
-        for c in range(cols):
+    # Extend to top edge if any shape touches it within the connecting rectangle
+    if any(r == top and top == 0 for r, _ in shape1 + shape2):
+        for c in range(left, right + 1):
             grid.values[0][c] = 4
     
-    # Extend to bottom edge if any shape touches it
-    if bbox1[2] == rows - 1 or bbox2[2] == rows - 1:
-        for c in range(cols):
+    # Extend to bottom edge if any shape touches it within the connecting rectangle
+    if any(r == bottom and bottom == rows - 1 for r, _ in shape1 + shape2):
+        for c in range(left, right + 1):
             grid.values[rows - 1][c] = 4
 
 def clean_up_yellow(grid: ColoredGrid, connecting_rectangle: Tuple[int, int, int, int]):
@@ -149,3 +149,11 @@ def preserve_c_shapes(grid: ColoredGrid, c_shapes: List[List[Tuple[int, int]]]):
         for r, c in shape:
             if grid.values[r][c] in [2, 5]:
                 grid.values[r][c] = grid.values[r][c]  # Preserve original color
+def preserve_original_layout(new_grid: ColoredGrid, input_grid: ColoredGrid, connecting_rectangle: Tuple[int, int, int, int]):
+    left, top, right, bottom = connecting_rectangle
+    rows, cols = new_grid.get_dimensions()
+    
+    for r in range(rows):
+        for c in range(cols):
+            if not (top <= r <= bottom and left <= c <= right):
+                new_grid.values[r][c] = input_grid.values[r][c]
