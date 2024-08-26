@@ -1,5 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List, Tuple, Set
 
 def solve_22a4bbc2(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -11,6 +11,7 @@ def solve_22a4bbc2(input_grid: ColoredGrid) -> ColoredGrid:
     Overlapping or adjacent qualifying rectangles are merged into larger red areas.
     All changes are applied simultaneously to the input grid.
     Non-qualifying blue or sky blue areas remain unchanged.
+    Sky blue areas are treated independently and are not changed to red unless they form a qualifying rectangle.
     """
     new_grid = input_grid.deep_copy()
     rows, cols = input_grid.get_dimensions()
@@ -19,12 +20,10 @@ def solve_22a4bbc2(input_grid: ColoredGrid) -> ColoredGrid:
     to_change = set()
     for r in range(rows):
         for c in range(cols):
-            if input_grid.values[r][c] in [1, 8]:  # Only consider blue and sky blue
+            if input_grid.values[r][c] in [1, 8]:  # Consider blue and sky blue
                 for height, width in qualifying_dimensions:
                     if is_qualifying_shape(input_grid, r, c, height, width):
-                        for i in range(height):
-                            for j in range(width):
-                                to_change.add((r+i, c+j))
+                        mark_for_change(to_change, r, c, height, width)
     
     for r, c in to_change:
         new_grid.values[r][c] = 2
@@ -41,3 +40,8 @@ def is_qualifying_shape(grid: ColoredGrid, row: int, col: int, height: int, widt
     return all(grid.values[r][c] == color 
                for r in range(row, row + height) 
                for c in range(col, col + width))
+
+def mark_for_change(to_change: Set[Tuple[int, int]], row: int, col: int, height: int, width: int):
+    for i in range(height):
+        for j in range(width):
+            to_change.add((row+i, col+j))
