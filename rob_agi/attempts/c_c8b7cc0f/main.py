@@ -6,11 +6,11 @@ def solve_c8b7cc0f(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid into a 3x3 output grid based on the following rules:
     1. Ignores black (0) and blue (1) colors.
     2. Finds the non-black, non-blue color with the most distinct positions in the input grid.
-    3. Creates a 3x3 output grid with the top-left cells filled with the most frequent color.
-    4. The number of filled cells is determined as follows:
-       - If the count of distinct positions is 1, 2, or 3, use that number.
-       - If the count is 4, fill 4 cells.
-       - If the count is 5 or more, fill 5 cells.
+    3. Creates a 3x3 output grid with the top row filled with the most frequent color.
+    4. The number of cells filled in the second row is determined as follows:
+       - If the count of distinct positions is 3 or less, no cells in the second row are filled.
+       - If the count is 4, one cell in the second row is filled.
+       - If the count is 5 or more, two cells in the second row are filled.
     5. If no valid colors are found, returns an all-black 3x3 grid.
     """
     # Initialize color position tracker
@@ -31,21 +31,19 @@ def solve_c8b7cc0f(input_grid: ColoredGrid) -> ColoredGrid:
     
     target_color = max(color_positions, key=lambda x: len(color_positions[x]))
 
-    # Determine the number of cells to fill
+    # Determine the number of cells to fill in the second row
     distinct_positions = len(color_positions[target_color])
     if distinct_positions <= 3:
-        cells_to_fill = distinct_positions
+        second_row_fill = 0
     elif distinct_positions == 4:
-        cells_to_fill = 4
+        second_row_fill = 1
     else:
-        cells_to_fill = 5
+        second_row_fill = 2
 
     # Create the output grid
-    output_values = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
-    fill_order = [(0, 0), (0, 1), (0, 2), (1, 0), (1, 1)]
-    for i in range(cells_to_fill):
-        row, col = fill_order[i]
-        output_values[row][col] = target_color
+    output_values = [[target_color, target_color, target_color],
+                     [target_color if i < second_row_fill else 0 for i in range(3)],
+                     [0, 0, 0]]
 
     # Return the output grid
     return ColoredGrid(values=output_values)
