@@ -7,8 +7,8 @@ def solve_696d4842(input_grid: ColoredGrid) -> ColoredGrid:
     1. Identify vertical lines, horizontal lines, and isolated cells.
     2. Extend vertical and horizontal lines to edges or other colored cells.
     3. Connect isolated cells to nearby lines of the same color.
-    4. Apply color transformations based on a predefined cycle.
-    5. Resolve intersections between extended lines.
+    4. Apply color transformations based on a predefined cycle for top and left edges.
+    5. Resolve intersections between extended lines based on line length.
     6. Iterate the process until stability or a maximum number of iterations.
     """
     output_grid = input_grid.deep_copy()
@@ -35,7 +35,7 @@ def solve_696d4842(input_grid: ColoredGrid) -> ColoredGrid:
         if direction == 'up':
             for i in range(r-1, -1, -1):
                 if output_grid.values[i][c] == 0:
-                    output_grid.values[i][c] = color if i > 0 else color_cycle[color]
+                    output_grid.values[i][c] = color_cycle[color] if i == 0 else color
                 else:
                     break
         elif direction == 'down':
@@ -47,7 +47,7 @@ def solve_696d4842(input_grid: ColoredGrid) -> ColoredGrid:
         elif direction == 'left':
             for j in range(c-1, -1, -1):
                 if output_grid.values[r][j] == 0:
-                    output_grid.values[r][j] = color if j > 0 else color_cycle[color]
+                    output_grid.values[r][j] = color_cycle[color] if j == 0 else color
                 else:
                     break
         elif direction == 'right':
@@ -71,39 +71,27 @@ def solve_696d4842(input_grid: ColoredGrid) -> ColoredGrid:
         for r in range(rows):
             for c in range(cols):
                 if output_grid.values[r][c] != 0:
-                    vertical_length = 1
-                    horizontal_length = 1
-                    for i in range(r-1, -1, -1):
-                        if output_grid.values[i][c] == output_grid.values[r][c]:
-                            vertical_length += 1
-                        else:
-                            break
-                    for i in range(r+1, rows):
-                        if output_grid.values[i][c] == output_grid.values[r][c]:
-                            vertical_length += 1
-                        else:
-                            break
-                    for j in range(c-1, -1, -1):
-                        if output_grid.values[r][j] == output_grid.values[r][c]:
-                            horizontal_length += 1
-                        else:
-                            break
-                    for j in range(c+1, cols):
-                        if output_grid.values[r][j] == output_grid.values[r][c]:
-                            horizontal_length += 1
-                        else:
-                            break
+                    vertical_length = sum(1 for i in range(rows) if output_grid.values[i][c] == output_grid.values[r][c])
+                    horizontal_length = sum(1 for j in range(cols) if output_grid.values[r][j] == output_grid.values[r][c])
                     if vertical_length > horizontal_length:
                         for j in range(cols):
-                            if j != c and output_grid.values[r][j] != 0:
+                            if output_grid.values[r][j] != 0:
                                 output_grid.values[r][j] = output_grid.values[r][c]
                     elif horizontal_length > vertical_length:
                         for i in range(rows):
-                            if i != r and output_grid.values[i][c] != 0:
+                            if output_grid.values[i][c] != 0:
                                 output_grid.values[i][c] = output_grid.values[r][c]
 
+    def apply_edge_transformations():
+        for i in range(rows):
+            if output_grid.values[i][0] != 0:
+                output_grid.values[i][0] = color_cycle[output_grid.values[i][0]]
+        for j in range(1, cols):
+            if output_grid.values[0][j] != 0:
+                output_grid.values[0][j] = color_cycle[output_grid.values[0][j]]
+
     iterations = 0
-    while iterations < 5:  # Maximum 5 iterations
+    while iterations < 10:  # Maximum 10 iterations
         old_grid = output_grid.deep_copy()
         vertical, horizontal, isolated = identify_structures()
         
@@ -123,6 +111,7 @@ def solve_696d4842(input_grid: ColoredGrid) -> ColoredGrid:
                 extend_line(r, c, 'right')
         
         resolve_intersections()
+        apply_edge_transformations()
         
         if output_grid.values == old_grid.values:
             break
