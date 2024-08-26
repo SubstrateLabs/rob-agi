@@ -2,21 +2,27 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_9ddd00f0(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the grid transformation challenge by horizontally extending the patterns in each row.
+    Solves the grid transformation challenge by extending patterns both horizontally and vertically.
     
     The function processes the grid as follows:
-    1. Keeps the right half of the grid (from the middle column onwards) unchanged.
-    2. For each row, copies the pattern from the right half to the left half, extending it horizontally.
-    3. The vertical structure of the grid remains unchanged.
+    1. Keeps the bottom-right quadrant of the grid unchanged.
+    2. Mirrors the bottom-right quadrant horizontally to fill the bottom-left quadrant.
+    3. Mirrors the entire bottom half vertically to fill the top half of the grid.
     
-    This creates a horizontally extended pattern where the left half mirrors the right half in each row.
+    This creates a pattern where both horizontal and vertical symmetry is achieved,
+    with the bottom-right quadrant serving as the source for the entire grid's pattern.
     """
     height, width = input_grid.get_dimensions()
     output_grid = input_grid.deep_copy()
-    middle = width // 2
+    mid_row, mid_col = height // 2, width // 2
 
-    for row in range(height):
-        for col in range(middle):
+    # Step 1: Mirror bottom-right to bottom-left
+    for row in range(mid_row, height):
+        for col in range(mid_col):
             output_grid.values[row][col] = input_grid.values[row][width - 1 - col]
+
+    # Step 2: Mirror bottom half to top half
+    for row in range(mid_row):
+        output_grid.values[row] = output_grid.values[height - 1 - row].copy()
 
     return output_grid
