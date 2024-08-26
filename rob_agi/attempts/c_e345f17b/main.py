@@ -7,12 +7,10 @@ def solve_e345f17b(input_grid: ColoredGrid) -> ColoredGrid:
     of magenta (6) and gray (5) squares.
 
     The algorithm works as follows:
-    1. Divides the 8x4 input grid into four 4x2 quadrants.
-    2. Counts the number of magenta and gray squares in each quadrant.
-    3. Determines the number of yellow squares to place (3 or 4) based on total colored squares.
-    4. Analyzes horizontal and vertical color distributions.
-    5. Places yellow squares in the 4x4 output grid to balance the input color distribution.
-    6. Adjusts placement for even distributions and edge preferences.
+    1. Analyzes the input grid's color distribution in four sections.
+    2. Maps these sections to the output grid's edges.
+    3. Places 3 or 4 yellow squares based on color density and patterns.
+    4. Ensures yellow squares are not adjacent.
 
     Args:
     input_grid (ColoredGrid): An 8x4 grid representing the input pattern.
@@ -21,49 +19,56 @@ def solve_e345f17b(input_grid: ColoredGrid) -> ColoredGrid:
     ColoredGrid: A 4x4 grid representing the transformed output pattern.
     """
     input_array = np.array(input_grid.values)
-    magenta, gray, yellow = 6, 5, 4
     output = np.zeros((4, 4), dtype=int)
 
-    # Count colored squares in each quadrant
-    q1 = np.sum((input_array[:2, :4] == magenta) | (input_array[:2, :4] == gray))
-    q2 = np.sum((input_array[:2, 4:] == magenta) | (input_array[:2, 4:] == gray))
-    q3 = np.sum((input_array[2:, :4] == magenta) | (input_array[2:, :4] == gray))
-    q4 = np.sum((input_array[2:, 4:] == magenta) | (input_array[2:, 4:] == gray))
+    # Analyze input sections
+    left = input_array[:, :4]
+    right = input_array[:, 4:]
+    top = input_array[:2, :]
+    bottom = input_array[2:, :]
 
-    total_colored = q1 + q2 + q3 + q4
+    def color_density(section):
+        return np.sum((section == 6) | (section == 5)) / section.size
+
+    densities = {
+        'left': color_density(left),
+        'right': color_density(right),
+        'top': color_density(top),
+        'bottom': color_density(bottom)
+    }
+
+    # Determine number of yellow squares
+    total_colored = np.sum((input_array == 6) | (input_array == 5))
     num_yellow = 4 if total_colored > 16 else 3
 
-    # Analyze horizontal and vertical distributions
-    left_sum = q1 + q3
-    right_sum = q2 + q4
-    top_sum = q1 + q2
-    bottom_sum = q3 + q4
-
-    # Place yellow squares
+    # Place yellow squares based on densities
     yellow_positions = []
-    if left_sum > right_sum * 1.5:
-        yellow_positions.extend([(1, 3), (2, 3)])
-    elif right_sum > left_sum * 1.5:
-        yellow_positions.extend([(1, 0), (2, 0)])
+    if densities['left'] > densities['right']:
+        yellow_positions.append((0, 0))
+    else:
+        yellow_positions.append((0, 3))
     
-    if top_sum > bottom_sum * 1.5:
-        yellow_positions.extend([(3, 1), (3, 2)])
-    elif bottom_sum > top_sum * 1.5:
-        yellow_positions.extend([(0, 1), (0, 2)])
+    if densities['top'] > densities['bottom']:
+        yellow_positions.append((0, 3) if (0, 3) not in yellow_positions else (0, 0))
+    else:
+        yellow_positions.append((3, 3) if (0, 3) in yellow_positions else (3, 0))
 
-    # Adjust for even distributions
-    if not yellow_positions:
-        yellow_positions = [(0, 0), (0, 3), (3, 0), (3, 3)]
+    # Place remaining yellow squares
+    corners = [(0, 0), (0, 3), (3, 0), (3, 3)]
+    for corner in corners:
+        if len(yellow_positions) < num_yellow and corner not in yellow_positions:
+            yellow_positions.append(corner)
+            break
 
-    # Ensure correct number of yellow squares
-    yellow_positions = yellow_positions[:num_yellow]
-    while len(yellow_positions) < num_yellow:
-        new_pos = (np.random.randint(4), np.random.randint(4))
-        if new_pos not in yellow_positions:
-            yellow_positions.append(new_pos)
+    if len(yellow_positions) < num_yellow:
+        middle_positions = [(1, 1), (1, 2), (2, 1), (2, 2)]
+        for pos in middle_positions:
+            if len(yellow_positions) < num_yellow:
+                yellow_positions.append(pos)
+                break
 
     # Place yellow squares in output grid
     for pos in yellow_positions:
-        output[pos] = yellow
+        output[pos] = 4
 
     return ColoredGrid(values=output.tolist())
