@@ -7,11 +7,12 @@ def solve_c663677b(input_grid: ColoredGrid) -> ColoredGrid:
     and applying it to the entire grid, including black (0) areas.
 
     The solution follows these steps:
-    1. Analyze the input grid to find non-black cells and the largest contiguous non-black region.
-    2. Determine the pattern size by checking for repeating units.
-    3. Extract the base pattern from the input grid.
-    4. Validate the pattern against non-black areas in the input grid.
-    5. Generate the output grid by applying the validated pattern to all cells.
+    1. Analyze the input grid to identify non-black areas.
+    2. Identify 3x9 vertical strips from the non-black areas.
+    3. Construct a 9x9 unit from the identified strips.
+    4. Validate the 9x9 unit against the input grid.
+    5. Generate the complete 27x27 pattern using the validated 9x9 unit.
+    6. Fill in black spaces while preserving non-black areas from the input.
 
     Args:
         input_grid (ColoredGrid): The input grid with partial pattern and black areas.
@@ -20,57 +21,75 @@ def solve_c663677b(input_grid: ColoredGrid) -> ColoredGrid:
         ColoredGrid: The solved grid with the full pattern applied to all cells.
     """
     # Step 1: Analyze the grid
-    non_black_map, max_region = analyze_grid(input_grid)
+    non_black_map = analyze_grid(input_grid)
 
-    # Step 2: Determine pattern size
-    pattern_size = find_pattern_size(input_grid, non_black_map, max_region)
+    # Step 2: Identify 3x9 vertical strips
+    strips = identify_strips(input_grid, non_black_map)
 
-    # Step 3: Extract base pattern
-    base_pattern = extract_base_pattern(input_grid, pattern_size)
+    # Step 3: Construct 9x9 unit
+    unit = construct_unit(strips)
 
-    # Step 4: Validate pattern
-    while not validate_pattern(input_grid, base_pattern, pattern_size):
-        pattern_size = (pattern_size[0] * 2, pattern_size[1] * 2)
-        base_pattern = extract_base_pattern(input_grid, pattern_size)
+    # Step 4: Validate 9x9 unit
+    if not validate_unit(input_grid, unit):
+        raise ValueError("Unable to find a valid 9x9 unit")
 
-    # Step 5: Generate output grid
-    output_grid = generate_output_grid(base_pattern, pattern_size, input_grid.get_dimensions())
+    # Step 5 & 6: Generate output grid and fill black spaces
+    output_grid = generate_output_grid(input_grid, unit)
 
     return output_grid
 
-def analyze_grid(grid: ColoredGrid) -> Tuple[Dict[Tuple[int, int], int], Tuple[int, int]]:
+def analyze_grid(grid: ColoredGrid) -> Dict[Tuple[int, int], int]:
     non_black_map = {}
-    max_region = (0, 0)
     rows, cols = grid.get_dimensions()
     
     for r in range(rows):
         for c in range(cols):
             if grid.values[r][c] != 0:
                 non_black_map[(r, c)] = grid.values[r][c]
-                max_region = max(max_region, (r+1, c+1))
     
-    return non_black_map, max_region
+    return non_black_map
 
-def find_pattern_size(grid: ColoredGrid, non_black_map: Dict[Tuple[int, int], int], max_region: Tuple[int, int]) -> Tuple[int, int]:
+def identify_strips(grid: ColoredGrid, non_black_map: Dict[Tuple[int, int], int]) -> List[List[List[int]]]:
+    strips = []
     rows, cols = grid.get_dimensions()
-    for size in range(1, min(rows, cols) + 1):
-        if all(grid.values[r][c] == grid.values[r % size][c % size] for (r, c) in non_black_map):
-            return (size, size)
-    return max_region
+    
+    for c in range(0, cols, 3):
+        strip = []
+        for r in range(rows):
+            row = [grid.values[r][c+i] if (r, c+i) in non_black_map else 0 for i in range(3)]
+            strip.append(row)
+        if any(any(cell != 0 for cell in row) for row in strip):
+            strips.append(strip)
+    
+    return strips
 
-def extract_base_pattern(grid: ColoredGrid, pattern_size: Tuple[int, int]) -> List[List[int]]:
-    return [[grid.values[r][c] for c in range(pattern_size[1])] for r in range(pattern_size[0])]
+def construct_unit(strips: List[List[List[int]]]) -> List[List[int]]:
+    unit = []
+    for i in range(0, 27, 9):
+        for j in range(9):
+            row = []
+            for strip in strips:
+                row.extend(strip[i+j])
+            unit.append(row)
+    return unit
 
-def validate_pattern(grid: ColoredGrid, pattern: List[List[int]], pattern_size: Tuple[int, int]) -> bool:
+def validate_unit(grid: ColoredGrid, unit: List[List[int]]) -> bool:
     rows, cols = grid.get_dimensions()
-    return all(
-        grid.values[r][c] == 0 or grid.values[r][c] == pattern[r % pattern_size[0]][c % pattern_size[1]]
-        for r in range(rows) for c in range(cols)
-    )
+    for r in range(rows):
+        for c in range(cols):
+            if grid.values[r][c] != 0 and grid.values[r][c] != unit[r % 9][c % 9]:
+                return False
+    return True
 
-def generate_output_grid(pattern: List[List[int]], pattern_size: Tuple[int, int], grid_size: Tuple[int, int]) -> ColoredGrid:
-    output_values = [
-        [pattern[r % pattern_size[0]][c % pattern_size[1]] for c in range(grid_size[1])]
-        for r in range(grid_size[0])
-    ]
+def generate_output_grid(input_grid: ColoredGrid, unit: List[List[int]]) -> ColoredGrid:
+    rows, cols = input_grid.get_dimensions()
+    output_values = []
+    for r in range(rows):
+        row = []
+        for c in range(cols):
+            if input_grid.values[r][c] != 0:
+                row.append(input_grid.values[r][c])
+            else:
+                row.append(unit[r % 9][c % 9])
+        output_values.append(row)
     return ColoredGrid(values=output_values)
