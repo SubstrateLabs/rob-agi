@@ -1,53 +1,56 @@
 example_0:
   input: |
-    A 15x14 grid mostly filled with black (0). There are five colored squares scattered across the grid:
-    - A sky blue (8) square in the top-right quadrant
-    - A yellow (4) square in the left side, about 1/3 down
-    - A green (3) square in the right side, about 1/3 down
-    - A red (2) square in the middle, slightly below center
-    - A magenta (6) square in the bottom-left quadrant
+    A 15x14 grid predominantly filled with black (0). Five non-black, single-cell color points are scattered:
+    - Sky blue (8): row 1, column 5
+    - Yellow (4): row 4, column 2
+    - Green (3): row 5, column 9
+    - Red (2): row 7, column 5
+    - Magenta (6): row 11, column 3
+    Note: Colors are represented by integers (1-9). Black (0) and red (2) are special colors.
   output: |
-    A 15x14 grid with a distinct rectangular frame structure. The frame is 10x11 squares, positioned slightly off-center towards the top-left. The frame consists of:
-    - A sky blue (8) top border
-    - A yellow (4) left border
-    - A green (3) right border
-    - A magenta (6) bottom border
-    - Gray (5) filling most of the interior
-    - The original red (2) square remains in its position, breaking the gray interior
-    The rest of the grid outside the frame remains black (0).
+    A 15x14 grid featuring a centered, rectangular frame:
+    - Frame dimensions: 10 cells wide, 11 cells tall
+    - Frame position: Starts at row 1, centered horizontally (columns 2-11)
+    - Frame border colors (clockwise from top): Sky blue (8), green (3), magenta (6), yellow (4)
+    - Frame interior: Filled with gray (5)
+    - Red line: Horizontal, centered vertically within the frame (row 6, columns 3-10)
+    - Outside the frame: Remains black (0)
+    Key observation: Frame uses all non-black, non-red colors from input. Red maintains its position.
 
 example_1:
   input: |
-    A 15x14 grid mostly filled with black (0). There are five colored squares scattered across the grid:
-    - A yellow (4) square near the top-center
-    - An orange (7) square in the right side, about 1/3 down
-    - A sky blue (8) square in the left side, about 2/3 down
-    - A red (2) square slightly to the right of the sky blue square
-    - A magenta (6) square near the bottom-center
+    A 15x14 grid predominantly filled with black (0). Five non-black, single-cell color points are scattered:
+    - Yellow (4): row 2, column 6
+    - Orange (7): row 5, column 10
+    - Sky blue (8): row 8, column 3
+    - Red (2): row 8, column 7
+    - Magenta (6): row 12, column 3
+    Note: Colors are represented by integers (1-9). Black (0) and red (2) are special colors.
   output: |
-    A 15x14 grid with a distinct rectangular frame structure. The frame is 9x11 squares, positioned slightly off-center. The frame consists of:
-    - A yellow (4) top border
-    - A sky blue (8) left border
-    - An orange (7) right border
-    - A magenta (6) bottom border
-    - Gray (5) filling most of the interior
-    - The original red (2) square remains in its position, breaking the gray interior
-    The rest of the grid outside the frame remains black (0).
+    A 15x14 grid featuring a centered, rectangular frame:
+    - Frame dimensions: 9 cells wide, 11 cells tall
+    - Frame position: Starts at row 2, centered horizontally (columns 3-11)
+    - Frame border colors (clockwise from top): Yellow (4), orange (7), magenta (6), sky blue (8)
+    - Frame interior: Filled with gray (5)
+    - Red line: Horizontal, centered vertically within the frame (row 7, columns 4-10)
+    - Outside the frame: Remains black (0)
+    Key observation: Frame uses all non-black, non-red colors from input. Red maintains its position.
 
 example_2:
   input: |
-    A 15x15 grid mostly filled with black (0). There are five colored squares scattered across the grid:
-    - A green (3) square in the top-left quadrant
-    - A red (2) square slightly left of center
-    - A magenta (6) square in the top-right quadrant
-    - A blue (1) square in the left side, about 2/3 down
-    - A brown (9) square near the bottom, slightly left of center
+    A 15x15 grid predominantly filled with black (0). Five non-black, single-cell color points are scattered:
+    - Green (3): row 3, column 4
+    - Red (2): row 6, column 6
+    - Magenta (6): row 7, column 12
+    - Blue (1): row 9, column 2
+    - Brown (9): row 13, column 5
+    Note: Colors are represented by integers (1-9). Black (0) and red (2) are special colors.
   output: |
-    A 15x15 grid with a distinct rectangular frame structure. The frame is 11x13 squares, positioned slightly off-center. The frame consists of:
-    - A green (3) top border
-    - A blue (1) left border
-    - A magenta (6) right border
-    - A brown (9) bottom border
-    - Gray (5) filling most of the interior
-    - The original red (2) square remains in its position, breaking the gray interior
-    The rest of the grid outside the frame remains black (0).
+    A 15x15 grid featuring a centered, rectangular frame:
+    - Frame dimensions: 11 cells wide, 13 cells tall
+    - Frame position: Starts at row 1, centered horizontally (columns 2-12)
+    - Frame border colors (clockwise from top): Green (3), magenta (6), brown (9), blue (1)
+    - Frame interior: Filled with gray (5)
+    - Red line: Horizontal, centered vertically within the frame (row 7, columns 3-11)
+    - Outside the frame: Remains black (0)
+    Key observation: Frame uses all non-black, non-red colors from input. Red maintains its position.
