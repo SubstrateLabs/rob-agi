@@ -1,6 +1,7 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Set, Dict
-import heapq
+import math
+import random
 
 def solve_b9630600(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -25,17 +26,26 @@ def solve_b9630600(input_grid: ColoredGrid) -> ColoredGrid:
     while adding aesthetic elements and maintaining symmetry where possible.
     """
     output_grid = input_grid.deep_copy()
+    fixed_cells = mark_fixed_cells(output_grid)
     shapes = identify_shapes(output_grid)
-    graph = create_graph(shapes)
-    mst = generate_minimal_spanning_tree(graph)
-    connect_shapes(output_grid, shapes, mst)
-    incorporate_isolated_cells(output_grid, shapes)
-    selective_fill_hollow_areas(output_grid, shapes)
-    optimize_connections(output_grid)
+    centroids = calculate_centroids(shapes)
+    symmetry = detect_symmetry(output_grid)
+    
+    expand_shapes(output_grid, shapes, fixed_cells)
+    create_primary_connections(output_grid, shapes, centroids)
+    fill_hollow_shapes(output_grid, shapes)
+    enhance_structural_integrity(output_grid, shapes)
+    create_secondary_connections(output_grid, shapes)
+    adjust_symmetry(output_grid, symmetry)
+    fill_and_expand(output_grid)
+    enhance_aesthetics(output_grid)
     verify_connectivity(output_grid)
-    final_adjustments(output_grid, input_grid)
+    clean_up_and_optimize(output_grid, fixed_cells)
     
     return output_grid
+
+def mark_fixed_cells(grid: ColoredGrid) -> Set[Tuple[int, int]]:
+    return {(r, c) for r in range(grid.num_rows) for c in range(grid.num_cols) if grid.get_cell(r, c) == 3}
 
 def identify_shapes(grid: ColoredGrid) -> List[Set[Tuple[int, int]]]:
     shapes = []
