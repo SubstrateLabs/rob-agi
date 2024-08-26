@@ -20,19 +20,16 @@ def solve_d931c21c(input_grid: ColoredGrid) -> ColoredGrid:
 
     def get_neighbors(row: int, col: int) -> List[Tuple[int, int]]:
         neighbors = []
-        for dr in [-1, 0, 1]:
-            for dc in [-1, 0, 1]:
-                if dr == 0 and dc == 0:
-                    continue
-                new_row, new_col = row + dr, col + dc
-                if 0 <= new_row < rows and 0 <= new_col < cols:
-                    neighbors.append((new_row, new_col))
+        for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:  # Only orthogonal neighbors
+            new_row, new_col = row + dr, col + dc
+            if 0 <= new_row < rows and 0 <= new_col < cols:
+                neighbors.append((new_row, new_col))
         return neighbors
 
     def trace_shape(start_row: int, start_col: int) -> Set[Tuple[int, int]]:
         shape = set()
         stack = [(start_row, start_col)]
-        open_edges = 0
+        open_edges = set()
 
         while stack:
             r, c = stack.pop()
@@ -44,9 +41,9 @@ def solve_d931c21c(input_grid: ColoredGrid) -> ColoredGrid:
                         if (nr, nc) not in shape:
                             stack.append((nr, nc))
                     else:
-                        open_edges += 1
+                        open_edges.add((nr, nc))
 
-        return shape if open_edges <= 2 else set()
+        return shape if len(open_edges) <= 2 else set()
 
     def flood_fill(start_row: int, start_col: int, shape: Set[Tuple[int, int]]) -> None:
         queue = [(start_row, start_col)]
