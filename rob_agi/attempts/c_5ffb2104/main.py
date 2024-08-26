@@ -7,7 +7,7 @@ def solve_5ffb2104(input_grid: ColoredGrid) -> ColoredGrid:
     The transformation maintains the following properties:
     1. All non-zero elements are moved to the rightmost available columns.
     2. The vertical order of elements within each column is preserved.
-    3. Elements from different columns are processed independently.
+    3. The relative horizontal order of elements is maintained.
     4. The relative vertical positions of all elements are maintained.
     
     Args:
@@ -17,20 +17,18 @@ def solve_5ffb2104(input_grid: ColoredGrid) -> ColoredGrid:
     ColoredGrid: A new grid with all non-zero elements moved to the right side.
     """
     rows, cols = input_grid.get_dimensions()
-    new_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
-    rightmost_column = cols - 1
-
+    new_grid = [[0 for _ in range(cols)] for _ in range(rows)]
+    
+    # Collect all non-zero elements
+    non_zero_elements = []
     for col in range(cols):
-        non_zero_elements = []
-        
         for row in range(rows):
-            value = input_grid.values[row][col]
-            if value != 0:
-                non_zero_elements.append((value, row))
-        
-        if non_zero_elements:
-            for value, row in non_zero_elements:
-                new_grid.values[row][rightmost_column] = value
-            rightmost_column -= 1
-
-    return new_grid
+            if input_grid.values[row][col] != 0:
+                non_zero_elements.append((input_grid.values[row][col], row))
+    
+    # Place non-zero elements from right to left
+    for i, (value, row) in enumerate(reversed(non_zero_elements)):
+        new_col = cols - 1 - i
+        new_grid[row][new_col] = value
+    
+    return ColoredGrid(values=new_grid)
