@@ -4,19 +4,25 @@ import heapq
 
 def solve_b9630600(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the b9630600 challenge by creating a minimally connected structure from the original green shapes.
+    Solves the b9630600 challenge by creating a cohesive and aesthetically pleasing structure
+    from the original green shapes.
 
     The solution follows these steps:
-    1. Analyze the input grid to identify green shapes and their characteristics
-    2. Create a graph representation of the shapes
-    3. Generate a minimal spanning tree to determine connections
-    4. Connect shapes using single-cell wide paths
-    5. Incorporate isolated cells and fill hollow areas selectively
-    6. Optimize connections and verify overall connectivity
-    7. Make final adjustments to preserve original features and symmetry where possible
+    1. Preserve original structure and mark fixed cells
+    2. Analyze input to identify shapes, calculate centroids, and detect symmetry
+    3. Expand shapes outwards where possible
+    4. Create primary connections between shapes
+    5. Fill hollow shapes and add internal structure
+    6. Enhance structural integrity
+    7. Create secondary connections
+    8. Check and adjust for symmetry
+    9. Fill isolated cells and expand sparse areas
+    10. Enhance aesthetics
+    11. Perform final connection check
+    12. Clean up and optimize the structure
 
-    This approach creates a minimally connected green structure that preserves the key features
-    and relative positions of the original shapes while ensuring a single connected component.
+    This approach creates a connected green structure that preserves the original shapes
+    while adding aesthetic elements and maintaining symmetry where possible.
     """
     output_grid = input_grid.deep_copy()
     shapes = identify_shapes(output_grid)
