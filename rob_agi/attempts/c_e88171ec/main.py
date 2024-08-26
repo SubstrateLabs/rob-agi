@@ -1,5 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Set
+from typing import List, Tuple, Set, Optional
 
 def solve_e88171ec(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -9,10 +9,11 @@ def solve_e88171ec(input_grid: ColoredGrid) -> ColoredGrid:
     The solution follows these steps:
     1. Find all contiguous regions of black (0) cells.
     2. Select the largest black region.
-    3. Attempt to place a 4x4 sky blue rectangle in the largest region.
-    4. If a 4x4 doesn't fit, attempt to place a 2x2 sky blue rectangle.
-    5. Place the rectangle in the bottom-right most position possible within the region.
-    6. Fill the chosen area with sky blue (8).
+    3. Calculate the center of the largest region.
+    4. Starting from the center and moving outwards in a spiral pattern:
+       a. Attempt to place a 4x4 sky blue rectangle.
+       b. If a 4x4 doesn't fit, attempt to place a 2x2 sky blue rectangle.
+    5. Fill the chosen area with sky blue (8).
 
     If no suitable region is found or no rectangle fits, return the original grid unchanged.
     """
@@ -72,13 +73,22 @@ def get_bounding_box(region: Set[Tuple[int, int]]) -> Tuple[int, int, int, int]:
 
 def find_rectangle_position(region: Set[Tuple[int, int]], bounding_box: Tuple[int, int, int, int]) -> Optional[Tuple[int, Tuple[int, int]]]:
     min_r, max_r, min_c, max_c = bounding_box
-    
-    for size in [4, 2]:
-        for r in range(max_r, min_r - 1, -1):
-            for c in range(max_c, min_c - 1, -1):
-                if r - size + 1 < min_r or c - size + 1 < min_c:
-                    continue
-                if all((rr, cc) in region for rr in range(r - size + 1, r + 1) for cc in range(c - size + 1, c + 1)):
-                    return size, (r - size + 1, c - size + 1)
-    
+    center_r = (min_r + max_r) // 2
+    center_c = (min_c + max_c) // 2
+
+    def spiral_coordinates():
+        dx, dy = 0, -1
+        x, y = 0, 0
+        for _ in range((max_r - min_r + 1) * (max_c - min_c + 1)):
+            yield center_r + y, center_c + x
+            if x == y or (x < 0 and x == -y) or (x > 0 and x == 1 - y):
+                dx, dy = -dy, dx
+            x, y = x + dx, y + dy
+
+    for r, c in spiral_coordinates():
+        for size in [4, 2]:
+            if r + size - 1 <= max_r and c + size - 1 <= max_c:
+                if all((rr, cc) in region for rr in range(r, r + size) for cc in range(c, c + size)):
+                    return size, (r, c)
+
     return None
