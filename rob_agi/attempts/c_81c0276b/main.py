@@ -9,7 +9,7 @@ def solve_81c0276b(input_grid: ColoredGrid) -> ColoredGrid:
     1. Identifies the frame color in the input grid.
     2. Scans the grid in a snake-like pattern from top-left to bottom-right to find 2x2 colored squares.
     3. Records the frequency of each color in the order of first appearance.
-    4. Creates an output grid where each row corresponds to a unique color, ordered by first appearance.
+    4. Creates an output grid where each row corresponds to a unique color, ordered by frequency (descending) and then by first appearance.
     5. Fills the output grid with the colors found, maintaining their order and frequency.
 
     Args:
@@ -36,11 +36,14 @@ def solve_81c0276b(input_grid: ColoredGrid) -> ColoredGrid:
                     else:
                         color_info[color] += 1
     
-    output_rows = len(color_info)
+    # Sort colors by frequency (descending) and then by order of appearance
+    sorted_colors = sorted(color_info.items(), key=lambda x: (-x[1], list(color_info.keys()).index(x[0])))
+    
+    output_rows = len(sorted_colors)
     output_cols = max(color_info.values())
     
     output_values = [[0] * output_cols for _ in range(output_rows)]
-    for i, (color, freq) in enumerate(color_info.items()):
+    for i, (color, freq) in enumerate(sorted_colors):
         output_values[i][:freq] = [color] * freq
     
     return ColoredGrid(values=output_values)
