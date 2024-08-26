@@ -1,0 +1,47 @@
+example_0:
+  input: |
+    A green (color 3) rectangular shape resembling a hollow rectangle or picture frame. The shape is centered in a 14x13 grid of black (0) squares. The green rectangle has a width of 9 squares and a height of 7 squares. It has three equally spaced vertical lines inside, dividing it into four sections.
+  output: |
+    The same green rectangular shape, but with slight modifications. The overall structure remains, but some green squares have shifted:
+    1. In the top row, the leftmost green square has moved one space to the left.
+    2. In the second row from the top, the second green square from the left has moved one space to the left.
+    3. In the middle row, the rightmost green square has moved one space to the right.
+    4. In the second row from the bottom, the second green square from the right has moved one space to the right.
+    5. In the bottom row, the rightmost green square has moved one space to the left.
+    These shifts create a slight wave-like or zigzag effect in the vertical lines of the rectangle.
+
+example_1:
+  input: |
+    A red (color 2) rectangular shape resembling a hollow rectangle or picture frame. The shape is positioned near the top of a 15x14 grid of black (0) squares. The red rectangle has a width of 6 squares and a height of 12 squares. It has one vertical line in the middle, dividing it into two equal sections.
+  output: |
+    The same red rectangular shape, but with significant modifications creating a wave-like pattern:
+    1. The top and bottom horizontal lines remain unchanged.
+    2. The vertical lines now zigzag, creating a wave-like pattern.
+    3. The zigzag pattern alternates direction every two rows.
+    4. The amplitude of the wave increases towards the middle of the rectangle and decreases towards the top and bottom.
+    5. The wave pattern is symmetrical vertically.
+    This transformation gives the rectangle a more dynamic, undulating appearance while maintaining its overall structure.
+
+example_2:
+  input: |
+    A gray (color 5) rectangular shape resembling a hollow rectangle or picture frame. The shape is centered in a 15x15 grid of black (0) squares. The gray rectangle has a width of 9 squares and a height of 10 squares. It has one vertical line in the middle and one horizontal line in the middle, dividing it into four equal sections.
+  output: |
+    The same gray rectangular shape, but with modifications creating a more complex wave-like pattern:
+    1. The top and bottom horizontal lines have slight indentations, moving inward by one square at the third and seventh positions.
+    2. The vertical lines now zigzag, creating a wave-like pattern similar to example_1, but more pronounced.
+    3. The zigzag pattern alternates direction every row.
+    4. The amplitude of the wave varies, creating a more dynamic pattern.
+    5. The left and right edges of the rectangle now have outward bulges at various points.
+    6. The overall pattern is not perfectly symmetrical, giving it a more organic appearance.
+
+example_3:
+  input: |
+    A sky blue (color 8) rectangular shape resembling a hollow rectangle or picture frame. The shape is positioned near the top of a 15x15 grid of black (0) squares. The sky blue rectangle has a width of 6 squares and a height of 13 squares. It has two vertical lines inside, dividing it into three equal sections.
+  output: |
+    The same sky blue rectangular shape, but with significant modifications creating a complex wave-like pattern:
+    1. The top and bottom horizontal lines remain unchanged.
+    2. The vertical lines now zigzag dramatically, creating a pronounced wave-like pattern.
+    3. The zigzag pattern alternates direction every row.
+    4. The amplitude of the wave varies, with some waves reaching the outer edges of the rectangle.
+    5. The pattern creates the illusion of the rectangle being divided into multiple smaller sections.
+    6. The overall effect is highly dynamic and fluid, while still maintaining the basic rectangular structure.
