@@ -1,29 +1,73 @@
 example_0:
   input: |
-    A 10x10 grid with mostly black (0) background. There's a vertical gray (5) line of 4 squares in the 3rd column, starting from row 3. In row 5, there's a horizontal line to the right of the gray line: 3 magenta (6) squares followed by 3 brown (9) squares.
+    A 10x10 grid with black (0) background. Key features:
+    1. Vertical seed: Gray (5) line in column 3, rows 3-6.
+    2. Horizontal seed: In row 5, columns 4-9, pattern [6, 6, 6, 9, 9, 9].
+    3. Empty spaces above, below, and to the right of the pattern.
   output: |
-    A 10x10 grid with mostly black (0) background. The vertical gray (5) line remains in the 3rd column but is now 4 squares long. The horizontal line that was in row 5 is now repeated in rows 2, 3, 4, and 5, creating a rectangular shape: 3 magenta (6) squares followed by 3 brown (9) squares in each row.
+    10x10 grid, black (0) background. Transformation:
+    1. Vertical gray (5) seed expanded to full column height (rows 2-5).
+    2. Horizontal [6, 6, 6, 9, 9, 9] pattern expanded vertically (rows 2-5).
+    3. Resulting rectangle: 4 rows tall (2-5), 7 columns wide (3-9).
+    4. Other areas remain black (0).
 
 example_1:
   input: |
-    A 10x10 grid with mostly black (0) background. There's a vertical gray (5) line along the left edge, 8 squares long. In row 8, there's a horizontal pattern to the right of the gray line: gray (5), yellow (4), green (3), green (3), yellow (4), yellow (4), yellow (4). In row 9, there's another horizontal pattern: gray (5), orange (7), green (3), orange (7), orange (7), green (3), green (3).
+    10x10 grid, black (0) background. Key features:
+    1. Vertical seed: Gray (5) line in column 1, rows 1-8.
+    2. Horizontal seed 1: Row 8, columns 1-7, pattern [5, 4, 3, 3, 4, 4, 4].
+    3. Horizontal seed 2: Row 9, columns 1-7, pattern [5, 7, 3, 7, 7, 3, 3].
+    4. Empty space to the right of the patterns.
   output: |
-    A 10x10 grid with mostly black (0) background. The vertical gray (5) line remains along the left edge, 8 squares long. The horizontal patterns from rows 8 and 9 in the input are now repeated alternately in rows 1 through 8, creating a striped rectangular shape next to the gray line.
+    10x10 grid, black (0) background. Transformation:
+    1. Vertical gray (5) seed unchanged.
+    2. Horizontal seeds expanded vertically, alternating patterns:
+       - Odd rows (1, 3, 5, 7): [5, 4, 3, 3, 4, 4, 4]
+       - Even rows (2, 4, 6, 8): [5, 7, 3, 7, 7, 3, 3]
+    3. Resulting rectangle: 8 rows tall (1-8), 7 columns wide (1-7).
+    4. Other areas remain black (0).
 
 example_2:
   input: |
-    A 10x10 grid with mostly black (0) background. In row 2, there's a horizontal gray (5) line of 6 squares. Below this, in column 2, there's a vertical line of different colors: red (2), blue (1), red (2), magenta (6), blue (1), blue (1).
+    10x10 grid, black (0) background. Key features:
+    1. Horizontal seed: Gray (5) line in row 2, columns 1-6.
+    2. Vertical seed: In column 2, rows 3-8, pattern [2, 1, 2, 6, 1, 1].
+    3. Empty spaces around the seeds.
   output: |
-    A 10x10 grid with mostly black (0) background. The horizontal gray (5) line in row 2 remains unchanged. The vertical line of different colors in column 2 is now expanded horizontally to match the width of the gray line above it, creating a rectangular shape of 6 columns wide, each column filled with its respective color.
+    10x10 grid, black (0) background. Transformation:
+    1. Horizontal gray (5) seed unchanged.
+    2. Vertical seed pattern expanded horizontally to match width of gray line:
+       - Columns 1-6 filled with respective colors from the vertical seed.
+       - Resulting rectangle: 6 rows tall (3-8), 6 columns wide (1-6).
+    3. Other areas remain black (0).
 
 example_3:
   input: |
-    A 10x10 grid with a complex pattern. There's a vertical gray (5) line along the left edge, 8 squares long. In the top right, there's a horizontal gray (5) line of 4 squares. Below this gray line, there's a vertical pattern: green (3), green (3), orange (7), green (3), orange (7), orange (7). In rows 8 and 9, there's a horizontal pattern next to the left gray line: magenta (6), green (3), magenta (6), green (3) in row 8, and red (2), red (2), red (2), red (2) in row 9.
+    10x10 grid with multiple seeds. Key features:
+    1. Vertical seed 1: Gray (5) line in column 1, rows 1-8.
+    2. Horizontal seed 1: Gray (5) line in row 1, columns 7-10.
+    3. Vertical seed 2: Column 7, rows 2-7, pattern [3, 3, 7, 3, 7, 7].
+    4. Horizontal seed 2: Row 8, columns 2-5, pattern [6, 3, 6, 3].
+    5. Horizontal seed 3: Row 9, columns 2-5, pattern [7, 3, 7, 7].
   output: |
-    A 10x10 grid with the pattern expanded. The vertical gray (5) line along the left edge remains unchanged. The horizontal gray (5) line in the top right also remains. The vertical pattern below the top-right gray line is now expanded horizontally to fill the space, creating a rectangular shape. The horizontal patterns from rows 8 and 9 are now repeated vertically, filling the space between the left gray line and the expanded right-side pattern.
+    10x10 grid. Transformation:
+    1. Vertical and horizontal gray (5) seeds unchanged.
+    2. Vertical seed 2 expanded horizontally to fill columns 7-10, rows 2-7.
+    3. Horizontal seeds 2 and 3 expanded vertically, alternating patterns:
+       - Odd rows: [6, 3, 6, 3]
+       - Even rows: [7, 3, 7, 7]
+       Filling the area: columns 2-5, rows 1-8.
+    4. Resulting in two rectangles: one on the right (columns 7-10, rows 1-7) and one in the middle (columns 2-5, rows 1-8).
 
 test_case_0:
   input: |
-    A 10x10 grid with mostly black (0) background. There's a horizontal gray (5) line of 5 squares in the top row. Below this, there's a vertical pattern in the leftmost column: gray (5), gray (5), gray (5), gray (5), gray (5), gray (5), gray (5), blue (1), blue (1). In the second column, there's another vertical pattern: yellow (4), yellow (4), yellow (4), yellow (4), yellow (4), yellow (4), yellow (4), red (2), red (2).
+    10x10 grid, black (0) background. Key features:
+    1. Horizontal seed: Gray (5) line in row 1, columns 1-5.
+    2. Vertical seed 1: Column 1, rows 2-10, pattern [5, 5, 5, 5, 5, 5, 5, 1, 1].
+    3. Vertical seed 2: Column 2, rows 2-10, pattern [4, 4, 4, 4, 4, 4, 4, 2, 2].
+    4. Empty spaces to the right of the vertical seeds.
   output: |
-    The output is not provided for this test case.
+    The output grid is not provided for this test case. Based on previous examples, we expect:
+    1. Horizontal gray (5) seed to remain unchanged.
+    2. Vertical seeds to expand horizontally, filling columns 1-5 with their respective patterns.
+    3. A resulting rectangle from rows 2-10 and columns 1-5, with alternating vertical patterns.
