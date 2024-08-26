@@ -6,10 +6,10 @@ def solve_08573cc6(input_grid: ColoredGrid) -> ColoredGrid:
     
     The solution follows these steps:
     1. Analyze the input grid to determine dimensions, colors, and single colored square position.
-    2. Calculate the pattern dimensions and position based on grid size and single square location.
-    3. Create an outer rectangle using the main color (top-left of input).
-    4. Create inner rectangles, using the main color for top/bottom/left and side color for right.
-    5. Incorporate the single colored square, adjusting nearby cells if needed.
+    2. Calculate the pattern dimensions and position based on grid size.
+    3. Create an outer rectangle using the main color (top-left of input) for top/bottom/left and side color for right.
+    4. Create inner rectangles, alternating colors for left side and using side color for right side.
+    5. Incorporate the single colored square, preserving its position.
     6. Fill the space between rectangles with the main color.
     7. Ensure some empty space around the edges of the grid.
     8. Adjust the pattern for visual balance and symmetry.
@@ -34,7 +34,7 @@ def solve_08573cc6(input_grid: ColoredGrid) -> ColoredGrid:
     new_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
     
     # Determine pattern size and position
-    start_row, start_col = 2, 2
+    start_row, start_col = 2, 1
     end_row, end_col = rows - 3, cols - 3
     
     # Draw rectangles
@@ -45,7 +45,7 @@ def solve_08573cc6(input_grid: ColoredGrid) -> ColoredGrid:
         right = end_col - offset
         
         for r in range(top, bottom + 1):
-            new_grid.values[r][left] = main_color
+            new_grid.values[r][left] = side_color if offset % 2 == 1 else main_color
             new_grid.values[r][right] = side_color
         for c in range(left, right + 1):
             new_grid.values[top][c] = main_color
@@ -53,7 +53,7 @@ def solve_08573cc6(input_grid: ColoredGrid) -> ColoredGrid:
     
     # Fill space between rectangles
     for r in range(start_row, end_row + 1):
-        for c in range(start_col, end_col + 1):
+        for c in range(start_col + 1, end_col):
             if new_grid.values[r][c] == 0:
                 new_grid.values[r][c] = main_color
     
@@ -65,10 +65,5 @@ def solve_08573cc6(input_grid: ColoredGrid) -> ColoredGrid:
             nr, nc = sr + dr, sc + dc
             if start_row <= nr <= end_row and start_col <= nc <= end_col:
                 new_grid.values[nr][nc] = main_color
-    
-    # Adjust pattern for visual balance
-    if cols > 7:
-        for r in range(start_row, end_row + 1):
-            new_grid.values[r][start_col - 1] = side_color
     
     return new_grid
