@@ -11,7 +11,7 @@ def solve_d4c90558(input_grid: ColoredGrid) -> ColoredGrid:
     representing a color, and all rows are padded to have the same length as the overall
     largest width found. The colors are arranged in order of their topmost occurrence,
     with ties broken by leftmost position. Gray (5) is treated as a continuation of the
-    current color when calculating contiguous widths.
+    current color when calculating contiguous widths, but is excluded from the output.
     
     Args:
     input_grid (ColoredGrid): The input grid to process.
@@ -28,20 +28,20 @@ def solve_d4c90558(input_grid: ColoredGrid) -> ColoredGrid:
         return width
 
     rows, cols = input_grid.get_dimensions()
-    color_info: Dict[int, Tuple[int, int, int]] = {}  # color: (top, left, width)
+    color_info: Dict[int, Tuple[int, int, int]] = {}  # color: (top, left, max_width)
     color_order: List[int] = []
     max_width = 0
 
     for r in range(rows):
         for c in range(cols):
             color = input_grid.get_cell(r, c)
-            if color != 0:
+            if color not in [0, 5]:  # Exclude black and gray
                 if color not in color_info:
                     color_info[color] = (r, c, 0)
                     color_order.append(color)
-                top, left, current_width = color_info[color]
+                top, left, current_max_width = color_info[color]
                 width = find_contiguous_width(r, c, color)
-                if width > current_width:
+                if width > current_max_width:
                     color_info[color] = (top, left, width)
                 max_width = max(max_width, width)
 
@@ -50,9 +50,8 @@ def solve_d4c90558(input_grid: ColoredGrid) -> ColoredGrid:
 
     output_rows = []
     for color in color_order:
-        if color != 5:  # Exclude gray from the output
-            _, _, width = color_info[color]
-            row = [color] * width + [0] * (max_width - width)
-            output_rows.append(row)
+        _, _, width = color_info[color]
+        row = [color] * width + [0] * (max_width - width)
+        output_rows.append(row)
 
     return ColoredGrid(values=output_rows)
