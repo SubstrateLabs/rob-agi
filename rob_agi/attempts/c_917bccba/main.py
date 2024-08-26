@@ -7,7 +7,7 @@ def solve_917bccba(input_grid: ColoredGrid) -> ColoredGrid:
     2. Fills in the shape completely
     3. Moves the vertical line of the cross to the right edge of the shape
     4. Adds horizontal lines of the cross color at the top and bottom of the shape,
-       extending to the maximum of one cell beyond on both sides or the grid width
+       extending to the edges of the grid
     5. Preserves any parts of the cross outside the shape
     """
     rows, cols = input_grid.get_dimensions()
@@ -44,8 +44,7 @@ def solve_917bccba(input_grid: ColoredGrid) -> ColoredGrid:
         new_grid.values[r][shape_right] = cross_color
     
     # Horizontal lines at the top and bottom of the shape
-    extension = max(cols, shape_right + 2) - shape_left
-    for c in range(max(0, shape_left - 1), min(cols, shape_left - 1 + extension)):
+    for c in range(cols):
         new_grid.values[shape_top][c] = cross_color
         new_grid.values[shape_bottom][c] = cross_color
     
@@ -53,7 +52,7 @@ def solve_917bccba(input_grid: ColoredGrid) -> ColoredGrid:
     for r in range(rows):
         for c in range(cols):
             if input_grid.values[r][c] == cross_color:
-                if r < shape_top or r > shape_bottom or c < shape_left or c > shape_right:
+                if r < shape_top or r > shape_bottom or c < shape_left:
                     new_grid.values[r][c] = cross_color
     
     return new_grid
