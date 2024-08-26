@@ -1,19 +1,20 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List, Tuple, Set
 from collections import deque
 
 def solve_12eac192(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by creating a green (3) path that connects blue (1) cells,
-    incorporating gray (5) and sky (8) cells when convenient. The path aims to be simple
-    and continuous, while preserving much of the original grid structure.
+    incorporating gray (5) and sky (8) cells when convenient. The path aims to be simple,
+    continuous, and snake-like, while preserving much of the original grid structure.
 
-    1. Identifies blue cells and groups them into clusters.
-    2. For each cluster, creates a green path using BFS, prioritizing connections to other blue cells.
-    3. Incorporates gray and sky cells when they help connect blue cells without complicating the path.
-    4. Leaves some blue cells unconverted if connecting them would create an overly complex path.
-    5. Ensures the final green path is continuous and orange (7) cells remain unchanged.
-    6. Maintains the overall structure of the original grid.
+    1. Identifies blue cells and chooses a starting point near edges or corners.
+    2. Uses a modified BFS to create a green path, prioritizing blue > gray > sky > black cells.
+    3. Favors continuing in the current direction and reaching towards edges and corners.
+    4. Limits path complexity and length to maintain simplicity.
+    5. Connects remaining blue cells if they are close to the main path.
+    6. Ensures the final green path is continuous and orange (7) cells remain unchanged.
+    7. Maintains the overall structure of the original grid.
 
     Args:
         input_grid (ColoredGrid): The input grid to be transformed.
@@ -27,7 +28,10 @@ def solve_12eac192(input_grid: ColoredGrid) -> ColoredGrid:
     def get_neighbors(r: int, c: int) -> List[Tuple[int, int]]:
         return [(r+dr, c+dc) for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)] if is_valid_cell(r+dr, c+dc)]
 
-    def bfs(start: Tuple[int, int], cluster: Set[Tuple[int, int]]) -> List[Tuple[int, int]]:
+    def get_cell_priority(color: int) -> int:
+        return {1: 3, 5: 2, 8: 1, 0: 0}.get(color, -1)
+
+    def bfs(start: Tuple[int, int]) -> List[Tuple[int, int]]:
         queue = deque([(start, 0)])
         path = []
         visited = set()
