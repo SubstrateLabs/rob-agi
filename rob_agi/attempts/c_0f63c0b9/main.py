@@ -9,11 +9,11 @@ def solve_0f63c0b9(input_grid: ColoredGrid) -> ColoredGrid:
     2. Each color creates a frame-like structure:
        - For a single color, it fills the entire grid.
        - For multiple colors:
-         - The topmost color fills the top two rows and extends down.
-         - Middle colors (if any) fill their top row and extend down.
-         - The bottommost color fills the bottom three rows and extends up.
+         - The topmost color fills at least the top row and extends down.
+         - Middle colors (if any) fill at least their top row and extend down.
+         - The bottommost color fills at least the bottom row and extends up.
     3. Vertical lines for each color extend from its start to its end boundary.
-    4. There's always at least one row of black between color sections for 3 or more colors.
+    4. The frame structure adapts to the spacing between colors in the input.
     5. The interior of each frame remains black.
     
     Args:
@@ -42,23 +42,32 @@ def solve_0f63c0b9(input_grid: ColoredGrid) -> ColoredGrid:
         is_last = i == len(colors) - 1
         
         # Determine boundaries
-        top_boundary = 0 if is_first else start_row
-        bottom_boundary = 14 if is_last else (colors[i+1][1] - 2 if i+1 < len(colors) else 11)
+        top_boundary = start_row if not is_first else 0
+        bottom_boundary = 14 if is_last else (colors[i+1][1] - 1 if i+1 < len(colors) else 13)
         
         # Fill horizontal rows
+        output_grid[top_boundary] = [color] * 15
         if is_first:
-            output_grid[0] = [color] * 15
-            output_grid[1] = [color] * 15
-        elif is_last:
-            output_grid[12] = [color] * 15
-            output_grid[13] = [color] * 15
+            output_grid[top_boundary + 1] = [color] * 15
+        if is_last:
             output_grid[14] = [color] * 15
-        else:
-            output_grid[top_boundary] = [color] * 15
+            output_grid[13] = [color] * 15
         
-        # Fill vertical lines
+        # Fill vertical lines and extend color
         for row in range(top_boundary, bottom_boundary + 1):
             output_grid[row][0] = color
             output_grid[row][14] = color
+            if row == top_boundary or row == bottom_boundary:
+                output_grid[row] = [color] * 15
+        
+        # Extend color to fill large gaps
+        if not is_last and i + 1 < len(colors):
+            next_start = colors[i+1][1]
+            gap = next_start - bottom_boundary - 1
+            if gap > 1:
+                extend_to = bottom_boundary + gap // 2
+                for row in range(bottom_boundary + 1, extend_to):
+                    output_grid[row][0] = color
+                    output_grid[row][14] = color
     
     return ColoredGrid(values=output_grid)
