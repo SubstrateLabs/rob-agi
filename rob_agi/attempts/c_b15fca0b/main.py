@@ -36,7 +36,7 @@ def solve_b15fca0b(input_grid: ColoredGrid) -> ColoredGrid:
     # Perform flood fill from all edges
     for r in range(rows):
         for c in range(cols):
-            if (r == 0 or r == rows-1 or c == 0 or c == cols-1) and grid.values[r][c] not in [BLUE, RED]:
+            if r == 0 or r == rows-1 or c == 0 or c == cols-1:
                 flood_fill(r, c)
 
     # Fill enclosed areas
