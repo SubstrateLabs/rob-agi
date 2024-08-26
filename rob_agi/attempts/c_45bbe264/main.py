@@ -2,39 +2,39 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_45bbe264(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by drawing lines and handling intersections.
+    Transforms the input grid by drawing vertical and horizontal lines, and handling intersections.
     
-    1. For each non-zero color in the input:
-       - If in an even row, draw a horizontal line across the entire row.
-       - If in an odd column, draw a vertical line down the entire column.
-    2. At intersections of different colors, place a red (2) square.
+    1. Draw vertical lines for all non-zero colors in the input grid.
+    2. Draw horizontal lines for non-zero colors in odd-indexed rows of the input grid.
+    3. At intersections of different colors, place a red (2) square.
     
     Returns a new ColoredGrid with the transformed pattern.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = input_grid.get_dimensions()
 
-    # First pass: Draw lines
-    for r in range(rows):
-        for c in range(cols):
-            color = input_grid.values[r][c]
-            if color != 0:
-                if r % 2 == 0:  # Even row
-                    for col in range(cols):
-                        if output_grid.values[r][col] == 0:
-                            output_grid.values[r][col] = color
-                if c % 2 == 1:  # Odd column
-                    for row in range(rows):
-                        if output_grid.values[row][c] == 0:
-                            output_grid.values[row][c] = color
+    # First pass: Draw vertical lines
+    for c in range(cols):
+        for r in range(rows):
+            if input_grid.values[r][c] != 0:
+                for row in range(rows):
+                    output_grid.values[row][c] = input_grid.values[r][c]
+                break  # Move to next column after finding first non-zero
 
-    # Second pass: Handle intersections
+    # Second pass: Draw horizontal lines (only for odd rows)
+    for r in range(1, rows, 2):
+        for c in range(cols):
+            if input_grid.values[r][c] != 0:
+                for col in range(cols):
+                    output_grid.values[r][col] = input_grid.values[r][c]
+                break  # Move to next row after finding first non-zero
+
+    # Third pass: Handle intersections
     for r in range(rows):
         for c in range(cols):
-            row_color = output_grid.values[r][c]
-            if r > 0 and c > 0:
-                col_color = output_grid.values[r-1][c]
-                if row_color != col_color and row_color != 0 and col_color != 0:
+            if output_grid.values[r][c] != 0:
+                if (r > 0 and output_grid.values[r-1][c] != 0 and output_grid.values[r-1][c] != output_grid.values[r][c]) or \
+                   (c > 0 and output_grid.values[r][c-1] != 0 and output_grid.values[r][c-1] != output_grid.values[r][c]):
                     output_grid.values[r][c] = 2  # Red for intersection
 
     return output_grid
