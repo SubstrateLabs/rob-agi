@@ -8,9 +8,9 @@ def solve_4364c1c4(input_grid: ColoredGrid) -> ColoredGrid:
     1. Identifies the background color as the most frequent color.
     2. Finds all distinct shapes (connected regions of non-background colors).
     3. Sorts shapes from top to bottom.
-    4. Moves shapes:
-       - Even-indexed shapes (0, 2, 4, ...): Move left with increasing amounts (1, 2, 3, ...)
-       - Odd-indexed shapes (1, 3, 5, ...): Move right and down with increasing amounts (1, 2, 3, ...)
+    4. Moves shapes in pairs:
+       - First shape of each pair: Move left with increasing amounts (1, 2, 3, ...)
+       - Second shape of each pair: Move right and down with increasing amounts (1, 2, 3, ...)
     5. Applies movements while keeping shapes within grid bounds and preventing overlaps.
     """
     background_color = Counter([cell for row in input_grid.values for cell in row]).most_common(1)[0][0]
@@ -19,17 +19,24 @@ def solve_4364c1c4(input_grid: ColoredGrid) -> ColoredGrid:
 
     new_grid = ColoredGrid(values=[[background_color for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
 
-    for i, shape in enumerate(shapes):
+    for i in range(0, len(shapes), 2):
         movement = (i // 2) + 1
-        if i % 2 == 0:  # Even-indexed shapes (0, 2, 4, ...)
-            dx, dy = -movement, 0
-        else:  # Odd-indexed shapes (1, 3, 5, ...)
-            dx, dy = movement, movement
-
-        new_shape = move_shape(shape, dx, dy, new_grid.num_rows, new_grid.num_cols)
-        color = input_grid.values[shape[0][0]][shape[0][1]]
-        new_shape = adjust_shape_position(new_grid, new_shape, background_color)
-        place_shape(new_grid, new_shape, color)
+        
+        # Move first shape left
+        if i < len(shapes):
+            shape1 = shapes[i]
+            new_shape1 = move_shape(shape1, -movement, 0, new_grid.num_rows, new_grid.num_cols)
+            color1 = input_grid.values[shape1[0][0]][shape1[0][1]]
+            new_shape1 = adjust_shape_position(new_grid, new_shape1, background_color)
+            place_shape(new_grid, new_shape1, color1)
+        
+        # Move second shape right and down
+        if i + 1 < len(shapes):
+            shape2 = shapes[i + 1]
+            new_shape2 = move_shape(shape2, movement, movement, new_grid.num_rows, new_grid.num_cols)
+            color2 = input_grid.values[shape2[0][0]][shape2[0][1]]
+            new_shape2 = adjust_shape_position(new_grid, new_shape2, background_color)
+            place_shape(new_grid, new_shape2, color2)
 
     return new_grid
 
@@ -74,10 +81,17 @@ def move_shape(shape: List[Tuple[int, int]], dx: int, dy: int, max_row: int, max
     return new_shape
 
 def adjust_shape_position(grid: ColoredGrid, shape: List[Tuple[int, int]], background_color: int) -> List[Tuple[int, int]]:
-    while any(r < 0 or r >= grid.num_rows or c < 0 or c >= grid.num_cols or grid.values[r][c] != background_color for r, c in shape):
-        shape = [(r - 1, c) for r, c in shape]  # Move shape up
+    if shape is None:
+        return None
+    
+    while any(r < 0 for r, _ in shape):
+        shape = [(r + 1, c) for r, c in shape]  # Move shape down if it's above the top edge
+    
+    while any(r >= grid.num_rows or c >= grid.num_cols or grid.values[r][c] != background_color for r, c in shape):
+        shape = [(r - 1, c) for r, c in shape]  # Move shape up if it overlaps or is out of bounds
         if any(r < 0 for r, _ in shape):
             return None  # Cannot place the shape without overlap
+    
     return shape
 
 def place_shape(grid: ColoredGrid, shape: List[Tuple[int, int]], color: int):
