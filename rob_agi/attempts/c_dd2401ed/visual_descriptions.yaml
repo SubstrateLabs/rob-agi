@@ -1,23 +1,23 @@
 example_0:
   input: |
-    A 7x15 grid with a vertical gray (5) line in the 5th column from the left. There are several red (2) dots scattered throughout the grid, mostly to the right of the gray line. Blue (1) dots appear in various positions, mostly to the left of the gray line.
+    A 7x15 grid with a vertical gray (5) line in the 5th column (index 4). Blue (1) dots are in columns 1, 2, and 4, all to the left of the gray line. Red (2) dots are scattered in columns 7, 8, 12, and 14, all to the right of the gray line.
   output: |
-    The same 7x15 grid, but the vertical gray (5) line has moved to the 10th column from the left. The red (2) dots remain in the same positions relative to the right edge of the grid. The blue (1) dots have shifted to maintain their relative positions to the left of the gray line.
+    The gray (5) line has moved to the 10th column (index 9), doubling its distance from the left edge. Blue (1) dots remain in their original positions. Red (2) dots have shifted left by 5 columns, maintaining their distance from the right edge. The red dot from column 7 is now in column 2, and the one from column 14 is now in column 9, just left of the new gray line position.
 
 example_1:
   input: |
-    A 7x15 grid with a vertical gray (5) line in the 6th column from the left. Red (2) dots are scattered throughout the grid, mostly to the right of the gray line. Blue (1) dots appear in various positions, all to the left of the gray line.
+    A 7x15 grid with a vertical gray (5) line in the 6th column (index 5). Blue (1) dots are in columns 1 and 5, all to the left of the gray line. Red (2) dots are scattered in columns 7, 8, 10, 11, and 15, all to the right of the gray line.
   output: |
-    The same 7x15 grid, but the vertical gray (5) line has moved to the 12th column from the left. The red (2) dots have shifted to maintain their relative positions to the right of the gray line. The blue (1) dots have been transformed into red (2) dots, keeping their relative positions to the left of the new gray line position.
+    The gray (5) line has moved to the 12th column (index 11), doubling its distance from the left edge. Blue (1) dots have transformed into red (2) dots but remain in their original positions in columns 1 and 5. Original red (2) dots have shifted left by 6 columns, maintaining their distance from the right edge. The red dots from columns 15 and 11 are now in columns 9 and 5 respectively.
 
 example_2:
   input: |
-    A 7x15 grid with a vertical gray (5) line in the 2nd column from the left. Red (2) dots are scattered throughout the grid to the right of the gray line. One blue (1) dot appears in the second row, leftmost column.
+    A 7x15 grid with a vertical gray (5) line in the 2nd column (index 1). One blue (1) dot is in the leftmost column (index 0). Red (2) dots are scattered in columns 5, 6, 10, and 13, all to the right of the gray line.
   output: |
-    The same 7x15 grid, but the vertical gray (5) line has moved to the 4th column from the left. The red (2) dots remain in the same positions relative to the right edge of the grid. The blue (1) dot remains in its original position.
+    The gray (5) line has moved to the 4th column (index 3), doubling its distance from the left edge. The blue (1) dot remains in its original position in the leftmost column. Red (2) dots have shifted left by 2 columns, maintaining their distance from the right edge. The red dots are now in columns 3, 4, 8, and 11.
 
 example_3:
   input: |
-    A 7x15 grid with a vertical gray (5) line in the 4th column from the left. Red (2) dots are scattered throughout the grid to the right of the gray line. One blue (1) dot appears in the second row, leftmost column, and another in the 5th row, 3rd column from the left.
+    A 7x15 grid with a vertical gray (5) line in the 4th column (index 3). Blue (1) dots are in columns 1 and 3, both to the left of the gray line. Red (2) dots are scattered in columns 6, 10, 13, and 15, all to the right of the gray line.
   output: |
-    The same 7x15 grid, but the vertical gray (5) line has moved to the 8th column from the left. The red (2) dots remain in the same positions relative to the right edge of the grid. The blue (1) dots remain in their original positions.
+    The gray (5) line has moved to the 8th column (index 7), doubling its distance from the left edge. Blue (1) dots remain in their original positions in columns 1 and 3. Red (2) dots have shifted left by 4 columns, maintaining their distance from the right edge. The red dots are now in columns 2, 6, 9, and 11.
