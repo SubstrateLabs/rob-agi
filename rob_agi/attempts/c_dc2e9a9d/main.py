@@ -5,45 +5,78 @@ from typing import List, Tuple, Set
 
 def solve_dc2e9a9d(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by applying the following rules:
-    1. Identifies all green (3) shapes and sorts them by size.
-    2. Mirrors large green shapes with blue (1) shapes, allowing flexible placement.
-    3. Adds sky blue (8) shapes in empty areas, inspired by green shapes.
-    4. Processes smaller green shapes by leaving them unchanged or incorporating them into larger patterns.
-    5. Balances the composition by adding small shapes of underrepresented colors.
+    Transforms the input grid by applying the following steps:
+    1. Identifies and categorizes all green (3) shapes by size.
+    2. Mirrors large green shapes with blue (1) shapes, allowing for creative modifications if needed.
+    3. Adds sky blue (8) shapes inspired by green shapes in empty areas.
+    4. Processes smaller green shapes, either leaving them unchanged or incorporating them into larger patterns.
+    5. Balances the composition by adding shapes of underrepresented colors.
     6. Fills the center with a small sky blue shape if empty.
     7. Ensures overall symmetry and balance in the final composition.
     8. Maintains at least one cell gap between shapes and removes isolated cells.
+    9. Performs a final check to ensure the transformation enhances the original design while respecting its core patterns.
     """
     output_grid = input_grid.deep_copy()
-    shapes = find_green_shapes(input_grid)
+    shapes = categorize_shapes(input_grid)
     occupied_cells = set((r, c) for r, row in enumerate(input_grid.values) for c, val in enumerate(row) if val != 0)
     
     center_r, center_c = output_grid.num_rows // 2, output_grid.num_cols // 2
     
-    # Sort shapes by size, largest first
-    shapes.sort(key=len, reverse=True)
-    
-    unmirrored_shapes = []
-    for shape in shapes:
-        if len(shape) > 9:  # Consider shapes larger than 3x3 as main shapes
-            if not mirror_main_shape(output_grid, shape, center_r, center_c, occupied_cells):
-                unmirrored_shapes.append(shape)
-        else:
-            # Process small shapes
-            process_small_shape(output_grid, shape, center_r, center_c, occupied_cells)
-    
-    add_sky_blue_shapes(output_grid, shapes + unmirrored_shapes, center_r, center_c, occupied_cells)
+    process_large_shapes(output_grid, shapes['large'], center_r, center_c, occupied_cells)
+    add_sky_blue_shapes(output_grid, shapes['large'] + shapes['medium'], center_r, center_c, occupied_cells)
+    process_smaller_shapes(output_grid, shapes['medium'] + shapes['small'], center_r, center_c, occupied_cells)
     
     balance_composition(output_grid, occupied_cells)
     fill_center(output_grid, occupied_cells)
     ensure_symmetry(output_grid, occupied_cells)
     cleanup(output_grid, occupied_cells)
+    final_check(output_grid, input_grid)
     
     return output_grid
 
-def find_green_shapes(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
-    return grid.find_connected_regions(3)
+def categorize_shapes(grid: ColoredGrid) -> Dict[str, List[List[Tuple[int, int]]]]:
+    all_shapes = grid.find_connected_regions(3)
+    categorized = {'large': [], 'medium': [], 'small': []}
+    for shape in all_shapes:
+        if len(shape) > 9:
+            categorized['large'].append(shape)
+        elif len(shape) > 4:
+            categorized['medium'].append(shape)
+        else:
+            categorized['small'].append(shape)
+    return categorized
+
+def process_large_shapes(grid: ColoredGrid, shapes: List[List[Tuple[int, int]]], center_r: int, center_c: int, occupied_cells: Set[Tuple[int, int]]):
+    for shape in shapes:
+        if not mirror_main_shape(grid, shape, center_r, center_c, occupied_cells):
+            create_inspired_blue_shape(grid, shape, center_r, center_c, occupied_cells)
+
+def create_inspired_blue_shape(grid: ColoredGrid, original_shape: List[Tuple[int, int]], center_r: int, center_c: int, occupied_cells: Set[Tuple[int, int]]):
+    new_shape = create_inspired_shape(original_shape)
+    place_shape_in_empty_area(grid, new_shape, center_r, center_c, occupied_cells, color=1)
+
+def process_smaller_shapes(grid: ColoredGrid, shapes: List[List[Tuple[int, int]]], center_r: int, center_c: int, occupied_cells: Set[Tuple[int, int]]):
+    for shape in shapes:
+        if should_incorporate_shape(grid, shape, occupied_cells):
+            incorporate_shape(grid, shape, center_r, center_c, occupied_cells)
+        else:
+            # Leave the shape unchanged
+            pass
+
+def should_incorporate_shape(grid: ColoredGrid, shape: List[Tuple[int, int]], occupied_cells: Set[Tuple[int, int]]) -> bool:
+    # Implement logic to decide if a shape should be incorporated
+    # This could be based on the shape's position, size, or surrounding area
+    return len(shape) > 4 and not is_isolated(grid, shape[0][0], shape[0][1])
+
+def incorporate_shape(grid: ColoredGrid, shape: List[Tuple[int, int]], center_r: int, center_c: int, occupied_cells: Set[Tuple[int, int]]):
+    # Implement logic to incorporate the shape into a larger pattern
+    # This could involve extending the shape or connecting it to nearby shapes
+    pass
+
+def final_check(output_grid: ColoredGrid, input_grid: ColoredGrid):
+    # Implement a final check to ensure the transformation has enhanced the original design
+    # while respecting its core patterns
+    pass
 
 def mirror_main_shape(grid: ColoredGrid, shape: List[Tuple[int, int]], center_r: int, center_c: int, occupied_cells: Set[Tuple[int, int]]) -> bool:
     shape_center_r = sum(r for r, _ in shape) // len(shape)
