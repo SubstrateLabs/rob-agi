@@ -1,35 +1,82 @@
 example_0:
   input: |
-    A large 21x18 grid mostly filled with black (0) squares. There are several blue (1) regions scattered throughout, with yellow (4) and magenta (6) squares interspersed within these blue regions. The blue regions vary in size and shape, some forming rectangles or L-shapes. The largest blue region is in the center-left, spanning about 6x8 squares. Yellow and magenta squares appear to be randomly placed within the blue areas, often near the edges or corners of these regions.
+    A 21x18 grid with multiple blue (1) regions surrounded by black (0). Key features:
+    1. Largest blue region: Center-left, approximately 6x8.
+    2. Special squares: Yellow (4) and magenta (6) within blue regions.
+    3. Blue region shapes: Varied, including rectangles and L-shapes.
+    4. Special square distribution: Often near edges or corners of blue regions.
+    5. Multiple blue regions contain both yellow and magenta squares.
   output: |
-    A small 5x5 blue (1) square with a magenta (6) square in the top-right corner and a yellow (4) square in the bottom-right corner. This appears to be a subset or extraction of one of the blue regions from the input grid, specifically focusing on an area that contains both a yellow and a magenta square.
+    A 5x5 blue (1) rectangle extracted from the input. Key features:
+    1. Magenta (6) square: Top-right corner.
+    2. Yellow (4) square: Bottom-right corner.
+    3. Represents the largest blue rectangle containing both types of special squares.
 
 example_1:
   input: |
-    A 22x20 grid predominantly filled with black (0) squares. There are several distinct blue (1) regions, each containing yellow (4) and magenta (6) squares. The blue regions are more structured than in the previous example, forming clear rectangular shapes. The largest blue region is roughly 9x8 squares in the bottom-left quadrant. Yellow and magenta squares are distributed within these blue rectangles, often appearing near the edges or corners.
+    A 22x20 grid with distinct blue (1) rectangular regions amid black (0). Key features:
+    1. Largest blue region: Bottom-left quadrant, approximately 9x8.
+    2. Special squares: Yellow (4) and magenta (6) within blue rectangles.
+    3. Blue regions: More structured and rectangular than example_0.
+    4. Special square distribution: Often near edges or corners of blue rectangles.
+    5. Multiple blue regions contain both yellow and magenta squares.
   output: |
-    A small 3x5 blue (1) rectangle. It contains a yellow (4) square in the top-left corner and a magenta (6) square in the middle of the second row. This appears to be a subset or extraction of one of the blue rectangular regions from the input grid, specifically one that contains both a yellow and a magenta square.
+    A 3x5 blue (1) rectangle extracted from the input. Key features:
+    1. Yellow (4) square: Top-left corner.
+    2. Magenta (6) square: Middle of the second row.
+    3. Represents the optimal rectangle based on special square count and position.
 
 example_2:
   input: |
-    A 22x21 grid with a mix of black (0) and blue (1) squares. The blue squares form several distinct rectangular regions of varying sizes. Within these blue rectangles, there are yellow (4) and magenta (6) squares scattered throughout. The largest blue region is roughly 9x6 squares in the top-left corner. The distribution of yellow and magenta squares within the blue areas seems more uniform compared to previous examples, with multiple instances in each blue region.
+    A 22x21 grid with multiple blue (1) rectangular regions amid black (0). Key features:
+    1. Largest blue region: Top-left corner, approximately 9x6.
+    2. Special squares: Yellow (4) and magenta (6) scattered throughout blue areas.
+    3. Special square distribution: More uniform than previous examples.
+    4. Multiple special squares in each blue region.
+    5. Various sizes of blue rectangular regions.
   output: |
-    A 4x6 blue (1) rectangle. It contains a magenta (6) square in the third row, third column, and a yellow (4) square in the fourth row, fifth column. This rectangle appears to be extracted from one of the larger blue regions in the input grid, specifically one that contains both magenta and yellow squares.
+    A 4x6 blue (1) rectangle extracted from the input. Key features:
+    1. Magenta (6) square: Third row, third column.
+    2. Yellow (4) square: Fourth row, fifth column.
+    3. Represents the optimal rectangle based on size and special square count.
 
 example_3:
   input: |
-    A 12x11 grid mostly filled with black (0) squares. There are two distinct blue (1) rectangular regions. The first is a 4x3 rectangle in the top-left corner, containing two yellow (4) squares. The second is a 6x4 rectangle in the bottom-right quadrant, containing one magenta (6) square. These blue regions are completely separated by black squares.
+    A 12x11 grid with two distinct blue (1) rectangular regions amid black (0). Key features:
+    1. Top-left blue region: 4x3 rectangle with two yellow (4) squares.
+    2. Bottom-right blue region: 6x4 rectangle with one magenta (6) square.
+    3. Blue regions are completely separated by black squares.
+    4. No blue regions contain both yellow and magenta squares.
   output: |
-    A 4x6 blue (1) rectangle. It contains a magenta (6) square in the third row, third column. This rectangle appears to be an expanded version of the 6x4 blue rectangle from the input grid, with the rows and columns swapped (transposed) and extended to include more blue squares.
+    A 4x6 blue (1) rectangle derived from the input. Key features:
+    1. Magenta (6) square: Third row, third column.
+    2. Expanded from the 6x4 bottom-right input region.
+    3. Transposed and extended to maximize blue area while including the magenta square.
 
 example_4:
   input: |
-    A 22x15 grid with several distinct blue (1) rectangular regions surrounded by black (0) squares. The blue rectangles vary in size and are scattered throughout the grid. Within these blue areas, there are yellow (4) and magenta (6) squares distributed seemingly randomly. Some blue regions contain multiple yellow and magenta squares, while others have only one or two. The largest blue region is roughly 6x6 squares in the center-right of the grid.
+    A 22x15 grid with multiple blue (1) rectangular regions amid black (0). Key features:
+    1. Largest blue region: Center-right, approximately 6x6.
+    2. Special squares: Yellow (4) and magenta (6) distributed within blue areas.
+    3. Varying special square density: Some regions have multiple, others have few.
+    4. Blue regions of various sizes scattered throughout the grid.
+    5. Multiple blue regions contain both yellow and magenta squares.
   output: |
-    A 7x5 blue (1) rectangle. It contains two yellow (4) squares: one in the third row, second column, and another in the fifth row, third column. This rectangle appears to be extracted and possibly expanded from one of the blue regions in the input grid, specifically one that contained at least two yellow squares.
+    A 7x5 blue (1) rectangle extracted from the input. Key features:
+    1. Two yellow (4) squares: Third row, second column; fifth row, third column.
+    2. No magenta squares included.
+    3. Represents the largest rectangle with the most special (yellow) squares.
 
 test_case_0:
   input: |
-    A 21x18 grid predominantly filled with black (0) squares. There are several distinct blue (1) rectangular regions of varying sizes scattered throughout the grid. Within these blue areas, there are yellow (4) and magenta (6) squares distributed seemingly randomly. Some blue regions contain multiple yellow and magenta squares, while others have only one or two. The largest blue region appears to be in the bottom-left quadrant, roughly 11x8 squares in size.
+    A 21x18 grid with multiple blue (1) rectangular regions amid black (0). Key features:
+    1. Largest blue region: Bottom-left quadrant, approximately 11x8.
+    2. Special squares: Yellow (4) and magenta (6) distributed within blue areas.
+    3. Varying special square density across blue regions.
+    4. Multiple blue regions of different sizes throughout the grid.
+    5. Some blue regions contain both yellow and magenta squares.
   output: |
-    The output grid is not provided for this test case.
+    Output not provided. The solution should extract the optimal blue rectangle based on:
+    1. Maximum number of special squares (yellow and magenta).
+    2. Largest area if special square count is tied.
+    3. Most top-left position if area and special square count are tied.
