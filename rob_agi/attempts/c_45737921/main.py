@@ -3,17 +3,20 @@ from typing import List, Tuple, Dict, Set
 
 def solve_45737921(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the 45737921 challenge by reversing the order of colors within each connected region of the grid that contains exactly two colors.
+    Solves the 45737921 challenge by swapping colors within each connected region of the grid that contains exactly two colors.
     
     The solution works as follows:
     1. Create a deep copy of the input grid.
     2. Find all non-black connected regions in the grid.
     3. For each region with exactly two colors:
-       - Separate the cells of each color into two lists.
-       - Sort each list based on row-major order.
-       - Reverse both sorted lists.
-       - Reassign colors to the cells based on the reversed lists, maintaining the original shape.
+       - Identify the two colors present in the region.
+       - Group cells by their color.
+       - Sort cells in each color group based on row-major order.
+       - Swap the colors of the sorted cells, maintaining their positions.
     4. Return the modified grid.
+
+    This approach preserves the shape and structure of each region while reversing the color pattern
+    for regions with exactly two colors. Regions with one color or more than two colors remain unchanged.
     """
     output_grid = input_grid.deep_copy()
     regions = find_all_regions(output_grid)
@@ -48,18 +51,22 @@ def has_two_colors(grid: ColoredGrid, region: List[Tuple[int, int]]) -> bool:
     return len(colors) == 2
 
 def reverse_colors_in_region(grid: ColoredGrid, region: List[Tuple[int, int]]) -> None:
-    colors = list(set(grid.get_cell(r, c) for r, c in region))
-    color_lists = [[], []]
+    colors = sorted(set(grid.get_cell(r, c) for r, c in region))
+    if len(colors) != 2:
+        return  # Only process regions with exactly two colors
+
+    color_to_cells = {color: [] for color in colors}
     for r, c in region:
-        color_index = colors.index(grid.get_cell(r, c))
-        color_lists[color_index].append((r, c))
-    
-    for color_list in color_lists:
-        color_list.sort(key=lambda x: (x[0], x[1]))  # Sort by row, then column
-    
-    color_map = {tuple(cell): grid.get_cell(cell[0], cell[1]) for cell in region}
-    reversed_colors = [color for color in reversed(sum(color_lists, []))]
-    
-    for (r, c), new_color in zip(sum(color_lists, []), reversed_colors):
-        if color_map[(r, c)] != new_color:
-            grid.set_cell(r, c, new_color)
+        color = grid.get_cell(r, c)
+        color_to_cells[color].append((r, c))
+
+    for color in colors:
+        color_to_cells[color].sort(key=lambda x: (x[0], x[1]))  # Sort by row, then column
+
+    new_color_assignments = []
+    for color, cells in color_to_cells.items():
+        other_color = colors[1] if color == colors[0] else colors[0]
+        new_color_assignments.extend([(cell, other_color) for cell in reversed(cells)])
+
+    for (r, c), new_color in new_color_assignments:
+        grid.set_cell(r, c, new_color)
