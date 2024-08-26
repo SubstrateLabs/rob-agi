@@ -4,67 +4,55 @@ from typing import List, Tuple
 def solve_79fb03f4(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the grid transformation challenge by:
-    1. Creating a "blue aura" around initial blue (1) squares and barriers (5 or 8)
-    2. Extending blue lines horizontally and vertically up to 2 cells from barriers or edges
-    3. Filling the area around barriers within a 2-cell radius
-    4. Converting all cells in the "blue aura" to blue (1)
-    5. Respecting barriers and grid edges
+    1. Scanning the grid to identify rows with initial blue cells (1) and barriers (5 or 8).
+    2. Filling entire rows containing initial blue cells with blue (1), except for barriers.
+    3. Expanding blue vertically up to 2 cells from filled rows, stopping at barriers or edges.
+    4. Creating a "blue aura" around barriers, extending up to 2 cells horizontally and vertically.
+    5. Performing a final pass to ensure all marked cells are blue (1) and others unchanged.
 
-    The function creates an aura effect around blue squares and barriers,
-    maintaining symmetry and following the "2 cells away" rule.
+    The function creates a specific pattern of blue expansion based on initial blue cells and barriers,
+    following the "2 cells away" rule and respecting grid boundaries.
     """
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
-    aura = [[False for _ in range(cols)] for _ in range(rows)]
 
     def is_barrier(r: int, c: int) -> bool:
         return 0 <= r < rows and 0 <= c < cols and grid.get_cell(r, c) in [5, 8]
 
-    def mark_aura(r: int, c: int):
-        if 0 <= r < rows and 0 <= c < cols and grid.get_cell(r, c) == 0:
-            aura[r][c] = True
+    def fill_row(r: int):
+        for c in range(cols):
+            if not is_barrier(r, c):
+                grid.set_cell(r, c, 1)
 
-    def horizontal_expansion():
-        for r in range(rows):
-            for c in range(cols):
-                if grid.get_cell(r, c) == 1:
-                    for dc in [-1, 1]:
-                        for i in range(1, 3):
-                            nc = c + i * dc
-                            if 0 <= nc < cols and not is_barrier(r, nc):
-                                mark_aura(r, nc)
-                            else:
-                                break
+    def vertical_expand(r: int):
+        for dr in [-2, -1, 1, 2]:
+            nr = r + dr
+            if 0 <= nr < rows:
+                for c in range(cols):
+                    if not is_barrier(nr, c) and grid.get_cell(nr, c) == 0:
+                        grid.set_cell(nr, c, 1)
 
-    def vertical_expansion():
-        for r in range(rows):
-            for c in range(cols):
-                if aura[r][c] or grid.get_cell(r, c) == 1:
-                    for dr in [-1, 1]:
-                        for i in range(1, 3):
-                            nr = r + i * dr
-                            if 0 <= nr < rows and not is_barrier(nr, c):
-                                mark_aura(nr, c)
-                            else:
-                                break
+    def barrier_aura(r: int, c: int):
+        for dr in range(-2, 3):
+            for dc in range(-2, 3):
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < rows and 0 <= nc < cols and grid.get_cell(nr, nc) == 0:
+                    grid.set_cell(nr, nc, 1)
 
-    def barrier_aura():
-        for r in range(rows):
-            for c in range(cols):
-                if is_barrier(r, c):
-                    for dr in range(-2, 3):
-                        for dc in range(-2, 3):
-                            mark_aura(r + dr, c + dc)
+    # Step 1 & 2: Scan and fill rows with initial blue cells
+    for r in range(rows):
+        if 1 in [grid.get_cell(r, c) for c in range(cols)]:
+            fill_row(r)
 
-    def fill_aura():
-        for r in range(rows):
-            for c in range(cols):
-                if aura[r][c] and grid.get_cell(r, c) == 0:
-                    grid.set_cell(r, c, 1)
+    # Step 3: Vertical expansion
+    for r in range(rows):
+        if 1 in [grid.get_cell(r, c) for c in range(cols)]:
+            vertical_expand(r)
 
-    horizontal_expansion()
-    vertical_expansion()
-    barrier_aura()
-    fill_aura()
+    # Step 4: Barrier aura
+    for r in range(rows):
+        for c in range(cols):
+            if is_barrier(r, c):
+                barrier_aura(r, c)
 
     return grid
