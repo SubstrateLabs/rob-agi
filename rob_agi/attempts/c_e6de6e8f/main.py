@@ -6,35 +6,44 @@ def solve_e6de6e8f(input_grid: ColoredGrid) -> ColoredGrid:
     
     The function works as follows:
     1. Initialize an 8x7 grid with black (0) squares and a green (3) square at the top center.
-    2. Map horizontal positions in the input to vertical start positions in the output.
-    3. For each red square in the top input row:
-       a. Calculate the starting row in the output using the mapping function.
-       b. Count consecutive red squares in the bottom row at the corresponding position.
-       c. Create a diagonal sequence of red squares in the output grid, moving down and right.
-    4. Return the completed output grid.
+    2. Find all positions of red squares in the top input row and the rightmost red square position.
+    3. Map input columns to output columns using a mapping function.
+    4. For each red square in the top input row:
+       a. Calculate the branch length by counting consecutive red squares in the bottom row.
+       b. Draw a branch in the output grid, starting from the mapped column and moving down and right.
+    5. Return the completed output grid.
     """
+    def map_column(input_col: int) -> int:
+        return min(6, round(input_col * 6 / 11))
+
+    def get_branch_length(start_col: int) -> int:
+        length = 0
+        for col in range(start_col, len(input_grid.values[1])):
+            if input_grid.values[1][col] == 2:
+                length += 1
+            else:
+                break
+        return length
+
+    def draw_branch(start_col: int, length: int, max_right_col: int) -> None:
+        row, col = 1, start_col
+        for _ in range(length):
+            if row >= 8 or col > max_right_col:
+                break
+            output[row][col] = 2
+            row += 1
+            if col < max_right_col:
+                col += 1
+
     output = [[0 for _ in range(7)] for _ in range(8)]
-    output[0][3] = 3  # Place green square at top center
+    output[0][3] = 3  # Green square at top center
 
-    def map_position(i: int) -> int:
-        return min(7, max(0, round(i * 7 / 11)))
+    top_red_positions = [i for i, v in enumerate(input_grid.values[0]) if v == 2]
+    max_right_col = map_column(max(top_red_positions))
 
-    current_column = 0
-    for i, top_value in enumerate(input_grid.values[0]):
-        if top_value == 2:  # Red square in top row
-            starting_row = map_position(i)
-            length = 0
-            for j in range(i, len(input_grid.values[1])):
-                if input_grid.values[1][j] == 2:
-                    length += 1
-                else:
-                    break
-            
-            for j in range(length):
-                if current_column < 7 and starting_row + j < 8:
-                    output[starting_row + j][current_column] = 2
-                else:
-                    break
-            current_column += 1
+    for pos in top_red_positions:
+        start_col = map_column(pos)
+        length = get_branch_length(pos)
+        draw_branch(start_col, length, max_right_col)
 
     return ColoredGrid(values=output)
