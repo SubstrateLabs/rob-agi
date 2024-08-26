@@ -14,7 +14,7 @@ def solve_b15fca0b(input_grid: ColoredGrid) -> ColoredGrid:
     Algorithm:
     1. Create a deep copy of the input grid.
     2. Initialize an 'open' grid to track cells that can be reached from any edge.
-    3. Perform flood fill from all edge cells that are not blue, including diagonal movements.
+    3. Perform flood fill from all edge cells that are not blue or red, including diagonal movements.
     4. Fill unreachable black cells with yellow.
     5. Return the modified grid.
     """
@@ -23,7 +23,7 @@ def solve_b15fca0b(input_grid: ColoredGrid) -> ColoredGrid:
     open_grid = [[False for _ in range(cols)] for _ in range(rows)]
 
     def flood_fill(r, c):
-        if not (0 <= r < rows and 0 <= c < cols) or open_grid[r][c] or grid.values[r][c] == BLUE:
+        if not (0 <= r < rows and 0 <= c < cols) or open_grid[r][c] or grid.values[r][c] in [BLUE, RED]:
             return
         open_grid[r][c] = True
         for dr in [-1, 0, 1]:
@@ -33,7 +33,7 @@ def solve_b15fca0b(input_grid: ColoredGrid) -> ColoredGrid:
     # Perform flood fill from all edges
     for r in range(rows):
         for c in range(cols):
-            if (r == 0 or r == rows-1 or c == 0 or c == cols-1) and grid.values[r][c] != BLUE:
+            if (r == 0 or r == rows-1 or c == 0 or c == cols-1) and grid.values[r][c] not in [BLUE, RED]:
                 flood_fill(r, c)
 
     # Fill enclosed areas
