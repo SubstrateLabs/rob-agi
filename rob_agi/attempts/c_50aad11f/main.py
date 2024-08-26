@@ -43,19 +43,25 @@ def solve_50aad11f(input_grid: ColoredGrid) -> ColoredGrid:
         indicators = []
         rows, cols = input_grid.get_dimensions()
         for region in regions:
-            for x, y in region:
-                for dx in [-1, 0, 1]:
-                    for dy in [-1, 0, 1]:
-                        nx, ny = x + dx, y + dy
-                        if 0 <= nx < rows and 0 <= ny < cols:
-                            cell_color = input_grid.get_cell(nx, ny)
-                            if cell_color not in [0, 6]:
-                                indicators.append(cell_color)
-                                break
-                    if indicators[-1] != 6:
+            indicator = 0  # Default color (black) if no indicator found
+            min_x = min(x for x, _ in region)
+            max_x = max(x for x, _ in region)
+            min_y = min(y for _, y in region)
+            max_y = max(y for _, y in region)
+        
+            for x in range(max(0, min_x - 1), min(rows, max_x + 2)):
+                for y in range(max(0, min_y - 1), min(cols, max_y + 2)):
+                    cell_color = input_grid.get_cell(x, y)
+                    if cell_color not in [0, 6]:
+                        indicator = cell_color
                         break
-                if indicators[-1] != 6:
+                if indicator != 0:
                     break
+        
+            if indicator == 0 and indicators:  # If no indicator found, use the previous color
+                indicator = indicators[-1]
+            indicators.append(indicator)
+    
         return indicators
 
     def assign_colors(regions: List[List[Tuple[int, int]]], indicators: List[int]) -> List[Tuple[int, List[Tuple[int, int]]]]:
