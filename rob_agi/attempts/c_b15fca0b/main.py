@@ -23,12 +23,15 @@ def solve_b15fca0b(input_grid: ColoredGrid) -> ColoredGrid:
     open_grid = [[False for _ in range(cols)] for _ in range(rows)]
 
     def flood_fill(r, c):
-        if not (0 <= r < rows and 0 <= c < cols) or open_grid[r][c] or grid.values[r][c] in [BLUE, RED]:
-            return
-        open_grid[r][c] = True
-        for dr in [-1, 0, 1]:
-            for dc in [-1, 0, 1]:
-                flood_fill(r + dr, c + dc)
+        stack = [(r, c)]
+        while stack:
+            r, c = stack.pop()
+            if not (0 <= r < rows and 0 <= c < cols) or open_grid[r][c] or grid.values[r][c] in [BLUE, RED]:
+                continue
+            open_grid[r][c] = True
+            for dr in [-1, 0, 1]:
+                for dc in [-1, 0, 1]:
+                    stack.append((r + dr, c + dc))
 
     # Perform flood fill from all edges
     for r in range(rows):
