@@ -2,17 +2,18 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_94133066(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Extracts the smallest rectangular area containing all non-black cells from the input grid,
-    adds a blue border, preserves all colors and their counts, and centers the pattern.
+    Transforms the input grid by extracting the pattern, centering it, and adding a blue border.
 
     1. Finds the bounding box of all non-black cells in the input grid.
-    2. Creates a new grid with the dimensions of the bounding box plus a blue border.
-    3. Copies all non-black cells from the input grid to their corresponding positions in the new grid.
-    4. Centers the pattern within the new grid.
-    5. Ensures all colors from the input grid are preserved in the output grid.
-    6. Fills any remaining cells with blue.
+    2. Creates a new grid with dimensions that are the larger of:
+       a) Pattern dimensions + 2 (for the border)
+       b) 9x9 (minimum size requirement)
+    3. Fills the new grid with blue (1) as a starting point.
+    4. Copies the pattern from the input grid to the center of the new grid.
+    5. Preserves the count of all colors (except black and blue) from the input grid.
+    6. Ensures the outermost layer is entirely blue.
 
-    Returns a new ColoredGrid object representing the extracted, preserved, and centered pattern with a blue border.
+    Returns a new ColoredGrid object representing the transformed pattern with a blue border.
     """
     # Find the bounding box
     rows, cols = input_grid.get_dimensions()
@@ -29,7 +30,7 @@ def solve_94133066(input_grid: ColoredGrid) -> ColoredGrid:
     output_height = max(pattern_height + 2, 9)  # Ensure minimum size of 9x9
     output_width = max(pattern_width + 2, 9)
     
-    # Create new grid
+    # Create new grid filled with blue
     output_grid = ColoredGrid(values=[[1 for _ in range(output_width)] for _ in range(output_height)])
     
     # Calculate padding for centering
@@ -50,10 +51,16 @@ def solve_94133066(input_grid: ColoredGrid) -> ColoredGrid:
         while output_grid.count_color(color) < count:
             for r in range(1, output_height - 1):
                 for c in range(1, output_width - 1):
-                    if output_grid.values[r][c] == 1 and not (r == 1 or r == output_height - 2 or c == 1 or c == output_width - 2):
+                    if output_grid.values[r][c] == 1:
                         output_grid.values[r][c] = color
                         break
                 if output_grid.count_color(color) == count:
                     break
+    
+    # Ensure border integrity
+    for r in range(output_height):
+        output_grid.values[r][0] = output_grid.values[r][-1] = 1
+    for c in range(output_width):
+        output_grid.values[0][c] = output_grid.values[-1][c] = 1
     
     return output_grid
