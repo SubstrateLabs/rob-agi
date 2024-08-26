@@ -45,14 +45,15 @@ def solve_917bccba(input_grid: ColoredGrid) -> ColoredGrid:
     
     # Horizontal lines at the top and bottom of the shape
     for c in range(cols):
-        new_grid.values[shape_top][c] = cross_color
-        new_grid.values[shape_bottom][c] = cross_color
+        if c < shape_left or c > shape_right:
+            new_grid.values[shape_top][c] = cross_color
+            new_grid.values[shape_bottom][c] = cross_color
     
     # Preserve original cross parts outside the shape
     for r in range(rows):
         for c in range(cols):
             if input_grid.values[r][c] == cross_color:
-                if r < shape_top or r > shape_bottom or c < shape_left:
+                if r < shape_top or r > shape_bottom or c < shape_left or c > shape_right:
                     new_grid.values[r][c] = cross_color
     
     return new_grid
