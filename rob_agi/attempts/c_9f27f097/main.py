@@ -8,8 +8,8 @@ def solve_9f27f097(input_grid: ColoredGrid) -> ColoredGrid:
     with a 180-degree rotation.
     
     1. Identify the border color
-    2. Find the source region (corner with the most diverse colors)
-    3. Find the target region (opposite corner to the source)
+    2. Find the source region (area with the most diverse colors)
+    3. Find the target region (empty or uniform color region)
     4. Determine the size of the source region
     5. Apply 180-degree rotation from source to target
     6. Handle target region expansion if necessary
@@ -17,14 +17,15 @@ def solve_9f27f097(input_grid: ColoredGrid) -> ColoredGrid:
     # Step 1: Identify border color
     border_color = identify_border_color(input_grid)
     
-    # Step 2 & 3: Find source and target regions
-    source_corner, target_corner = find_source_and_target_corners(input_grid, border_color)
+    # Step 2: Find source region
+    source_region = find_most_diverse_region(input_grid, border_color)
     
-    # Step 4: Determine size of source region
-    source_size = determine_source_size(input_grid, source_corner, border_color)
+    # Step 3 & 4: Find target region and determine size
+    source_size = len(source_region)
+    target_region = find_target_region(input_grid, border_color, source_size)
     
     # Step 5 & 6: Apply rotation and handle expansion
-    output_grid = apply_transformation(input_grid, source_corner, target_corner, source_size, border_color)
+    output_grid = apply_transformation(input_grid, source_region, target_region)
     
     return output_grid
 
@@ -56,18 +57,13 @@ def determine_source_size(grid: ColoredGrid, corner: str, border_color: int) -> 
         size += 1
     return size
 
-def apply_transformation(grid: ColoredGrid, source_corner: str, target_corner: str, size: int, border_color: int) -> ColoredGrid:
+def apply_transformation(grid: ColoredGrid, source_region: List[Tuple[int, int]], target_region: List[Tuple[int, int]]) -> ColoredGrid:
     output_grid = grid.deep_copy()
-    source_row, source_col = get_corner_coordinates(source_corner, grid.num_rows, grid.num_cols)
-    target_row, target_col = get_corner_coordinates(target_corner, grid.num_rows, grid.num_cols)
+    source_bounds = get_region_bounds(source_region)
+    target_bounds = get_region_bounds(target_region)
     
-    for r in range(size):
-        for c in range(size):
-            source_value = grid.values[source_row + r][source_col + c]
-            new_r = target_row + (size - 1 - r)
-            new_c = target_col + (size - 1 - c)
-            if 0 <= new_r < grid.num_rows and 0 <= new_c < grid.num_cols:
-                output_grid.values[new_r][new_c] = source_value
+    for (sy, sx), (ty, tx) in zip(source_region, target_region):
+        output_grid.values[ty][tx] = grid.values[sy][sx]
     
     return output_grid
 
