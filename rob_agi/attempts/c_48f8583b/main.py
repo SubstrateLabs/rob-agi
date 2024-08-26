@@ -10,8 +10,8 @@ def solve_48f8583b(input_grid: ColoredGrid) -> ColoredGrid:
     5. Fill the rest of the grid with zeros (black).
     
     The implementation checks for symmetry, repeating rows or columns, and dominant colors or patterns.
-    It then places the original grid and duplicates it based on the detected pattern, ensuring no more
-    than a 6x6 area is filled with non-zero values.
+    It then places the original grid in the appropriate location, with the default being the top-right corner.
+    Duplication is applied based on the detected pattern, ensuring no more than a 6x6 area is filled with non-zero values.
     """
     output = ColoredGrid(values=[[0 for _ in range(9)] for _ in range(9)])
     
@@ -57,10 +57,9 @@ def solve_48f8583b(input_grid: ColoredGrid) -> ColoredGrid:
                 output.values[i+3][j+6] = input_grid.values[i][j]  # Middle-right
                 output.values[i+6][j+3] = input_grid.values[i][j]  # Bottom-middle
     else:
-        # No clear pattern: place in top-left and duplicate once vertically
+        # No clear pattern: place in top-right corner
         for i in range(3):
             for j in range(3):
-                output.values[i][j] = input_grid.values[i][j]      # Top-left
-                output.values[i+3][j] = input_grid.values[i][j]    # Middle-left
+                output.values[i][j+6] = input_grid.values[i][j]    # Top-right
     
     return output
