@@ -50,5 +50,9 @@ def transform_region(grid: ColoredGrid, region: List[Tuple[int, int]]):
     midpoint = (top + bottom) // 2
     
     for r, c in region:
-        if r >= midpoint:
+        if r > midpoint:
             grid.values[r][c] = 2  # Change to red
+        elif r == midpoint:
+            # If the region has an odd number of rows, change the middle row to red
+            if (bottom - top + 1) % 2 != 0:
+                grid.values[r][c] = 2  # Change to red
