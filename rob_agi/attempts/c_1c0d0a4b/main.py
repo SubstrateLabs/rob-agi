@@ -6,7 +6,7 @@ def solve_1c0d0a4b(input_grid: ColoredGrid) -> ColoredGrid:
     
     This function applies the following rules:
     1. Black cells (0) diagonally adjacent to sky blue cells (8) become red (2),
-       but only if they are not orthogonally adjacent to any sky blue cells.
+       but only if they are part of the inner boundary of a sky blue region.
     2. All sky blue cells (8) become black (0) in the output.
     3. All other cells remain black (0).
     
@@ -22,26 +22,20 @@ def solve_1c0d0a4b(input_grid: ColoredGrid) -> ColoredGrid:
     rows, cols = input_grid.get_dimensions()
     output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
     
+    def count_diagonal_sky_blue(r, c):
+        count = 0
+        for dr, dc in [(-1,-1), (-1,1), (1,-1), (1,1)]:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols and input_grid.values[nr][nc] == 8:
+                count += 1
+        return count
+    
     # First pass: Mark potential red cells
     for r in range(rows):
         for c in range(cols):
             if input_grid.values[r][c] == 0:  # If the cell is black
-                for dr, dc in [(-1,-1), (-1,1), (1,-1), (1,1)]:  # Check diagonals
-                    nr, nc = r + dr, c + dc
-                    if 0 <= nr < rows and 0 <= nc < cols and input_grid.values[nr][nc] == 8:
-                        output_grid.values[r][c] = -1  # Mark as potential red
-                        break
-
-    # Second pass: Confirm red cells and clean up
-    for r in range(rows):
-        for c in range(cols):
-            if output_grid.values[r][c] == -1:  # If it's a potential red cell
-                is_red = True
-                for dr, dc in [(0,1), (1,0), (0,-1), (-1,0)]:  # Check orthogonal neighbors
-                    nr, nc = r + dr, c + dc
-                    if 0 <= nr < rows and 0 <= nc < cols and input_grid.values[nr][nc] == 8:
-                        is_red = False
-                        break
-                output_grid.values[r][c] = 2 if is_red else 0
-
+                sky_blue_count = count_diagonal_sky_blue(r, c)
+                if 0 < sky_blue_count < 4:  # At least one, but not all diagonal neighbors are sky blue
+                    output_grid.values[r][c] = 2  # Mark as red
+    
     return output_grid
