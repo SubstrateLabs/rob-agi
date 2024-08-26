@@ -895,6 +895,8 @@ async def bootstrap_solved():
 
 
 def distill_solved():
+    from pathlib import Path
+
     all_solves = []
     for gp in all_challenges:
         challenge_id = gp.id
