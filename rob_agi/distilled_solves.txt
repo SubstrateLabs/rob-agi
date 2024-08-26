@@ -1,4 +1,4 @@
-Here's a distilled list of common steps and approaches from the various ARC challenge solutions:
+A distilled list of common problem-solving techniques for grid-based puzzles:
 
 - Analyze the input grid to identify key features (colors, patterns, shapes).
 - Create a deep copy of the input grid to avoid modifying the original.
