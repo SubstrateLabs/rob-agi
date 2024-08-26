@@ -15,6 +15,7 @@ def solve_12eac192(input_grid: ColoredGrid) -> ColoredGrid:
     5. Preserves orange (7) cells and maintains the overall structure of the original grid.
     6. Adapts behavior based on grid size, with more complete coverage for smaller grids.
     7. Ensures all blue cells are connected, even if it means creating a less snake-like path.
+    8. Preserves blue cells that are not part of the main path.
 
     Args:
         input_grid (ColoredGrid): The input grid to be transformed.
@@ -73,7 +74,7 @@ def solve_12eac192(input_grid: ColoredGrid) -> ColoredGrid:
     path = create_path(start)
 
     for r, c in path:
-        if grid[r][c] != 7:  # Preserve orange cells
+        if grid[r][c] not in [1, 7]:  # Preserve blue and orange cells
             grid.set_cell(r, c, 3)
 
     # Ensure all blue cells are connected
@@ -82,7 +83,7 @@ def solve_12eac192(input_grid: ColoredGrid) -> ColoredGrid:
             nearest_green = min((abs(br-r) + abs(bc-c), (r, c)) for r, c in path if grid[r][c] == 3)
             r, c = nearest_green[1]
             while (r, c) != (br, bc):
-                if grid[r][c] not in [3, 7]:
+                if grid[r][c] not in [1, 3, 7]:
                     grid.set_cell(r, c, 3)
                 r += 1 if br > r else -1 if br < r else 0
                 c += 1 if bc > c else -1 if bc < c else 0
