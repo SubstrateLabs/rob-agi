@@ -10,7 +10,7 @@ def solve_626c0bcc(input_grid: ColoredGrid) -> ColoredGrid:
     2. Analyze each region to determine its type (large, thin, or small).
     3. Color each region based on its type:
        - Large regions: Place 2x2 blue (1) squares in corners and fill with a specific pattern.
-       - Thin regions: Use alternating colors.
+       - Thin regions: Use a fixed pattern based on the region's shape.
        - Small regions: Use a fixed pattern.
     4. Resolve any remaining color conflicts.
     
@@ -35,7 +35,7 @@ def analyze_region(region: List[Tuple[int, int]]) -> Tuple[str, List[Tuple[int, 
     height = max_row - min_row + 1
     
     if width >= 3 and height >= 3:
-        blue_locations = [(min_row, min_col), (min_row, max_col-1), (max_row-1, min_col), (max_row-1, max_col-1)]
+        blue_locations = [(min_row, min_col), (min_row, max_col), (max_row, min_col), (max_row, max_col)]
         return "large", [loc for loc in blue_locations if loc in region]
     elif width <= 2 or height <= 2:
         return "thin", []
@@ -53,13 +53,26 @@ def color_region(grid: ColoredGrid, region: List[Tuple[int, int]], region_type: 
                 grid.set_cell(r, c, colors[color_index])
                 color_index = (color_index + 1) % 3
     elif region_type == "thin":
-        colors = [2, 3, 4]
-        for i, (r, c) in enumerate(region):
-            grid.set_cell(r, c, colors[i % 3])
+        color_thin_region(grid, region)
     else:  # small
         colors = [2, 3, 4, 2]
         for i, (r, c) in enumerate(region):
-            grid.set_cell(r, c, colors[i])
+            grid.set_cell(r, c, colors[i % len(colors)])
+
+def color_thin_region(grid: ColoredGrid, region: List[Tuple[int, int]]):
+    min_row, min_col = min(region)
+    max_row, max_col = max(region)
+    width = max_col - min_col + 1
+    height = max_row - min_row + 1
+    
+    if width <= 2:  # Vertical thin region
+        colors = [2, 1, 3, 1]
+        for i, (r, c) in enumerate(sorted(region)):
+            grid.set_cell(r, c, colors[i % len(colors)])
+    else:  # Horizontal thin region
+        colors = [2, 4, 1, 1]
+        for i, (r, c) in enumerate(sorted(region, key=lambda x: x[1])):
+            grid.set_cell(r, c, colors[i % len(colors)])
 
 def place_shape(grid: ColoredGrid, region: List[Tuple[int, int]], shape: Tuple[int, int], color: int, row: int, col: int):
     for r in range(row, row + shape[0]):
