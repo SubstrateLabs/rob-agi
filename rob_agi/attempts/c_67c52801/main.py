@@ -72,13 +72,15 @@ def place_group(output_grid: ColoredGrid, group: List[Tuple[int, int, int]]):
     rows, cols = output_grid.get_dimensions()
     group_height = max(r for r, _, _ in group) - min(r for r, _, _ in group) + 1
     group_width = max(c for _, c, _ in group) - min(c for _, c, _ in group) + 1
-    min_col = min(c for _, c, _ in group)
+    min_row = min(r for r, _, _ in group)
     
     for placement_row in range(rows - 2, -1, -1):  # Start from second to last row
-        for placement_col in range(min_col, cols):  # Start from the original leftmost position
+        if placement_row + group_height > rows - 1:
+            continue
+        for placement_col in range(cols):
             if can_place_group(output_grid, group, placement_row, placement_col, group_height, group_width):
                 for r, c, color in group:
-                    rel_r, rel_c = r - min(r for r, _, _ in group), c - min(c for _, c, _ in group)
+                    rel_r, rel_c = r - min_row, c - min(c for _, c, _ in group)
                     output_grid.values[placement_row + rel_r][placement_col + rel_c] = color
                 return
 
@@ -87,8 +89,11 @@ def can_place_group(grid: ColoredGrid, group: List[Tuple[int, int, int]], start_
     if start_row + height > rows - 1 or start_col + width > cols:
         return False
     
+    min_row = min(r for r, _, _ in group)
+    min_col = min(c for _, c, _ in group)
+    
     for r, c, _ in group:
-        rel_r, rel_c = r - min(r for r, _, _ in group), c - min(c for _, c, _ in group)
+        rel_r, rel_c = r - min_row, c - min_col
         if grid.values[start_row + rel_r][start_col + rel_c] != 0:
             return False
     
@@ -101,7 +106,7 @@ def handle_single_cells(input_grid: ColoredGrid, output_grid: ColoredGrid):
     for c in range(cols):
         if input_grid.values[second_last_row][c] != 0 and output_grid.values[second_last_row][c] == 0:
             color = input_grid.values[second_last_row][c]
-            for new_c in range(c, cols):
+            for new_c in range(cols):
                 if output_grid.values[second_last_row][new_c] == 0:
                     output_grid.values[second_last_row][new_c] = color
                     break
