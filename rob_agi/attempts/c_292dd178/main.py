@@ -8,9 +8,10 @@ def solve_292dd178(input_grid: ColoredGrid) -> ColoredGrid:
     
     The function performs the following steps:
     1. Creates a deep copy of the input grid.
-    2. Uses a flood fill algorithm to mark all reachable cells from the edges.
+    2. Uses a flood fill algorithm to mark all reachable cells from non-blue edges.
     3. Fills all unreachable cells (except blue ones) with red (2).
     4. Preserves all blue (1) cells and cells reachable from non-blue edges.
+    5. Handles cases where enclosed areas extend to the grid edges.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -34,10 +35,10 @@ def solve_292dd178(input_grid: ColoredGrid) -> ColoredGrid:
                 for dr, dc in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
                     queue.append((r + dr, c + dc))
     
-    # Start flood fill from edge cells that are not blue (1) or red (2)
+    # Start flood fill from non-blue edge cells
     for r in range(rows):
         for c in range(cols):
-            if (r == 0 or r == rows - 1 or c == 0 or c == cols - 1) and grid.values[r][c] not in [1, 2]:
+            if (r == 0 or r == rows - 1 or c == 0 or c == cols - 1) and grid.values[r][c] != 1:
                 flood_fill(r, c)
     
     # Fill unreachable cells with red (2)
