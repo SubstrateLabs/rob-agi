@@ -4,23 +4,28 @@ import math
 
 def solve_73ccf9c2(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Identify the largest shape in the input grid, scale it, and center it in a 7x5 output grid.
+    Identify the most significant shape in the input grid, abstract it, and fit it into an appropriately sized output grid.
     
     The function performs the following steps:
     1. Find all non-black shapes in the input grid
-    2. Select the largest shape based on pixel count
-    3. Determine the bounding box of the selected shape
-    4. Scale the shape to fit within a 7x5 grid while maintaining aspect ratio
-    5. Center the scaled shape in the 7x5 output grid
+    2. Select the most figure-like shape based on complexity, distinctiveness, and symmetry
+    3. Abstract the selected shape by simplifying its structure while maintaining key features
+    4. Determine the appropriate output grid size based on input complexity
+    5. Scale and center the abstracted shape in the output grid
     6. Apply the original color to the output shape
     """
     shapes = find_shapes(input_grid)
     if not shapes:
-        return ColoredGrid(values=[[0] * 5 for _ in range(7)])  # Return a 7x5 black grid if no shapes found
+        return ColoredGrid(values=[[0] * 4 for _ in range(4)])  # Return a 4x4 black grid if no shapes found
     
-    largest_shape = max(shapes, key=len)
-    color = input_grid.get_cell(largest_shape[0][0], largest_shape[0][1])
-    return scale_and_center(largest_shape, (7, 5), color)
+    most_significant_shape = select_most_figure_like(shapes)
+    color = input_grid.get_cell(most_significant_shape[0][0], most_significant_shape[0][1])
+    
+    key_points = extract_key_points(most_significant_shape)
+    simplified_shape = simplify_shape(key_points)
+    
+    output_size = determine_output_size(input_grid.get_dimensions())
+    return scale_and_center(simplified_shape, output_size, color)
 
 def find_shapes(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
     shapes = []
@@ -129,16 +134,12 @@ def scale_and_center(shape: List[Tuple[int, int]], output_size: Tuple[int, int],
     max_c = max(c for _, c in shape)
     
     # Calculate scaling factors
-    scale_r = (rows - 1) / (max_r - min_r) if max_r > min_r else 1
-    scale_c = (cols - 1) / (max_c - min_c) if max_c > min_c else 1
+    scale_r = (rows - 2) / (max_r - min_r)
+    scale_c = (cols - 2) / (max_c - min_c)
     scale = min(scale_r, scale_c)
     
     # Scale the shape
-    scaled_shape = []
-    for r, c in shape:
-        new_r = (r - min_r) * scale
-        new_c = (c - min_c) * scale
-        scaled_shape.append((new_r, new_c))
+    scaled_shape = [(int((r - min_r) * scale), int((c - min_c) * scale)) for r, c in shape]
     
     # Find the bounding box of the scaled shape
     min_scaled_r = min(r for r, _ in scaled_shape)
@@ -147,15 +148,23 @@ def scale_and_center(shape: List[Tuple[int, int]], output_size: Tuple[int, int],
     max_scaled_c = max(c for _, c in scaled_shape)
     
     # Calculate centering offsets
-    offset_r = (rows - (max_scaled_r - min_scaled_r)) / 2 - min_scaled_r
-    offset_c = (cols - (max_scaled_c - min_scaled_c)) / 2 - min_scaled_c
+    offset_r = (rows - (max_scaled_r - min_scaled_r)) // 2 - min_scaled_r
+    offset_c = (cols - (max_scaled_c - min_scaled_c)) // 2 - min_scaled_c
     
     # Center and draw the scaled shape
-    for r, c in scaled_shape:
-        new_r = int(r + offset_r)
-        new_c = int(c + offset_c)
-        if 0 <= new_r < rows and 0 <= new_c < cols:
-            output[new_r][new_c] = color
+    for i in range(len(scaled_shape) - 1):
+        r1, c1 = scaled_shape[i]
+        r2, c2 = scaled_shape[i + 1]
+        for r, c in bresenham_line(r1 + offset_r, c1 + offset_c, r2 + offset_r, c2 + offset_c):
+            if 0 <= r < rows and 0 <= c < cols:
+                output[r][c] = color
+    
+    # Connect the last point to the first point
+    r1, c1 = scaled_shape[-1]
+    r2, c2 = scaled_shape[0]
+    for r, c in bresenham_line(r1 + offset_r, c1 + offset_c, r2 + offset_r, c2 + offset_c):
+        if 0 <= r < rows and 0 <= c < cols:
+            output[r][c] = color
     
     return ColoredGrid(values=output)
 
