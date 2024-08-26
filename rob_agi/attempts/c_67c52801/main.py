@@ -7,9 +7,10 @@ def solve_67c52801(input_grid: ColoredGrid) -> ColoredGrid:
     
     The transformation follows these rules:
     1. The bottom row of the input grid remains unchanged.
-    2. Colored cell groups move downward and to the left, maintaining their shapes and relative order.
-    3. Single colored cells in the second-to-last row move as far left as possible.
-    4. Empty space (black/0) fills from the top and right.
+    2. Colored cell groups move downward and to the left, maintaining their shapes.
+    3. Groups are placed in order from bottom to top, then left to right.
+    4. Single colored cells in the second-to-last row move as far left as possible.
+    5. Empty space (black/0) fills from the top and right.
     
     The algorithm works as follows:
     1. Initialize the output grid with zeros and copy the bottom row from the input.
@@ -73,7 +74,7 @@ def place_group(output_grid: ColoredGrid, group: List[Tuple[int, int, int]]):
     group_width = max(c for _, c, _ in group) - min(c for _, c, _ in group) + 1
     
     for placement_row in range(rows - 2, -1, -1):  # Start from second to last row
-        for placement_col in range(cols - group_width + 1):
+        for placement_col in range(cols):
             if can_place_group(output_grid, group, placement_row, placement_col, group_height, group_width):
                 for r, c, color in group:
                     rel_r, rel_c = r - min(r for r, _, _ in group), c - min(c for _, c, _ in group)
