@@ -9,7 +9,7 @@ def solve_48131b3c(input_grid: ColoredGrid) -> ColoredGrid:
        - Top-left: Copy from input
        - Top-right: Take from right in input (wrap if needed)
        - Bottom-left: Take from below in input (wrap if needed)
-       - Bottom-right: Take from diagonally down-right in input (wrap if needed)
+       - Bottom-right: Copy from input (creating a diagonal pattern)
     3. Repeat this pattern to fill the entire output grid, creating a seamless tiled pattern.
     """
     input_height, input_width = input_grid.get_dimensions()
@@ -18,12 +18,12 @@ def solve_48131b3c(input_grid: ColoredGrid) -> ColoredGrid:
     for i in range(input_height):
         for j in range(input_width):
             # Fill top-left quadrant
-            output_grid.values[i][j] = input_grid.values[i][j]
+            output_grid.values[2*i][2*j] = input_grid.values[i][j]
             # Fill top-right quadrant
-            output_grid.values[i][j + input_width] = input_grid.values[i][(j+1) % input_width]
+            output_grid.values[2*i][2*j + 1] = input_grid.values[i][(j+1) % input_width]
             # Fill bottom-left quadrant
-            output_grid.values[i + input_height][j] = input_grid.values[(i+1) % input_height][j]
+            output_grid.values[2*i + 1][2*j] = input_grid.values[(i+1) % input_height][j]
             # Fill bottom-right quadrant
-            output_grid.values[i + input_height][j + input_width] = input_grid.values[(i+1) % input_height][(j+1) % input_width]
+            output_grid.values[2*i + 1][2*j + 1] = input_grid.values[i][j]
     
     return output_grid
