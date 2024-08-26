@@ -16,7 +16,8 @@ def solve_c658a4bd(input_grid: ColoredGrid) -> ColoredGrid:
         regions = []
         for color in range(1, 10):  # Assuming colors are 1-9
             color_regions = grid.find_connected_regions(color)
-            for region in color_regions:
+            if color_regions:
+                region = max(color_regions, key=len)  # Use the largest region for each color
                 min_x = min(c for _, c in region)
                 max_x = max(c for _, c in region)
                 min_y = min(r for r, _ in region)
@@ -31,21 +32,24 @@ def solve_c658a4bd(input_grid: ColoredGrid) -> ColoredGrid:
         def distance_from_edge(bbox):
             return min(bbox[0], bbox[1], grid_size - bbox[2] - 1, grid_size - bbox[3] - 1)
         
-        sorted_regions = sorted(regions, key=lambda r: (distance_from_edge(r['bounding_box']), r['bounding_box'][:2]))
+        sorted_regions = sorted(regions, key=lambda r: (-distance_from_edge(r['bounding_box']), r['bounding_box'][:2]))
         return [r['color'] for r in sorted_regions]
 
-    def get_output_size(ordered_colors):
-        return 2 * len(ordered_colors) - 1
-
     def create_output_grid(ordered_colors):
-        size = get_output_size(ordered_colors)
+        size = 2 * len(ordered_colors) - 1
         output = ColoredGrid(values=[[0 for _ in range(size)] for _ in range(size)])
         
         for i, color in enumerate(ordered_colors):
             frame_size = size - 2 * i
             for x in range(frame_size):
                 for y in range(frame_size):
-                    output.values[i + y][i + x] = color
+                    if x == 0 or x == frame_size - 1 or y == 0 or y == frame_size - 1:
+                        output.values[i + y][i + x] = color
+        
+        # Fill the center
+        if ordered_colors:
+            center = len(ordered_colors) - 1
+            output.values[center][center] = ordered_colors[-1]
         
         return output
 
