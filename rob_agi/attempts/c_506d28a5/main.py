@@ -40,7 +40,7 @@ def solve_506d28a5(input_grid: ColoredGrid) -> ColoredGrid:
             for row in range(3, -1, -1):
                 if input_column[row] == 0:
                     output_column[row] = 0
-                elif output_column[row] != 0:  # Stop if we've reached a non-black cell that wasn't set from the top
+                else:
                     break
         else:
             # Copy input column if no red
