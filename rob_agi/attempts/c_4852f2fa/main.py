@@ -5,10 +5,10 @@ def solve_4852f2fa(input_grid: ColoredGrid) -> ColoredGrid:
     Transform the input grid based on the number of yellow squares.
     
     1. Count yellow (4) squares in the input grid.
-    2. Create a 3xN output grid where N = (yellow_count + 1) * 3 - 1.
-    3. Fill the top row with alternating [0, 8, 8] pattern.
-    4. Fill the middle row entirely with 8's.
-    5. Fill the bottom row with alternating [0, 8, 0] pattern.
+    2. Create a 3xN output grid where N = (yellow_count + 1) * 3.
+    3. Fill the output grid with a repeating pattern:
+       - Top row: [0, 0, 8] repeated
+       - Middle and bottom rows: [8, 8, 0] repeated
     
     Returns a new ColoredGrid object with the transformed grid.
     """
@@ -16,20 +16,17 @@ def solve_4852f2fa(input_grid: ColoredGrid) -> ColoredGrid:
     yellow_count = sum(row.count(4) for row in input_grid.values)
     
     # Calculate output width
-    output_width = (yellow_count + 1) * 3 - 1
+    output_width = (yellow_count + 1) * 3
     
-    # Create top row
-    top_row = [0, 8, 8] * (yellow_count + 1)
-    top_row.pop()  # Remove the last 0
+    # Create empty output grid
+    output = [[0 for _ in range(output_width)] for _ in range(3)]
     
-    # Create middle row
-    middle_row = [8] * output_width
-    
-    # Create bottom row
-    bottom_row = [0, 8, 0] * (yellow_count + 1)
-    bottom_row.pop()  # Remove the last 0
-    
-    # Combine rows
-    output = [top_row, middle_row, bottom_row]
+    # Fill the output grid with the repeating pattern
+    for i in range(output_width):
+        if i % 3 == 2:
+            output[0][i] = 8  # Top row
+        if i % 3 == 0 or i % 3 == 1:
+            output[1][i] = 8  # Middle row
+            output[2][i] = 8  # Bottom row
     
     return ColoredGrid(values=output)
