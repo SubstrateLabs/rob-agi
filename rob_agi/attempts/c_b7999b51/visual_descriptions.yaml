@@ -1,0 +1,46 @@
+example_0:
+  input: |
+    The grid is 19x18. The main features are:
+    1. A blue (1) 'L' shape in the top-left, with red (2) filling its right arm.
+    2. A sky blue (8) rectangle in the middle-left, partially overlapping with an orange (7) rectangle to its right and below.
+    3. The rest of the grid is filled with black (0), which can be considered empty space.
+    The shapes are distinct and don't overlap except for the sky blue and orange rectangles.
+  output: |
+    A small 4x5 grid summarizing the main colors from the input:
+    1. Top row: sky blue (8), orange (7), blue (1), red (2)
+    2. Second row: sky blue (8), orange (7), blue (1), black (0)
+    3. Third row: sky blue (8), orange (7), blue (1), black (0)
+    4. Fourth row: sky blue (8), orange (7), black (0), black (0)
+    5. Fifth row: sky blue (8), black (0), black (0), black (0)
+    It appears to be a compressed representation of the color layout from the input.
+
+example_1:
+  input: |
+    The grid is 10x15. The main features are:
+    1. A red (2) rectangle in the top-left corner.
+    2. A green (3) rectangle extending from the right side of the red rectangle.
+    3. A blue (1) square in the middle-left of the grid.
+    4. The rest is filled with black (0) as empty space.
+    The shapes are distinct and don't overlap.
+  output: |
+    A small 3x3 grid summarizing the main colors from the input:
+    1. Top row: red (2), blue (1), green (3)
+    2. Middle row: red (2), blue (1), black (0)
+    3. Bottom row: red (2), black (0), black (0)
+    This appears to be a compressed representation of the color layout from the input.
+
+example_2:
+  input: |
+    The grid is 10x15. The main features are:
+    1. A sky blue (8) square in the top-left corner.
+    2. A yellow (4) shape that looks like an inverted 'T' in the middle-left.
+    3. A small green (3) rectangle within the left arm of the yellow 'T'.
+    4. The rest is filled with black (0) as empty space.
+    The shapes are distinct, with the green rectangle nested within the yellow shape.
+  output: |
+    A small 4x3 grid summarizing the main colors from the input:
+    1. Top row: yellow (4), sky blue (8), green (3)
+    2. Second row: yellow (4), sky blue (8), black (0)
+    3. Third row: yellow (4), sky blue (8), black (0)
+    4. Bottom row: yellow (4), black (0), black (0)
+    This appears to be a compressed representation of the color layout from the input.
