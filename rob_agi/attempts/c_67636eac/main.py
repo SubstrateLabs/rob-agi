@@ -9,6 +9,7 @@ def solve_67636eac(input_grid: ColoredGrid) -> ColoredGrid:
     2. Extracts each shape in its minimal bounding box, preserving its structure.
     3. Arranges shapes vertically in the order they appear in the input grid (top-to-bottom, left-to-right).
     4. Creates a new grid with the extracted shapes stacked vertically, centered horizontally.
+    5. Preserves the internal structure of each shape, including black cells within the shape's bounding box.
     
     Args:
     input_grid (ColoredGrid): The input grid containing shapes.
@@ -34,7 +35,7 @@ def solve_67636eac(input_grid: ColoredGrid) -> ColoredGrid:
                 min_c = min(x[1] for x in region)
                 max_c = max(x[1] for x in region)
                 
-                # Extract shape
+                # Extract shape (including black cells within the bounding box)
                 shape = input_grid.extract_subgrid(min_r, min_c, max_r - min_r + 1, max_c - min_c + 1)
                 shapes.append((r, c, shape))
 
