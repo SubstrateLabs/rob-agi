@@ -1,41 +1,58 @@
 example_0:
   input: |
-    A 22x22 grid with a pattern of sky blue (8) lines forming a grid. The lines are 1 unit thick and spaced every 4 units horizontally and vertically. This creates 5x5 "cells" of empty black space. Within these cells, there are three colored squares: a red (2) square in the top-left cell of the second column, and two green (3) squares in the bottom-left cell of the fourth column and the bottom-right cell of the fourth column from the right.
+    A 22x22 grid divided into 5x5 sections by sky blue (8) lines. The grid contains:
+    - A red (2) square in the top-left corner of the second 5x5 section from the left.
+    - A green (3) square in the bottom-left corner of the fourth 5x5 section from the left.
+    - Another green (3) square in the bottom-right corner of the fourth 5x5 section from the right.
+    All other cells within the 5x5 sections are black (0).
   output: |
-    The same 22x22 grid structure with sky blue (8) lines is maintained. The main changes are:
-    1. The red (2) square in the top-left has expanded to fill its entire 3x3 cell.
-    2. The two green (3) squares have each expanded to fill their respective 3x3 cells.
-    3. A new magenta (6) 3x3 cell has appeared in the center of the third row of cells.
-    4. The bottom-right quadrant of the grid (excluding the rightmost column and bottom row) is now filled with green (3) squares.
+    The 22x22 grid structure with sky blue (8) lines remains unchanged. The transformations are:
+    1. The red (2) square expands to fill its entire 5x5 section.
+    2. Both green (3) squares expand vertically to fill their columns and horizontally within their 5x5 sections.
+    3. A new magenta (6) 5x5 section appears in the center of the third row of sections, where expanded red and green overlap.
+    4. The entire bottom-right quadrant (excluding the rightmost column and bottom row) is filled with green (3), due to vertical expansion from the original green square.
 
 example_1:
   input: |
-    A 24x24 grid with sky blue (8) lines forming a grid. The lines are 1 unit thick and spaced every 3 units horizontally and vertically, creating 2x2 "cells" of empty black space. There are four colored squares: two red (2) squares in the top-left and bottom-right quadrants, and two green (3) squares in the top-right and bottom-left quadrants.
+    A 24x24 grid divided into 3x3 sections by sky blue (8) lines. The grid contains:
+    - A red (2) square in the top-left 3x3 section.
+    - Another red (2) square in the bottom-right 3x3 section.
+    - A green (3) square in the top-right 3x3 section.
+    - Another green (3) square in the bottom-left 3x3 section.
+    All other cells within the 3x3 sections are black (0).
   output: |
-    The 24x24 grid structure with sky blue (8) lines is maintained. The changes are:
-    1. Each of the four colored squares has expanded to fill its entire 2x2 cell.
-    2. New colored regions have appeared:
-       - The top two rows of cells in the second column from the left are now red (2).
-       - The bottom two rows of cells in the second column from the right are now red (2).
-       - The middle four rows of cells in the center two columns are now magenta (6).
-    3. The entire third column from the left and third column from the right, excluding the top and bottom two cells, are filled with green (3).
+    The 24x24 grid structure with sky blue (8) lines remains unchanged. The transformations are:
+    1. All four colored squares expand to fill their respective 3x3 sections.
+    2. Red (2) expands horizontally:
+       - Filling the top two rows of 3x3 sections in the second column from the left.
+       - Filling the bottom two rows of 3x3 sections in the second column from the right.
+    3. Green (3) expands vertically:
+       - Filling the entire third column from the left and right, except for the top and bottom two 3x3 sections.
+    4. Magenta (6) appears in the middle four rows of the center two columns, where expanded red and green overlap.
 
 example_2:
   input: |
-    A 26x26 grid with sky blue (8) lines forming a grid. The lines are 1 unit thick and spaced every 6 units horizontally and vertically, creating 5x5 "cells" of empty black space. There are four colored squares: two red (2) squares in the top-left and bottom-right quadrants, and two green (3) squares in the middle-left and middle-right sides.
+    A 26x26 grid divided into 5x5 sections by sky blue (8) lines. The grid contains:
+    - A red (2) square in the top-left 5x5 section.
+    - Another red (2) square in the bottom-right 5x5 section.
+    - A green (3) square in the middle-left 5x5 section (third row, first column).
+    - Another green (3) square in the middle-right 5x5 section (third row, last column).
+    All other cells within the 5x5 sections are black (0).
   output: |
-    The 26x26 grid structure with sky blue (8) lines is maintained. The changes are:
-    1. The red (2) square in the top-left has expanded to fill the entire top-left 5x5 cell.
-    2. The two green (3) squares have each expanded to fill their respective 5x5 cells.
-    3. The entire second row of 5x5 cells from the top is now filled with red (2).
-    4. The entire third row of 5x5 cells from the top is now filled with green (3).
+    The 26x26 grid structure with sky blue (8) lines remains unchanged. The transformations are:
+    1. The top-left red (2) square expands to fill its entire 5x5 section.
+    2. Both green (3) squares expand vertically to fill their entire columns and horizontally within their 5x5 sections.
+    3. The entire second row of 5x5 sections from the top is filled with red (2) due to upward expansion.
+    4. The entire third row of 5x5 sections is filled with green (3) due to horizontal expansion within the row.
+    5. The bottom-right red square's expansion is limited by the green expansion above it.
 
 test_case_0:
   input: |
-    A 26x26 grid with sky blue (8) lines forming a grid. The lines are 1 unit thick and spaced every 6 units horizontally and vertically, creating 5x5 "cells" of empty black space. There are four colored squares: two red (2) squares in the top-left and bottom-right quadrants, and two green (3) squares in the middle-left and middle-right sides.
+    Identical to example_2: A 26x26 grid divided into 5x5 sections by sky blue (8) lines, with red (2) squares in top-left and bottom-right, and green (3) squares in middle-left and middle-right 5x5 sections.
   output: |
-    The 26x26 grid structure with sky blue (8) lines is maintained. The changes are:
-    1. The red (2) square in the top-left has expanded to fill the entire top-left 5x5 cell.
-    2. The two green (3) squares have each expanded to fill their respective 5x5 cells.
-    3. The entire second row of 5x5 cells from the top is now filled with red (2).
-    4. The entire third row of 5x5 cells from the top is now filled with green (3).
+    The transformations are identical to example_2:
+    1. Top-left red expands to fill its 5x5 section.
+    2. Green squares expand vertically to fill columns and horizontally within their 5x5 sections.
+    3. Second row of 5x5 sections filled with red (2).
+    4. Third row of 5x5 sections filled with green (3).
+    5. Bottom-right red expansion limited by green above.
