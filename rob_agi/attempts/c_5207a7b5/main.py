@@ -8,10 +8,10 @@ def solve_5207a7b5(input_grid: ColoredGrid) -> ColoredGrid:
        - Start with a width equal to the gray line's column index.
        - Maintain this width for a number of rows equal to the gray line's length.
        - After that, decrease the width by 1 every two rows.
-       - Continue as a single column until the total height is 2 * (gray line column index + 1).
+       - Continue until the shape narrows to a single column or reaches the bottom of the grid.
     3. Preserve the gray line in its original position and length.
     4. Add a magenta (color 6) shape to the right of the gray line:
-       - Width is calculated as: min(3 - (gray line column index % 3), width - gray_line_column - 1)
+       - Width is 1 column.
        - Height is equal to the gray line's length.
     5. Leave all other cells black (color 0).
 
@@ -29,23 +29,23 @@ def solve_5207a7b5(input_grid: ColoredGrid) -> ColoredGrid:
     gray_line_length = sum(1 for row in input_grid.values if row[gray_line_column] == 5)
 
     # Draw sky blue shape
-    sky_blue_height = min(2 * (gray_line_column + 1), height)
-    for row in range(sky_blue_height):
-        if row < gray_line_length:
-            sky_blue_width = gray_line_column
-        else:
-            sky_blue_width = max(1, gray_line_column - (row - gray_line_length + 1) // 2)
+    sky_blue_width = gray_line_column
+    row = 0
+    while row < height and sky_blue_width > 0:
         for col in range(sky_blue_width):
             new_grid.values[row][col] = 8
+        if row >= gray_line_length:
+            if row % 2 == 1:
+                sky_blue_width = max(1, sky_blue_width - 1)
+        row += 1
 
     # Preserve gray line
     for row in range(gray_line_length):
         new_grid.values[row][gray_line_column] = 5
 
     # Add magenta shape
-    magenta_width = min(3 - (gray_line_column % 3), width - gray_line_column - 1)
     for row in range(gray_line_length):
-        for col in range(gray_line_column + 1, gray_line_column + 1 + magenta_width):
-            new_grid.values[row][col] = 6
+        if gray_line_column + 1 < width:
+            new_grid.values[row][gray_line_column + 1] = 6
 
     return new_grid
