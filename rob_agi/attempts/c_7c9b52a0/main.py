@@ -8,8 +8,8 @@ def solve_7c9b52a0(input_grid: ColoredGrid) -> ColoredGrid:
     1. Identifies the background color
     2. Finds all non-background elements
     3. Creates a new compact grid containing only non-background elements
-    4. Preserves relative positions and relationships between elements
-    5. Removes any unnecessary empty space between non-background elements
+    4. Preserves relative positions, relationships, and shapes between elements
+    5. Removes unnecessary empty space while maintaining the overall structure
     6. Returns the new compact grid
 
     Args:
@@ -51,14 +51,21 @@ def solve_7c9b52a0(input_grid: ColoredGrid) -> ColoredGrid:
         for color, r, c in elements:
             grid[r - min_row][c - min_col] = color
         
-        # Remove empty rows and columns
+        return grid
+
+    def remove_empty_space(grid: List[List[int]]) -> List[List[int]]:
+        # Remove empty rows
         grid = [row for row in grid if any(cell != 0 for cell in row)]
-        grid = [list(col) for col in zip(*grid) if any(cell != 0 for cell in col)]
+        
+        # Remove empty columns
+        cols_to_keep = [col for col in range(len(grid[0])) if any(row[col] != 0 for row in grid)]
+        grid = [[row[col] for col in cols_to_keep] for row in grid]
         
         return grid
 
     bg_color = find_background_color(input_grid)
     non_bg_elements = extract_non_background_elements(input_grid, bg_color)
     compact_grid = create_compact_grid(non_bg_elements)
+    final_grid = remove_empty_space(compact_grid)
 
-    return ColoredGrid(values=compact_grid)
+    return ColoredGrid(values=final_grid)
