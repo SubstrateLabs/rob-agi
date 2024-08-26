@@ -9,9 +9,10 @@ def solve_9def23fe(input_grid: ColoredGrid) -> ColoredGrid:
     2. Determines vertical bar positions based on the original rectangle's width.
     3. Determines horizontal bar positions based on the original rectangle's height.
     4. Creates a new grid with expanded red area, including horizontal and vertical bars.
-    5. Fills the entire width of the grid with red for specific horizontal bar rows.
+    5. Fills specific rows entirely with red, extending beyond the original rectangle.
     6. Fills the area between the leftmost and rightmost vertical bars from the top of the original rectangle to the bottom of the grid.
     7. Preserves the positions of all scattered colored dots from the original grid.
+    8. Extends the top row of the pattern to match the width of the widest row.
     
     The transformation includes:
     - Creating vertical red bars at the left and right edges of the original rectangle, and 1-2 additional bars based on the width.
@@ -19,6 +20,7 @@ def solve_9def23fe(input_grid: ColoredGrid) -> ColoredGrid:
     - Extending specific horizontal bars across the full width of the grid.
     - Extending the red area vertically from the top of the original rectangle to the bottom of the grid, between the outermost vertical bars.
     - Maintaining all non-red, non-black dots from the original grid in their original positions.
+    - Ensuring the top row of the pattern extends to match the width of the widest row in the pattern.
     
     Returns a new ColoredGrid with the transformed pattern.
     """
@@ -43,7 +45,10 @@ def solve_9def23fe(input_grid: ColoredGrid) -> ColoredGrid:
     # Step 6: Preserve scattered dots
     preserve_scattered_dots(new_grid, scattered_dots)
 
-    # Step 7: Return new grid
+    # Step 7: Extend top row
+    extend_top_row(new_grid, vertical_bars)
+
+    # Step 8: Return new grid
     return ColoredGrid(values=new_grid)
 
 def find_original_rectangle(grid: ColoredGrid) -> Tuple[int, int, int, int]:
@@ -104,12 +109,17 @@ def fill_expanded_rectangle(grid: List[List[int]], rect: Tuple[int, int, int, in
     top, _, _, _ = rect
     rows, cols = len(grid), len(grid[0])
     left, right = min(vertical_bars), max(vertical_bars)
-    for r in range(top, rows):
-        if r in horizontal_bars:
+    for r in range(rows):
+        if r >= top and (r in horizontal_bars or r == rows - 1):
             grid[r] = [2] * cols
-        else:
+        elif r >= top:
             for c in range(left, right + 1):
                 grid[r][c] = 2
+
+def extend_top_row(grid: List[List[int]], vertical_bars: List[int]):
+    max_width = max(sum(1 for cell in row if cell == 2) for row in grid)
+    left = min(vertical_bars)
+    grid[0] = [2 if left <= c < left + max_width else 0 for c in range(len(grid[0]))]
 
 def preserve_scattered_dots(grid: List[List[int]], dots: List[Tuple[int, int, int]]):
     for r, c, value in dots:
