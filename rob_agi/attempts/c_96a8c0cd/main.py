@@ -1,24 +1,24 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import Tuple, Set
+from typing import Tuple, Set, List
+import heapq
 
 def solve_96a8c0cd(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the grid transformation challenge by creating a comprehensive tree-like structure
+    Solve the grid transformation challenge by creating a minimal tree-like structure
     of red (2) cells connecting all non-black colored cells. The algorithm follows these steps:
 
-    1. Analyze the input grid to find the active area containing colored cells.
+    1. Analyze the input grid to find all colored cells.
     2. Create a new grid, copying all non-black colored cells from the input.
-    3. Fill the active area with red cells, preserving original colored cells.
-    4. Process the leftmost column and top row specially.
-    5. Connect isolated colored cells in the top row and leftmost column.
-    6. Extend the red structure to the grid edges.
-    7. Perform a final check and cleanup.
+    3. Implement Prim's algorithm to create a minimal spanning tree connecting all colored cells.
+    4. Optimize the red structure by removing unnecessary red cells.
+    5. Extend the red structure to the grid edges when necessary.
+    6. Perform a final verification.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
 
     Returns:
-    ColoredGrid: The transformed grid with the red network connecting colored cells.
+    ColoredGrid: The transformed grid with the minimal red network connecting colored cells.
     """
     rows, cols = input_grid.get_dimensions()
     grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
@@ -30,51 +30,65 @@ def solve_96a8c0cd(input_grid: ColoredGrid) -> ColoredGrid:
     colored_cells = [(r, c) for r in range(rows) for c in range(cols) if is_colored(r, c)]
     if not colored_cells:
         return input_grid
-    min_row, max_row = min(r for r, _ in colored_cells), max(r for r, _ in colored_cells)
-    min_col, max_col = min(c for _, c in colored_cells), max(c for _, c in colored_cells)
 
     # Step 2: Copy non-black colored cells
     for r, c in colored_cells:
         grid.set_cell(r, c, input_grid.get_cell(r, c))
 
-    # Step 3: Fill active area with red cells
-    for r in range(min_row + 1, max_row + 1):
-        for c in range(min_col, max_col + 1):
-            if not is_colored(r, c):
-                grid.set_cell(r, c, 2)
+    # Step 3: Implement Prim's algorithm
+    def manhattan_distance(cell1: Tuple[int, int], cell2: Tuple[int, int]) -> int:
+        return abs(cell1[0] - cell2[0]) + abs(cell1[1] - cell2[1])
 
-    # Step 4: Process leftmost column and top row
-    for r in range(min_row, max_row + 1):
-        if is_colored(r, min_col) or (min_col + 1 < cols and grid.get_cell(r, min_col + 1) == 2):
-            grid.set_cell(r, min_col, 2)
+    def get_neighbors(r: int, c: int) -> List[Tuple[int, int]]:
+        return [(r+dr, c+dc) for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                if 0 <= r+dr < rows and 0 <= c+dc < cols]
 
-    for c in range(min_col, max_col + 1):
-        if is_colored(min_row, c) or (min_row + 1 < rows and grid.get_cell(min_row + 1, c) == 2):
-            grid.set_cell(min_row, c, 2)
+    start = colored_cells[0]
+    visited = set([start])
+    edges = [(manhattan_distance(start, neighbor), start, neighbor)
+             for neighbor in get_neighbors(*start)]
+    heapq.heapify(edges)
 
-    # Step 5: Connect isolated colored cells in top row and leftmost column
-    for c in range(min_col, max_col):
-        if is_colored(min_row, c) and grid.get_cell(min_row, c + 1) == 0:
-            for cc in range(c + 1, max_col + 1):
-                if grid.get_cell(min_row, cc) != 0:
-                    break
-                grid.set_cell(min_row, cc, 2)
+    while edges:
+        _, parent, current = heapq.heappop(edges)
+        if current not in visited:
+            visited.add(current)
+            if not is_colored(*current):
+                grid.set_cell(*current, 2)  # Set to red
+            for neighbor in get_neighbors(*current):
+                if neighbor not in visited:
+                    heapq.heappush(edges, (manhattan_distance(current, neighbor), current, neighbor))
 
-    for r in range(min_row, max_row):
-        if is_colored(r, min_col) and grid.get_cell(r + 1, min_col) == 0:
-            for rr in range(r + 1, max_row + 1):
-                if grid.get_cell(rr, min_col) != 0:
-                    break
-                grid.set_cell(rr, min_col, 2)
+    # Step 4: Optimize the red structure
+    def is_critical(r: int, c: int) -> bool:
+        if grid.get_cell(r, c) != 2:
+            return False
+        neighbors = [grid.get_cell(*n) for n in get_neighbors(r, c)]
+        return sum(1 for n in neighbors if n > 0) > 2
 
-    # Step 6: Extend red structure to grid edges
-    for c in range(min_col):
-        grid.set_cell(max_row, c, 2)
-    for r in range(max_row + 1, rows):
-        grid.set_cell(r, max_col, 2)
+    for r in range(rows):
+        for c in range(cols):
+            if grid.get_cell(r, c) == 2 and not is_critical(r, c):
+                grid.set_cell(r, c, 0)
 
-    # Step 7: Final check and cleanup
+    # Step 5: Extend to edges
     for r, c in colored_cells:
-        grid.set_cell(r, c, input_grid.get_cell(r, c))
+        if r == 0 or r == rows - 1 or c == 0 or c == cols - 1:
+            if r > 0 and grid.get_cell(r-1, c) == 2:
+                for rr in range(r-1, -1, -1):
+                    grid.set_cell(rr, c, 2)
+            if r < rows - 1 and grid.get_cell(r+1, c) == 2:
+                for rr in range(r+1, rows):
+                    grid.set_cell(rr, c, 2)
+            if c > 0 and grid.get_cell(r, c-1) == 2:
+                for cc in range(c-1, -1, -1):
+                    grid.set_cell(r, cc, 2)
+            if c < cols - 1 and grid.get_cell(r, c+1) == 2:
+                for cc in range(c+1, cols):
+                    grid.set_cell(r, cc, 2)
+
+    # Step 6: Final verification
+    for r, c in colored_cells:
+        assert grid.get_cell(r, c) == input_grid.get_cell(r, c), "Original colored cell not preserved"
 
     return grid
