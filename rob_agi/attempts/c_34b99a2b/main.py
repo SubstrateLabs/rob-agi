@@ -5,24 +5,22 @@ def solve_34b99a2b(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the 5x9 input grid into a 5x4 output grid based on the following steps:
     1. Splits the input into left and right halves, analyzing sky (8) and gray (5) regions.
-    2. Calculates activity scores for each quadrant of the input.
-    3. Maps activity scores to the output grid, placing red (2) squares accordingly.
-    4. Applies smoothing rules to connect nearby red cells.
-    5. Ensures vertical consistency in columns with multiple red cells.
-    6. Processes the bottom row based on input density.
-    7. Makes final adjustments to remove isolated cells and balance the pattern.
+    2. Calculates density scores for each quadrant of the input.
+    3. Maps inverse density scores to the output grid, placing red (2) squares accordingly.
+    4. Ensures a balanced distribution of red squares based on overall input density.
+    5. Applies connectivity rules to create coherent patterns of red squares.
+    6. Makes final adjustments to balance the pattern and match example outputs.
     """
     left_half, right_half = split_grid(input_grid)
     output = [[0 for _ in range(4)] for _ in range(5)]
     
-    activity_scores = calculate_activity_scores(left_half, right_half)
-    map_activity_to_output(activity_scores, output)
+    density_scores = calculate_density_scores(left_half, right_half)
+    total_density = sum(density_scores) / len(density_scores)
+    total_red = int(6 + (1 - total_density) * 4)  # 6-10 red squares based on inverse density
     
-    apply_smoothing_rules(output)
-    ensure_vertical_consistency(output)
-    process_bottom_row(left_half, right_half, output)
-    remove_isolated_cells(output)
-    final_adjustments(output)
+    map_inverse_density_to_output(density_scores, output, total_red)
+    ensure_connectivity(output)
+    balance_pattern(output, total_red)
     
     return ColoredGrid(values=output)
 
@@ -31,26 +29,38 @@ def split_grid(grid: ColoredGrid) -> Tuple[List[List[int]], List[List[int]]]:
     right_half = [row[5:] for row in grid.values]
     return left_half, right_half
 
-def calculate_activity_scores(left_half: List[List[int]], right_half: List[List[int]]) -> List[float]:
+def calculate_density_scores(left_half: List[List[int]], right_half: List[List[int]]) -> List[float]:
     scores = []
     for half, color in [(left_half, 8), (right_half, 5)]:
-        for rows in [slice(0, 3), slice(3, 5)]:
-            quadrant = [row[rows] for row in half]
-            score = (
-                sum(cell == color for row in quadrant for cell in row) / len(quadrant) / len(quadrant[0]) +
-                len(identify_vertical_lines(quadrant, color)) / len(quadrant[0]) +
-                len(identify_diagonal_lines(quadrant, color)) / (len(quadrant) * len(quadrant[0]))
-            ) / 3
+        for rows, cols in [(slice(0, 3), slice(0, 2)), (slice(0, 3), slice(2, 4)), 
+                           (slice(3, 5), slice(0, 2)), (slice(3, 5), slice(2, 4))]:
+            quadrant = [row[cols] for row in half[rows]]
+            score = sum(cell == color for row in quadrant for cell in row) / len(quadrant) / len(quadrant[0])
             scores.append(score)
     return scores
 
-def map_activity_to_output(scores: List[float], output: List[List[int]]):
-    quadrants = [(0, 0), (3, 0), (0, 2), (3, 2)]
-    for score, (start_row, start_col) in zip(scores, quadrants):
-        num_red = int(score * 4)
+def map_inverse_density_to_output(scores: List[float], output: List[List[int]], total_red: int):
+    inverse_scores = [1 - score for score in scores]
+    total_inverse = sum(inverse_scores)
+    quadrants = [(3, 2), (3, 0), (0, 2), (0, 0)]  # Inverse mapping
+    remaining_red = total_red
+    
+    for score, (start_row, start_col) in zip(inverse_scores, quadrants):
+        num_red = int((score / total_inverse) * total_red)
+        num_red = min(num_red, remaining_red, 4)  # Ensure we don't place too many reds
+        cells = [(r, c) for r in range(start_row, start_row + 2) for c in range(start_col, start_col + 2)]
         for _ in range(num_red):
-            r, c = start_row + _ // 2, start_col + _ % 2
+            if cells:
+                r, c = cells.pop(random.randint(0, len(cells) - 1))
+                output[r][c] = 2
+                remaining_red -= 1
+    
+    # Place any remaining reds
+    while remaining_red > 0:
+        r, c = random.randint(0, 4), random.randint(0, 3)
+        if output[r][c] == 0:
             output[r][c] = 2
+            remaining_red -= 1
 
 def identify_vertical_lines(quadrant: List[List[int]], color: int) -> List[int]:
     return [c for c in range(len(quadrant[0])) if sum(1 for r in range(len(quadrant)) if quadrant[r][c] == color) >= 2]
@@ -126,3 +136,65 @@ def final_adjustments(output: List[List[int]]):
                     total_red += 1
                     if total_red >= 6:
                         return
+import random
+
+def ensure_connectivity(output: List[List[int]]):
+    def get_neighbors(r, c):
+        return [(r+dr, c+dc) for dr, dc in [(0,1),(1,0),(0,-1),(-1,0)]
+                if 0 <= r+dr < 5 and 0 <= c+dc < 4]
+    
+    def dfs(r, c, visited):
+        stack = [(r, c)]
+        while stack:
+            curr_r, curr_c = stack.pop()
+            if (curr_r, curr_c) not in visited:
+                visited.add((curr_r, curr_c))
+                for nr, nc in get_neighbors(curr_r, curr_c):
+                    if output[nr][nc] == 2:
+                        stack.append((nr, nc))
+    
+    red_cells = [(r, c) for r in range(5) for c in range(4) if output[r][c] == 2]
+    if not red_cells:
+        return
+    
+    visited = set()
+    dfs(red_cells[0][0], red_cells[0][1], visited)
+    
+    for r, c in red_cells:
+        if (r, c) not in visited:
+            # Connect isolated red cell to the nearest connected red cell
+            min_dist = float('inf')
+            nearest = None
+            for vr, vc in visited:
+                dist = abs(r - vr) + abs(c - vc)
+                if dist < min_dist:
+                    min_dist = dist
+                    nearest = (vr, vc)
+            if nearest:
+                nr, nc = nearest
+                for cr, cc in [(r, nc), (nr, c)]:
+                    output[cr][cc] = 2
+                dfs(r, c, visited)
+
+def balance_pattern(output: List[List[int]], total_red: int):
+    # Ensure no row or column is entirely red or black
+    for r in range(5):
+        if all(cell == 2 for cell in output[r]) or all(cell == 0 for cell in output[r]):
+            c = random.randint(0, 3)
+            output[r][c] = 2 if output[r][c] == 0 else 0
+    
+    for c in range(4):
+        if all(output[r][c] == 2 for r in range(5)) or all(output[r][c] == 0 for r in range(5)):
+            r = random.randint(0, 4)
+            output[r][c] = 2 if output[r][c] == 0 else 0
+    
+    # Adjust to match total_red
+    current_red = sum(sum(row) for row in output) // 2
+    while current_red != total_red:
+        r, c = random.randint(0, 4), random.randint(0, 3)
+        if current_red < total_red and output[r][c] == 0:
+            output[r][c] = 2
+            current_red += 1
+        elif current_red > total_red and output[r][c] == 2:
+            output[r][c] = 0
+            current_red -= 1
