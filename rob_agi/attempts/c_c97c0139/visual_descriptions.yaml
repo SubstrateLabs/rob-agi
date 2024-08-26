@@ -1,0 +1,26 @@
+example_0:
+  input: |
+    The input grid is 19x17 in size. It consists mostly of black (0) squares, representing empty space. There is a single horizontal red (2) line in the middle of the grid, specifically in row 7. This red line spans from column 2 to column 16, making it 15 squares long. The rest of the grid is entirely black.
+  output: |
+    The output grid maintains the same 19x17 size. The red horizontal line from the input remains unchanged in row 7. Above and below this red line, a symmetrical diamond-like shape has been formed using sky blue (8) squares. This sky blue diamond extends 6 rows above and 6 rows below the red line, with its widest point aligning with the ends of the red line. The diamond shape tapers to a point at the top and bottom, creating a symmetrical pattern. The rest of the grid remains black (0).
+
+example_1:
+  input: |
+    The input grid is 21x19 in size. It contains two distinct red (2) lines:
+    1. A vertical line in column 4, spanning from row 2 to row 6 (5 squares tall).
+    2. A horizontal line in row 12, spanning from column 9 to column 17 (9 squares wide).
+    The rest of the grid is filled with black (0) squares, representing empty space.
+  output: |
+    The output grid maintains the 21x19 size. Both red lines from the input remain unchanged:
+    1. The vertical red line in column 4, rows 2-6.
+    2. The horizontal red line in row 12, columns 9-17.
+    Around each red line, a small sky blue (8) diamond shape has been added:
+    1. For the vertical line, the diamond is 3 squares wide at its widest point (centered on the red line) and extends one square above and below the red line.
+    2. For the horizontal line, the diamond is 7 squares tall at its tallest point (centered on the red line) and extends four squares to the left and right of the red line's ends.
+    These diamond shapes taper to points at their extremities. The rest of the grid remains black (0).
+
+test_case_0:
+  input: |
+    The input for the test case is not provided in the given code snippet.
+  output: |
+    The expected output for the test case is not provided in the given code snippet.
