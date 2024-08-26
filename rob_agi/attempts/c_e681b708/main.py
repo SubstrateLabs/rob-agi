@@ -6,12 +6,22 @@ def solve_e681b708(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid based on the following rules:
     1. Identifies the main structure (connected blue cells and colored endpoints).
-    2. Divides the grid into regions based on horizontal and vertical blue lines.
-    3. Assigns colors to regions based on their position and proximity to endpoints.
-    4. Transforms scattered dots to the color of their region.
-    5. Handles special cases near endpoints and structure.
-    6. Merges adjacent transformed dots of the same color.
+    2. Divides the grid into regions based on the main structure.
+    3. Analyzes each region's position relative to the structure and endpoints.
+    4. Assigns colors to regions based on their position and nearest endpoints.
+    5. Transforms scattered blue dots to the color of their region.
+    6. Handles special cases:
+       - Keeps blue dots below the bottommost horizontal line blue.
+       - Colors cells adjacent to endpoints appropriately.
     7. Preserves the main structure and original colored endpoints.
+
+    The color assignment follows a clockwise pattern:
+    - Above the structure: Red (2) or Sky Blue (8)
+    - Right of the structure: Green (3) or Sky Blue (8)
+    - Below the structure: Green (3) or Sky Blue (8)
+    - Left of the structure: Green (3) or Sky Blue (8)
+
+    Sky Blue (8) is used when it's the nearest endpoint color.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -102,9 +112,11 @@ def assign_colors_to_regions(grid: ColoredGrid, regions: List[Set[Tuple[int, int
     return region_colors
 
 def transform_scattered_dots(grid: ColoredGrid, structure: Set[Tuple[int, int]], regions: List[Set[Tuple[int, int]]], region_colors: Dict[Tuple[int, int], int]):
-    for r, c in grid.get_dimensions():
-        if (r, c) not in structure and grid.values[r][c] == 1:
-            grid.values[r][c] = region_colors.get((r, c), 1)
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        for c in range(cols):
+            if (r, c) not in structure and grid.values[r][c] == 1:
+                grid.values[r][c] = region_colors.get((r, c), 1)
 
 def handle_special_cases(grid: ColoredGrid, endpoints: List[Tuple[int, int, int]], structure: Set[Tuple[int, int]]):
     rows, cols = grid.get_dimensions()
