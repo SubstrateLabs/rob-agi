@@ -11,7 +11,7 @@ def solve_cfb2ce5a(input_grid: ColoredGrid) -> ColoredGrid:
     The algorithm works as follows:
     1. Analyze the initial grid to identify unique colors, their patterns, and frequencies.
     2. Calculate target frequencies for each color.
-    3. Create pattern templates for each color.
+    3. Create pattern templates for each color based on their initial arrangement.
     4. Perform a multi-stage expansion process:
        a. Pattern-based Expansion: Expand each color according to its template.
        b. Boundary Interaction: Handle color interactions at boundaries.
@@ -112,7 +112,6 @@ def solve_cfb2ce5a(input_grid: ColoredGrid) -> ColoredGrid:
                     grid.values[r][c] = random.choices(colors, weights=weights)[0]
 
     def adjust_symmetry():
-        # Improved vertical symmetry adjustment
         for r in range(1, rows - 1):
             for c in range(1, cols // 2):
                 left_color = grid.values[r][c]
@@ -155,14 +154,22 @@ def solve_cfb2ce5a(input_grid: ColoredGrid) -> ColoredGrid:
         for c in range(cols):
             grid.values[0][c] = grid.values[-1][c] = 0
 
+    def preserve_original_pattern(color: int):
+        original_positions = get_color_positions(color)
+        for r, c in original_positions:
+            grid.values[r][c] = color
+
+    grid = input_grid.deep_copy()
+    rows, cols = grid.get_dimensions()
     colors = get_unique_colors()
     color_patterns = {color: identify_pattern(color) for color in colors}
     initial_frequencies = get_color_frequencies()
     target_frequencies = calculate_target_frequencies(initial_frequencies)
     pattern_templates = {color: create_pattern_template(color, pattern) for color, pattern in color_patterns.items()}
 
-    for _ in range(5):  # Perform multiple iterations of expansion
+    for _ in range(3):  # Perform multiple iterations of expansion
         for color in colors:
+            preserve_original_pattern(color)
             expand_pattern(color, pattern_templates[color])
             handle_boundary_interaction(color, target_frequencies)
         
@@ -172,6 +179,8 @@ def solve_cfb2ce5a(input_grid: ColoredGrid) -> ColoredGrid:
         maintain_border()
 
     # Final adjustments
+    for color in colors:
+        preserve_original_pattern(color)
     fill_empty_spaces(target_frequencies)
     enhance_connectivity()
     adjust_symmetry()
