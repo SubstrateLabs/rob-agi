@@ -5,12 +5,13 @@ def solve_d4b1c2b1(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Expands a colored grid based on the following rules:
     1. If the grid is uniform (all cells have the same color), return the input grid unchanged.
-    2. Otherwise, expand each cell into a 3x3 square region, preserving the color of each original cell in its expanded region.
+    2. Otherwise, expand each cell into a square region, where the size of the square is determined by the size of the largest connected region in the input grid.
     """
     if is_uniform(input_grid):
         return input_grid
 
-    expansion_factor = 3
+    largest_region_size = find_largest_region_size(input_grid)
+    expansion_factor = get_expansion_factor(largest_region_size)
     
     rows, cols = input_grid.get_dimensions()
     new_rows, new_cols = rows * expansion_factor, cols * expansion_factor
@@ -55,4 +56,9 @@ def find_largest_region_size(grid: ColoredGrid) -> int:
 
 def get_expansion_factor(region_size: int) -> int:
     """Determine the expansion factor based on the largest region size."""
-    return 3  # Always return 3 for non-uniform grids
+    if region_size == 1:
+        return 2
+    elif region_size == 2:
+        return 3
+    else:
+        return 4
