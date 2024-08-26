@@ -1,18 +1,16 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple
-import math
 
 def solve_11e1fe23(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by adding a diamond shape between the two horizontally closest colored dots.
+    Transforms the input grid by connecting the three colored dots with a zigzag line.
     
     1. Identifies all colored dots in the grid.
-    2. Finds the two horizontally closest colored dots.
-    3. Determines the diamond shape between these dots.
-    4. Colors the diamond based on the colors of the closest dots.
-    5. Draws the diamond on a copy of the input grid.
+    2. Sorts the dots based on their vertical position (top to bottom).
+    3. Creates a zigzag path connecting these dots.
+    4. Draws the path on a copy of the input grid.
     
-    Returns the new grid with the added diamond shape.
+    Returns the new grid with the added zigzag path.
     """
     # Step 1: Scan the input grid
     colored_dots = [(r, c, input_grid.get_cell(r, c)) 
@@ -20,44 +18,29 @@ def solve_11e1fe23(input_grid: ColoredGrid) -> ColoredGrid:
                     for c in range(input_grid.num_cols) 
                     if input_grid.get_cell(r, c) != 0]
     
-    if len(colored_dots) < 2:
-        return input_grid  # Not enough dots to form a diamond
+    if len(colored_dots) < 3:
+        return input_grid  # Not enough dots to form a zigzag
     
-    # Step 2: Find the two horizontally closest colored dots
-    closest_pair = min([(a, b) for a in colored_dots for b in colored_dots if a != b],
-                       key=lambda pair: abs(pair[0][1] - pair[1][1]))
+    # Step 2: Sort dots vertically
+    sorted_dots = sorted(colored_dots, key=lambda x: x[0])
     
-    # Step 3: Determine the diamond shape
-    left_dot, right_dot = sorted(closest_pair, key=lambda dot: dot[1])
-    mid_row = (left_dot[0] + right_dot[0]) // 2
-    mid_col = (left_dot[1] + right_dot[1]) // 2
-    width = right_dot[1] - left_dot[1]
-    height = max(1, abs(left_dot[0] - right_dot[0]))
+    # Step 3: Create zigzag path
+    path = []
+    for i in range(len(sorted_dots) - 1):
+        start = sorted_dots[i]
+        end = sorted_dots[i + 1]
+        mid_row = (start[0] + end[0]) // 2
+        path.extend([
+            (start[0], start[1], start[2]),
+            (mid_row, start[1], start[2]),
+            (mid_row, end[1], end[2]),
+            (end[0], end[1], end[2])
+        ])
     
-    # Step 4: Color the diamond
-    top_color = left_dot[2]
-    bottom_color = right_dot[2]
-    left_color = 5  # Gray
-    right_color = (left_dot[2] + right_dot[2]) % 10
-    
-    # Step 5: Draw the diamond
+    # Step 4: Draw the path
     new_grid = input_grid.deep_copy()
-    diamond_points = [
-        (mid_row - height // 2, mid_col, top_color),
-        (mid_row, left_dot[1], left_color),
-        (mid_row, right_dot[1], right_color),
-        (mid_row + height // 2, mid_col, bottom_color)
-    ]
-    
-    for point in diamond_points:
-        if 0 <= point[0] < new_grid.num_rows and 0 <= point[1] < new_grid.num_cols:
-            new_grid.set_cell(point[0], point[1], point[2])
-    
-    # Draw lines connecting the diamond points
-    draw_line(new_grid, diamond_points[0], diamond_points[1], top_color)
-    draw_line(new_grid, diamond_points[0], diamond_points[2], right_color)
-    draw_line(new_grid, diamond_points[3], diamond_points[1], left_color)
-    draw_line(new_grid, diamond_points[3], diamond_points[2], bottom_color)
+    for i in range(len(path) - 1):
+        draw_line(new_grid, path[i], path[i + 1], path[i][2])
     
     return new_grid
 
