@@ -1,0 +1,46 @@
+example_0:
+  input: |
+    A 21x16 grid with mostly black (empty) space. There are four distinct colored shapes:
+    1. A sky blue (8) shape in the top left, resembling a cross or plus sign.
+    2. A red (2) shape in the top right, looking like an irregular T or hammer.
+    3. An orange (7) shape in the middle-right, resembling a distorted H or two connected rectangles.
+    4. A magenta (6) shape in the bottom right, looking like an irregular cross or plus sign.
+    Each shape is surrounded by black space and doesn't touch the others.
+  output: |
+    A 4x5 grid containing only the sky blue (8) shape from the input, centered and complete. It clearly shows a cross or plus sign made of sky blue squares on a black background.
+
+example_1:
+  input: |
+    A 22x17 grid with mostly black (empty) space. There are five distinct colored shapes:
+    1. A red (2) shape in the top left, resembling a heart or strawberry.
+    2. A green (3) shape in the middle right, looking like a distorted star or flower.
+    3. A yellow (4) shape on the left side, resembling a vertical rectangle with protrusions.
+    4. A blue (1) shape in the bottom center, looking like a diamond or kite.
+    5. A single sky blue (8) pixel in the top right corner.
+    Each shape is surrounded by black space and doesn't touch the others.
+  output: |
+    A 6x7 grid containing only the blue (1) shape from the input, centered and complete. It clearly shows a diamond or kite shape made of blue squares on a black background.
+
+example_2:
+  input: |
+    A 21x19 grid with mostly black (empty) space. There are five distinct colored shapes:
+    1. A magenta (6) shape in the top left, resembling an irregular T or hammer.
+    2. A green (3) shape in the top right, looking like a distorted star or flower.
+    3. A blue (1) shape in the middle, resembling a butterfly or bow tie.
+    4. An orange (7) shape in the middle right, looking like a small L or corner.
+    5. A yellow (4) shape at the bottom, resembling a goblet or chalice.
+    Each shape is surrounded by black space and doesn't touch the others.
+  output: |
+    A 3x5 grid containing only the magenta (6) shape from the input, centered and complete. It clearly shows an irregular T or hammer shape made of magenta squares on a black background.
+
+test_case_0:
+  input: |
+    A 21x19 grid with mostly black (empty) space. There are five distinct colored shapes:
+    1. A magenta (6) shape in the top left, resembling an irregular T or hammer.
+    2. A green (3) shape in the top right, looking like a distorted star or flower.
+    3. A blue (1) shape in the middle, resembling a butterfly or bow tie.
+    4. An orange (7) shape in the middle right, looking like a small L or corner.
+    5. A yellow (4) shape at the bottom, resembling a goblet or chalice.
+    Each shape is surrounded by black space and doesn't touch the others.
+  output: |
+    The output is not provided for this test case.
