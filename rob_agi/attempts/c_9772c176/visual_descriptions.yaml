@@ -1,17 +1,38 @@
 example_0:
   input: |
-    The input grid is 29x29 in size. It contains two distinct sky blue (8) shapes. The larger shape is in the upper left corner, occupying roughly a quarter of the grid. It has a rounded, cloud-like appearance with a flat bottom edge. The smaller shape is in the lower right quadrant, occupying about a ninth of the grid. It also has a cloud-like appearance but is more compact. The rest of the grid is filled with black (0), representing empty space.
+    The input grid is 29x29. It contains two distinct sky blue (8) shapes on a black (0) background. The larger shape, occupying about 25% of the grid, is in the upper-left corner. It has a cloud-like appearance with a flat bottom edge and rounded top. The smaller shape, about 11% of the grid size, is in the lower-right quadrant. It's also cloud-like but more compact. The shapes are not touching and have clear, defined edges.
   output: |
-    The output grid maintains the same sky blue (8) shapes from the input. However, it introduces yellow (4) elements around and between these shapes. The yellow forms an "aura" or halo around the larger sky blue shape, extending outwards by 1-3 pixels, with more extension on the right and bottom sides. There's also a tendril of yellow extending downwards from the larger shape, almost connecting to the smaller shape. The smaller sky blue shape has a thinner yellow border, mostly on its upper and left sides. There's also a small yellow dot below the smaller shape. The yellow elements create a sense of connection and flow between the two sky blue shapes.
+    The output retains the original sky blue (8) shapes exactly. New yellow (4) elements are added:
+    1. A halo around both sky blue shapes, 1-3 pixels wide, wider on the right and bottom.
+    2. The larger shape's halo is more pronounced, especially on the bottom-right.
+    3. A yellow tendril extends downward from the larger shape, almost connecting to the smaller shape.
+    4. The smaller shape has a thinner yellow border, mainly on its upper-left.
+    5. A small yellow dot appears below the smaller shape.
+    6. Yellow pixels never directly touch sky blue pixels; there's always a one-pixel black gap.
+    7. The yellow creates a visual flow between the two shapes without changing their original form.
 
 example_1:
   input: |
-    The input grid is 22x22 in size. It contains two distinct sky blue (8) shapes. The upper shape is roughly circular or oval, positioned in the top-center of the grid. The lower shape is larger and more irregular, resembling a wide, flattened cloud. It's positioned in the bottom-center of the grid, taking up more horizontal space. The rest of the grid is filled with black (0), representing empty space.
+    The input grid is 22x22. It features two sky blue (8) shapes on a black (0) background. The upper shape is oval, positioned in the top-center. The lower shape is larger and irregular, resembling a wide, flattened cloud in the bottom-center. It spans more horizontally than vertically. The shapes are distinct and not touching.
   output: |
-    The output grid maintains the same sky blue (8) shapes from the input. It introduces yellow (4) elements around and between these shapes. The yellow forms an "aura" or halo around both sky blue shapes. The upper shape has a more pronounced yellow border on its bottom and sides. The lower shape has a thicker yellow border on its top and sides, with a slight extension upwards on the left side. There's also a significant yellow area between the two shapes, creating a visual connection. This connecting area has a slightly asymmetrical shape, with more yellow on the left side. There are also small yellow extensions or "tendrils" reaching out from both shapes into the black space, particularly noticeable above the upper shape and below the lower shape.
+    The output preserves the original sky blue (8) shapes and adds yellow (4) elements:
+    1. Both shapes gain a yellow halo, varying in thickness.
+    2. The upper shape's halo is thicker on the bottom and sides.
+    3. The lower shape's halo is more pronounced on top and sides, with an upward extension on the left.
+    4. A significant yellow area bridges the gap between the shapes, slightly left-biased.
+    5. Small yellow tendrils extend into black space, notably above the upper shape and below the lower shape.
+    6. Yellow pixels maintain a one-pixel black buffer from sky blue pixels.
+    7. The yellow additions create a visual connection between the shapes without altering their original structure.
 
 test_case_0:
   input: |
-    The input grid is 21x21 in size. It contains two distinct sky blue (8) shapes. The upper shape is roughly circular or oval, positioned in the top-left quadrant of the grid. The lower shape is larger and more irregular, resembling a wide, flattened cloud or perhaps a landscape feature like a hill. It's positioned in the bottom-center of the grid, taking up more horizontal space and touching the bottom edge. The rest of the grid is filled with black (0), representing empty space.
+    The input grid is 21x21. It contains two sky blue (8) shapes on a black (0) background. The upper shape is oval, located in the top-left quadrant. The lower shape is larger and irregular, resembling a wide, flattened cloud or hill. It's positioned in the bottom-center, touching the bottom edge of the grid. The shapes are separate and have distinct boundaries.
   output: |
-    The output is not provided for the test case, as it is meant to be solved based on the pattern observed in the examples.
+    The output is not provided, as it's to be generated based on the patterns observed in the examples. Key points to consider:
+    1. Preserve the original sky blue shapes exactly.
+    2. Add yellow halos around both shapes, likely varying in thickness.
+    3. Create a visual connection between the shapes using yellow elements.
+    4. Maintain a one-pixel black buffer between yellow and sky blue pixels.
+    5. Consider adding yellow tendrils or extensions, especially in the space between shapes.
+    6. The yellow additions should follow the general contours of the sky blue shapes.
+    7. Expect some asymmetry in the yellow additions, possibly influenced by the shapes' positions in the grid.
