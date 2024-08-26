@@ -1,16 +1,19 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple
 
+from typing import List, Tuple
+from collections import deque
+
 def solve_13713586(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by expanding colored regions downwards and to the right,
+    Transforms the input grid by expanding colored regions in all directions,
     while preserving gray boundaries and respecting the "first to reach" rule.
     
     The algorithm works as follows:
     1. Create a copy of the input grid.
     2. Identify all colored positions (excluding black and gray).
     3. Sort colored positions from top to bottom, then left to right.
-    4. For each colored position, expand downwards and then to the right.
+    4. For each colored position, perform a flood fill in all directions.
     5. Preserve gray boundaries by restoring them after expansion.
 
     Args:
@@ -22,34 +25,27 @@ def solve_13713586(input_grid: ColoredGrid) -> ColoredGrid:
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
 
-    def expand_color(r: int, c: int, color: int):
-        # Expand downwards
-        last_row = r
-        while last_row + 1 < rows and grid.values[last_row + 1][c] == 0:
-            last_row += 1
-            grid.values[last_row][c] = color
+    def get_colored_positions(grid: ColoredGrid) -> List[Tuple[int, int, int]]:
+        positions = []
+        for r in range(rows):
+            for c in range(cols):
+                if grid.values[r][c] not in [0, 5]:
+                    positions.append((r, c, grid.values[r][c]))
+        return sorted(positions)
 
-        # Expand rightwards for each row
-        for row in range(r, last_row + 1):
-            col = c
-            while col + 1 < cols and (grid.values[row][col + 1] == 0 or grid.values[row][col + 1] == color):
-                col += 1
-                grid.values[row][col] = color
+    def flood_fill(grid: List[List[int]], row: int, col: int, color: int):
+        queue = deque([(row, col)])
+        while queue:
+            r, c = queue.popleft()
+            if 0 <= r < rows and 0 <= c < cols and grid[r][c] == 0:
+                grid[r][c] = color
+                for dr, dc in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+                    queue.append((r + dr, c + dc))
 
-    # Identify colored positions
-    colored_positions = []
-    for r in range(rows):
-        for c in range(cols):
-            if grid.values[r][c] not in [0, 5]:
-                colored_positions.append((r, c))
+    colored_positions = get_colored_positions(grid)
 
-    # Sort colored positions
-    colored_positions.sort()
-
-    # Expand colors
-    for r, c in colored_positions:
-        color = grid.values[r][c]
-        expand_color(r, c, color)
+    for r, c, color in colored_positions:
+        flood_fill(grid.values, r, c, color)
 
     # Preserve gray boundaries
     for r in range(rows):
