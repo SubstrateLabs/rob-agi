@@ -6,27 +6,27 @@ def solve_85b81ff1(input_grid: ColoredGrid) -> ColoredGrid:
     1. Create a deep copy of the input grid.
     2. For each non-black column:
        a. Set the second row from the top to black (0).
-       b. If the second row from the bottom is black, set it to the column's color.
+       b. If the second row from the bottom is black in the input, set it to the column's color.
+       c. Leave the top and bottom rows unchanged.
     3. Return the modified grid.
 
     This approach maintains the structure at the top and bottom while
-    redistributing black cells in a consistent pattern.
+    redistributing black cells in a consistent pattern, ensuring that isolated
+    color cells are moved to the bottom of gaps when possible.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = input_grid.get_dimensions()
 
     for col in range(cols):
-        # Skip all-black columns
-        if all(input_grid.get_cell(row, col) == 0 for row in range(rows)):
-            continue
-
-        # Get the color of the column (from the top or bottom row)
         column_color = input_grid.get_cell(0, col) or input_grid.get_cell(rows-1, col)
+        
+        if column_color == 0:
+            continue  # Skip entirely black columns
 
-        # Set the second row from the top to black
+        # Set second row to black
         output_grid.set_cell(1, col, 0)
 
-        # Set the second row from the bottom to the column color if it's black
+        # Check and potentially modify second-to-last row
         if input_grid.get_cell(rows-2, col) == 0:
             output_grid.set_cell(rows-2, col, column_color)
 
