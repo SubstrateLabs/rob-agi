@@ -1,47 +1,53 @@
 example_0:
   input: |
-    A green (color 3) rectangular shape resembling a hollow rectangle or picture frame. The shape is centered in a 14x13 grid of black (0) squares. The green rectangle has a width of 9 squares and a height of 7 squares. It has three equally spaced vertical lines inside, dividing it into four sections.
+    A green (color 3) hollow rectangular shape centered in a 14x13 grid of black (0) squares. The green rectangle has outer dimensions of 9x7 squares. It contains three equally spaced vertical lines, creating four columns within the shape. The rectangle's borders and internal lines are all one pixel thick.
   output: |
-    The same green rectangular shape, but with slight modifications. The overall structure remains, but some green squares have shifted:
-    1. In the top row, the leftmost green square has moved one space to the left.
-    2. In the second row from the top, the second green square from the left has moved one space to the left.
-    3. In the middle row, the rightmost green square has moved one space to the right.
-    4. In the second row from the bottom, the second green square from the right has moved one space to the right.
-    5. In the bottom row, the rightmost green square has moved one space to the left.
-    These shifts create a slight wave-like or zigzag effect in the vertical lines of the rectangle.
+    The green rectangular shape maintains its overall structure but exhibits a subtle wave-like distortion:
+    1. The top and bottom horizontal edges remain straight and unchanged.
+    2. The vertical edges and internal lines now have a slight zigzag pattern.
+    3. The zigzag effect is most pronounced in the middle rows and diminishes towards the top and bottom.
+    4. The distortion is symmetrical vertically, creating a mirrored effect between the upper and lower halves.
+    5. The wave-like pattern maintains connectivity between all parts of the shape.
+    6. The total area occupied by green pixels remains approximately the same as in the input.
 
 example_1:
   input: |
-    A red (color 2) rectangular shape resembling a hollow rectangle or picture frame. The shape is positioned near the top of a 15x14 grid of black (0) squares. The red rectangle has a width of 6 squares and a height of 12 squares. It has one vertical line in the middle, dividing it into two equal sections.
+    A red (color 2) hollow rectangular shape near the top of a 15x14 grid of black (0) squares. The red rectangle has outer dimensions of 6x12 squares. It contains one central vertical line, dividing the shape into two equal columns. All borders and the internal line are one pixel thick.
   output: |
-    The same red rectangular shape, but with significant modifications creating a wave-like pattern:
-    1. The top and bottom horizontal lines remain unchanged.
-    2. The vertical lines now zigzag, creating a wave-like pattern.
-    3. The zigzag pattern alternates direction every two rows.
-    4. The amplitude of the wave increases towards the middle of the rectangle and decreases towards the top and bottom.
-    5. The wave pattern is symmetrical vertically.
-    This transformation gives the rectangle a more dynamic, undulating appearance while maintaining its overall structure.
+    The red rectangular shape undergoes a more pronounced wave-like transformation:
+    1. The top and bottom horizontal edges remain straight and in their original positions.
+    2. The vertical edges and central line now form a distinct zigzag pattern.
+    3. The zigzag effect alternates direction every two rows, creating a sinusoidal wave appearance.
+    4. The amplitude of the wave is largest in the middle rows and decreases towards the top and bottom.
+    5. The wave pattern is symmetrical both vertically and horizontally.
+    6. Despite the significant distortion, all parts of the shape remain connected.
+    7. The overall area and perimeter of the shape are preserved, with pixels shifting rather than being added or removed.
 
 example_2:
   input: |
-    A gray (color 5) rectangular shape resembling a hollow rectangle or picture frame. The shape is centered in a 15x15 grid of black (0) squares. The gray rectangle has a width of 9 squares and a height of 10 squares. It has one vertical line in the middle and one horizontal line in the middle, dividing it into four equal sections.
+    A gray (color 5) hollow rectangular shape centered in a 15x15 grid of black (0) squares. The gray rectangle has outer dimensions of 9x10 squares. It contains one central vertical line and one central horizontal line, dividing the shape into four equal quadrants. All borders and internal lines are one pixel thick.
   output: |
-    The same gray rectangular shape, but with modifications creating a more complex wave-like pattern:
-    1. The top and bottom horizontal lines have slight indentations, moving inward by one square at the third and seventh positions.
-    2. The vertical lines now zigzag, creating a wave-like pattern similar to example_1, but more pronounced.
-    3. The zigzag pattern alternates direction every row.
-    4. The amplitude of the wave varies, creating a more dynamic pattern.
-    5. The left and right edges of the rectangle now have outward bulges at various points.
-    6. The overall pattern is not perfectly symmetrical, giving it a more organic appearance.
+    The gray rectangular shape undergoes a complex wave-like transformation affecting both vertical and horizontal elements:
+    1. The top and bottom horizontal edges now have slight inward curves, with dips at the 1/3 and 2/3 points.
+    2. The vertical edges and central vertical line form pronounced zigzag patterns.
+    3. The central horizontal line also adopts a wave-like pattern, complementing the vertical distortions.
+    4. The zigzag effect in vertical elements alternates direction in each row.
+    5. Wave amplitudes vary, creating a dynamic and organic appearance.
+    6. The left and right edges show outward bulges at certain points, balanced by inward curves elsewhere.
+    7. The transformation maintains connectivity throughout the shape and preserves the overall rectangular structure.
+    8. The total area occupied by gray pixels remains consistent with the input, despite the complex distortions.
 
 example_3:
   input: |
-    A sky blue (color 8) rectangular shape resembling a hollow rectangle or picture frame. The shape is positioned near the top of a 15x15 grid of black (0) squares. The sky blue rectangle has a width of 6 squares and a height of 13 squares. It has two vertical lines inside, dividing it into three equal sections.
+    A sky blue (color 8) hollow rectangular shape near the top of a 15x15 grid of black (0) squares. The sky blue rectangle has outer dimensions of 6x13 squares. It contains two equally spaced vertical lines, dividing the shape into three columns. All borders and internal lines are one pixel thick.
   output: |
-    The same sky blue rectangular shape, but with significant modifications creating a complex wave-like pattern:
-    1. The top and bottom horizontal lines remain unchanged.
-    2. The vertical lines now zigzag dramatically, creating a pronounced wave-like pattern.
-    3. The zigzag pattern alternates direction every row.
-    4. The amplitude of the wave varies, with some waves reaching the outer edges of the rectangle.
-    5. The pattern creates the illusion of the rectangle being divided into multiple smaller sections.
-    6. The overall effect is highly dynamic and fluid, while still maintaining the basic rectangular structure.
+    The sky blue rectangular shape undergoes the most dramatic wave-like transformation:
+    1. The top and bottom horizontal edges remain straight and unchanged.
+    2. The vertical edges and two internal lines now form extreme zigzag patterns.
+    3. The zigzag effect alternates direction in every row, creating a high-frequency wave appearance.
+    4. Wave amplitudes vary significantly, with some peaks reaching the outer boundaries of the original shape.
+    5. The transformation creates the illusion of the rectangle being divided into multiple smaller, interconnected sections.
+    6. Despite the extreme distortion, all parts of the shape maintain connectivity.
+    7. The overall rectangular structure is preserved, though significantly altered in appearance.
+    8. The total area occupied by sky blue pixels remains consistent with the input, with pixels rearranged rather than added or removed.
+    9. The transformation results in a highly dynamic, fluid-like appearance while retaining the essence of the original shape.
