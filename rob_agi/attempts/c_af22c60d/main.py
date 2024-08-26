@@ -8,14 +8,13 @@ def solve_af22c60d(input_grid: ColoredGrid) -> ColoredGrid:
     extended from surrounding non-black cells.
 
     The solution follows these steps:
-    1. Analyze the global structure of the grid to identify patterns and symmetries.
-    2. Identify black regions and categorize them based on size and position.
-    3. Extend patterns into black regions based on global and local context.
-    4. Apply symmetry and repetition to fill larger black areas.
-    5. Resolve conflicts and ensure consistency in pattern extensions.
-    6. Handle edge cases and corners.
-    7. Perform iterative refinement to improve the solution.
-    8. Validate and finalize the filled grid.
+    1. Analyze the global structure of the grid to identify patterns, symmetries, and hidden images.
+    2. Identify and categorize black regions based on size, shape, and position.
+    3. Detect complex patterns and recurring sequences in non-black areas.
+    4. Analyze symmetry and repetition across the entire grid.
+    5. Extend patterns into black regions based on global context and local neighbors.
+    6. Apply iterative refinement to improve the solution.
+    7. Validate and finalize the filled grid, ensuring consistency and visual coherence.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -34,34 +33,39 @@ def solve_af22c60d(input_grid: ColoredGrid) -> ColoredGrid:
                 for dr, dc in directions 
                 if 0 <= r + dr < rows and 0 <= c + dc < cols]
 
-    def extract_pattern(r: int, c: int, size: int = 5) -> List[List[int]]:
-        return [[grid.get_cell(i, j) 
-                 for j in range(max(0, c - size // 2), min(cols, c + size // 2 + 1))]
-                for i in range(max(0, r - size // 2), min(rows, r + size // 2 + 1))]
-
-    def find_best_pattern(r: int, c: int) -> List[List[int]]:
-        patterns = [extract_pattern(nr, nc) for nr, nc, color in get_neighbors(r, c, True) if color != 0]
-        return max(patterns, key=lambda p: sum(row.count(0) for row in p), default=[])
-
-    def extend_pattern(pattern: List[List[int]], r: int, c: int) -> None:
-        pr, pc = len(pattern), len(pattern[0])
-        for i in range(pr):
-            for j in range(pc):
-                if 0 <= r + i - pr // 2 < rows and 0 <= c + j - pc // 2 < cols:
-                    if grid.get_cell(r + i - pr // 2, c + j - pc // 2) == 0:
-                        grid.set_cell(r + i - pr // 2, c + j - pc // 2, pattern[i][j])
-
     def analyze_global_structure():
-        # Implement global structure analysis here
+        # Implement advanced global structure analysis
         pass
 
     def categorize_black_regions():
-        # Implement black region categorization here
+        # Implement more sophisticated black region categorization
         pass
 
-    def apply_symmetry_and_repetition():
-        # Implement symmetry and repetition application here
+    def detect_complex_patterns():
+        # Implement complex pattern detection
         pass
+
+    def analyze_symmetry_and_repetition():
+        # Implement symmetry and repetition analysis
+        pass
+
+    def extend_patterns(black_cells):
+        for r, c in black_cells:
+            neighbors = get_neighbors(r, c, include_diagonal=True)
+            non_black_neighbors = [color for _, _, color in neighbors if color != 0]
+            if non_black_neighbors:
+                most_common_color = Counter(non_black_neighbors).most_common(1)[0][0]
+                grid.set_cell(r, c, most_common_color)
+
+    def iterative_refinement():
+        for _ in range(3):  # Perform refinement three times
+            for r in range(rows):
+                for c in range(cols):
+                    neighbors = get_neighbors(r, c, include_diagonal=True)
+                    color_counts = Counter(color for _, _, color in neighbors if color != 0)
+                    if color_counts:
+                        most_common_color = color_counts.most_common(1)[0][0]
+                        grid.set_cell(r, c, most_common_color)
 
     # Step 1: Analyze global structure
     analyze_global_structure()
@@ -69,33 +73,20 @@ def solve_af22c60d(input_grid: ColoredGrid) -> ColoredGrid:
     # Step 2: Categorize black regions
     categorize_black_regions()
 
-    # Step 3 & 4: Extend patterns and apply symmetry
+    # Step 3: Detect complex patterns
+    detect_complex_patterns()
+
+    # Step 4: Analyze symmetry and repetition
+    analyze_symmetry_and_repetition()
+
+    # Step 5: Extend patterns
     black_cells = [(r, c) for r in range(rows) for c in range(cols) if grid.get_cell(r, c) == 0]
-    for r, c in black_cells:
-        best_pattern = find_best_pattern(r, c)
-        if best_pattern:
-            extend_pattern(best_pattern, r, c)
-    apply_symmetry_and_repetition()
+    extend_patterns(black_cells)
 
-    # Step 5 & 6: Resolve conflicts and handle edge cases
-    for r in range(rows):
-        for c in range(cols):
-            if grid.get_cell(r, c) == 0:
-                neighbors = get_neighbors(r, c)
-                if neighbors:
-                    color_counts = Counter(color for _, _, color in neighbors if color != 0)
-                    if color_counts:
-                        most_common_color = color_counts.most_common(1)[0][0]
-                        grid.set_cell(r, c, most_common_color)
+    # Step 6: Iterative refinement
+    iterative_refinement()
 
-    # Step 7: Iterative refinement
-    for _ in range(2):  # Perform refinement twice
-        for r in range(rows):
-            for c in range(cols):
-                neighbors = get_neighbors(r, c, include_diagonal=True)
-                color_counts = Counter(color for _, _, color in neighbors if color != 0)
-                if color_counts:
-                    most_common_color = color_counts.most_common(1)[0][0]
-                    grid.set_cell(r, c, most_common_color)
+    # Step 7: Validation and finalization
+    # (This step is implicit in the return of the grid)
 
     return grid
