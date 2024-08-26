@@ -1,65 +1,76 @@
 example_0:
   input: |
-    A 15x15 grid with mostly black (empty) squares. There are a few colored squares:
-    - A magenta (6) square in the top-right corner (row 0, column 5)
-    - A gray (5) square next to it (row 0, column 6)
-    - A green (3) square next to the gray (row 0, column 7)
-    - Another green (3) square in the top-right corner (row 2, column 14)
-    - A magenta (6) square in the bottom-left corner (row 4, column 0)
-    The colored squares appear to be disconnected and sparse.
+    A 15x15 grid with mostly black (0) squares. Colored squares are:
+    - Magenta (6): (0,5) and (4,0)
+    - Gray (5): (0,6)
+    - Green (3): (0,7) and (2,14)
+    Key observations:
+    - Each color appears at least twice, except for gray
+    - The topmost occurrence of each color is in the first row
+    - Colors are disconnected and spread across the grid
   output: |
-    The same 15x15 grid, but now with lines connecting the colored squares:
-    - A vertical magenta (6) line from the top magenta square to the bottom one
-    - A vertical gray (5) line from the top gray square to the bottom of the grid
-    - A green (3) line that goes down from the top green square, then right to connect to the other green square
-    The lines appear to use the minimum number of segments to connect all squares of the same color.
-    The lines do not overwrite each other at intersections.
+    The 15x15 grid now has lines connecting same-colored squares:
+    - Magenta (6): Vertical line from (0,5) to (4,0)
+    - Gray (5): Vertical line from (0,6) to the bottom row
+    - Green (3): Vertical line from (0,7) to row 2, then horizontal to (2,14)
+    Key transformations:
+    - Lines start from the topmost occurrence of each color
+    - Vertical lines extend to the bottom or until they reach another square of the same color
+    - Horizontal lines in the bottom row connect disconnected squares
+    - Lines do not overwrite existing colored squares or other lines
 
 example_1:
   input: |
-    A 12x12 grid with mostly black (empty) squares. There are a few colored squares:
-    - A gray (5) square in the top-left area (row 0, column 4)
-    - A green (3) square next to it (row 0, column 5)
-    - A sky blue (8) square next to the green (row 0, column 6)
-    - A gray (5) square in the left edge (row 4, column 0)
-    - A sky blue (8) square in the right edge (row 5, column 11)
-    - A green (3) square in the left edge (row 8, column 0)
-    The colored squares are disconnected and spread across the grid.
+    A 12x12 grid with mostly black (0) squares. Colored squares are:
+    - Gray (5): (0,4) and (4,0)
+    - Green (3): (0,5) and (8,0)
+    - Sky blue (8): (0,6) and (5,11)
+    Key observations:
+    - Each color appears exactly twice
+    - The topmost occurrence of each color is in the first row
+    - Colors are disconnected and spread across edges and corners
   output: |
-    The same 12x12 grid, but now with lines connecting the colored squares:
-    - A gray (5) line that goes down from the top gray square, then left to the other gray square
-    - A green (3) line that goes down from the top green square to the bottom green square
-    - A sky blue (8) line that goes down from the top sky blue square, then right to the other sky blue square
-    The lines use the minimum number of segments to connect all squares of the same color.
-    The lines do not overwrite each other at intersections.
+    The 12x12 grid now has lines connecting same-colored squares:
+    - Gray (5): Vertical line from (0,4) to row 4, then horizontal to (4,0)
+    - Green (3): Vertical line from (0,5) to (8,0)
+    - Sky blue (8): Vertical line from (0,6) to row 5, then horizontal to (5,11)
+    Key transformations:
+    - Lines prioritize vertical movement before horizontal
+    - Horizontal lines only appear in the row of the lower square
+    - The minimum number of line segments are used for each color
 
 example_2:
   input: |
-    An 11x11 grid with mostly black (empty) squares. There are a few colored squares:
-    - A yellow (4) square in the top area (row 0, column 3)
-    - A magenta (6) square next to it (row 0, column 4)
-    - A red (2) square next to the magenta (row 0, column 5)
-    - A yellow (4) square in the left edge (row 4, column 0)
-    - A red (2) square in the right edge (row 4, column 10)
-    - A magenta (6) square in the bottom-right corner (row 9, column 10)
-    The colored squares are disconnected and spread across the grid.
+    An 11x11 grid with mostly black (0) squares. Colored squares are:
+    - Yellow (4): (0,3) and (4,0)
+    - Magenta (6): (0,4) and (9,10)
+    - Red (2): (0,5) and (4,10)
+    Key observations:
+    - Each color appears exactly twice
+    - All colors start in the top row but end in different rows
+    - Colors are maximally spread out (corners and edges)
   output: |
-    The same 11x11 grid, but now with lines connecting the colored squares:
-    - A yellow (4) line that goes down from the top yellow square, then left to the other yellow square
-    - A magenta (6) line that goes down from the top magenta square to the bottom magenta square
-    - A red (2) line that goes down from the top red square, then right to the other red square
-    The lines use the minimum number of segments to connect all squares of the same color.
-    The lines do not overwrite each other at intersections.
+    The 11x11 grid now has lines connecting same-colored squares:
+    - Yellow (4): Vertical line from (0,3) to row 4, then horizontal to (4,0)
+    - Magenta (6): Vertical line from (0,4) to (9,10)
+    - Red (2): Vertical line from (0,5) to row 4, then horizontal to (4,10)
+    Key transformations:
+    - Vertical lines always start from the top occurrence
+    - Horizontal lines are only drawn in the row of the lower square
+    - Lines take the shortest path while adhering to the vertical-then-horizontal rule
 
 test_case_0:
   input: |
-    An 11x11 grid with mostly black (empty) squares. There are a few colored squares:
-    - A yellow (4) square in the top area (row 0, column 3)
-    - A magenta (6) square next to it (row 0, column 4)
-    - A red (2) square next to the magenta (row 0, column 5)
-    - A yellow (4) square in the left edge (row 4, column 0)
-    - A red (2) square in the right edge (row 4, column 10)
-    - A magenta (6) square in the bottom-right corner (row 9, column 10)
-    The colored squares are disconnected and spread across the grid.
+    An 11x11 grid with mostly black (0) squares. Colored squares are:
+    - Yellow (4): (0,3) and (4,0)
+    - Magenta (6): (0,4) and (9,10)
+    - Red (2): (0,5) and (4,10)
+    Key observations:
+    - Identical layout to example_2
+    - Tests the consistency of the transformation rules
   output: |
     The output grid is not provided for this test case.
+    Expected transformation based on previous examples:
+    - Vertical lines from top occurrences
+    - Horizontal lines only in the row of lower squares
+    - Minimum number of line segments while connecting all same-colored squares
