@@ -1,23 +1,63 @@
 example_0:
   input: |
-    A 22x16 grid with a large sky blue (8) frame-like structure in the top left quadrant. The frame has a hollow center. Inside this frame, there's a small red (2) L-shaped pattern in the upper left corner. On the right side of the grid, there's another sky blue structure that looks like a backwards 'F'. Inside this structure, there's a small red T-shaped pattern.
+    A 22x16 grid with two distinct sky blue (8) regions:
+    1. A large frame-like structure in the top-left quadrant, occupying roughly 10x9 cells. The frame has a hollow center.
+    2. A backwards 'F'-shaped structure on the right side, spanning the full height of the grid.
+    Red (2) patterns:
+    - Inside the left frame: A small 3-cell L-shaped pattern in the upper-left corner.
+    - Inside the right structure: A 5-cell T-shaped pattern near the top.
+    The rest of the grid is filled with black (0).
   output: |
-    The same 22x16 grid with the sky blue structures unchanged. The red patterns inside both structures have been expanded and made symmetrical. In the left structure, the red L-shape has become a larger symmetrical pattern. In the right structure, the red T-shape has been mirrored vertically to create a symmetrical pattern within the confines of the blue structure.
+    The 22x16 grid maintains the same sky blue (8) structures. Changes in red (2) patterns:
+    1. Left frame: The L-shape expands into a symmetrical pattern, mirrored both horizontally and vertically. It now occupies most of the frame's interior, touching all four inner edges.
+    2. Right structure: The T-shape is vertically expanded and mirrored. The pattern now consists of three T-shapes stacked vertically, centered within the available space.
+    Both expansions maintain symmetry and are confined within their respective sky blue regions.
 
 example_1:
   input: |
-    A 17x18 grid with a large sky blue (8) rectangular frame in the center. Inside this frame, there's a small red (2) L-shaped pattern in the upper left corner.
+    A 17x18 grid featuring a central sky blue (8) rectangular frame, approximately 10x14 cells. The frame has a 2-cell thick border with a hollow interior.
+    Inside this frame, in the upper-left corner, is a small red (2) L-shaped pattern consisting of 3 cells.
+    The rest of the grid, including the frame's interior, is black (0).
   output: |
-    The same 17x18 grid with the sky blue frame unchanged. The red L-shaped pattern inside has been expanded into a larger, symmetrical pattern that fills more of the frame's interior. The pattern now resembles a square with its corners touching the frame's inner edges.
+    The 17x18 grid retains the unchanged sky blue (8) rectangular frame.
+    The red (2) L-shaped pattern is transformed:
+    1. It expands symmetrically both horizontally and vertically.
+    2. The new pattern forms a larger square shape, with its corners touching all four inner edges of the frame.
+    3. The pattern maintains internal symmetry, mirroring itself in both axes.
+    The expansion is confined entirely within the sky blue frame, not affecting any area outside it.
 
 example_2:
   input: |
-    A 16x24 grid with a sky blue (8) structure resembling an elaborate picture frame or window. Inside this structure, there's a red (2) pattern that looks like a cross with extra dots on three of its arms.
+    A 16x24 grid with a complex sky blue (8) structure resembling an ornate picture frame:
+    - Outer dimensions approximately 14x20 cells.
+    - Features decorative elements like rounded corners and a more elaborate top section.
+    Inside this structure is a red (2) pattern:
+    - Resembles a cross with additional 'dots' (single cells) on three of its arms.
+    - The cross is positioned in the upper portion of the frame's interior.
+    The remaining grid space is filled with black (0).
   output: |
-    The same 16x24 grid with the sky blue structure unchanged. The red pattern inside has been expanded vertically. The cross shape is now repeated three times vertically, creating a symmetrical pattern that fills more of the frame's interior. Each cross maintains the extra dots on its arms.
+    The 16x24 grid maintains the identical sky blue (8) ornate frame structure.
+    The red (2) pattern undergoes vertical expansion:
+    1. The original cross-with-dots pattern is replicated three times vertically.
+    2. These replications are evenly spaced within the frame's interior.
+    3. Each replication maintains the exact shape of the original, including all 'dot' elements.
+    4. The overall pattern is vertically symmetrical, with the middle cross acting as the axis of symmetry.
+    5. The expanded pattern fills more of the frame's interior height while maintaining its original width.
+    All modifications to the red pattern are strictly contained within the sky blue frame.
 
 test_case_0:
   input: |
-    A 16x24 grid with a sky blue (8) structure resembling an elaborate picture frame or window. Inside this structure, there's a red (2) pattern that looks like a cross with extra dots on three of its arms.
+    A 16x24 grid featuring a sky blue (8) structure similar to example_2:
+    - An ornate frame-like shape with decorative elements.
+    - Spans most of the grid, leaving a small black (0) border.
+    Inside the frame is a red (2) pattern:
+    - Positioned in the upper portion of the frame's interior.
+    - Forms a cross shape with additional 'dot' cells on three of its arms.
+    - The pattern is asymmetrical vertically.
+    The rest of the grid, including most of the frame's interior, is black (0).
   output: |
-    The output grid is not provided for this test case.
+    The output grid is not provided for this test case. Based on previous examples, one might expect:
+    1. The sky blue (8) frame to remain unchanged.
+    2. The red (2) pattern to be vertically expanded and made symmetrical.
+    3. The expansion to be confined within the sky blue frame's interior.
+    4. The pattern to potentially repeat multiple times vertically, filling more of the available space.
