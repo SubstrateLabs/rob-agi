@@ -9,8 +9,8 @@ def solve_12422b43(input_grid: ColoredGrid) -> ColoredGrid:
     
     1. Preserves the first column unchanged.
     2. For each subsequent column:
-       a. Extracts the entire pattern, including zeros.
-       b. Extends the pattern to fill the entire column height.
+       a. Extracts the non-zero pattern from the top of the column.
+       b. If a non-zero pattern exists, extends it to fill the entire column height.
        c. Replaces the column with the extended pattern.
     3. Handles cases where the pattern doesn't divide evenly into the column height.
     4. Leaves columns that are entirely zero unchanged.
@@ -25,9 +25,15 @@ def solve_12422b43(input_grid: ColoredGrid) -> ColoredGrid:
     rows, cols = input_grid.get_dimensions()
     
     for c in range(1, cols):  # Start from the second column
-        pattern = [input_grid.get_cell(r, c) for r in range(rows)]
+        pattern = []
+        for r in range(rows):
+            cell = input_grid.get_cell(r, c)
+            if cell != 0:
+                pattern.append(cell)
+            elif pattern:  # Stop if we've found a non-zero pattern and hit a zero
+                break
         
-        if any(pattern):  # If the column is not entirely zeros
+        if pattern:  # If we found a non-zero pattern
             repetitions = math.ceil(rows / len(pattern))
             extended_pattern = (pattern * repetitions)[:rows]
             

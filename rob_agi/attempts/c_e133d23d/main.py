@@ -6,7 +6,7 @@ def solve_e133d23d(input_grid: ColoredGrid) -> ColoredGrid:
     
     For each row in the input:
     - Checks if magenta (6) or sky blue (8) is present in the first three columns for the first output column
-    - Checks if magenta (6) or sky blue (8) is present in the middle two columns for the second output column
+    - Checks if magenta (6) or sky blue (8) is present in the middle three columns for the second output column
     - Checks if magenta (6) or sky blue (8) is present in the last three columns for the third output column
     - If the condition is met, sets the corresponding output cell to red (2)
     - Otherwise, sets the corresponding output cell to black (0)
@@ -25,7 +25,7 @@ def solve_e133d23d(input_grid: ColoredGrid) -> ColoredGrid:
         output_grid.values[row][0] = 2 if check_magenta_or_sky(input_row[:3]) else 0
         
         # Process second column of output
-        output_grid.values[row][1] = 2 if check_magenta_or_sky(input_row[3:5]) else 0
+        output_grid.values[row][1] = 2 if check_magenta_or_sky(input_row[2:5]) else 0
         
         # Process third column of output
         output_grid.values[row][2] = 2 if check_magenta_or_sky(input_row[4:]) else 0

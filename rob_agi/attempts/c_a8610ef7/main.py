@@ -7,8 +7,8 @@ def solve_a8610ef7(input_grid: ColoredGrid) -> ColoredGrid:
     1. Non-8 colors are preserved.
     2. Isolated 8-cells become red (2).
     3. Edges of 8-regions are always gray (5).
-    4. Interior cells of 8-regions alternate between red (2) and gray (5) in a checkerboard pattern.
-    5. The top-left cell of each 8-region is always gray (5).
+    4. Interior cells of 8-regions follow a global checkerboard pattern of red (2) and gray (5).
+    5. The global checkerboard pattern ensures the top-left cell of the grid is gray (5).
     """
     output = []
     rows, cols = len(input_grid.values), len(input_grid.values[0])
@@ -28,9 +28,10 @@ def solve_a8610ef7(input_grid: ColoredGrid) -> ColoredGrid:
     def get_checkerboard_color(r, c):
         return 5 if (r + c) % 2 == 0 else 2
     
-    for r, row in enumerate(input_grid.values):
+    for r in range(rows):
         new_row = []
-        for c, cell in enumerate(row):
+        for c in range(cols):
+            cell = input_grid.values[r][c]
             if cell != 8:
                 new_row.append(cell)
             elif is_isolated(r, c):

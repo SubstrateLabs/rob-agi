@@ -118,7 +118,7 @@ class Solver:
         prompt += f"\n<VISUAL_DESCRIPTIONS>\n{desc}\n</VISUAL_DESCRIPTIONS>\n"
         prompt += "Examine all the information you have, state your understanding of the challenge, and propose a detailed solution to the challenge in words. Any solution must always apply to every case, not just the failing exception here.\n"
         # ask_coder.run(prompt)
-        prompt = "Then reflect on your idea. Look very closely and notice if there are any other patterns or discrepancies worth noting. Remember this is about identifying abstract, intuitive ideas about what is happening.\n"
+        prompt = "Then reflect on your idea. Look very closely and notice if there are any other patterns or discrepancies worth noting. Remember this is about identifying abstract, intuitive ideas about what is happening. This takes humility, be honest, give it good effort and avoid over confidence.\n"
         prompt += f"Explicitly consider how your idea applies to each of the examples and test cases in attempts/{self.challenge_id}/test.py. To check your thinking, illustrate how your idea either works or doesn't for each case.\n"
         prompt += f"If the rule(s) you came up with does not apply to any specific case, call it out and think about a more general idea that does apply in every case. Be meticulous and careful in your reflection. Sometimes you need to zoom out to see how a single idea can apply to all cases.\n"
         ask_coder.run(prompt)
@@ -182,6 +182,7 @@ class Solver:
         current_result = self.run_tests()
         is_failing = not current_result["success"]
 
+        plan = None
         while is_failing and local_tries < max_tries:
             logger.info(f"-------------------- ATTEMPT {local_tries+1}/{max_tries} --------------------------\n")
             if prev_solution:
@@ -195,9 +196,10 @@ class Solver:
             self.total_attempts += 1
             current_result = self.run_tests()
             is_failing = not current_result["success"]
-            write_meta_file(
-                self.challenge_root, solved=not is_failing, latest_plan=plan, total_attempts=self.total_attempts
-            )
+
+        write_meta_file(
+            self.challenge_root, solved=not is_failing, latest_plan=plan, total_attempts=self.total_attempts
+        )
 
         logger.info(f"Total time: {time.perf_counter() - t0:.2f}s")
         return current_result["success"]

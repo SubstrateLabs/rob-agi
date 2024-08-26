@@ -7,9 +7,9 @@ def solve_aa300dc3(input_grid: ColoredGrid) -> ColoredGrid:
     Solve the aa300dc3 challenge by creating a diagonal line of 8 sky blue squares
     through the black region of the grid, avoiding obstacles.
 
-    1. Analyze the grid to find potential starting points near corners
+    1. Analyze the grid to find potential starting points near edges and corners
     2. For each starting point, use a modified A* algorithm to find a diagonal path of exactly 8 steps
-    3. Evaluate found paths based on diagonality and grid coverage
+    3. Evaluate found paths based on diagonality, grid coverage, and obstacle avoidance
     4. Place 8 sky blue squares along the best found path
     5. Return the modified grid or the original if no valid path is found
     """
@@ -17,17 +17,13 @@ def solve_aa300dc3(input_grid: ColoredGrid) -> ColoredGrid:
     output_grid = input_grid.deep_copy()
 
     def find_potential_starts():
-        corners = [(0, 0), (0, cols-1), (rows-1, 0), (rows-1, cols-1)]
         starts = []
-        for corner in corners:
-            for r in range(max(0, corner[0]-3), min(rows, corner[0]+4)):
-                for c in range(max(0, corner[1]-3), min(cols, corner[1]+4)):
-                    if input_grid.get_cell(r, c) == 0:
-                        starts.append((r, c))
+        for r in range(rows):
+            for c in range(cols):
+                if input_grid.get_cell(r, c) == 0 and (r == 0 or r == rows-1 or c == 0 or c == cols-1 or
+                                                       (r <= 2 or r >= rows-3) or (c <= 2 or c >= cols-3)):
+                    starts.append((r, c))
         return starts
-
-    def get_opposite_corner(start):
-        return (rows-1-start[0], cols-1-start[1])
 
     def heuristic(a, b):
         return max(abs(b[0] - a[0]), abs(b[1] - a[1]))  # Diagonal distance
@@ -44,20 +40,25 @@ def solve_aa300dc3(input_grid: ColoredGrid) -> ColoredGrid:
     def evaluate_path(path):
         diagonality = sum(1 for i in range(len(path)-1) if abs(path[i][0]-path[i+1][0]) == abs(path[i][1]-path[i+1][1]))
         coverage = abs(path[0][0] - path[-1][0]) + abs(path[0][1] - path[-1][1])
-        return diagonality + coverage * 0.5
+        obstacle_avoidance = sum(1 for r, c in path if any(input_grid.get_cell(nr, nc) != 0 
+                                                          for nr, nc in [(r-1,c-1), (r-1,c), (r-1,c+1), 
+                                                                         (r,c-1), (r,c+1), 
+                                                                         (r+1,c-1), (r+1,c), (r+1,c+1)] 
+                                                          if 0 <= nr < rows and 0 <= nc < cols))
+        return diagonality * 2 + coverage * 0.5 + obstacle_avoidance * 0.5
 
     best_path = None
     best_score = -1
 
     for start in find_potential_starts():
-        end = get_opposite_corner(start)
-        path = modified_a_star(input_grid, start, end)
-        
-        if len(path) == 8:
-            score = evaluate_path(path)
-            if score > best_score:
-                best_path = path
-                best_score = score
+        for end in find_potential_starts():
+            if start != end:
+                path = modified_a_star(input_grid, start, end)
+                if len(path) == 8:
+                    score = evaluate_path(path)
+                    if score > best_score:
+                        best_path = path
+                        best_score = score
 
     if best_path:
         for r, c in best_path:

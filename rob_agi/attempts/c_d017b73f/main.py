@@ -10,6 +10,8 @@ def solve_d017b73f(input_grid: ColoredGrid) -> ColoredGrid:
     vertical order and left-to-right precedence. The resulting grid is compressed horizontally
     by removing columns that contain only black cells, while preserving the vertical alignment,
     appropriate horizontal spacing of color groups, and the original number of rows.
+    Color groups are placed in their original vertical positions if possible, otherwise they are
+    moved to the nearest available space below their original position.
     """
     rows, cols = input_grid.get_dimensions()
     
@@ -48,12 +50,29 @@ def solve_d017b73f(input_grid: ColoredGrid) -> ColoredGrid:
     for group, color in color_groups:
         min_r = min(r for r, _ in group)
         max_r = max(r for r, _ in group)
-        min_c = max(rightmost_col[min_r:max_r+1]) + 1
-        shape = [(r - min_r, c - min(c for _, c in group)) for r, c in group]
-        for r, c in group:
-            new_grid[r][min_c + c - min(c for _, c in group)] = color
-        for r in range(min_r, max_r + 1):
-            rightmost_col[r] = max(rightmost_col[r], min_c + max(c for _, c in shape))
+        group_height = max_r - min_r + 1
+        group_width = max(c for _, c in group) - min(c for _, c in group) + 1
+        
+        # Find the nearest available space
+        placed = False
+        for start_r in range(min_r, rows - group_height + 1):
+            if all(rightmost_col[r] == 0 for r in range(start_r, start_r + group_height)):
+                min_c = 0
+            else:
+                min_c = max(rightmost_col[r] for r in range(start_r, start_r + group_height)) + 1
+            
+            if min_c + group_width <= cols:
+                # Place the group
+                for r, c in group:
+                    new_r = start_r + (r - min_r)
+                    new_c = min_c + (c - min(c for _, c in group))
+                    new_grid[new_r][new_c] = color
+                    rightmost_col[new_r] = max(rightmost_col[new_r], new_c + 1)
+                placed = True
+                break
+        
+        if not placed:
+            raise ValueError("Unable to place all color groups")
     
     # Step 5: Compress horizontally
     def compress_horizontally(grid):

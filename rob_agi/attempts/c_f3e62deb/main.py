@@ -8,9 +8,9 @@ def solve_f3e62deb(input_grid: ColoredGrid) -> ColoredGrid:
     The function identifies the 3x3 hollow square in the input grid and moves it
     to an available edge in the following priority order:
     1. Right edge (if not already there)
-    2. Bottom edge (if not at right edge)
-    3. Left edge (if not at bottom edge)
-    4. Top edge (if not at left edge)
+    2. Top edge (if not at right edge)
+    3. Bottom edge (if not at top edge)
+    4. Left edge (if not at bottom edge)
     
     The shape maintains its vertical position when moving horizontally and
     its horizontal position when moving vertically.
@@ -34,12 +34,12 @@ def solve_f3e62deb(input_grid: ColoredGrid) -> ColoredGrid:
     # Determine new position based on priority order
     if left < 7:
         new_left, new_top = 7, top  # Move to right edge
+    elif top > 0:
+        new_left, new_top = left, 0  # Move to top edge
     elif top < 7:
         new_left, new_top = left, 7  # Move to bottom edge
-    elif left > 0:
-        new_left, new_top = 0, top  # Move to left edge
     else:
-        new_left, new_top = left, 0  # Move to top edge
+        new_left, new_top = 0, top  # Move to left edge
 
     # Create new grid with moved square
     new_grid = ColoredGrid(values=[[0 for _ in range(10)] for _ in range(10)])

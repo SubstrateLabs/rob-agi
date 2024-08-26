@@ -30,11 +30,10 @@ def solve_27a77e38(input_grid: ColoredGrid) -> ColoredGrid:
         if color not in top_row_colors:
             top_row_colors.append(color)
     
-    # Scan the entire middle column and find the first matching color
+    # Scan the entire middle column and find the first matching color from the top row
     chosen_color = None
-    for row in range(num_rows):
-        color = input_grid.values[row][middle_col]
-        if color in top_row_colors:
+    for color in top_row_colors:
+        if color in [input_grid.values[row][middle_col] for row in range(num_rows)]:
             chosen_color = color
             break
     

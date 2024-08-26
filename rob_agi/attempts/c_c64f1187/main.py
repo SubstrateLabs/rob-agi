@@ -6,34 +6,38 @@ def solve_c64f1187(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transform the input grid by:
     1. Processing the upper section to create 2x2 colored rectangles from non-blue, non-zero colors.
-    2. Processing the lower section to create 2x2 colored rectangles with single-cell extensions
+    2. Adding a separator row of zeros.
+    3. Processing the lower section to create 2x2 colored rectangles with single-cell extensions
        below the left cell for all but the rightmost rectangle in each row.
-    3. Arranging these processed elements in a compact output grid.
-    4. Optimizing the output grid by removing trailing empty rows and columns.
+    4. Arranging these processed elements in a compact output grid.
+    5. Optimizing the output grid by removing trailing empty rows and columns.
     """
     upper_colors = process_upper_section(input_grid)
     lower_rows = process_lower_section(input_grid)
     
-    width = max(len(upper_colors) * 2, max((len(row) for row in lower_rows), default=0) * 2)
-    height = math.ceil(len(upper_colors) / 2) * 2 + len(lower_rows) * 2
+    width = max(len(upper_colors) * 3 - 1, max((len(row) * 3 - 1 for row in lower_rows), default=0))
+    height = math.ceil(len(upper_colors) / 2) * 2 + 1 + len(lower_rows) * 2
     
     output_grid = ColoredGrid(values=[[0 for _ in range(width)] for _ in range(height)])
     
     # Place upper section rectangles
     for i, color in enumerate(upper_colors):
         row = (i // 2) * 2
-        col = (i % 2) * 2
+        col = (i % 2) * 3
         place_2x2_rectangle(output_grid, color, row, col)
         if i % 2 == 0 and i < len(upper_colors) - 1:
             output_grid.values[row + 1][col + 1] = 0
     
+    # Add separator row
+    separator_row = math.ceil(len(upper_colors) / 2) * 2
+    
     # Place lower section rectangles
-    lower_start = math.ceil(len(upper_colors) / 2) * 2
+    lower_start = separator_row + 1
     for row_index, row in enumerate(lower_rows):
         for col_index, color in enumerate(row):
-            place_2x2_rectangle(output_grid, color, lower_start + row_index * 2, col_index * 2)
+            place_2x2_rectangle(output_grid, color, lower_start + row_index * 2, col_index * 3)
             if col_index < len(row) - 1:  # Add extension for all but the rightmost rectangle
-                output_grid.values[lower_start + row_index * 2 + 1][col_index * 2] = color
+                output_grid.values[lower_start + row_index * 2 + 1][col_index * 3] = color
     
     # Optimize the output grid
     output_grid = remove_trailing_empty_rows_and_columns(output_grid)

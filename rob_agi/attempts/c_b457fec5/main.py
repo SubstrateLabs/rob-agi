@@ -42,7 +42,9 @@ def solve_b457fec5(input_grid: ColoredGrid) -> ColoredGrid:
     # Step 4: Define function to get color for any coordinate
     def get_color(row, col):
         diagonal_index = row + (col if fill_direction == 1 else -col)
-        return next(color_cycle) for _ in range(diagonal_index % len(color_sequence))
+        for _ in range(diagonal_index % len(color_sequence)):
+            next(color_cycle)
+        return next(color_cycle)
     
     # Step 5: Process the input grid
     for r in range(rows):

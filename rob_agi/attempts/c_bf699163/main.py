@@ -1,5 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Optional
+from typing import Optional, List, Tuple
 
 def solve_bf699163(input_grid: ColoredGrid) -> Optional[ColoredGrid]:
     """
@@ -40,7 +40,7 @@ def solve_bf699163(input_grid: ColoredGrid) -> Optional[ColoredGrid]:
     center_row = (rows - 1) / 2
     center_col = (cols - 1) / 2
 
-    valid_patterns = []
+    valid_patterns: List[Tuple[int, int, int, float]] = []
     for row in range(1, rows - 1):
         for col in range(1, cols - 1):
             if is_valid_pattern(input_grid, row, col):
