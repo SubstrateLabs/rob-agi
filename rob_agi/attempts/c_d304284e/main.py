@@ -5,7 +5,8 @@ def solve_d304284e(input_grid: ColoredGrid) -> ColoredGrid:
     Solve the d304284e challenge by identifying the original pattern in the input grid,
     then replicating it across the grid. The replication alternates between the original color
     and magenta (6), with black (0) rows separating each vertical repetition.
-    The pattern starts from the top-left corner and the original input is preserved.
+    The pattern starts from the top-left corner of the grid, and the original input is preserved.
+    Partial patterns are added at the right and bottom edges if there's remaining space.
     """
     pattern, original_color = find_pattern(input_grid)
     if not pattern:
@@ -45,8 +46,8 @@ def create_replicated_grid(grid: ColoredGrid, pattern, original_color):
     pattern_height, pattern_width = len(pattern), len(pattern[0])
 
     for r in range(0, grid.num_rows, pattern_height + 1):
-        for c in range(0, grid.num_cols, pattern_width):
-            color = original_color if (c // pattern_width) % 2 == 0 else 6
+        for c in range(0, grid.num_cols, pattern_width + 1):
+            color = original_color if (c // (pattern_width + 1)) % 2 == 0 else 6
             stamp_pattern(new_grid, pattern, r, c, color)
 
     return new_grid
@@ -55,8 +56,9 @@ def stamp_pattern(grid, pattern, start_row, start_col, color):
     for r in range(len(pattern)):
         if start_row + r < len(grid):
             for c in range(len(pattern[0])):
-                if start_col + c < len(grid[0]) and pattern[r][c] != 0:
-                    grid[start_row + r][start_col + c] = color
+                if start_col + c < len(grid[0]):
+                    if pattern[r][c] != 0:
+                        grid[start_row + r][start_col + c] = color
 
 def preserve_original_input(input_grid, new_grid):
     for r in range(input_grid.num_rows):
