@@ -7,52 +7,41 @@ def solve_477d2879(input_grid: ColoredGrid) -> ColoredGrid:
     Transform the input grid by expanding colors based on their numeric value and influence.
     
     1. Initialize an output grid with zeros.
-    2. Process colors from highest (9) to lowest (1):
-       - For each cell of the current color in the input grid:
-         * Calculate an influence map for the entire grid.
-         * Apply the color to cells where its influence is highest and greater than existing color.
-    3. Fill any remaining black cells with the highest-numbered non-black neighbor.
+    2. Calculate global influence maps for each color present in the input.
+    3. Apply colors based on their influence, from highest to lowest.
+    4. Fill remaining black cells with the highest-valued neighbor.
+    5. Refine color boundaries for more natural-looking results.
     
     Returns the transformed ColoredGrid.
     """
     rows, cols = input_grid.get_dimensions()
     result = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
     
-    def calculate_influence(start_row, start_col, color):
+    def calculate_global_influence(color):
         influence = [[0 for _ in range(cols)] for _ in range(rows)]
-        queue = deque([(start_row, start_col, color)])
-        visited = set()
-        
-        while queue:
-            r, c, score = queue.popleft()
-            if (r, c) in visited or score <= 0:
-                continue
-            visited.add((r, c))
-            influence[r][c] = max(influence[r][c], score)
-            
-            for dr, dc in [(-1,0), (1,0), (0,-1), (0,1), (-1,-1), (-1,1), (1,-1), (1,1)]:
-                nr, nc = r + dr, c + dc
-                if 0 <= nr < rows and 0 <= nc < cols:
-                    new_score = score - (1 if dr == 0 or dc == 0 else 1.4)  # Less influence diagonally
-                    queue.append((nr, nc, new_score))
-        
-        return influence
-
-    # Process colors from highest to lowest
-    for color in range(9, 0, -1):
-        influence_map = [[0 for _ in range(cols)] for _ in range(rows)]
         for r in range(rows):
             for c in range(cols):
                 if input_grid.values[r][c] == color:
-                    cell_influence = calculate_influence(r, c, color)
                     for i in range(rows):
                         for j in range(cols):
-                            influence_map[i][j] = max(influence_map[i][j], cell_influence[i][j])
-        
-        for r in range(rows):
-            for c in range(cols):
-                if influence_map[r][c] > 0 and result.values[r][c] < color:
-                    result.values[r][c] = color
+                            distance = math.sqrt((r - i)**2 + (c - j)**2)
+                            influence[i][j] = max(influence[i][j], color * math.exp(-distance / color))
+        return influence
+
+    # Calculate global influence maps
+    influence_maps = {}
+    for color in range(9, 0, -1):
+        if any(color in row for row in input_grid.values):
+            influence_maps[color] = calculate_global_influence(color)
+
+    # Apply colors based on influence
+    for color in range(9, 0, -1):
+        if color in influence_maps:
+            for r in range(rows):
+                for c in range(cols):
+                    if influence_maps[color][r][c] > 0 and (result.values[r][c] == 0 or 
+                                                            influence_maps[color][r][c] > influence_maps[result.values[r][c]][r][c]):
+                        result.values[r][c] = color
 
     # Fill remaining black cells
     def get_highest_neighbor(r, c):
@@ -73,5 +62,21 @@ def solve_477d2879(input_grid: ColoredGrid) -> ColoredGrid:
                     if highest > 0:
                         result.values[r][c] = highest
                         changed = True
+
+    # Refine color boundaries
+    for _ in range(2):  # Apply refinement twice for better results
+        new_result = result.deep_copy()
+        for r in range(rows):
+            for c in range(cols):
+                neighbors = []
+                for dr, dc in [(-1,0), (1,0), (0,-1), (0,1), (-1,-1), (-1,1), (1,-1), (1,1)]:
+                    nr, nc = r + dr, c + dc
+                    if 0 <= nr < rows and 0 <= nc < cols:
+                        neighbors.append(result.values[nr][nc])
+                if neighbors:
+                    most_common = max(set(neighbors), key=neighbors.count)
+                    if neighbors.count(most_common) >= 5:  # If majority of neighbors are a different color
+                        new_result.values[r][c] = most_common
+        result = new_result
 
     return result
