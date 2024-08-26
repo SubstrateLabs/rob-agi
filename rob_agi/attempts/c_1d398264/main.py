@@ -51,7 +51,7 @@ def solve_1d398264(input_grid: ColoredGrid) -> ColoredGrid:
             expand_diagonal(r, c, 1, 1, color)
         elif color == 8:  # Sky Blue
             expand_vertical(r, c, color)
-            expand_horizontal(rows - 1, color)
+            expand_horizontal_bottom(color)
 
     def expand_diagonal(r, c, dr, dc, color):
         nr, nc = r + dr, c + dc
@@ -76,13 +76,20 @@ def solve_1d398264(input_grid: ColoredGrid) -> ColoredGrid:
                     grid[nr][c] = color
 
     def expand_vertical(r, c, color):
-        for nr in range(r, rows):
+        for nr in range(r + 1, rows):
             if grid[nr][c] == 0:
                 grid[nr][c] = color
 
-    for r in range(rows):
+    def expand_horizontal_bottom(color):
         for c in range(cols):
-            if grid[r][c] != 0:
-                expand_color(r, c, grid[r][c])
+            if grid[rows-1][c] == color:
+                for nc in range(cols):
+                    if grid[rows-1][nc] == 0:
+                        grid[rows-1][nc] = color
+
+    original_cells = [(r, c) for r in range(rows) for c in range(cols) if grid[r][c] != 0]
+
+    for r, c in original_cells:
+        expand_color(r, c, grid[r][c])
 
     return ColoredGrid(values=grid)
