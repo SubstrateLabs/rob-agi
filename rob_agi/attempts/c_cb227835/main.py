@@ -10,8 +10,8 @@ def solve_cb227835(input_grid: ColoredGrid) -> ColoredGrid:
     The path is chosen based on the relative positions of the start and end points:
     - Straight line for aligned squares
     - Rectangular path for squares forming a rectangle
-    - Diagonal zigzag for perfect diagonals
-    - Adaptive zigzag for other cases
+    - Symmetrical zigzag for perfect diagonals
+    - Adaptive rectangular path for other cases
     
     The original sky squares remain unchanged.
     
@@ -25,7 +25,7 @@ def solve_cb227835(input_grid: ColoredGrid) -> ColoredGrid:
         return [(c, r) for r, row in enumerate(grid) for c, val in enumerate(row) if val == 8]
     
     def create_path(start: Tuple[int, int], end: Tuple[int, int]) -> List[Tuple[int, int]]:
-        path = [start]
+        path = []
         x, y = start
         ex, ey = end
         dx = ex - x
@@ -38,37 +38,25 @@ def solve_cb227835(input_grid: ColoredGrid) -> ColoredGrid:
                 x += step_x
                 y += step_y
                 path.append((x, y))
-        elif abs(dx) == abs(dy):  # Perfect diagonal
+        elif abs(dx) == abs(dy):  # Perfect diagonal (symmetrical zigzag)
             step_x = 1 if dx > 0 else -1
             step_y = 1 if dy > 0 else -1
             while (x, y) != end:
                 x += step_x
-                y += step_y
                 path.append((x, y))
                 if (x, y) != end:
-                    path.append((x, y + step_y))
-        else:  # Rectangular or adaptive zigzag
-            if abs(dx) > abs(dy):
-                while x != ex:
-                    x += 1 if dx > 0 else -1
+                    y += step_y
                     path.append((x, y))
-                    if y != ey and x != ex:
-                        y += 1 if dy > 0 else -1
-                        path.append((x, y))
-            else:
-                while y != ey:
-                    y += 1 if dy > 0 else -1
-                    path.append((x, y))
-                    if x != ex and y != ey:
-                        x += 1 if dx > 0 else -1
-                        path.append((x, y))
-            
-            # Complete the path if necessary
-            while x != ex:
+        else:  # Adaptive rectangular path
+            mid_x = (x + ex) // 2
+            while x != mid_x:
                 x += 1 if dx > 0 else -1
                 path.append((x, y))
             while y != ey:
                 y += 1 if dy > 0 else -1
+                path.append((x, y))
+            while x != ex:
+                x += 1 if dx > 0 else -1
                 path.append((x, y))
         
         return path
@@ -81,7 +69,8 @@ def solve_cb227835(input_grid: ColoredGrid) -> ColoredGrid:
     path = create_path(start, end)
     
     new_grid = input_grid.deep_copy()
-    for x, y in path[1:-1]:  # Exclude start and end points
-        new_grid.values[y][x] = 3  # Set to green
+    for x, y in path:
+        if new_grid.values[y][x] != 8:  # Don't overwrite sky squares
+            new_grid.values[y][x] = 3  # Set to green
     
     return new_grid
