@@ -1,39 +1,49 @@
 example_0:
   input: |
-    A 19x18 grid predominantly filled with gray (5) and black (0) squares. There are several yellow (4) squares scattered throughout, mostly in the middle and lower sections. The yellow squares appear in small clusters or individually.
+    A 19x18 grid with a complex pattern of gray (5) and black (0) squares forming the background. Yellow (4) squares are scattered throughout, with notable concentrations in the middle-right and bottom-left areas. Some yellow squares are isolated, while others form small clusters of 2-3 squares.
   output: |
-    The grid maintains its overall structure, but some changes are noticeable:
-    1. Most yellow (4) squares remain unchanged.
-    2. A few yellow squares have been converted to red (2).
-    3. Red squares appear to form small L-shaped patterns, usually adjacent to remaining yellow squares.
-    4. The changes are concentrated in the middle and lower sections of the grid where the yellow squares were originally located.
+    The grid's overall structure remains intact, with these key transformations:
+    1. Most isolated yellow (4) squares remain unchanged.
+    2. In areas with yellow square clusters, some have been converted to red (2) squares.
+    3. Red squares consistently form L-shaped patterns, always connected to at least one yellow square.
+    4. L-shapes vary in size, ranging from 2 to 5 squares in length.
+    5. Some yellow squares serve as corner points for multiple L-shaped red patterns.
+    6. No red squares appear without a direct connection to a yellow square.
 
 example_1:
   input: |
-    A 16x18 grid with a mix of gray (5), black (0), and yellow (4) squares. Yellow squares are more prevalent in the middle and lower right sections, often appearing in small clusters.
+    A 16x18 grid with a varied distribution of gray (5) and black (0) squares. Yellow (4) squares are more concentrated in the middle and lower-right quadrants. Several small clusters of 2-4 yellow squares are visible, with some isolated yellow squares scattered throughout.
   output: |
-    The grid structure is largely maintained, but with these changes:
-    1. Several yellow (4) squares have been converted to red (2).
-    2. Red squares form small L-shaped patterns, often connected to or near remaining yellow squares.
-    3. Some yellow squares remain unchanged, particularly those that are isolated or in the center of clusters.
-    4. The transformations are most noticeable in areas where yellow squares were originally clustered.
+    The grid maintains its basic structure, with these significant changes:
+    1. Many yellow (4) square clusters have been partially converted to red (2) squares.
+    2. Red squares consistently form L-shaped patterns, always anchored to at least one yellow square.
+    3. L-shapes vary in size and orientation, adapting to the original yellow square distributions.
+    4. Some complex formations appear where multiple L-shapes share yellow corner squares.
+    5. Isolated yellow squares mostly remain unchanged, unless they could form part of a larger L-shape.
+    6. No red squares exist without a direct connection to a yellow square.
 
 example_2:
   input: |
-    A 15x14 grid with a mix of gray (5), black (0), and yellow (4) squares. Yellow squares are scattered throughout, with some clustering in the upper left and middle sections.
+    A 15x14 grid with a balanced mix of gray (5) and black (0) squares. Yellow (4) squares are distributed across the grid, with notable clusters in the upper-left and central areas. Some yellow squares form diagonal patterns, while others are more randomly placed.
   output: |
-    The grid maintains its overall structure, but with these alterations:
-    1. Several yellow (4) squares have been converted to red (2).
-    2. Red squares form small L-shaped patterns, often adjacent to or near remaining yellow squares.
-    3. Some yellow squares, particularly those in the center of clusters or isolated, remain unchanged.
-    4. The changes are most prominent in areas where yellow squares were originally grouped together.
+    The grid's fundamental structure is preserved, with these notable transformations:
+    1. Many yellow (4) squares have been converted to red (2), especially in clustered areas.
+    2. Red squares exclusively form L-shaped patterns, each connected to at least one yellow square.
+    3. L-shapes demonstrate various sizes and orientations, optimizing coverage around yellow squares.
+    4. Some yellow squares act as junction points for multiple L-shaped red patterns.
+    5. Isolated yellow squares either remain unchanged or become part of extended L-shapes.
+    6. The upper-left cluster shows a complex interaction of multiple L-shapes and yellow squares.
+    7. No red squares appear disconnected from yellow squares.
 
 example_3:
   input: |
-    A 15x14 grid dominated by gray (5) and black (0) squares, with several yellow (4) squares scattered throughout. Yellow squares appear in small clusters, particularly in the middle and lower sections of the grid.
+    A 15x14 grid predominantly composed of gray (5) and black (0) squares. Yellow (4) squares are scattered throughout, with small clusters in the middle and lower sections. Some yellow squares form short line segments, while others appear in more random arrangements.
   output: |
-    The grid's overall structure is preserved, but with these modifications:
-    1. Many yellow (4) squares have been converted to red (2).
-    2. Red squares form small L-shaped patterns, often connected to or near remaining yellow squares.
-    3. Some yellow squares, especially those in the center of clusters or isolated, remain unchanged.
-    4. The transformations are most noticeable in areas where yellow squares were originally grouped together, particularly in the middle and lower sections of the grid.
+    The grid retains its overall layout, with these key alterations:
+    1. A significant number of yellow (4) squares have been transformed into red (2) squares.
+    2. Red squares invariably create L-shaped patterns, each connected to at least one yellow square.
+    3. L-shapes show diversity in size and orientation, adapting to the original yellow square placements.
+    4. Some yellow squares serve as corner points for multiple L-shaped red patterns, creating complex structures.
+    5. Isolated yellow squares either remain unchanged or become integrated into larger L-shapes.
+    6. The middle and lower sections display intricate combinations of L-shapes and yellow squares.
+    7. No red squares exist in isolation; all are part of L-shapes connected to yellow squares.
