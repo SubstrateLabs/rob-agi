@@ -34,9 +34,9 @@ def solve_7d18a6fb(input_grid: ColoredGrid) -> ColoredGrid:
     color_rarity = {color: 1 - (count / total_cells) for color, count in color_counts.items()}
     
     extracted_shapes = []
-    for quadrant in quadrants:
+    for i, quadrant in enumerate(quadrants):
         regions = identify_regions(quadrant, background)
-        significant_region = select_significant_region(regions, quadrant.get_dimensions(), color_rarity)
+        significant_region = select_significant_region(regions, quadrant.get_dimensions(), color_rarity, i)
         if significant_region:
             extracted_shapes.append(extract_shape(significant_region, quadrant.get_dimensions()))
         else:
@@ -72,22 +72,22 @@ def identify_regions(grid: ColoredGrid, background: int) -> List[Tuple[int, List
 
     return regions
 
-def score_region(region: Tuple[int, List[Tuple[int, int]]], quadrant_size: Tuple[int, int], color_rarity: Dict[int, float]) -> float:
+def score_region(region: Tuple[int, List[Tuple[int, int]]], quadrant_size: Tuple[int, int], color_rarity: Dict[int, float], quadrant_index: int) -> float:
     color, cells = region
     size_score = len(cells) / (quadrant_size[0] * quadrant_size[1])
     rarity_score = color_rarity[color]
     
-    # Calculate position score (closer to corner is better)
-    corner = (0, 0)  # Assuming top-left corner, adjust for other quadrants
+    # Calculate position score (closer to the correct corner is better)
+    corner = [(0, 0), (0, quadrant_size[1]-1), (quadrant_size[0]-1, 0), (quadrant_size[0]-1, quadrant_size[1]-1)][quadrant_index]
     distances = [((r - corner[0])**2 + (c - corner[1])**2)**0.5 for r, c in cells]
     position_score = 1 - (sum(distances) / len(distances)) / ((quadrant_size[0]**2 + quadrant_size[1]**2)**0.5)
     
-    return size_score * 0.4 + rarity_score * 0.4 + position_score * 0.2
+    return size_score * 0.3 + rarity_score * 0.4 + position_score * 0.3
 
-def select_significant_region(regions: List[Tuple[int, List[Tuple[int, int]]]], quadrant_size: Tuple[int, int], color_rarity: Dict[int, float]) -> Optional[Tuple[int, List[Tuple[int, int]]]]:
+def select_significant_region(regions: List[Tuple[int, List[Tuple[int, int]]]], quadrant_size: Tuple[int, int], color_rarity: Dict[int, float], quadrant_index: int) -> Optional[Tuple[int, List[Tuple[int, int]]]]:
     if not regions:
         return None
-    scored_regions = [(region, score_region(region, quadrant_size, color_rarity)) for region in regions]
+    scored_regions = [(region, score_region(region, quadrant_size, color_rarity, quadrant_index)) for region in regions]
     return max(scored_regions, key=lambda x: x[1])[0]
 
 def extract_shape(region: Tuple[int, List[Tuple[int, int]]], quadrant_size: Tuple[int, int]) -> List[List[int]]:
@@ -103,10 +103,16 @@ def extract_shape(region: Tuple[int, List[Tuple[int, int]]], quadrant_size: Tupl
     
     shape = [[0 for _ in range(3)] for _ in range(3)]
     
-    for r, c in cells:
-        shape_r = (r - min_r) * 3 // shape_height
-        shape_c = (c - min_c) * 3 // shape_width
-        shape[shape_r][shape_c] = color
+    for r in range(3):
+        for c in range(3):
+            r_start = min_r + (r * shape_height) // 3
+            r_end = min_r + ((r + 1) * shape_height) // 3
+            c_start = min_c + (c * shape_width) // 3
+            c_end = min_c + ((c + 1) * shape_width) // 3
+            
+            cell_colors = [color for (rr, cc), color in cells if r_start <= rr < r_end and c_start <= cc < c_end]
+            if cell_colors:
+                shape[r][c] = max(set(cell_colors), key=cell_colors.count)
     
     return shape
 
@@ -118,7 +124,8 @@ def create_output_grid(extracted_shapes: List[Optional[List[List[int]]]], backgr
         if shape:
             for r in range(3):
                 for c in range(3):
-                    output[qr + r][qc + c] = shape[r][c]
+                    if shape[r][c] != 0:  # Only place non-background colors
+                        output[qr + r][qc + c] = shape[r][c]
     
     # Fill central cross
     for i in range(7):
