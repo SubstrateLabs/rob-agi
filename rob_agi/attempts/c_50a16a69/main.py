@@ -1,36 +1,32 @@
 from rob_agi.colored_grid import ColoredGrid
 
-def identify_border(grid):
+def identify_border_colors(grid):
     rows, cols = grid.get_dimensions()
-    border_colors = set(grid.values[0] + grid.values[-1] + [row[0] for row in grid.values] + [row[-1] for row in grid.values])
-    return border_colors
+    return set(grid.values[0] + grid.values[-1] + [row[0] for row in grid.values] + [row[-1] for row in grid.values])
 
-def find_core_sequence(grid, border_colors):
-    sequence = []
+def identify_non_border_colors(grid, border_colors):
+    return set(color for row in grid.values for color in row if color not in border_colors)
+
+def determine_color_sequence(grid, non_border_colors):
     rows, cols = grid.get_dimensions()
-    for i in range(min(rows, cols)):
-        color = grid.values[i][i]
-        if color not in border_colors and color not in sequence:
-            sequence.append(color)
-        if len(sequence) == 2:  # We only need the first 2 colors of the pattern
-            break
-    return sequence
+    color_positions = {color: (rows * cols, 0) for color in non_border_colors}
+    for r in range(rows):
+        for c in range(cols):
+            color = grid.values[r][c]
+            if color in non_border_colors:
+                position = r * cols + c
+                if position < color_positions[color][0]:
+                    color_positions[color] = (position, color_positions[color][1])
+                color_positions[color] = (color_positions[color][0], color_positions[color][1] + 1)
+    return [color for color, _ in sorted(color_positions.items(), key=lambda x: (x[1][0], -x[1][1]))]
 
-def determine_start_color(grid, sequence, border_colors):
-    for i in range(min(grid.get_dimensions())):
-        color = grid.values[i][i]
-        if color not in border_colors:
-            return color
-    return sequence[0]  # Fallback to first color in sequence
-
-def generate_output_grid(input_grid, sequence, start_color):
+def generate_output_grid(input_grid, sequence):
     rows, cols = input_grid.get_dimensions()
     output_values = []
-    start_index = sequence.index(start_color)
     for i in range(rows):
         row = []
         for j in range(cols):
-            color = sequence[(start_index + i + j) % len(sequence)]
+            color = sequence[(i + j) % len(sequence)]
             row.append(color)
         output_values.append(row)
     return ColoredGrid(values=output_values)
@@ -41,9 +37,9 @@ def solve_50a16a69(input_grid: ColoredGrid) -> ColoredGrid:
     
     The function performs the following steps:
     1. Identifies the border colors of the input grid.
-    2. Finds the core sequence of colors from the non-border area.
-    3. Determines the starting color for the output pattern.
-    4. Generates a new grid by extending the identified sequence across the entire area, starting with the correct color.
+    2. Identifies the non-border colors.
+    3. Determines the sequence of non-border colors based on their first occurrence and frequency.
+    4. Generates a new grid by extending the identified sequence across the entire area.
     
     This approach works for various patterns, handling different grid sizes, border colors,
     and extending the pattern to areas that were originally borders or uniform regions.
@@ -54,7 +50,15 @@ def solve_50a16a69(input_grid: ColoredGrid) -> ColoredGrid:
     Returns:
     ColoredGrid: The transformed grid with the extended pattern.
     """
-    border_colors = identify_border(input_grid)
-    core_sequence = find_core_sequence(input_grid, border_colors)
-    start_color = determine_start_color(input_grid, core_sequence, border_colors)
-    return generate_output_grid(input_grid, core_sequence, start_color)
+    border_colors = identify_border_colors(input_grid)
+    non_border_colors = identify_non_border_colors(input_grid, border_colors)
+    
+    if not non_border_colors:
+        non_border_colors = set(color for row in input_grid.values for color in row)
+    
+    sequence = determine_color_sequence(input_grid, non_border_colors)
+    
+    if not sequence:
+        return input_grid  # If no sequence is found, return the input grid unchanged
+    
+    return generate_output_grid(input_grid, sequence)
