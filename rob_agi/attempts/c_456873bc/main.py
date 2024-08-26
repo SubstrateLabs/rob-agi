@@ -5,11 +5,10 @@ def solve_456873bc(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by applying the following rules:
     1. Removes all green (3) areas, replacing them with black (0).
-    2. Identifies red (2) lines and their intersections.
-    3. Converts specific intersections of red lines to blue (8):
-       - At grid edges
-       - Where a red line terminates by meeting another red line perpendicularly
-    4. Extends the pattern of red lines into previously green areas.
+    2. Identifies existing red (2) patterns.
+    3. Creates mirrored versions of red patterns across vertical and horizontal axes.
+    4. Converts endpoints and significant intersections of red patterns to blue (8).
+    5. Ensures overall symmetry in the final grid.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -19,12 +18,10 @@ def solve_456873bc(input_grid: ColoredGrid) -> ColoredGrid:
     """
     grid = input_grid.deep_copy()
     grid = remove_green_areas(grid)
-    red_lines = identify_red_lines(grid)
-    intersections = find_intersections(red_lines)
-    classified_intersections = classify_intersections(intersections, grid)
-    grid = convert_intersections_to_blue(grid, classified_intersections)
-    empty_areas = find_empty_areas(grid)
-    grid = extend_pattern(grid, empty_areas, red_lines)
+    red_patterns = identify_red_patterns(grid)
+    grid = create_mirrored_patterns(grid, red_patterns)
+    grid = mark_endpoints_and_intersections(grid)
+    grid = ensure_symmetry(grid)
     return grid
 
 def remove_green_areas(grid: ColoredGrid) -> ColoredGrid:
@@ -35,76 +32,80 @@ def remove_green_areas(grid: ColoredGrid) -> ColoredGrid:
                 grid.set_cell(r, c, 0)
     return grid
 
-def identify_red_lines(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
+def identify_red_patterns(grid: ColoredGrid) -> List[Set[Tuple[int, int]]]:
     rows, cols = grid.get_dimensions()
-    lines = []
+    patterns = []
     visited = set()
 
-    def dfs(r: int, c: int) -> List[Tuple[int, int]]:
-        line = []
+    def dfs(r: int, c: int) -> Set[Tuple[int, int]]:
+        pattern = set()
         stack = [(r, c)]
         while stack:
             curr_r, curr_c = stack.pop()
             if (curr_r, curr_c) not in visited and grid.get_cell(curr_r, curr_c) == 2:
                 visited.add((curr_r, curr_c))
-                line.append((curr_r, curr_c))
+                pattern.add((curr_r, curr_c))
                 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
                     nr, nc = curr_r + dr, curr_c + dc
                     if 0 <= nr < rows and 0 <= nc < cols:
                         stack.append((nr, nc))
-        return line
+        return pattern
 
     for r in range(rows):
         for c in range(cols):
             if (r, c) not in visited and grid.get_cell(r, c) == 2:
-                line = dfs(r, c)
-                if len(line) > 1:
-                    lines.append(line)
+                pattern = dfs(r, c)
+                if len(pattern) > 1:
+                    patterns.append(pattern)
 
-    return lines
+    return patterns
 
-def find_intersections(lines: List[List[Tuple[int, int]]]) -> List[Tuple[int, int]]:
-    intersections = set()
-    for line in lines:
-        for point in line:
-            intersections.add(point)
-    return list(intersections)
-
-def classify_intersections(intersections: List[Tuple[int, int]], grid: ColoredGrid) -> List[Tuple[int, int]]:
+def create_mirrored_patterns(grid: ColoredGrid, patterns: List[Set[Tuple[int, int]]]) -> ColoredGrid:
     rows, cols = grid.get_dimensions()
-    classified = []
-    for r, c in intersections:
-        if r == 0 or r == rows - 1 or c == 0 or c == cols - 1:
-            classified.append((r, c))
-        else:
-            neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)] 
-                            if 0 <= r + dr < rows and 0 <= c + dc < cols and grid.get_cell(r + dr, c + dc) == 2)
-            if neighbors == 1:
-                classified.append((r, c))
-    return classified
+    mid_row, mid_col = rows // 2, cols // 2
 
-def convert_intersections_to_blue(grid: ColoredGrid, intersections: List[Tuple[int, int]]) -> ColoredGrid:
-    for r, c in intersections:
-        grid.set_cell(r, c, 8)
+    for pattern in patterns:
+        # Mirror vertically
+        for r, c in pattern:
+            mirrored_c = cols - 1 - c
+            if grid.get_cell(r, mirrored_c) == 0:
+                grid.set_cell(r, mirrored_c, 2)
+
+        # Mirror horizontally
+        for r, c in pattern:
+            mirrored_r = rows - 1 - r
+            if grid.get_cell(mirrored_r, c) == 0:
+                grid.set_cell(mirrored_r, c, 2)
+
+        # Mirror diagonally
+        for r, c in pattern:
+            mirrored_r, mirrored_c = rows - 1 - r, cols - 1 - c
+            if grid.get_cell(mirrored_r, mirrored_c) == 0:
+                grid.set_cell(mirrored_r, mirrored_c, 2)
+
     return grid
 
-def find_empty_areas(grid: ColoredGrid) -> List[Tuple[int, int]]:
+def mark_endpoints_and_intersections(grid: ColoredGrid) -> ColoredGrid:
     rows, cols = grid.get_dimensions()
-    return [(r, c) for r in range(rows) for c in range(cols) if grid.get_cell(r, c) == 0]
+    for r in range(rows):
+        for c in range(cols):
+            if grid.get_cell(r, c) == 2:
+                red_neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                                    if 0 <= r + dr < rows and 0 <= c + dc < cols and grid.get_cell(r + dr, c + dc) == 2)
+                if red_neighbors == 1 or (red_neighbors == 2 and (r == 0 or r == rows - 1 or c == 0 or c == cols - 1)):
+                    grid.set_cell(r, c, 8)
+    return grid
 
-def extend_pattern(grid: ColoredGrid, empty_areas: List[Tuple[int, int]], red_lines: List[List[Tuple[int, int]]]) -> ColoredGrid:
+def ensure_symmetry(grid: ColoredGrid) -> ColoredGrid:
     rows, cols = grid.get_dimensions()
-    for r, c in empty_areas:
-        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            nr, nc = r + dr, c + dc
-            if 0 <= nr < rows and 0 <= nc < cols and grid.get_cell(nr, nc) == 2:
-                grid.set_cell(r, c, 2)
-                break
-    
-    # Re-run intersection classification and conversion for extended lines
-    new_red_lines = identify_red_lines(grid)
-    new_intersections = find_intersections(new_red_lines)
-    new_classified_intersections = classify_intersections(new_intersections, grid)
-    grid = convert_intersections_to_blue(grid, new_classified_intersections)
-    
+    for r in range(rows):
+        for c in range(cols):
+            value = grid.get_cell(r, c)
+            mirrored_r, mirrored_c = rows - 1 - r, cols - 1 - c
+            mirrored_value = grid.get_cell(mirrored_r, mirrored_c)
+            if value != mirrored_value:
+                if value in (2, 8) and mirrored_value == 0:
+                    grid.set_cell(mirrored_r, mirrored_c, value)
+                elif mirrored_value in (2, 8) and value == 0:
+                    grid.set_cell(r, c, mirrored_value)
     return grid
