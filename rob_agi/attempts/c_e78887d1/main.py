@@ -3,19 +3,36 @@ from typing import List, Tuple, Dict
 from collections import defaultdict
 
 def solve_e78887d1(input_grid: ColoredGrid) -> ColoredGrid:
+    """
+    Transforms an input grid into a 3-row output grid by compressing, idealizing, and arranging color patterns.
+    
+    The solution involves:
+    1. Analyzing color groups and their patterns in the input grid.
+    2. Compressing vertical repetitions to fit within 3 rows.
+    3. Idealizing shapes while maintaining their essential characteristics.
+    4. Arranging idealized shapes horizontally, preserving relative positions.
+    5. Optimizing space usage and ensuring proper separation between shapes.
+    6. Aligning elements vertically and completing partial patterns where appropriate.
+    7. Refining the output to ensure symmetry and completeness of shapes.
+    
+    This approach preserves the essence of input patterns while creating a consistent, idealized 3-row output.
+    """
     rows, cols = input_grid.get_dimensions()
     color_groups = identify_color_groups(input_grid)
     
-    representations = []
+    compressed_shapes = []
     for color, positions in color_groups.items():
-        pattern = analyze_pattern(positions, rows, cols)
-        prominence = len(positions) / (rows * cols)
-        representation = create_idealized_representation(color, pattern, prominence)
-        representations.append(representation)
+        bounding_box = get_bounding_box(positions)
+        pattern = analyze_pattern(positions, bounding_box)
+        prominence = len(positions) / ((bounding_box[2] - bounding_box[0] + 1) * (bounding_box[3] - bounding_box[1] + 1))
+        compressed = compress_vertically(positions, bounding_box)
+        idealized = idealize_shape(compressed, pattern, prominence)
+        compressed_shapes.append((color, idealized, bounding_box, prominence))
     
-    output_grid = combine_representations(representations, cols)
+    output_grid = arrange_shapes(compressed_shapes, cols)
+    optimize_space(output_grid)
+    align_vertically(output_grid)
     refine_output(output_grid)
-    complete_patterns(output_grid)
     
     return output_grid
 
@@ -58,13 +75,14 @@ def create_idealized_representation(color: int, pattern: str, prominence: float)
     else:
         return [[color, 0, 0], [0, color, 0], [0, 0, color]]
 
-def combine_representations(representations: List[List[List[int]], cols: int) -> ColoredGrid:
+def arrange_shapes(compressed_shapes: List[Tuple[int, List[List[int]], Tuple[int, int, int, int], float]], cols: int) -> ColoredGrid:
     output = [[0 for _ in range(cols)] for _ in range(3)]
-    for rep in representations:
+    for color, shape, (top, left, bottom, right), prominence in compressed_shapes:
+        shape_width = right - left + 1
         for r in range(3):
-            for c in range(cols):
-                if rep[r][c] != 0 and output[r][c] == 0:
-                    output[r][c] = rep[r][c]
+            for c in range(shape_width):
+                if shape[r][c] != 0 and output[r][left + c] == 0:
+                    output[r][left + c] = color
     return ColoredGrid(values=output)
 
 def identify_pattern(positions: List[Tuple[int, int]], rows: int, cols: int) -> str:
@@ -150,3 +168,56 @@ def complete_horizontal_line(grid: ColoredGrid, col: int):
             for c in range(col, min(col+3, grid.get_dimensions()[1])):
                 if grid.values[row][c] == 0:
                     grid.values[row][c] = color
+def get_bounding_box(positions: List[Tuple[int, int]]) -> Tuple[int, int, int, int]:
+    top = min(r for r, _ in positions)
+    left = min(c for _, c in positions)
+    bottom = max(r for r, _ in positions)
+    right = max(c for _, c in positions)
+    return (top, left, bottom, right)
+
+def compress_vertically(positions: List[Tuple[int, int]], bounding_box: Tuple[int, int, int, int]) -> List[List[int]]:
+    top, left, bottom, right = bounding_box
+    height = bottom - top + 1
+    width = right - left + 1
+    
+    if height <= 3:
+        return [[1 if (r + top, c + left) in positions else 0 for c in range(width)] for r in range(height)]
+    
+    compressed = [[0 for _ in range(width)] for _ in range(3)]
+    for r in range(3):
+        for c in range(width):
+            if any((r + i * 3 + top, c + left) in positions for i in range((height + 2) // 3)):
+                compressed[r][c] = 1
+    return compressed
+
+def idealize_shape(shape: List[List[int]], pattern: str, prominence: float) -> List[List[int]]:
+    if pattern == "vertical":
+        return [[1, 0, 1] for _ in range(3)]
+    if pattern == "horizontal":
+        return [[0, 0, 0], [1, 1, 1], [0, 0, 0]]
+    if pattern == "block":
+        return [[1, 1, 0], [1, 1, 1], [0, 1, 1]]
+    if pattern == "corner":
+        return [[1, 1, 0], [1, 0, 0], [1, 1, 0]]
+    # For scattered patterns, use prominence to determine density
+    if prominence > 0.5:
+        return [[1, 0, 1], [0, 1, 0], [1, 0, 1]]
+    else:
+        return [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+
+def optimize_space(grid: ColoredGrid):
+    cols = grid.get_dimensions()[1]
+    for c in range(cols - 1, 0, -1):
+        if all(grid.values[r][c] == 0 for r in range(3)):
+            for r in range(3):
+                grid.values[r][c:] = grid.values[r][c+1:] + [0]
+
+def align_vertically(grid: ColoredGrid):
+    cols = grid.get_dimensions()[1]
+    for c in range(cols):
+        column = [grid.values[r][c] for r in range(3)]
+        non_zero = [color for color in column if color != 0]
+        for r in range(len(non_zero)):
+            grid.values[r][c] = non_zero[r]
+        for r in range(len(non_zero), 3):
+            grid.values[r][c] = 0
