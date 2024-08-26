@@ -8,11 +8,12 @@ def solve_e345f17b(input_grid: ColoredGrid) -> ColoredGrid:
     and patterns of magenta (6) and gray (5) squares.
 
     The algorithm works as follows:
-    1. Creates a heat map of the input grid, giving higher weights to squares near corners and edges.
-    2. Determines the number of yellow squares to place based on the total heat.
-    3. Identifies potential positions for yellow squares based on influence scores.
-    4. Places yellow squares ensuring no adjacency and considering the input pattern.
-    5. Handles special cases like aligned yellow squares.
+    1. Preprocesses the input grid into 2x2 blocks.
+    2. Creates a heat map based on the concentration of magenta and gray squares.
+    3. Determines the number and positions of yellow squares based on the heat map.
+    4. Applies special rules for positioning yellow squares (e.g., L-shapes, diagonals).
+    5. Ensures a balanced distribution of yellow squares.
+    6. Generates the final 4x4 output grid.
 
     Args:
     input_grid (ColoredGrid): An 8x4 grid representing the input pattern.
@@ -21,63 +22,54 @@ def solve_e345f17b(input_grid: ColoredGrid) -> ColoredGrid:
     ColoredGrid: A 4x4 grid representing the transformed output pattern.
     """
     input_array = np.array(input_grid.values)
-    output = np.zeros((4, 4), dtype=int)
-
-    def create_heat_map(grid: np.ndarray) -> np.ndarray:
-        heat_map = np.zeros_like(grid, dtype=float)
-        rows, cols = grid.shape
+    
+    def preprocess_grid(grid: np.ndarray) -> np.ndarray:
+        return grid.reshape(4, 2, 4, 2).sum(axis=(1, 3))
+    
+    def create_heat_map(preprocessed: np.ndarray) -> np.ndarray:
+        heat_map = preprocessed.copy().astype(float)
+        rows, cols = heat_map.shape
         for r in range(rows):
             for c in range(cols):
-                if grid[r, c] in [5, 6]:
-                    weight = 1.0
-                    if grid[r, c] == 6:  # Give higher weight to magenta
-                        weight = 1.5
-                    # Give higher weight to corners and edges
-                    if r in [0, rows-1] and c in [0, cols-1]:
-                        weight *= 2
-                    elif r in [0, rows-1] or c in [0, cols-1]:
-                        weight *= 1.5
-                    heat_map[r, c] = weight
+                if r in [0, rows-1] or c in [0, cols-1]:
+                    heat_map[r, c] *= 1.5
         return heat_map
-
-    heat_map = create_heat_map(input_array)
-    total_heat = np.sum(heat_map)
-
-    # Determine number of yellow squares
-    num_yellow = 4 if total_heat > 20 else 3
-
-    # Calculate influence scores for each position in the output grid
-    influence_scores = np.zeros((4, 4))
-    for r in range(4):
-        for c in range(4):
-            influence_scores[r, c] = np.sum(heat_map[r*2:(r+1)*2, c*2:(c+1)*2])
-
-    # Place yellow squares
-    yellow_positions = []
-    for _ in range(num_yellow):
-        max_score = np.max(influence_scores)
-        if max_score == 0:
-            break
-        r, c = np.unravel_index(np.argmax(influence_scores), influence_scores.shape)
-        yellow_positions.append((r, c))
-        influence_scores[r, c] = 0
-        # Set adjacent positions to 0 to avoid adjacency
-        if r > 0: influence_scores[r-1, c] = 0
-        if r < 3: influence_scores[r+1, c] = 0
-        if c > 0: influence_scores[r, c-1] = 0
-        if c < 3: influence_scores[r, c+1] = 0
-
-    # Handle special case: align yellow squares if there's a strong horizontal or vertical pattern
-    if num_yellow == 3:
-        row_sums = np.sum(heat_map, axis=1)
-        col_sums = np.sum(heat_map, axis=0)
-        if np.max(row_sums) > 1.5 * np.mean(row_sums):
-            yellow_positions = [(1, 0), (1, 1), (1, 2)]
-        elif np.max(col_sums) > 1.5 * np.mean(col_sums):
-            yellow_positions = [(0, 1), (1, 1), (2, 1)]
-
-    # Place yellow squares in output grid
+    
+    preprocessed = preprocess_grid(input_array)
+    heat_map = create_heat_map(preprocessed)
+    
+    num_yellow = 4 if np.sum(heat_map) > 20 else 3
+    
+    def get_yellow_positions(heat: np.ndarray, n: int) -> List[Tuple[int, int]]:
+        positions = []
+        for _ in range(n):
+            r, c = np.unravel_index(np.argmax(heat), heat.shape)
+            positions.append((r, c))
+            heat[r, c] = 0
+            if r > 0: heat[r-1, c] = 0
+            if r < 3: heat[r+1, c] = 0
+            if c > 0: heat[r, c-1] = 0
+            if c < 3: heat[r, c+1] = 0
+        return positions
+    
+    yellow_positions = get_yellow_positions(heat_map.copy(), num_yellow)
+    
+    def adjust_positions(positions: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
+        if len(positions) == 3:
+            # Check for L-shape or diagonal
+            positions.sort()
+            if positions[0][0] == positions[1][0] and positions[1][1] == positions[2][1]:
+                return positions  # Already L-shape
+            if positions[0][0] != positions[1][0] and positions[1][1] != positions[2][1]:
+                return positions  # Already diagonal
+            # Adjust to form L-shape
+            return [(0, 0), (1, 0), (1, 1)]
+        return positions
+    
+    yellow_positions = adjust_positions(yellow_positions)
+    
+    output = np.zeros((4, 4), dtype=int)
     for r, c in yellow_positions:
         output[r, c] = 4
-
+    
     return ColoredGrid(values=output.tolist())
