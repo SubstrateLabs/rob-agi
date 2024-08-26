@@ -1,17 +1,17 @@
 from rob_agi.colored_grid import ColoredGrid
-from collections import deque
 
 def solve_84db8fc4(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by finding the longest continuous path of black squares
     connecting any two edge points on different edges, turning this path gray,
-    and leaving all other squares unchanged.
+    and changing all other black squares to red.
 
     1. Find the longest continuous path of black (0) squares connecting any two edge points on different edges.
     2. Turn this path gray (5).
-    3. Leave all other squares unchanged, including other black squares.
+    3. Change all other black squares to red (2).
+    4. Leave all other colored squares unchanged.
 
-    If no valid path is found, the grid remains unchanged.
+    If no valid path is found, all black squares are changed to red.
 
     Args:
         input_grid (ColoredGrid): The input grid to be transformed.
@@ -64,8 +64,13 @@ def solve_84db8fc4(input_grid: ColoredGrid) -> ColoredGrid:
                 if len(path) > len(longest_path):
                     longest_path = path
 
-    if longest_path:
-        for r, c in longest_path:
-            output_grid.values[r][c] = 5  # Gray
+    longest_path_set = set(longest_path)
+
+    for r in range(rows):
+        for c in range(cols):
+            if (r, c) in longest_path_set:
+                output_grid.values[r][c] = 5  # Gray
+            elif output_grid.values[r][c] == 0:
+                output_grid.values[r][c] = 2  # Red
 
     return output_grid
