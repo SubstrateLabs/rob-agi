@@ -5,10 +5,10 @@ def solve_310f3251(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by:
     1. Expanding it 3x3 times
     2. Copying the original pattern to each expanded section
-    3. Adding red squares (2) in a diagonal pattern, replacing only black squares (0)
+    3. Adding red squares (2) in a specific column, replacing only black squares (0)
     
-    The diagonal pattern is determined by the formula:
-    (original_row + original_column) % input_rows == input_rows - 1
+    The red squares are placed in the column (input_cols - 1) of the output grid,
+    appearing every N rows, where N is the height of the input grid.
     """
     input_rows, input_cols = input_grid.get_dimensions()
     
@@ -18,12 +18,9 @@ def solve_310f3251(input_grid: ColoredGrid) -> ColoredGrid:
         for j in range(input_cols * 3):
             output_grid.values[i][j] = input_grid.values[i % input_rows][j % input_cols]
     
-    for i in range(input_rows * 3):
-        for j in range(input_cols * 3):
-            orig_i = i % input_rows
-            orig_j = j % input_cols
-            if (orig_i + orig_j) % input_rows == input_rows - 1:
-                if output_grid.values[i][j] == 0:  # Only replace black squares
-                    output_grid.values[i][j] = 2  # 2 represents red
+    red_column = input_cols - 1
+    for i in range(0, input_rows * 3, input_rows):
+        if output_grid.values[i][red_column] == 0:
+            output_grid.values[i][red_column] = 2  # 2 represents red
     
     return output_grid
