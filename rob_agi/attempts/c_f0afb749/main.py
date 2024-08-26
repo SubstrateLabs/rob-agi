@@ -26,7 +26,7 @@ def solve_f0afb749(input_grid: ColoredGrid) -> ColoredGrid:
 
     # Step 3: Add blue diagonal
     for i in range(1, output_rows):
-        j = i - 1
+        j = i
         if j < output_cols and output_grid[i][j] == 0:
             output_grid[i][j] = 1  # Set to blue
 
