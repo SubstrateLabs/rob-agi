@@ -6,8 +6,11 @@ def solve_e633a9e5(input_grid: ColoredGrid) -> ColoredGrid:
     The expansion follows these rules:
     1. Initialize a 5x5 grid with placeholder values.
     2. Map each input cell to the top-left of a 2x2 area in the output grid.
-    3. Fill remaining cells by comparing with neighboring cells and the corresponding input cell.
-    4. Always choose the smallest (or equal) color value when comparing.
+    3. Fill remaining cells based on their position:
+       - Top-right: minimum of left neighbor and right input cell
+       - Bottom-left: minimum of top neighbor and bottom input cell
+       - Bottom-right: minimum of top, left, top-left neighbors, and corresponding input cell
+    4. Always choose the smallest color value when comparing.
     """
     input_values = input_grid.values
     output_values = [[None for _ in range(5)] for _ in range(5)]
@@ -21,25 +24,23 @@ def solve_e633a9e5(input_grid: ColoredGrid) -> ColoredGrid:
     for r in range(5):
         for c in range(5):
             if output_values[r][c] is None:
-                relevant_values = []
-                
-                # Check cell above
-                if r > 0 and output_values[r-1][c] is not None:
-                    relevant_values.append(output_values[r-1][c])
-                
-                # Check cell to the left
-                if c > 0 and output_values[r][c-1] is not None:
-                    relevant_values.append(output_values[r][c-1])
-                
-                # Check cell diagonally up and left
-                if r > 0 and c > 0 and output_values[r-1][c-1] is not None:
-                    relevant_values.append(output_values[r-1][c-1])
-                
-                # Always include the corresponding input grid cell
                 input_r, input_c = r // 2, c // 2
-                relevant_values.append(input_values[input_r][input_c])
                 
-                # Set the current cell to the minimum of relevant values
-                output_values[r][c] = min(relevant_values)
+                if r % 2 == 0 and c % 2 == 1:  # Top-right
+                    left = output_values[r][c-1]
+                    right_input = input_values[input_r][min(input_c+1, 2)] if input_c < 2 else left
+                    output_values[r][c] = min(left, right_input)
+                
+                elif r % 2 == 1 and c % 2 == 0:  # Bottom-left
+                    top = output_values[r-1][c]
+                    bottom_input = input_values[min(input_r+1, 2)][input_c] if input_r < 2 else top
+                    output_values[r][c] = min(top, bottom_input)
+                
+                else:  # Bottom-right
+                    top = output_values[r-1][c]
+                    left = output_values[r][c-1]
+                    top_left = output_values[r-1][c-1]
+                    input_val = input_values[input_r][input_c]
+                    output_values[r][c] = min(top, left, top_left, input_val)
 
     return ColoredGrid(values=output_values)
