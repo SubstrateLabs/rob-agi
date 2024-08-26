@@ -2,94 +2,152 @@ from rob_agi.colored_grid import ColoredGrid
 from typing import Tuple, List
 import random
 
+import random
+from typing import List, Tuple, Set
+
 def solve_9772c176(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by adding a yellow (4) path that responds to sky blue (8) shapes.
+    Transforms the input grid by adding a yellow (4) aura that responds to sky blue (8) shapes.
     
     The solution follows these steps:
-    1. Create a continuous yellow path from top-left to bottom-right.
-    2. The path follows the edges of sky blue shapes when encountered.
-    3. Add "rays" and additional yellow pixels to create visual interest.
-    4. Handle empty or near-empty grids with a meandering path.
-    5. Ensure all yellow pixels are connected in the final result.
+    1. Identify blue shapes and create an initial yellow border around them.
+    2. Extend yellow tendrils into black space.
+    3. Connect nearby blue shapes with yellow bridges.
+    4. Fill large black spaces with scattered yellow pixels.
+    5. Ensure all yellow pixels are connected.
+    6. Balance yellow density and create an organic appearance.
 
     Args:
     input_grid (ColoredGrid): The input grid containing sky blue shapes.
 
     Returns:
-    ColoredGrid: The transformed grid with added yellow paths.
+    ColoredGrid: The transformed grid with added yellow aura.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
-    
-    def is_valid_move(x: int, y: int) -> bool:
-        return 0 <= x < rows and 0 <= y < cols and output_grid.get_cell(x, y) != 8
 
-    def get_neighbors(x: int, y: int) -> List[Tuple[int, int]]:
-        return [(x+dx, y+dy) for dx, dy in [(-1,-1), (-1,0), (-1,1), (0,-1), (0,1), (1,-1), (1,0), (1,1)]
-                if is_valid_move(x+dx, y+dy)]
+    def get_neighbors(x: int, y: int, diagonal: bool = False) -> List[Tuple[int, int]]:
+        directions = [(-1,0), (1,0), (0,-1), (0,1)]
+        if diagonal:
+            directions += [(-1,-1), (-1,1), (1,-1), (1,1)]
+        return [(x+dx, y+dy) for dx, dy in directions if 0 <= x+dx < rows and 0 <= y+dy < cols]
 
-    def is_adjacent_to_blue(x: int, y: int) -> bool:
-        return any(0 <= x+dx < rows and 0 <= y+dy < cols and output_grid.get_cell(x+dx, y+dy) == 8
-                   for dx, dy in [(-1,0), (1,0), (0,-1), (0,1)])
-
-    def choose_move(x: int, y: int, target_x: int, target_y: int) -> Tuple[int, int]:
-        neighbors = get_neighbors(x, y)
-        if not neighbors:
-            return x, y  # Stay in place if no valid moves
-        
-        # Prioritize moves along blue shapes
-        blue_adjacent = [n for n in neighbors if is_adjacent_to_blue(*n)]
-        if blue_adjacent:
-            return random.choice(blue_adjacent)
-        
-        # Otherwise, move towards the target
-        dx = target_x - x
-        dy = target_y - y
-        preferred = [n for n in neighbors if (n[0]-x)*dx + (n[1]-y)*dy > 0]
-        return random.choice(preferred) if preferred else random.choice(neighbors)
-
-    def create_path():
-        x, y = 0, 0
-        output_grid.set_cell(x, y, 4)
-        while (x, y) != (rows-1, cols-1):
-            nx, ny = choose_move(x, y, rows-1, cols-1)
-            if (nx, ny) != (x, y):
-                output_grid.set_cell(nx, ny, 4)
-            x, y = nx, ny
-
-    def add_rays():
+    def find_blue_shapes() -> List[Set[Tuple[int, int]]]:
+        shapes = []
+        visited = set()
         for x in range(rows):
             for y in range(cols):
-                if output_grid.get_cell(x, y) == 4:
-                    for _ in range(2):  # Add up to 2 rays per yellow pixel
-                        nx, ny = random.choice(get_neighbors(x, y))
-                        if output_grid.get_cell(nx, ny) == 0:
-                            output_grid.set_cell(nx, ny, 4)
+                if output_grid.get_cell(x, y) == 8 and (x, y) not in visited:
+                    shape = set()
+                    stack = [(x, y)]
+                    while stack:
+                        cx, cy = stack.pop()
+                        if (cx, cy) in visited:
+                            continue
+                        visited.add((cx, cy))
+                        shape.add((cx, cy))
+                        for nx, ny in get_neighbors(cx, cy):
+                            if output_grid.get_cell(nx, ny) == 8:
+                                stack.append((nx, ny))
+                    shapes.append(shape)
+        return shapes
+
+    def create_yellow_border(shapes: List[Set[Tuple[int, int]]]) -> Set[Tuple[int, int]]:
+        border = set()
+        for shape in shapes:
+            for x, y in shape:
+                for nx, ny in get_neighbors(x, y, diagonal=True):
+                    if output_grid.get_cell(nx, ny) == 0:
+                        output_grid.set_cell(nx, ny, 4)
+                        border.add((nx, ny))
+        return border
+
+    def extend_yellow_tendrils(border: Set[Tuple[int, int]]):
+        for x, y in border:
+            length = random.randint(1, 5)
+            cx, cy = x, y
+            for _ in range(length):
+                neighbors = [n for n in get_neighbors(cx, cy) if output_grid.get_cell(*n) == 0]
+                if not neighbors:
+                    break
+                nx, ny = random.choice(neighbors)
+                output_grid.set_cell(nx, ny, 4)
+                cx, cy = nx, ny
+
+    def connect_shapes(shapes: List[Set[Tuple[int, int]]]):
+        for i, shape1 in enumerate(shapes):
+            for shape2 in shapes[i+1:]:
+                x1, y1 = random.choice(list(shape1))
+                x2, y2 = random.choice(list(shape2))
+                if abs(x1-x2) + abs(y1-y2) < max(rows, cols) // 4:
+                    while (x1, y1) != (x2, y2):
+                        if random.random() < 0.7:
+                            x1 += 1 if x2 > x1 else -1 if x2 < x1 else 0
+                        else:
+                            y1 += 1 if y2 > y1 else -1 if y2 < y1 else 0
+                        if output_grid.get_cell(x1, y1) == 0:
+                            output_grid.set_cell(x1, y1, 4)
+
+    def fill_large_black_spaces():
+        for x in range(rows):
+            for y in range(cols):
+                if output_grid.get_cell(x, y) == 0:
+                    if random.random() < 0.1:
+                        output_grid.set_cell(x, y, 4)
 
     def ensure_connectivity():
-        def dfs(x, y):
-            stack = [(x, y)]
+        def flood_fill(start_x, start_y):
+            stack = [(start_x, start_y)]
             visited = set()
             while stack:
-                cx, cy = stack.pop()
-                if (cx, cy) in visited:
+                x, y = stack.pop()
+                if (x, y) in visited:
                     continue
-                visited.add((cx, cy))
-                for nx, ny in get_neighbors(cx, cy):
+                visited.add((x, y))
+                for nx, ny in get_neighbors(x, y):
                     if output_grid.get_cell(nx, ny) == 4:
                         stack.append((nx, ny))
             return visited
 
-        connected = dfs(0, 0)
-        for x in range(rows):
-            for y in range(cols):
-                if output_grid.get_cell(x, y) == 4 and (x, y) not in connected:
-                    output_grid.set_cell(x, y, 0)  # Remove disconnected yellow pixels
+        yellow_pixels = [(x, y) for x in range(rows) for y in range(cols) if output_grid.get_cell(x, y) == 4]
+        if not yellow_pixels:
+            return
+
+        connected = flood_fill(*yellow_pixels[0])
+        for x, y in yellow_pixels:
+            if (x, y) not in connected:
+                path = []
+                cx, cy = x, y
+                while (cx, cy) not in connected:
+                    path.append((cx, cy))
+                    neighbors = get_neighbors(cx, cy)
+                    cx, cy = min(neighbors, key=lambda n: min(abs(n[0]-tx) + abs(n[1]-ty) for tx, ty in connected))
+                for px, py in path:
+                    output_grid.set_cell(px, py, 4)
+
+    def apply_cellular_automaton():
+        for _ in range(3):
+            new_grid = output_grid.deep_copy()
+            for x in range(rows):
+                for y in range(cols):
+                    if output_grid.get_cell(x, y) == 4:
+                        neighbors = sum(1 for nx, ny in get_neighbors(x, y) if output_grid.get_cell(nx, ny) == 4)
+                        if neighbors < 2 or neighbors > 4:
+                            new_grid.set_cell(x, y, 0)
+                    elif output_grid.get_cell(x, y) == 0:
+                        neighbors = sum(1 for nx, ny in get_neighbors(x, y) if output_grid.get_cell(nx, ny) == 4)
+                        if neighbors == 3:
+                            new_grid.set_cell(x, y, 4)
+            output_grid = new_grid
 
     # Main execution
-    create_path()
-    add_rays()
+    blue_shapes = find_blue_shapes()
+    yellow_border = create_yellow_border(blue_shapes)
+    extend_yellow_tendrils(yellow_border)
+    connect_shapes(blue_shapes)
+    fill_large_black_spaces()
     ensure_connectivity()
+    apply_cellular_automaton()
+    ensure_connectivity()  # Final connectivity check
 
     return output_grid
