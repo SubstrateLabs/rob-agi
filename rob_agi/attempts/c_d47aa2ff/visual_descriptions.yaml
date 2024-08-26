@@ -1,54 +1,72 @@
 example_0:
   input: |
-    The input grid is 10x21 in size. The most prominent feature is a vertical gray (5) line running down the center of the grid, dividing it into two halves. On either side of this line, there are several colored squares scattered symmetrically:
-    - Two magenta (6) squares in the 2nd and 5th rows
-    - Four green (3) squares in the 3rd row and 9th row
-    - One magenta (6) square in the 9th row
-    The rest of the grid is filled with black (0), which can be considered empty space.
+    The input grid is 10x21. A vertical gray (5) line divides it into two equal halves:
+    Left half (columns 0-9):
+    - Magenta (6) squares at (1,8) and (4,3)
+    - Green (3) squares at (2,2), (2,5), (8,1), and (8,8)
+    Right half (columns 11-20): Mirror image of the left half
+    Central column (10): Entirely gray (5)
+    All other cells are black (0)
+    Note: The right half is not used in the solution but provides context for the pattern.
   output: |
-    The output grid is 10x10, exactly half the width of the input. It appears to be the left half of the input grid with two key changes:
-    - A blue (1) square has been placed in the 7th row, 7th column
-    - A red (2) square has been placed in the 6th row, 7th column
-    All other colored squares from the left half of the input remain in their original positions. The central gray line is no longer present.
+    The output grid is 10x10, derived from the left half of the input:
+    - All colored squares from the left half remain unchanged
+    - New blue (1) square added at (6,6)
+    - New red (2) square added at (5,6)
+    - The central gray line is removed
+    - All other cells remain black (0)
+    Key observation: The new colored squares are placed in the right half of this grid, avoiding existing colored squares.
 
 example_1:
   input: |
-    The input grid is 10x21. Like the previous example, there's a central vertical gray (5) line. The grid is symmetrical on both sides of this line, with various colored squares:
-    - Yellow (4) squares in the 1st and 5th rows
-    - Sky blue (8) squares in the 2nd and 8th rows
-    - Brown (9) squares in the 4th and 6th rows
-    - Yellow (4) square in the 5th row
-    The rest is black (0) empty space.
+    10x21 grid with a central gray (5) line. Symmetrical pattern on both sides:
+    Left half (columns 0-9):
+    - Yellow (4) squares at (0,3) and (4,7)
+    - Sky blue (8) squares at (1,6) and (7,3)
+    - Brown (9) squares at (3,1) and (5,1)
+    Right half (columns 11-20): Mirror image of the left half
+    Central column (10): Entirely gray (5)
+    All other cells are black (0)
   output: |
-    The output grid is 10x10, representing the left half of the input. The key changes are:
-    - A blue (1) square in the 4th row, 5th column
-    - A red (2) square in the 4th row, 6th column
-    - Another blue (1) square in the 7th row, 7th column
-    - Another red (2) square in the 9th row, 8th column
-    All other colored squares from the left half of the input remain in their original positions. The central gray line is removed.
+    10x10 grid based on the left half of the input:
+    - Existing colored squares unchanged
+    - New blue (1) squares added at (3,5) and (6,7)
+    - New red (2) squares added at (3,6) and (8,7)
+    - Central gray line removed
+    - All other cells remain black (0)
+    Note: The new colored squares are placed in balanced positions, avoiding clusters.
 
 example_2:
   input: |
-    This 10x21 grid also has a central vertical gray (5) line. The grid is symmetrical, with these colored squares:
-    - Sky blue (8) squares in the 2nd, 3rd, and 9th rows
-    - Green (3) squares in the 4th row, with additional ones at the edges
-    - One green (3) square in the 5th row
-    - Magenta (6) squares in the 6th, 7th, and 9th rows
-    The rest is black (0) empty space.
+    10x21 grid with central gray (5) line. Symmetrical layout:
+    Left half (columns 0-9):
+    - Sky blue (8) squares at (1,7), (2,3), and (8,3)
+    - Green (3) squares at (3,1), (3,9), (4,5)
+    - Magenta (6) squares at (5,3), (6,7), and (8,7)
+    Right half (columns 11-20): Mirror image of the left half
+    Central column (10): Entirely gray (5)
+    All other cells are black (0)
   output: |
-    The output is a 10x10 grid, representing the left half of the input. The changes are:
-    - A blue (1) square in the 4th row, 7th column
-    - A red (2) square in the 5th row, 6th column
-    - Another blue (1) square in the 7th row, 8th column
-    - Another red (2) square in the 9th row, 8th column
-    All other colored squares from the left half of the input remain in their original positions. The central gray line is removed.
+    10x10 grid derived from the left half:
+    - Existing colored squares unchanged
+    - New blue (1) squares added at (3,7) and (6,8)
+    - New red (2) squares added at (4,6) and (8,7)
+    - Central gray line removed
+    - All other cells remain black (0)
+    Observation: New squares are placed to balance the existing pattern, with red squares adjacent to blue ones.
 
 test_case_0:
   input: |
-    This is identical to example_0's input. It's a 10x21 grid with a central vertical gray (5) line, and symmetrically placed colored squares on either side:
-    - Two magenta (6) squares in the 2nd and 5th rows
-    - Four green (3) squares in the 3rd row and 9th row
-    - One magenta (6) square in the 9th row
-    The rest is black (0) empty space.
+    Identical to example_0's input. 10x21 grid with central gray (5) line:
+    Left half (columns 0-9):
+    - Magenta (6) squares at (1,8) and (4,3)
+    - Green (3) squares at (2,2), (2,5), (8,1), and (8,8)
+    Right half and central column: As described in example_0
+    All other cells are black (0)
   output: |
-    The output is not provided for this test case.
+    Output not provided. The solution should follow the pattern established in the examples:
+    - Preserve the left 10x10 grid
+    - Add two pairs of blue (1) and red (2) squares in balanced positions
+    - Place red squares adjacent to blue ones
+    - Avoid overlapping with existing colored squares
+    - Remove the central gray line
