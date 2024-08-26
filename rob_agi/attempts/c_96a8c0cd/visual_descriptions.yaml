@@ -1,80 +1,115 @@
 example_0:
   input: |
-    A 22x12 grid with mostly black (empty) space. There are several colored elements:
-    - A single red cell in the top-left corner (row 3, column 0)
-    - Three vertical green lines, each 3 cells tall, in columns 6, 13, and 20
-    - Two vertical blue lines, each 3 cells tall, in columns 9 and 17
-    - A single blue cell in the top-right corner (row 2, column 20)
-    The colored elements are mostly concentrated in rows 2-6.
+    A 22x12 grid with sparse colored elements:
+    - Red (2): Single cell at (3, 0)
+    - Green (3): Three vertical lines at columns 6, 13, 20, each 3 cells tall (rows 2-4)
+    - Blue (1): Two vertical lines at columns 9, 17 (rows 3-5), and a single cell at (2, 20)
+    - Black (0): All other cells
+    Key observations:
+    - Colored elements form a rough horizontal line
+    - Large empty spaces between colored elements
+    - Some colored elements touch the grid edge (left and top)
   output: |
-    A 22x12 grid with the same colored elements as the input, but with additional red cells forming a tree-like structure:
-    - The single red cell in the top-left corner remains
-    - Red cells now connect all the colored elements horizontally and vertically
-    - The red structure extends to the left edge of the grid
-    - There's a horizontal red line in row 3 connecting all vertical colored lines
-    - Vertical red lines extend downward from each colored element to row 5
-    - A red line extends to the top-right blue cell
-    The overall effect is a red network connecting all non-black colored cells.
+    Same 22x12 grid with original elements preserved and new red (2) cells added:
+    - Original red cell acts as the root of the tree structure
+    - Horizontal red line at row 3 connects all vertical colored lines
+    - Vertical red lines extend from horizontal line to all colored cells
+    - Red path extends to top-right blue cell
+    - No diagonal connections
+    - Red structure touches left and top edges where colored cells were present
+    Key transformations:
+    - Minimal red paths connect all non-black cells
+    - Tree-like structure with clear "trunk" and "branches"
+    - Red cells only added where necessary for connectivity
 
 example_1:
   input: |
-    A 12x22 grid with various colored elements scattered throughout:
-    - A single red cell at the top (row 0, column 3)
-    - Multiple horizontal blue lines, each 3 cells wide, at different rows
-    - Multiple horizontal green lines, each 3 cells wide, at different rows
-    - Some blue lines are disconnected (e.g., in row 9)
-    The colored elements are spread across the grid, leaving large areas of black (empty) space.
+    A 12x22 grid with scattered colored elements:
+    - Red (2): Single cell at (0, 3)
+    - Blue (1): Multiple horizontal lines, each 3 cells wide, at rows 5, 7, 9
+    - Green (3): Multiple horizontal lines, each 3 cells wide, at rows 2, 6, 12, 15, 17, 19
+    - Black (0): All other cells
+    Key observations:
+    - Colored elements spread across the grid vertically
+    - Some colored lines are disconnected (e.g., blue line in row 9)
+    - Large empty spaces between colored elements
+    - Some colored elements touch the grid edge (top)
   output: |
-    A 12x22 grid with the same colored elements as the input, but with additional red cells forming a tree-like structure:
-    - The single red cell at the top remains
-    - Red cells now connect all the colored elements vertically and horizontally
-    - There's a vertical red line on the left side of the grid connecting all horizontal colored lines
-    - Horizontal red lines extend from the vertical line to each colored element
-    - Some red lines extend to the right edge of the grid where colored elements are near the edge
-    The overall effect is a red network connecting all non-black colored cells, with a main vertical "trunk" and horizontal "branches".
+    Same 12x22 grid with original elements preserved and new red (2) cells added:
+    - Vertical red "trunk" on the left side connects all horizontal colored lines
+    - Horizontal red "branches" extend from trunk to each colored element
+    - Red paths extend to right edge where colored elements are near
+    - Original red cell at top integrated into the structure
+    Key transformations:
+    - Minimal red network connects all non-black cells
+    - Clear tree-like structure with main trunk and branches
+    - Red cells only added where necessary for connectivity
+    - Structure adapts to the vertical spread of colored elements
 
 example_2:
   input: |
-    A 12x22 grid with various colored elements scattered throughout:
-    - A single red cell at the top (row 0, column 5)
-    - Multiple horizontal blue lines, each 3 cells wide, at different rows
-    - Multiple horizontal green lines, each 3 cells wide, at different rows
-    - Some green lines span the entire width of the grid (row 6)
-    The colored elements are spread across the grid, with more concentration on the left side.
+    A 12x22 grid with scattered colored elements:
+    - Red (2): Single cell at (0, 5)
+    - Blue (1): Horizontal lines at rows 2, 4, 7, 11, 19, each 3 cells wide
+    - Green (3): Horizontal lines at rows 6, 9, 14, 17, some spanning full width
+    - Black (0): All other cells
+    Key observations:
+    - Colored elements spread across the grid, more dense on left
+    - Some green lines span the entire grid width
+    - Large empty spaces between some colored elements
+    - Some colored elements touch the grid edges (top, left, right)
   output: |
-    A 12x22 grid with the same colored elements as the input, but with additional red cells forming a tree-like structure:
-    - The single red cell at the top remains
-    - Red cells now connect all the colored elements vertically and horizontally
-    - There's a vertical red line slightly left of center, connecting all horizontal colored lines
-    - Horizontal red lines extend from the vertical line to each colored element
-    - Red lines extend to both left and right edges of the grid where colored elements are near the edges
-    The overall effect is a red network connecting all non-black colored cells, with a main vertical "trunk" and horizontal "branches" extending in both directions.
+    Same 12x22 grid with original elements preserved and new red (2) cells added:
+    - Vertical red "trunk" slightly left of center connects all horizontal colored lines
+    - Horizontal red "branches" extend from trunk to each colored element
+    - Red paths reach both left and right edges where colored elements are near
+    - Original red cell at top integrated into the structure
+    Key transformations:
+    - Minimal red network connects all non-black cells
+    - Tree-like structure adapts to the distribution of colored elements
+    - Red cells efficiently bridge large gaps between colored elements
+    - Structure touches grid edges where original colors were present
 
 example_3:
   input: |
-    A 19x13 grid with colored elements concentrated in the upper-left quadrant:
-    - A single red cell in the top-left corner (row 3, column 0)
-    - Three vertical green lines, each 3 cells tall, in columns 3, 9, and 12
-    - One vertical blue line, 3 cells tall, in column 6
-    - The colored elements are mostly in rows 2-6 and columns 0-12
-    The rest of the grid is black (empty) space.
+    A 19x13 grid with colored elements in upper-left quadrant:
+    - Red (2): Single cell at (3, 0)
+    - Green (3): Three vertical lines at columns 3, 9, 12, each 3 cells tall (rows 2-4)
+    - Blue (1): One vertical line at column 6, 3 cells tall (rows 3-5)
+    - Black (0): All other cells
+    Key observations:
+    - Colored elements concentrated in top-left, rows 2-6 and columns 0-12
+    - Large empty area in bottom-right
+    - Some colored elements touch the grid edge (left)
   output: |
-    A 19x13 grid with the same colored elements as the input, but with additional red cells forming a tree-like structure:
-    - The single red cell in the top-left corner remains
-    - Red cells now connect all the colored elements horizontally and vertically
-    - There's a horizontal red line in row 3 connecting all vertical colored lines
-    - Vertical red lines extend downward from each colored element to row 5
-    - A red line extends to the right edge of the grid from the rightmost green line
-    - A red line extends to the bottom edge of the grid from the bottom of the tree-like structure
-    The overall effect is a red network connecting all non-black colored cells, with extensions to the grid edges.
+    Same 19x13 grid with original elements preserved and new red (2) cells added:
+    - Horizontal red line at row 3 connects all vertical colored lines
+    - Vertical red lines extend to connect all colored cells
+    - Red path extends to right edge from rightmost green line
+    - Red path extends to bottom edge from lowest point of the structure
+    - Original red cell integrated into the structure
+    Key transformations:
+    - Minimal red network connects all non-black cells
+    - Tree-like structure confined to upper-left quadrant where colors exist
+    - Red paths extend to right and bottom edges
+    - Efficient use of red cells, leaving large empty areas untouched
 
 test_case_0:
   input: |
-    A 19x13 grid with colored elements concentrated in the upper-left quadrant:
-    - A single red cell in the top-left corner (row 3, column 0)
-    - Three vertical green lines, each 3 cells tall, in columns 3, 9, and 12
-    - One vertical blue line, 3 cells tall, in column 6
-    - The colored elements are mostly in rows 2-6 and columns 0-12
-    The rest of the grid is black (empty) space.
+    A 19x13 grid with colored elements in upper-left quadrant:
+    - Red (2): Single cell at (3, 0)
+    - Green (3): Three vertical lines at columns 3, 9, 12, each 3 cells tall (rows 2-4)
+    - Blue (1): One vertical line at column 6, 3 cells tall (rows 3-5)
+    - Black (0): All other cells
+    Key observations:
+    - Identical to example_3 input
+    - Colored elements concentrated in top-left, rows 2-6 and columns 0-12
+    - Large empty area in bottom-right
+    - Some colored elements touch the grid edge (left)
   output: |
-    The output grid is not provided for the test case.
+    Output grid not provided. Based on previous examples, expected transformation:
+    - Minimal red network connecting all non-black cells
+    - Tree-like structure mainly in upper-left quadrant
+    - Possible extensions to right and bottom edges
+    - Preservation of all original colored cells
+    - Efficient use of red cells, likely leaving large empty areas untouched
