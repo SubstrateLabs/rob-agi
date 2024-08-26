@@ -3,34 +3,77 @@ from typing import List, Tuple
 
 def solve_e78887d1(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by extracting the most representative 3-row pattern.
+    Transforms the input grid into a 3-row representation that captures the essence of the input patterns.
     
     The function performs the following steps:
-    1. Identifies non-empty 3-row sets in the input grid.
-    2. Selects the most representative 3-row set based on pattern consistency.
-    3. Extracts the selected 3-row set to form the output grid.
-    4. Adjusts patterns if necessary to maintain consistency across the output.
+    1. Identifies distinct color groups and their patterns in the input grid.
+    2. Creates an idealized 3-row representation for each color group.
+    3. Combines the representations while maintaining relative proportions and order.
+    4. Refines the output to ensure balance and utilization of all 3 rows.
     
-    This approach prioritizes preserving the most common and consistent pattern
-    from the input grid, adapting it to fit the 3-row output constraint.
+    This approach focuses on distilling and idealizing the essence of the input patterns
+    rather than strict replication, allowing for creative interpretation while maintaining
+    consistency across different inputs.
     """
     rows, cols = input_grid.get_dimensions()
-    non_empty_rows = [i for i in range(rows) if any(input_grid.values[i])]
-    row_sets = [non_empty_rows[i:i+3] for i in range(0, len(non_empty_rows), 4) if i+3 <= len(non_empty_rows)]
+    color_groups = identify_color_groups(input_grid)
+    output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(3)])
     
-    if not row_sets:
-        return ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(3)])
+    for color, positions in color_groups.items():
+        pattern = identify_pattern(positions, rows, cols)
+        representation = create_representation(color, pattern, cols)
+        merge_representation(output_grid, representation)
     
-    # Select the most representative row set
-    best_set = max(row_sets, key=lambda s: sum(input_grid.values[r].count(0) for r in s))
-    
-    # Extract the selected 3-row set
-    output_grid = ColoredGrid(values=[input_grid.values[r][:] for r in best_set])
-    
-    # Adjust patterns if necessary
-    complete_patterns(output_grid)
+    refine_output(output_grid)
     
     return output_grid
+
+def identify_color_groups(grid: ColoredGrid) -> Dict[int, List[Tuple[int, int]]]:
+    color_groups = {}
+    for r in range(grid.get_dimensions()[0]):
+        for c in range(grid.get_dimensions()[1]):
+            color = grid.values[r][c]
+            if color != 0:
+                if color not in color_groups:
+                    color_groups[color] = []
+                color_groups[color].append((r, c))
+    return color_groups
+
+def identify_pattern(positions: List[Tuple[int, int]], rows: int, cols: int) -> str:
+    if len(set(r for r, _ in positions)) == 1:
+        return "horizontal"
+    if len(set(c for _, c in positions)) == 1:
+        return "vertical"
+    if len(positions) >= rows * cols / 4:
+        return "block"
+    return "scattered"
+
+def create_representation(color: int, pattern: str, cols: int) -> List[List[int]]:
+    if pattern == "vertical":
+        return [[color, 0, color] for _ in range(3)]
+    if pattern == "horizontal":
+        return [[0, 0, 0], [color] * 3, [0, 0, 0]]
+    if pattern == "block":
+        return [[color, color, 0], [color, color, color], [0, color, color]]
+    return [[color, 0, 0], [0, color, 0], [0, 0, color]]  # scattered
+
+def merge_representation(output_grid: ColoredGrid, representation: List[List[int]]):
+    for r in range(3):
+        for c in range(len(representation[0])):
+            if representation[r][c] != 0:
+                output_grid.values[r][output_grid.values[r].index(0)] = representation[r][c]
+
+def refine_output(grid: ColoredGrid):
+    for col in range(grid.get_dimensions()[1]):
+        colors = [grid.values[r][col] for r in range(3)]
+        if len(set(colors)) == 1 and colors[0] != 0:
+            grid.values[1][col] = 0
+        elif colors.count(0) == 2:
+            non_zero = next(color for color in colors if color != 0)
+            for r in range(3):
+                if grid.values[r][col] == 0:
+                    grid.values[r][col] = non_zero
+                    break
 
 def complete_patterns(grid: ColoredGrid):
     """Completes patterns in the grid by filling in missing parts of shapes and ensuring consistency."""
