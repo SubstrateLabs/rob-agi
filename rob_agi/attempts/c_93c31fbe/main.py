@@ -1,132 +1,115 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Set
-from collections import deque
 
 def solve_93c31fbe(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by creating symmetrical patterns with blue (1) elements while respecting other colored elements.
+    Transforms the input grid by creating a symmetrical blue (1) pattern while respecting other colored elements.
     The solution:
-    1. Analyzes the grid to identify regions and symmetry axes.
-    2. Creates symmetrical patterns in each region, using 2x2 blue squares as anchors.
-    3. Connects patterns between regions, maintaining overall symmetry.
-    4. Enhances global symmetry and visual appeal.
-    5. Ensures connectivity of all blue pixels.
-    6. Optimizes the pattern for aesthetic appeal and symmetry.
-    7. Handles boundaries with non-blue shapes and isolated blue pixels.
-    8. Performs final cleanup and validation.
+    1. Analyzes the grid to identify non-blue elements and grid dimensions.
+    2. Establishes a main backbone (vertical or horizontal) based on grid orientation.
+    3. Connects the backbone to non-blue elements symmetrically.
+    4. Creates symmetrical branches from the backbone.
+    5. Forms symmetrical units (2x2 squares, crosses) at intersections and endpoints.
+    6. Fills in details in empty spaces while maintaining symmetry.
+    7. Ensures connectivity of all blue pixels.
+    8. Optimizes and cleans up the pattern.
+    9. Performs final checks for symmetry, connectivity, and interaction with non-blue elements.
     """
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
 
-    def get_blue_pixels() -> Set[Tuple[int, int]]:
-        return {(r, c) for r in range(rows) for c in range(cols) if grid.values[r][c] == 1}
+    def is_valid(r: int, c: int) -> bool:
+        return 0 <= r < rows and 0 <= c < cols
 
-    def get_other_shapes() -> Set[Tuple[int, int]]:
+    def get_non_blue_elements() -> Set[Tuple[int, int]]:
         return {(r, c) for r in range(rows) for c in range(cols) if grid.values[r][c] not in [0, 1]}
 
-    def is_valid(r: int, c: int) -> bool:
-        return 0 <= r < rows and 0 <= c < cols and grid.values[r][c] in [0, 1]
+    def create_backbone():
+        if rows >= cols:
+            c = cols // 2
+            for r in range(rows):
+                if is_valid(r, c) and grid.values[r][c] == 0:
+                    grid.values[r][c] = 1
+        else:
+            r = rows // 2
+            for c in range(cols):
+                if is_valid(r, c) and grid.values[r][c] == 0:
+                    grid.values[r][c] = 1
 
-    def find_regions() -> List[Set[Tuple[int, int]]]:
-        regions = []
+    def connect_to_non_blue(non_blue: Set[Tuple[int, int]]):
+        backbone = [(r, cols//2) for r in range(rows)] if rows >= cols else [(rows//2, c) for c in range(cols)]
+        for r, c in non_blue:
+            closest = min(backbone, key=lambda x: abs(x[0]-r) + abs(x[1]-c))
+            r1, c1 = closest
+            while (r1, c1) != (r, c):
+                if r1 < r:
+                    r1 += 1
+                elif r1 > r:
+                    r1 -= 1
+                if c1 < c:
+                    c1 += 1
+                elif c1 > c:
+                    c1 -= 1
+                if is_valid(r1, c1) and grid.values[r1][c1] == 0:
+                    grid.values[r1][c1] = 1
+
+    def create_branches():
+        if rows >= cols:
+            for r in range(2, rows-2, 4):
+                for c in range(cols):
+                    if is_valid(r, c) and grid.values[r][c] == 0:
+                        grid.values[r][c] = 1
+        else:
+            for c in range(2, cols-2, 4):
+                for r in range(rows):
+                    if is_valid(r, c) and grid.values[r][c] == 0:
+                        grid.values[r][c] = 1
+
+    def create_symmetrical_units():
+        for r in range(rows-1):
+            for c in range(cols-1):
+                if all(is_valid(r+dr, c+dc) and grid.values[r+dr][c+dc] == 0 for dr, dc in [(0,0), (0,1), (1,0), (1,1)]):
+                    for dr, dc in [(0,0), (0,1), (1,0), (1,1)]:
+                        grid.values[r+dr][c+dc] = 1
+
+    def fill_details():
+        for r in range(1, rows-1):
+            for c in range(1, cols-1):
+                if grid.values[r][c] == 0 and sum(grid.values[r+dr][c+dc] == 1 for dr, dc in [(0,1), (1,0), (0,-1), (-1,0)]) >= 2:
+                    grid.values[r][c] = 1
+
+    def ensure_connectivity():
         visited = set()
+        stack = [(0, 0)]
+        while stack:
+            r, c = stack.pop()
+            if (r, c) not in visited and is_valid(r, c):
+                visited.add((r, c))
+                if grid.values[r][c] == 1:
+                    for dr, dc in [(0,1), (1,0), (0,-1), (-1,0)]:
+                        nr, nc = r+dr, c+dc
+                        if is_valid(nr, nc) and (nr, nc) not in visited:
+                            stack.append((nr, nc))
         for r in range(rows):
             for c in range(cols):
-                if (r, c) not in visited and grid.values[r][c] == 0:
-                    region = set()
-                    queue = deque([(r, c)])
-                    while queue:
-                        cr, cc = queue.popleft()
-                        if (cr, cc) not in visited and grid.values[cr][cc] == 0:
-                            region.add((cr, cc))
-                            visited.add((cr, cc))
-                            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                                nr, nc = cr + dr, cc + dc
-                                if is_valid(nr, nc):
-                                    queue.append((nr, nc))
-                    regions.append(region)
-        return regions
+                if grid.values[r][c] == 1 and (r, c) not in visited:
+                    grid.values[r][c] = 0
 
-    def create_symmetrical_pattern(region: Set[Tuple[int, int]]):
-        min_r = min(r for r, _ in region)
-        max_r = max(r for r, _ in region)
-        min_c = min(c for _, c in region)
-        max_c = max(c for _, c in region)
-        center_r, center_c = (min_r + max_r) // 2, (min_c + max_c) // 2
-
-        for r, c in region:
-            if (r + c) % 2 == 0 and is_valid(r+1, c+1):
-                grid.values[r][c] = 1
-                grid.values[r+1][c] = 1
-                grid.values[r][c+1] = 1
-                grid.values[r+1][c+1] = 1
-
-        # Create symmetry
-        for r, c in region:
-            if grid.values[r][c] == 1:
-                sym_r = 2 * center_r - r
-                sym_c = 2 * center_c - c
-                if (sym_r, sym_c) in region:
-                    grid.values[sym_r][sym_c] = 1
-
-    def connect_regions(regions: List[Set[Tuple[int, int]]]):
-        for i, region1 in enumerate(regions):
-            for region2 in regions[i+1:]:
-                min_dist = float('inf')
-                connection = None
-                for r1, c1 in region1:
-                    for r2, c2 in region2:
-                        if grid.values[r1][c1] == 1 and grid.values[r2][c2] == 1:
-                            dist = abs(r1 - r2) + abs(c1 - c2)
-                            if dist < min_dist:
-                                min_dist = dist
-                                connection = ((r1, c1), (r2, c2))
-                if connection:
-                    (r1, c1), (r2, c2) = connection
-                    r, c = r1, c1
-                    while (r, c) != (r2, c2):
-                        if r < r2:
-                            r += 1
-                        elif r > r2:
-                            r -= 1
-                        if c < c2:
-                            c += 1
-                        elif c > c2:
-                            c -= 1
-                        if is_valid(r, c):
-                            grid.values[r][c] = 1
-
-    def enhance_global_symmetry():
+    def optimize_and_clean():
         for r in range(rows):
             for c in range(cols):
                 if grid.values[r][c] == 1:
-                    sym_r, sym_c = rows - 1 - r, cols - 1 - c
-                    if is_valid(sym_r, sym_c):
-                        grid.values[sym_r][sym_c] = 1
+                    neighbors = sum(1 for dr, dc in [(0,1), (1,0), (0,-1), (-1,0)] if is_valid(r+dr, c+dc) and grid.values[r+dr][c+dc] == 1)
+                    if neighbors <= 1:
+                        grid.values[r][c] = 0
 
-    def ensure_connectivity():
-        blue_pixels = get_blue_pixels()
-        if not blue_pixels:
-            return
-        connected = set()
-        stack = [next(iter(blue_pixels))]
-        while stack:
-            r, c = stack.pop()
-            if (r, c) not in connected:
-                connected.add((r, c))
-                for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                    nr, nc = r + dr, c + dc
-                    if (nr, nc) in blue_pixels:
-                        stack.append((nr, nc))
-        for r, c in blue_pixels - connected:
-            grid.values[r][c] = 0
-
-    other_shapes = get_other_shapes()
-    regions = find_regions()
-    for region in regions:
-        create_symmetrical_pattern(region)
-    connect_regions(regions)
-    enhance_global_symmetry()
+    non_blue = get_non_blue_elements()
+    create_backbone()
+    connect_to_non_blue(non_blue)
+    create_branches()
+    create_symmetrical_units()
+    fill_details()
     ensure_connectivity()
+    optimize_and_clean()
 
     return grid
