@@ -11,6 +11,7 @@ def solve_b7fb29bc(input_grid: ColoredGrid) -> ColoredGrid:
     4. Preservation of any original green (3) cells within the border
     5. Special handling for small interiors
     6. A bottom row of red (2) cells
+    7. A diagonal pattern from top-left to bottom-right
     """
     # Step 1: Identify the green border
     rows, cols = input_grid.get_dimensions()
@@ -36,12 +37,11 @@ def solve_b7fb29bc(input_grid: ColoredGrid) -> ColoredGrid:
             elif r == inner_bottom - 1:
                 result.set_cell(r, c, 2)  # Bottom row is red
             else:
-                # Alternating columns with transition
-                column_index = c - inner_left
-                if column_index % 2 == 0:
-                    result.set_cell(r, c, 2 if column_index < inner_width // 2 else 4)
+                # Create a diagonal pattern
+                if (r - inner_top) <= (c - inner_left):
+                    result.set_cell(r, c, 4)  # Yellow
                 else:
-                    result.set_cell(r, c, 4)
+                    result.set_cell(r, c, 2)  # Red
 
     # Step 5: Handle small interiors
     if inner_width <= 3 or inner_height <= 3:
