@@ -8,8 +8,9 @@ def solve_759f3fd3(input_grid: ColoredGrid) -> ColoredGrid:
     The pattern follows these rules:
     1. The green (3) cross is preserved from the input.
     2. Each quadrant is filled with a yellow (4) staircase pattern, starting from the corner adjacent to the cross.
-    3. The edges of the grid are filled with alternating yellow (4) and black (0), with specific rules for each edge.
+    3. The edges of the grid are filled with a specific pattern of yellow (4) and black (0).
     4. The corners of the grid (except where the cross intersects) are always yellow (4).
+    5. The staircase pattern in each quadrant follows a specific rule, creating nested rectangles.
     
     This creates a complex pattern that respects the green cross while filling the rest of the grid
     with a consistent yellow and black design.
@@ -27,6 +28,17 @@ def solve_759f3fd3(input_grid: ColoredGrid) -> ColoredGrid:
     for c in range(cols):
         output_grid.values[cross_row][c] = 3
     
+    # Fill the edges
+    for c in range(cols):
+        if c != cross_col:
+            output_grid.values[0][c] = 4  # Top edge
+            output_grid.values[-1][c] = 4 if c % 2 == 0 else 0  # Bottom edge
+    
+    for r in range(rows):
+        if r != cross_row:
+            output_grid.values[r][0] = 4 if r % 2 == 0 else 0  # Left edge
+            output_grid.values[r][-1] = 4 if r % 2 == 0 else 0  # Right edge
+    
     # Fill each quadrant
     quadrants = [
         (0, 0, cross_row, cross_col),
@@ -36,38 +48,16 @@ def solve_759f3fd3(input_grid: ColoredGrid) -> ColoredGrid:
     ]
     
     for top, left, bottom, right in quadrants:
-        step_width, step_length = 2, 1
         r, c = top, left
+        step = 1
         while r < bottom and c < right:
-            for i in range(step_length):
+            for i in range(step):
                 if r + i < bottom and c < right:
                     output_grid.values[r + i][c] = 4
-            r += step_length
+                if r < bottom and c + i < right:
+                    output_grid.values[r][c + i] = 4
+            r += 1
             c += 1
-            step_length += 1
-            if step_length > step_width:
-                step_width += 2
-                step_length = 1
-    
-    # Fill the edges
-    for c in range(cols):
-        if c != cross_col:
-            output_grid.values[0][c] = 4  # Top edge
-            output_grid.values[-1][c] = 4 if c % 2 == 0 else 0  # Bottom edge
-    
-    for r in range(1, rows - 1):
-        if r != cross_row:
-            output_grid.values[r][0] = 4 if r % 2 == 0 else 0  # Left edge
-            output_grid.values[r][-1] = 4 if r % 2 == 0 else 0  # Right edge
-    
-    # Ensure corners are yellow (except where cross intersects)
-    if cross_row != 0 and cross_col != 0:
-        output_grid.values[0][0] = 4
-    if cross_row != 0 and cross_col != cols - 1:
-        output_grid.values[0][-1] = 4
-    if cross_row != rows - 1 and cross_col != 0:
-        output_grid.values[-1][0] = 4
-    if cross_row != rows - 1 and cross_col != cols - 1:
-        output_grid.values[-1][-1] = 4
+            step += 1
     
     return output_grid
