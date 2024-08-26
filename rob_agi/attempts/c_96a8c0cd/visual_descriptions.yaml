@@ -1,0 +1,80 @@
+example_0:
+  input: |
+    A 22x12 grid with mostly black (empty) space. There are several colored elements:
+    - A single red cell in the top-left corner (row 3, column 0)
+    - Three vertical green lines, each 3 cells tall, in columns 6, 13, and 20
+    - Two vertical blue lines, each 3 cells tall, in columns 9 and 17
+    - A single blue cell in the top-right corner (row 2, column 20)
+    The colored elements are mostly concentrated in rows 2-6.
+  output: |
+    A 22x12 grid with the same colored elements as the input, but with additional red cells forming a tree-like structure:
+    - The single red cell in the top-left corner remains
+    - Red cells now connect all the colored elements horizontally and vertically
+    - The red structure extends to the left edge of the grid
+    - There's a horizontal red line in row 3 connecting all vertical colored lines
+    - Vertical red lines extend downward from each colored element to row 5
+    - A red line extends to the top-right blue cell
+    The overall effect is a red network connecting all non-black colored cells.
+
+example_1:
+  input: |
+    A 12x22 grid with various colored elements scattered throughout:
+    - A single red cell at the top (row 0, column 3)
+    - Multiple horizontal blue lines, each 3 cells wide, at different rows
+    - Multiple horizontal green lines, each 3 cells wide, at different rows
+    - Some blue lines are disconnected (e.g., in row 9)
+    The colored elements are spread across the grid, leaving large areas of black (empty) space.
+  output: |
+    A 12x22 grid with the same colored elements as the input, but with additional red cells forming a tree-like structure:
+    - The single red cell at the top remains
+    - Red cells now connect all the colored elements vertically and horizontally
+    - There's a vertical red line on the left side of the grid connecting all horizontal colored lines
+    - Horizontal red lines extend from the vertical line to each colored element
+    - Some red lines extend to the right edge of the grid where colored elements are near the edge
+    The overall effect is a red network connecting all non-black colored cells, with a main vertical "trunk" and horizontal "branches".
+
+example_2:
+  input: |
+    A 12x22 grid with various colored elements scattered throughout:
+    - A single red cell at the top (row 0, column 5)
+    - Multiple horizontal blue lines, each 3 cells wide, at different rows
+    - Multiple horizontal green lines, each 3 cells wide, at different rows
+    - Some green lines span the entire width of the grid (row 6)
+    The colored elements are spread across the grid, with more concentration on the left side.
+  output: |
+    A 12x22 grid with the same colored elements as the input, but with additional red cells forming a tree-like structure:
+    - The single red cell at the top remains
+    - Red cells now connect all the colored elements vertically and horizontally
+    - There's a vertical red line slightly left of center, connecting all horizontal colored lines
+    - Horizontal red lines extend from the vertical line to each colored element
+    - Red lines extend to both left and right edges of the grid where colored elements are near the edges
+    The overall effect is a red network connecting all non-black colored cells, with a main vertical "trunk" and horizontal "branches" extending in both directions.
+
+example_3:
+  input: |
+    A 19x13 grid with colored elements concentrated in the upper-left quadrant:
+    - A single red cell in the top-left corner (row 3, column 0)
+    - Three vertical green lines, each 3 cells tall, in columns 3, 9, and 12
+    - One vertical blue line, 3 cells tall, in column 6
+    - The colored elements are mostly in rows 2-6 and columns 0-12
+    The rest of the grid is black (empty) space.
+  output: |
+    A 19x13 grid with the same colored elements as the input, but with additional red cells forming a tree-like structure:
+    - The single red cell in the top-left corner remains
+    - Red cells now connect all the colored elements horizontally and vertically
+    - There's a horizontal red line in row 3 connecting all vertical colored lines
+    - Vertical red lines extend downward from each colored element to row 5
+    - A red line extends to the right edge of the grid from the rightmost green line
+    - A red line extends to the bottom edge of the grid from the bottom of the tree-like structure
+    The overall effect is a red network connecting all non-black colored cells, with extensions to the grid edges.
+
+test_case_0:
+  input: |
+    A 19x13 grid with colored elements concentrated in the upper-left quadrant:
+    - A single red cell in the top-left corner (row 3, column 0)
+    - Three vertical green lines, each 3 cells tall, in columns 3, 9, and 12
+    - One vertical blue line, 3 cells tall, in column 6
+    - The colored elements are mostly in rows 2-6 and columns 0-12
+    The rest of the grid is black (empty) space.
+  output: |
+    The output grid is not provided for the test case.
