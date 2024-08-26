@@ -9,7 +9,8 @@ def solve_770cc55f(input_grid: ColoredGrid) -> ColoredGrid:
     2. Finds overlapping columns between top and bottom lines.
     3. If overlap exists and a red line is present, creates a yellow rectangle connecting either top or bottom line to the red line,
        choosing the connection that results in the larger area.
-    4. Returns the modified grid with the yellow rectangle added, or the original grid if no overlap or no red line.
+    4. The yellow rectangle's width is refined to match the width of the colored line it's connecting to, within the overlap area.
+    5. Returns the modified grid with the yellow rectangle added, or the original grid if no overlap or no red line.
     """
     rows, cols = input_grid.get_dimensions()
     output_grid = input_grid.deep_copy()
@@ -31,19 +32,25 @@ def solve_770cc55f(input_grid: ColoredGrid) -> ColoredGrid:
     if not overlap or red_line_row is None:
         return output_grid
     
-    # Determine rectangle dimensions
-    left_col = max(min(top_line), min(bottom_line))
-    right_col = min(max(top_line), max(bottom_line))
-    width = right_col - left_col + 1
+    # Determine potential rectangle dimensions
+    left_col = max(min(overlap), min(top_line), min(bottom_line))
+    right_col = min(max(overlap), max(top_line), max(bottom_line))
+    
+    # Calculate areas for top and bottom connections
+    top_area = (right_col - left_col + 1) * (red_line_row - 1)
+    bottom_area = (right_col - left_col + 1) * (rows - red_line_row - 2)
     
     # Decide whether to connect to top or bottom
-    top_area = width * red_line_row
-    bottom_area = width * (rows - red_line_row - 1)
-    
     if top_area >= bottom_area:
         start_row, end_row = 1, red_line_row
+        connected_line = top_line
     else:
         start_row, end_row = red_line_row + 1, rows - 1
+        connected_line = bottom_line
+    
+    # Refine the yellow rectangle dimensions
+    left_col = max(c for c in range(left_col, right_col + 1) if c in connected_line)
+    right_col = min(c for c in range(right_col, left_col - 1, -1) if c in connected_line)
     
     # Create yellow rectangle
     for row in range(start_row, end_row):
