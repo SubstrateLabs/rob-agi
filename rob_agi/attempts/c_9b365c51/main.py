@@ -9,13 +9,11 @@ def solve_9b365c51(input_grid: ColoredGrid) -> ColoredGrid:
     1. Identifies the sequence of unique colors from the left side of the grid.
     2. Creates a deep copy of the input grid.
     3. Clears the left side of the grid (first 7 columns).
-    4. Replaces sky blue (8) cells and their vertical sections on the right side 
-       with colors from the identified sequence, using a new color for each 
-       contiguous vertical section containing sky blue cells.
+    4. Replaces sky blue (8) regions on the right side with colors from the identified sequence.
+       Each contiguous sky blue region is filled with a single color, and colors are used in order.
     5. Returns the transformed grid.
 
-    The color sequence wraps around if more colors are needed than are present
-    in the original sequence.
+    The color sequence wraps around if more regions are present than colors in the sequence.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -43,6 +41,8 @@ def solve_9b365c51(input_grid: ColoredGrid) -> ColoredGrid:
                 if output_grid.values[row][col] == 8:
                     output_grid.values[row][col] = current_color
             color_index += 1
+        else:
+            color_index = 0  # Reset color index when encountering a non-sky blue column
 
     # Step 5: Return the transformed grid
     return output_grid
