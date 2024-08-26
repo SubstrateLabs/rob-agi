@@ -83,8 +83,10 @@ def fill_remaining_cells(grid: ColoredGrid):
     for r in range(rows):
         for c in range(cols):
             if grid.get_cell(r, c) == 0:
+                neighbors = []
                 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
                     nr, nc = r + dr, c + dc
                     if 0 <= nr < rows and 0 <= nc < cols and grid.get_cell(nr, nc) != 0:
-                        grid.set_cell(r, c, grid.get_cell(nr, nc))
-                        break
+                        neighbors.append(grid.get_cell(nr, nc))
+                if neighbors:
+                    grid.set_cell(r, c, neighbors[0])
