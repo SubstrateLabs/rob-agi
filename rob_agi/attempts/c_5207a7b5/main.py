@@ -5,8 +5,10 @@ def solve_5207a7b5(input_grid: ColoredGrid) -> ColoredGrid:
     Transform the input grid according to the following rules:
     1. Find the gray vertical line (color 5) in the input grid.
     2. Create a sky blue (color 8) triangle on the left side, with base width equal to the gray line's column index.
+       The triangle continues as a single column to the bottom of the grid.
     3. Preserve the gray line in its original position and length.
-    4. Add a magenta (color 6) shape to the right of the gray line, with width decreasing by 1 each row.
+    4. Add a magenta (color 6) shape to the right of the gray line, starting with width 1 and increasing by 1 each row,
+       up to a maximum width of 3 or the available space.
     5. Leave all other cells black (color 0).
 
     Args:
@@ -22,9 +24,9 @@ def solve_5207a7b5(input_grid: ColoredGrid) -> ColoredGrid:
     gray_line_column = next(col for col in range(width) if input_grid.values[0][col] == 5)
     gray_line_length = sum(1 for row in input_grid.values if row[gray_line_column] == 5)
 
-    # Draw sky blue triangle
+    # Draw sky blue triangle and column
     for row in range(height):
-        for col in range(min(gray_line_column, height - row)):
+        for col in range(min(gray_line_column, row + 1)):
             new_grid.values[row][col] = 8
 
     # Preserve gray line
@@ -32,9 +34,9 @@ def solve_5207a7b5(input_grid: ColoredGrid) -> ColoredGrid:
         new_grid.values[row][gray_line_column] = 5
 
     # Add magenta shape
-    magenta_width = min(3, width - gray_line_column - 1)
-    for row in range(magenta_width):
-        for col in range(gray_line_column + 1, gray_line_column + 1 + magenta_width - row):
+    magenta_max_width = min(3, width - gray_line_column - 1)
+    for row in range(magenta_max_width):
+        for col in range(gray_line_column + 1, min(gray_line_column + 2 + row, width)):
             new_grid.values[row][col] = 6
 
     return new_grid
