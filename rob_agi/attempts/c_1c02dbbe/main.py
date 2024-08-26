@@ -1,20 +1,22 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Dict
+from typing import List, Tuple
 
 def solve_1c02dbbe(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by expanding colored regions based on seed points.
     
-    The function identifies seed points (non-gray, non-black cells), determines
-    territories for each color, and expands these colors within their territories.
-    The expansion is balanced and preserves the overall structure of the grid.
+    The function identifies seed points (non-gray, non-black cells), sorts them
+    from left to right and top to bottom, then expands each color horizontally
+    and vertically. The expansion respects the order of seed points and allows
+    for L-shaped expansions when the same color appears in different columns.
     
     Steps:
-    1. Identify seed points
-    2. Determine territories for each color
-    3. Expand colors within their territories
-    4. Fill remaining areas with gray
+    1. Find and sort seed points
+    2. Process seed points from left to right
+    3. Expand colors horizontally and vertically
+    4. Handle same-color seeds in different columns
     5. Preserve the black border
+    6. Final cleanup of isolated gray cells
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed
@@ -22,63 +24,63 @@ def solve_1c02dbbe(input_grid: ColoredGrid) -> ColoredGrid:
     Returns:
     ColoredGrid: The transformed grid with expanded color regions
     """
-    # Step 1: Identify seed points
-    seed_points = find_seed_points(input_grid)
-    
-    # Step 2: Determine territories
-    territories = determine_territories(input_grid, seed_points)
-    
-    # Step 3 & 4: Expand colors and fill remaining areas
-    output_grid = expand_colors(input_grid, seed_points, territories)
-    
-    # Step 5: Preserve black border
+    output_grid = input_grid.deep_copy()
+    seed_points = find_and_sort_seed_points(output_grid)
+    process_seed_points(output_grid, seed_points)
     preserve_border(output_grid)
-    
+    cleanup_isolated_gray(output_grid)
     return output_grid
 
-def find_seed_points(grid: ColoredGrid) -> Dict[int, List[Tuple[int, int]]]:
-    seed_points = {}
+def find_and_sort_seed_points(grid: ColoredGrid) -> List[Tuple[int, int, int]]:
+    seed_points = []
     rows, cols = grid.get_dimensions()
     for r in range(rows):
         for c in range(cols):
             color = grid.get_cell(r, c)
             if color not in [0, 5]:  # Not black or gray
-                if color not in seed_points:
-                    seed_points[color] = []
-                seed_points[color].append((r, c))
-    return seed_points
+                seed_points.append((color, r, c))
+    return sorted(seed_points, key=lambda x: (x[2], x[1]))  # Sort by column, then row
 
-def determine_territories(grid: ColoredGrid, seed_points: Dict[int, List[Tuple[int, int]]]) -> Dict[int, Tuple[int, int, int, int]]:
-    territories = {}
+def process_seed_points(grid: ColoredGrid, seed_points: List[Tuple[int, int, int]]):
     rows, cols = grid.get_dimensions()
-    for color, points in seed_points.items():
-        min_r = min(p[0] for p in points)
-        max_r = max(p[0] for p in points)
-        min_c = min(p[1] for p in points)
-        max_c = max(p[1] for p in points)
-        
-        # Extend territory to edges or midpoints
-        top = 0 if min_r == 1 else (min_r + max_r) // 2
-        bottom = rows - 1 if max_r == rows - 2 else (min_r + max_r) // 2
-        left = 0 if min_c == 1 else (min_c + max_c) // 2
-        right = cols - 1 if max_c == cols - 2 else (min_c + max_c) // 2
-        
-        territories[color] = (top, left, bottom, right)
-    return territories
+    last_col = -1
+    for i, (color, row, col) in enumerate(seed_points):
+        if col != last_col:
+            right_boundary = cols - 1 if i == len(seed_points) - 1 else (col + seed_points[i+1][2]) // 2
+            expand_vertically(grid, color, col)
+            expand_horizontally(grid, color, col, right_boundary)
+            last_col = col
 
-def expand_colors(grid: ColoredGrid, seed_points: Dict[int, List[Tuple[int, int]]], territories: Dict[int, Tuple[int, int, int, int]]) -> ColoredGrid:
-    output_grid = grid.deep_copy()
-    for color, territory in territories.items():
-        top, left, bottom, right = territory
-        for r in range(top, bottom + 1):
-            for c in range(left, right + 1):
-                if output_grid.get_cell(r, c) == 5:  # Only replace gray cells
-                    output_grid.set_cell(r, c, color)
-    return output_grid
+def expand_vertically(grid: ColoredGrid, color: int, col: int):
+    rows, _ = grid.get_dimensions()
+    for r in range(1, rows - 1):  # Exclude border rows
+        if grid.get_cell(r, col) in [0, 5]:  # Only replace black or gray cells
+            grid.set_cell(r, col, color)
+
+def expand_horizontally(grid: ColoredGrid, color: int, start_col: int, end_col: int):
+    rows, _ = grid.get_dimensions()
+    for r in range(1, rows - 1):  # Exclude border rows
+        for c in range(start_col, end_col + 1):
+            if grid.get_cell(r, c) in [0, 5]:  # Only replace black or gray cells
+                grid.set_cell(r, c, color)
 
 def preserve_border(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
     for r in range(rows):
-        for c in range(cols):
-            if r == 0 or r == rows - 1 or c == 0 or c == cols - 1:
-                grid.set_cell(r, c, 0)  # Set to black
+        grid.set_cell(r, 0, 0)
+        grid.set_cell(r, cols - 1, 0)
+    for c in range(cols):
+        grid.set_cell(0, c, 0)
+        grid.set_cell(rows - 1, c, 0)
+
+def cleanup_isolated_gray(grid: ColoredGrid):
+    rows, cols = grid.get_dimensions()
+    for r in range(1, rows - 1):
+        for c in range(1, cols - 1):
+            if grid.get_cell(r, c) == 5:  # Gray cell
+                surrounding_colors = set([
+                    grid.get_cell(r-1, c), grid.get_cell(r+1, c),
+                    grid.get_cell(r, c-1), grid.get_cell(r, c+1)
+                ]) - {0, 5}  # Exclude black and gray
+                if len(surrounding_colors) == 1:
+                    grid.set_cell(r, c, surrounding_colors.pop())
