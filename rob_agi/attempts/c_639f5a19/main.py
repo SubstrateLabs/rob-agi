@@ -1,5 +1,4 @@
 from rob_agi.colored_grid import ColoredGrid
-import math
 
 def solve_639f5a19(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -10,11 +9,11 @@ def solve_639f5a19(input_grid: ColoredGrid) -> ColoredGrid:
     2. For each region:
        a. Determine the section size (6x6 or 4x4) based on the region's dimensions.
        b. Divide the region into sections and apply a color pattern to each section:
-          - Top-left (2x2): Magenta (6)
-          - Top-right (2x2): Blue (1)
+          - Top-left (2x2 or 3x3): Magenta (6)
+          - Top-right (2x2 or 3x3): Blue (1)
           - Center (2x2): Yellow (4)
-          - Bottom-left (2x2): Red (2)
-          - Bottom-right (2x2): Green (3)
+          - Bottom-left (2x2 or 3x3): Red (2)
+          - Bottom-right (2x2 or 3x3): Green (3)
     3. The pattern adapts to regions of any size, maintaining the relative positions of colors.
     4. Non-sky blue areas in the grid are preserved.
 
@@ -35,27 +34,32 @@ def solve_639f5a19(input_grid: ColoredGrid) -> ColoredGrid:
         width = max_col - min_col + 1
         height = max_row - min_row + 1
         
-        section_size = 6 if min(width, height) % 6 == 0 else 4
-        num_sections_x = math.ceil(width / section_size)
-        num_sections_y = math.ceil(height / section_size)
+        section_size = 6 if width >= 6 and height >= 6 else 4
         
         for cell_row, cell_col in region:
-            section_i = (cell_row - min_row) // section_size
-            section_j = (cell_col - min_col) // section_size
+            relative_row = cell_row - min_row
+            relative_col = cell_col - min_col
             
-            relative_row = (cell_row - min_row) % section_size
-            relative_col = (cell_col - min_col) % section_size
+            section_row = relative_row % section_size
+            section_col = relative_col % section_size
             
-            if relative_row < 2 and relative_col < 2:
+            if section_row < section_size // 2 and section_col < section_size // 2:
                 new_color = 6  # Magenta
-            elif relative_row < 2:
+            elif section_row < section_size // 2 and section_col >= section_size // 2:
                 new_color = 1  # Blue
-            elif relative_row >= 2 and relative_col < 2:
+            elif section_row >= section_size // 2 and section_col < section_size // 2:
                 new_color = 2  # Red
-            elif relative_row >= 2 and relative_col >= 2:
+            elif section_row >= section_size // 2 and section_col >= section_size // 2:
                 new_color = 3  # Green
             else:
                 new_color = 4  # Yellow (center)
+            
+            if section_size == 6:
+                if 2 <= section_row <= 3 and 2 <= section_col <= 3:
+                    new_color = 4  # Yellow (center for 6x6)
+            else:  # 4x4 section
+                if 1 <= section_row <= 2 and 1 <= section_col <= 2:
+                    new_color = 4  # Yellow (center for 4x4)
             
             new_grid.values[cell_row][cell_col] = new_color
     
