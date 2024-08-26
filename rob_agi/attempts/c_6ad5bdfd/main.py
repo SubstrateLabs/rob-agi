@@ -19,10 +19,11 @@ def process_bottom_anchor(input_grid: ColoredGrid, new_grid: ColoredGrid):
 
 def process_left_anchor(input_grid: ColoredGrid, new_grid: ColoredGrid):
     rows, cols = input_grid.get_dimensions()
-    for r in range(rows):
-        non_zeros = [input_grid.values[r][c] for c in range(1, cols) if input_grid.values[r][c] != 0]
-        for c, value in enumerate(non_zeros, start=1):
+    for c in range(1, cols):
+        non_zeros = [input_grid.values[r][c] for r in range(rows) if input_grid.values[r][c] != 0]
+        for r, value in enumerate(non_zeros):
             new_grid.values[r][c] = value
+    for r in range(rows):
         new_grid.values[r][0] = input_grid.values[r][0]  # Copy anchor line
 
 def process_right_anchor(input_grid: ColoredGrid, new_grid: ColoredGrid):
