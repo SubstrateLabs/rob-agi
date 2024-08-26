@@ -3,47 +3,49 @@ from typing import Tuple, List
 
 def solve_e95e3d8e(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solves the grid transformation challenge by creating a template from non-black areas,
-    determining the pattern dimensions, extending the template if necessary,
-    and filling in the black areas with the corresponding pattern values.
+    Solves the grid transformation challenge by identifying the pattern unit,
+    creating a full pattern grid, and revealing the underlying pattern in black areas.
     
-    1. Creates a template from non-black areas of the input grid
-    2. Determines the pattern dimensions based on non-black cells
-    3. Extends the template to cover the entire grid if necessary
-    4. Fills black areas with corresponding colors from the extended template
-    5. Returns a new grid with the pattern completed
+    1. Identifies the smallest repeating pattern unit in the input grid
+    2. Creates a full pattern grid by tiling the pattern unit
+    3. Generates the output grid by revealing the underlying pattern in black areas
+    4. Returns a new grid with the complete pattern, maintaining original non-black cells
     """
-    template = create_template(input_grid)
-    pattern_width, pattern_height = get_pattern_dimensions(input_grid)
-    extended_template = extend_template(template, pattern_width, pattern_height, input_grid.num_rows, input_grid.num_cols)
-    return fill_grid(input_grid, extended_template)
+    pattern_unit = identify_pattern_unit(input_grid)
+    full_pattern = create_full_pattern(pattern_unit, input_grid.num_rows, input_grid.num_cols)
+    return reveal_pattern(input_grid, full_pattern)
 
-def create_template(input_grid: ColoredGrid) -> List[List[int]]:
-    return [[cell if cell != 0 else -1 for cell in row] for row in input_grid.values]
-
-def get_pattern_dimensions(input_grid: ColoredGrid) -> Tuple[int, int]:
+def identify_pattern_unit(input_grid: ColoredGrid) -> ColoredGrid:
     rows, cols = input_grid.get_dimensions()
-    pattern_width = max(j for i in range(rows) for j in range(cols) if input_grid.values[i][j] != 0) + 1
-    pattern_height = max(i for i in range(rows) for j in range(cols) if input_grid.values[i][j] != 0) + 1
-    return pattern_width, pattern_height
+    for height in range(1, rows + 1):
+        for width in range(1, cols + 1):
+            if is_valid_pattern(input_grid, height, width):
+                return input_grid.extract_subgrid(0, 0, height, width)
+    return input_grid  # Fallback to full grid if no pattern found
 
-def extend_template(template: List[List[int]], pattern_width: int, pattern_height: int, rows: int, cols: int) -> List[List[int]]:
-    extended = [[-1 for _ in range(cols)] for _ in range(rows)]
-    for i in range(rows):
-        for j in range(cols):
-            if template[i % pattern_height][j % pattern_width] != -1:
-                extended[i][j] = template[i % pattern_height][j % pattern_width]
-    return extended
+def is_valid_pattern(grid: ColoredGrid, height: int, width: int) -> bool:
+    rows, cols = grid.get_dimensions()
+    pattern = grid.extract_subgrid(0, 0, height, width)
+    for i in range(0, rows, height):
+        for j in range(0, cols, width):
+            if not all(
+                grid.values[i + r][j + c] in (0, pattern.values[r % height][c % width])
+                for r in range(min(height, rows - i))
+                for c in range(min(width, cols - j))
+            ):
+                return False
+    return True
 
-def fill_grid(input_grid: ColoredGrid, extended_template: List[List[int]]) -> ColoredGrid:
+def create_full_pattern(pattern_unit: ColoredGrid, rows: int, cols: int) -> ColoredGrid:
+    return pattern_unit.tile_grid(max(rows // pattern_unit.num_rows + 1, cols // pattern_unit.num_cols + 1))
+
+def reveal_pattern(input_grid: ColoredGrid, full_pattern: ColoredGrid) -> ColoredGrid:
     rows, cols = input_grid.get_dimensions()
-    new_values = []
-    for i in range(rows):
-        new_row = []
-        for j in range(cols):
-            if input_grid.values[i][j] != 0:
-                new_row.append(input_grid.values[i][j])
-            else:
-                new_row.append(extended_template[i][j])
-        new_values.append(new_row)
+    new_values = [
+        [
+            input_grid.values[i][j] if input_grid.values[i][j] != 0 else full_pattern.values[i][j]
+            for j in range(cols)
+        ]
+        for i in range(rows)
+    ]
     return ColoredGrid(values=new_values)
