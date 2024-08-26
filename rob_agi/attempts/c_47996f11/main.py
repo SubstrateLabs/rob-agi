@@ -8,11 +8,11 @@ def solve_47996f11(input_grid: ColoredGrid) -> ColoredGrid:
     
     The solution involves:
     1. Identifying magenta regions in the grid
-    2. Analyzing surrounding patterns and color distributions
-    3. Extending existing patterns into magenta regions
-    4. Ensuring vertical and horizontal continuity
-    5. Balancing color distribution
-    6. Refining edges and iteratively improving the result
+    2. Analyzing and extending horizontal and vertical patterns
+    3. Resolving conflicts between horizontal and vertical pattern extensions
+    4. Filling remaining cells based on neighbor information
+    5. Smoothing discontinuities
+    6. Balancing color distribution
     
     This approach aims to seamlessly integrate new patterns with the existing structure,
     maintaining the overall style and complexity of the original grid.
@@ -23,68 +23,94 @@ def solve_47996f11(input_grid: ColoredGrid) -> ColoredGrid:
     def create_magenta_mask() -> List[List[bool]]:
         return [[input_grid.values[r][c] == 6 for c in range(cols)] for r in range(rows)]
     
-    def analyze_grid() -> Dict:
-        color_freq = Counter(color for row in input_grid.values for color in row if color != 6)
-        transitions = defaultdict(Counter)
-        patterns = defaultdict(Counter)
+    def analyze_edge_patterns() -> Dict[str, List[List[int]]]:
+        patterns = {"left": [], "right": [], "top": [], "bottom": []}
+        for r in range(rows):
+            if 6 in input_grid.values[r]:
+                left = [input_grid.values[r][c] for c in range(cols) if input_grid.values[r][c] != 6]
+                right = [input_grid.values[r][c] for c in range(cols-1, -1, -1) if input_grid.values[r][c] != 6]
+                patterns["left"].append(left)
+                patterns["right"].append(right)
+        for c in range(cols):
+            if 6 in [input_grid.values[r][c] for r in range(rows)]:
+                top = [input_grid.values[r][c] for r in range(rows) if input_grid.values[r][c] != 6]
+                bottom = [input_grid.values[r][c] for r in range(rows-1, -1, -1) if input_grid.values[r][c] != 6]
+                patterns["top"].append(top)
+                patterns["bottom"].append(bottom)
+        return patterns
+    
+    def extend_patterns(patterns: Dict[str, List[List[int]]]) -> None:
+        for r in range(rows):
+            if any(magenta_mask[r]):
+                left_pattern = patterns["left"][r]
+                right_pattern = patterns["right"][r]
+                for c in range(cols):
+                    if magenta_mask[r][c]:
+                        left_color = left_pattern[c % len(left_pattern)] if left_pattern else None
+                        right_color = right_pattern[c % len(right_pattern)] if right_pattern else None
+                        if left_color is not None and right_color is not None:
+                            output_grid.values[r][c] = left_color if c % 2 == 0 else right_color
+                        elif left_color is not None:
+                            output_grid.values[r][c] = left_color
+                        elif right_color is not None:
+                            output_grid.values[r][c] = right_color
+        
+        for c in range(cols):
+            if any(magenta_mask[r][c] for r in range(rows)):
+                top_pattern = patterns["top"][c]
+                bottom_pattern = patterns["bottom"][c]
+                for r in range(rows):
+                    if magenta_mask[r][c]:
+                        top_color = top_pattern[r % len(top_pattern)] if top_pattern else None
+                        bottom_color = bottom_pattern[r % len(bottom_pattern)] if bottom_pattern else None
+                        if top_color is not None and bottom_color is not None:
+                            if output_grid.values[r][c] == 6:  # Only change if not set by horizontal pattern
+                                output_grid.values[r][c] = top_color if r % 2 == 0 else bottom_color
+                        elif top_color is not None and output_grid.values[r][c] == 6:
+                            output_grid.values[r][c] = top_color
+                        elif bottom_color is not None and output_grid.values[r][c] == 6:
+                            output_grid.values[r][c] = bottom_color
+    
+    def fill_remaining_cells() -> None:
         for r in range(rows):
             for c in range(cols):
-                if input_grid.values[r][c] != 6:
-                    for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                        nr, nc = r + dr, c + dc
-                        if 0 <= nr < rows and 0 <= nc < cols and input_grid.values[nr][nc] != 6:
-                            transitions[input_grid.values[r][c]][input_grid.values[nr][nc]] += 1
-                    if c < cols - 2:
-                        pattern = tuple(input_grid.values[r][c:c+3])
-                        patterns[pattern[0]][pattern[1:]] += 1
-        return {"freq": color_freq, "transitions": transitions, "patterns": patterns}
+                if output_grid.values[r][c] == 6:
+                    neighbors = [output_grid.values[r+dr][c+dc] for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]
+                                 if 0 <= r+dr < rows and 0 <= c+dc < cols and output_grid.values[r+dr][c+dc] != 6]
+                    if neighbors:
+                        output_grid.values[r][c] = max(set(neighbors), key=neighbors.count)
+                    else:
+                        output_grid.values[r][c] = max(set(color for row in input_grid.values for color in row if color != 6), key=lambda x: sum(row.count(x) for row in input_grid.values))
     
-    def extend_pattern(r: int, c: int, stats: Dict) -> int:
-        neighbors = [output_grid.values[r+dr][c+dc] for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]
-                     if 0 <= r+dr < rows and 0 <= c+dc < cols and not magenta_mask[r+dr][c+dc]]
-        if not neighbors:
-            return stats["freq"].most_common(1)[0][0]
-        
-        prev_color = max(set(neighbors), key=neighbors.count)
-        if c >= 2 and not magenta_mask[r][c-2] and not magenta_mask[r][c-1]:
-            pattern = (output_grid.values[r][c-2], output_grid.values[r][c-1])
-            if pattern in stats["patterns"][prev_color]:
-                return max(stats["patterns"][prev_color][pattern], key=stats["patterns"][prev_color][pattern].get)
-        
-        return max(stats["transitions"][prev_color], key=stats["transitions"][prev_color].get)
+    def smooth_discontinuities() -> None:
+        for r in range(rows):
+            for c in range(cols):
+                if magenta_mask[r][c]:
+                    neighbors = [output_grid.values[r+dr][c+dc] for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]
+                                 if 0 <= r+dr < rows and 0 <= c+dc < cols]
+                    if len(set(neighbors)) == 1 and output_grid.values[r][c] != neighbors[0]:
+                        output_grid.values[r][c] = neighbors[0]
     
-    def balance_color_distribution():
-        target_dist = {k: v for k, v in grid_stats["freq"].items()}
+    def balance_color_distribution() -> None:
+        target_dist = Counter(color for row in input_grid.values for color in row if color != 6)
         current_dist = Counter(color for row in output_grid.values for color in row)
         for r in range(rows):
             for c in range(cols):
                 if magenta_mask[r][c]:
                     current_color = output_grid.values[r][c]
                     if current_dist[current_color] > target_dist[current_color]:
-                        new_color = min(target_dist, key=lambda x: current_dist[x] / target_dist[x])
-                        output_grid.values[r][c] = new_color
-                        current_dist[current_color] -= 1
-                        current_dist[new_color] += 1
+                        candidates = [color for color in target_dist if current_dist[color] < target_dist[color]]
+                        if candidates:
+                            new_color = min(candidates, key=lambda x: abs(current_dist[x] - target_dist[x]))
+                            output_grid.values[r][c] = new_color
+                            current_dist[current_color] -= 1
+                            current_dist[new_color] += 1
     
     magenta_mask = create_magenta_mask()
-    grid_stats = analyze_grid()
-    
-    # Fill magenta regions
-    for _ in range(2):  # Two passes for better pattern extension
-        for r in range(rows):
-            for c in range(cols):
-                if magenta_mask[r][c]:
-                    output_grid.values[r][c] = extend_pattern(r, c, grid_stats)
-    
-    # Balance color distribution
+    edge_patterns = analyze_edge_patterns()
+    extend_patterns(edge_patterns)
+    fill_remaining_cells()
+    smooth_discontinuities()
     balance_color_distribution()
-    
-    # Refine edges
-    for r in range(rows):
-        for c in range(cols):
-            if magenta_mask[r][c]:
-                neighbors = [output_grid.values[r+dr][c+dc] for dr in [-1, 0, 1] for dc in [-1, 0, 1]
-                             if 0 <= r+dr < rows and 0 <= c+dc < cols and (dr, dc) != (0, 0)]
-                output_grid.values[r][c] = max(set(neighbors), key=neighbors.count)
     
     return output_grid
