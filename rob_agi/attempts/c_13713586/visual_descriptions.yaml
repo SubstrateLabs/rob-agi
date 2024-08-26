@@ -1,0 +1,54 @@
+example_0:
+  input: |
+    A 16x15 grid with mostly black (empty) space. There are three distinct colored regions:
+    1. A horizontal yellow (4) line of 5 squares in the 4th row, slightly right of center.
+    2. A horizontal sky blue (8) line of 4 squares in the 7th row, on the left side.
+    3. A horizontal green (3) line of 3 squares in the 12th row, slightly right of center.
+    The bottom row (16th) is entirely gray (5), forming a solid base.
+  output: |
+    The same 16x15 grid, but the colored regions have expanded:
+    1. The yellow region has grown into a 5x8 rectangle, extending downwards.
+    2. The sky blue region has expanded into an 8x4 rectangle, extending downwards to the gray base.
+    3. The green region has grown into a 3x4 rectangle, extending downwards.
+    The colored regions do not overlap. The gray base remains unchanged.
+    Black space fills the rest of the grid.
+
+example_1:
+  input: |
+    A 16x17 grid with mostly black space. There are four distinct colored regions:
+    1. Two red (2) squares vertically aligned in the 12th column, 2nd and 3rd rows.
+    2. A vertical green (3) line of 4 squares in the 7th column, from 5th to 8th row.
+    3. A vertical orange (7) line of 4 squares in the 3rd column, from 8th to 11th row.
+    4. The rightmost column (17th) is entirely gray (5), forming a solid vertical border.
+  output: |
+    The same 16x17 grid, but the colored regions have expanded:
+    1. The red region has grown into a 5x2 rectangle, extending rightwards to the gray border.
+    2. The green region has expanded into a 7x10 rectangle, extending in all directions but mostly downwards and rightwards.
+    3. The orange region has grown into a 11x7 rectangle, extending in all directions but mostly downwards and rightwards.
+    The colored regions do not overlap. The gray border remains unchanged.
+    Black space fills the rest of the grid.
+
+example_2:
+  input: |
+    A 17x17 grid with mostly black space. There are four distinct colored regions:
+    1. A vertical gray (5) line forming the leftmost column.
+    2. A vertical green (3) line of 6 squares in the 10th column, from 2nd to 7th row.
+    3. A vertical magenta (6) line of 9 squares in the 14th column, from 5th to 13th row.
+    4. Two red (2) squares vertically aligned in the 7th column, 11th and 12th rows.
+  output: |
+    The same 17x17 grid, but the colored regions have expanded:
+    1. The gray vertical line remains unchanged.
+    2. The green region has grown into a 9x10 rectangle, extending rightwards from the gray line and downwards.
+    3. The magenta region has expanded into a 9x6 rectangle, extending leftwards and slightly downwards.
+    4. The red region has grown into a 6x2 rectangle, extending leftwards to the gray line and slightly downwards.
+    The colored regions do not overlap. Black space fills the rest of the grid.
+
+test_case_0:
+  input: |
+    A 17x17 grid with mostly black space. There are four distinct colored regions:
+    1. A vertical gray (5) line forming the leftmost column.
+    2. A vertical green (3) line of 6 squares in the 10th column, from 2nd to 7th row.
+    3. A vertical magenta (6) line of 9 squares in the 14th column, from 5th to 13th row.
+    4. Two red (2) squares vertically aligned in the 7th column, 11th and 12th rows.
+  output: |
+    Not provided in the test case.
