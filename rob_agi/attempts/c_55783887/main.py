@@ -10,12 +10,12 @@ def solve_55783887(input_grid: ColoredGrid) -> ColoredGrid:
     1. Identify the background color and all non-background colored dots.
     2. For each color:
        a. Sort the dot positions from top-left to bottom-right.
-       b. Create a path through all dots, extending one step beyond the first and last dots.
+       b. Create a path through all dots, extending diagonally beyond the first and last dots.
        c. Connect the points in the path using diagonal movements, creating zigzags when necessary.
     3. Draw all paths on the output grid.
     4. Ensure all original dots are preserved.
     
-    The result creates continuous diagonal lines for each color, extending slightly beyond the dots,
+    The result creates continuous diagonal lines for each color, extending diagonally beyond the dots,
     while connecting all dots of the same color and allowing intersections between different colors.
     """
     background_color = find_background_color(input_grid)
@@ -55,10 +55,10 @@ def create_extended_path(dots: List[Tuple[int, int]], max_row: int, max_col: int
     
     first_dot, last_dot = sorted_dots[0], sorted_dots[-1]
     
-    # Extend one step before the first dot
+    # Extend diagonally before the first dot
     start = (max(0, first_dot[0] - 1), max(0, first_dot[1] - 1))
     
-    # Extend one step after the last dot
+    # Extend diagonally after the last dot
     end = (min(max_row - 1, last_dot[0] + 1), min(max_col - 1, last_dot[1] + 1))
     
     return [start] + sorted_dots + [end]
@@ -66,20 +66,25 @@ def create_extended_path(dots: List[Tuple[int, int]], max_row: int, max_col: int
 def connect_points(path: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
     connected_path = []
     for i in range(len(path) - 1):
-        connected_path.extend(get_zigzag_path(path[i], path[i+1]))
+        connected_path.extend(get_diagonal_path(path[i], path[i+1]))
     return connected_path
 
-def get_zigzag_path(start: Tuple[int, int], end: Tuple[int, int]) -> List[Tuple[int, int]]:
+def get_diagonal_path(start: Tuple[int, int], end: Tuple[int, int]) -> List[Tuple[int, int]]:
     path = []
     current = start
     while current != end:
         path.append(current)
         dx = end[1] - current[1]
         dy = end[0] - current[0]
-        if abs(dx) > abs(dy):
-            current = (current[0], current[1] + sign(dx))
+        if dx != 0:
+            step_x = sign(dx)
         else:
-            current = (current[0] + sign(dy), current[1])
+            step_x = 0
+        if dy != 0:
+            step_y = sign(dy)
+        else:
+            step_y = 0
+        current = (current[0] + step_y, current[1] + step_x)
     path.append(end)
     return path
 
