@@ -7,11 +7,12 @@ def solve_8fbca751(input_grid: ColoredGrid) -> ColoredGrid:
     Solve the grid transformation challenge by outlining all blue shapes with red.
     
     This function identifies all blue (8) regions in the input grid, groups them into
-    logical shapes (including nearby disconnected cells), and outlines each shape
-    with red (2) cells. The outline includes cells immediately adjacent to blue cells
-    (including diagonally). The outline does not extend beyond the grid boundaries
-    or overwrite existing non-black cells. Each logical blue shape is enclosed in
-    its own unified outline.
+    logical shapes (including nearby disconnected cells within one cell distance),
+    and outlines each shape with red (2) cells. The outline includes cells immediately
+    adjacent to blue cells (including diagonally). The outline does not extend beyond
+    the grid boundaries or overwrite existing non-black cells. Each logical blue shape
+    is enclosed in its own unified outline, even if it consists of nearby but not
+    directly connected blue cells.
     
     Args:
         input_grid (ColoredGrid): The input grid to be transformed.
@@ -26,10 +27,10 @@ def solve_8fbca751(input_grid: ColoredGrid) -> ColoredGrid:
     def is_valid(r: int, c: int) -> bool:
         return 0 <= r < rows and 0 <= c < cols
 
-    def get_adjacent_cells(r: int, c: int) -> Set[Tuple[int, int]]:
+    def get_adjacent_cells(r: int, c: int, distance: int = 1) -> Set[Tuple[int, int]]:
         adjacent = set()
-        for dr in [-1, 0, 1]:
-            for dc in [-1, 0, 1]:
+        for dr in range(-distance, distance + 1):
+            for dc in range(-distance, distance + 1):
                 if dr == 0 and dc == 0:
                     continue
                 nr, nc = r + dr, c + dc
@@ -45,8 +46,10 @@ def solve_8fbca751(input_grid: ColoredGrid) -> ColoredGrid:
             if cell in blue_cells:
                 shape.add(cell)
                 blue_cells.remove(cell)
-                for adjacent in get_adjacent_cells(*cell):
+                for adjacent in get_adjacent_cells(*cell, distance=2):
                     if adjacent in blue_cells and adjacent not in shape:
+                        queue.append(adjacent)
+                    elif grid.values[adjacent[0]][adjacent[1]] == 8 and adjacent not in shape:
                         queue.append(adjacent)
         return shape
 
