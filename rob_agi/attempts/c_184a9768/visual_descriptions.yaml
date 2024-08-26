@@ -1,23 +1,79 @@
 example_0:
   input: |
-    A complex shape resembling a building or structure. The main body is red (2), forming a large rectangular shape with some internal details. There's a blue (1) L-shaped structure at the bottom. Yellow (4) regions appear in the top-left of the red structure and bottom-right. Two small sky blue (8) squares are in the middle-left. A magenta (6) rectangle is on the right side. Green (3) appears as two small squares in the top-right. Gray (5) dots are scattered around the edges of the grid.
+    A 21x23 grid dominated by a large red (2) structure in the center, resembling a building. Key features:
+    - Red (2) forms the main body, roughly rectangular with some internal divisions.
+    - Blue (1) creates an L-shaped structure at the bottom, wrapping around the red.
+    - Yellow (4) appears in two main areas: top-left corner of the red structure and bottom-right of the grid.
+    - Sky blue (8) forms two small 2x2 squares in the middle-left of the red structure.
+    - Magenta (6) creates a 3x6 rectangle on the far right, adjacent to the red.
+    - Green (3) appears as two small areas in the top-right corner.
+    - Gray (5) dots are scattered around the edges, not forming any significant structure.
+    - Black (0) fills the remaining space, creating the background.
   output: |
-    A simplified and more structured version of the input. The red (2) shape is more rectangular and symmetrical. The blue (1) L-shape at the bottom is preserved but slightly modified. Yellow (4) is now a single rectangular region inside the red structure. The sky blue (8) region is larger and centrally placed within the red area. The magenta (6) rectangle is maintained on the right side but inside the blue structure. The green (3) squares are now placed within the blue area. Gray (5) dots are removed. The entire structure is surrounded by a black (0) border.
+    A 21x23 grid with a simplified and more symmetrical structure. Key transformations:
+    - Red (2) maintains its central position but becomes a perfect rectangle without internal divisions.
+    - Blue (1) retains its L-shape at the bottom but with straighter edges.
+    - Yellow (4) is consolidated into a single rectangular region inside the red structure.
+    - Sky blue (8) is enlarged to a 2x3 rectangle, centrally placed within the red area.
+    - Magenta (6) keeps its rectangular shape but is now positioned inside the blue structure.
+    - Green (3) is moved to form a small rectangle within the blue area.
+    - Gray (5) is completely removed.
+    - Black (0) forms a clear border around the entire structure and fills any gaps.
 
 example_1:
   input: |
-    A blue (1) structure dominates the top-left quadrant, forming a large square with some internal details. A red (2) rectangle is in the top-right. Yellow (4) forms a large, complex shape in the bottom half, with some internal details. Two sky blue (8) squares are in the middle-left. Green (3) appears as vertical lines on the right side. Gray (5) dots are scattered around the edges.
+    A 20x22 grid with distinct color regions. Key features:
+    - Blue (1) dominates the top-left quadrant, forming a large square with internal details.
+    - Yellow (4) creates a complex shape in the bottom half, with irregular edges and internal gaps.
+    - Red (2) forms a small 3x5 rectangle in the top-right corner.
+    - Sky blue (8) appears as two 2x2 squares in the middle-left of the yellow area.
+    - Green (3) creates three vertical lines on the far right side.
+    - Gray (5) dots are scattered around the edges and corners.
+    - Black (0) fills the remaining space and gaps between color regions.
   output: |
-    The blue (1) structure in the top-left is preserved but simplified, with internal details rearranged. The red (2) rectangle is now placed inside the blue structure. The yellow (4) shape is more rectangular and symmetrical, occupying most of the bottom half. The sky blue (8) squares are now placed within the yellow structure. The green (3) vertical lines are condensed into a small rectangle within the yellow area. Gray (5) dots are removed. The entire structure is surrounded by a black (0) border.
+    A 20x22 grid with a more organized and symmetrical layout. Key transformations:
+    - Blue (1) maintains its position in the top-left but becomes a perfect square without internal details.
+    - Yellow (4) is transformed into a large rectangle occupying the bottom half of the grid.
+    - Red (2) is moved inside the blue structure, forming a smaller rectangle in the top-left corner.
+    - Sky blue (8) is consolidated into a single 2x2 square, centrally placed within the yellow area.
+    - Green (3) is condensed into a small rectangle within the yellow structure on the right side.
+    - Gray (5) is completely removed.
+    - Black (0) creates a clear border around all structures and fills any gaps.
 
 example_2:
   input: |
-    A large blue (1) structure dominates most of the grid, forming a complex shape with internal details. Red (2) appears as a small rectangle in the top-right. Yellow (4) forms a small rectangle in the middle-left. Sky blue (8) is a vertical line on the right side. Green (3) appears as two squares in the bottom-middle. Gray (5) dots are scattered around the edges.
+    A 20x20 grid dominated by a large blue (1) structure. Key features:
+    - Blue (1) forms a complex shape covering most of the grid, with internal details and irregular edges.
+    - Red (2) creates a small 3x3 rectangle in the top-right corner.
+    - Yellow (4) forms a 4x4 rectangle in the middle-left area.
+    - Sky blue (8) appears as a vertical line of 4 cells on the right side.
+    - Green (3) forms two 2x2 squares in the bottom-middle area.
+    - Gray (5) dots are scattered around the edges and corners.
+    - Black (0) fills the remaining space and internal gaps.
   output: |
-    The blue (1) structure is simplified and more symmetrical, occupying most of the grid. The red (2) rectangle is now placed inside the blue structure in the top-left. The yellow (4) rectangle is also inside the blue structure, in the middle-left. The sky blue (8) vertical line is now a small rectangle within the blue structure on the right side. The green (3) squares are condensed into a small rectangle within the blue structure at the bottom. Gray (5) dots are removed. The entire structure is surrounded by a black (0) border.
+    A 20x20 grid with a simplified and more symmetrical structure. Key transformations:
+    - Blue (1) is transformed into a large, perfect rectangle occupying most of the grid.
+    - Red (2) is moved inside the blue structure, forming a small rectangle in the top-left corner.
+    - Yellow (4) maintains its rectangular shape but is repositioned inside the blue structure in the middle-left.
+    - Sky blue (8) is changed from a vertical line to a small rectangle within the blue structure on the right side.
+    - Green (3) is consolidated into a single small rectangle within the blue structure at the bottom.
+    - Gray (5) is completely removed.
+    - Black (0) creates a clear border around the entire structure and fills any remaining gaps.
 
 test_case_0:
   input: |
-    A complex structure with multiple colors. The main body is red (2), forming a large irregular shape with internal details. Blue (1) forms an L-shape at the bottom. Yellow (4) appears in several places, including a rectangle at the bottom and scattered squares. Sky blue (8) forms two small regions. Green (3) is present as small squares on the right side. Magenta (6) forms a rectangle on the right. Gray (5) dots are scattered around the edges.
+    A complex 21x23 grid with multiple color regions. Key features:
+    - Red (2) forms the main body, creating a large irregular shape with internal details and protrusions.
+    - Blue (1) creates an L-shaped structure at the bottom, partially wrapping around the red.
+    - Yellow (4) appears in multiple areas: a large rectangle at the bottom-right and scattered smaller regions.
+    - Sky blue (8) forms two small distinct regions within the red structure.
+    - Green (3) appears as small squares on the right side of the grid.
+    - Magenta (6) creates a rectangle on the far right, adjacent to the red structure.
+    - Gray (5) dots are scattered around the edges and corners.
+    - Black (0) fills the remaining space and gaps between color regions.
   output: |
-    The output is not provided for the test case.
+    The output is not provided for the test case, but based on previous examples, it's expected to:
+    - Simplify and regularize the shapes of each color region.
+    - Maintain the relative positions and sizes of color regions where possible.
+    - Remove gray (5) dots entirely.
+    - Create a black (0) border around the entire structure.
