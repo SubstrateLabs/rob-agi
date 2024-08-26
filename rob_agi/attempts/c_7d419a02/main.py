@@ -7,16 +7,14 @@ def solve_7d419a02(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by changing blue (8) regions to yellow (4) based on their position, structure, and size.
     
     The transformation follows these rules:
-    1. Blue regions closer to the edges and corners are more likely to be changed to yellow.
-    2. A blue "core" is maintained in the center of the grid, with a cross/plus shape for larger grids.
-    3. Line-like structures and small isolated blue regions remain blue.
-    4. Black (0) and magenta (6) cells remain unchanged.
-    5. The transformation is applied symmetrically across the entire grid.
-    6. Larger blue regions are more likely to be transformed than smaller ones.
-    7. The central cross structure is preserved more strongly in larger grids.
-    8. The transformation is more aggressive for larger grids.
-    9. Contextual analysis is performed to ensure consistent patterns.
-    10. The overall blue-to-yellow ratio is balanced during transformation.
+    1. Identifies structural elements like central cross and checkerboard patterns.
+    2. Segments the grid into regions and analyzes their context.
+    3. Assigns transformation scores based on region size, location, and grid structure.
+    4. Transforms regions to yellow starting from highest scores until a target ratio is reached.
+    5. Refines the pattern to improve consistency and preserve small features.
+    6. Ensures symmetry across vertical and horizontal axes.
+    7. Maintains a balance between blue and yellow based on grid size.
+    8. Preserves black (0) and magenta (6) cells.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -28,48 +26,22 @@ def solve_7d419a02(input_grid: ColoredGrid) -> ColoredGrid:
     rows, cols = grid.get_dimensions()
     center_row, center_col = (rows - 1) / 2, (cols - 1) / 2
     max_distance = math.sqrt(center_row**2 + center_col**2)
-    cross_threshold = max(rows, cols) * 0.3
-    processed = set()
-
+    scale_factor = math.log(max(rows, cols)) / math.log(30)  # Normalized to 1 for 30x30 grid
+    
     def distance_from_center(r: int, c: int) -> float:
-        return math.sqrt((r - center_row)**2 + (c - center_col)**2)
+        return math.sqrt((r - center_row)**2 + (c - center_col)**2) / max_distance
 
-    def is_edge_or_corner(r: int, c: int) -> bool:
-        return r == 0 or r == rows - 1 or c == 0 or c == cols - 1
-
-    def is_line_like(region: List[Tuple[int, int]]) -> bool:
-        if len(region) <= 2:
-            return True
-        r_min, r_max = min(r for r, _ in region), max(r for r, _ in region)
-        c_min, c_max = min(c for _, c in region), max(c for _, c in region)
-        return (r_max - r_min <= 1) or (c_max - c_min <= 1)
-
-    def is_part_of_cross(r: int, c: int) -> bool:
+    def is_part_of_structure(r: int, c: int) -> bool:
         cross_width = max(1, min(rows, cols) // 10)
-        return (abs(r - center_row) <= cross_width or abs(c - center_col) <= cross_width) and distance_from_center(r, c) <= cross_threshold
-
-    def calculate_transform_score(region: List[Tuple[int, int]]) -> float:
-        avg_distance = sum(distance_from_center(r, c) for r, c in region) / len(region)
-        edge_factor = sum(1 for r, c in region if is_edge_or_corner(r, c)) / len(region)
-        size_factor = min(1, len(region) / (rows * cols * 0.05))
-        cross_factor = sum(1 for r, c in region if is_part_of_cross(r, c)) / len(region)
-        
-        return (avg_distance / max_distance) * 0.4 + edge_factor * 0.3 + size_factor * 0.3 - cross_factor * 0.8
-
-    def should_transform(region: List[Tuple[int, int]], context_score: float, yellow_ratio: float) -> bool:
-        if is_line_like(region) or len(region) <= 2:
-            return False
-        transform_score = calculate_transform_score(region) + context_score
-        threshold = 0.5 - (max(rows, cols) / 100) * 0.05 + yellow_ratio * 0.2  # Adjust threshold based on current yellow ratio
-        return transform_score > threshold
+        is_cross = abs(r - center_row) <= cross_width or abs(c - center_col) <= cross_width
+        is_checkerboard = (r + c) % 2 == 0
+        return is_cross or is_checkerboard
 
     def flood_fill(row: int, col: int) -> List[Tuple[int, int]]:
-        stack = [(row, col)]
-        region = []
+        stack, region = [(row, col)], []
         while stack:
             r, c = stack.pop()
-            if (r, c) not in processed and is_blue(grid.values[r][c]):
-                processed.add((r, c))
+            if (r, c) not in region and grid.values[r][c] == 8:
                 region.append((r, c))
                 for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                     nr, nc = r + dr, c + dc
@@ -78,41 +50,41 @@ def solve_7d419a02(input_grid: ColoredGrid) -> ColoredGrid:
         return region
 
     def get_context_score(region: List[Tuple[int, int]]) -> float:
-        context_cells = set()
-        for r, c in region:
-            for dr in [-1, 0, 1]:
-                for dc in [-1, 0, 1]:
-                    nr, nc = r + dr, c + dc
-                    if 0 <= nr < rows and 0 <= nc < cols and (nr, nc) not in region:
-                        context_cells.add((nr, nc))
-        yellow_count = sum(1 for r, c in context_cells if grid.values[r][c] == 4)
+        context_cells = set((r+dr, c+dc) for r, c in region for dr in [-1, 0, 1] for dc in [-1, 0, 1])
+        context_cells -= set(region)
+        yellow_count = sum(1 for r, c in context_cells if 0 <= r < rows and 0 <= c < cols and grid.values[r][c] == 4)
         return yellow_count / len(context_cells) if context_cells else 0
 
-    def apply_symmetry(r: int, c: int) -> List[Tuple[int, int]]:
-        return [(r, c), (rows - 1 - r, c), (r, cols - 1 - c), (rows - 1 - r, cols - 1 - c)]
+    def calculate_transform_score(region: List[Tuple[int, int]]) -> float:
+        avg_distance = sum(distance_from_center(r, c) for r, c in region) / len(region)
+        size_factor = min(1, len(region) / (rows * cols * 0.05))
+        structure_factor = sum(1 for r, c in region if is_part_of_structure(r, c)) / len(region)
+        return (avg_distance * 0.4 + size_factor * 0.4 - structure_factor * 0.8) * scale_factor
 
     regions = []
     for row in range(rows):
         for col in range(cols):
-            if is_blue(grid.values[row][col]) and (row, col) not in processed:
-                region = flood_fill(row, col)
-                regions.append(region)
+            if grid.values[row][col] == 8 and not any((row, col) in region for region in regions):
+                regions.append(flood_fill(row, col))
 
-    regions.sort(key=len, reverse=True)
-    yellow_ratio = 0
+    regions.sort(key=lambda r: calculate_transform_score(r) + get_context_score(r), reverse=True)
+    target_yellow_ratio = 0.4 + 0.2 * scale_factor
+    current_yellow_ratio = 0
 
     for region in regions:
-        context_score = get_context_score(region)
-        if should_transform(region, context_score, yellow_ratio) and yellow_ratio < 0.6:
-            symmetric_cells = set()
-            for r, c in region:
-                symmetric_cells.update(apply_symmetry(r, c))
-            for r, c in symmetric_cells:
-                if is_blue(grid.values[r][c]):
-                    grid.values[r][c] = 4  # Change to yellow
-            yellow_ratio = sum(row.count(4) for row in grid.values) / (rows * cols)
+        if current_yellow_ratio >= target_yellow_ratio:
+            break
+        symmetric_cells = set((r, c) for r, c in region).union(
+            (rows-1-r, c) for r, c in region).union(
+            (r, cols-1-c) for r, c in region).union(
+            (rows-1-r, cols-1-c) for r, c in region)
+        )
+        for r, c in symmetric_cells:
+            if grid.values[r][c] == 8:
+                grid.values[r][c] = 4
+                current_yellow_ratio += 1 / (rows * cols)
 
-    # Post-processing for consistency
+    # Pattern refinement
     for r in range(rows):
         for c in range(cols):
             if grid.values[r][c] == 8:
@@ -123,6 +95,3 @@ def solve_7d419a02(input_grid: ColoredGrid) -> ColoredGrid:
                     grid.values[r][c] = 4
 
     return grid
-
-def is_blue(cell: int) -> bool:
-    return cell == 8
