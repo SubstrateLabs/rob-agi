@@ -7,7 +7,7 @@ def solve_b20f7c8b(input_grid: ColoredGrid) -> ColoredGrid:
     The transformation rules are:
     1. For left regions:
        - If solid, new_color = (original_color + 1) % 10
-       - If patterned, fill with the color of the top-left pixel
+       - If patterned, fill with the first non-zero color encountered
     2. For right regions:
        - If solid, new_color = (original_color + 3) % 10
        - If patterned, fill with gray (5)
@@ -31,14 +31,22 @@ def solve_b20f7c8b(input_grid: ColoredGrid) -> ColoredGrid:
     return output_grid
 
 def is_solid_block(block: ColoredGrid) -> bool:
-    return len(set(cell for row in block.values for cell in row)) == 1
+    non_zero_colors = set(cell for row in block.values for cell in row if cell != 0)
+    return len(non_zero_colors) == 1
+
+def get_first_non_zero_color(block: ColoredGrid) -> int:
+    for row in block.values:
+        for cell in row:
+            if cell != 0:
+                return cell
+    return 0  # Default to 0 if all cells are zero
 
 def transform_block(block: ColoredGrid, is_left: bool) -> ColoredGrid:
     if is_solid_block(block):
-        original_color = block.values[0][0]
+        original_color = get_first_non_zero_color(block)
         new_color = (original_color + 1) % 10 if is_left else (original_color + 3) % 10
     else:
-        new_color = block.values[0][0] if is_left else 5
+        new_color = get_first_non_zero_color(block) if is_left else 5
     
     return ColoredGrid(values=[[new_color for _ in range(5)] for _ in range(5)])
 
