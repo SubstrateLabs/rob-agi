@@ -5,23 +5,24 @@ def solve_94be5b80(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by converting vertical lines at the top into horseshoe shapes,
     while preserving existing horseshoes. The process involves:
-    1. Extracting unique colors from the top area (first 3 rows).
+    1. Extracting unique colors from the top area (first 3 rows) in order.
     2. Identifying existing horseshoes in the input grid.
-    3. Creating new horseshoes for each extracted color not already present.
-    4. Preserving existing horseshoes in their original positions.
-    5. Filling remaining space with black (0).
+    3. Creating a layout plan for all horseshoes (existing and new).
+    4. Generating the output grid with horseshoes in their determined positions.
+    5. Ensuring exactly 2 rows of space between horseshoes.
+    6. Filling remaining space with black (0).
     """
     output_grid = ColoredGrid(values=[[0 for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
     rows, cols = input_grid.get_dimensions()
 
     def extract_top_colors() -> List[int]:
-        unique_colors = set()
+        unique_colors = []
         for r in range(3):
             for c in range(cols):
                 color = input_grid.get_cell(r, c)
-                if color != 0:
-                    unique_colors.add(color)
-        return list(unique_colors)
+                if color != 0 and color not in unique_colors:
+                    unique_colors.append(color)
+        return unique_colors
 
     def create_horseshoe(color: int, top: int, left: int):
         for r in range(top, top + 3):
@@ -58,17 +59,21 @@ def solve_94be5b80(input_grid: ColoredGrid) -> ColoredGrid:
     existing_horseshoes = find_existing_horseshoes()
     existing_colors = set(color for color, _, _ in existing_horseshoes)
 
-    # Step 3: Create new horseshoes
-    current_row = 5
+    # Step 3: Create layout plan
+    layout = existing_horseshoes[:]
     for color in top_colors:
-        if color not in existing_colors and current_row + 3 <= rows:
+        if color not in existing_colors:
+            layout.append((color, -1, -1))  # -1 indicates a new horseshoe
+    layout.sort(key=lambda x: x[1])  # Sort by row position
+
+    # Step 4: Determine positions and create horseshoes
+    current_row = 5
+    for color, top, left in layout:
+        if top == -1:  # New horseshoe
             create_horseshoe(color, current_row, 3)
             current_row += 5
-
-    # Step 4: Preserve existing horseshoes
-    for color, top, left in existing_horseshoes:
-        for r in range(3):
-            for c in range(6):
-                output_grid.set_cell(top + r, left + c, input_grid.get_cell(top + r, left + c))
+        else:  # Existing horseshoe
+            create_horseshoe(color, top, left)
+            current_row = max(current_row, top + 5)
 
     return output_grid
