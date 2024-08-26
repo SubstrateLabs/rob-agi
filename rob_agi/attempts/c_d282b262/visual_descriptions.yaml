@@ -1,0 +1,54 @@
+example_0:
+  input: |
+    The grid contains four distinct shapes or patterns, each in a different quadrant of the grid:
+    1. Top-left: A 3x3 square pattern of alternating sky blue (8) and green (3) colors.
+    2. Middle-left: A 3x3 square pattern of alternating red (2) and blue (1) colors.
+    3. Bottom-left: A 3x3 square pattern of alternating orange (7) and magenta (6) colors.
+    4. Middle-right: A 3x3 L-shaped pattern of alternating blue (1) and yellow (4) colors.
+    The rest of the grid is filled with black (0), which can be considered as empty space.
+  output: |
+    The four distinct shapes or patterns from the input have been moved:
+    1. The sky blue and green square is now in the top-right corner.
+    2. The red and blue square is now in the middle-right area.
+    3. The orange and magenta square is now in the bottom-right area.
+    4. The blue and yellow L-shape is now in the bottom-right corner, adjacent to the orange and magenta square.
+    All patterns maintain their original orientation and relative positions to each other.
+    The rest of the grid remains filled with black (0) as empty space.
+
+example_1:
+  input: |
+    The grid contains five distinct small patterns or shapes scattered across the grid:
+    1. Top-left: A 2x2 square of alternating blue (1) and red (2) colors.
+    2. Middle-top: A 2x2 square of alternating gray (5) and sky blue (8) colors.
+    3. Middle-left: A 2x2 square of alternating magenta (6) and yellow (4) colors.
+    4. Bottom-left: A 2x2 square of alternating sky blue (8) and brown (9) colors.
+    5. Bottom-right: A 2x2 square of alternating red (2) and blue (1) colors.
+    The rest of the grid is filled with black (0), representing empty space.
+  output: |
+    The five distinct patterns from the input have been moved to the right side of the grid:
+    1. The blue and red square is now in the top-right area.
+    2. The gray and sky blue square is now in the top-right corner.
+    3. The magenta and yellow square is now in the bottom-right area.
+    4. The sky blue and brown square is now in the middle-right area.
+    5. The red and blue square remains in the bottom-right corner.
+    All patterns maintain their original orientation.
+    The rest of the grid remains filled with black (0) as empty space.
+
+example_2:
+  input: |
+    The grid contains five distinct patterns or shapes scattered across the grid:
+    1. Top-left: A 2x2 square of alternating brown (9) and red (2) colors.
+    2. Middle-top: A 3x3 square of alternating green (3) and orange (7) colors.
+    3. Middle: A 3x3 square of alternating magenta (6) and sky blue (8) colors.
+    4. Bottom-right: A 2x2 square of alternating sky blue (8) and gray (5) colors.
+    5. Bottom-left: A 2x2 square of alternating red (2) and gray (5) colors.
+    The rest of the grid is filled with black (0), representing empty space.
+  output: |
+    The five distinct patterns from the input have been moved to the right side of the grid:
+    1. The brown and red square is now in the top-right area.
+    2. The green and orange square is now in the top-right corner.
+    3. The magenta and sky blue square is now in the middle-right area.
+    4. The sky blue and gray square remains in the bottom-right corner.
+    5. The red and gray square is now in the bottom-right area.
+    All patterns maintain their original orientation and relative positions to each other.
+    The rest of the grid remains filled with black (0) as empty space.
