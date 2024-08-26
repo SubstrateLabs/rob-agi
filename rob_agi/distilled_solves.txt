@@ -1,0 +1,20 @@
+- Analyze the input grid to identify key features (colors, patterns, shapes).
+- Create a deep copy of the input grid to avoid modifying the original.
+- Determine grid dimensions and handle variable-sized inputs.
+- Identify and count unique colors in the grid.
+- Detect lines, shapes, or patterns (horizontal, vertical, diagonal).
+- Find connected regions of the same color.
+- Identify symmetry or mirroring in the grid.
+- Extract subgrids or pattern units.
+- Use flood fill or depth-first search algorithms for region detection.
+- Apply transformations (rotation, reflection, translation) to grid elements.
+- Calculate distances or relationships between key elements.
+- Determine the output grid size based on input characteristics.
+- Fill new grids with background colors or patterns.
+- Apply rules or transformations based on relative positions.
+- Use backtracking for solving constraint satisfaction problems.
+- Implement color swapping or replacement logic.
+- Detect and preserve special elements (e.g., fixed points, unique shapes).
+- Use sorting to order elements or colors based on specific criteria.
+- Expand or contract grid regions based on rules.
+- Use mathematical operations (min, max, count) for grid analysis.

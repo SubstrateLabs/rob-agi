@@ -903,7 +903,14 @@ def distill_solved():
         print(solved, total_attempts)
         if solved and latest_plan:
             all_solves.append({"id": challenge_id, "latest_plan": latest_plan})
-    print(all_solves)
+    full_str = "\n".join([f"{s['id']}:\n{s['latest_plan']}" for s in all_solves])
+    prompt = (
+        full_str
+        + "\n\nAbove is a list of various plans to solve ARC Challenges. Distill all the strategies into a single bullet list of common steps and approaches. The list should not be longer than about 30 items, try to capture the most important or frequently used ideas."
+    )
+    res = solver.get_ask_coder([]).run(prompt)
+    with open("distilled_solves.txt", "w") as f:
+        f.write(res)
 
 
 async def main():
@@ -939,10 +946,10 @@ async def main():
     # research_loop(prev_event=last)
 
     # distill_research()
-    # distill_solved()
+    distill_solved()
 
-    for i in range(1):
-        await solve_loop(max_concurrent=20)
+    # for i in range(1):
+    #     await solve_loop(max_concurrent=20)
     # await solve_loop(max_concurrent=4, max_challenges=8)
 
 
