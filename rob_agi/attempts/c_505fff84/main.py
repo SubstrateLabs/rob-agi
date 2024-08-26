@@ -7,81 +7,102 @@ def solve_505fff84(input_grid: ColoredGrid) -> ColoredGrid:
     Extracts the most significant pattern of red squares from the input grid.
     
     The function performs the following steps:
-    1. Creates a heat map based on the density of red squares
-    2. Identifies the most representative area using the heat map
-    3. Extracts and simplifies the selected area
-    4. Refines the pattern by removing unnecessary rows/columns
-    5. Ensures pattern integrity and minimum size
+    1. Converts the input grid to a binary representation (1 for red, 0 for others)
+    2. Analyzes the distribution of red squares and identifies key features
+    3. Generates candidate patterns based on the most significant features
+    4. Evaluates and selects the best candidate pattern
+    5. Refines the selected pattern to ensure it captures the essence of the input
     6. Returns the final pattern as a new ColoredGrid
     """
-    # Step 1: Create heat map
-    heat_map = create_heat_map(input_grid)
-    
-    # Step 2: Identify the most representative area
-    top, left, bottom, right = find_best_area(heat_map)
-    
-    # Step 3: Extract and simplify the selected area
-    subgrid = input_grid.extract_subgrid(top, left, bottom - top + 1, right - left + 1)
-    simplified = simplify_subgrid(subgrid)
-    
-    # Step 4: Refine the pattern
-    refined = refine_pattern(simplified)
-    
-    # Step 5: Ensure pattern integrity and minimum size
-    final_pattern = ensure_pattern_integrity(refined, subgrid)
-    
+    binary_grid = convert_to_binary(input_grid)
+    features = extract_features(binary_grid)
+    candidates = generate_candidates(features, binary_grid)
+    best_candidate = evaluate_candidates(candidates, binary_grid)
+    final_pattern = refine_pattern(best_candidate, binary_grid)
     return final_pattern
 
-def create_heat_map(grid: ColoredGrid) -> np.ndarray:
-    values = np.array(grid.values)
-    kernel = np.ones((3, 3))
-    heat_map = np.zeros_like(values, dtype=float)
-    for i in range(values.shape[0]):
-        for j in range(values.shape[1]):
-            subgrid = values[max(0, i-1):min(i+2, values.shape[0]), max(0, j-1):min(j+2, values.shape[1])]
-            heat_map[i, j] = np.sum(subgrid == 2)
-    return heat_map
+def convert_to_binary(grid: ColoredGrid) -> np.ndarray:
+    return np.array(grid.values) == 2
 
-def find_best_area(heat_map: np.ndarray) -> Tuple[int, int, int, int]:
+def extract_features(binary_grid: np.ndarray) -> dict:
+    features = {}
+    features['density'] = np.mean(binary_grid)
+    features['row_density'] = np.mean(binary_grid, axis=1)
+    features['col_density'] = np.mean(binary_grid, axis=0)
+    features['largest_component'] = largest_connected_component(binary_grid)
+    return features
+
+def largest_connected_component(binary_grid: np.ndarray) -> List[Tuple[int, int]]:
+    def dfs(i, j, component):
+        if i < 0 or i >= binary_grid.shape[0] or j < 0 or j >= binary_grid.shape[1] or not binary_grid[i, j] or (i, j) in visited:
+            return
+        visited.add((i, j))
+        component.append((i, j))
+        for di, dj in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            dfs(i + di, j + dj, component)
+
+    visited = set()
+    largest_component = []
+    for i in range(binary_grid.shape[0]):
+        for j in range(binary_grid.shape[1]):
+            if binary_grid[i, j] and (i, j) not in visited:
+                component = []
+                dfs(i, j, component)
+                if len(component) > len(largest_component):
+                    largest_component = component
+    return largest_component
+
+def generate_candidates(features: dict, binary_grid: np.ndarray) -> List[np.ndarray]:
+    candidates = []
+    
+    # Candidate 1: Based on overall density
+    size = max(2, min(6, int(np.sqrt(np.sum(binary_grid)))))
+    candidate = np.random.rand(size, size) < features['density']
+    candidates.append(candidate)
+    
+    # Candidate 2: Based on largest connected component
+    if features['largest_component']:
+        min_i = min(i for i, j in features['largest_component'])
+        max_i = max(i for i, j in features['largest_component'])
+        min_j = min(j for i, j in features['largest_component'])
+        max_j = max(j for i, j in features['largest_component'])
+        candidate = binary_grid[min_i:max_i+1, min_j:max_j+1]
+        candidates.append(candidate)
+    
+    # Candidate 3: Based on row and column densities
+    rows = np.argsort(features['row_density'])[-3:]
+    cols = np.argsort(features['col_density'])[-3:]
+    candidate = binary_grid[np.ix_(rows, cols)]
+    candidates.append(candidate)
+    
+    return candidates
+
+def evaluate_candidates(candidates: List[np.ndarray], binary_grid: np.ndarray) -> np.ndarray:
     best_score = -1
-    best_area = (0, 0, heat_map.shape[0] - 1, heat_map.shape[1] - 1)
-    for top in range(heat_map.shape[0]):
-        for left in range(heat_map.shape[1]):
-            for bottom in range(top + 2, heat_map.shape[0]):
-                for right in range(left + 2, heat_map.shape[1]):
-                    area = heat_map[top:bottom+1, left:right+1]
-                    score = np.mean(area)
-                    if score > best_score:
-                        best_score = score
-                        best_area = (top, left, bottom, right)
-    return best_area
+    best_candidate = None
+    for candidate in candidates:
+        score = evaluate_pattern(candidate, binary_grid)
+        if score > best_score:
+            best_score = score
+            best_candidate = candidate
+    return best_candidate
 
-def simplify_subgrid(grid: ColoredGrid) -> ColoredGrid:
-    new_values = [[2 if cell == 2 else 0 for cell in row] for row in grid.values]
-    return ColoredGrid(values=new_values)
+def evaluate_pattern(pattern: np.ndarray, binary_grid: np.ndarray) -> float:
+    pattern_density = np.mean(pattern)
+    grid_density = np.mean(binary_grid)
+    size_score = 1 / (np.abs(np.log(pattern.size / binary_grid.size)) + 1)
+    density_score = 1 / (np.abs(pattern_density - grid_density) + 0.1)
+    return size_score * density_score
 
-def refine_pattern(grid: ColoredGrid) -> ColoredGrid:
-    values = np.array(grid.values)
-    row_ratios = np.mean(values == 2, axis=1)
-    col_ratios = np.mean(values == 2, axis=0)
-    rows_to_keep = np.where(row_ratios >= 0.3)[0]
-    cols_to_keep = np.where(col_ratios >= 0.3)[0]
-    refined_values = values[rows_to_keep][:, cols_to_keep].tolist()
-    return ColoredGrid(values=refined_values)
-
-def ensure_pattern_integrity(grid: ColoredGrid, original_subgrid: ColoredGrid) -> ColoredGrid:
-    values = np.array(grid.values)
-    if values.shape[0] < 2 or values.shape[1] < 2:
-        original_values = np.array(original_subgrid.values)
-        if values.shape[0] < 2:
-            values = np.vstack((values, original_values[values.shape[0]]))
-        if values.shape[1] < 2:
-            values = np.hstack((values, original_values[:, values.shape[1]].reshape(-1, 1)))
+def refine_pattern(pattern: np.ndarray, binary_grid: np.ndarray) -> ColoredGrid:
+    # Ensure minimum size
+    while pattern.shape[0] < 2 or pattern.shape[1] < 2:
+        pattern = np.pad(pattern, ((0, 1), (0, 1)), mode='edge')
     
     # Ensure at least one red square
-    if np.sum(values == 2) == 0:
-        red_positions = np.argwhere(np.array(original_subgrid.values) == 2)
-        if len(red_positions) > 0:
-            values[tuple(red_positions[0])] = 2
+    if np.sum(pattern) == 0:
+        pattern[0, 0] = 1
     
-    return ColoredGrid(values=values.tolist())
+    # Convert back to ColoredGrid format
+    values = [[2 if cell else 0 for cell in row] for row in pattern]
+    return ColoredGrid(values=values)
