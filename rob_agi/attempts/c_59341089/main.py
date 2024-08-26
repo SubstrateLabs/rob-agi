@@ -6,7 +6,7 @@ def solve_59341089(input_grid: ColoredGrid) -> ColoredGrid:
     The output consists of four 3x3 blocks, where:
     1. The top row is repeated 4 times.
     2. The middle row alternates between the original and a horizontally flipped version.
-    3. The bottom row is the horizontal flip of the top row, repeated 4 times.
+    3. The bottom row alternates between a horizontally flipped version and the original, repeated twice.
 
     Args:
         input_grid (ColoredGrid): A 3x3 input grid
@@ -28,7 +28,9 @@ def solve_59341089(input_grid: ColoredGrid) -> ColoredGrid:
     middle_flipped = middle_original[::-1]
     output[1] = middle_original + middle_flipped + middle_original + middle_flipped
 
-    # Fill the bottom row (horizontal flip of top row, repeated 4 times)
-    output[2] = input_values[2][::-1] * 4
+    # Fill the bottom row (alternating flipped and original, repeated twice)
+    bottom_original = input_values[2]
+    bottom_flipped = bottom_original[::-1]
+    output[2] = (bottom_flipped + bottom_original) * 2
 
     return ColoredGrid(values=output)
