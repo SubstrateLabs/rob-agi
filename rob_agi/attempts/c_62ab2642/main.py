@@ -34,7 +34,7 @@ def solve_62ab2642(input_grid: ColoredGrid) -> ColoredGrid:
                 if not count_only:
                     output_grid.values[cy][cx] = replacement_color
                 
-                for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]:
                     nx, ny = cx + dx, cy + dy
                     if 0 <= nx < cols and 0 <= ny < rows and output_grid.values[ny][nx] == target_color:
                         stack.append((nx, ny))
