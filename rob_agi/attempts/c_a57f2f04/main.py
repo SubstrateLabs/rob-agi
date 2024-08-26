@@ -68,6 +68,9 @@ def generate_pattern(color: int) -> List[List[int]]:
 
 def apply_pattern(grid: ColoredGrid, pattern: List[List[int]], region: List[Tuple[int, int]]):
     pattern_height, pattern_width = len(pattern), len(pattern[0])
-    for i, (r, c) in enumerate(region):
-        pr, pc = i % pattern_height, i % pattern_width
+    min_r = min(r for r, _ in region)
+    min_c = min(c for _, c in region)
+    for r, c in region:
+        pr = (r - min_r) % pattern_height
+        pc = (c - min_c) % pattern_width
         grid.values[r][c] = pattern[pr][pc]
