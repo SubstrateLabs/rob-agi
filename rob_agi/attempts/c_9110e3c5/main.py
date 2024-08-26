@@ -11,11 +11,11 @@ def create_horizontal_stripe_grid() -> ColoredGrid:
 
 def solve_9110e3c5(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms a 7x7 input grid into a 3x3 output grid based on the distribution of black cells.
+    Transforms a 7x7 input grid into a 3x3 output grid based on the distribution of non-black cells.
     
-    The function analyzes the distribution of black cells (0) in the input grid,
-    particularly in the center-right area and upper-right quadrant. Based on this
-    distribution, it returns one of three predefined 3x3 patterns:
+    The function analyzes the distribution of non-black cells in the input grid,
+    particularly in the center and right half areas. Based on this distribution,
+    it returns one of three predefined 3x3 patterns:
     1. Backwards "C" pattern
     2. Inverted "L" pattern
     3. Horizontal stripe pattern
@@ -27,31 +27,32 @@ def solve_9110e3c5(input_grid: ColoredGrid) -> ColoredGrid:
     ColoredGrid: A 3x3 ColoredGrid object representing the output pattern.
     """
     rows, cols = input_grid.get_dimensions()
-    center_right_black = 0
-    upper_right_black = 0
-    total_black = 0
+    total_non_black = 0
+    center_non_black = 0
+    right_half_non_black = 0
 
     for r in range(rows):
         for c in range(cols):
-            if input_grid.get_cell(r, c) == 0:  # Black cell
-                total_black += 1
-                if c >= cols // 2:
-                    center_right_black += 1
-                    if r < rows // 2:
-                        upper_right_black += 1
+            if input_grid.get_cell(r, c) != 0:  # Non-black cell
+                total_non_black += 1
+                if 2 <= r <= 4 and 2 <= c <= 4:  # Center 3x3 area
+                    center_non_black += 1
+                if c >= cols // 2:  # Right half
+                    right_half_non_black += 1
 
-    if total_black == 0:
+    if total_non_black == 0:
         return create_horizontal_stripe_grid()
 
-    center_right_ratio = center_right_black / total_black
-    upper_right_ratio = upper_right_black / total_black
+    center_density = center_non_black / total_non_black
+    right_half_density = right_half_non_black / total_non_black
 
-    CENTER_RIGHT_THRESHOLD = 0.5
-    UPPER_RIGHT_THRESHOLD = 0.3
+    CENTER_THRESHOLD = 0.2
+    RIGHT_HALF_THRESHOLD = 0.6
 
-    if center_right_ratio >= CENTER_RIGHT_THRESHOLD:
-        return create_backwards_c_grid()
-    elif upper_right_ratio >= UPPER_RIGHT_THRESHOLD:
-        return create_inverted_l_grid()
+    if center_density < CENTER_THRESHOLD:
+        if right_half_density > RIGHT_HALF_THRESHOLD:
+            return create_backwards_c_grid()
+        else:
+            return create_horizontal_stripe_grid()
     else:
-        return create_horizontal_stripe_grid()
+        return create_inverted_l_grid()
