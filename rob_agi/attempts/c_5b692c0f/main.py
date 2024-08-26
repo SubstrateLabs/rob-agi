@@ -4,19 +4,20 @@ from collections import defaultdict
 
 def solve_5b692c0f(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by creating symmetry in shapes and expanding them.
+    Enhances shapes in the input grid while preserving their unique characteristics.
     
     The function performs the following steps:
     1. Identifies connected regions (shapes) in the input grid.
     2. For each shape:
-       a. Determines its bounding box and primary axis (horizontal or vertical).
-       b. Creates symmetry by mirroring along the primary axis.
-       c. Expands the shape to fill its bounding box.
-       d. Smooths the edges to create more cohesive shapes.
-    3. Places the transformed shapes onto a new grid.
+       a. Analyzes its structure, orientation, and unique features.
+       b. Creates a template based on the shape's most characteristic part.
+       c. Enhances the shape using the template, applying symmetry selectively.
+       d. Preserves unique features and color patterns.
+       e. Refines the shape by smoothing edges and filling gaps.
+    3. Places the enhanced shapes onto a new grid, maintaining their relative positions.
     
-    This results in more symmetrical and expanded versions of the original shapes,
-    while maintaining their relative positions and color patterns.
+    This results in idealized versions of the original shapes that maintain their
+    essential characteristics while improving their overall form and symmetry.
     """
     rows, cols = input_grid.get_dimensions()
     output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
@@ -61,22 +62,72 @@ def transform_shape(region: List[Tuple[int, int, int]]) -> List[Tuple[int, int, 
     left = min(c for _, c, _ in region)
     right = max(c for _, c, _ in region)
     
-    width = right - left + 1
+    # Create a template based on the most characteristic part
+    template = create_template(region, top, left, bottom, right)
+    
+    # Enhance the shape using the template
+    enhanced_shape = enhance_shape(region, template, top, left, bottom, right)
+    
+    # Preserve unique features
+    preserved_shape = preserve_features(enhanced_shape, region)
+    
+    # Refine the shape
+    refined_shape = refine_shape(preserved_shape, top, left, bottom, right)
+    
+    return refined_shape
+
+def create_template(region: List[Tuple[int, int, int]], top: int, left: int, bottom: int, right: int) -> Dict[Tuple[int, int], int]:
+    template = {}
+    mid_row = (top + bottom) // 2
+    mid_col = (left + right) // 2
+    
+    for r, c, color in region:
+        if r <= mid_row and c <= mid_col:
+            template[(r - top, c - left)] = color
+    
+    return template
+
+def enhance_shape(region: List[Tuple[int, int, int]], template: Dict[Tuple[int, int], int], top: int, left: int, bottom: int, right: int) -> List[Tuple[int, int, int]]:
+    enhanced = region.copy()
     height = bottom - top + 1
+    width = right - left + 1
     
-    # Determine primary axis
-    if width > height:
-        symmetrical_shape = mirror_horizontal(region, top, bottom)
-    else:
-        symmetrical_shape = mirror_vertical(region, left, right)
+    for r in range(height):
+        for c in range(width):
+            if (r, c) in template:
+                enhanced.append((top + r, left + c, template[(r, c)]))
+                enhanced.append((bottom - r, left + c, template[(r, c)]))
+                enhanced.append((top + r, right - c, template[(r, c)]))
+                enhanced.append((bottom - r, right - c, template[(r, c)]))
     
-    # Expand shape
-    expanded_shape = expand_shape(symmetrical_shape, top, left, bottom, right)
+    return list(set(enhanced))  # Remove duplicates
+
+def preserve_features(enhanced_shape: List[Tuple[int, int, int]], original_shape: List[Tuple[int, int, int]]) -> List[Tuple[int, int, int]]:
+    preserved = enhanced_shape.copy()
+    original_set = set((r, c) for r, c, _ in original_shape)
     
-    # Smooth edges
-    smoothed_shape = smooth_edges(expanded_shape, top, left, bottom, right)
+    for r, c, color in original_shape:
+        if (r, c) not in original_set:
+            preserved.append((r, c, color))
     
-    return smoothed_shape
+    return preserved
+
+def refine_shape(shape: List[Tuple[int, int, int]], top: int, left: int, bottom: int, right: int) -> List[Tuple[int, int, int]]:
+    refined = shape.copy()
+    shape_dict = {(r, c): color for r, c, color in shape}
+    
+    for r in range(top, bottom + 1):
+        for c in range(left, right + 1):
+            if (r, c) not in shape_dict:
+                neighbors = [(r+dr, c+dc) for dr in [-1, 0, 1] for dc in [-1, 0, 1] if (r+dr, c+dc) in shape_dict]
+                if len(neighbors) >= 5:
+                    color_counts = defaultdict(int)
+                    for nr, nc in neighbors:
+                        color_counts[shape_dict[(nr, nc)]] += 1
+                    most_common_color = max(color_counts, key=color_counts.get)
+                    refined.append((r, c, most_common_color))
+    
+    return refined
 
 def mirror_horizontal(shape: List[Tuple[int, int, int]], top: int, bottom: int) -> List[Tuple[int, int, int]]:
     midline = (top + bottom) // 2
