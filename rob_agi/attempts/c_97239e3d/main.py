@@ -1,70 +1,57 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Optional
+from collections import deque
 
 def solve_97239e3d(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the grid expansion challenge by expanding colored squares within their quadrants.
+    Solve the grid expansion challenge by expanding colored squares based on priority.
     
     The solution follows these steps:
-    1. Define four quadrants in the 16x16 grid: top-left, top-right, bottom-left, bottom-right.
-    2. Process the first three quadrants in order: top-left, top-right, bottom-left.
-    3. For each quadrant, find the first non-black, non-sky colored square in the quadrant or adjacent quadrants.
-    4. If found, fill the quadrant with this color, preserving sky-colored squares.
-    5. Repeat the process until no further changes are made, allowing multiple rounds of expansion.
-    6. Leave the bottom-right quadrant unchanged.
-    7. Preserve the 17th row and column (index 16) from the original grid.
+    1. Identify expansion colors and their positions.
+    2. Sort colors based on priority (closer to corners and edges have higher priority).
+    3. Expand each color using a flood-fill algorithm, stopping at non-black, non-sky blue colors and grid edges.
+    4. Repeat the expansion process until no changes are made.
+    5. Preserve the 17th row and column (index 16) from the original grid.
     """
     output_grid = input_grid.deep_copy()
+    rows, cols = output_grid.get_dimensions()
     
-    def is_in_quadrant(r: int, c: int, start_row: int, end_row: int, start_col: int, end_col: int) -> bool:
-        return start_row <= r < end_row and start_col <= c < end_col
-
-    def find_color_in_quadrant(start_row: int, end_row: int, start_col: int, end_col: int) -> Optional[int]:
-        for r in range(start_row, end_row):
-            for c in range(start_col, end_col):
+    def is_expandable(r: int, c: int) -> bool:
+        return 0 <= r < rows and 0 <= c < cols and output_grid.get_cell(r, c) in [0, 8]
+    
+    def get_priority(r: int, c: int) -> float:
+        return min(r, rows-1-r, c, cols-1-c)
+    
+    def find_expansion_colors() -> List[Tuple[int, List[Tuple[int, int]]]]:
+        colors = {}
+        for r in range(rows):
+            for c in range(cols):
                 color = output_grid.get_cell(r, c)
                 if color not in [0, 8]:
-                    return color
-        return None
-
-    def find_color_in_adjacent_quadrants(quad_index: int) -> Optional[int]:
-        adjacent_quads = {
-            0: [1, 2],  # top-left: check top-right and bottom-left
-            1: [0, 3],  # top-right: check top-left and bottom-right
-            2: [0, 3]   # bottom-left: check top-left and bottom-right
-        }
-        for adj_quad in adjacent_quads[quad_index]:
-            color = find_color_in_quadrant(*quadrants[adj_quad])
-            if color is not None:
-                return color
-        return None
-
-    def expand_color(start_row: int, end_row: int, start_col: int, end_col: int, color: int) -> bool:
+                    if color not in colors:
+                        colors[color] = []
+                    colors[color].append((r, c))
+        return sorted(colors.items(), key=lambda x: min(get_priority(r, c) for r, c in x[1]))
+    
+    def expand_color(color: int, start_positions: List[Tuple[int, int]]) -> bool:
         changed = False
-        for r in range(start_row, end_row):
-            for c in range(start_col, end_col):
-                if output_grid.get_cell(r, c) == 0:
-                    output_grid.set_cell(r, c, color)
+        queue = deque(start_positions)
+        while queue:
+            r, c = queue.popleft()
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                nr, nc = r + dr, c + dc
+                if is_expandable(nr, nc):
+                    output_grid.set_cell(nr, nc, color)
+                    queue.append((nr, nc))
                     changed = True
         return changed
-
-    quadrants = [
-        (0, 8, 0, 8),   # top-left
-        (0, 8, 8, 16),  # top-right
-        (8, 16, 0, 8),  # bottom-left
-        (8, 16, 8, 16)  # bottom-right (not processed)
-    ]
-
+    
     changes_made = True
     while changes_made:
         changes_made = False
-        for i, quadrant in enumerate(quadrants[:3]):  # Process only the first three quadrants
-            color = find_color_in_quadrant(*quadrant)
-            if color is None:
-                color = find_color_in_adjacent_quadrants(i)
-            if color is not None:
-                changes_made |= expand_color(*quadrant, color)
-
+        for color, positions in find_expansion_colors():
+            changes_made |= expand_color(color, positions)
+    
     # Preserve the 17th row and column
     for i in range(17):
         output_grid.set_cell(16, i, input_grid.get_cell(16, i))
