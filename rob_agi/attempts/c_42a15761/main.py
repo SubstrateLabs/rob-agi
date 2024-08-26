@@ -6,7 +6,7 @@ def solve_42a15761(input_grid: ColoredGrid) -> ColoredGrid:
     The transformation follows these rules:
     1. Top bars and vertical segments of 'E's are always full.
     2. Middle bars alternate between full and partial within each column.
-    3. Bottom bars are full when the middle bar is partial, and partial when the middle bar is full.
+    3. Bottom bars are the opposite of middle bars: full when the middle bar is partial, and partial when the middle bar is full.
     4. The direction of partial bars (left or right) is consistent within a column but may vary between columns.
     5. Black vertical separating lines remain unchanged.
     """
@@ -24,10 +24,11 @@ def solve_42a15761(input_grid: ColoredGrid) -> ColoredGrid:
 
     def get_partial_bar_direction(col: int) -> str:
         e_start = col * 4
-        middle_row = e_height // 2
-        if new_grid.values[middle_row][e_start + 1] == 2:
-            return 'left'
-        return 'right'
+        for r in range(e_height):
+            middle_row = r * e_height + e_height // 2
+            if new_grid.values[middle_row][e_start + 1] == 0:
+                return 'right' if new_grid.values[middle_row][e_start + 2] == 2 else 'left'
+        return 'left'  # Default to left if no partial bar is found
 
     def is_full_middle_bar(e_index: int) -> bool:
         return e_index % 2 == 0
@@ -41,31 +42,21 @@ def solve_42a15761(input_grid: ColoredGrid) -> ColoredGrid:
             e_start = col * 4
             e_top = e * e_height
             
-            # Fix top bar
-            new_grid.values[e_top][e_start:e_start+3] = [2, 2, 2]
-            
-            # Fix vertical segments
+            # Fix top bar and vertical segments
             for r in range(e_top, e_top + e_height):
-                new_grid.values[r][e_start] = 2
-                new_grid.values[r][e_start+2] = 2
+                new_grid.values[r][e_start:e_start+3] = [2, 2, 2] if r == e_top else [2, new_grid.values[r][e_start+1], 2]
             
             # Fix middle bar
             middle_row = e_top + e_height // 2
             if is_full_middle_bar(e):
                 new_grid.values[middle_row][e_start:e_start+3] = [2, 2, 2]
             else:
-                if direction == 'left':
-                    new_grid.values[middle_row][e_start:e_start+3] = [2, 0, 0]
-                else:
-                    new_grid.values[middle_row][e_start:e_start+3] = [0, 0, 2]
+                new_grid.values[middle_row][e_start:e_start+3] = [2, 0, 0] if direction == 'left' else [0, 0, 2]
             
             # Fix bottom bar
             bottom_row = e_top + e_height - 1
             if is_full_middle_bar(e):
-                if direction == 'left':
-                    new_grid.values[bottom_row][e_start:e_start+3] = [2, 2, 0]
-                else:
-                    new_grid.values[bottom_row][e_start:e_start+3] = [0, 2, 2]
+                new_grid.values[bottom_row][e_start:e_start+3] = [2, 2, 0] if direction == 'left' else [0, 2, 2]
             else:
                 new_grid.values[bottom_row][e_start:e_start+3] = [2, 2, 2]
 
