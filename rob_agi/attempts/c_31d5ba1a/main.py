@@ -4,9 +4,9 @@ def solve_31d5ba1a(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms a 6x5 input grid into a 3x5 output grid based on the following rules:
     1. For each column in the input grid:
-       - If any cell in rows 0-1 contains 9, set the corresponding cell in the first row of the output to 6.
-       - If any cell in rows 2-3 contains 9, set the corresponding cell in the second row of the output to 6.
-       - If any cell in rows 4-5 contains 4, set the corresponding cell in the third row of the output to 6.
+       - If BOTH cells in rows 0-1 contain 9, set the corresponding cell in the first row of the output to 6.
+       - If EITHER cell in rows 2-3 contains 9, set the corresponding cell in the second row of the output to 6.
+       - If EITHER cell in rows 4-5 contains 4, set the corresponding cell in the third row of the output to 6.
     2. All other cells in the output grid remain 0 (black).
     """
     # Initialize the output grid
@@ -15,15 +15,15 @@ def solve_31d5ba1a(input_grid: ColoredGrid) -> ColoredGrid:
     # Process the input grid
     for col in range(5):
         # Check top section (rows 0 and 1)
-        if 9 in [input_grid.values[0][col], input_grid.values[1][col]]:
+        if input_grid.values[0][col] == 9 and input_grid.values[1][col] == 9:
             output_grid.values[0][col] = 6
         
         # Check middle section (rows 2 and 3)
-        if 9 in [input_grid.values[2][col], input_grid.values[3][col]]:
+        if input_grid.values[2][col] == 9 or input_grid.values[3][col] == 9:
             output_grid.values[1][col] = 6
         
         # Check bottom section (rows 4 and 5)
-        if 4 in [input_grid.values[4][col], input_grid.values[5][col]]:
+        if input_grid.values[4][col] == 4 or input_grid.values[5][col] == 4:
             output_grid.values[2][col] = 6
     
     return output_grid
