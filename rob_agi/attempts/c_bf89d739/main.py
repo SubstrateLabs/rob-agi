@@ -6,10 +6,8 @@ def solve_bf89d739(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the grid transformation challenge by connecting red dots with green lines.
     
-    The function identifies clusters of red dots, creates local vertical spines for each cluster,
-    connects red dots to their local spines, and then connects the spines if necessary.
-    The algorithm ensures that all red dots are connected in an optimized tree-like structure
-    with vertical spines and horizontal branches.
+    The function identifies red dots, creates a vertical spine through the center of mass,
+    connects all red dots to the spine, and optimizes the connections to form a tree-like structure.
     
     Args:
     input_grid (ColoredGrid): The input grid containing red dots to be connected.
@@ -23,72 +21,41 @@ def solve_bf89d739(input_grid: ColoredGrid) -> ColoredGrid:
     if not red_dots:
         return result_grid
 
-    clusters = cluster_red_dots(red_dots)
-    for cluster in clusters:
-        spine_col = find_optimal_spine(cluster)
-        create_vertical_spine(result_grid, cluster, spine_col)
-        connect_dots_to_spine(result_grid, cluster, spine_col)
-
-    connect_spines(result_grid, clusters)
-    optimize_connections(result_grid)
+    spine_col = find_optimal_spine(red_dots)
+    create_vertical_spine(result_grid, red_dots, spine_col)
+    connect_dots_to_spine(result_grid, red_dots, spine_col)
+    optimize_connections(result_grid, red_dots, spine_col)
 
     return result_grid
 
 def find_red_dots(grid: ColoredGrid) -> List[Tuple[int, int]]:
     return [(r, c) for r in range(grid.num_rows) for c in range(grid.num_cols) if grid.values[r][c] == 2]
 
-def cluster_red_dots(red_dots: List[Tuple[int, int]]) -> List[List[Tuple[int, int]]]:
-    sorted_dots = sorted(red_dots, key=lambda x: x[1])  # Sort by x-coordinate
-    clusters = []
-    current_cluster = [sorted_dots[0]]
-    
-    for dot in sorted_dots[1:]:
-        if dot[1] - current_cluster[-1][1] <= 2:  # Adjust threshold as needed
-            current_cluster.append(dot)
-        else:
-            clusters.append(current_cluster)
-            current_cluster = [dot]
-    
-    clusters.append(current_cluster)
-    return clusters
-
-def find_optimal_spine(cluster: List[Tuple[int, int]]) -> int:
-    x_coords = [c for _, c in cluster]
+def find_optimal_spine(red_dots: List[Tuple[int, int]]) -> int:
+    x_coords = [c for _, c in red_dots]
     return round(statistics.mean(x_coords))
 
-def create_vertical_spine(grid: ColoredGrid, cluster: List[Tuple[int, int]], spine_col: int):
-    min_row = min(r for r, _ in cluster)
-    max_row = max(r for r, _ in cluster)
+def create_vertical_spine(grid: ColoredGrid, red_dots: List[Tuple[int, int]], spine_col: int):
+    min_row = min(r for r, _ in red_dots)
+    max_row = max(r for r, _ in red_dots)
     draw_line(grid, (min_row, spine_col), (max_row, spine_col), True)
 
-def connect_dots_to_spine(grid: ColoredGrid, cluster: List[Tuple[int, int]], spine_col: int):
-    for r, c in cluster:
+def connect_dots_to_spine(grid: ColoredGrid, red_dots: List[Tuple[int, int]], spine_col: int):
+    for r, c in red_dots:
         if c != spine_col:
             draw_line(grid, (r, c), (r, spine_col), False)
 
-def connect_spines(grid: ColoredGrid, clusters: List[List[Tuple[int, int]]]):
-    if len(clusters) <= 1:
-        return
-    
-    spine_cols = [find_optimal_spine(cluster) for cluster in clusters]
-    for i in range(len(clusters) - 1):
-        start_col = spine_cols[i]
-        end_col = spine_cols[i + 1]
-        start_row = min(r for r, _ in clusters[i])
-        end_row = min(r for r, _ in clusters[i + 1])
-        
-        if start_row == end_row:
-            draw_line(grid, (start_row, start_col), (end_row, end_col), False)
-        else:
-            mid_col = (start_col + end_col) // 2
-            draw_line(grid, (start_row, start_col), (start_row, mid_col), False)
-            draw_line(grid, (start_row, mid_col), (end_row, mid_col), True)
-            draw_line(grid, (end_row, mid_col), (end_row, end_col), False)
-
-def optimize_connections(grid: ColoredGrid):
-    # This function can be implemented to further optimize the connections
-    # For now, we'll leave it as a placeholder
-    pass
+def optimize_connections(grid: ColoredGrid, red_dots: List[Tuple[int, int]], spine_col: int):
+    sorted_dots = sorted(red_dots, key=lambda x: x[0])  # Sort by row
+    for i in range(len(sorted_dots) - 1):
+        current_dot = sorted_dots[i]
+        next_dot = sorted_dots[i + 1]
+        if current_dot[1] == next_dot[1]:  # Same column
+            draw_line(grid, current_dot, next_dot, True)
+        elif abs(current_dot[1] - spine_col) > abs(next_dot[1] - spine_col):
+            # If the next dot is closer to the spine, connect through it
+            draw_line(grid, current_dot, (current_dot[0], next_dot[1]), False)
+            draw_line(grid, (current_dot[0], next_dot[1]), next_dot, True)
 
 def draw_line(grid: ColoredGrid, start: Tuple[int, int], end: Tuple[int, int], is_vertical: bool):
     y1, x1 = start
