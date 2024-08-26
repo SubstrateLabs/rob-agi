@@ -32,84 +32,66 @@ def solve_12eac192(input_grid: ColoredGrid) -> ColoredGrid:
         return {1: 3, 5: 2, 8: 1, 0: 0}.get(color, -1)
 
     def bfs(start: Tuple[int, int]) -> List[Tuple[int, int]]:
-        queue = deque([(start, 0)])
+        queue = deque([start])
         path = []
         visited = set()
-        non_blue_count = 0
+        current_direction = None
+        complexity = 0
+        max_complexity = min(rows, cols) * 2
 
-        while queue:
-            (r, c), non_blue = queue.popleft()
+        while queue and complexity < max_complexity:
+            r, c = queue.popleft()
             if (r, c) in visited:
                 continue
             visited.add((r, c))
             path.append((r, c))
 
-            if grid[r][c] != 1:
-                non_blue_count += 1
-            else:
-                non_blue_count = 0
-
-            if non_blue_count > 3:
-                break
-
             neighbors = get_neighbors(r, c)
-            for nr, nc in sorted(neighbors, key=lambda x: priority_order.index(grid[x[0]][x[1]]) if grid[x[0]][x[1]] in priority_order else len(priority_order)):
-                if (nr, nc) not in visited and grid[nr][nc] != 7:
-                    new_non_blue = non_blue + 1 if grid[nr][nc] != 1 else 0
-                    queue.append(((nr, nc), new_non_blue))
+            neighbors.sort(key=lambda x: (
+                -get_cell_priority(grid[x[0]][x[1]]),
+                0 if current_direction and (x[0]-r, x[1]-c) == current_direction else 1,
+                -(x[0] in (0, rows-1) or x[1] in (0, cols-1))
+            ))
 
-            if all((r, c) in visited for r, c in cluster):
-                break
+            for nr, nc in neighbors:
+                if (nr, nc) not in visited and grid[nr][nc] != 7:
+                    queue.append((nr, nc))
+                    if current_direction and (nr-r, nc-c) != current_direction:
+                        complexity += 1
+                    current_direction = (nr-r, nc-c)
+                    break
 
         return path
 
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
-    priority_order = [1, 5, 8, 0]  # Blue, Gray, Sky, Black
 
     blue_cells = [(r, c) for r in range(rows) for c in range(cols) if grid[r][c] == 1]
     if not blue_cells:
         return grid
 
-    # Group blue cells into clusters
-    clusters = []
-    visited_blues = set()
-    for blue in blue_cells:
-        if blue not in visited_blues:
-            cluster = set()
-            stack = [blue]
-            while stack:
-                cell = stack.pop()
-                if cell not in visited_blues:
-                    visited_blues.add(cell)
-                    cluster.add(cell)
-                    stack.extend([n for n in get_neighbors(*cell) if grid[n[0]][n[1]] == 1 and n not in visited_blues])
-            clusters.append(cluster)
+    # Choose starting point
+    start = max(blue_cells, key=lambda x: (x[0] in (0, rows-1) or x[1] in (0, cols-1), 
+                                           sum(1 for nr, nc in get_neighbors(*x) if grid[nr][nc] not in [1, 7])))
 
-    # Process each cluster
-    for cluster in sorted(clusters, key=len, reverse=True):
-        start = max(cluster, key=lambda x: sum(1 for nr, nc in get_neighbors(*x) if grid[nr][nc] in [1, 5, 8]))
-        path = bfs(start, cluster)
+    # Create main path
+    main_path = bfs(start)
 
-        # Convert path to green
-        for r, c in path:
-            if grid[r][c] in [0, 1, 5, 8]:
-                grid.set_cell(r, c, 3)
+    # Convert main path to green
+    for r, c in main_path:
+        if grid[r][c] in [0, 1, 5, 8]:
+            grid.set_cell(r, c, 3)
 
-    # Try to connect remaining blue cells
+    # Connect remaining blue cells
     for br, bc in blue_cells:
         if grid[br][bc] == 1:
-            nearest_green = min((abs(br-r) + abs(bc-c), (r, c)) for r in range(rows) for c in range(cols) if grid[r][c] == 3)[1]
-            current_path = []
-            r, c = br, bc
-            while (r, c) != nearest_green:
-                if grid[r][c] in [0, 1, 5, 8]:
-                    current_path.append((r, c))
-                dr = 1 if r < nearest_green[0] else -1 if r > nearest_green[0] else 0
-                dc = 1 if c < nearest_green[1] else -1 if c > nearest_green[1] else 0
-                r, c = r + dr, c + dc
-            if len(current_path) <= 3:  # Only connect if path is short
-                for pr, pc in current_path:
-                    grid.set_cell(pr, pc, 3)
+            nearest_green = min((abs(br-r) + abs(bc-c), (r, c)) for r, c in main_path if grid[r][c] == 3)
+            if nearest_green[0] <= 3:
+                r, c = nearest_green[1]
+                while (r, c) != (br, bc):
+                    if grid[r][c] in [0, 1, 5, 8]:
+                        grid.set_cell(r, c, 3)
+                    r += 1 if br > r else -1 if br < r else 0
+                    c += 1 if bc > c else -1 if bc < c else 0
 
     return grid
