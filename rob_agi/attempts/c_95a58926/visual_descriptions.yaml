@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    The grid is 19x13 in size. It consists primarily of gray (5) and black (0) squares, with some red (2) squares scattered throughout. There are three distinct horizontal gray lines spanning the entire width of the grid at rows 5, 10, and 15. Two vertical gray lines run from top to bottom at columns 5 and 10. The red squares appear randomly placed, mostly near the intersections of the gray lines and along the edges of the grid. The overall effect is a grid divided into 16 rectangular sections by the gray lines, with red dots appearing sporadically.
+  output: |
+    The output grid maintains the same 19x13 size and overall structure as the input. The three horizontal gray lines and two vertical gray lines remain in the same positions. However, all red squares have been removed, and new red squares have been added at specific intersections of the gray lines. These new red squares appear at the points where the horizontal and vertical gray lines meet, creating a regular pattern. The rest of the grid is filled with black (0) squares, giving a cleaner and more organized appearance compared to the input.
+
+example_1:
+  input: |
+    The grid is 21x17 in size. It's dominated by gray (5) and black (0) squares, with green (3) squares scattered throughout. Three horizontal gray lines span the entire width at rows 6, 12, and 18. Two vertical gray lines run from top to bottom at columns 6 and 12. Green squares are randomly distributed, with higher concentrations near the gray line intersections and along the grid edges. Some areas have clusters of green squares. The overall effect is a grid divided into 16 sections by the gray lines, with green elements scattered across it.
+  output: |
+    The output grid maintains the 21x17 size and basic structure of the input. The three horizontal and two vertical gray lines remain in their original positions. However, all randomly placed green squares have been removed. New green squares have been added at the intersections of the gray lines, creating a regular pattern. These green squares appear where the horizontal and vertical gray lines meet. The rest of the grid is filled with black (0) squares, resulting in a more organized and symmetrical appearance compared to the input.
+
+example_2:
+  input: |
+    The grid is 21x24 in size. It's primarily composed of gray (5) and black (0) squares, with yellow (4) squares scattered throughout. Five horizontal gray lines span the entire width at every fourth row (rows 4, 8, 12, 16, 20). Six vertical gray lines run from top to bottom at every fourth column (columns 4, 8, 12, 16, 20, 24). Yellow squares are randomly distributed across the grid, with some clustering in certain areas. The overall effect is a grid divided into 35 rectangular sections by the gray lines, with yellow elements scattered across it.
+  output: |
+    The output grid maintains the 21x24 size and basic structure of the input. The five horizontal and six vertical gray lines remain in their original positions. However, all randomly placed yellow squares have been removed. New yellow squares have been added at the intersections of the gray lines, creating a regular pattern. These yellow squares appear where the horizontal and vertical gray lines meet. The rest of the grid is filled with black (0) squares. The result is a highly organized grid with a clear pattern of yellow squares at regular intervals along the gray lines.
+
+test_case_0:
+  input: |
+    The grid is 21x24 in size. It's primarily composed of gray (5) and black (0) squares, with yellow (4) squares scattered throughout. Five horizontal gray lines span the entire width at every fourth row (rows 4, 8, 12, 16, 20). Six vertical gray lines run from top to bottom at every fourth column (columns 4, 8, 12, 16, 20, 24). Yellow squares are randomly distributed across the grid, with some clustering in certain areas. The overall effect is a grid divided into 35 rectangular sections by the gray lines, with yellow elements scattered across it.
+  output: |
+    The output grid is not provided in the test case, so no description can be given.
