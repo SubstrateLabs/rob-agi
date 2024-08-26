@@ -6,9 +6,9 @@ def solve_5a5a2103(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by applying a 4x4 pattern to each section of the grid.
     
     The transformation works as follows:
-    1. Identifies the dividing lines in the grid.
+    1. Identifies the dividing lines in the grid (color 8).
     2. For each row of sections:
-       a. Finds the first non-zero, non-dividing-line color in the leftmost section.
+       a. Finds the first non-zero, non-dividing-line color in the row.
        b. If a color is found, generates a 4x4 pattern for this color.
        c. Applies this pattern across the entire row, respecting dividing lines.
        d. If no color is found, leaves the row unchanged.
@@ -22,11 +22,14 @@ def solve_5a5a2103(input_grid: ColoredGrid) -> ColoredGrid:
     ColoredGrid: The transformed grid.
     """
     
-    def find_dividing_lines(grid: List[List[int]]) -> Tuple[int, List[int], List[int]]:
-        divider_color = next(color for row in grid for color in row if color != 0)
-        horizontal_lines = [i for i, row in enumerate(grid) if all(cell == divider_color for cell in row)]
-        vertical_lines = [j for j in range(len(grid[0])) if all(row[j] == divider_color for row in grid)]
-        return divider_color, horizontal_lines, vertical_lines
+    def find_dividing_lines(grid: List[List[int]]) -> Tuple[List[int], List[int]]:
+        rows, cols = len(grid), len(grid[0])
+        horizontal_lines = [i for i in range(rows) if all(cell == 8 for cell in grid[i])]
+        vertical_lines = [j for j in range(cols) if all(grid[i][j] == 8 for i in range(rows))]
+        return horizontal_lines, vertical_lines
+    
+    def find_pattern_color(row: List[int]) -> int:
+        return next((color for color in row if color not in [0, 8]), 0)
     
     def generate_pattern(color: int) -> List[List[int]]:
         return [
@@ -37,31 +40,47 @@ def solve_5a5a2103(input_grid: ColoredGrid) -> ColoredGrid:
         ]
     
     def apply_pattern(grid: List[List[int]], pattern: List[List[int]], start_row: int, end_row: int,
-                      divider_color: int, vertical_lines: List[int]) -> None:
+                      start_col: int, end_col: int) -> None:
         for row in range(start_row, end_row):
-            for col in range(len(grid[0])):
-                if col not in vertical_lines and grid[row][col] != divider_color:
-                    grid[row][col] = pattern[(row - start_row) % 4][col % 4]
+            for col in range(start_col, end_col):
+                if grid[row][col] != 8:
+                    grid[row][col] = pattern[(row - start_row) % 4][(col - start_col) % 4]
     
     # Find dividing lines
-    divider_color, horizontal_lines, vertical_lines = find_dividing_lines(input_grid.values)
+    horizontal_lines, vertical_lines = find_dividing_lines(input_grid.values)
     
     # Create a new grid with the same dimensions as the input
     new_grid = [row[:] for row in input_grid.values]
     
     # Process each row of sections
-    for section_start in range(0, len(new_grid), 5):
-        if section_start in horizontal_lines:
+    row = 0
+    while row < len(new_grid):
+        if row in horizontal_lines:
+            row += 1
             continue
-    
-        # Find the color for this row of sections
-        section_color = next((color for color in new_grid[section_start] if color not in [0, divider_color]), None)
         
-        if section_color is not None:
-            pattern = generate_pattern(section_color)
+        # Find the end of this section row
+        next_horizontal = next((line for line in horizontal_lines if line > row), len(new_grid))
+        
+        # Find the pattern color for this row
+        pattern_color = find_pattern_color(new_grid[row])
+        
+        if pattern_color != 0:
+            pattern = generate_pattern(pattern_color)
             
             # Apply the pattern across the row
-            section_end = min(section_start + 4, len(new_grid))
-            apply_pattern(new_grid, pattern, section_start, section_end, divider_color, vertical_lines)
+            col = 0
+            while col < len(new_grid[0]):
+                if col in vertical_lines:
+                    col += 1
+                    continue
+                
+                # Find the end of this section column
+                next_vertical = next((line for line in vertical_lines if line > col), len(new_grid[0]))
+                
+                apply_pattern(new_grid, pattern, row, next_horizontal, col, next_vertical)
+                col = next_vertical
+        
+        row = next_horizontal
     
     return ColoredGrid(values=new_grid)
