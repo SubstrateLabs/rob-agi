@@ -4,14 +4,13 @@ from typing import List, Tuple
 def solve_009d5c81(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by changing the color of the larger shape (color 8)
-    based on its characteristics and position relative to the smaller shape (color 1).
-    The smaller shape is removed, and the rest of the grid remains black (color 0).
+    based on its geometric properties. The smaller shape (color 1) is removed,
+    and the rest of the grid remains black (color 0).
 
     The new color of the larger shape is determined as follows:
-    - Green (3) if the smaller shape is below and to the left of the larger shape
-    - Orange (7) if the larger shape is complex (multiple disconnected parts or high perimeter-to-area ratio)
-    - Red (2) if the larger shape has more straight lines and right angles
-    - Green (3) if the larger shape has more curved features
+    - Orange (7) if the shape is complex (high perimeter-to-area ratio)
+    - Red (2) if the shape has more straight lines and right angles
+    - Green (3) if the shape has more curved or organic features
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed
@@ -22,29 +21,21 @@ def solve_009d5c81(input_grid: ColoredGrid) -> ColoredGrid:
     rows, cols = input_grid.get_dimensions()
     output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
 
-    # Extract the shapes
+    # Extract the larger shape (color 8)
     larger_shape = input_grid.find_connected_regions(8)[0]
-    smaller_shape = input_grid.find_connected_regions(1)[0]
 
-    # Determine the bounding box of the larger shape
-    min_r = min(r for r, _ in larger_shape)
-    max_r = max(r for r, _ in larger_shape)
-    min_c = min(c for _, c in larger_shape)
-    max_c = max(c for _, c in larger_shape)
+    # Analyze the larger shape
+    complexity = analyze_complexity(larger_shape)
+    mechanical_score = analyze_mechanical_features(larger_shape)
+    natural_score = analyze_natural_features(larger_shape)
 
-    # Analyze the relative position of the smaller shape
-    smaller_r, smaller_c = smaller_shape[0]
-    if smaller_r > max_r and smaller_c < min_c:
-        new_color = 3  # Green
+    # Determine the new color
+    if complexity > 0.8:  # Adjusted threshold for complexity
+        new_color = 7  # Orange
+    elif mechanical_score > natural_score:
+        new_color = 2  # Red
     else:
-        # Analyze the larger shape
-        complexity = analyze_complexity(larger_shape)
-        if complexity > 0.2:  # Threshold for complexity
-            new_color = 7  # Orange
-        else:
-            mechanical_score = analyze_mechanical_features(larger_shape)
-            natural_score = analyze_natural_features(larger_shape)
-            new_color = 2 if mechanical_score > natural_score else 3
+        new_color = 3  # Green
 
     # Transform the grid
     for r, c in larger_shape:
@@ -59,11 +50,22 @@ def analyze_complexity(shape: List[Tuple[int, int]]) -> float:
 
 def analyze_mechanical_features(shape: List[Tuple[int, int]]) -> float:
     straight_lines = sum(1 for r, c in shape if sum((r+1, c) in shape, (r-1, c) in shape, (r, c+1) in shape, (r, c-1) in shape) == 2)
-    return straight_lines / len(shape)
+    right_angles = count_right_angles(shape)
+    return (straight_lines + right_angles) / len(shape)
 
 def analyze_natural_features(shape: List[Tuple[int, int]]) -> float:
     curves = sum(1 for r, c in shape if sum((r+1, c) in shape, (r-1, c) in shape, (r, c+1) in shape, (r, c-1) in shape) > 2)
     return curves / len(shape)
+
+def count_right_angles(shape: List[Tuple[int, int]]) -> int:
+    right_angles = 0
+    for r, c in shape:
+        neighbors = [(r+1, c), (r-1, c), (r, c+1), (r, c-1)]
+        if sum((nr, nc) in shape for nr, nc in neighbors) == 2:
+            diagonal_neighbors = [(r+1, c+1), (r+1, c-1), (r-1, c+1), (r-1, c-1)]
+            if sum((nr, nc) in shape for nr, nc in diagonal_neighbors) == 1:
+                right_angles += 1
+    return right_angles
 
 def analyze_mechanical_features(grid: ColoredGrid, shape: List[Tuple[int, int]]) -> float:
     lines = grid.detect_lines()
