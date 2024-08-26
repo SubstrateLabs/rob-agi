@@ -12,7 +12,6 @@ def solve_94be5b80(input_grid: ColoredGrid) -> ColoredGrid:
     5. Ensuring exactly 2 rows of space between horseshoes.
     6. Filling remaining space with black (0).
     """
-    output_grid = ColoredGrid(values=[[0 for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
     rows, cols = input_grid.get_dimensions()
 
     def extract_top_colors() -> List[int]:
@@ -24,13 +23,13 @@ def solve_94be5b80(input_grid: ColoredGrid) -> ColoredGrid:
                     unique_colors.append(color)
         return unique_colors
 
-    def create_horseshoe(color: int, top: int, left: int):
+    def create_horseshoe(grid: ColoredGrid, color: int, top: int, left: int):
         for r in range(top, top + 3):
             for c in range(left, left + 6):
                 if r == top + 1 and left + 1 < c < left + 4:
-                    output_grid.set_cell(r, c, 0)
+                    grid.set_cell(r, c, 0)
                 else:
-                    output_grid.set_cell(r, c, color)
+                    grid.set_cell(r, c, color)
 
     def is_horseshoe(grid: ColoredGrid, top: int, left: int) -> bool:
         if top + 2 >= rows or left + 5 >= cols:
@@ -66,14 +65,18 @@ def solve_94be5b80(input_grid: ColoredGrid) -> ColoredGrid:
             layout.append((color, -1, -1))  # -1 indicates a new horseshoe
     layout.sort(key=lambda x: x[1])  # Sort by row position
 
+    # Calculate output grid size
+    output_rows = len(layout) * 5 - 2  # 3 rows per horseshoe + 2 rows spacing, -2 for no spacing after last horseshoe
+    output_rows = max(output_rows, rows)  # Ensure output is at least as tall as input
+    output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(output_rows)])
+
     # Step 4: Determine positions and create horseshoes
-    current_row = 5
+    current_row = 2
     for color, top, left in layout:
         if top == -1:  # New horseshoe
-            create_horseshoe(color, current_row, 3)
-            current_row += 5
+            create_horseshoe(output_grid, color, current_row, 3)
         else:  # Existing horseshoe
-            create_horseshoe(color, top, left)
-            current_row = max(current_row, top + 5)
+            create_horseshoe(output_grid, color, current_row, left)
+        current_row += 5
 
     return output_grid
