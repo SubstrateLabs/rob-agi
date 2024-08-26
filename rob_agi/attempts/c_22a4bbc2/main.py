@@ -14,9 +14,9 @@ def solve_22a4bbc2(input_grid: ColoredGrid) -> ColoredGrid:
     """
     new_grid = input_grid.deep_copy()
     rows, cols = input_grid.get_dimensions()
-    marked = [[False for _ in range(cols)] for _ in range(rows)]
     qualifying_dimensions = [(2,2), (3,1), (1,3), (3,2), (2,3), (3,3), (4,1), (1,4)]
     
+    to_change = set()
     for r in range(rows):
         for c in range(cols):
             if input_grid.values[r][c] in [1, 8]:  # Only consider blue and sky blue
@@ -24,12 +24,10 @@ def solve_22a4bbc2(input_grid: ColoredGrid) -> ColoredGrid:
                     if is_qualifying_shape(input_grid, r, c, height, width):
                         for i in range(height):
                             for j in range(width):
-                                marked[r+i][c+j] = True
+                                to_change.add((r+i, c+j))
     
-    for r in range(rows):
-        for c in range(cols):
-            if marked[r][c]:
-                new_grid.values[r][c] = 2
+    for r, c in to_change:
+        new_grid.values[r][c] = 2
     
     return new_grid
 
