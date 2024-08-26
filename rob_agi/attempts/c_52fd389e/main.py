@@ -4,14 +4,14 @@ from typing import List, Tuple, Set
 def solve_52fd389e(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transform the input grid based on yellow regions and sky blue area:
-    1. Identify yellow (4) regions.
+    1. Identify yellow (4) regions and their properties.
     2. Process each yellow region:
-       - If it contains a non-yellow, non-sky blue color, create a border with that color.
-       - If it contains sky blue or no other colors, mark for integration with sky blue area.
-    3. Expand bordered regions into adjacent black cells.
-    4. Create a sky blue (8) region starting from near the top-left of the largest yellow region.
-    5. Expand sky blue to fill remaining black cells and marked regions.
-    6. Ensure yellow region integrity and no black cells remain.
+       - If it contains non-yellow, non-sky blue colors, create a border with the smallest such color.
+       - Border size is 1 for regions in top-left quadrant, 3 otherwise.
+       - If it contains only yellow or sky blue, mark for replacement by sky blue.
+    3. Apply borders to yellow regions.
+    4. Create a sky blue (8) region starting from (0,0), filling black areas and marked regions.
+    5. Ensure yellow region integrity and no black cells remain.
     """
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
@@ -41,49 +41,51 @@ def solve_52fd389e(input_grid: ColoredGrid) -> ColoredGrid:
             for c in range(cols):
                 if (r, c) not in visited and grid.get_cell(r, c) == 4:
                     region = flood_fill(r, c, 4)
-                    yellow_regions.append(region)
+                    min_r = min(r for r, _ in region)
+                    min_c = min(c for _, c in region)
+                    max_r = max(r for r, _ in region)
+                    max_c = max(c for _, c in region)
+                    internal_colors = set()
+                    for rr, cc in region:
+                        for nr, nc in get_neighbors(rr, cc):
+                            if grid.get_cell(nr, nc) not in [0, 4]:
+                                internal_colors.add(grid.get_cell(nr, nc))
+                    yellow_regions.append({
+                        'region': region,
+                        'bounds': (min_r, min_c, max_r, max_c),
+                        'internal_colors': internal_colors
+                    })
                     visited.update(region)
         return yellow_regions
 
-    def process_yellow_region(region):
-        internal_colors = set()
-        for r, c in region:
-            for nr, nc in get_neighbors(r, c):
-                color = grid.get_cell(nr, nc)
-                if color not in [0, 4]:
-                    internal_colors.add(color)
-        
-        if 8 in internal_colors or not internal_colors:
-            return None  # Mark for integration with sky blue
-        else:
-            return min(internal_colors)  # Choose the smallest non-zero, non-4 color
+    def process_yellow_regions(yellow_regions):
+        for region_info in yellow_regions:
+            min_r, min_c, max_r, max_c = region_info['bounds']
+            internal_colors = region_info['internal_colors']
+            
+            if 8 in internal_colors or not internal_colors:
+                region_info['replace'] = True
+            else:
+                border_color = min(internal_colors)
+                border_size = 1 if min_r < rows // 2 and min_c < cols // 2 else 3
+                region_info['border'] = {
+                    'color': border_color,
+                    'size': border_size
+                }
 
-    def create_border(region, color):
-        for r, c in region:
-            for nr, nc in get_neighbors(r, c):
-                if grid.get_cell(nr, nc) == 0:
-                    grid.set_cell(nr, nc, color)
+    def apply_borders(yellow_regions):
+        for region_info in yellow_regions:
+            if 'border' in region_info:
+                min_r, min_c, max_r, max_c = region_info['bounds']
+                color = region_info['border']['color']
+                size = region_info['border']['size']
+                for r in range(max(0, min_r - size), min(rows, max_r + size + 1)):
+                    for c in range(max(0, min_c - size), min(cols, max_c + size + 1)):
+                        if grid.get_cell(r, c) == 0:
+                            grid.set_cell(r, c, color)
 
-    def expand_color(color):
-        expansion = True
-        while expansion:
-            expansion = False
-            for r in range(rows):
-                for c in range(cols):
-                    if grid.get_cell(r, c) == color:
-                        for nr, nc in get_neighbors(r, c):
-                            if grid.get_cell(nr, nc) == 0:
-                                grid.set_cell(nr, nc, color)
-                                expansion = True
-
-    def find_sky_blue_start(yellow_regions):
-        largest_region = max(yellow_regions, key=len)
-        min_r = min(r for r, _ in largest_region)
-        min_c = min(c for _, c in largest_region)
-        return max(0, min_r - 1), max(0, min_c - 1)
-
-    def create_sky_blue_region(start_r, start_c):
-        stack = [(start_r, start_c)]
+    def create_sky_blue_region():
+        stack = [(0, 0)]
         while stack:
             r, c = stack.pop()
             if is_valid(r, c) and grid.get_cell(r, c) in [0, 8]:
@@ -91,14 +93,9 @@ def solve_52fd389e(input_grid: ColoredGrid) -> ColoredGrid:
                 stack.extend(get_neighbors(r, c))
 
     yellow_regions = find_yellow_regions()
-    for region in yellow_regions:
-        border_color = process_yellow_region(region)
-        if border_color:
-            create_border(region, border_color)
-            expand_color(border_color)
-
-    sky_start_row, sky_start_col = find_sky_blue_start(yellow_regions)
-    create_sky_blue_region(sky_start_row, sky_start_col)
+    process_yellow_regions(yellow_regions)
+    apply_borders(yellow_regions)
+    create_sky_blue_region()
 
     # Final cleanup
     for r in range(rows):
