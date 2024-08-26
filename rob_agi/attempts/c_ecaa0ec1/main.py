@@ -5,9 +5,9 @@ def solve_ecaa0ec1(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the ecaa0ec1 challenge by reorganizing the colored cells.
     
-    1. Analyze the input grid to find the bounding box and center of non-black cells.
+    1. Analyze the input grid to find the bounding box of non-black cells.
     2. Identify or create a valid 3x3 structure with blue (1) and sky blue (8) cells.
-    3. Place the 3x3 structure near the center of the non-black cells.
+    3. Place the 3x3 structure centered on the bounding box.
     4. If yellow (4) exists in the input, place one yellow cell adjacent to the structure.
     5. Clear all other cells to black (0).
     6. Return the new grid with the reorganized structure.
@@ -18,14 +18,13 @@ def solve_ecaa0ec1(input_grid: ColoredGrid) -> ColoredGrid:
         return input_grid.deep_copy()
 
     center = calculate_center(bounding_box)
-    existing_structure = find_existing_structure(input_grid, center)
-    structure = create_valid_structure(existing_structure)
+    structure = find_or_create_structure(input_grid, center)
     
     output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
     place_structure(output_grid, structure, center)
     
     if has_yellow(input_grid):
-        place_yellow(output_grid, center)
+        place_yellow(output_grid, structure, center)
     
     return output_grid
 
@@ -50,6 +49,12 @@ def calculate_center(bbox: Tuple[int, int, int, int]) -> Tuple[int, int]:
     center_col = (min_col + max_col) // 2
     return (center_row, center_col)
 
+def find_or_create_structure(grid: ColoredGrid, center: Tuple[int, int]) -> List[List[int]]:
+    existing = find_existing_structure(grid, center)
+    if is_valid_structure(existing):
+        return existing
+    return create_valid_structure()
+
 def find_existing_structure(grid: ColoredGrid, center: Tuple[int, int]) -> List[List[int]]:
     center_row, center_col = center
     rows, cols = grid.get_dimensions()
@@ -64,19 +69,13 @@ def find_existing_structure(grid: ColoredGrid, center: Tuple[int, int]) -> List[
     
     return structure
 
-def create_valid_structure(existing_structure: List[List[int]]) -> List[List[int]]:
-    valid_structures = [
-        [[1, 8, 1], [8, 1, 1], [1, 1, 8]],
-        [[1, 8, 1], [1, 1, 1], [1, 8, 8]],
-        [[1, 8, 1], [8, 1, 8], [1, 8, 1]]
-    ]
-    
-    # Count matching cells with each valid structure
-    matches = [sum(existing_structure[r][c] == struct[r][c] for r in range(3) for c in range(3))
-               for struct in valid_structures]
-    
-    # Return the valid structure with the most matches
-    return valid_structures[matches.index(max(matches))]
+def is_valid_structure(structure: List[List[int]]) -> bool:
+    blue_count = sum(row.count(1) for row in structure)
+    sky_blue_count = sum(row.count(8) for row in structure)
+    return blue_count >= 3 and sky_blue_count >= 2 and blue_count + sky_blue_count == 9
+
+def create_valid_structure() -> List[List[int]]:
+    return [[8, 8, 1], [1, 8, 1], [8, 1, 1]]
 
 def place_structure(grid: ColoredGrid, structure: List[List[int]], center: Tuple[int, int]):
     center_row, center_col = center
@@ -91,10 +90,10 @@ def place_structure(grid: ColoredGrid, structure: List[List[int]], center: Tuple
 def has_yellow(grid: ColoredGrid) -> bool:
     return any(4 in row for row in grid.values)
 
-def place_yellow(grid: ColoredGrid, center: Tuple[int, int]):
+def place_yellow(grid: ColoredGrid, structure: List[List[int]], center: Tuple[int, int]):
     center_row, center_col = center
     rows, cols = grid.get_dimensions()
-    directions = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+    directions = [(-2, 0), (-1, -1), (-1, 1), (0, -2), (0, 2), (1, -1), (1, 1), (2, 0)]
     for dr, dc in directions:
         r, c = center_row + dr, center_col + dc
         if 0 <= r < rows and 0 <= c < cols and grid.values[r][c] == 0:
