@@ -11,7 +11,7 @@ def solve_963f59bc(input_grid: ColoredGrid) -> ColoredGrid:
     2. Finds isolated squares of different colors
     3. For each isolated square, applies a transformed version of the primary shape:
        - Rotations (0°, 90°, 180°, 270°) and mirrors (horizontal, vertical)
-       - Aligns key points of the transformed shape with the isolated square
+       - Aligns the transformed shape with the isolated square
        - Maximizes the number of filled squares within grid boundaries
     4. Applies transformations in order of best fit
     5. Preserves original elements and grid boundaries
@@ -42,11 +42,6 @@ def solve_963f59bc(input_grid: ColoredGrid) -> ColoredGrid:
     def mirror_vertical(shape: List[List[int]]) -> List[List[int]]:
         return shape[::-1]
 
-    def find_key_points(shape: List[List[int]]) -> List[Tuple[int, int]]:
-        rows, cols = len(shape), len(shape[0])
-        non_zero = [(r, c) for r in range(rows) for c in range(cols) if shape[r][c] != 0]
-        return non_zero
-
     def apply_shape(grid: List[List[int]], shape: List[List[int]], offset_r: int, offset_c: int, color: int):
         height, width = len(shape), len(shape[0])
         rows, cols = len(grid), len(grid[0])
@@ -56,6 +51,18 @@ def solve_963f59bc(input_grid: ColoredGrid) -> ColoredGrid:
                 if 0 <= grid_r < rows and 0 <= grid_c < cols:
                     if shape[i][j] != 0 and grid[grid_r][grid_c] == 0:
                         grid[grid_r][grid_c] = color
+
+    def calculate_score(grid: List[List[int]], shape: List[List[int]], offset_r: int, offset_c: int, color: int) -> int:
+        score = 0
+        height, width = len(shape), len(shape[0])
+        rows, cols = len(grid), len(grid[0])
+        for i in range(height):
+            for j in range(width):
+                grid_r, grid_c = offset_r + i, offset_c + j
+                if 0 <= grid_r < rows and 0 <= grid_c < cols:
+                    if shape[i][j] != 0 and grid[grid_r][grid_c] == 0:
+                        score += 1
+        return score
 
     primary_shape = find_primary_shape(input_grid)
     output_grid = input_grid.deep_copy()
@@ -85,20 +92,17 @@ def solve_963f59bc(input_grid: ColoredGrid) -> ColoredGrid:
 
         for transform in transformations:
             transformed_shape = transform(primary_shape)
-            key_points = find_key_points(transformed_shape)
+            shape_height, shape_width = len(transformed_shape), len(transformed_shape[0])
 
-            for key_r, key_c in key_points:
-                offset_r = isolated_r - key_r
-                offset_c = isolated_c - key_c
-
-                temp_grid = [row[:] for row in output_grid.values]
-                apply_shape(temp_grid, transformed_shape, offset_r, offset_c, isolated_color)
-
-                score = sum(sum(1 for cell in row if cell == isolated_color) for row in temp_grid)
-                if score > best_score:
-                    best_score = score
-                    best_transformation = transformed_shape
-                    best_offset = (offset_r, offset_c)
+            for r in range(-shape_height + 1, rows):
+                for c in range(-shape_width + 1, cols):
+                    if 0 <= isolated_r - r < shape_height and 0 <= isolated_c - c < shape_width:
+                        if transformed_shape[isolated_r - r][isolated_c - c] != 0:
+                            score = calculate_score(output_grid.values, transformed_shape, r, c, isolated_color)
+                            if score > best_score:
+                                best_score = score
+                                best_transformation = transformed_shape
+                                best_offset = (r, c)
 
         if best_transformation:
             apply_shape(output_grid.values, best_transformation, best_offset[0], best_offset[1], isolated_color)
