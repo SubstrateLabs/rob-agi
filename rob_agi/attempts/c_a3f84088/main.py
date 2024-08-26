@@ -9,13 +9,13 @@ def solve_a3f84088(input_grid: ColoredGrid) -> ColoredGrid:
     1. Preserves the outer gray (5) outline from the input grid.
     2. Creates nested frames of alternating colors (red and gray) moving inward.
     3. Handles the center area based on the remaining space size:
-       - For 3x3 or smaller center, fills it with the appropriate pattern.
-       - For 4x4 or 5x5 centers, applies a specific pattern.
+       - For 3x3 or smaller center, fills it with black (0).
+       - For 4x4 or larger centers, continues the alternating pattern.
     4. Returns the transformed grid.
 
     The pattern consists of the original outer gray outline, followed by
     alternating red and gray frames moving inward, with each frame being
-    separated by a one-cell gap of the previous color.
+    separated by a one-cell gap of black (0).
     """
     new_grid = input_grid.deep_copy()
     top, left, bottom, right = find_outer_boundary(new_grid)
@@ -23,7 +23,7 @@ def solve_a3f84088(input_grid: ColoredGrid) -> ColoredGrid:
     current_color = 2  # Start with red for the first inner frame
     previous_color = 5  # Gray
 
-    while bottom - top > 4 and right - left > 4:
+    while bottom - top > 2 and right - left > 2:
         # Draw current color frame
         draw_outline(new_grid, top+1, left+1, bottom-1, right-1, current_color)
         
@@ -40,15 +40,12 @@ def solve_a3f84088(input_grid: ColoredGrid) -> ColoredGrid:
     center_height = bottom - top + 1
     center_width = right - left + 1
     if center_height <= 3 and center_width <= 3:
-        fill_area(new_grid, top, left, bottom, right, current_color)
-        if center_height == 3 and center_width == 3:
-            new_grid.values[top+1][left+1] = previous_color
-    elif center_height == 4 and center_width == 4:
-        fill_area(new_grid, top, left, bottom, right, current_color)
-    elif center_height == 5 and center_width == 5:
+        fill_area(new_grid, top, left, bottom, right, 0)  # Fill with black
+    else:
+        # Continue the pattern for 4x4 or larger centers
         draw_outline(new_grid, top, left, bottom, right, current_color)
-        fill_area(new_grid, top+1, left+1, bottom-1, right-1, previous_color)
-        new_grid.values[top+2][left+2] = current_color
+        if center_height > 4 and center_width > 4:
+            fill_area(new_grid, top+1, left+1, bottom-1, right-1, previous_color)
     
     return new_grid
 
