@@ -8,26 +8,19 @@ def solve_1c56ad9f(input_grid: ColoredGrid) -> ColoredGrid:
     1. Identify all non-zero connected shapes in the grid.
     2. For each shape:
        a. Top and bottom rows remain unchanged.
-       b. Internal rows are shifted based on their distance from the vertical center:
+       b. Internal rows are shifted alternately left and right:
           - Odd-numbered rows shift left elements to the left.
           - Even-numbered rows shift right elements to the right.
-          - Shift magnitude is largest at the center and decreases towards edges.
     3. Maintain vertical connectivity by filling gaps created by shifts.
     4. Preserve shape integrity and handle shape intersections.
     5. Retain the original background (black/0 areas).
     This creates a 3D bulging effect on the shapes while preserving their overall structure and connectivity.
     """
-    result = ColoredGrid(values=[[0 for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
+    result = input_grid.deep_copy()
     shapes = find_shapes(input_grid)
     
     for shape in shapes:
-        process_shape(input_grid, result, shape)
-    
-    # Copy any remaining black areas
-    for row in range(input_grid.num_rows):
-        for col in range(input_grid.num_cols):
-            if result.values[row][col] == 0:
-                result.values[row][col] = input_grid.values[row][col]
+        process_shape(result, shape)
     
     return result
 
@@ -60,59 +53,46 @@ def flood_fill(grid: ColoredGrid, row: int, col: int, visited: set) -> Tuple[int
     
     return (min_row, max_row, min_col, max_col)
 
-def process_shape(input_grid: ColoredGrid, result: ColoredGrid, shape: Tuple[int, int, int, int]):
+def process_shape(grid: ColoredGrid, shape: Tuple[int, int, int, int]):
     """Process a single shape according to the transformation rules."""
     min_row, max_row, min_col, max_col = shape
-    
-    # Copy top and bottom rows
-    result.values[min_row] = input_grid.values[min_row][min_col:max_col+1]
-    result.values[max_row] = input_grid.values[max_row][min_col:max_col+1]
     
     # Process internal rows
     for row in range(min_row + 1, max_row):
         row_index = row - min_row
-        if row_index % 4 == 1:  # Shift left
-            shift_left(input_grid, result, row, min_col, max_col)
-        elif row_index % 4 == 3:  # Shift right
-            shift_right(input_grid, result, row, min_col, max_col)
-        else:  # Copy as-is
-            for col in range(min_col, max_col + 1):
-                result.values[row][col] = input_grid.values[row][col]
+        if row_index % 2 == 1:  # Odd rows shift left
+            shift_left(grid, row, min_col, max_col)
+        else:  # Even rows shift right
+            shift_right(grid, row, min_col, max_col)
     
     # Maintain vertical connectivity
-    maintain_vertical_connectivity(result, shape)
+    maintain_vertical_connectivity(grid, shape)
 
-def shift_left(input_grid: ColoredGrid, result: ColoredGrid, row: int, min_col: int, max_col: int):
+def shift_left(grid: ColoredGrid, row: int, min_col: int, max_col: int):
     """Shift the leftmost non-zero element to the left."""
-    for col in range(min_col, max_col + 1):
-        if input_grid.values[row][col] != 0:
-            if col > 0 and result.values[row][col-1] == 0:
-                result.values[row][col-1] = input_grid.values[row][col]
-            else:
-                result.values[row][col] = input_grid.values[row][col]
+    for col in range(min_col, max_col):
+        if grid.values[row][col] != 0:
+            if col > min_col and grid.values[row][col-1] == 0:
+                grid.values[row][col-1] = grid.values[row][col]
+                grid.values[row][col] = 0
             break
-    for col in range(col + 1, max_col + 1):
-        result.values[row][col] = input_grid.values[row][col]
 
-def shift_right(input_grid: ColoredGrid, result: ColoredGrid, row: int, min_col: int, max_col: int):
+def shift_right(grid: ColoredGrid, row: int, min_col: int, max_col: int):
     """Shift the rightmost non-zero element to the right."""
-    for col in range(max_col, min_col - 1, -1):
-        if input_grid.values[row][col] != 0:
-            if col < input_grid.num_cols - 1 and result.values[row][col+1] == 0:
-                result.values[row][col+1] = input_grid.values[row][col]
-            else:
-                result.values[row][col] = input_grid.values[row][col]
+    for col in range(max_col, min_col, -1):
+        if grid.values[row][col] != 0:
+            if col < max_col and grid.values[row][col+1] == 0:
+                grid.values[row][col+1] = grid.values[row][col]
+                grid.values[row][col] = 0
             break
-    for col in range(min_col, col):
-        result.values[row][col] = input_grid.values[row][col]
 
-def maintain_vertical_connectivity(result: ColoredGrid, shape: Tuple[int, int, int, int]):
+def maintain_vertical_connectivity(grid: ColoredGrid, shape: Tuple[int, int, int, int]):
     """Ensure vertical lines remain connected."""
     min_row, max_row, min_col, max_col = shape
     for col in range(min_col, max_col + 1):
-        for row in range(min_row, max_row + 1):
-            if result.values[row][col] == 0:
-                above = result.values[row-1][col] if row > min_row else 0
-                below = result.values[row+1][col] if row < max_row else 0
-                if above != 0 and below != 0:
-                    result.values[row][col] = above
+        for row in range(min_row + 1, max_row):
+            if grid.values[row][col] == 0:
+                above = grid.values[row-1][col]
+                below = grid.values[row+1][col]
+                if above != 0 and above == below:
+                    grid.values[row][col] = above
