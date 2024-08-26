@@ -1,20 +1,17 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
-
-from typing import List, Tuple, Set
+from typing import List, Tuple, Set, Dict
 
 def solve_dc2e9a9d(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by applying the following steps:
-    1. Identifies and categorizes all green (3) shapes by size.
-    2. Mirrors large green shapes with blue (1) shapes, allowing for creative modifications if needed.
-    3. Adds sky blue (8) shapes inspired by green shapes in empty areas.
-    4. Processes smaller green shapes, either leaving them unchanged or incorporating them into larger patterns.
-    5. Balances the composition by adding shapes of underrepresented colors.
-    6. Fills the center with a small sky blue shape if empty.
-    7. Ensures overall symmetry and balance in the final composition.
-    8. Maintains at least one cell gap between shapes and removes isolated cells.
-    9. Performs a final check to ensure the transformation enhances the original design while respecting its core patterns.
+    1. Identifies and categorizes all green (3) shapes by size (large, medium, small).
+    2. Mirrors large green shapes with blue (1) shapes, with modifications if needed.
+    3. Adds sky blue (8) shapes inspired by large and medium green shapes in empty areas.
+    4. Processes medium and small green shapes, either mirroring, incorporating into patterns, or leaving unchanged.
+    5. Fills the center with a small sky blue shape if empty.
+    6. Ensures overall balance and symmetry by adding smaller blue or sky blue shapes to underrepresented areas.
+    7. Maintains at least one cell gap between shapes and removes isolated cells.
+    8. Performs a final check to ensure the transformation enhances the original design while respecting its core patterns.
     """
     output_grid = input_grid.deep_copy()
     shapes = categorize_shapes(input_grid)
@@ -55,23 +52,40 @@ def create_inspired_blue_shape(grid: ColoredGrid, original_shape: List[Tuple[int
     new_shape = create_inspired_shape(original_shape)
     place_shape_in_empty_area(grid, new_shape, center_r, center_c, occupied_cells, color=1)
 
-def process_smaller_shapes(grid: ColoredGrid, shapes: List[List[Tuple[int, int]]], center_r: int, center_c: int, occupied_cells: Set[Tuple[int, int]]):
-    for shape in shapes:
-        if should_incorporate_shape(grid, shape, occupied_cells):
-            incorporate_shape(grid, shape, center_r, center_c, occupied_cells)
+def process_medium_and_small_shapes(grid: ColoredGrid, medium_shapes: List[List[Tuple[int, int]]], small_shapes: List[List[Tuple[int, int]]], center_r: int, center_c: int, occupied_cells: Set[Tuple[int, int]]):
+    for shape in medium_shapes:
+        if should_mirror_shape(grid, shape, center_r, center_c):
+            mirror_shape(grid, shape, center_r, center_c, occupied_cells, color=1)
         else:
-            # Leave the shape unchanged
-            pass
+            incorporate_into_pattern(grid, shape, occupied_cells)
+    
+    for shape in small_shapes:
+        if len(shape) <= 2 or is_isolated(grid, shape[0][0], shape[0][1]):
+            continue  # Leave very small or isolated shapes unchanged
+        else:
+            incorporate_into_pattern(grid, shape, occupied_cells)
 
-def should_incorporate_shape(grid: ColoredGrid, shape: List[Tuple[int, int]], occupied_cells: Set[Tuple[int, int]]) -> bool:
-    # Implement logic to decide if a shape should be incorporated
-    # This could be based on the shape's position, size, or surrounding area
-    return len(shape) > 4 and not is_isolated(grid, shape[0][0], shape[0][1])
+def should_mirror_shape(grid: ColoredGrid, shape: List[Tuple[int, int]], center_r: int, center_c: int) -> bool:
+    shape_center_r = sum(r for r, _ in shape) // len(shape)
+    shape_center_c = sum(c for _, c in shape) // len(shape)
+    return abs(shape_center_r - center_r) + abs(shape_center_c - center_c) > grid.num_rows // 4
 
-def incorporate_shape(grid: ColoredGrid, shape: List[Tuple[int, int]], center_r: int, center_c: int, occupied_cells: Set[Tuple[int, int]]):
-    # Implement logic to incorporate the shape into a larger pattern
-    # This could involve extending the shape or connecting it to nearby shapes
-    pass
+def mirror_shape(grid: ColoredGrid, shape: List[Tuple[int, int]], center_r: int, center_c: int, occupied_cells: Set[Tuple[int, int]], color: int):
+    shape_center_r = sum(r for r, _ in shape) // len(shape)
+    shape_center_c = sum(c for _, c in shape) // len(shape)
+    mirror_r = center_r + (center_r - shape_center_r)
+    mirror_c = center_c + (center_c - shape_center_c)
+    
+    if can_place_shape(grid, shape, mirror_r, mirror_c, occupied_cells):
+        place_shape(grid, shape, mirror_r, mirror_c, color, occupied_cells)
+
+def incorporate_into_pattern(grid: ColoredGrid, shape: List[Tuple[int, int]], occupied_cells: Set[Tuple[int, int]]):
+    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+    for dr, dc in directions:
+        new_shape = [(r + dr, c + dc) for r, c in shape]
+        if can_place_shape(grid, new_shape, 0, 0, occupied_cells):
+            place_shape(grid, new_shape, 0, 0, 1, occupied_cells)
+            return
 
 def final_check(output_grid: ColoredGrid, input_grid: ColoredGrid):
     # Implement a final check to ensure the transformation has enhanced the original design
@@ -236,51 +250,54 @@ def process_small_shape(grid: ColoredGrid, shape: List[Tuple[int, int]], center_
             place_shape(grid, new_shape, shape_center_r, shape_center_c, 1, occupied_cells)
             return
 
-def balance_composition(grid: ColoredGrid, occupied_cells: Set[Tuple[int, int]]):
+def balance_and_ensure_symmetry(grid: ColoredGrid, occupied_cells: Set[Tuple[int, int]]):
+    center_r, center_c = grid.num_rows // 2, grid.num_cols // 2
     color_count = {1: 0, 3: 0, 8: 0}
-    for r, row in enumerate(grid.values):
-        for c, val in enumerate(row):
-            if val in color_count:
-                color_count[val] += 1
+    left_weight, right_weight = 0, 0
     
+    for r in range(grid.num_rows):
+        for c in range(grid.num_cols):
+            if grid.values[r][c] in color_count:
+                color_count[grid.values[r][c]] += 1
+            if c < center_c:
+                left_weight += grid.values[r][c] != 0
+            else:
+                right_weight += grid.values[r][c] != 0
+    
+    # Balance colors
     min_color = min(color_count, key=color_count.get)
     if color_count[min_color] * 2 < max(color_count.values()):
         add_balancing_shapes(grid, min_color, occupied_cells)
+    
+    # Ensure symmetry
+    if abs(left_weight - right_weight) > 3:
+        lighter_side = 'left' if left_weight < right_weight else 'right'
+        add_symmetry_shapes(grid, lighter_side, occupied_cells)
 
 def add_balancing_shapes(grid: ColoredGrid, color: int, occupied_cells: Set[Tuple[int, int]]):
-    for _ in range(3):  # Try to add up to 3 balancing shapes
-        shape = [(0, 0), (0, 1), (1, 0), (1, 1)]  # 2x2 square
-        for r in range(0, grid.num_rows - 1, 2):
-            for c in range(0, grid.num_cols - 1, 2):
+    shapes = [[(0, 0), (0, 1), (1, 0), (1, 1)],  # 2x2 square
+              [(0, 0), (0, 1), (0, 2), (1, 1)]]  # T shape
+    
+    for shape in shapes:
+        for r in range(0, grid.num_rows - len(shape)):
+            for c in range(0, grid.num_cols - len(shape[0])):
                 if can_place_shape(grid, shape, r, c, occupied_cells):
                     place_shape(grid, shape, r, c, color, occupied_cells)
                     return
-
-def fill_center(grid: ColoredGrid, occupied_cells: Set[Tuple[int, int]]):
-    center_r, center_c = grid.num_rows // 2, grid.num_cols // 2
-    if all((r, c) not in occupied_cells for r in range(center_r-1, center_r+2) for c in range(center_c-1, center_c+2)):
-        shape = [(0, 0), (0, 1), (0, 2), (1, 1), (2, 1)]  # Cross shape
-        place_shape(grid, shape, center_r-1, center_c-1, 8, occupied_cells)
-
-def ensure_symmetry(grid: ColoredGrid, occupied_cells: Set[Tuple[int, int]]):
-    center_r, center_c = grid.num_rows // 2, grid.num_cols // 2
-    left_weight = sum(grid.values[r][c] != 0 for r in range(grid.num_rows) for c in range(center_c))
-    right_weight = sum(grid.values[r][c] != 0 for r in range(grid.num_rows) for c in range(center_c, grid.num_cols))
-    
-    if abs(left_weight - right_weight) > 5:
-        lighter_side = 'left' if left_weight < right_weight else 'right'
-        add_symmetry_shapes(grid, lighter_side, occupied_cells)
 
 def add_symmetry_shapes(grid: ColoredGrid, side: str, occupied_cells: Set[Tuple[int, int]]):
     center_c = grid.num_cols // 2
     start_c, end_c = (0, center_c) if side == 'left' else (center_c, grid.num_cols)
     
-    for r in range(0, grid.num_rows - 1, 2):
-        for c in range(start_c, end_c - 1, 2):
-            if all((r+dr, c+dc) not in occupied_cells for dr in range(2) for dc in range(2)):
-                shape = [(0, 0), (0, 1), (1, 0), (1, 1)]  # 2x2 square
-                place_shape(grid, shape, r, c, 1 if side == 'left' else 8, occupied_cells)
-                return
+    shapes = [[(0, 0), (0, 1)],  # 1x2 rectangle
+              [(0, 0), (1, 0)]]  # 2x1 rectangle
+    
+    for shape in shapes:
+        for r in range(0, grid.num_rows - len(shape)):
+            for c in range(start_c, end_c - len(shape[0])):
+                if can_place_shape(grid, shape, r, c, occupied_cells):
+                    place_shape(grid, shape, r, c, 1 if side == 'left' else 8, occupied_cells)
+                    return
 
 def cleanup(grid: ColoredGrid, occupied_cells: Set[Tuple[int, int]]):
     for r in range(grid.num_rows):
