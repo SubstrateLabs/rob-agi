@@ -1,5 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List, Tuple, Set, Optional
 from collections import deque
 
 def solve_e681b708(input_grid: ColoredGrid) -> ColoredGrid:
@@ -7,9 +7,10 @@ def solve_e681b708(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid based on the following rules:
     1. Identifies the main structure (largest connected component of blue cells).
     2. Finds endpoints of the structure and their colors.
-    3. Creates a reachability map from these endpoints.
-    4. Transforms blue dots not part of the structure based on reachability.
+    3. Creates a distance map from these endpoints.
+    4. Propagates colors from endpoints to scattered blue dots based on distance.
     5. Merges adjacent transformed dots of the same color.
+    6. Maintains the integrity of the main structure and original colored endpoints.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -67,25 +68,48 @@ def find_endpoints(grid: ColoredGrid, structure: Set[Tuple[int, int]]) -> List[T
             endpoints.append((r, c, grid.values[r][c]))
     return endpoints
 
-def create_reachability_map(grid: ColoredGrid, structure: Set[Tuple[int, int]], endpoints: List[Tuple[int, int, int]]) -> List[List[Optional[int]]]:
+def create_distance_map(grid: ColoredGrid, structure: Set[Tuple[int, int]], endpoints: List[Tuple[int, int, int]]) -> List[List[List[Tuple[int, int]]]]:
     rows, cols = grid.get_dimensions()
-    reachability_map = [[None for _ in range(cols)] for _ in range(rows)]
+    distance_map = [[[] for _ in range(cols)] for _ in range(rows)]
     
-    for r, c, color in endpoints:
-        queue = deque([(r, c)])
+    for idx, (r, c, color) in enumerate(endpoints):
+        queue = deque([(r, c, 0)])
         visited = set()
         while queue:
-            cr, cc = queue.popleft()
+            cr, cc, dist = queue.popleft()
             if (cr, cc) in visited or (cr, cc) in structure:
                 continue
             visited.add((cr, cc))
-            reachability_map[cr][cc] = color
+            distance_map[cr][cc].append((dist, idx))
             for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
                 nr, nc = cr + dr, cc + dc
                 if 0 <= nr < rows and 0 <= nc < cols and (nr, nc) not in structure:
-                    queue.append((nr, nc))
+                    queue.append((nr, nc, dist + 1))
     
-    return reachability_map
+    return distance_map
+
+def propagate_colors(grid: ColoredGrid, structure: Set[Tuple[int, int]], distance_map: List[List[List[Tuple[int, int]]]], endpoints: List[Tuple[int, int, int]]) -> ColoredGrid:
+    rows, cols = grid.get_dimensions()
+    new_grid = grid.deep_copy()
+    
+    for r in range(rows):
+        for c in range(cols):
+            if (r, c) not in structure and grid.values[r][c] == 1:
+                if distance_map[r][c]:
+                    min_dist = min(dist for dist, _ in distance_map[r][c])
+                    closest_endpoints = [idx for dist, idx in distance_map[r][c] if dist == min_dist]
+                    if len(closest_endpoints) == 1:
+                        new_grid.values[r][c] = endpoints[closest_endpoints[0]][2]
+                    else:
+                        # Priority system: prefer non-blue colors, then lower color values
+                        colors = [endpoints[idx][2] for idx in closest_endpoints]
+                        non_blue_colors = [color for color in colors if color != 1]
+                        if non_blue_colors:
+                            new_grid.values[r][c] = min(non_blue_colors)
+                        else:
+                            new_grid.values[r][c] = min(colors)
+    
+    return new_grid
 
 def merge_adjacent_dots(grid: ColoredGrid, structure: Set[Tuple[int, int]]):
     rows, cols = grid.get_dimensions()
@@ -104,3 +128,11 @@ def merge_adjacent_dots(grid: ColoredGrid, structure: Set[Tuple[int, int]]):
         for c in range(cols):
             if (r, c) not in visited and (r, c) not in structure and grid.values[r][c] != 1:
                 dfs_merge(r, c, grid.values[r][c])
+
+def solve_e681b708(input_grid: ColoredGrid) -> ColoredGrid:
+    main_structure = find_main_structure(input_grid)
+    endpoints = find_endpoints(input_grid, main_structure)
+    distance_map = create_distance_map(input_grid, main_structure, endpoints)
+    transformed_grid = propagate_colors(input_grid, main_structure, distance_map, endpoints)
+    merge_adjacent_dots(transformed_grid, main_structure)
+    return transformed_grid
