@@ -1,0 +1,17 @@
+example_0:
+  input: |
+    A 30x30 grid mostly filled with black (0). There are several yellow dots (4) scattered across the grid. In the center, there's a small 2x2 red square (2).
+  output: |
+    The 30x30 grid remains mostly black (0). The yellow dots (4) are in the same positions. The 2x2 red square (2) in the center has expanded. There are now several 2x2 red squares scattered across the grid, always adjacent to yellow dots.
+
+example_1:
+  input: |
+    A 26x26 grid mostly filled with black (0). There are multiple yellow dots (4) scattered across the grid. Near the top left, there's an irregular red shape (2) resembling an 'L' or backwards 'J'.
+  output: |
+    The 26x26 grid remains mostly black (0). The yellow dots (4) are in the same positions. The irregular red shape near the top left remains unchanged. There are now several new 2x2 red squares scattered across the grid, always adjacent to yellow dots.
+
+example_2:
+  input: |
+    A 25x25 grid mostly filled with black (0). There are multiple yellow dots (4) scattered across the grid. Near the top left, there's an irregular red shape (2) resembling a sideways 'T'.
+  output: |
+    The 25x25 grid remains mostly black (0). The yellow dots (4) are in the same positions. The irregular red shape near the top left remains unchanged. There are now several new 2x2 red squares scattered across the grid, always adjacent to yellow dots. Some of these new red squares connect to form larger irregular shapes.
