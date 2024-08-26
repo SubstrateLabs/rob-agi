@@ -8,9 +8,9 @@ def solve_292dd178(input_grid: ColoredGrid) -> ColoredGrid:
     
     The function performs the following steps:
     1. Creates a deep copy of the input grid.
-    2. Identifies enclosed areas using a flood fill algorithm.
-    3. Fills the enclosed areas with red (2).
-    4. Ensures that originally blue cells remain blue.
+    2. Uses a flood fill algorithm to mark all reachable cells from the edges.
+    3. Fills all unreachable cells (except blue ones) with red (2).
+    4. Preserves all blue (1) cells and cells reachable from non-blue edges.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -21,38 +21,29 @@ def solve_292dd178(input_grid: ColoredGrid) -> ColoredGrid:
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
     
-    def is_enclosed(x: int, y: int) -> bool:
-        if grid.values[x][y] == 1:  # Blue cell
-            return False
-        
-        queue = deque([(x, y)])
-        visited = set()
-        
+    # Create a boolean matrix to mark reachable cells
+    reachable = [[False for _ in range(cols)] for _ in range(rows)]
+    
+    # Helper function for flood fill
+    def flood_fill(start_r: int, start_c: int):
+        queue = deque([(start_r, start_c)])
         while queue:
-            cx, cy = queue.popleft()
-            
-            if cx == 0 or cx == rows - 1 or cy == 0 or cy == cols - 1:
-                return False
-            
-            if (cx, cy) in visited:
-                continue
-            
-            visited.add((cx, cy))
-            
-            for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]:
-                nx, ny = cx + dx, cy + dy
-                if 0 <= nx < rows and 0 <= ny < cols and grid.values[nx][ny] != 1:
-                    queue.append((nx, ny))
-        
-        return True
+            r, c = queue.popleft()
+            if 0 <= r < rows and 0 <= c < cols and grid.values[r][c] != 1 and not reachable[r][c]:
+                reachable[r][c] = True
+                for dr, dc in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+                    queue.append((r + dr, c + dc))
     
-    to_fill = set()
-    for x in range(rows):
-        for y in range(cols):
-            if grid.values[x][y] != 1 and is_enclosed(x, y):
-                to_fill.add((x, y))
+    # Start flood fill from edge cells that are not blue (1) or red (2)
+    for r in range(rows):
+        for c in range(cols):
+            if (r == 0 or r == rows - 1 or c == 0 or c == cols - 1) and grid.values[r][c] not in [1, 2]:
+                flood_fill(r, c)
     
-    for x, y in to_fill:
-        grid.values[x][y] = 2
+    # Fill unreachable cells with red (2)
+    for r in range(rows):
+        for c in range(cols):
+            if not reachable[r][c] and grid.values[r][c] != 1:
+                grid.values[r][c] = 2
     
     return grid
