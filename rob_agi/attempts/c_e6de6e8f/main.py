@@ -22,7 +22,7 @@ def solve_e6de6e8f(input_grid: ColoredGrid) -> ColoredGrid:
     current_row, current_col = 1, 3
 
     for decision_point in decision_points:
-        while current_row < 8 and current_col < min(decision_point, 6):
+        while current_row < 7 and current_col < min(decision_point, 6):
             output[current_row][current_col] = 2
             current_row += 1
             current_col += 1
@@ -30,16 +30,20 @@ def solve_e6de6e8f(input_grid: ColoredGrid) -> ColoredGrid:
         if current_col >= 6:  # Stop if we've reached the rightmost valid column
             break
 
-        if input_grid.values[1][decision_point] == 2 and current_row < 8 and current_col < 6:
+        if input_grid.values[1][decision_point] == 2 and current_row < 7 and current_col < 6:
             output[current_row][current_col] = 2
             current_row += 1
             current_col += 1
 
     # Complete the path to the bottom-right
-    while current_row < 8 and current_col < 7:
+    while current_row < 7 and current_col < 6:
         output[current_row][current_col] = 2
-        if current_col < 6:
-            current_col += 1
+        current_row += 1
+        current_col += 1
+
+    # Ensure the path reaches the bottom
+    while current_row < 8:
+        output[current_row][current_col] = 2
         current_row += 1
 
     return ColoredGrid(values=output)
