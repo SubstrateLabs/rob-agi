@@ -7,30 +7,27 @@ def solve_df8cc377(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by identifying closed shapes, filling their interiors with patterns,
     and clearing the rest of the grid. The process involves:
     1. Detecting closed shapes in the grid using flood fill.
-    2. Identifying the highest-numbered color present in the grid for filling.
+    2. For each shape, identifying the highest-numbered color present within or adjacent to it for filling.
     3. For shapes 5x5 or larger, filling the interior with a checkerboard pattern using
-       the highest-numbered color and black (0).
-    4. For 3x3 shapes, placing a single dot of the highest-numbered color at the center.
-    5. For 5x3 or 3x5 shapes, placing two dots of the highest-numbered color symmetrically.
+       the shape's fill color and black (0).
+    4. For 3x3 shapes, placing a single dot of the shape's fill color at the center.
+    5. For 5x3 or 3x5 shapes, placing two dots of the shape's fill color symmetrically.
     6. For shapes smaller than 3x3 but closed, preserving them without filling.
     7. Clearing all cells not part of any shape's boundary or interior.
-    8. Reconstructing the grid with the modified shapes.
-    9. Removing all scattered dots that are not part of any closed shape.
+    8. Removing all scattered dots that are not part of any closed shape.
     """
     BLACK = 0
-
-    def get_highest_fill_color(grid: ColoredGrid) -> int:
-        return max((color for color in range(9, 0, -1) if any(color in row for row in grid.values)), default=0)
 
     def find_shapes(grid: ColoredGrid) -> List[Tuple[int, List[Tuple[int, int]], List[Tuple[int, int]]]]:
         shapes = []
         visited = set()
         rows, cols = grid.get_dimensions()
 
-        def flood_fill(r: int, c: int, color: int) -> Tuple[List[Tuple[int, int]], List[Tuple[int, int]]]:
+        def flood_fill(r: int, c: int, color: int) -> Tuple[List[Tuple[int, int]], List[Tuple[int, int]], int]:
             boundary = []
             interior = []
             queue = deque([(r, c)])
+            max_color = color
             while queue:
                 curr_r, curr_c = queue.popleft()
                 if (curr_r, curr_c) not in visited and grid.get_cell(curr_r, curr_c) == color:
@@ -39,22 +36,24 @@ def solve_df8cc377(input_grid: ColoredGrid) -> ColoredGrid:
                     for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
                         nr, nc = curr_r + dr, curr_c + dc
                         if 0 <= nr < rows and 0 <= nc < cols:
-                            if grid.get_cell(nr, nc) != color:
+                            neighbor_color = grid.get_cell(nr, nc)
+                            if neighbor_color != color:
                                 is_boundary = True
+                                max_color = max(max_color, neighbor_color)
                             else:
                                 queue.append((nr, nc))
                     if is_boundary:
                         boundary.append((curr_r, curr_c))
                     else:
                         interior.append((curr_r, curr_c))
-            return boundary, interior
+            return boundary, interior, max_color
 
         for r in range(rows):
             for c in range(cols):
                 if (r, c) not in visited and grid.get_cell(r, c) != BLACK:
-                    boundary, interior = flood_fill(r, c, grid.get_cell(r, c))
+                    boundary, interior, fill_color = flood_fill(r, c, grid.get_cell(r, c))
                     if boundary:  # Only add shapes with a boundary
-                        shapes.append((grid.get_cell(r, c), boundary, interior))
+                        shapes.append((grid.get_cell(r, c), boundary, interior, fill_color))
 
         return shapes
 
@@ -93,9 +92,8 @@ def solve_df8cc377(input_grid: ColoredGrid) -> ColoredGrid:
 
     new_grid = ColoredGrid(values=[[BLACK for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
     shapes = find_shapes(input_grid)
-    fill_color = get_highest_fill_color(input_grid)
 
-    for shape_color, boundary, interior in shapes:
+    for shape_color, boundary, interior, fill_color in shapes:
         # Add boundary to new_grid for all closed shapes
         for r, c in boundary:
             new_grid.set_cell(r, c, shape_color)
