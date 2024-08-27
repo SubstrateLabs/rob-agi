@@ -24,8 +24,7 @@ def solve_cf133acc(input_grid: ColoredGrid) -> ColoredGrid:
             current_color = result.values[row][col]
             if current_color != 0:
                 color_stack.append(current_color)
-            else:
-                if color_stack:
-                    result.values[row][col] = color_stack[-1]
+            if current_color == 0 and color_stack:
+                result.values[row][col] = color_stack[-1]
     
     return result
