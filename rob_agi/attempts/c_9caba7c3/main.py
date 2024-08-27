@@ -11,6 +11,7 @@ def solve_9caba7c3(input_grid: ColoredGrid) -> ColoredGrid:
        moving right and down, but not crossing black (0) squares.
     5. Preserves the original state of black (0) squares and all other colors outside the red regions.
     6. Applies transformations based on the original grid state.
+    7. Ensures that orange propagation starts from the top-left of each transformed region.
     """
     original_grid = input_grid.deep_copy()
     new_grid = input_grid.deep_copy()
@@ -21,28 +22,31 @@ def solve_9caba7c3(input_grid: ColoredGrid) -> ColoredGrid:
         return row < mid_row and col < mid_col
 
     def flood_fill(row, col, color, target_color, visited):
-        if (row < 0 or row >= height or col < 0 or col >= width or
-            original_grid.values[row][col] != target_color or (row, col) in visited):
-            return
+        stack = [(row, col)]
+        while stack:
+            r, c = stack.pop()
+            if (r < 0 or r >= height or c < 0 or c >= width or
+                original_grid.values[r][c] != target_color or (r, c) in visited):
+                continue
 
-        visited.add((row, col))
-        new_grid.values[row][col] = color
+            visited.add((r, c))
+            new_grid.values[r][c] = color
 
-        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            flood_fill(row + dr, col + dc, color, target_color, visited)
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                stack.append((r + dr, c + dc))
 
     def propagate_orange(start_row, start_col, visited):
         queue = deque([(start_row, start_col)])
         while queue:
             row, col = queue.popleft()
-            if (row, col) not in visited:
+            if new_grid.values[row][col] != 4:
                 continue
             new_grid.values[row][col] = 7
             for dr, dc in [(0, 1), (1, 0)]:  # Only right and down
                 new_row, new_col = row + dr, col + dc
                 if (0 <= new_row < height and 0 <= new_col < width and
                     original_grid.values[new_row][new_col] != 0 and
-                    (new_row, new_col) in visited):
+                    new_grid.values[new_row][new_col] == 4):
                     queue.append((new_row, new_col))
 
     visited = set()
@@ -55,6 +59,7 @@ def solve_9caba7c3(input_grid: ColoredGrid) -> ColoredGrid:
         for col in range(width):
             if new_grid.values[row][col] == 4:
                 propagate_orange(row, col, visited)
+                break  # Start orange propagation from the first yellow square found
 
     # Final check for upper-left quadrant red squares
     for row in range(mid_row):
