@@ -6,7 +6,8 @@ def solve_ad7e01d0(input_grid: ColoredGrid) -> ColoredGrid:
     1. The output grid size is the square of the input grid size.
     2. For odd-sized inputs, fill the middle row and column with the input pattern.
     3. For even-sized inputs, fill the entire perimeter with the input pattern and replicate the input in the corners.
-    4. The rest of the grid remains filled with zeros (black).
+    4. For even-sized inputs, also fill the rows and columns adjacent to the middle with the input pattern.
+    5. The rest of the grid remains filled with zeros (black).
     """
     n = len(input_grid.values)
     output_size = n * n
@@ -18,11 +19,19 @@ def solve_ad7e01d0(input_grid: ColoredGrid) -> ColoredGrid:
             output_values[mid][i] = input_grid.values[n//2][i % n]
             output_values[i][mid] = input_grid.values[i % n][n//2]
     else:  # Even-sized input
+        mid = output_size // 2
         for i in range(output_size):
-            output_values[0][i] = input_grid.values[0][i % n]  # Top edge
-            output_values[output_size - 1][i] = input_grid.values[n - 1][i % n]  # Bottom edge
-            output_values[i][0] = input_grid.values[i % n][0]  # Left edge
-            output_values[i][output_size - 1] = input_grid.values[i % n][n - 1]  # Right edge
+            # Fill top, bottom, left, and right edges
+            output_values[0][i] = input_grid.values[0][i % n]
+            output_values[output_size - 1][i] = input_grid.values[n - 1][i % n]
+            output_values[i][0] = input_grid.values[i % n][0]
+            output_values[i][output_size - 1] = input_grid.values[i % n][n - 1]
+            
+            # Fill rows and columns adjacent to the middle
+            output_values[mid - 1][i] = input_grid.values[n//2 - 1][i % n]
+            output_values[mid][i] = input_grid.values[n//2][i % n]
+            output_values[i][mid - 1] = input_grid.values[i % n][n//2 - 1]
+            output_values[i][mid] = input_grid.values[i % n][n//2]
         
         # Fill the corners with complete copies of the input
         for i in range(n):
