@@ -71,4 +71,21 @@ def solve_62ab2642(input_grid: ColoredGrid) -> ColoredGrid:
             if is_surrounded_by_gray(x, y):
                 flood_fill(x, y, 0, 7, diagonal=False)
 
+    # Additional pass to fill isolated areas that are diagonally connected
+    def is_diagonally_isolated(x, y):
+        if output_grid.values[y][x] != 0:
+            return False
+        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]:
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < cols and 0 <= ny < rows:
+                if output_grid.values[ny][nx] not in [5, 7]:
+                    return False
+            # Edge of grid counts as gray
+        return True
+
+    for y in range(rows):
+        for x in range(cols):
+            if is_diagonally_isolated(x, y):
+                flood_fill(x, y, 0, 7, diagonal=True)
+
     return output_grid
