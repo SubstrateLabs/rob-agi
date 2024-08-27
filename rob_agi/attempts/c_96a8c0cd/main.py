@@ -8,12 +8,13 @@ def solve_96a8c0cd(input_grid: ColoredGrid) -> ColoredGrid:
     of red (2) cells connecting all non-black colored cells and extending to the grid edges.
 
     The algorithm follows these steps:
-    1. Analyze the input grid to find all colored cells.
-    2. Create a new grid, copying all non-black colored cells from the input.
-    3. Implement a modified Prim's algorithm to create a minimal spanning tree connecting all colored cells.
-    4. Extend the red structure to all four grid edges.
-    5. Optimize the red structure by removing unnecessary red cells while maintaining connectivity.
-    6. Perform a final verification to ensure all requirements are met.
+    1. Initialize the output grid by copying non-black cells from the input.
+    2. Identify key points (colored cells and corners).
+    3. Create a minimal spanning tree connecting all key points.
+    4. Extend the red structure to all grid edges.
+    5. Connect corners if not already connected.
+    6. Optimize the red structure by removing unnecessary cells.
+    7. Verify the solution meets all requirements.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -24,78 +25,70 @@ def solve_96a8c0cd(input_grid: ColoredGrid) -> ColoredGrid:
     rows, cols = input_grid.get_dimensions()
     grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
 
-    def is_colored(r: int, c: int) -> bool:
-        return input_grid.get_cell(r, c) > 0
+    # Step 1: Initialize output grid
+    for r in range(rows):
+        for c in range(cols):
+            if input_grid.get_cell(r, c) > 0:
+                grid.set_cell(r, c, input_grid.get_cell(r, c))
 
-    # Step 1: Analyze the input grid
-    colored_cells = [(r, c) for r in range(rows) for c in range(cols) if is_colored(r, c)]
-    if not colored_cells:
-        return input_grid
+    # Step 2: Identify key points
+    key_points = [(r, c) for r in range(rows) for c in range(cols) if grid.get_cell(r, c) > 0]
+    key_points += [(0, 0), (0, cols-1), (rows-1, 0), (rows-1, cols-1)]
+    key_points = list(set(key_points))  # Remove duplicates
 
-    # Step 2: Copy non-black colored cells
-    for r, c in colored_cells:
-        grid.set_cell(r, c, input_grid.get_cell(r, c))
-
-    # Step 3: Implement modified Prim's algorithm
+    # Step 3: Create minimal spanning tree
     def manhattan_distance(cell1: Tuple[int, int], cell2: Tuple[int, int]) -> int:
         return abs(cell1[0] - cell2[0]) + abs(cell1[1] - cell2[1])
 
-    def get_neighbors(r: int, c: int) -> List[Tuple[int, int]]:
-        return [(r+dr, c+dc) for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
-                if 0 <= r+dr < rows and 0 <= c+dc < cols]
-
-    start = colored_cells[0]
-    visited = set([start])
-    edges = [(manhattan_distance(start, neighbor), start, neighbor)
-             for neighbor in colored_cells[1:]]
-    heapq.heapify(edges)
-
-    while edges:
-        _, parent, current = heapq.heappop(edges)
-        if current not in visited:
-            visited.add(current)
-            r, c = current
-            while (r, c) != parent:
-                if r < parent[0]: r += 1
-                elif r > parent[0]: r -= 1
-                elif c < parent[1]: c += 1
-                elif c > parent[1]: c -= 1
-                if grid.get_cell(r, c) == 0:
-                    grid.set_cell(r, c, 2)  # Set to red
-            for neighbor in colored_cells:
-                if neighbor not in visited:
-                    heapq.heappush(edges, (manhattan_distance(current, neighbor), current, neighbor))
-
-    # Step 4: Extend to all four edges
-    def extend_to_edge(r: int, c: int, dr: int, dc: int):
-        while 0 <= r < rows and 0 <= c < cols:
+    def connect_points(start: Tuple[int, int], end: Tuple[int, int]):
+        r, c = start
+        while (r, c) != end:
             if grid.get_cell(r, c) == 0:
-                grid.set_cell(r, c, 2)
-            r += dr
-            c += dc
+                grid.set_cell(r, c, 2)  # Set to red
+            if r < end[0]: r += 1
+            elif r > end[0]: r -= 1
+            elif c < end[1]: c += 1
+            elif c > end[1]: c -= 1
 
-    for r in range(rows):
-        extend_to_edge(r, 0, 0, 1)  # Left to right
-        extend_to_edge(r, cols-1, 0, -1)  # Right to left
-    for c in range(cols):
-        extend_to_edge(0, c, 1, 0)  # Top to bottom
-        extend_to_edge(rows-1, c, -1, 0)  # Bottom to top
+    connected = set([key_points[0]])
+    while len(connected) < len(key_points):
+        best_distance = float('inf')
+        best_connection = None
+        for point in connected:
+            for candidate in key_points:
+                if candidate not in connected:
+                    distance = manhattan_distance(point, candidate)
+                    if distance < best_distance:
+                        best_distance = distance
+                        best_connection = (point, candidate)
+        connect_points(*best_connection)
+        connected.add(best_connection[1])
 
-    # Step 5: Optimize the red structure
+    # Step 4: Extend to edges (already done in step 3)
+
+    # Step 5: Connect corners (already done in step 3)
+
+    # Step 6: Optimize red structure
     def is_critical(r: int, c: int) -> bool:
         if grid.get_cell(r, c) != 2:
             return False
-        neighbors = [grid.get_cell(*n) for n in get_neighbors(r, c)]
-        return sum(1 for n in neighbors if n > 0) > 2 or r in [0, rows-1] or c in [0, cols-1]
+        neighbors = [(r+dr, c+dc) for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                     if 0 <= r+dr < rows and 0 <= c+dc < cols]
+        colored_neighbors = sum(1 for nr, nc in neighbors if grid.get_cell(nr, nc) > 0)
+        return colored_neighbors > 2 or (r, c) in [(0, 0), (0, cols-1), (rows-1, 0), (rows-1, cols-1)]
 
     for r in range(rows):
         for c in range(cols):
             if grid.get_cell(r, c) == 2 and not is_critical(r, c):
                 grid.set_cell(r, c, 0)
 
-    # Step 6: Final verification
-    assert all(grid.get_cell(r, c) == input_grid.get_cell(r, c) for r, c in colored_cells), "Original colored cells not preserved"
+    # Step 7: Verify solution
+    assert all(grid.get_cell(r, c) == input_grid.get_cell(r, c) for r in range(rows) for c in range(cols) if input_grid.get_cell(r, c) > 0), "Original colored cells not preserved"
     assert all(any(grid.get_cell(r, c) > 0 for r in range(rows)) for c in range(cols)), "Not all columns have colored cells"
     assert all(any(grid.get_cell(r, c) > 0 for c in range(cols)) for r in range(rows)), "Not all rows have colored cells"
+    assert all(grid.get_cell(0, c) > 0 for c in range(cols) if any(grid.get_cell(r, c) > 0 for r in range(rows))), "Not extended to top edge"
+    assert all(grid.get_cell(rows-1, c) > 0 for c in range(cols) if any(grid.get_cell(r, c) > 0 for r in range(rows))), "Not extended to bottom edge"
+    assert all(grid.get_cell(r, 0) > 0 for r in range(rows) if any(grid.get_cell(r, c) > 0 for c in range(cols))), "Not extended to left edge"
+    assert all(grid.get_cell(r, cols-1) > 0 for r in range(rows) if any(grid.get_cell(r, c) > 0 for c in range(cols))), "Not extended to right edge"
 
     return grid
