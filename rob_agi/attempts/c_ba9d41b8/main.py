@@ -1,5 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List, Tuple, Set
 
 def solve_ba9d41b8(input_grid: ColoredGrid) -> ColoredGrid:
     """
