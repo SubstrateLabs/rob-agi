@@ -12,8 +12,8 @@ def solve_17cae0c1(input_grid: ColoredGrid) -> ColoredGrid:
     - If rightmost, it becomes blue (1)
     
     For the remaining two sections:
-    - If to the left of the highest rank, assign brown (9) to the higher rank and yellow (4) to the lower rank
-    - If to the right of the highest rank, assign yellow (4) to the higher rank and brown (9) to the lower rank
+    - The section to the left of the highest rank becomes yellow (4)
+    - The section to the right of the highest rank becomes brown (9)
     """
     # Step 1: Parse the input grid
     sections = [
@@ -37,13 +37,13 @@ def solve_17cae0c1(input_grid: ColoredGrid) -> ColoredGrid:
         colors[1] = 9  # Brown for middle
         colors[2] = 4  # Yellow for rightmost
     elif highest_rank_index == 1:
-        colors[0] = 9  # Brown for left of highest
+        colors[0] = 4  # Yellow for left of highest
         colors[1] = 3  # Green for middle highest
-        colors[2] = 4  # Yellow for right of highest
+        colors[2] = 9  # Brown for right of highest
     else:  # highest_rank_index == 2
-        colors[0] = 9  # Brown for leftmost
-        colors[1] = 1  # Blue for middle
-        colors[2] = 4  # Yellow for rightmost
+        colors[0] = 4  # Yellow for leftmost
+        colors[1] = 6  # Magenta for middle
+        colors[2] = 3  # Green for rightmost
 
     # Step 5: Create the output grid
     output_values = []
