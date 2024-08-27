@@ -6,14 +6,16 @@ def solve_8ba14f53(input_grid: ColoredGrid) -> ColoredGrid:
     Transform a 4x9 input grid into a 3x3 output grid based on the following rules:
     1. Identify the two most prominent non-black colors in the input grid.
     2. Analyze each color's position, span, and density.
-    3. Represent each color minimally in the output grid, preserving vertical order.
+    3. Represent each color in the output grid, preserving vertical order.
     4. Place colors based on their horizontal position and span in the input.
-    5. Ensure both prominent colors are represented, even if minimally.
-    6. Fill remaining cells with black (0).
+    5. If a color spans more than half the input grid width, represent it with three cells horizontally in the output.
+    6. Ensure both prominent colors are represented, even if minimally.
+    7. Maintain vertical separation between colors if possible.
+    8. Fill remaining cells with black (0).
 
-    The transformation creates a minimal representation of the two most prominent colors
-    while maintaining their relative vertical positions and giving a sense of their
-    horizontal distribution.
+    The transformation creates a representation of the two most prominent colors
+    while maintaining their relative vertical positions and accurately reflecting
+    their horizontal distribution in the input grid.
     """
     colors = analyze_grid(input_grid)
     sorted_colors = rank_colors(colors)
@@ -60,23 +62,18 @@ def create_output_grid(sorted_colors: List[Tuple[int, Dict]], input_dims: Tuple[
     pos1 = min(2, info1['top'] * 3 // rows)
     pos2 = min(2, info2['top'] * 3 // rows)
 
-    # Place colors minimally
+    # Place colors and extend horizontally if necessary
     output_values[pos1][0] = color1
-    if pos2 == pos1:
-        output_values[min(2, pos2 + 1)][0] = color2
-    else:
-        output_values[pos2][0] = color2
-
-    # Extend horizontally if necessary
     if info1['h_span'] > 0.5:
         output_values[pos1][1] = color1
+        output_values[pos1][2] = color1
+
+    if pos2 == pos1:
+        pos2 = min(2, pos2 + 1)
+    output_values[pos2][0] = color2
     if info2['h_span'] > 0.5:
         output_values[pos2][1] = color2
-
-    # Ensure minimal representation
-    for row in output_values:
-        if row.count(row[0]) > 1 and row[0] != 0:
-            row[1:] = [0, 0]
+        output_values[pos2][2] = color2
 
     # Shift rows up if necessary
     while output_values[0] == [0, 0, 0] and any(row != [0, 0, 0] for row in output_values[1:]):
