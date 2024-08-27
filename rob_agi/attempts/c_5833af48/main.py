@@ -42,8 +42,8 @@ def analyze_pattern(grid: List[List[int]]) -> List[Tuple[int, int]]:
 
 def calculate_output_size(pattern: List[Tuple[int, int]]) -> Tuple[int, int]:
     complexity = len(pattern)
-    size = max(6, min(9, complexity + 3))
-    return size, size + 3  # Make it slightly wider for better symmetry
+    size = max(9, min(15, complexity * 2 + 1))
+    return size, size  # Make it square for perfect symmetry
 
 def apply_symmetrical_pattern(output: List[List[int]], pattern: List[Tuple[int, int]]):
     rows, cols = len(output), len(output[0])
@@ -71,10 +71,10 @@ def refine_pattern(output: List[List[int]]):
     # Connect edge patterns
     for r in range(1, rows - 1):
         if output[r][0] == 8 and output[r][-1] == 8:
-            output[r][cols // 4] = output[r][cols // 2] = output[r][3 * cols // 4] = 8
+            output[r][cols // 3] = output[r][2 * cols // 3] = 8
     for c in range(1, cols - 1):
         if output[0][c] == 8 and output[-1][c] == 8:
-            output[rows // 4][c] = output[rows // 2][c] = output[3 * rows // 4][c] = 8
+            output[rows // 3][c] = output[2 * rows // 3][c] = 8
 
     # Ensure symmetry
     for r in range(rows):
@@ -82,8 +82,19 @@ def refine_pattern(output: List[List[int]]):
             if output[r][c] == 8:
                 output[rows - r - 1][c] = output[r][cols - c - 1] = output[rows - r - 1][cols - c - 1] = 8
 
-    # Remove isolated cells
+    # Remove isolated cells and add connecting cells
     for r in range(1, rows - 1):
         for c in range(1, cols - 1):
-            if output[r][c] == 8 and sum(output[r+dr][c+dc] == 8 for dr, dc in [(0,1),(1,0),(0,-1),(-1,0)]) < 2:
+            neighbors = sum(output[r+dr][c+dc] == 8 for dr, dc in [(0,1),(1,0),(0,-1),(-1,0)])
+            if output[r][c] == 8 and neighbors < 2:
                 output[r][c] = output[0][0]  # Change to background color
+            elif output[r][c] != 8 and neighbors >= 3:
+                output[r][c] = 8  # Add connecting cell
+
+    # Ensure perfect symmetry
+    for r in range(rows // 2 + 1):
+        for c in range(cols):
+            if output[r][c] == 8:
+                output[rows - r - 1][c] = 8
+                output[r][cols - c - 1] = 8
+                output[rows - r - 1][cols - c - 1] = 8
