@@ -7,10 +7,10 @@ def solve_c62e2108(input_grid: ColoredGrid) -> ColoredGrid:
     
     The function identifies non-black, non-blue shapes in the input grid,
     expands them based on their position in the grid:
-    - Top-left shapes are expanded to a 2x3 grid with a connecting top line.
-    - Bottom-left shapes are expanded vertically to form a column of 4 repetitions.
-    - Top-right shapes are expanded down to form a 2x1 column.
-    - Bottom-right shapes are expanded to a 2x3 grid with an extra right column and connecting top line.
+    - Top-left shapes are expanded to fill the entire top-left quadrant.
+    - Bottom-left shapes are expanded vertically, repeating the pattern four times.
+    - Top-right shapes are expanded downwards, doubling the original height.
+    - Bottom-right shapes are expanded to fill the entire bottom-right quadrant.
     Blue areas are removed, and black areas outside expansions are preserved.
     
     Args:
@@ -39,7 +39,7 @@ def find_shapes(grid: ColoredGrid) -> List[Dict]:
                 shape = get_shape(grid, r, c, visited)
                 shapes.append(shape)
     
-    return sorted(shapes, key=lambda x: (x['row'], x['col']), reverse=True)
+    return sorted(shapes, key=lambda x: (x['row'], x['col']))
 
 def get_shape(grid: ColoredGrid, start_r: int, start_c: int, visited: set) -> Dict:
     color = grid.values[start_r][start_c]
@@ -64,34 +64,34 @@ def expand_shape(grid: List[List[int]], shape: Dict, rows: int, cols: int):
     mid_row, mid_col = rows // 2, cols // 2
     
     if r < mid_row and c < mid_col:  # Top-left quadrant
-        expand_top_left(grid, color, r, c, rows, cols)
+        expand_top_left(grid, color, mid_row, mid_col)
     elif r >= mid_row and c < mid_col:  # Bottom-left quadrant
-        expand_bottom_left(grid, color, r, c, rows, cols)
+        expand_bottom_left(grid, color, r, c, rows, mid_col)
     elif r < mid_row and c >= mid_col:  # Top-right quadrant
-        expand_top_right(grid, color, r, c, rows, cols)
+        expand_top_right(grid, color, r, c, mid_row, cols)
     else:  # Bottom-right quadrant
-        expand_bottom_right(grid, color, r, c, rows, cols)
+        expand_bottom_right(grid, color, mid_row, mid_col, rows, cols)
 
-def expand_top_left(grid: List[List[int]], color: int, r: int, c: int, rows: int, cols: int):
-    for i in range(r, min(r + 6, rows)):
-        for j in range(c, min(c + 15, cols)):
-            if i == r or (i - r) % 4 == 0 or (j - c) % 4 == 0 or (j - c) % 4 == 3:
+def expand_top_left(grid: List[List[int]], color: int, mid_row: int, mid_col: int):
+    for i in range(mid_row):
+        for j in range(mid_col):
+            grid[i][j] = color
+
+def expand_bottom_left(grid: List[List[int]], color: int, r: int, c: int, rows: int, mid_col: int):
+    pattern_height = (rows - r) // 4
+    for i in range(r, rows):
+        for j in range(mid_col):
+            if grid[i % pattern_height + r][j] != 0:
                 grid[i][j] = color
 
-def expand_bottom_left(grid: List[List[int]], color: int, r: int, c: int, rows: int, cols: int):
-    for i in range(max(0, r - 12), rows):
-        for j in range(c, min(c + 4, cols)):
-            if (i - r) % 4 == 0 or (i - r) % 4 == 3 or j == c or j == c + 3:
+def expand_top_right(grid: List[List[int]], color: int, r: int, c: int, mid_row: int, cols: int):
+    pattern_height = mid_row - r
+    for i in range(r, mid_row * 2):
+        for j in range(c, cols):
+            if grid[i % pattern_height + r][j] != 0:
                 grid[i][j] = color
 
-def expand_top_right(grid: List[List[int]], color: int, r: int, c: int, rows: int, cols: int):
-    for i in range(r, min(r + 8, rows)):
-        for j in range(c, min(c + 4, cols)):
-            if (i - r) % 4 == 0 or (i - r) % 4 == 3 or j == c or j == c + 3:
-                grid[i][j] = color
-
-def expand_bottom_right(grid: List[List[int]], color: int, r: int, c: int, rows: int, cols: int):
-    for i in range(max(0, r - 4), rows):
-        for j in range(max(0, c - 12), cols):
-            if i == r - 4 or (i - r) % 4 == 0 or (j - c) % 4 == 0 or j == cols - 1:
-                grid[i][j] = color
+def expand_bottom_right(grid: List[List[int]], color: int, mid_row: int, mid_col: int, rows: int, cols: int):
+    for i in range(mid_row, rows):
+        for j in range(mid_col, cols):
+            grid[i][j] = color
