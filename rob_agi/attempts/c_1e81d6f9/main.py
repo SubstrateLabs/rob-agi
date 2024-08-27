@@ -1,10 +1,8 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Dict
-from collections import defaultdict
-
-from typing import List, Tuple, Dict
 from collections import defaultdict, deque
 import heapq
+import random
 
 def solve_1e81d6f9(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -16,6 +14,7 @@ def solve_1e81d6f9(input_grid: ColoredGrid) -> ColoredGrid:
     4. Maintains spatial distribution of colors.
     5. Ensures color variety by preserving at least one cell of each color present in the input.
     6. Makes minimal changes to the input grid.
+    7. Allows for occasional complete removal of a color or keeping fewer than 3 instances.
     
     Returns a new ColoredGrid with the transformed grid.
     """
@@ -74,7 +73,8 @@ def solve_1e81d6f9(input_grid: ColoredGrid) -> ColoredGrid:
         for region in regions:
             for cell in region:
                 isolation = calculate_isolation(cell, color)
-                heapq.heappush(queue, (-len(region), isolation, cell))
+                edge_priority = 1 if cell[0] in (0, rows-1) or cell[1] in (0, cols-1) else 0
+                heapq.heappush(queue, (-len(region), isolation, edge_priority, random.random(), cell))
         color_queues[color] = queue
     
     # Step 2-5: Process other colors
@@ -85,19 +85,19 @@ def solve_1e81d6f9(input_grid: ColoredGrid) -> ColoredGrid:
                 active_colors.remove(color)
                 continue
             
-            _, _, (r, c) = heapq.heappop(color_queues[color])
+            _, _, _, _, (r, c) = heapq.heappop(color_queues[color])
             if output_grid.values[r][c] == 0:
                 output_grid.values[r][c] = color
                 color_counters[color] += 1
                 
                 # Remove nearby cells from the queue
-                color_queues[color] = [item for item in color_queues[color] if abs(item[2][0] - r) + abs(item[2][1] - c) > 2]
+                color_queues[color] = [item for item in color_queues[color] if abs(item[4][0] - r) + abs(item[4][1] - c) > 2]
                 heapq.heapify(color_queues[color])
                 
-                if color_counters[color] >= 4:
+                if color_counters[color] >= 3 and random.random() < 0.7:  # 70% chance to stop at 3
                     active_colors.remove(color)
             
-            if all(counter >= 3 for counter in color_counters.values()):
+            if all(counter >= 2 for counter in color_counters.values()) and random.random() < 0.3:  # 30% chance to stop early
                 active_colors.clear()
                 break
     
