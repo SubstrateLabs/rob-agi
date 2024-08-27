@@ -36,7 +36,7 @@ def solve_5207a7b5(input_grid: ColoredGrid) -> ColoredGrid:
             for col in range(sky_blue_width):
                 new_grid.values[row][col] = 8
         else:
-            if row % 2 == 0 and sky_blue_width > 1:
+            if row % 2 == 0 and sky_blue_width > 0:
                 sky_blue_width -= 1
             for col in range(sky_blue_width):
                 new_grid.values[row][col] = 8
