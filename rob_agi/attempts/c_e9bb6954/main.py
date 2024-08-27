@@ -5,9 +5,9 @@ def solve_e9bb6954(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the grid transformation challenge by following these steps:
     1. Identify all 3x3 squares of the same non-zero color in the input grid.
-    2. Sort the 3x3 squares by their center column (left to right), then by center row (top to bottom).
-    3. Draw vertical lines using the leftmost and rightmost 3x3 squares' center columns and colors.
-    4. Draw horizontal lines for each 3x3 square's center row using its color.
+    2. Determine the leftmost and rightmost columns containing 3x3 squares.
+    3. Draw vertical lines using the leftmost and rightmost columns' colors.
+    4. Draw horizontal lines for each unique center row of 3x3 squares using their colors.
     5. When drawing lines, only overwrite cells with higher-numbered colors or zeros.
     6. Preserve all original non-zero values from the input grid.
     7. Return the transformed grid with these lines drawn.
@@ -27,7 +27,7 @@ def solve_e9bb6954(input_grid: ColoredGrid) -> ColoredGrid:
                 color = input_grid.get_cell(r, c)
                 if color != 0 and is_3x3_square(r, c, color):
                     squares.append((c+1, r+1, color))  # (center_col, center_row, color)
-        return sorted(squares)
+        return squares
 
     def draw_line(start, end, color):
         sr, sc = start
@@ -40,15 +40,17 @@ def solve_e9bb6954(input_grid: ColoredGrid) -> ColoredGrid:
     squares = find_3x3_squares()
     
     if squares:
-        left_col, _, left_color = squares[0]
-        right_col, _, right_color = squares[-1]
+        left_col = min(square[0] for square in squares)
+        right_col = max(square[0] for square in squares)
+        left_color = next(square[2] for square in squares if square[0] == left_col)
+        right_color = next(square[2] for square in squares if square[0] == right_col)
         
         # Draw vertical lines
         draw_line((0, left_col), (rows - 1, left_col), left_color)
         draw_line((0, right_col), (rows - 1, right_col), right_color)
         
         # Draw horizontal lines
-        for _, center_row, color in squares:
+        for _, center_row, color in sorted(squares, key=lambda x: x[1]):
             draw_line((center_row, 0), (center_row, cols - 1), color)
 
     # Preserve original non-zero values
