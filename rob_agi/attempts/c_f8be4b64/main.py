@@ -6,12 +6,14 @@ def solve_f8be4b64(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by expanding colored centers into territories.
     
     1. Identifies colored centers (non-green, non-black cells adjacent to green cells).
-    2. Creates vertical lines for each colored center.
-    3. Creates horizontal lines for each colored center.
-    4. Fills territories between lines.
-    5. Preserves original green cells.
-    6. Removes isolated green cells.
-    7. Ensures all non-edge cells have a non-black color.
+    2. Sorts colored centers by color value in descending order.
+    3. Creates vertical lines for each colored center.
+    4. Creates horizontal lines for each colored center.
+    5. Fills territories between lines.
+    6. Preserves original green cells.
+    7. Removes isolated green cells.
+    8. Ensures all non-edge cells have a non-black color.
+    9. Expands territories to fill the entire grid.
     
     Args:
     input_grid (ColoredGrid): The input grid to transform.
@@ -47,6 +49,9 @@ def solve_f8be4b64(input_grid: ColoredGrid) -> ColoredGrid:
     
     # Ensure all non-edge cells have a non-black color
     fill_remaining_black_cells(new_grid)
+    
+    # Expand territories to fill the entire grid
+    expand_territories(new_grid)
     
     return new_grid
 
@@ -128,3 +133,23 @@ def fill_remaining_black_cells(grid: ColoredGrid):
                                    if grid.values[r + dr][c + dc] != 0]
                 if adjacent_colors:
                     grid.values[r][c] = max(adjacent_colors)
+
+def expand_territories(grid: ColoredGrid):
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        left_color = 0
+        right_color = 0
+        for c in range(cols):
+            if grid.values[r][c] != 0:
+                left_color = grid.values[r][c]
+                break
+        for c in range(cols - 1, -1, -1):
+            if grid.values[r][c] != 0:
+                right_color = grid.values[r][c]
+                break
+        for c in range(cols):
+            if grid.values[r][c] == 0:
+                if c < cols // 2:
+                    grid.values[r][c] = left_color
+                else:
+                    grid.values[r][c] = right_color
