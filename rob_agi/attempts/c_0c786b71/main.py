@@ -5,7 +5,7 @@ def solve_0c786b71(input_grid: ColoredGrid) -> ColoredGrid:
     Transform the input 3x4 grid into a larger 6x8 grid using a specific pattern.
     
     The transformation follows these steps:
-    1. Fill the top-left 3x4 quadrant with the input rows in a specific order:
+    1. Fill the top-left 3x4 quadrant with the input rows in this order:
        last row, first row, second row of the input, swapping the first and last elements of each row.
     2. Mirror the top-left quadrant horizontally to fill the top-right quadrant.
     3. Mirror the entire top half vertically to create the bottom half.
@@ -16,7 +16,8 @@ def solve_0c786b71(input_grid: ColoredGrid) -> ColoredGrid:
     output = [[0 for _ in range(8)] for _ in range(6)]
     
     # Fill top-left quadrant
-    for i, row in enumerate([2, 0, 1]):  # Order: last, first, second row of input
+    row_order = [2, 0, 1]  # Order: last, first, second row of input
+    for i, row in enumerate(row_order):
         output[i][0] = input_grid.values[row][3]
         output[i][1:3] = input_grid.values[row][1:3]
         output[i][3] = input_grid.values[row][0]
