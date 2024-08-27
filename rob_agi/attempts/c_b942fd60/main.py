@@ -12,15 +12,9 @@ def solve_b942fd60(input_grid: ColoredGrid) -> ColoredGrid:
     4. Ensures red lines don't extend beyond the last colored square in any direction
     5. Handles special cases like single row/column of colored squares
     
-    Steps:
-    1. Create a deep copy of the input grid
-    2. Identify all non-black squares
-    3. Determine the optimal vertical line position(s)
-    4. Draw vertical red lines
-    5. Connect horizontal lines to colored squares
-    6. Handle special cases
-    7. Clean up unnecessary extensions
-    8. Return the modified grid
+    The algorithm optimizes the placement of vertical lines to minimize the total
+    distance between colored squares and these lines. It then connects all non-black
+    squares to the nearest vertical line with horizontal red lines.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -58,13 +52,11 @@ def solve_b942fd60(input_grid: ColoredGrid) -> ColoredGrid:
     two_cols = min(((c1, c2) for c1 in range(cols) for c2 in range(c1+1, cols)),
                    key=lambda cols: total_distance(cols))
     
-    optimal_cols = [one_col] if total_distance([one_col]) <= total_distance(two_cols) * 1.2 else list(two_cols)
+    optimal_cols = list(two_cols) if total_distance(two_cols) < total_distance([one_col]) * 0.8 else [one_col]
     
     # Draw vertical red lines
-    top_row = min(colored_rows)
-    bottom_row = max(colored_rows)
     for col in optimal_cols:
-        for r in range(top_row, bottom_row + 1):
+        for r in range(rows):
             if output_grid.get_cell(r, col) == 0:
                 output_grid.set_cell(r, col, 2)
     
