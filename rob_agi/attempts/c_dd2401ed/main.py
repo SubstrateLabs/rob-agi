@@ -8,10 +8,10 @@ def solve_dd2401ed(input_grid: ColoredGrid) -> ColoredGrid:
     1. Finds the original gray line position.
     2. Calculates the new gray line position (original position + original position).
     3. Creates a new grid with the gray line in the new position.
-    4. Copies colored dots:
-       - Dots to the left of the original gray line remain in their absolute positions.
-       - Dots to the right of the original gray line are shifted left by the same amount
-         as the gray line moved right, potentially being removed if pushed off the left edge.
+    4. Processes colored dots:
+       - Blue (1) dots to the left of the original gray line remain in their positions.
+       - Blue (1) dots to the right of the original gray line transform into red (2) dots and remain in their positions.
+       - Red (2) dots are shifted left by the same amount as the gray line moved right.
     5. Places the gray line in its new position.
     """
     rows, cols = input_grid.get_dimensions()
@@ -33,11 +33,15 @@ def solve_dd2401ed(input_grid: ColoredGrid) -> ColoredGrid:
             if col < original_pos:
                 # Copy colors to the left of the original gray line
                 new_grid.values[row][col] = color
-            elif col > original_pos and color != 0:
-                # Shift colors to the right of the original gray line
-                new_col = col - shift
-                if new_col >= 0:
-                    new_grid.values[row][new_col] = color
+            elif col > original_pos:
+                if color == 1:
+                    # Transform blue (1) to red (2) and keep position
+                    new_grid.values[row][col] = 2
+                elif color == 2:
+                    # Shift red (2) dots left
+                    new_col = col - shift
+                    if new_col >= 0:
+                        new_grid.values[row][new_col] = color
         
         # Place the gray line in its new position
         new_grid.values[row][new_pos] = 5
