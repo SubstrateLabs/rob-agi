@@ -20,7 +20,7 @@ from rob_agi.arc_util import load_task_set
 from rob_agi.computed_result import ComputedResult
 from rob_agi.grid_problem import GridProblem
 from rob_agi.solver_functions import problem_setup_aider, get_test_case_descriptions
-from rob_agi.test_factory import run_pytest, setup_files, read_meta_file, write_meta_file
+from rob_agi.test_factory import run_pytest, setup_files, read_meta_file, write_meta_file, TestOutput
 
 project_root = Path(__file__).parent.parent
 ignore_template = project_root / ".aiderignore"
@@ -40,6 +40,8 @@ class Solver:
             "main": self.challenge_root / main_file,
             "test": self.challenge_root / test_file,
             "visual_descriptions": self.challenge_root / "visual_descriptions.yaml",
+            "notebook": self.challenge_root / "notebook.txt",
+            "experiment": self.challenge_root / "experiment.py",
             "image": project_root / f"data/task_images/{challenge.id}.png",
             "distilled": project_root / f"rob_agi/distilled_solves.txt",
             "colored_grid": project_root / "rob_agi/colored_grid.py",
@@ -97,7 +99,12 @@ class Solver:
 
     def get_modify_coder(self, fnames=None):
         if fnames is None:
-            fnames = [self.file_paths["main"], self.file_paths["visual_descriptions"]]
+            fnames = [
+                self.file_paths["main"],
+                self.file_paths["visual_descriptions"],
+                self.file_paths["notebook"],
+                self.file_paths["experiment"],
+            ]
         read_only_fnames = [
             self.file_paths["test"],
             self.file_paths["colored_grid"],
@@ -105,23 +112,25 @@ class Solver:
         ]
         return self.get_coder(fnames=fnames, read_only_fnames=read_only_fnames, auto_commits=True)
 
-    def run_tests(self):
+    def run_tests(self) -> TestOutput:
         result = run_pytest(self.file_paths["test"])
         logger.info(result)
         return result
 
-    def get_prefix(self, is_first):
+    def get_prefix(self, is_first: bool) -> str:
         if is_first:
             prefix = f"{self.goal}\n\nCurrently the tests used to validate the solution are failing. This means that your previous solution is incorrect."
         else:
             prefix = "The tests used to validate the solution are still failing. This means that your previous solution is incorrect."
         return prefix
 
-    def get_plan(self, current_result, is_first=False):
+    def get_plan(self, current_result: TestOutput, is_first: bool = False) -> str:
         desc = self.get_visual_descriptions()
         ask_coder = self.get_ask_coder()
         prefix = self.get_prefix(is_first)
-        prompt = f"{prefix}\n\n<VALIDATION_OUTPUT>\n{current_result['error']}\n{current_result['output']}</VALIDATION_OUTPUT>\n"
+        prompt = (
+            f"{prefix}\n\n<VALIDATION_OUTPUT>\n{current_result.error}\n{current_result.output}</VALIDATION_OUTPUT>\n"
+        )
         prompt += f"\n<VISUAL_DESCRIPTIONS>\n{desc}\n</VISUAL_DESCRIPTIONS>\n"
         prompt += "Examine all the information you have, state your understanding of the challenge, and propose a detailed solution to the challenge in words. Any solution must always apply to every case, not just the failing exception here.\n"
         # ask_coder.run(prompt)
@@ -133,17 +142,16 @@ class Solver:
         res = ask_coder.run("Based on that reflection detail a step by step plan for how to solve the challenge\n")
         return res
 
-    def get_edit(self, current_result, plan, is_first=True, update_visual_desc=False) -> str:
+    def get_edit(self, current_result: TestOutput, plan, is_first=True, update_visual_desc=False) -> str:
         modify_coder = self.get_modify_coder()
         prefix = self.get_prefix(is_first)
-        prompt = f"{prefix}\n\n<VALIDATION_OUTPUT>\n{current_result['error']}\n{current_result['output']}</VALIDATION_OUTPUT>\n"
-        prompt += f"\nYour latest thinking is:\n<LATEST_THINKING>\n{plan}\n</LATEST_THINKING>\n"
-        prompt += f"Use that latest thinking and solve the challenge by modifying the implementation file. Always ensure that the docstring to solve_{self.challenge_id} includes a correct summary of the solution in words.\n"
+        prompt = f"{prefix}\n\n<TEST_OUTPUT>\n{current_result.error}\n{current_result.output}</TEST_OUTPUT>\n"
+        prompt += f"\nYour most recent plan is:\n<RECENT_PLANNING>\n{plan}\n</RECENT_PLANNING>\n"
+        prompt += f"Use that latest planning and solve the challenge by modifying the implementation file. Always ensure that the docstring to solve_{self.challenge_id} includes a correct summary of the solution in words.\n"
         prompt += "Make sure your code changes are in the SEARCH/REPLACE format."
-        # prompt += f"An image of the challenge is provided at {self.challenge.id}.png"
-        # prompt += f"colored_grid.py includes a library of functions that may be useful. modify this file if you need."
         modifications = modify_coder.run(prompt)
         logger.info(f"\n~~~~~~~~~EDITED~~~~~~~~~~~\n{modify_coder.aider_edited_files}")
+        res = self.run_tests()
         if update_visual_desc:
             update_prompt = "If the visual_descriptions.yaml can be improved (more detail, more accurate, better intuitive abstractions, cutting irrelevant info, clarity, etc), include those changes too. This file is purely for descriptions of the grid images. It should not have any information about the code or the solution. These descriptions should help someone trying to solve this problem though, so it should include language that is relevant for solving the problem.\n"
             modify_coder.run(update_prompt)
@@ -186,7 +194,7 @@ class Solver:
     def run_solve(self, max_tries=default_max_tries, prev_solution=None) -> bool:
         t0 = time.perf_counter()
         current_result = self.run_tests()
-        if current_result["success"]:
+        if current_result.success:
             logger.info(f"Tests are passing. No need to run the solver. ({time.perf_counter() - t0:.2f}s)")
             write_meta_file(
                 self.challenge_root,
@@ -196,7 +204,7 @@ class Solver:
             )
             return True
 
-        is_failing = not current_result["success"]
+        is_failing = not current_result.success
         local_tries = 0
         while is_failing and local_tries < max_tries:
             logger.info(f"-------------------- ATTEMPT {local_tries+1}/{max_tries} --------------------------\n")
@@ -210,7 +218,7 @@ class Solver:
             local_tries += 1
             self.total_attempts += 1
             current_result = self.run_tests()
-            is_failing = not current_result["success"]
+            is_failing = not current_result.success
             write_meta_file(
                 self.challenge_root,
                 solved=not is_failing,
@@ -218,7 +226,7 @@ class Solver:
                 total_attempts=self.total_attempts,
             )
         logger.info(f"Total time: {time.perf_counter() - t0:.2f}s")
-        return current_result["success"]
+        return current_result.success
 
     def __del__(self):
         self.teardown()

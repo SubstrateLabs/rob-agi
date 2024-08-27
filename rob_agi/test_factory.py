@@ -2,6 +2,7 @@ import json
 import subprocess
 import sys
 import traceback
+from dataclasses import dataclass
 from pathlib import Path
 from pprint import pformat
 from typing import Optional
@@ -11,6 +12,14 @@ from rob_agi.grid_problem import GridProblem
 
 
 to_replace = "============================= test session starts ==============================\ncollecting ..."
+
+
+@dataclass
+class TestOutput:
+    success: bool
+    output: str
+    error: str
+    returncode: int
 
 
 def run_pytest(test_file: Path):
@@ -23,13 +32,10 @@ def run_pytest(test_file: Path):
             timeout=10,
         )
         output = result.stdout.replace(to_replace, "")
-
-        return {
-            "success": result.returncode == 0,
-            "output": output,
-            "error": result.stderr,
-            "returncode": result.returncode,
-        }
+        test_output = TestOutput(
+            success=result.returncode == 0, output=output, error=result.stderr, returncode=result.returncode
+        )
+        return test_output
     except Exception as e:
         trace_str = traceback.format_exc()
         return {"success": False, "output": "", "error": str(e) + trace_str, "returncode": -1}

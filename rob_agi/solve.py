@@ -948,10 +948,10 @@ async def main():
     # research_loop(prev_event=last)
 
     # distill_research()
-    distill_solved()
+    # distill_solved()
 
-    # for i in range(1):
-    #     await solve_loop(max_concurrent=20)
+    for i in range(1):
+        await solve_loop(max_concurrent=12)
     # await solve_loop(max_concurrent=4, max_challenges=8)
 
 
