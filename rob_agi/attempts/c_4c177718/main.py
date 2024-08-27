@@ -6,10 +6,11 @@ def solve_4c177718(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms a 15x15 input grid into a 9x15 output grid by:
     1. Identifying all shapes in the input grid
     2. Discarding the red shape (color code 2)
-    3. Sorting the remaining two shapes by color code
-    4. Placing the shape with the lower color code in the top half of the output grid
-    5. Placing the shape with the higher color code in the bottom half of the output grid
-    6. Centering both shapes horizontally and vertically in their respective halves
+    3. Selecting the shape with the lowest color code from above the gray line
+    4. Selecting the shape with the highest color code from below the gray line
+    5. Placing the shape from above the line in the top half of the output grid
+    6. Placing the shape from below the line in the bottom half of the output grid
+    7. Centering both shapes horizontally and vertically in their respective halves
     """
     def find_shapes(grid: ColoredGrid) -> List[List[Tuple[int, int, int]]]:
         shapes = []
@@ -17,7 +18,7 @@ def solve_4c177718(input_grid: ColoredGrid) -> ColoredGrid:
         rows, cols = grid.get_dimensions()
         for r in range(rows):
             for c in range(cols):
-                if grid.values[r][c] != 0 and (r, c) not in visited:
+                if grid.values[r][c] not in [0, 5] and (r, c) not in visited:
                     color = grid.values[r][c]
                     shape = []
                     stack = [(r, c)]
@@ -26,7 +27,7 @@ def solve_4c177718(input_grid: ColoredGrid) -> ColoredGrid:
                         if (curr_r, curr_c) not in visited and 0 <= curr_r < rows and 0 <= curr_c < cols and grid.values[curr_r][curr_c] == color:
                             visited.add((curr_r, curr_c))
                             shape.append((curr_r, curr_c, color))
-                            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]:
                                 nr, nc = curr_r + dr, curr_c + dc
                                 if 0 <= nr < rows and 0 <= nc < cols:
                                     stack.append((nr, nc))
@@ -48,15 +49,20 @@ def solve_4c177718(input_grid: ColoredGrid) -> ColoredGrid:
     # Find all shapes
     shapes = find_shapes(input_grid)
 
-    # Filter out red shape and sort remaining shapes
-    shapes = [shape for shape in shapes if shape[0][2] != 2]  # Remove red shape
-    shapes.sort(key=lambda x: x[0][2])  # Sort by color code
+    # Find the gray line
+    gray_line_row = next(r for r, row in enumerate(input_grid.values) if 5 in row)
+
+    # Filter shapes and select the appropriate ones
+    shapes_above = [shape for shape in shapes if shape[0][0] < gray_line_row and shape[0][2] != 2]
+    shapes_below = [shape for shape in shapes if shape[0][0] > gray_line_row]
+
+    top_shape = min(shapes_above, key=lambda x: x[0][2])
+    bottom_shape = max(shapes_below, key=lambda x: x[0][2])
 
     # Create new 9x15 grid
     new_grid = [[0 for _ in range(15)] for _ in range(9)]
 
     # Place top shape
-    top_shape = shapes[0]
     top_min_r, top_max_r, top_min_c, top_max_c = get_shape_bounds(top_shape)
     top_height = top_max_r - top_min_r + 1
     top_width = top_max_c - top_min_c + 1
@@ -65,7 +71,6 @@ def solve_4c177718(input_grid: ColoredGrid) -> ColoredGrid:
     place_shape(new_grid, top_shape, top_top_row, top_left_col)
 
     # Place bottom shape
-    bottom_shape = shapes[1]
     bottom_min_r, bottom_max_r, bottom_min_c, bottom_max_c = get_shape_bounds(bottom_shape)
     bottom_height = bottom_max_r - bottom_min_r + 1
     bottom_width = bottom_max_c - bottom_min_c + 1
