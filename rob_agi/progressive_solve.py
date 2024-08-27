@@ -41,6 +41,8 @@ class Solver:
             "test": self.challenge_root / test_file,
             "visual_descriptions": self.challenge_root / "visual_descriptions.yaml",
             "image": project_root / f"data/task_images/{challenge.id}.png",
+            "distilled": project_root / f"rob_agi/distilled_solves.txt",
+            "colored_grid": project_root / "rob_agi/colored_grid.py",
         }
         self.adhoc_ignore = project_root / f".adhoc-aiderignore-{challenge.id}"
         self.setup()
@@ -90,13 +92,17 @@ class Solver:
 
     def get_ask_coder(self, fnames=None):
         if fnames is None:
-            fnames = [self.file_paths["main"], self.file_paths["test"]]
+            fnames = [self.file_paths["main"], self.file_paths["test"], self.file_paths["distilled"]]
         return self.get_coder(edit_format="ask", fnames=fnames)
 
-    def get_modify_coder(self, fnames):
+    def get_modify_coder(self, fnames=None):
         if fnames is None:
             fnames = [self.file_paths["main"], self.file_paths["visual_descriptions"]]
-        read_only_fnames = [self.file_paths["test"], project_root / "rob_agi/colored_grid.py"]
+        read_only_fnames = [
+            self.file_paths["test"],
+            self.file_paths["colored_grid"],
+            self.file_paths["distilled"],
+        ]
         return self.get_coder(fnames=fnames, read_only_fnames=read_only_fnames, auto_commits=True)
 
     def run_tests(self):

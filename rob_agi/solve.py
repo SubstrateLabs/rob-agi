@@ -76,7 +76,7 @@ remote_pip_deps = [
     "git+https://github.com/SubstrateLabs/rob-agi.git@673d3e5",
     "numpy",
 ]
-max_tries_per_challenge = 0
+max_tries_per_challenge = 1
 
 all_challenges = list(challenges.values())
 random.shuffle(all_challenges)
