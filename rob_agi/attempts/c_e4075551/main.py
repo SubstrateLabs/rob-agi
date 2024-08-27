@@ -22,8 +22,8 @@ def solve_e4075551(input_grid: ColoredGrid) -> ColoredGrid:
     if not unique_colors:
         return output_grid  # Return all black grid if no unique colors found
 
-    frame_height = len(unique_colors) + 3
-    frame_width = frame_height + 2
+    frame_height = len(unique_colors) + 7
+    frame_width = frame_height - 2
     start_row = (rows - frame_height) // 2
     start_col = (cols - frame_width) // 2
     color_assignments = assign_colors(unique_colors)
@@ -63,15 +63,6 @@ def assign_colors(unique_colors: List[int]) -> dict:
         assignments['left'] = assignments['right'] = unique_colors[0]
     return assignments
 
-def draw_frame(grid: ColoredGrid, start_row: int, start_col: int, frame_height: int, frame_width: int, colors: dict):
-    # Draw top and bottom borders
-    draw_line(grid, start_row, start_col, start_col + frame_width - 1, colors['top'])
-    draw_line(grid, start_row + frame_height - 1, start_col, start_col + frame_width - 1, colors['bottom'])
-    
-    # Draw left and right borders
-    draw_line(grid, start_row + 1, start_col, start_row + frame_height - 2, colors['left'])
-    draw_line(grid, start_row + 1, start_col + frame_width - 1, start_row + frame_height - 2, colors['right'])
-
 def draw_horizontal_line(grid: ColoredGrid, row: int, start_col: int, end_col: int, color: int):
     for c in range(start_col, end_col + 1):
         grid.set_cell(row, c, color)
@@ -86,9 +77,8 @@ def draw_frame(grid: ColoredGrid, start_row: int, start_col: int, frame_height: 
     draw_horizontal_line(grid, start_row + frame_height - 1, start_col, start_col + frame_width - 1, colors['bottom'])
     
     # Draw left and right borders
-    for row in range(start_row + 1, start_row + frame_height - 1):
-        grid.set_cell(row, start_col, colors['left'])
-        grid.set_cell(row, start_col + frame_width - 1, colors['right'])
+    draw_vertical_line(grid, start_col, start_row + 1, start_row + frame_height - 2, colors['left'])
+    draw_vertical_line(grid, start_col + frame_width - 1, start_row + 1, start_row + frame_height - 2, colors['right'])
 
 def fill_frame(grid: ColoredGrid, start_row: int, start_col: int, frame_height: int, frame_width: int):
     for r in range(start_row + 1, start_row + frame_height - 1):
