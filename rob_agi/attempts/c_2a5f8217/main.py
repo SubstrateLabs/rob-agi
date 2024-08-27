@@ -3,11 +3,12 @@ from rob_agi.colored_grid import ColoredGrid
 def solve_2a5f8217(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the grid transformation challenge by updating each non-zero cell's color
-    to the maximum color value among all cells of the same color in the grid.
+    to the maximum color value among all cells of the same color in the entire grid.
 
-    The transformation happens in two steps:
-    1. Identify all connected regions of the same color.
-    2. For each region, set all cells to the maximum color value found in the grid.
+    The transformation happens in three steps:
+    1. Analyze the grid to find the maximum value for each color.
+    2. Identify all connected regions of the same color.
+    3. For each region, set all cells to the maximum color value found in the entire grid.
 
     Args:
         input_grid (ColoredGrid): The input grid to be transformed.
@@ -15,6 +16,15 @@ def solve_2a5f8217(input_grid: ColoredGrid) -> ColoredGrid:
     Returns:
         ColoredGrid: The transformed grid with colors updated.
     """
+    output_grid = input_grid.deep_copy()
+    max_color_values = {}
+
+    # Analyze the grid to find max values for each color
+    for row in output_grid.values:
+        for cell in row:
+            if cell != 0:
+                max_color_values[cell] = max(max_color_values.get(cell, 0), cell)
+
     def find_connected_regions(grid):
         rows, cols = grid.get_dimensions()
         visited = set()
@@ -40,19 +50,14 @@ def solve_2a5f8217(input_grid: ColoredGrid) -> ColoredGrid:
 
         return regions
 
-    def transform_grid(grid, regions):
-        new_grid = grid.deep_copy()
-        for color, color_regions in regions.items():
-            max_color = max(grid.values[r][c] for region in color_regions for r, c in region)
-            for region in color_regions:
-                for r, c in region:
-                    new_grid.values[r][c] = max_color
-        return new_grid
-
     # Find connected regions
-    regions = find_connected_regions(input_grid)
+    color_regions = find_connected_regions(output_grid)
 
     # Transform the grid
-    transformed_grid = transform_grid(input_grid, regions)
+    for color, regions in color_regions.items():
+        max_value = max_color_values[color]
+        for region in regions:
+            for r, c in region:
+                output_grid.values[r][c] = max_value
 
-    return transformed_grid
+    return output_grid
