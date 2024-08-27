@@ -3,15 +3,12 @@ from typing import List, Tuple
 
 def solve_cb227835(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the challenge by creating an optimal path between two sky-colored squares.
+    Solve the challenge by creating a rectangular path between two sky-colored squares.
     
     The function finds the two sky-colored (8) squares in the input grid,
-    creates a path between them, and marks the path with green (3) squares.
-    The path is chosen based on the relative positions of the start and end points:
-    - Straight line for aligned squares
-    - Rectangular path for squares forming a rectangle
-    - Symmetrical zigzag for perfect diagonals
-    - Adaptive rectangular path for other cases
+    creates a rectangular path between them, and marks the path with green (3) squares.
+    The path forms a rectangle with the sky squares at opposite corners.
+    Three sides of the rectangle are filled based on the relative positions of the sky squares.
     
     The original sky squares remain unchanged.
     
@@ -19,45 +16,38 @@ def solve_cb227835(input_grid: ColoredGrid) -> ColoredGrid:
     input_grid (ColoredGrid): The input grid containing two sky-colored squares.
     
     Returns:
-    ColoredGrid: A new grid with the optimal path marked in green.
+    ColoredGrid: A new grid with the rectangular path marked in green.
     """
     def find_sky_squares(grid: List[List[int]]) -> List[Tuple[int, int]]:
         return [(c, r) for r, row in enumerate(grid) for c, val in enumerate(row) if val == 8]
     
-    def create_path(start: Tuple[int, int], end: Tuple[int, int]) -> List[Tuple[int, int]]:
+    def create_rectangular_path(start: Tuple[int, int], end: Tuple[int, int]) -> List[Tuple[int, int]]:
+        x1, y1 = start
+        x2, y2 = end
         path = []
-        x, y = start
-        ex, ey = end
-        dx = ex - x
-        dy = ey - y
         
-        if dx == 0 or dy == 0:  # Straight line
-            step_x = 1 if dx > 0 else -1 if dx < 0 else 0
-            step_y = 1 if dy > 0 else -1 if dy < 0 else 0
-            while (x, y) != end:
-                x += step_x
-                y += step_y
-                path.append((x, y))
-        elif abs(dx) == abs(dy):  # Perfect diagonal (symmetrical zigzag)
-            step_x = 1 if dx > 0 else -1
-            step_y = 1 if dy > 0 else -1
-            while (x, y) != end:
-                x += step_x
-                path.append((x, y))
-                if (x, y) != end:
-                    y += step_y
+        if x1 == x2 or y1 == y2:  # Straight line
+            for x in range(min(x1, x2), max(x1, x2) + 1):
+                for y in range(min(y1, y2), max(y1, y2) + 1):
                     path.append((x, y))
-        else:  # Adaptive rectangular path
-            mid_x = (x + ex) // 2
-            while x != mid_x:
-                x += 1 if dx > 0 else -1
-                path.append((x, y))
-            while y != ey:
-                y += 1 if dy > 0 else -1
-                path.append((x, y))
-            while x != ex:
-                x += 1 if dx > 0 else -1
-                path.append((x, y))
+        else:
+            width = abs(x2 - x1)
+            height = abs(y2 - y1)
+            
+            if width > height:
+                # Fill top, bottom, and left sides
+                for x in range(min(x1, x2), max(x1, x2) + 1):
+                    path.append((x, y1))
+                    path.append((x, y2))
+                for y in range(min(y1, y2) + 1, max(y1, y2)):
+                    path.append((min(x1, x2), y))
+            else:
+                # Fill left, right, and bottom sides
+                for y in range(min(y1, y2), max(y1, y2) + 1):
+                    path.append((x1, y))
+                    path.append((x2, y))
+                for x in range(min(x1, x2) + 1, max(x1, x2)):
+                    path.append((x, max(y1, y2)))
         
         return path
     
@@ -66,7 +56,7 @@ def solve_cb227835(input_grid: ColoredGrid) -> ColoredGrid:
         return input_grid  # Return original grid if there aren't exactly two sky squares
     
     start, end = sky_squares
-    path = create_path(start, end)
+    path = create_rectangular_path(start, end)
     
     new_grid = input_grid.deep_copy()
     for x, y in path:
