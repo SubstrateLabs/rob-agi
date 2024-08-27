@@ -2,16 +2,16 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_3a301edc(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by adding a square border around the main shape.
+    Transforms the input grid by adding a border around the main shape.
     
     1. Identifies the main shape in the input grid.
-    2. Finds the center color of the shape to use as the border color.
+    2. Finds the border color by checking the outer boundary of the shape.
     3. Determines the border thickness based on the largest dimension of the shape.
-    4. Creates a new square grid with the original shape centered and adds a border of the center color.
-    5. The border thickness is 1 for shapes with largest dimension <= 3, 2 for 3 < largest dimension <= 5,
-       and 3 for largest dimension > 5.
+    4. Creates a new grid with the original shape centered and adds a border.
+    5. The border thickness is 1 for shapes with largest dimension <= 5,
+       and 2 for largest dimension > 5.
     6. Adjusts the result to match the original grid size, preserving black space if necessary.
-    7. Ensures the result is always a square, centered in the original grid when possible.
+    7. Ensures the result is centered in the original grid.
     
     Returns a new ColoredGrid with the transformed pattern.
     """
@@ -32,32 +32,26 @@ def solve_3a301edc(input_grid: ColoredGrid) -> ColoredGrid:
     shape_height = max_row - min_row + 1
     largest_dim = max(shape_width, shape_height)
     
-    # Find the center color
-    center_row = (min_row + max_row) // 2
-    center_col = (min_col + max_col) // 2
-    border_color = input_grid.values[center_row][center_col]
-    if border_color == 0:
-        for dr in range(max(shape_height, shape_width)):
-            for dc in range(-dr, dr+1):
-                for r, c in [(center_row+dr, center_col+dc), (center_row-dr, center_col+dc),
-                             (center_row+dc, center_col+dr), (center_row+dc, center_col-dr)]:
-                    if 0 <= r < rows and 0 <= c < cols and input_grid.values[r][c] != 0:
-                        border_color = input_grid.values[r][c]
-                        break
-                if border_color != 0:
+    # Find the border color (outer boundary color)
+    border_color = 0
+    for r in range(min_row, max_row + 1):
+        for c in range(min_col, max_col + 1):
+            if input_grid.values[r][c] != 0:
+                if r == min_row or r == max_row or c == min_col or c == max_col:
+                    border_color = input_grid.values[r][c]
                     break
-            if border_color != 0:
-                break
+        if border_color != 0:
+            break
+    
+    # If no border color found, use the center color
+    if border_color == 0:
+        center_row, center_col = (min_row + max_row) // 2, (min_col + max_col) // 2
+        border_color = input_grid.values[center_row][center_col]
     
     # Determine the border thickness
-    if largest_dim <= 3:
-        border_thickness = 1
-    elif largest_dim <= 5:
-        border_thickness = 2
-    else:
-        border_thickness = 3
+    border_thickness = 1 if largest_dim <= 5 else 2
     
-    # Create the new square grid
+    # Create the new grid
     new_size = largest_dim + (2 * border_thickness)
     new_grid = [[border_color for _ in range(new_size)] for _ in range(new_size)]
     
@@ -71,8 +65,8 @@ def solve_3a301edc(input_grid: ColoredGrid) -> ColoredGrid:
     
     # Adjust the result to match the original grid size
     output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
-    start_row = max(0, (rows - new_size) // 2)
-    start_col = max(0, (cols - new_size) // 2)
+    start_row = (rows - new_size) // 2
+    start_col = (cols - new_size) // 2
     for r in range(new_size):
         for c in range(new_size):
             if 0 <= start_row + r < rows and 0 <= start_col + c < cols:
