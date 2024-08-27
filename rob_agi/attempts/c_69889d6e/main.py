@@ -38,7 +38,7 @@ def solve_69889d6e(input_grid: ColoredGrid) -> ColoredGrid:
         col += 1
 
     # Ensure the staircase reaches the top-right corner
-    for r in range(row + 1):
+    for r in range(row, -1, -1):
         output_grid.set_cell(r, cols - 1, 2)
         if cols > 1:
             output_grid.set_cell(r, cols - 2, 2)
