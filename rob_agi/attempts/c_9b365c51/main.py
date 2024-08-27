@@ -10,7 +10,8 @@ def solve_9b365c51(input_grid: ColoredGrid) -> ColoredGrid:
     2. Identifies sky blue (8) regions on the right side of the grid.
     3. Creates a deep copy of the input grid and clears the left side.
     4. Fills each sky blue region with colors from the sequence, wrapping around if necessary.
-    5. Returns the transformed grid.
+    5. Preserves non-sky blue colors on the right side.
+    6. Returns the transformed grid.
 
     Each sky blue region is filled with a single color, and the color sequence
     continues from one region to the next, wrapping around when it reaches the end.
@@ -41,7 +42,13 @@ def solve_9b365c51(input_grid: ColoredGrid) -> ColoredGrid:
         fill_region(output_grid, top, left, height, width, fill_color)
         color_index += 1
 
-    # Step 5: Return the transformed grid
+    # Step 5: Preserve non-sky blue colors on the right side
+    for row in range(output_grid.num_rows):
+        for col in range(7, output_grid.num_cols):
+            if input_grid.values[row][col] != 8 and input_grid.values[row][col] != 0:
+                output_grid.values[row][col] = input_grid.values[row][col]
+
+    # Step 6: Return the transformed grid
     return output_grid
 
 def analyze_input_grid(grid: ColoredGrid) -> List[int]:
@@ -51,7 +58,7 @@ def analyze_input_grid(grid: ColoredGrid) -> List[int]:
             color = grid.values[row][col]
             if color != 0 and color not in color_sequence:
                 color_sequence.append(color)
-    return color_sequence
+    return color_sequence if color_sequence else [1]  # Default to blue if no colors found
 
 def identify_sky_blue_regions(grid: ColoredGrid) -> List[Tuple[int, int, int, int]]:
     regions = []
