@@ -3,14 +3,10 @@ from typing import List, Tuple
 from collections import deque
 
 def extract_color_key(grid):
-    color_key = []
     for row in grid:
         if 5 in row:  # Found the gray area
-            for c in row:
-                if c != 0 and c != 5 and c not in color_key:
-                    color_key.append(c)
-            return color_key
-    return color_key
+            return [c for c in row if c not in [0, 5]]
+    return []
 
 def get_sorted_regions(grid):
     regions = []
@@ -33,16 +29,14 @@ def get_sorted_regions(grid):
         for c in range(cols):
             if grid[r][c] not in [0, 5] and (r, c) not in visited:
                 region = flood_fill(r, c, grid[r][c])
-                regions.append(region)
+                regions.append((min(region), region))
     
-    return sorted(regions, key=lambda r: (min(r)[0], min(r)[1]))
+    return [region for _, region in sorted(regions)]
 
 def transform_grid(input_grid, color_key):
     sorted_regions = get_sorted_regions(input_grid)
-    
     new_grid = [row[:] for row in input_grid]  # Create a deep copy of the input grid
     
-    # Assign new colors to regions
     for i, region in enumerate(sorted_regions):
         new_color = color_key[i % len(color_key)]
         for r, c in region:
