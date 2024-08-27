@@ -3,20 +3,24 @@ from typing import List, Tuple, Set
 
 def solve_a934301b(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the a934301b challenge by identifying and preserving non-dominated shapes.
+    Solve the a934301b challenge by identifying and preserving dominant shapes.
     
     The solution follows these steps:
     1. Identify all distinct shapes in the input grid.
-    2. Analyze each shape to create a normalized representation.
-    3. Compare shapes to determine dominance relationships.
-    4. Create an output grid containing only non-dominated shapes.
+    2. Divide the grid into sections (quadrants).
+    3. Calculate complexity scores for each shape.
+    4. Determine dominant shapes in each section and globally.
+    5. Create an output grid containing only dominant shapes.
     
-    A shape is considered dominated if another shape can fully contain it
-    when moved, rotated, or flipped.
+    A shape is considered dominant based on its complexity score,
+    which takes into account size, presence of special cells (8),
+    and shape irregularity.
     """
     shapes = find_shapes(input_grid)
-    non_dominated = find_non_dominated_shapes(shapes)
-    return create_output_grid(input_grid, non_dominated)
+    sections = divide_grid_into_sections(input_grid)
+    scored_shapes = calculate_shape_complexity(shapes)
+    dominant_shapes = find_dominant_shapes(scored_shapes, sections)
+    return create_output_grid(input_grid, dominant_shapes)
 
 def find_shapes(grid: ColoredGrid) -> List[Set[Tuple[int, int]]]:
     shapes = []
@@ -39,58 +43,50 @@ def dfs(grid: ColoredGrid, r: int, c: int, color: int, shape: Set[Tuple[int, int
     for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
         dfs(grid, r + dr, c + dc, color, shape, visited)
 
-def find_non_dominated_shapes(shapes: List[Set[Tuple[int, int]]]) -> List[Set[Tuple[int, int]]]:
-    non_dominated = []
-    for i, shape in enumerate(shapes):
-        if not any(dominates(other, shape) for j, other in enumerate(shapes) if i != j):
-            non_dominated.append(shape)
-    return non_dominated
+def divide_grid_into_sections(grid: ColoredGrid) -> List[Tuple[int, int, int, int]]:
+    rows, cols = grid.get_dimensions()
+    mid_row, mid_col = rows // 2, cols // 2
+    return [
+        (0, 0, mid_row, mid_col),
+        (0, mid_col, mid_row, cols),
+        (mid_row, 0, rows, mid_col),
+        (mid_row, mid_col, rows, cols)
+    ]
 
-def dominates(shape1: Set[Tuple[int, int]], shape2: Set[Tuple[int, int]]) -> bool:
-    if len(shape1) < len(shape2):
-        return False
-    
-    normalized1 = normalize_shape(shape1)
-    normalized2 = normalize_shape(shape2)
-    
-    for rotation in range(4):
-        rotated2 = rotate_shape(normalized2, rotation)
-        if can_contain(normalized1, rotated2):
-            return True
-    return False
+def calculate_shape_complexity(shapes: List[Set[Tuple[int, int]]]) -> List[Tuple[Set[Tuple[int, int]], int]]:
+    scored_shapes = []
+    for shape in shapes:
+        size = len(shape)
+        special_cells = sum(1 for r, c in shape if grid.get_cell(r, c) == 8)
+        irregularity = calculate_irregularity(shape)
+        score = size + special_cells * 2 + irregularity
+        scored_shapes.append((shape, score))
+    return scored_shapes
 
-def normalize_shape(shape: Set[Tuple[int, int]]) -> Set[Tuple[int, int]]:
+def calculate_irregularity(shape: Set[Tuple[int, int]]) -> int:
     min_r = min(r for r, _ in shape)
-    min_c = min(c for _, c in shape)
-    return {(r - min_r, c - min_c) for r, c in shape}
-
-def rotate_shape(shape: Set[Tuple[int, int]], rotation: int) -> Set[Tuple[int, int]]:
-    if rotation == 0:
-        return shape
     max_r = max(r for r, _ in shape)
+    min_c = min(c for _, c in shape)
     max_c = max(c for _, c in shape)
-    if rotation == 1:
-        return {(c, max_r - r) for r, c in shape}
-    elif rotation == 2:
-        return {(max_r - r, max_c - c) for r, c in shape}
-    else:
-        return {(max_c - c, r) for r, c in shape}
+    bounding_box_area = (max_r - min_r + 1) * (max_c - min_c + 1)
+    return bounding_box_area - len(shape)
 
-def can_contain(shape1: Set[Tuple[int, int]], shape2: Set[Tuple[int, int]]) -> bool:
-    max_r1 = max(r for r, _ in shape1)
-    max_c1 = max(c for _, c in shape1)
-    max_r2 = max(r for r, _ in shape2)
-    max_c2 = max(c for _, c in shape2)
-    
-    for dr in range(max_r1 - max_r2 + 1):
-        for dc in range(max_c1 - max_c2 + 1):
-            if all((r + dr, c + dc) in shape1 for r, c in shape2):
-                return True
-    return False
+def find_dominant_shapes(scored_shapes: List[Tuple[Set[Tuple[int, int]], int]], sections: List[Tuple[int, int, int, int]]) -> List[Set[Tuple[int, int]]]:
+    dominant_shapes = []
+    for section in sections:
+        section_shapes = [shape for shape, score in scored_shapes if shape_in_section(shape, section)]
+        if section_shapes:
+            max_score = max(score for shape, score in scored_shapes if shape in section_shapes)
+            dominant_shapes.extend(shape for shape in section_shapes if any(score == max_score for s, score in scored_shapes if s == shape))
+    return dominant_shapes
 
-def create_output_grid(input_grid: ColoredGrid, non_dominated: List[Set[Tuple[int, int]]]) -> ColoredGrid:
+def shape_in_section(shape: Set[Tuple[int, int]], section: Tuple[int, int, int, int]) -> bool:
+    min_r, min_c, max_r, max_c = section
+    return any(min_r <= r < max_r and min_c <= c < max_c for r, c in shape)
+
+def create_output_grid(input_grid: ColoredGrid, dominant_shapes: List[Set[Tuple[int, int]]]) -> ColoredGrid:
     output_grid = ColoredGrid(values=[[0 for _ in range(input_grid.num_cols)] for _ in range(input_grid.num_rows)])
-    for shape in non_dominated:
+    for shape in dominant_shapes:
         for r, c in shape:
             output_grid.set_cell(r, c, input_grid.get_cell(r, c))
     return output_grid
