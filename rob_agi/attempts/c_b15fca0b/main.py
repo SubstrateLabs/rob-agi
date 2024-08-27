@@ -31,13 +31,16 @@ def solve_b15fca0b(input_grid: ColoredGrid) -> ColoredGrid:
             open_grid[r][c] = True
             for dr in [-1, 0, 1]:
                 for dc in [-1, 0, 1]:
+                    if dr == 0 and dc == 0:
+                        continue
                     stack.append((r + dr, c + dc))
 
     # Perform flood fill from all edges
     for r in range(rows):
         for c in range(cols):
             if r == 0 or r == rows-1 or c == 0 or c == cols-1:
-                flood_fill(r, c)
+                if grid.values[r][c] not in [BLUE, RED]:
+                    flood_fill(r, c)
 
     # Fill enclosed areas
     for r in range(rows):
