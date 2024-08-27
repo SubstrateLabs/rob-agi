@@ -33,7 +33,7 @@ def solve_b7f8a4d8(input_grid: ColoredGrid) -> ColoredGrid:
 
     def expand_vertical(row, col, color, within_supercell=False):
         top = row - row % supercell_size if within_supercell else 0
-        bottom = (top + supercell_size) if within_supercell else height
+        bottom = min(height, (row - row % supercell_size + supercell_size) if within_supercell else height)
         for r in range(top, bottom):
             if r != row and output_grid.values[r][col] == 0:
                 output_grid.values[r][col] = color
@@ -66,6 +66,18 @@ def solve_b7f8a4d8(input_grid: ColoredGrid) -> ColoredGrid:
             elif border == 1:  # Blue supercell
                 if color == 3:  # Green
                     expand_green_in_blue(row, col)
+    
+    # Connect vertical green expansions in blue supercells
+    for col in range(supercell_size // 2, width, supercell_size):
+        green_cells = []
+        for row in range(height):
+            if get_supercell_border(row, col) == 1 and output_grid.values[row][col] == 3:
+                green_cells.append(row)
+        for i in range(len(green_cells) - 1):
+            start, end = green_cells[i], green_cells[i + 1]
+            for r in range(start + 1, end):
+                if output_grid.values[r][col] == 0:
+                    output_grid.values[r][col] = 3
     
     # Preserve grid structure
     for row in range(height):
