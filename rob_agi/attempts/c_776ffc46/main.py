@@ -26,8 +26,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
                 for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                     nr, nc = r + dr, c + dc
                     if (0 <= nr < rows and 0 <= nc < cols and
-                        output_grid.values[nr][nc] == color and
-                        output_grid.values[nr][nc] != 5):  # Don't cross gray borders
+                        output_grid.values[nr][nc] == color):
                         stack.append((nr, nc))
         return region
 
