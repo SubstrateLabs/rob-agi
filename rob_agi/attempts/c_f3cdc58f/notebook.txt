@@ -1,1 +1,35 @@
 Challenge f3cdc58f:
+
+Problem Description:
+- Transform a 10x10 input grid into an output grid with a specific pattern.
+- The output grid should have colored columns in the bottom-left corner.
+- Colors are represented by numbers: 1 (blue), 2 (red), 3 (green), 4 (yellow).
+- The columns should be ordered from left to right: blue, red, green, yellow.
+- Column heights should be proportional to the frequency of colors in the input grid.
+- The rest of the grid should be filled with 0 (black/empty).
+
+Key Observations:
+1. The output grid always has the colored columns starting from the bottom-left corner.
+2. The order of colors is fixed: blue (1), red (2), green (3), yellow (4) from left to right.
+3. Column heights are proportional to color frequencies but must fit within the grid.
+4. All present colors in the input should have at least one square in the output, even if rare.
+
+Current Implementation Issues:
+- The columns are not starting from the bottom of the grid.
+- The order of colors is incorrect (yellow appears first instead of last).
+- The proportions of the columns seem off compared to the expected output.
+
+Next Steps:
+1. Modify the column filling process to start from the bottom of the grid.
+2. Ensure the correct order of colors: blue (1), red (2), green (3), yellow (4).
+3. Refine the height calculation to better match the expected proportions.
+4. Implement a minimum height of 1 for any color present in the input grid.
+
+Things to Avoid:
+- Don't fill columns from top to bottom.
+- Don't change the order of colors in the output.
+- Avoid leaving any present color out of the output, even if it's rare in the input.
+
+Uncertainties:
+- The exact formula for calculating column heights based on color frequencies.
+- How to handle rounding when calculating heights to ensure they sum to the grid height.
