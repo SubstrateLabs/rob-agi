@@ -1,7 +1,24 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List
 
-import math
+def get_column_pattern(grid: ColoredGrid, column_index: int) -> List[int]:
+    """Extract the non-zero pattern from the top of the column."""
+    pattern = []
+    for r in range(grid.num_rows):
+        cell = grid.get_cell(r, column_index)
+        if cell != 0:
+            pattern.append(cell)
+        elif pattern:  # Stop if we've found a non-zero pattern and hit a zero
+            break
+    return pattern
+
+def extend_pattern(pattern: List[int], column_height: int) -> List[int]:
+    """Extend the pattern to fill the column height."""
+    if not pattern:
+        return [0] * column_height
+    repetitions = (column_height + len(pattern) - 1) // len(pattern)
+    extended_pattern = (pattern * repetitions)[:column_height]
+    return extended_pattern
 
 def solve_12422b43(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -25,19 +42,10 @@ def solve_12422b43(input_grid: ColoredGrid) -> ColoredGrid:
     rows, cols = input_grid.get_dimensions()
     
     for c in range(1, cols):  # Start from the second column
-        pattern = []
-        for r in range(rows):
-            cell = input_grid.get_cell(r, c)
-            if cell != 0:
-                pattern.append(cell)
-            elif pattern:  # Stop if we've found a non-zero pattern and hit a zero
-                break
+        pattern = get_column_pattern(input_grid, c)
+        extended_pattern = extend_pattern(pattern, rows)
         
-        if pattern:  # If we found a non-zero pattern
-            repetitions = math.ceil(rows / len(pattern))
-            extended_pattern = (pattern * repetitions)[:rows]
-            
-            for r in range(rows):
-                output_grid.set_cell(r, c, extended_pattern[r])
+        for r in range(rows):
+            output_grid.set_cell(r, c, extended_pattern[r])
     
     return output_grid
