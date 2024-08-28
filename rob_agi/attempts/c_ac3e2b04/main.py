@@ -95,45 +95,4 @@ def fill_gaps(grid: ColoredGrid):
                 if neighbors >= 2:
                     grid.set_cell(r, c, 1)
 
-def handle_intersections(grid: ColoredGrid):
-    rows, cols = grid.get_dimensions()
-    for r in range(rows):
-        for c in range(cols):
-            if grid.get_cell(r, c) == 2:
-                neighbors = [(r-1,c), (r+1,c), (r,c-1), (r,c+1)]
-                blue_neighbors = [n for n in neighbors if 0 <= n[0] < rows and 0 <= n[1] < cols and grid.get_cell(n[0], n[1]) == 1]
-                if len(blue_neighbors) >= 2:
-                    for nr, nc in neighbors:
-                        if 0 <= nr < rows and 0 <= nc < cols and grid.get_cell(nr, nc) == 0:
-                            grid.set_cell(nr, nc, 1)
-
-def final_symmetry_check(grid: ColoredGrid):
-    rows, cols = grid.get_dimensions()
-    for r in range(rows):
-        for c in range(cols):
-            if grid.get_cell(r, c) == 1:
-                grid.set_cell(rows - 1 - r, c, 1)
-                grid.set_cell(r, cols - 1 - c, 1)
-                grid.set_cell(rows - 1 - r, cols - 1 - c, 1)
-
-def preserve_original_colors(output_grid: ColoredGrid, input_grid: ColoredGrid):
-    rows, cols = input_grid.get_dimensions()
-    for r in range(rows):
-        for c in range(cols):
-            if input_grid.get_cell(r, c) != 0:
-                output_grid.set_cell(r, c, input_grid.get_cell(r, c))
-def connect_blue_networks(grid: ColoredGrid):
-    rows, cols = grid.get_dimensions()
-    for r in range(rows):
-        blue_cells = [c for c in range(cols) if grid.get_cell(r, c) == 1]
-        if len(blue_cells) > 1:
-            for c in range(min(blue_cells), max(blue_cells) + 1):
-                if grid.get_cell(r, c) == 0:
-                    grid.set_cell(r, c, 1)
-    
-    for c in range(cols):
-        blue_cells = [r for r in range(rows) if grid.get_cell(r, c) == 1]
-        if len(blue_cells) > 1:
-            for r in range(min(blue_cells), max(blue_cells) + 1):
-                if grid.get_cell(r, c) == 0:
-                    grid.set_cell(r, c, 1)
+# Remove these functions as they are no longer needed
