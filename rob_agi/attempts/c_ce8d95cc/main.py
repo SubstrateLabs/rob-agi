@@ -7,10 +7,10 @@ def solve_ce8d95cc(input_grid: ColoredGrid) -> ColoredGrid:
     
     The solution:
     1. Identifies vertical and horizontal lines in the input grid.
-    2. Creates a new grid with dimensions based on the number of lines.
-    3. Places horizontal lines first, preserving their full width.
-    4. Places vertical lines, respecting intersections with horizontal lines.
-    5. Removes empty rows and columns between lines.
+    2. Creates a new grid with dimensions based on the number of lines, ensuring at least one column/row of empty space between lines.
+    3. Places vertical lines first, preserving their relative positions.
+    4. Places horizontal lines, overwriting intersections with vertical lines.
+    5. Adds empty columns and rows at the edges and between lines.
     
     This approach maintains the relative positioning and colors of all lines while
     compressing the grid to its essential features, correctly handling intersections
@@ -19,23 +19,22 @@ def solve_ce8d95cc(input_grid: ColoredGrid) -> ColoredGrid:
     vertical_lines = find_vertical_lines(input_grid)
     horizontal_lines = find_horizontal_lines(input_grid)
     
-    new_width = len(vertical_lines) + 1
-    new_height = len(horizontal_lines) + 1
+    new_width = max(2 * len(vertical_lines) + 1, 3)  # Ensure at least 3 columns
+    new_height = max(2 * len(horizontal_lines) + 1, 3)  # Ensure at least 3 rows
     
     output_grid = ColoredGrid(values=[[0 for _ in range(new_width)] for _ in range(new_height)])
     
-    # Place horizontal lines first
+    # Place vertical lines
+    for i, (col, color) in enumerate(vertical_lines):
+        output_col = 2 * i + 1
+        for row in range(new_height):
+            output_grid.values[row][output_col] = color
+    
+    # Place horizontal lines, overwriting intersections
     for i, (row, color) in enumerate(horizontal_lines):
-        output_row = i + 1
+        output_row = 2 * i + 1
         for col in range(new_width):
             output_grid.values[output_row][col] = color
-    
-    # Place vertical lines, preserving intersections
-    for i, (col, color) in enumerate(vertical_lines):
-        output_col = i + 1
-        for row in range(new_height):
-            if output_grid.values[row][output_col] == 0:  # Only fill if not a horizontal line
-                output_grid.values[row][output_col] = color
     
     return output_grid
 
