@@ -1,1 +1,25 @@
 Challenge c8b7cc0f:
+
+Observations:
+1. The input is a grid of colored squares, where colors are represented by numbers (0: black, 1: blue, 4: yellow, etc.).
+2. The output is always a 3x3 grid.
+3. The top row of the output is always filled with the same color.
+4. Black (0) and blue (1) seem to be ignored in the input when determining the output color.
+
+Current understanding:
+1. The color that fills the top row of the output is the most frequent non-black, non-blue color in the input.
+2. The number of filled cells in the second and third rows seems to depend on the distribution of the chosen color in the input grid.
+
+What doesn't work:
+1. Simply counting the number of distinct rows and columns where the color appears and using that to fill the second and third rows.
+2. Filling the second row based on the number of distinct rows where the color appears (up to 3).
+3. Filling one cell in the third row if the color appears in 3 or more distinct columns.
+
+Unknowns:
+1. The exact rule for determining how many cells to fill in the second and third rows.
+2. Whether the position of the color in the input grid matters, beyond just counting occurrences.
+
+Next steps:
+1. Analyze the distribution of the chosen color in the input grid more carefully.
+2. Consider if the total count of the color matters, not just the number of distinct rows/columns.
+3. Look for patterns in how the color is distributed across the input grid (e.g., clustering, spread).
