@@ -20,44 +20,45 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         green_count = sum(row.count(GREEN) for row in input_grid.values)
         return red_count, green_count
 
-    def flood_fill(x: int, y: int) -> Set[Tuple[int, int]]:
-        region = set()
-        queue = deque([(x, y)])
-        while queue:
-            cx, cy = queue.popleft()
-            if (cx, cy) not in region and 0 <= cx < rows and 0 <= cy < cols and input_grid.values[cx][cy] == BLUE:
-                region.add((cx, cy))
-                for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                    nx, ny = cx + dx, cy + dy
-                    if 0 <= nx < rows and 0 <= ny < cols and input_grid.values[nx][ny] == BLUE:
-                        queue.append((nx, ny))
+    def flood_fill(x: int, y: int, visited: List[List[bool]]) -> List[Tuple[int, int]]:
+        region = []
+        stack = [(x, y)]
+        while stack:
+            cx, cy = stack.pop()
+            if (0 <= cx < rows and 0 <= cy < cols and
+                input_grid.values[cx][cy] == BLUE and not visited[cx][cy]):
+                visited[cx][cy] = True
+                region.append((cx, cy))
+                for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                    stack.append((cx + dx, cy + dy))
         return region
 
-    def is_plus_shape(region: Set[Tuple[int, int]]) -> bool:
+    def is_plus_shape(region: List[Tuple[int, int]]) -> bool:
         if len(region) != 5:
             return False
-        center = next(iter(region))
-        arms = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-        return all((center[0] + dx, center[1] + dy) in region for dx, dy in arms)
+        center = region[0]
+        orthogonal_neighbors = [(center[0]+1, center[1]), (center[0]-1, center[1]),
+                                (center[0], center[1]+1), (center[0], center[1]-1)]
+        return all(neighbor in region for neighbor in orthogonal_neighbors)
 
     rows, cols = len(input_grid.values), len(input_grid.values[0])
     red_count, green_count = count_colors()
     target_color = RED if red_count >= green_count else GREEN
 
-    new_grid = [row[:] for row in input_grid.values]
-    visited = set()
-    to_transform = set()
+    visited = [[False for _ in row] for row in input_grid.values]
+    eligible_regions = []
 
     for i in range(rows):
         for j in range(cols):
-            if input_grid.values[i][j] == BLUE and (i, j) not in visited:
-                region = flood_fill(i, j)
-                visited.update(region)
-                size = len(region)
-                if 2 <= size <= 4 or (size == 5 and is_plus_shape(region)):
-                    to_transform.update(region)
+            if input_grid.values[i][j] == BLUE and not visited[i][j]:
+                region = flood_fill(i, j, visited)
+                if 2 <= len(region) <= 4 or (len(region) == 5 and is_plus_shape(region)):
+                    eligible_regions.append(region)
 
-    for x, y in to_transform:
-        new_grid[x][y] = target_color
+    transformed_grid = [row[:] for row in input_grid.values]
 
-    return ColoredGrid(values=new_grid)
+    for region in eligible_regions:
+        for x, y in region:
+            transformed_grid[x][y] = target_color
+
+    return ColoredGrid(values=transformed_grid)
