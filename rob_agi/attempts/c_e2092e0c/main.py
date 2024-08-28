@@ -3,16 +3,15 @@ from typing import List, Tuple
 
 def solve_e2092e0c(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the grid transformation challenge by extending an existing gray 'L' shape.
+    Solve the grid transformation challenge by extending the gray 'L' shape in the top-left corner.
     
     The solution follows these steps:
-    1. Analyze the input grid to find the dimensions and locate the existing gray 'L' shape.
-    2. Identify the corner point of the 'L' shape.
-    3. Calculate the target dimensions based on 2/3 of the grid size.
-    4. Determine the extension dimensions, ensuring not to shrink the existing gray area.
-    5. Create a new grid as a deep copy of the input grid.
-    6. Extend the gray area from the corner point, filling in a rectangular shape.
-    7. Ensure the extension doesn't go beyond grid boundaries.
+    1. Analyze the input grid to find the dimensions and the existing gray 'L' shape.
+    2. Calculate the target dimensions based on 2/3 of the grid size.
+    3. Determine the extension dimensions, ensuring to meet or exceed the target area.
+    4. Create a new grid as a deep copy of the input grid.
+    5. Fill the extension area with gray (5), overwriting any existing colors.
+    6. Ensure the extension doesn't go beyond grid boundaries.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -28,31 +27,35 @@ def solve_e2092e0c(input_grid: ColoredGrid) -> ColoredGrid:
         height = 0
         for i in range(min(rows, cols)):
             if grid.get_cell(0, i) == 5:
-                width = i + 1
+                width = max(width, i + 1)
             if grid.get_cell(i, 0) == 5:
-                height = i + 1
-            if grid.get_cell(0, i) != 5 and grid.get_cell(i, 0) != 5:
-                break
+                height = max(height, i + 1)
         return width, height
     
-    def find_corner_point(grid, l_width, l_height):
-        return l_height - 1, l_width - 1
-    
-    def calculate_extension(grid_dim, l_dim, corner_pos):
-        target = round(grid_dim * 2/3)
-        return max(target - corner_pos, l_dim)
-    
-    # Find original L and corner point
+    # Find original L
     orig_width, orig_height = find_gray_L(output_grid)
-    corner_row, corner_col = find_corner_point(output_grid, orig_width, orig_height)
     
-    # Calculate extension dimensions
-    ext_width = calculate_extension(cols, orig_width, corner_col)
-    ext_height = calculate_extension(rows, orig_height, corner_row)
+    # Calculate target and extension dimensions
+    target_width = round(cols * 2/3)
+    target_height = round(rows * 2/3)
+    ext_width = max(target_width, orig_width)
+    ext_height = max(target_height, orig_height)
     
-    # Extend and fill
-    for row in range(corner_row + 1 - orig_height, min(corner_row + ext_height, rows)):
-        for col in range(corner_col + 1 - orig_width, min(corner_col + ext_width, cols)):
+    # Adjust dimensions to meet target area if necessary
+    target_area = target_width * target_height
+    while ext_width * ext_height < target_area:
+        if ext_width < ext_height:
+            ext_width += 1
+        else:
+            ext_height += 1
+    
+    # Ensure extension doesn't exceed grid dimensions
+    ext_width = min(ext_width, cols)
+    ext_height = min(ext_height, rows)
+    
+    # Fill the extension area
+    for row in range(ext_height):
+        for col in range(ext_width):
             output_grid.set_cell(row, col, 5)
     
     return output_grid
