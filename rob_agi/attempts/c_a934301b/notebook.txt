@@ -1,1 +1,35 @@
 Challenge a934301b:
+
+Problem Description:
+- The challenge involves transforming a 2D grid of colored squares.
+- Input and output are ColoredGrid objects.
+- The goal is to identify and preserve dominant shapes while removing others.
+
+Key Observations:
+1. Dominant shapes are determined by complexity and uniqueness.
+2. The grid is divided into quadrants for local dominance analysis.
+3. Special cells (color 8) seem to have more importance.
+
+Current Approach:
+1. Find all shapes in the grid using DFS.
+2. Calculate shape complexity based on size, special cells, irregularity, and uniqueness.
+3. Determine dominant shapes in each quadrant and globally.
+4. Create an output grid with only dominant shapes.
+
+Issues Encountered:
+1. TypeError: unhashable type: 'set' in find_dominant_shapes function.
+   - This occurs when trying to create a set of dominant shapes.
+   - Sets are mutable and cannot be hashed, so they can't be elements of another set.
+
+Next Steps:
+1. Modify find_dominant_shapes to use a list instead of a set for deduplication.
+2. Review the complexity scoring system to ensure it correctly identifies dominant shapes.
+3. Consider adjusting thresholds for shape preservation.
+
+Things That Don't Work:
+- Using set() to remove duplicate shapes when shapes are represented as sets.
+
+Open Questions:
+1. Are we correctly balancing local (quadrant) and global dominance?
+2. Is our uniqueness calculation sufficient for identifying truly unique shapes?
+3. Should we consider shape position in the grid as a factor in dominance?
