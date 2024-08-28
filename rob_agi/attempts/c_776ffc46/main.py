@@ -20,11 +20,15 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
             r, c = stack.pop()
             if (0 <= r < rows and 0 <= c < cols and 
                 output_grid.values[r][c] == color and 
-                (r, c) not in visited and
-                output_grid.values[r][c] != 5):  # Don't cross gray borders
+                (r, c) not in visited):
                 region.append((r, c))
                 visited.add((r, c))
-                stack.extend([(r-1, c), (r+1, c), (r, c-1), (r, c+1)])
+                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                    nr, nc = r + dr, c + dc
+                    if (0 <= nr < rows and 0 <= nc < cols and
+                        output_grid.values[nr][nc] == color and
+                        output_grid.values[nr][nc] != 5):  # Don't cross gray borders
+                        stack.append((nr, nc))
         return region
 
     def count_color_prevalence():
