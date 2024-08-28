@@ -6,10 +6,11 @@ def solve_705a3229(input_grid: ColoredGrid) -> ColoredGrid:
     Transform the input grid by expanding colored squares into T-shapes or rectangles.
     
     For each colored square:
-    1. Determine the longest possible stem direction (up or down).
-    2. Create the stem in that direction.
-    3. Create a horizontal top at the far end of the stem.
-    4. Fill in the resulting shape with the original color.
+    1. Determine the maximum possible expansion in both vertical directions.
+    2. Choose the direction with more space (or upward if equal).
+    3. Create a vertical stem in the chosen direction.
+    4. Create a horizontal top at the far end of the stem.
+    5. Fill in the resulting shape with the original color.
 
     The shape will be a T, inverted T, or rectangle, depending on available space.
 
@@ -35,14 +36,14 @@ def solve_705a3229(input_grid: ColoredGrid) -> ColoredGrid:
             r += dr
         return count
     
-    def create_stem(r: int, c: int, color: int, direction: int):
-        while 0 <= r < rows and output_grid.get_cell(r, c) == 0:
-            output_grid.set_cell(r, c, color)
-            r += direction
+    def create_stem(r: int, c: int, color: int, direction: int, length: int):
+        for i in range(length + 1):  # +1 to include the original square
+            output_grid.set_cell(r + i * direction, c, color)
     
     def create_top(r: int, c: int, color: int):
+        output_grid.set_cell(r, c, color)  # Ensure the center is colored
         for dc in [-1, 1]:
-            nc = c
+            nc = c + dc
             while 0 <= nc < cols and output_grid.get_cell(r, nc) == 0:
                 output_grid.set_cell(r, nc, color)
                 nc += dc
@@ -52,10 +53,10 @@ def solve_705a3229(input_grid: ColoredGrid) -> ColoredGrid:
         down_count = count_extension(r, c, 1)
         
         if up_count >= down_count:
-            create_stem(r, c, color, -1)
+            create_stem(r, c, color, -1, up_count)
             create_top(r - up_count, c, color)
         else:
-            create_stem(r, c, color, 1)
+            create_stem(r, c, color, 1, down_count)
             create_top(r + down_count, c, color)
     
     return output_grid
