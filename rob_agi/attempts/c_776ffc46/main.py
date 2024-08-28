@@ -15,16 +15,16 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     """
     BLUE, RED, GREEN, GRAY = 1, 2, 3, 5
 
-    def flood_fill(grid: List[List[int]], x: int, y: int) -> Set[Tuple[int, int]]:
+    def flood_fill(x: int, y: int) -> Set[Tuple[int, int]]:
         region = set()
         queue = deque([(x, y)])
         while queue:
             cx, cy = queue.popleft()
-            if (cx, cy) not in region and 0 <= cx < len(grid) and 0 <= cy < len(grid[0]) and grid[cx][cy] == BLUE:
+            if (cx, cy) not in region and 0 <= cx < rows and 0 <= cy < cols and input_grid.values[cx][cy] == BLUE:
                 region.add((cx, cy))
                 for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                     nx, ny = cx + dx, cy + dy
-                    if 0 <= nx < len(grid) and 0 <= ny < len(grid[0]) and grid[nx][ny] == BLUE:
+                    if 0 <= nx < rows and 0 <= ny < cols and input_grid.values[nx][ny] == BLUE:
                         queue.append((nx, ny))
         return region
 
@@ -36,30 +36,26 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         arm_lengths = [sum(1 for i in range(1, 4) if (center[0] + dx * i, center[1] + dy * i) in region) for dx, dy in arms]
         return all(length > 0 for length in arm_lengths) and max(arm_lengths) - min(arm_lengths) <= 1
 
-    def apply_transformations(grid: List[List[int]], regions_to_transform: List[Set[Tuple[int, int]]], target_color: int) -> ColoredGrid:
-        new_grid = [row[:] for row in grid]
-        for region in regions_to_transform:
-            for x, y in region:
-                new_grid[x][y] = target_color
-        return ColoredGrid(values=new_grid)
-
+    rows, cols = len(input_grid.values), len(input_grid.values[0])
     red_count = sum(row.count(RED) for row in input_grid.values)
     green_count = sum(row.count(GREEN) for row in input_grid.values)
     target_color = GREEN if green_count > red_count else RED
 
     blue_regions = []
     visited = set()
-    for i in range(len(input_grid.values)):
-        for j in range(len(input_grid.values[0])):
+    for i in range(rows):
+        for j in range(cols):
             if input_grid.values[i][j] == BLUE and (i, j) not in visited:
-                region = flood_fill(input_grid.values, i, j)
+                region = flood_fill(i, j)
                 visited.update(region)
-                blue_regions.append(region)
+                if 2 <= len(region) <= 8:
+                    blue_regions.append(region)
 
-    regions_to_transform = []
+    new_grid = [row[:] for row in input_grid.values]
     for region in blue_regions:
         size = len(region)
         if 2 <= size <= 5 or (6 <= size <= 8 and is_plus_shape(region)):
-            regions_to_transform.append(region)
+            for x, y in region:
+                new_grid[x][y] = target_color
 
-    return apply_transformations(input_grid.values, regions_to_transform, target_color)
+    return ColoredGrid(values=new_grid)
