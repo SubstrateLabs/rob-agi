@@ -1,1 +1,41 @@
 Challenge f3e62deb:
+
+Pattern Observed:
+1. The challenge involves moving a 3x3 hollow square within a 10x10 grid.
+2. The square moves according to these rules:
+   a. If not at the right edge, move to the right edge.
+   b. If at the right edge but not at the bottom, move to the bottom edge.
+   c. If at the right and bottom edges, move to the top edge.
+
+Current Implementation:
+- Correctly identifies the hollow square.
+- Moves the square to the right edge when possible.
+- Attempts to move to the bottom or top edge when already at the right edge.
+
+Issues Identified:
+1. The current implementation fails for test case 4, where the square should move to the top edge instead of the right edge.
+
+Hypothesis:
+The current logic doesn't correctly handle the case where the square is closer to the top edge than the bottom edge when it's already on the right side of the grid.
+
+Next Steps:
+1. Modify the logic to compare the distance to the top and bottom edges when the square is already on the right side.
+2. If the square is closer to the top edge, move it to the top instead of the bottom.
+3. Ensure that the horizontal position is maintained when moving vertically.
+
+Things to Keep in Mind:
+- The grid is 10x10, so indices range from 0 to 9.
+- The square is 3x3, so we need to consider its full size when calculating distances to edges.
+- We should prioritize moving to the right edge first, then consider vertical movement.
+
+Certainties:
+- The square always moves as a whole, maintaining its 3x3 shape.
+- The center of the square always remains black (0).
+- The square's color doesn't change during movement.
+
+Unknowns:
+- Whether there are any edge cases we haven't considered yet.
+- If there are any additional rules for movement that we haven't discovered.
+
+Failed Attempts:
+- Simply moving to the bottom edge when at the right edge doesn't work for all cases.
