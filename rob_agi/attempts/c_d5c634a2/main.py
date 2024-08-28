@@ -1,3 +1,4 @@
+import math
 from rob_agi.colored_grid import ColoredGrid
 
 def solve_d5c634a2(input_grid: ColoredGrid) -> ColoredGrid:
@@ -13,31 +14,29 @@ def solve_d5c634a2(input_grid: ColoredGrid) -> ColoredGrid:
     4. The middle row of the output is always kept black (0) regardless of the rules above.
     """
     input_height, input_width = input_grid.get_dimensions()
-    third_height = -(-input_height // 3)  # Ceiling division
+    third_height = math.ceil(input_height / 3)
     output = [[0 for _ in range(6)] for _ in range(3)]
 
-    for third in range(3):
-        if third == 1:  # Skip processing for the middle third
-            continue
+    for third in [0, 2]:  # Process only top and bottom thirds
         start_row = third * third_height
         end_row = min((third + 1) * third_height, input_height)
 
         # Process left half
-        if has_horizontal_line(input_grid, start_row, end_row, 0, input_width // 2):
+        if has_horizontal_line(input_grid, start_row, end_row, 0, math.floor(input_width / 2)):
             output[third][0] = 3
 
         # Process right half
-        if has_horizontal_line(input_grid, start_row, end_row, input_width // 2, input_width):
+        if has_horizontal_line(input_grid, start_row, end_row, math.floor(input_width / 2), input_width):
             output[third][2] = 3
 
         # Process middle third vertically
-        middle_start = input_width // 3
-        middle_end = 2 * input_width // 3
+        middle_start = math.floor(input_width / 3)
+        middle_end = math.floor(2 * input_width / 3)
         if has_any_red(input_grid, start_row, end_row, middle_start, middle_end):
             output[third][3] = 1
 
         # Process right third vertically
-        right_start = 2 * input_width // 3
+        right_start = math.floor(2 * input_width / 3)
         if has_any_red(input_grid, start_row, end_row, right_start, input_width):
             output[third][5] = 1
 
