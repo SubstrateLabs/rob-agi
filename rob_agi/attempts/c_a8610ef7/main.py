@@ -28,6 +28,7 @@ def solve_a8610ef7(input_grid: ColoredGrid) -> ColoredGrid:
     def get_checkerboard_color(r, c):
         return 5 if (r + c) % 2 == 0 else 2
     
+    # First pass: Mark edges and isolated cells
     for r in range(rows):
         new_row = []
         for c in range(cols):
@@ -39,6 +40,13 @@ def solve_a8610ef7(input_grid: ColoredGrid) -> ColoredGrid:
             elif is_edge(r, c):
                 new_row.append(5)
             else:
-                new_row.append(get_checkerboard_color(r, c))
+                new_row.append(8)  # Temporarily keep interior cells as 8
         output.append(new_row)
+    
+    # Second pass: Apply checkerboard pattern to interior cells
+    for r in range(rows):
+        for c in range(cols):
+            if output[r][c] == 8:
+                output[r][c] = get_checkerboard_color(r, c)
+    
     return ColoredGrid(values=output)
