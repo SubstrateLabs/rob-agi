@@ -31,6 +31,12 @@ def solve_e9ac8c9e(input_grid: ColoredGrid) -> ColoredGrid:
     new_top = center_row - gray_height // 2
     new_left = center_col - gray_width // 2
     
+    # Adjust for odd dimensions
+    if gray_height % 2 != 0:
+        new_top -= 1
+    if gray_width % 2 != 0:
+        new_left -= 1
+    
     # Calculate the dimensions for each color block
     top_height = (gray_height + 1) // 2
     bottom_height = gray_height - top_height
