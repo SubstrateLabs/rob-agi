@@ -9,10 +9,14 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     (5 pixels in a + configuration) are transformed. Other blue shapes and
     colors remain unchanged. All transformations are applied simultaneously.
 
-    1. Identify gray borders and determine the target color.
-    2. Find all blue plus shapes in the grid.
-    3. Transform these blue plus shapes to the target color.
-    4. Return the modified grid.
+    1. Identify all gray borders in the grid.
+    2. Count red and green pixels adjacent to all gray borders collectively.
+    3. Determine the target color based on the counts.
+    4. Find all blue plus shapes in the grid.
+    5. Transform these blue plus shapes to the target color.
+    6. Return the modified grid.
+
+    If no red or green pixels are found adjacent to gray borders, return the original grid.
     """
     GRAY, BLUE, RED, GREEN = 5, 1, 2, 3
     rows, cols = len(input_grid.values), len(input_grid.values[0])
@@ -33,29 +37,38 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
                 return False
         return True
 
+    # Step 1: Identify all gray borders
     gray_cells = [(r, c) for r in range(rows) for c in range(cols) if input_grid.values[r][c] == GRAY]
     
+    # Step 2: Count red and green pixels adjacent to all gray borders
     red_count, green_count = 0, 0
+    adjacent_cells = set()
     for gr, gc in gray_cells:
-        for nr, nc in get_adjacent_cells(gr, gc):
-            if input_grid.values[nr][nc] == RED:
-                red_count += 1
-            elif input_grid.values[nr][nc] == GREEN:
-                green_count += 1
+        adjacent_cells.update(get_adjacent_cells(gr, gc))
+    
+    for r, c in adjacent_cells:
+        if input_grid.values[r][c] == RED:
+            red_count += 1
+        elif input_grid.values[r][c] == GREEN:
+            green_count += 1
 
+    # Step 3: Determine the target color
     if red_count == 0 and green_count == 0:
         return input_grid
 
     target_color = RED if red_count >= green_count else GREEN
     
+    # Step 4: Find all blue plus shapes
     blue_plus_shapes = []
     for r in range(rows):
         for c in range(cols):
             if is_blue_plus(r, c):
                 blue_plus_shapes.append((r, c))
     
+    # Step 5: Transform blue plus shapes
     for r, c in blue_plus_shapes:
         for dr, dc in [(0, 0), (0, 1), (1, 0), (0, -1), (-1, 0)]:
             result_grid[r+dr][c+dc] = target_color
     
+    # Step 6: Return the modified grid
     return ColoredGrid(values=result_grid)
