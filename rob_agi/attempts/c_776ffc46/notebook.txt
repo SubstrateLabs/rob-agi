@@ -1,0 +1,29 @@
+Challenge 776ffc46: Transform blue regions in a grid
+
+Rules:
+1. Blue regions (color 1) of size 3x3 or smaller should be changed to red (color 2) or green (color 3).
+2. The choice between red and green depends on which color is more prevalent in the entire grid.
+3. Larger blue regions (larger than 3x3) should remain unchanged.
+4. Single blue pixels should remain unchanged.
+5. Other colors (including gray) should remain unchanged.
+6. The transformation should be applied to all eligible blue regions simultaneously.
+
+Key observations:
+- The grid size is 20x20.
+- Gray (color 5) often forms borders or structures that should not be modified.
+- Some blue regions form specific shapes (e.g., plus signs) that need to be identified and transformed if they meet the size criteria.
+- The prevalence of red vs green in the entire grid determines the target color for transformation.
+
+Implementation steps:
+1. Create a deep copy of the input grid.
+2. Count the total number of red and green cells to determine the preferred color.
+3. Identify all blue regions using a flood fill or depth-first search algorithm.
+4. For each blue region:
+   a. Calculate its dimensions (width and height).
+   b. If the region is 3x3 or smaller (area <= 9 and max dimension <= 3), transform it to the preferred color.
+   c. Otherwise, leave it unchanged.
+5. Return the transformed grid.
+
+Current issues:
+- The implementation is changing some blue regions that should remain unchanged.
+- We need to ensure that the size check is correctly implemented for all shapes, including non-rectangular ones like plus signs.
