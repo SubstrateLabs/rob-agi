@@ -26,7 +26,7 @@ def solve_184a9768(input_grid: ColoredGrid) -> ColoredGrid:
     3. Creates a simplified main structure based on the dominant color
     4. Processes secondary colors, placing them relative to the main structure
     5. Optimizes the layout to minimize empty space
-    6. Removes gray dots and ensures all regions are rectangular
+    6. Removes gray dots and ensures all regions are rectangular or L-shaped
     7. Adds a black border around the entire structure
 
     The transformation maintains color relationships, relative positions,
@@ -71,45 +71,65 @@ def solve_184a9768(input_grid: ColoredGrid) -> ColoredGrid:
             for c in range(left, right + 1):
                 output_grid.values[r][c] = color
 
+    def create_l_shape(color: int, top: int, left: int, bottom: int, right: int, thickness: int):
+        create_rectangle(color, top, left, bottom, left + thickness - 1)
+        create_rectangle(color, bottom - thickness + 1, left, bottom, right)
+
     color_regions = analyze_grid()
+    total_cells = sum(sum(r.size for r in regions) for regions in color_regions.values())
     color_hierarchy = sorted(color_regions.keys(), key=lambda x: sum(r.size for r in color_regions[x]), reverse=True)
 
     main_color = color_hierarchy[0]
     main_region = max(color_regions[main_color], key=lambda r: r.size)
     main_bbox = simplify_region(main_region)
-    create_rectangle(main_color, *main_bbox)
+
+    # Determine if main structure should be L-shaped
+    main_area = sum(r.size for r in color_regions[main_color])
+    if main_area / total_cells > 0.4 and (main_bbox[2] - main_bbox[0]) > (main_bbox[3] - main_bbox[1]) * 1.5:
+        create_l_shape(main_color, *main_bbox, thickness=(main_bbox[3] - main_bbox[1]) // 2)
+    else:
+        create_rectangle(main_color, *main_bbox)
 
     for color in color_hierarchy[1:]:
-        for region in sorted(color_regions[color], key=lambda r: r.size, reverse=True):
-            bbox = simplify_region(region)
-            relative_position = (
-                (bbox[0] + bbox[2]) // 2 - (main_bbox[0] + main_bbox[2]) // 2,
-                (bbox[1] + bbox[3]) // 2 - (main_bbox[1] + main_bbox[3]) // 2
-            )
+        total_color_area = sum(r.size for r in color_regions[color])
+        color_percentage = total_color_area / total_cells
 
-            if color == 8:  # Sky blue
-                top = (main_bbox[0] + main_bbox[2]) // 2 - 1
-                left = (main_bbox[1] + main_bbox[3]) // 2 - 1
-                create_rectangle(color, top, left, top + 1, left + 1)
-            elif all(abs(x) < (main_bbox[2] - main_bbox[0]) // 3 for x in relative_position):
-                # Place inside main structure
-                height = min(bbox[2] - bbox[0] + 1, (main_bbox[2] - main_bbox[0]) // 3)
-                width = min(bbox[3] - bbox[1] + 1, (main_bbox[3] - main_bbox[1]) // 3)
-                top = main_bbox[0] + (main_bbox[2] - main_bbox[0] - height) // 2
-                left = main_bbox[1] + (main_bbox[3] - main_bbox[1] - width) // 2
-                create_rectangle(color, top, left, top + height - 1, left + width - 1)
-            else:
-                # Place adjacent to main structure
-                if abs(relative_position[0]) > abs(relative_position[1]):
-                    # Place above or below
-                    top = main_bbox[0] - 2 if relative_position[0] < 0 else main_bbox[2] + 2
-                    left = (main_bbox[1] + main_bbox[3]) // 2 - (bbox[3] - bbox[1]) // 2
-                    create_rectangle(color, top, left, top + 1, left + (bbox[3] - bbox[1]))
+        if color_percentage > 0.05:
+            for region in sorted(color_regions[color], key=lambda r: r.size, reverse=True):
+                bbox = simplify_region(region)
+                relative_position = (
+                    (bbox[0] + bbox[2]) // 2 - (main_bbox[0] + main_bbox[2]) // 2,
+                    (bbox[1] + bbox[3]) // 2 - (main_bbox[1] + main_bbox[3]) // 2
+                )
+
+                if all(abs(x) < (main_bbox[2] - main_bbox[0]) // 3 for x in relative_position):
+                    # Place inside main structure
+                    height = min(bbox[2] - bbox[0] + 1, (main_bbox[2] - main_bbox[0]) // 3)
+                    width = min(bbox[3] - bbox[1] + 1, (main_bbox[3] - main_bbox[1]) // 3)
+                    top = main_bbox[0] + (main_bbox[2] - main_bbox[0] - height) // 2
+                    left = main_bbox[1] + (main_bbox[3] - main_bbox[1] - width) // 2
+                    create_rectangle(color, top, left, top + height - 1, left + width - 1)
                 else:
-                    # Place left or right
-                    top = (main_bbox[0] + main_bbox[2]) // 2 - (bbox[2] - bbox[0]) // 2
-                    left = main_bbox[1] - 2 if relative_position[1] < 0 else main_bbox[3] + 2
-                    create_rectangle(color, top, left, top + (bbox[2] - bbox[0]), left + 1)
+                    # Place adjacent to main structure
+                    if abs(relative_position[0]) > abs(relative_position[1]):
+                        # Place above or below
+                        top = main_bbox[0] - 2 if relative_position[0] < 0 else main_bbox[2] + 2
+                        left = (main_bbox[1] + main_bbox[3]) // 2 - (bbox[3] - bbox[1]) // 2
+                        create_rectangle(color, top, left, top + 1, left + (bbox[3] - bbox[1]))
+                    else:
+                        # Place left or right
+                        top = (main_bbox[0] + main_bbox[2]) // 2 - (bbox[2] - bbox[0]) // 2
+                        left = main_bbox[1] - 2 if relative_position[1] < 0 else main_bbox[3] + 2
+                        create_rectangle(color, top, left, top + (bbox[2] - bbox[0]), left + 1)
+        elif 0.02 < color_percentage <= 0.05:
+            # Create a smaller rectangular region
+            region = max(color_regions[color], key=lambda r: r.size)
+            bbox = simplify_region(region)
+            height = min(bbox[2] - bbox[0] + 1, (main_bbox[2] - main_bbox[0]) // 4)
+            width = min(bbox[3] - bbox[1] + 1, (main_bbox[3] - main_bbox[1]) // 4)
+            top = main_bbox[0] + (main_bbox[2] - main_bbox[0] - height) // 2
+            left = main_bbox[1] + (main_bbox[3] - main_bbox[1] - width) // 2
+            create_rectangle(color, top, left, top + height - 1, left + width - 1)
 
     # Optimize space usage
     non_zero_rows = [r for r in range(rows) if any(output_grid.values[r][c] != 0 for c in range(cols))]
@@ -127,4 +147,10 @@ def solve_184a9768(input_grid: ColoredGrid) -> ColoredGrid:
         
         output_grid = ColoredGrid(values=optimized_grid)
 
-    return output_grid
+    # Add black border
+    bordered_grid = [[0 for _ in range(output_grid.num_cols + 2)] for _ in range(output_grid.num_rows + 2)]
+    for r in range(output_grid.num_rows):
+        for c in range(output_grid.num_cols):
+            bordered_grid[r + 1][c + 1] = output_grid.values[r][c]
+
+    return ColoredGrid(values=bordered_grid)
