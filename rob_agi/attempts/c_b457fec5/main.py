@@ -10,11 +10,11 @@ def solve_b457fec5(input_grid: ColoredGrid) -> ColoredGrid:
     1. Extract the color sequence from the input grid.
     2. Determine the fill direction based on the color cluster's position.
     3. Create a color cycle from the extracted sequence.
-    4. Define a function to get the color for any coordinate in an infinite diagonal pattern.
+    4. Find the top-left corner of the first gray region.
     5. Process the input grid, replacing gray cells with the appropriate colors from the pattern.
     6. Return the transformed grid.
     
-    The pattern starts from the top-left or top-right of the gray region (depending on the fill direction),
+    The pattern starts from the top-left or top-right of the first gray region (depending on the fill direction),
     uses colors in the order they appear in the input, and follows a diagonal pattern
     while maintaining color sequence across all gray regions.
     """
@@ -39,17 +39,17 @@ def solve_b457fec5(input_grid: ColoredGrid) -> ColoredGrid:
     # Step 3: Create color cycle
     color_cycle = cycle(color_sequence)
     
-    # Step 4: Define function to get color for any coordinate
-    def get_color(row, col):
-        diagonal_index = row + (col if fill_direction == 1 else -col)
-        for _ in range(diagonal_index % len(color_sequence)):
-            next(color_cycle)
-        return next(color_cycle)
+    # Step 4: Find the top-left corner of the first gray region
+    start_row, start_col = next((r, c) for r in range(rows) for c in range(cols) if input_grid.values[r][c] == 5)
     
     # Step 5: Process the input grid
     for r in range(rows):
         for c in range(cols):
             if output_grid.values[r][c] == 5:  # gray
-                output_grid.values[r][c] = get_color(r, c)
+                diagonal_index = (r - start_row) + ((c - start_col) if fill_direction == 1 else (start_col - c))
+                color = next(color_cycle)
+                for _ in range(diagonal_index % len(color_sequence)):
+                    color = next(color_cycle)
+                output_grid.values[r][c] = color
     
     return output_grid
