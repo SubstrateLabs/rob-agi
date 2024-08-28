@@ -9,11 +9,8 @@ def solve_e88171ec(input_grid: ColoredGrid) -> ColoredGrid:
     The solution follows these steps:
     1. Find all contiguous regions of black (0) cells.
     2. Select the largest black region.
-    3. Calculate the center of the largest region.
-    4. Starting from the center and moving outwards in a spiral pattern:
-       a. Attempt to place a 4x4 sky blue rectangle.
-       b. If a 4x4 doesn't fit, attempt to place a 2x2 sky blue rectangle.
-    5. Fill the chosen area with sky blue (8).
+    3. Find the largest possible rectangle within the largest black region.
+    4. Fill the chosen rectangle with sky blue (8).
 
     If no suitable region is found or no rectangle fits, return the original grid unchanged.
     """
@@ -26,14 +23,13 @@ def solve_e88171ec(input_grid: ColoredGrid) -> ColoredGrid:
     if len(largest_region) < 4:
         return input_grid
     
-    bounding_box = get_bounding_box(largest_region)
-    blue_rectangle = find_rectangle_position(largest_region, bounding_box)
+    blue_rectangle = find_largest_rectangle(largest_region)
     
     if blue_rectangle:
         output_grid = input_grid.deep_copy()
-        size, (top, left) = blue_rectangle
-        for r in range(top, top + size):
-            for c in range(left, left + size):
+        top, left, bottom, right = blue_rectangle
+        for r in range(top, bottom + 1):
+            for c in range(left, right + 1):
                 output_grid.set_cell(r, c, 8)
         return output_grid
     
@@ -64,31 +60,37 @@ def find_black_regions(grid: ColoredGrid) -> List[Set[Tuple[int, int]]]:
 def get_largest_region(regions: List[Set[Tuple[int, int]]]) -> Set[Tuple[int, int]]:
     return max(regions, key=len)
 
-def get_bounding_box(region: Set[Tuple[int, int]]) -> Tuple[int, int, int, int]:
+def find_largest_rectangle(region: Set[Tuple[int, int]]) -> Optional[Tuple[int, int, int, int]]:
+    if not region:
+        return None
+    
     min_r = min(r for r, _ in region)
     max_r = max(r for r, _ in region)
     min_c = min(c for _, c in region)
     max_c = max(c for _, c in region)
-    return min_r, max_r, min_c, max_c
-
-def find_rectangle_position(region: Set[Tuple[int, int]], bounding_box: Tuple[int, int, int, int]) -> Optional[Tuple[int, Tuple[int, int]]]:
-    min_r, max_r, min_c, max_c = bounding_box
-    center_r = (min_r + max_r) // 2
-    center_c = (min_c + max_c) // 2
-
-    def spiral_coordinates():
-        dx, dy = 0, -1
-        x, y = 0, 0
-        for _ in range((max_r - min_r + 1) * (max_c - min_c + 1)):
-            yield center_r + y, center_c + x
-            if x == y or (x < 0 and x == -y) or (x > 0 and x == 1 - y):
-                dx, dy = -dy, dx
-            x, y = x + dx, y + dy
-
-    for r, c in spiral_coordinates():
-        for size in [4, 2]:
-            if r + size - 1 <= max_r and c + size - 1 <= max_c:
-                if all((rr, cc) in region for rr in range(r, r + size) for cc in range(c, c + size)):
-                    return size, (r, c)
-
-    return None
+    
+    heights = [0] * (max_c - min_c + 1)
+    max_rectangle = (0, 0, 0, 0)
+    max_area = 0
+    
+    for r in range(min_r, max_r + 1):
+        for c in range(min_c, max_c + 1):
+            if (r, c) in region:
+                heights[c - min_c] += 1
+            else:
+                heights[c - min_c] = 0
+        
+        stack = []
+        for i, h in enumerate(heights + [0]):
+            start = i
+            while stack and stack[-1][1] > h:
+                index, height = stack.pop()
+                width = i - index
+                area = width * height
+                if area > max_area and width % 2 == 0 and height % 2 == 0:
+                    max_area = area
+                    max_rectangle = (r - height + 1, index + min_c, r, index + min_c + width - 1)
+                start = index
+            stack.append((start, h))
+    
+    return max_rectangle if max_area > 0 else None
