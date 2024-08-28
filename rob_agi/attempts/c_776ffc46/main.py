@@ -13,26 +13,25 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
+    visited = [[False for _ in range(cols)] for _ in range(rows)]
 
     def is_valid(r: int, c: int) -> bool:
         return 0 <= r < rows and 0 <= c < cols
 
-    def flood_fill(start_row: int, start_col: int) -> Set[Tuple[int, int]]:
-        color = input_grid.values[start_row][start_col]
+    def flood_fill(start_row: int, start_col: int) -> List[Tuple[int, int]]:
         stack = [(start_row, start_col)]
-        region = set()
-        while stack:
+        region = []
+        while stack and len(region) <= 8:
             row, col = stack.pop()
-            if (row, col) in region or input_grid.values[row][col] != color or input_grid.values[row][col] == 5:
+            if visited[row][col] or input_grid.values[row][col] != 1:
                 continue
-            region.add((row, col))
-            if len(region) > 8:
-                return set()
+            visited[row][col] = True
+            region.append((row, col))
             for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                 new_row, new_col = row + dr, col + dc
-                if is_valid(new_row, new_col) and input_grid.values[new_row][new_col] == color:
+                if is_valid(new_row, new_col) and input_grid.values[new_row][new_col] == 1 and not visited[new_row][new_col]:
                     stack.append((new_row, new_col))
-        return region if 2 <= len(region) <= 8 else set()
+        return region if 2 <= len(region) <= 8 else []
 
     def determine_target_color() -> int:
         red_count = sum(row.count(2) for row in input_grid.values)
@@ -40,15 +39,17 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         return 2 if red_count >= green_count else 3
 
     target_color = determine_target_color()
-    global_visited = set()
+    regions_to_transform = []
 
     for row in range(rows):
         for col in range(cols):
-            if input_grid.values[row][col] == 1 and (row, col) not in global_visited:
+            if input_grid.values[row][col] == 1 and not visited[row][col]:
                 region = flood_fill(row, col)
                 if region:
-                    for r, c in region:
-                        output_grid.values[r][c] = target_color
-                    global_visited.update(region)
+                    regions_to_transform.append(region)
+
+    for region in regions_to_transform:
+        for r, c in region:
+            output_grid.values[r][c] = target_color
 
     return output_grid
