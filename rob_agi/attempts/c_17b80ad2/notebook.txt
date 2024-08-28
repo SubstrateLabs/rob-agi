@@ -1,1 +1,35 @@
 Challenge 17b80ad2:
+
+Objective:
+Transform a 2D grid of colored dots into vertical lines, following specific rules.
+
+What we know:
+1. The input is a grid of integers (0-9) representing colors.
+2. We need to process each column independently.
+3. Vertical lines should be created for each color, prioritizing longer lines.
+4. Colors should extend upwards and downwards until hitting another color or the grid edge.
+5. Distant dots of the same color within a column should be connected.
+6. Original non-black (non-zero) cells must be preserved in their positions.
+
+What we've learned:
+1. Our current implementation is not fully correct. It's missing some vertical extensions.
+2. The algorithm is correctly preserving original colors and creating some vertical lines.
+3. The main issue seems to be with extending colors to fill empty spaces between dots.
+
+What doesn't work:
+1. Simply extending colors upwards and downwards from their original positions is not sufficient.
+
+What needs improvement:
+1. The algorithm for determining the extent of vertical lines for each color.
+2. Handling of multiple instances of the same color in a column.
+3. Filling in gaps between distant dots of the same color.
+
+Next steps:
+1. Revise the `process_column` function to better handle multiple instances of the same color.
+2. Implement a more sophisticated method for determining the start and end points of each color's line.
+3. Ensure that all empty spaces between the topmost and bottommost instances of a color are filled.
+4. Double-check that we're correctly prioritizing longer lines when colors conflict.
+
+Unknowns:
+1. The exact priority system when multiple colors could potentially occupy the same space.
+2. Whether there are any edge cases we haven't considered yet.
