@@ -17,24 +17,22 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     def is_valid(r: int, c: int) -> bool:
         return 0 <= r < rows and 0 <= c < cols
 
-    def flood_fill(start_row: int, start_col: int) -> List[Tuple[int, int]]:
+    def flood_fill(start_row: int, start_col: int) -> Set[Tuple[int, int]]:
         color = input_grid.values[start_row][start_col]
         stack = [(start_row, start_col)]
-        region = []
-        visited = set()
+        region = set()
         while stack:
             row, col = stack.pop()
-            if (row, col) in visited or input_grid.values[row][col] != color or input_grid.values[row][col] == 5:
+            if (row, col) in region or input_grid.values[row][col] != color or input_grid.values[row][col] == 5:
                 continue
-            visited.add((row, col))
-            region.append((row, col))
+            region.add((row, col))
             if len(region) > 8:
-                return []
+                return set()
             for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                 new_row, new_col = row + dr, col + dc
                 if is_valid(new_row, new_col) and input_grid.values[new_row][new_col] == color:
                     stack.append((new_row, new_col))
-        return region if 2 <= len(region) <= 8 else []
+        return region if 2 <= len(region) <= 8 else set()
 
     def determine_target_color() -> int:
         red_count = sum(row.count(2) for row in input_grid.values)
@@ -51,6 +49,6 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
                 if region:
                     for r, c in region:
                         output_grid.values[r][c] = target_color
-                        global_visited.add((r, c))
+                    global_visited.update(region)
 
     return output_grid
