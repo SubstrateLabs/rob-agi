@@ -1,1 +1,25 @@
 Challenge 782b5218:
+
+Pattern Analysis:
+1. The output grid always has a triangular pattern with three colors.
+2. The top-left triangle is always filled with the lowest color (usually black, 0).
+3. If red (2) is present, it forms a diagonal stripe of width 2.
+4. The remaining area is filled with the most frequent color (excluding 0 and 2).
+
+Key Observations:
+1. The black triangle should cover the entire top-left half of the grid, up to the main diagonal.
+2. The red diagonal (if present) should start from the top-left corner and extend to the bottom-right.
+3. The most frequent color should fill the remaining bottom-right area.
+
+Current Issues:
+1. Our implementation is creating the pattern in the wrong direction (top-right to bottom-left instead of top-left to bottom-right).
+2. The red diagonal is not starting from the correct position.
+
+Next Steps:
+1. Modify the diagonal pattern creation to start from the top-left corner.
+2. Adjust the red diagonal placement to begin at the top-left and extend to the bottom-right.
+3. Ensure the most frequent color fills the remaining area correctly.
+
+Things to avoid:
+1. Don't use r + c < rows for determining the black triangle area, as it creates the wrong diagonal direction.
+2. Don't start the red diagonal after the black triangle ends, as it should overlap with the black area.
