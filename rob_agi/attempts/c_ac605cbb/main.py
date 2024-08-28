@@ -13,6 +13,7 @@ def solve_ac605cbb(input_grid: ColoredGrid) -> ColoredGrid:
     7. Uses Yellow (4) for diagonal connections when needed.
     8. Fills gaps with Gray (5) if they have two or more non-zero neighbors.
     9. Completes patterns for each color and resolves conflicts based on color priority.
+    10. Ensures original colored squares are preserved unless moved as part of their expansion rule.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -73,14 +74,35 @@ def expand_horizontal(grid: ColoredGrid, r: int, c: int, color: int):
 
 def expand_blue(grid: ColoredGrid, r: int, c: int):
     rows, cols = grid.get_dimensions()
-    new_r, new_c = r-1, c+1  # Move diagonally up and right
+    new_r, new_c = r-1, c+2  # Move diagonally up and two steps right
     if new_r < 0 or new_c >= cols:
-        new_r, new_c = r+1, c-1  # Move diagonally down and left if out of bounds
+        new_r, new_c = r+1, c-2  # Move diagonally down and two steps left if out of bounds
     
-    if grid.get_cell(new_r, new_c) == 0:
+    if 0 <= new_r < rows and 0 <= new_c < cols and grid.get_cell(new_r, new_c) == 0:
         grid.set_cell(new_r, new_c, 1)
         expand_horizontal(grid, new_r, new_c, 1)
         expand_vertical(grid, new_r, new_c, 1)
+    
+    # Connect original position to the new position
+    connect_blue(grid, r, c, new_r, new_c)
+
+def expand_vertical(grid: ColoredGrid, r: int, c: int, color: int):
+    rows, _ = grid.get_dimensions()
+    for i in range(r+1, rows):
+        if grid.get_cell(i, c) == 0:
+            grid.set_cell(i, c, 5)
+        else:
+            break
+
+def connect_blue(grid: ColoredGrid, r1: int, c1: int, r2: int, c2: int):
+    if r1 != r2 and c1 != c2:
+        # Connect diagonally with gray
+        r, c = r1, c1
+        while r != r2 and c != c2:
+            r += 1 if r2 > r1 else -1
+            c += 1 if c2 > c1 else -1
+            if grid.get_cell(r, c) == 0:
+                grid.set_cell(r, c, 5)
 
 def connect_expansions(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
