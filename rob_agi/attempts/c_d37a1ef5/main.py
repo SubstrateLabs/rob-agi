@@ -9,7 +9,8 @@ def solve_d37a1ef5(input_grid: ColoredGrid) -> ColoredGrid:
     2. Expands the side edges inward up to 2 cells, respecting gray cells
     3. Fills in the inner area, creating a consistent expanded frame
     4. Ensures all gray cells maintain a 1-cell black border
-    5. Returns a new grid with the expanded red frame
+    5. Processes top and bottom rows to maintain original thickness
+    6. Returns a new grid with the expanded red frame
     """
     new_grid = input_grid.deep_copy()
     rows, cols = new_grid.get_dimensions()
@@ -20,28 +21,32 @@ def solve_d37a1ef5(input_grid: ColoredGrid) -> ColoredGrid:
     left = next(c for c in range(cols) if any(row[c] == 2 for row in new_grid.values))
     right = next(c for c in range(cols-1, -1, -1) if any(row[c] == 2 for row in new_grid.values))
 
-    # Process left and right edges
+    # Process rows (excluding top and bottom frame rows)
     for r in range(top + 1, bottom):
-        # Left edge
+        # Left expansion
         for c in range(left + 1, min(left + 3, (left + right) // 2)):
             if new_grid.values[r][c] == 0 and not is_adjacent_to_gray(new_grid, r, c):
                 new_grid.values[r][c] = 2
             else:
                 break
-        # Right edge
+        # Right expansion
         for c in range(right - 1, max(right - 3, (left + right) // 2), -1):
             if new_grid.values[r][c] == 0 and not is_adjacent_to_gray(new_grid, r, c):
                 new_grid.values[r][c] = 2
             else:
                 break
-
-    # Process inner area
-    for r in range(top + 1, bottom):
+        # Fill between expanded edges
         for c in range(left + 1, right):
-            if new_grid.values[r][c] == 0 and is_adjacent_to_red(new_grid, r, c) and not is_adjacent_to_gray(new_grid, r, c):
+            if new_grid.values[r][c] == 0 and not is_adjacent_to_gray(new_grid, r, c):
                 new_grid.values[r][c] = 2
 
-    # Ensure gray cells have a black border
+    # Process top and bottom rows
+    for r in [top + 1, bottom - 1]:
+        for c in range(left + 1, right):
+            if new_grid.values[r][c] == 0 and not is_adjacent_to_gray(new_grid, r, c):
+                new_grid.values[r][c] = 2
+
+    # Preserve gray cell borders
     for r in range(rows):
         for c in range(cols):
             if new_grid.values[r][c] == 5:
@@ -60,12 +65,4 @@ def is_adjacent_to_gray(grid: ColoredGrid, r: int, c: int) -> bool:
             nr, nc = r + dr, c + dc
             if 0 <= nr < rows and 0 <= nc < cols and grid.values[nr][nc] == 5:
                 return True
-    return False
-
-def is_adjacent_to_red(grid: ColoredGrid, r: int, c: int) -> bool:
-    rows, cols = grid.get_dimensions()
-    for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-        nr, nc = r + dr, c + dc
-        if 0 <= nr < rows and 0 <= nc < cols and grid.values[nr][nc] == 2:
-            return True
     return False
