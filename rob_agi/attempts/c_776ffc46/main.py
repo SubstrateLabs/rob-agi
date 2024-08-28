@@ -9,47 +9,45 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     3. Larger blue regions, single blue pixels, and other colors remain unchanged.
     4. All transformations are applied simultaneously.
     5. Gray (5) acts as a border and is not considered part of any region.
+    6. Only orthogonally adjacent cells are considered part of the same region.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
 
-    def find_connected_region(row: int, col: int, color: int, visited: Set[Tuple[int, int]]) -> List[Tuple[int, int]]:
+    def flood_fill(start_row: int, start_col: int) -> List[Tuple[int, int]]:
+        color = input_grid.values[start_row][start_col]
+        stack = [(start_row, start_col)]
         region = []
-        stack = [(row, col)]
+        visited = set()
         while stack:
-            r, c = stack.pop()
-            if (0 <= r < rows and 0 <= c < cols and 
-                output_grid.values[r][c] == color and 
-                (r, c) not in visited):
-                region.append((r, c))
-                visited.add((r, c))
+            row, col = stack.pop()
+            if (row, col) in visited:
+                continue
+            visited.add((row, col))
+            if input_grid.values[row][col] == color:
+                region.append((row, col))
                 for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                    nr, nc = r + dr, c + dc
-                    if (0 <= nr < rows and 0 <= nc < cols and
-                        output_grid.values[nr][nc] == color):
-                        stack.append((nr, nc))
+                    new_row, new_col = row + dr, col + dc
+                    if 0 <= new_row < rows and 0 <= new_col < cols:
+                        if input_grid.values[new_row][new_col] != 5:  # Not gray
+                            stack.append((new_row, new_col))
         return region
 
-    def count_color_prevalence():
+    def determine_target_color() -> int:
         red_count = sum(row.count(2) for row in input_grid.values)
         green_count = sum(row.count(3) for row in input_grid.values)
         return 2 if red_count >= green_count else 3
 
-    def is_transformable(region: List[Tuple[int, int]]) -> bool:
-        return 2 <= len(region) <= 8
-
-    target_color = count_color_prevalence()
+    target_color = determine_target_color()
     visited = set()
-    transform_coords = set()
-
+    
     for row in range(rows):
         for col in range(cols):
-            if output_grid.values[row][col] == 1 and (row, col) not in visited:
-                region = find_connected_region(row, col, 1, visited)
-                if is_transformable(region):
-                    transform_coords.update(region)
-
-    for row, col in transform_coords:
-        output_grid.values[row][col] = target_color
-
+            if input_grid.values[row][col] == 1 and (row, col) not in visited:
+                region = flood_fill(row, col)
+                if 2 <= len(region) <= 8:
+                    for r, c in region:
+                        output_grid.values[r][c] = target_color
+                visited.update(region)
+    
     return output_grid
