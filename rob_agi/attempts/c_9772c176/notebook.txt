@@ -1,1 +1,30 @@
-Challenge 9772c176:
+Challenge 9772c176: Adding Yellow Shadows to Sky Blue Shapes
+
+Key Observations:
+1. The challenge involves adding yellow (4) shadows to sky blue (8) shapes on a black (0) background.
+2. Shadows should not directly touch the sky blue shapes; there must be a one-pixel black buffer.
+3. Shadows are more pronounced on the bottom and right sides of shapes.
+4. There should be a visual connection (bridge) between separate sky blue shapes using yellow pixels.
+5. Some scattered yellow pixels appear in the black space, especially towards the bottom-right.
+
+Current Implementation Issues:
+1. The shadow is too extensive, covering almost the entire grid with yellow pixels.
+2. The one-pixel buffer between blue and yellow is not maintained.
+3. The directional bias (bottom-right emphasis) is not correctly implemented.
+4. The shadow doesn't follow the contours of the sky blue shapes closely enough.
+
+Next Steps:
+1. Adjust the shadow intensity calculation to limit the spread of yellow pixels.
+2. Implement a strict check to ensure no yellow pixel touches a sky blue pixel.
+3. Refine the directional bias to emphasize bottom and right sides more accurately.
+4. Improve the algorithm for creating bridges between shapes.
+5. Add a more controlled method for scattered yellow pixels in black space.
+
+Failed Approaches:
+1. Using a simple distance-based shadow map without considering shape contours.
+2. Applying a uniform shadow around the entire shape without directional bias.
+
+Open Questions:
+1. What's the ideal maximum distance for shadow spread from sky blue shapes?
+2. How to balance between connected shadows and scattered pixels?
+3. What's the best way to create natural-looking bridges between shapes?
