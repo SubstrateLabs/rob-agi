@@ -1,1 +1,38 @@
 Challenge b7cb93ac:
+
+Observations:
+1. The input is a larger grid (e.g., 10x11, 10x12, 10x13) with mostly empty (black) space.
+2. The output is always a 3x4 grid containing elements from the input.
+3. The challenge involves identifying key patterns and colors from the input and arranging them in the output grid.
+
+Key patterns:
+- Horizontal lines
+- Vertical lines
+- Special shapes (L-shaped, T-shaped, cross-shaped)
+- Sky blue (8) dots are given special consideration
+
+Current understanding:
+- The middle row of the output is always filled with the color of the longest horizontal line from the input.
+- The leftmost column of the output is filled with the color of the longest vertical line from the input, except possibly for the corners.
+- Sky blue (8) is placed in the corners if present in the input.
+- The top and bottom rows of the output mirror each other.
+
+Issues encountered:
+- The current implementation is not correctly handling the placement of the third color (red in example 2).
+- The algorithm is prioritizing sky blue (8) over other colors even when it's not the most prominent.
+
+Next steps:
+1. Revise the color selection logic to ensure all three prominent colors are represented correctly.
+2. Adjust the corner placement logic to handle cases where sky blue is not present or when another color should take precedence.
+3. Implement a check to ensure the top and bottom rows always mirror each other.
+
+Certainties:
+- The output is always a 3x4 grid.
+- The middle row is uniform and represents the most prominent horizontal pattern.
+
+Uncertainties:
+- The exact priority order for color selection when multiple patterns are present.
+- How to handle cases where fewer than three colors are present in the input.
+
+Failed approaches:
+- Simply prioritizing sky blue (8) for corner placement without considering other prominent colors.
