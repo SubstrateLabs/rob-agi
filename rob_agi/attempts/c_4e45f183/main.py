@@ -10,9 +10,9 @@ def solve_4e45f183(input_grid: ColoredGrid) -> ColoredGrid:
     1. Analyzing each 5x5 section to determine the two most frequent colors.
     2. Creating frame-like patterns in left and right sections with the less frequent color.
     3. Generating a symmetrical pattern in the middle sections.
-    4. Ensuring both horizontal and vertical symmetry across the entire grid.
+    4. Ensuring both vertical and modified horizontal symmetry across the entire grid.
     5. Preserving the original grid structure with black borders and separators.
-    6. Applying modified horizontal symmetry between top and bottom thirds.
+    6. Special handling for the middle third to maintain unique patterns if present.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -30,21 +30,19 @@ def solve_4e45f183(input_grid: ColoredGrid) -> ColoredGrid:
         section = [[primary] * 5 for _ in range(5)]
         for i in range(5):
             section[0][i] = section[i][0] = secondary
-        section[4][4] = secondary
         return section
 
     def create_middle_section(primary: int, secondary: int) -> List[List[int]]:
         section = [[primary] * 5 for _ in range(5)]
         for i in range(5):
             section[0][i] = section[4][i] = secondary
-        section[1][1] = section[1][3] = section[3][1] = section[3][3] = section[2][2] = secondary
+            section[i][0] = section[i][4] = secondary
         return section
 
     def create_right_section(primary: int, secondary: int) -> List[List[int]]:
         section = [[primary] * 5 for _ in range(5)]
         for i in range(5):
             section[0][i] = section[i][4] = secondary
-        section[4][0] = secondary
         return section
 
     def transform_section(section: List[List[int]], position: str) -> List[List[int]]:
@@ -84,12 +82,14 @@ def solve_4e45f183(input_grid: ColoredGrid) -> ColoredGrid:
     # Apply modified horizontal symmetry
     for r in range(5):
         for c in range(17):
-            if c < 6:
-                output_values[13+r][c+1] = output_values[5-r][c+1]
-            elif 6 < c < 12:
-                output_values[13+r][c+1] = output_values[7+r][c+1]
-            else:
-                output_values[13+r][c+1] = output_values[5-r][18-c]
+            output_values[13+r][c+1] = output_values[5-r][c+1]
+
+    # Special handling for middle third
+    middle_third = input_grid.extract_subgrid(7, 1, 5, 17).values
+    transformed_middle = [transform_section(middle_third[i:i+5], ['left', 'middle', 'right'][i//5]) for i in range(0, 15, 5)]
+    for r in range(5):
+        for c in range(17):
+            output_values[7+r][c+1] = transformed_middle[c//5][r][c%5]
 
     # Preserve black borders and separators
     for i in range(19):
