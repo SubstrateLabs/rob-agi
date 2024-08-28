@@ -1,1 +1,25 @@
 Challenge 19bb5feb:
+
+Observations:
+1. The input is a large grid (up to 30x30) containing 2x2 colored squares within a larger area (usually sky blue).
+2. The output is always a 2x2 grid.
+3. The colors in the output correspond to the colors of the 2x2 squares in the input, excluding black (0) and sky blue (8).
+4. The placement of colors in the output grid is based on their numerical values, not their positions in the input grid.
+
+Rules (confirmed):
+1. The top-left cell of the output is always the lowest color value found.
+2. The bottom-left cell is always black (0).
+
+Rules (need verification):
+3. The top-right cell is the highest color value if there are 3+ unique colors, otherwise 0.
+4. The bottom-right cell is the second-highest color value if there are 2+ unique colors, otherwise the highest color value.
+
+Current implementation issues:
+- The bottom-right cell is incorrectly set to the highest color value instead of the second-highest when there are 3+ colors.
+
+Next steps:
+1. Modify the implementation to correctly set the bottom-right cell to the second-highest color value when there are 3+ colors.
+2. Double-check the rule for the top-right cell (is it always the highest color, or only when there are 3+ colors?).
+3. Verify if the order of colors matters when there are only two unique colors (does the higher value always go in the bottom-right?).
+
+Remember: The solution should work for all possible inputs within the constraints of the problem, including edge cases with fewer than 3 unique colors.
