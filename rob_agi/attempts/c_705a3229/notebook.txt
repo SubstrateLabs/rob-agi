@@ -1,1 +1,28 @@
-Challenge 705a3229:
+Challenge 705a3229: Transform a grid by expanding colored squares into T-shapes or rectangles
+
+Observations:
+1. The transformation expands colored squares vertically and horizontally.
+2. The expansion prioritizes the direction with more available space.
+3. If space is equal in both directions, it expands upwards.
+4. The expansion creates T-shapes, inverted T-shapes, or rectangles.
+5. The expansion should not overwrite existing colored squares.
+
+Current implementation issues:
+1. The expansion is not stopping at existing colored squares.
+2. The horizontal expansion (top of the T) is not correct for all cases.
+3. The vertical expansion (stem of the T) is extending too far in some cases.
+
+Things to try:
+1. Modify the count_extension function to stop at existing colored squares.
+2. Adjust the create_stem and create_top functions to respect existing colors.
+3. Implement a check to ensure we don't expand beyond the original colored square's position.
+
+Known constraints:
+- Grid size can be between 1x1 and 30x30.
+- Color values are integers from 0 to 9.
+- 0 represents black (empty space).
+
+Next steps:
+1. Revise the expansion logic to respect existing colored squares.
+2. Implement a more precise method for determining the expansion limits.
+3. Add checks to prevent overwriting of original colored squares during expansion.
