@@ -1,5 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List, Tuple, Set
 from collections import deque
 
 def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
@@ -15,7 +15,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     BLUE, RED, GREEN, GRAY = 1, 2, 3, 5
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
-    visited = [[False for _ in range(cols)] for _ in range(rows)]
+    visited = set()
 
     def is_valid(r: int, c: int) -> bool:
         return 0 <= r < rows and 0 <= c < cols and input_grid.values[r][c] != GRAY
@@ -25,13 +25,13 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         region = []
         while queue:
             row, col = queue.popleft()
-            if visited[row][col] or input_grid.values[row][col] != BLUE:
+            if (row, col) in visited or input_grid.values[row][col] != BLUE:
                 continue
-            visited[row][col] = True
+            visited.add((row, col))
             region.append((row, col))
             for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                 new_row, new_col = row + dr, col + dc
-                if is_valid(new_row, new_col) and input_grid.values[new_row][new_col] == BLUE and not visited[new_row][new_col]:
+                if is_valid(new_row, new_col) and input_grid.values[new_row][new_col] == BLUE and (new_row, new_col) not in visited:
                     queue.append((new_row, new_col))
         return region
 
@@ -45,7 +45,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
 
     for row in range(rows):
         for col in range(cols):
-            if input_grid.values[row][col] == BLUE and not visited[row][col]:
+            if input_grid.values[row][col] == BLUE and (row, col) not in visited:
                 region = flood_fill(row, col)
                 if 2 <= len(region) <= 8:
                     regions_to_transform.append(region)
