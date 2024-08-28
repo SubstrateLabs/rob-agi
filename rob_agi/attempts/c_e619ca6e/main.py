@@ -8,35 +8,35 @@ def solve_e619ca6e(input_grid: ColoredGrid) -> ColoredGrid:
     Solves the grid expansion challenge by growing green structures organically.
     
     The solution follows these steps:
-    1. Initialize the grid and identify seed points.
-    2. Create a directional field to guide growth.
-    3. Iteratively grow the structure:
-       a. Expand existing green cells.
-       b. Create branches.
-       c. Regulate thickness.
-       d. Apply edge repulsion.
-       e. Fill empty spaces.
-    4. Ensure connectivity of all green cells.
-    5. Add fine details with isolated green squares.
-    6. Perform final cleanup and boundary verification.
-    
+    1. Initialize and analyze the grid, identifying seed points and creating influence maps.
+    2. Perform main growth phase using probability-based expansion.
+    3. Add branching structures to create more complex patterns.
+    4. Create isolated formations in empty areas.
+    5. Fine-tune the structure by smoothing edges and filling small gaps.
+    6. Adjust for symmetry and refine edges.
+    7. Perform final connectivity check and cleanup.
+
     This approach creates a complex, organic structure that expands from the original green cells,
     maintaining intricate patterns while adapting to different input configurations.
     """
     rows, cols = input_grid.get_dimensions()
     output_grid = input_grid.deep_copy()
     seed_points = identify_seed_points(input_grid)
-    directional_field = create_directional_field(rows, cols)
     
-    for _ in range(20):  # Adjust the number of iterations as needed
-        expand_structures(output_grid, seed_points, directional_field)
-        create_branches(output_grid, directional_field)
-        regulate_thickness(output_grid)
-        apply_edge_repulsion(output_grid)
-        fill_empty_spaces(output_grid)
+    influence_maps = create_influence_maps(output_grid, seed_points)
     
-    ensure_connectivity(output_grid)
-    add_fine_details(output_grid)
+    # Main growth phase
+    for _ in range(min(rows, cols)):  # Adjust iterations based on grid size
+        expand_structures(output_grid, influence_maps)
+        ensure_connectivity(output_grid, seed_points)
+    
+    add_branches(output_grid, influence_maps)
+    create_isolated_formations(output_grid, influence_maps)
+    fine_tune_structure(output_grid)
+    adjust_symmetry(output_grid, seed_points)
+    refine_edges(output_grid)
+    
+    final_connectivity_check(output_grid, seed_points)
     final_cleanup(output_grid)
     
     return output_grid
@@ -50,75 +50,62 @@ def identify_seed_points(grid: ColoredGrid) -> Set[Tuple[int, int]]:
                 seed_points.add((r, c))
     return seed_points
 
-def create_directional_field(rows: int, cols: int) -> List[List[Tuple[float, float]]]:
-    field = [[(0.0, 0.0) for _ in range(cols)] for _ in range(rows)]
-    center_r, center_c = rows // 2, cols // 2
+def create_influence_maps(grid: ColoredGrid, seed_points: Set[Tuple[int, int]]) -> dict:
+    rows, cols = grid.get_dimensions()
+    distance_map = [[float('inf') for _ in range(cols)] for _ in range(rows)]
+    edge_pressure_map = [[0.0 for _ in range(cols)] for _ in range(rows)]
+    symmetry_map = [[0.0 for _ in range(cols)] for _ in range(rows)]
+    
+    # Calculate center of mass for seed points
+    if seed_points:
+        center_r = sum(r for r, _ in seed_points) / len(seed_points)
+        center_c = sum(c for _, c in seed_points) / len(seed_points)
+    else:
+        center_r, center_c = rows // 2, cols // 2
+    
+    # Create distance and symmetry maps
     for r in range(rows):
         for c in range(cols):
-            dx = c - center_c
-            dy = r - center_r
-            distance = math.sqrt(dx**2 + dy**2)
-            if distance == 0:
-                field[r][c] = (random.uniform(-1, 1), random.uniform(-1, 1))
-            else:
-                field[r][c] = (dx / distance + random.uniform(-0.5, 0.5),
-                               dy / distance + random.uniform(-0.5, 0.5))
-    return field
+            for sr, sc in seed_points:
+                dist = math.sqrt((r - sr)**2 + (c - sc)**2)
+                distance_map[r][c] = min(distance_map[r][c], dist)
+            
+            # Edge pressure (higher near edges)
+            edge_dist = min(r, c, rows-1-r, cols-1-c)
+            edge_pressure_map[r][c] = 1 - (edge_dist / max(rows//2, cols//2))
+            
+            # Symmetry (higher in symmetrical positions)
+            sym_r, sym_c = 2*center_r - r, 2*center_c - c
+            if 0 <= sym_r < rows and 0 <= sym_c < cols:
+                symmetry_map[r][c] = 1 - (abs(r - sym_r) + abs(c - sym_c)) / (rows + cols)
+    
+    return {
+        'distance': distance_map,
+        'edge_pressure': edge_pressure_map,
+        'symmetry': symmetry_map
+    }
 
-def expand_structures(grid: ColoredGrid, seed_points: Set[Tuple[int, int]], field: List[List[Tuple[float, float]]]):
+def expand_structures(grid: ColoredGrid, influence_maps: dict):
     rows, cols = grid.get_dimensions()
     new_green_cells = set()
-    for r, c in seed_points:
-        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            nr, nc = r + dr, c + dc
-            if 0 <= nr < rows and 0 <= nc < cols and grid.get_cell(nr, nc) == 0:
-                direction = field[nr][nc]
-                if random.random() < 0.3 + 0.4 * (direction[0]*dr + direction[1]*dc):
-                    new_green_cells.add((nr, nc))
+    for r in range(rows):
+        for c in range(cols):
+            if grid.get_cell(r, c) == 0 and any(grid.get_cell(r+dr, c+dc) == 3 
+                                                for dr, dc in [(0,1),(1,0),(0,-1),(-1,0)] 
+                                                if 0 <= r+dr < rows and 0 <= c+dc < cols):
+                growth_prob = calculate_growth_probability(r, c, influence_maps)
+                if random.random() < growth_prob:
+                    new_green_cells.add((r, c))
     for r, c in new_green_cells:
         grid.set_cell(r, c, 3)
-    seed_points.update(new_green_cells)
 
-def create_branches(grid: ColoredGrid, field: List[List[Tuple[float, float]]]):
-    rows, cols = grid.get_dimensions()
-    for r in range(rows):
-        for c in range(cols):
-            if grid.get_cell(r, c) == 3 and random.random() < 0.05:
-                direction = field[r][c]
-                dr, dc = int(round(direction[0])), int(round(direction[1]))
-                nr, nc = r + dr, c + dc
-                if 0 <= nr < rows and 0 <= nc < cols and grid.get_cell(nr, nc) == 0:
-                    grid.set_cell(nr, nc, 3)
+def calculate_growth_probability(r: int, c: int, influence_maps: dict) -> float:
+    distance_factor = 1 / (1 + influence_maps['distance'][r][c])
+    edge_factor = 1 - influence_maps['edge_pressure'][r][c]
+    symmetry_factor = influence_maps['symmetry'][r][c]
+    return 0.3 * distance_factor + 0.3 * edge_factor + 0.4 * symmetry_factor
 
-def regulate_thickness(grid: ColoredGrid):
-    rows, cols = grid.get_dimensions()
-    for r in range(rows):
-        for c in range(cols):
-            if grid.get_cell(r, c) == 3:
-                green_neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
-                                      if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.get_cell(r+dr, c+dc) == 3)
-                if green_neighbors < 2 or green_neighbors > 3:
-                    grid.set_cell(r, c, 0)
-
-def apply_edge_repulsion(grid: ColoredGrid):
-    rows, cols = grid.get_dimensions()
-    for r in range(rows):
-        for c in range(cols):
-            if grid.get_cell(r, c) == 3:
-                if r <= 1 or r >= rows - 2 or c <= 1 or c >= cols - 2:
-                    grid.set_cell(r, c, 0)
-
-def fill_empty_spaces(grid: ColoredGrid):
-    rows, cols = grid.get_dimensions()
-    for r in range(1, rows - 1):
-        for c in range(1, cols - 1):
-            if grid.get_cell(r, c) == 0:
-                green_neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
-                                      if grid.get_cell(r+dr, c+dc) == 3)
-                if green_neighbors >= 5:
-                    grid.set_cell(r, c, 3)
-
-def ensure_connectivity(grid: ColoredGrid):
+def ensure_connectivity(grid: ColoredGrid, seed_points: Set[Tuple[int, int]]):
     rows, cols = grid.get_dimensions()
     visited = set()
     
@@ -133,14 +120,10 @@ def ensure_connectivity(grid: ColoredGrid):
                     if 0 <= nr < rows and 0 <= nc < cols:
                         stack.append((nr, nc))
     
-    # Find the first green cell and start DFS
-    for r in range(rows):
-        for c in range(cols):
-            if grid.get_cell(r, c) == 3:
-                dfs(r, c)
-                break
-        if visited:
-            break
+    # Start DFS from all seed points
+    for r, c in seed_points:
+        if (r, c) not in visited:
+            dfs(r, c)
     
     # Remove any disconnected green cells
     for r in range(rows):
@@ -148,14 +131,77 @@ def ensure_connectivity(grid: ColoredGrid):
             if grid.get_cell(r, c) == 3 and (r, c) not in visited:
                 grid.set_cell(r, c, 0)
 
-def add_fine_details(grid: ColoredGrid):
+def add_branches(grid: ColoredGrid, influence_maps: dict):
     rows, cols = grid.get_dimensions()
-    for _ in range(rows * cols // 100):  # Add a number of details proportional to grid size
-        r, c = random.randint(0, rows - 1), random.randint(0, cols - 1)
-        if grid.get_cell(r, c) == 0 and all(grid.get_cell(r + dr, c + dc) == 0
-                                            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
-                                            if 0 <= r + dr < rows and 0 <= c + dc < cols):
-            grid.set_cell(r, c, 3)
+    for r in range(rows):
+        for c in range(cols):
+            if grid.get_cell(r, c) == 3:
+                green_neighbors = sum(1 for dr, dc in [(0,1),(1,0),(0,-1),(-1,0)]
+                                      if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.get_cell(r+dr, c+dc) == 3)
+                if green_neighbors in [1, 2] and random.random() < 0.1:
+                    branch_direction = max([(dr, dc) for dr, dc in [(0,1),(1,0),(0,-1),(-1,0)]],
+                                           key=lambda d: influence_maps['symmetry'][r+d[0]][c+d[1]])
+                    for i in range(1, 4):  # Branch length 2-3 cells
+                        nr, nc = r + i*branch_direction[0], c + i*branch_direction[1]
+                        if 0 <= nr < rows and 0 <= nc < cols and grid.get_cell(nr, nc) == 0:
+                            grid.set_cell(nr, nc, 3)
+                        else:
+                            break
+
+def create_isolated_formations(grid: ColoredGrid, influence_maps: dict):
+    rows, cols = grid.get_dimensions()
+    for r in range(rows - 4):
+        for c in range(cols - 4):
+            if all(grid.get_cell(r+dr, c+dc) == 0 for dr in range(5) for dc in range(5)):
+                if random.random() < 0.05 * (1 - influence_maps['distance'][r][c]) * (r / rows):
+                    for dr in range(3):
+                        for dc in range(3):
+                            grid.set_cell(r+dr+1, c+dc+1, 3)
+
+def fine_tune_structure(grid: ColoredGrid):
+    rows, cols = grid.get_dimensions()
+    changes = True
+    while changes:
+        changes = False
+        for r in range(rows):
+            for c in range(cols):
+                green_neighbors = sum(1 for dr, dc in [(0,1),(1,0),(0,-1),(-1,0),(1,1),(1,-1),(-1,1),(-1,-1)]
+                                      if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.get_cell(r+dr, c+dc) == 3)
+                if grid.get_cell(r, c) == 3 and green_neighbors <= 3:
+                    grid.set_cell(r, c, 0)
+                    changes = True
+                elif grid.get_cell(r, c) == 0 and green_neighbors >= 5:
+                    grid.set_cell(r, c, 3)
+                    changes = True
+
+def adjust_symmetry(grid: ColoredGrid, seed_points: Set[Tuple[int, int]]):
+    rows, cols = grid.get_dimensions()
+    center_r = sum(r for r, _ in seed_points) / len(seed_points)
+    center_c = sum(c for _, c in seed_points) / len(seed_points)
+    
+    for r in range(rows):
+        for c in range(cols):
+            sym_r, sym_c = int(2*center_r - r), int(2*center_c - c)
+            if 0 <= sym_r < rows and 0 <= sym_c < cols:
+                if grid.get_cell(r, c) != grid.get_cell(sym_r, sym_c):
+                    if random.random() < 0.5:
+                        grid.set_cell(sym_r, sym_c, grid.get_cell(r, c))
+                    else:
+                        grid.set_cell(r, c, grid.get_cell(sym_r, sym_c))
+
+def refine_edges(grid: ColoredGrid):
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        for c in range(cols):
+            if grid.get_cell(r, c) == 3:
+                if r == 0 or r == rows-1 or c == 0 or c == cols-1:
+                    connected_area = sum(1 for dr in range(-2, 3) for dc in range(-2, 3)
+                                         if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.get_cell(r+dr, c+dc) == 3)
+                    if connected_area < (rows * cols) // 10:
+                        grid.set_cell(r, c, 0)
+
+def final_connectivity_check(grid: ColoredGrid, seed_points: Set[Tuple[int, int]]):
+    ensure_connectivity(grid, seed_points)
 
 def final_cleanup(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
