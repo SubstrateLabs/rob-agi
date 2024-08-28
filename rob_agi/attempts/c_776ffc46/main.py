@@ -25,11 +25,11 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         queue = deque([(x, y)])
         while queue:
             cx, cy = queue.popleft()
-            if (cx, cy) not in region and 0 <= cx < rows and 0 <= cy < cols and input_grid.values[cx][cy] == BLUE:
+            if (cx, cy) not in region and 0 <= cx < rows and 0 <= cy < cols and new_grid[cx][cy] == BLUE:
                 region.add((cx, cy))
                 for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                     nx, ny = cx + dx, cy + dy
-                    if 0 <= nx < rows and 0 <= ny < cols and input_grid.values[nx][ny] == BLUE:
+                    if 0 <= nx < rows and 0 <= ny < cols and new_grid[nx][ny] == BLUE:
                         queue.append((nx, ny))
         return region
 
@@ -44,20 +44,17 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     red_count, green_count = count_colors()
     target_color = RED if red_count >= green_count else GREEN
 
-    blue_regions = []
+    new_grid = [row[:] for row in input_grid.values]
     visited = set()
+
     for i in range(rows):
         for j in range(cols):
-            if input_grid.values[i][j] == BLUE and (i, j) not in visited:
+            if new_grid[i][j] == BLUE and (i, j) not in visited:
                 region = flood_fill(i, j)
                 visited.update(region)
-                blue_regions.append(region)
-
-    new_grid = [row[:] for row in input_grid.values]
-    for region in blue_regions:
-        size = len(region)
-        if 2 <= size <= 4 or (size == 5 and is_plus_shape(region)):
-            for x, y in region:
-                new_grid[x][y] = target_color
+                size = len(region)
+                if 2 <= size <= 4 or (size == 5 and is_plus_shape(region)):
+                    for x, y in region:
+                        new_grid[x][y] = target_color
 
     return ColoredGrid(values=new_grid)
