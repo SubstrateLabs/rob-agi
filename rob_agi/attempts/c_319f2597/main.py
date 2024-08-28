@@ -6,12 +6,10 @@ def solve_319f2597(input_grid: ColoredGrid) -> ColoredGrid:
     
     The transformation follows these steps:
     1. Analyze the input grid for existing black cells.
-    2. Determine the position of the vertical stripe (2 columns).
-    3. Determine the position of the horizontal line (2 rows).
-    4. Create the L-shape by filling in the vertical stripe and horizontal line.
+    2. Determine the position of the vertical stripe (2 columns) in the right half.
+    3. Determine the position of the horizontal stripe (2 rows) in the upper half.
+    4. Create the L-shape by filling in the vertical stripe and horizontal stripe.
     5. Preserve existing black cells from the input grid.
-    6. Extend the L-shape to the edges of the grid.
-    7. Ensure the intersection of the vertical stripe and horizontal line is fully black.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -22,22 +20,25 @@ def solve_319f2597(input_grid: ColoredGrid) -> ColoredGrid:
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
     
-    # Find existing black cells
-    black_cells = [(r, c) for r in range(rows) for c in range(cols) if input_grid.get_cell(r, c) == 0]
+    # Analyze the input grid
+    col_counts = [sum(1 for r in range(rows) if input_grid.get_cell(r, c) == 0) for c in range(cols)]
+    row_counts = [sum(1 for c in range(cols//2) if input_grid.get_cell(r, c) == 0) for r in range(rows)]
     
     # Determine vertical stripe
-    col_counts = {}
-    for _, c in black_cells:
-        col_counts[c] = col_counts.get(c, 0) + 1
-    stripe_cols = sorted(col_counts, key=lambda x: (-col_counts[x], x))[:2]
+    right_half_cols = list(range(cols//2, cols))
+    stripe_cols = sorted(right_half_cols, key=lambda c: (-col_counts[c], -c))[:2]
     stripe_left, stripe_right = min(stripe_cols), max(stripe_cols)
     
-    # Determine horizontal line
-    row_counts = {}
-    for r, _ in black_cells:
-        row_counts[r] = row_counts.get(r, 0) + 1
-    line_rows = sorted(row_counts, key=lambda x: (-row_counts[x], x))[:2]
-    horizontal_top, horizontal_bottom = min(line_rows), max(line_rows)
+    # Determine horizontal stripe
+    upper_half_rows = list(range(rows//2))
+    stripe_rows = sorted(upper_half_rows, key=lambda r: (-row_counts[r], -r))[:2]
+    horizontal_top, horizontal_bottom = min(stripe_rows), max(stripe_rows)
+    
+    # If no black cells found, use default positions
+    if not any(col_counts):
+        stripe_left, stripe_right = cols - 2, cols - 1
+    if not any(row_counts):
+        horizontal_top, horizontal_bottom = rows // 4, rows // 4 + 1
     
     # Create L-shape
     for row in range(rows):
@@ -48,18 +49,9 @@ def solve_319f2597(input_grid: ColoredGrid) -> ColoredGrid:
                 output_grid.set_cell(row, col, 0)
     
     # Preserve existing black cells
-    for r, c in black_cells:
-        output_grid.set_cell(r, c, 0)
-    
-    # Extend L-shape to edges
-    for row in range(rows):
-        output_grid.set_cell(row, 0, 0)
-    for col in range(cols):
-        output_grid.set_cell(0, col, 0)
-    
-    # Ensure intersection is fully black
-    for row in range(horizontal_top, horizontal_bottom + 1):
-        for col in range(stripe_left, stripe_right + 1):
-            output_grid.set_cell(row, col, 0)
+    for r in range(rows):
+        for c in range(cols):
+            if input_grid.get_cell(r, c) == 0 and output_grid.get_cell(r, c) != 0:
+                output_grid.set_cell(r, c, 0)
     
     return output_grid
