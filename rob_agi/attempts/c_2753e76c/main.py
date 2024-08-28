@@ -9,9 +9,10 @@ def solve_2753e76c(input_grid: ColoredGrid) -> ColoredGrid:
     1. Count the frequency of each non-black color in the input grid.
     2. Select the top 4 most frequent colors (or fewer if there aren't 4).
     3. Calculate the relative frequency of each color.
-    4. Create an output grid with 4 rows and width equal to the sum of relative frequencies.
+    4. Create an output grid with 4 rows and width based on the sum of relative frequencies.
     5. Fill each row from right to left with the corresponding color.
     6. Align colors to the right in each row, filling unused cells with black (0).
+    7. Ensure the most frequent color fills the entire top row.
     
     This approach captures the essence of the input grid by showing the relative
     frequencies of the most prominent colors in a compact form.
@@ -27,10 +28,10 @@ def solve_2753e76c(input_grid: ColoredGrid) -> ColoredGrid:
 
     # Calculate relative frequencies
     max_count = max(color_counts[color] for color in top_colors)
-    relative_frequencies = {color: round((count / max_count) * 4) for color, count in color_counts.items() if color in top_colors}
+    relative_frequencies = {color: round((count / max_count) * 5) for color, count in color_counts.items() if color in top_colors}
 
     # Determine output grid width
-    width = sum(relative_frequencies.values())
+    width = max(sum(relative_frequencies.values()), 5)  # Ensure minimum width of 5
 
     # Create the output grid
     output_grid = [[0 for _ in range(width)] for _ in range(4)]
@@ -42,5 +43,13 @@ def solve_2753e76c(input_grid: ColoredGrid) -> ColoredGrid:
         start = max(0, current_col - cells_to_fill)
         output_grid[row][start:current_col] = [color] * (current_col - start)
         current_col = start
+
+    # Ensure the top row (most frequent color) fills the entire width
+    output_grid[0] = [top_colors[0]] * width
+
+    # Right-align all color sections
+    for row in output_grid:
+        non_zero = [cell for cell in row if cell != 0]
+        row[:] = [0] * (width - len(non_zero)) + non_zero
 
     return ColoredGrid(values=output_grid)
