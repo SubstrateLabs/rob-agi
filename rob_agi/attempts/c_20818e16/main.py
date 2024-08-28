@@ -19,15 +19,15 @@ def solve_20818e16(input_grid: ColoredGrid) -> ColoredGrid:
     
     1. Identify the background color and extract non-background shapes.
     2. Preserve the exact shape and size of each colored region.
-    3. Sort shapes by color, then area, then original position.
+    3. Sort shapes by area (ascending), then by color, then by original position.
     4. Arrange shapes in a compact manner, starting from the smallest possible grid.
-    5. Optimize the final arrangement by shifting shapes and removing empty space.
+    5. Optimize the final arrangement by removing empty space.
     6. Ensure all original colors (except background) are represented in the output.
     
     The algorithm uses a deterministic approach to find a compact arrangement,
     trying different grid sizes and positions for each shape. It starts with a minimum
-    grid size and expands if necessary. The final arrangement is optimized by shifting
-    shapes and removing empty rows and columns.
+    grid size and expands if necessary. The final arrangement is optimized by
+    removing empty rows and columns.
     
     Returns a new ColoredGrid with the transformed and compact arrangement.
     """
@@ -79,7 +79,7 @@ def extract_shapes(grid: ColoredGrid, background_color: int) -> List[Shape]:
     return shapes
 
 def sort_shapes(shapes: List[Shape]) -> List[Shape]:
-    return sorted(shapes, key=lambda s: (s.color, s.height * s.width, s.original_position))
+    return sorted(shapes, key=lambda s: (s.height * s.width, s.color, s.original_position))
 
 def find_optimal_arrangement(shapes: List[Shape]) -> List[List[int]]:
     total_area = sum(s.height * s.width for s in shapes)
@@ -95,7 +95,7 @@ def find_optimal_arrangement(shapes: List[Shape]) -> List[List[int]]:
         for i in range(shape.height):
             for j in range(shape.width):
                 if shape.structure[i][j] != 0:
-                    grid[r+i][c+j] = shape.color
+                    grid[r+i][c+j] = shape.structure[i][j]
 
     while True:
         grid = [[0 for _ in range(min_size)] for _ in range(min_size)]
