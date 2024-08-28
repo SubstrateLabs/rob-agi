@@ -1,1 +1,30 @@
 Challenge baf41dbf:
+
+Problem Description:
+- Transform a 2D grid by expanding a green (3) shape while respecting boundaries set by magenta (6) dots and grid edges.
+- The internal structure of the green shape should be preserved and scaled appropriately.
+- The grid dimensions remain the same after transformation.
+
+What we know:
+1. The green shape expands horizontally and vertically until it reaches a magenta dot or the grid edge.
+2. The internal structure (black cells within the green shape) must be maintained and scaled.
+3. Magenta dots remain in their original positions and should not be overwritten.
+
+What we've learned from the latest test:
+1. Our current implementation is expanding the shape correctly horizontally.
+2. The vertical expansion is incorrect - it's filling the entire height of the grid instead of respecting the top and bottom boundaries.
+3. The internal structure is being preserved but not scaled correctly.
+
+What needs to be fixed:
+1. Vertical expansion calculation needs to be adjusted to respect top and bottom boundaries.
+2. Scaling of the internal structure needs to be more accurate.
+3. The top-left corner of the expanded shape should remain at (1,1) instead of (0,0).
+
+Next steps:
+1. Modify the vertical expansion calculation in the find_boundary function.
+2. Adjust the mapping of original cells to new positions to ensure correct scaling of internal structure.
+3. Ensure the expanded shape starts at the correct position (1,1) instead of (0,0).
+
+Things that don't work:
+- Simply expanding the shape to fill the entire available space without proper scaling.
+- Ignoring the original position of the green shape when expanding.
