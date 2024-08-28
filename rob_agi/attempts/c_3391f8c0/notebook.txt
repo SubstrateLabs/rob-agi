@@ -1,1 +1,34 @@
 Challenge 3391f8c0:
+
+Key Observations:
+1. The transformation involves vertical flipping and color swapping.
+2. Patterns are relocated to opposite sides of the grid center.
+3. The shape of patterns may change slightly, but their essential structure is maintained.
+
+Color Transformation Rules:
+- 2 (red) <-> 3 (green)
+- Other colors remain unchanged
+- Black (0) is treated as empty space
+
+Pattern Transformation:
+- Patterns are moved to the opposite side of the grid center.
+- Patterns may expand or contract based on available space.
+- The overall structure of patterns is preserved.
+
+Current Issues:
+- The transformation of the 'U' shapes in example 1 is incorrect.
+- The relocation of patterns is not precise enough.
+
+Things to Try:
+- Implement a more precise method for pattern relocation.
+- Develop a way to maintain the relative positions of multiple related patterns (e.g., the three 'U' shapes).
+- Improve the expansion/contraction logic to better preserve pattern structure.
+
+Unknowns:
+- How to handle cases where patterns overlap after relocation.
+- The exact rules for pattern expansion/contraction.
+
+Next Steps:
+1. Refine the pattern relocation algorithm to maintain relative positions of related patterns.
+2. Improve the pattern expansion/contraction logic.
+3. Implement a method to resolve pattern overlaps after relocation.
