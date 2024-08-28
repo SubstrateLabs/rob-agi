@@ -1,1 +1,25 @@
 Challenge 67c52801:
+
+Key Observations:
+1. The bottom row of the input grid remains unchanged in the output.
+2. Colored cell groups move downward and to the left, maintaining their shapes.
+3. Groups are placed in order from bottom to top, then left to right.
+4. Single colored cells in the second-to-last row move as far left as possible.
+5. Empty space (black/0) fills from the top and right.
+
+Current Implementation Issues:
+1. The algorithm is not correctly handling the placement of groups in relation to single cells in the second-to-last row.
+2. The order of group placement seems to be incorrect, leading to misplacement of larger groups.
+
+Attempted Solutions:
+1. Handling single cells in the second-to-last row before placing color groups.
+2. Excluding the bottom two rows when identifying color groups.
+
+Next Steps:
+1. Revise the group placement algorithm to ensure larger groups are placed first, followed by smaller groups and single cells.
+2. Implement a more sophisticated sorting mechanism for color groups based on size and position.
+3. Ensure that single cells in the second-to-last row do not interfere with the placement of larger groups.
+
+Unknowns:
+1. The exact priority order for placing different sized groups and single cells.
+2. How to handle conflicts between group placements and single cell placements in the second-to-last row.
