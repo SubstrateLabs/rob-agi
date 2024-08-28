@@ -1,1 +1,40 @@
 Challenge b20f7c8b:
+
+Observations:
+1. The grid is 22x18 in size.
+2. There are four 5x5 regions to transform: (1,1), (1,16), (9,1), (9,16).
+3. Transformation occurs in two passes.
+
+First Pass Rules:
+- Left regions (columns 1-5 and 8-12):
+  - If solid, new_color = (original_color + 1) % 10
+  - If patterned, fill with the first non-zero color
+- Right regions (columns 16-20):
+  - If solid, new_color = (original_color + 3) % 10
+  - If patterned, fill with gray (5)
+
+Second Pass Rules (only for bottom regions):
+- Left region (columns 1-5): new_color = (current_color + 2) % 10
+- Right region (columns 16-20): new_color = (current_color + 1) % 10
+
+Current Issues:
+1. The transformation of the top-left region in example_1 is incorrect.
+2. The second pass transformation for the bottom regions needs adjustment.
+
+Next Steps:
+1. Review the logic for determining if a block is solid or patterned.
+2. Ensure that the first pass correctly handles patterned blocks in left regions.
+3. Verify that the second pass is only applied to bottom regions.
+4. Double-check the color calculations for each transformation step.
+
+Things That Don't Work:
+- Applying the same transformation rules to all regions in both passes.
+- Ignoring the distinction between solid and patterned blocks.
+
+Certainties:
+- The grid size and locations of the regions to transform.
+- The need for two separate transformation passes.
+
+Uncertainties:
+- The exact conditions for determining a solid vs. patterned block.
+- Whether the current implementation correctly preserves unchanged areas.
