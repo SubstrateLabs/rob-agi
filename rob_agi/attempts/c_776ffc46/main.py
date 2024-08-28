@@ -13,24 +13,23 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
+    visited = set()
+    regions_to_transform = []
 
     def flood_fill(start_row: int, start_col: int) -> List[Tuple[int, int]]:
         color = input_grid.values[start_row][start_col]
         stack = [(start_row, start_col)]
         region = []
-        visited = set()
-        while stack and len(region) <= 8:
+        while stack:
             row, col = stack.pop()
-            if (row, col) in visited:
+            if (row, col) in visited or input_grid.values[row][col] != color:
                 continue
             visited.add((row, col))
-            if input_grid.values[row][col] == color:
-                region.append((row, col))
-                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                    new_row, new_col = row + dr, col + dc
-                    if 0 <= new_row < rows and 0 <= new_col < cols:
-                        if input_grid.values[new_row][new_col] == color:
-                            stack.append((new_row, new_col))
+            region.append((row, col))
+            for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                new_row, new_col = row + dr, col + dc
+                if 0 <= new_row < rows and 0 <= new_col < cols and input_grid.values[new_row][new_col] == color:
+                    stack.append((new_row, new_col))
         return region
 
     def determine_target_color() -> int:
@@ -39,15 +38,16 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         return 2 if red_count >= green_count else 3
 
     target_color = determine_target_color()
-    visited = set()
-    
+
     for row in range(rows):
         for col in range(cols):
             if input_grid.values[row][col] == 1 and (row, col) not in visited:
                 region = flood_fill(row, col)
                 if 2 <= len(region) <= 8:
-                    for r, c in region:
-                        output_grid.values[r][c] = target_color
-                visited.update(region)
-    
+                    regions_to_transform.append(region)
+
+    for region in regions_to_transform:
+        for r, c in region:
+            output_grid.values[r][c] = target_color
+
     return output_grid
