@@ -1,4 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
+import random
 
 def solve_b7fb29bc(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -6,12 +7,13 @@ def solve_b7fb29bc(input_grid: ColoredGrid) -> ColoredGrid:
     
     The pattern consists of:
     1. A yellow (4) border just inside the green (3) border
-    2. A complex pattern of red (2) and yellow (4) in the interior
-    3. Alternating columns of red and yellow in the top rows
-    4. Horizontal stripes of red and yellow in the middle rows
-    5. A bottom row of red (2), except for the yellow border
-    6. Preservation of any original green (3) cells within the border
-    7. Special handling for small interiors and the top-right corner
+    2. A complex pattern of red (2) and yellow (4) in the interior, based on:
+       - Position of the original green cell (if any)
+       - Distance from the center or original green cell
+       - Horizontal and vertical striping
+    3. Preservation of any original green (3) cells within the border
+    4. Special handling for small interiors
+    5. Balanced distribution of red and yellow (approx. 40% red, 60% yellow)
     """
     # Step 1: Identify the green border
     rows, cols = input_grid.get_dimensions()
@@ -29,32 +31,87 @@ def solve_b7fb29bc(input_grid: ColoredGrid) -> ColoredGrid:
     inner_height = inner_bottom - inner_top + 1
     inner_width = inner_right - inner_left + 1
 
-    # Step 4: Fill the interior with the complex pattern
+    # Step 4: Find the original green cell (if any)
+    original_green = None
+    for r in range(inner_top, inner_bottom + 1):
+        for c in range(inner_left, inner_right + 1):
+            if input_grid.get_cell(r, c) == 3:
+                original_green = (r, c)
+                break
+        if original_green:
+            break
+
+    # Step 5: Determine pattern orientation
+    use_horizontal = original_green is None or original_green[0] < (inner_top + inner_bottom) // 2
+
+    # Step 6: Fill the interior with the complex pattern
+    center = ((inner_top + inner_bottom) // 2, (inner_left + inner_right) // 2)
+    max_distance = max(inner_height, inner_width) // 2
+
     for r in range(inner_top, inner_bottom + 1):
         for c in range(inner_left, inner_right + 1):
             if r == inner_top or r == inner_bottom or c == inner_left or c == inner_right:
                 result.set_cell(r, c, 4)  # Yellow border
-            elif r == inner_top + 1:  # Second row from top
-                result.set_cell(r, c, 2 if c % 2 == 0 else 4)  # Alternating red and yellow
-            elif r == inner_bottom:
-                result.set_cell(r, c, 2)  # Bottom row is red
-            elif (r - inner_top) % 2 == 0:  # Even rows
-                result.set_cell(r, c, 4 if c % 3 == 0 else 2)  # More red, some yellow
-            else:  # Odd rows
-                result.set_cell(r, c, 2 if c % 3 == 0 else 4)  # More yellow, some red
+            elif input_grid.get_cell(r, c) == 3:
+                continue  # Preserve original green cell
+            else:
+                # Calculate distance factor
+                if original_green:
+                    distance = max(abs(r - original_green[0]), abs(c - original_green[1]))
+                else:
+                    distance = max(abs(r - center[0]), abs(c - center[1]))
+                distance_factor = 1 - (distance / max_distance)
 
-    # Step 5: Handle small interiors
-    if inner_width <= 3 or inner_height <= 3:
+                # Apply striping
+                stripe_factor = 0.2 if (r + c) % 2 == 0 else -0.2
+
+                # Determine color probability
+                yellow_prob = 0.6 + distance_factor * 0.2 + stripe_factor
+
+                if use_horizontal:
+                    if r == inner_top + 1:
+                        result.set_cell(r, c, 4 if c % 2 == 0 else 2)
+                    elif r == inner_bottom:
+                        result.set_cell(r, c, 4 if original_green and original_green[0] > center[0] else 2)
+                    else:
+                        result.set_cell(r, c, 4 if random.random() < yellow_prob else 2)
+                else:
+                    if r <= center[0]:
+                        result.set_cell(r, c, 4 if random.random() < yellow_prob else 2)
+                    else:
+                        result.set_cell(r, c, 4 if c % 2 == 0 else 2)
+
+    # Step 7: Handle small interiors
+    if inner_width <= 5 or inner_height <= 5:
         for r in range(inner_top, inner_bottom + 1):
             for c in range(inner_left, inner_right + 1):
-                result.set_cell(r, c, 4)  # Fill with yellow for small interiors
+                if input_grid.get_cell(r, c) != 3:
+                    result.set_cell(r, c, 4 if (r + c) % 2 == 0 else 2)
 
-    # Step 6: Preserve original green cells and handle top-right corner
-    for r in range(top, bottom + 1):
-        for c in range(left, right + 1):
-            if input_grid.get_cell(r, c) == 3:
-                result.set_cell(r, c, 3)
-            elif r == inner_top and c == inner_right - 1:  # Top-right corner
-                result.set_cell(r, c, 4)  # Ensure it's yellow
+    # Step 8: Adjust around the original green cell
+    if original_green:
+        r, c = original_green
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nr, nc = r + dr, c + dc
+            if inner_top <= nr <= inner_bottom and inner_left <= nc <= inner_right:
+                result.set_cell(nr, nc, 4)
+
+    # Step 9: Final pass to balance colors
+    yellow_count = sum(1 for r in range(inner_top, inner_bottom + 1)
+                       for c in range(inner_left, inner_right + 1)
+                       if result.get_cell(r, c) == 4)
+    total_cells = (inner_bottom - inner_top + 1) * (inner_right - inner_left + 1)
+    yellow_ratio = yellow_count / total_cells
+
+    if yellow_ratio < 0.55:
+        for r in range(inner_top, inner_bottom + 1):
+            for c in range(inner_left, inner_right + 1):
+                if result.get_cell(r, c) == 2 and random.random() < 0.2:
+                    result.set_cell(r, c, 4)
+    elif yellow_ratio > 0.65:
+        for r in range(inner_top, inner_bottom + 1):
+            for c in range(inner_left, inner_right + 1):
+                if result.get_cell(r, c) == 4 and random.random() < 0.2:
+                    result.set_cell(r, c, 2)
 
     return result
