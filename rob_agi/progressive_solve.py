@@ -154,8 +154,11 @@ class Solver:
         logger.info(f"======================================\n\n{exp}\n\n")
         if exp:
             prompt += f"\n<EXPERIMENT_OUTPUT>\nSTDOUT:{exp.output}\nSTDERR:{exp.error}\n</EXPERIMENT_OUTPUT>\n"
+        prompt += f"This is attempt number {self.total_attempts + 1} to solve the challenge.\n"
+        if self.total_attempts > 16:
+            prompt += "This means that this is either especially difficult or you've likely been going down the wrong path. Feel free to relinquish a lot of what you think you know about this problem and try to zoom out and see it with fresh eyes.\n"
         prompt += "Before we try to come up with a new solution let's take in all of this information, notice what may be important, and ask ourselves some relevant questions to help us introspect and explore the problem more completely.\n"
-        prompt += "Look at all the cases you've been presented with. Come up with 3-5 questions that you think are important to ask yourself. These questions should help you understand the challenge better and guide you to a better, more general solution that solves the challenge. Maybe they are about discrepancies, new things you've noticed that might be important, your own assumptions, specific failure cases, conspicuous patterns, etc. Do not answer the questions yet.\n"
+        prompt += "Look at all the cases you've been presented with. Come up with 3-5 questions that you think are important to ask yourself. These questions should help you understand the challenge better and guide you to a better, more general solution that solves the challenge. Maybe they are about discrepancies, new things you've noticed that might be important, your own assumptions, specific failure cases, conspicuous patterns, things you are unsure about, etc. Do not answer the questions yet.\n"
         ask_coder.run(prompt)
         ask_coder.run(
             "Now, think carefully and answer the questions you came up with. But don't propose a solution quite yet.\n"
@@ -184,12 +187,12 @@ class Solver:
         reflect_coder = self.get_reflect_coder(modify_coder)
         if not res.success:
             reflect = f"The output of the tests after your changes is:\n\n<STDERR>\n{res.error}</STDERR>\n\n<STDOUT>{res.output}</STDOUT>\n"
-            reflect += "Based on the output of the tests, reflect on what you have learned. notebook.txt is where you keep the latest notes for solving the challenge. This file should always contain accurate and up-to-date information about the challenge, and over time it will help future versions of you solve it. Revise it or append to it according to what you've learned. It should be well maintained and never be more than 3 pages long, ideally shorter. Make sure you use the SEARCH/REPLACE format\n"
+            reflect += "Based on the output of the tests, reflect on what you have learned. `notebook.txt` is where you keep the latest notes for solving the challenge. This file should always contain accurate and up-to-date information about the challenge, and over time it will help future versions of you solve it. Revise it or append to it according to what you've learned. It should be well maintained and never be more than 3 pages long, ideally shorter. It's often useful to explicitly keep track of things that you have tried that do not work, since it prevents your thinking from going in circles. What are you absolutely certain about? What are you guessing about? What remains unknown? Make sure you use the SEARCH/REPLACE format\n"
             reflect_coder.run(reflect)
-            experiment = "Also if you want to run an experiment in python to help you find out more pointed information, you can write code in experiment.py. This file will be run immediately and the stdout and stderr will be available in the next pass at solving. Make sure you use the SEARCH/REPLACE format"
+            experiment = "Also if you want to run an experiment in python to help you find out more pointed information, you can write code in `experiment.py`. This file will be run immediately and the stdout and stderr will be available in the next pass at solving. Make sure you use the SEARCH/REPLACE format"
             reflect_coder.run(experiment)
             if update_visual_desc:
-                update_prompt = "If the visual_descriptions.yaml can be improved (more detail, more accurate, better intuitive abstractions, cutting irrelevant info, clarity, etc), include those changes too. This file is purely for descriptions of the grid images. It should not have any information about the code or the solution. These descriptions should help someone trying to solve this problem though, so it should include language that is relevant for solving the problem. Make sure you use the SEARCH/REPLACE format.\n"
+                update_prompt = "If the `visual_descriptions.yaml` can be improved (more detail, more accurate, better intuitive abstractions, cutting irrelevant info, clarity, etc), include those changes too. This file is purely for descriptions of the grid images. It should not have any information about the code or the solution. These descriptions should help someone trying to solve this problem though, so it should include language that is relevant for solving the problem. Make sure you use the SEARCH/REPLACE format.\n"
                 modify_coder.run(update_prompt)
             logger.info(f"\n~~~~~~~~~REFLECT_EDIT~~~~~~~~~~~\n{modify_coder.aider_edited_files}")
         return modifications

@@ -174,6 +174,7 @@ Once we have found that function, we apply it to the test case(s) to compute the
 Think conceptually using core knowledge like pattern recognition, spatial reasoning, and rule application, geometry, causality, object-ness. 
 Think closely about how this would appear if you rendered squares. Note that objects can often have semantic meaning.
 It's not uncommon to flip, rotate, crop, overlay, finish a pattern, translate objects, isolate colors, draw paths, manipulate empty space, or employ some other spatial operation based on high-level reasoning and pattern recognition. 
+The transformations are often simple if understood correctly, but they can be complex if you don't see the pattern. If you find yourself needing too many specific rules, you might be missing the pattern.
 These are general abstract problem solving challenges. Remember to think logically and with high standards for coherence. The solutions can sometimes require a compositional approach where you think step by step. Some involve extrapolation. It's best to visualize the problem as a colored grid so that you can see things spatially.
 
 {grid_setup()}
