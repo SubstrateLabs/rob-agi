@@ -1,1 +1,39 @@
 Challenge e5790162:
+
+Objective:
+Transform an input grid by creating a green path (3) that connects the initial green square to all magenta (6) and sky blue (8) squares, and extends to an edge of the grid if efficient.
+
+Key Observations:
+1. The path must be continuous and without branches.
+2. The path should prioritize connecting magenta squares before sky blue squares.
+3. The path should extend to an edge if possible within 3 steps of the last target square.
+4. The solution should not overwrite existing colored squares.
+
+Current Implementation:
+- Uses A* algorithm for pathfinding between colored squares.
+- Attempts to extend the path to an edge after connecting all targets.
+- Implements backtracking to find an efficient extension point if direct extension fails.
+
+Issues Identified:
+1. The current implementation is creating unnecessary extensions and branches.
+2. The path is not always taking the most efficient route between targets.
+3. The edge extension logic may be too aggressive, creating paths that are not required.
+
+Next Steps:
+1. Refine the pathfinding algorithm to prioritize straight lines and minimize turns.
+2. Implement a more strict rule for edge extension, only extending when absolutely necessary.
+3. Add a post-processing step to remove any unnecessary branches or extensions.
+4. Ensure that the path always starts from the green square if present, or from the first colored square otherwise.
+
+Things That Don't Work:
+- Aggressive edge extension without considering the overall path efficiency.
+- Treating all colored squares equally without prioritization.
+
+Unknowns:
+- The exact criteria for when an edge extension is considered "efficient" in all cases.
+- Whether there are specific rules for handling multiple green squares (if that's possible in the input).
+
+Certainties:
+- The path must connect all colored squares.
+- The path should form a single, continuous line without branches.
+- The solution should not modify the positions of the original colored squares.
