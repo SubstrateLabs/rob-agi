@@ -1,5 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import Tuple
+from typing import Tuple, List
 
 def solve_6f473927(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -7,15 +7,16 @@ def solve_6f473927(input_grid: ColoredGrid) -> ColoredGrid:
     
     Steps:
     1. Analyze the input grid to find the boundaries of the red pattern.
-    2. Create an expanded grid with double the width minus 1.
-    3. Copy the red pattern to the right side of the new grid.
-    4. Add a complementary sky blue pattern in a zigzag manner on the left side.
+    2. Determine the output grid dimensions based on the red pattern position.
+    3. Create an expanded grid and copy the red pattern to the appropriate side.
+    4. Add a complementary sky blue pattern on the opposite side.
+    5. Refine the sky blue pattern to complement the red pattern's shape.
     
     Returns:
-    ColoredGrid: The transformed grid with the original red pattern on the right and new sky blue pattern on the left.
+    ColoredGrid: The transformed grid with the original red pattern and new sky blue pattern.
     """
     red_bounds = find_red_boundaries(input_grid)
-    new_grid = create_expanded_grid(input_grid)
+    new_grid = create_expanded_grid(input_grid, red_bounds)
     add_sky_blue_pattern(new_grid, red_bounds)
     return new_grid
 
@@ -34,13 +35,22 @@ def find_red_boundaries(grid: ColoredGrid) -> Tuple[int, int, int, int]:
     
     return left, right, top, bottom
 
-def create_expanded_grid(input_grid: ColoredGrid) -> ColoredGrid:
-    """Create the expanded grid and copy the original pattern to the right side."""
+def create_expanded_grid(input_grid: ColoredGrid, red_bounds: Tuple[int, int, int, int]) -> ColoredGrid:
+    """Create the expanded grid and copy the original pattern to the appropriate side."""
     rows, cols = input_grid.get_dimensions()
-    new_cols = (cols * 2) - 1
+    left, right, _, _ = red_bounds
+    red_center = (left + right) / 2
+    
+    new_cols = cols + max(left, cols - right - 1)
     new_values = [[0 for _ in range(new_cols)] for _ in range(rows)]
     
-    offset = new_cols - cols
+    if red_center < cols / 2:
+        # Red pattern on the right side
+        offset = new_cols - cols
+    else:
+        # Red pattern on the left side
+        offset = 0
+    
     for r in range(rows):
         for c in range(cols):
             new_values[r][c + offset] = input_grid.get_cell(r, c)
@@ -48,19 +58,45 @@ def create_expanded_grid(input_grid: ColoredGrid) -> ColoredGrid:
     return ColoredGrid(values=new_values)
 
 def add_sky_blue_pattern(grid: ColoredGrid, red_bounds: Tuple[int, int, int, int]):
-    """Add the complementary sky blue pattern to the left side of the expanded grid in a zigzag manner."""
+    """Add the complementary sky blue pattern to the grid."""
     rows, cols = grid.get_dimensions()
-    left, _, _, _ = red_bounds
+    left, right, top, bottom = red_bounds
     
-    start_col = 0
+    red_center = (left + right) / 2
+    sky_blue_start = cols - 1 if red_center < cols / 2 else 0
+    sky_blue_direction = -1 if red_center < cols / 2 else 1
+    
     for row in range(rows):
-        if row % 2 == 1:
-            start_col = max(start_col - 1, 0)
+        red_in_row = any(grid.get_cell(row, c) == 2 for c in range(cols))
+        col = sky_blue_start
+        zigzag = row % 2 == 0
         
-        col = start_col
-        while col < left + (cols - 1) // 2:
+        while 0 <= col < cols:
             if grid.get_cell(row, col) == 0:
-                grid.set_cell(row, col, 8)  # Sky blue
-            col += 1
-        
-        start_col = min(start_col + 1, left + (cols - 1) // 2 - 1)
+                if red_in_row:
+                    if zigzag:
+                        grid.set_cell(row, col, 8)  # Sky blue
+                    zigzag = not zigzag
+                else:
+                    if (col - sky_blue_start) % 2 == 0:
+                        grid.set_cell(row, col, 8)  # Sky blue
+            elif grid.get_cell(row, col) == 2:
+                break
+            col += sky_blue_direction
+    
+    refine_sky_blue_pattern(grid, red_bounds)
+
+def refine_sky_blue_pattern(grid: ColoredGrid, red_bounds: Tuple[int, int, int, int]):
+    """Refine the sky blue pattern to complement the red pattern's shape."""
+    rows, cols = grid.get_dimensions()
+    left, right, top, bottom = red_bounds
+    
+    for row in range(rows):
+        red_cells = [c for c in range(cols) if grid.get_cell(row, c) == 2]
+        if red_cells:
+            min_red, max_red = min(red_cells), max(red_cells)
+            for col in range(cols):
+                if col < min_red and grid.get_cell(row, col) == 0:
+                    grid.set_cell(row, col, 8)
+                elif col > max_red and grid.get_cell(row, col) == 0:
+                    grid.set_cell(row, col, 8)
