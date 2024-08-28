@@ -6,17 +6,17 @@ def solve_15113be4(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by enhancing or introducing a secondary color (green, magenta, or sky blue)
     in a balanced and visually interesting pattern across all quadrants. The function follows these steps:
     1. Identifies the secondary color to use (3: green, 6: magenta, or 8: sky blue).
-    2. Analyzes the existing pattern, distribution, and complexity of colors in each quadrant.
-    3. Creates a pattern strategy based on the analysis.
-    4. Enhances existing secondary color areas by forming geometric patterns like L-shapes, clusters, or diagonal paths.
-    5. Introduces new instances of the secondary color following the pattern strategy.
+    2. Preserves existing patterns of the secondary color.
+    3. Enhances existing patterns by forming L-shapes around fixed secondary color cells.
+    4. Creates new L-shapes, especially near blue (1) dots.
+    5. Fills isolated secondary color dots by extending them into L-shapes.
     6. Balances the distribution of the secondary color across quadrants.
-    7. Refines the transformation for consistency and visual appeal.
+    7. Refines the transformation by addressing any remaining isolated secondary color dots.
     8. Preserves the yellow (4) grid structure throughout the process.
-    9. Interacts with existing colors, especially blue (1), to create visually interesting patterns.
+    9. Adds final touches for visual interest, such as diagonal paths or clusters.
 
-    The transformation aims to create a balanced, aesthetically pleasing distribution of the secondary color
-    while maintaining the original grid's structure and enhancing existing patterns.
+    The transformation aims to create a balanced, aesthetically pleasing distribution of L-shapes
+    of the secondary color while maintaining the original grid's structure and enhancing existing patterns.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -27,13 +27,13 @@ def solve_15113be4(input_grid: ColoredGrid) -> ColoredGrid:
     output_grid = input_grid.deep_copy()
     secondary_color = identify_secondary_color(output_grid)
     
-    analysis = analyze_grid(output_grid, secondary_color)
-    strategy = create_pattern_strategy(analysis, secondary_color)
-    
-    enhance_existing_areas(output_grid, secondary_color, strategy)
-    introduce_new_instances(output_grid, secondary_color, strategy)
-    balance_distribution(output_grid, secondary_color, analysis)
+    preserve_existing_patterns(output_grid, secondary_color)
+    enhance_existing_patterns(output_grid, secondary_color)
+    create_new_l_shapes(output_grid, secondary_color)
+    fill_isolated_dots(output_grid, secondary_color)
+    balance_distribution(output_grid, secondary_color)
     refine_transformation(output_grid, secondary_color)
+    add_final_touches(output_grid, secondary_color)
 
     return output_grid
 
@@ -46,132 +46,77 @@ def identify_secondary_color(grid: ColoredGrid) -> int:
     elif 8 in colors:
         return 8  # sky blue
     else:
-        return 8  # default to sky blue if no secondary color is present
+        return 3  # default to green if no secondary color is present
 
-def analyze_grid(grid: ColoredGrid, color: int) -> Dict:
+def preserve_existing_patterns(grid: ColoredGrid, color: int):
     rows, cols = grid.get_dimensions()
-    quadrants = {1: [0, rows//2, 0, cols//2],
-                 2: [0, rows//2, cols//2, cols],
-                 3: [rows//2, rows, 0, cols//2],
-                 4: [rows//2, rows, cols//2, cols]}
-    
-    analysis = {}
-    for q, (r_start, r_end, c_start, c_end) in quadrants.items():
-        quadrant_cells = [(r, c) for r in range(r_start, r_end) for c in range(c_start, c_end)]
-        color_count = sum(1 for r, c in quadrant_cells if grid.get_cell(r, c) == color)
-        blue_count = sum(1 for r, c in quadrant_cells if grid.get_cell(r, c) == 1)
-        diagonal_paths = find_diagonal_paths(grid, color, quadrant_cells)
-        clusters = find_clusters(grid, color, quadrant_cells)
-        
-        complexity_score = color_count + blue_count + len(diagonal_paths) * 2 + len(clusters) * 3
-        
-        analysis[q] = {
-            'color_count': color_count,
-            'blue_count': blue_count,
-            'diagonal_paths': diagonal_paths,
-            'clusters': clusters,
-            'complexity_score': complexity_score
-        }
-    
-    return analysis
+    for r in range(rows):
+        for c in range(cols):
+            if grid.get_cell(r, c) == color:
+                grid.set_cell(r, c, -color)  # Mark as fixed
 
-def create_pattern_strategy(analysis: Dict, color: int) -> Dict:
-    avg_complexity = sum(q['complexity_score'] for q in analysis.values()) / len(analysis)
-    strategy = {}
-    for q, data in analysis.items():
-        if data['complexity_score'] < avg_complexity:
-            strategy[q] = {
-                'add_diagonals': len(data['diagonal_paths']) < 2,
-                'enhance_clusters': len(data['clusters']) < 3,
-                'target_increase': int(avg_complexity - data['complexity_score'])
-            }
-        else:
-            strategy[q] = {
-                'add_diagonals': False,
-                'enhance_clusters': False,
-                'target_increase': 0
-            }
-    return strategy
-
-def enhance_existing_areas(grid: ColoredGrid, color: int, strategy: Dict):
-    for q, strat in strategy.items():
-        if strat['enhance_clusters']:
-            enhance_clusters(grid, color, q)
-        if strat['add_diagonals']:
-            add_diagonal_paths(grid, color, q)
-
-def introduce_new_instances(grid: ColoredGrid, color: int, strategy: Dict):
+def enhance_existing_patterns(grid: ColoredGrid, color: int):
     rows, cols = grid.get_dimensions()
-    quadrants = {1: [0, rows//2, 0, cols//2],
-                 2: [0, rows//2, cols//2, cols],
-                 3: [rows//2, rows, 0, cols//2],
-                 4: [rows//2, rows, cols//2, cols]}
+    for r in range(rows):
+        for c in range(cols):
+            if grid.get_cell(r, c) == -color:  # Fixed secondary color cell
+                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                    nr, nc = r + dr, c + dc
+                    if is_valid_cell(grid, nr, nc) and grid.get_cell(nr, nc) in [0, 1]:
+                        if forms_l_shape(grid, r, c, -color, nr, nc):
+                            grid.set_cell(nr, nc, color)
     
-    for q, strat in strategy.items():
-        r_start, r_end, c_start, c_end = quadrants[q]
-        added = 0
-        for r in range(r_start, r_end):
-            for c in range(c_start, c_end):
-                if added >= strat['target_increase']:
-                    break
-                if is_valid_cell(grid, r, c) and grid.get_cell(r, c) in [0, 1]:
-                    if not has_adjacent_color(grid, r, c, color):
-                        grid.set_cell(r, c, color)
-                        added += 1
-            if added >= strat['target_increase']:
-                break
+    # Unmark fixed cells
+    for r in range(rows):
+        for c in range(cols):
+            if grid.get_cell(r, c) == -color:
+                grid.set_cell(r, c, color)
 
-def balance_distribution(grid: ColoredGrid, color: int, analysis: Dict):
-    total_color = sum(data['color_count'] for data in analysis.values())
-    target_per_quadrant = total_color // 4
-    
+def create_new_l_shapes(grid: ColoredGrid, color: int):
     rows, cols = grid.get_dimensions()
-    quadrants = {1: [0, rows//2, 0, cols//2],
-                 2: [0, rows//2, cols//2, cols],
-                 3: [rows//2, rows, 0, cols//2],
-                 4: [rows//2, rows, cols//2, cols]}
+    for r in range(rows):
+        for c in range(cols):
+            if grid.get_cell(r, c) == 1 and not has_adjacent_color(grid, r, c, color):
+                create_l_shape(grid, r, c, color)
+
+def fill_isolated_dots(grid: ColoredGrid, color: int):
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        for c in range(cols):
+            if grid.get_cell(r, c) == color and not has_adjacent_color(grid, r, c, color):
+                extend_to_l_shape(grid, r, c, color)
+
+def balance_distribution(grid: ColoredGrid, color: int):
+    rows, cols = grid.get_dimensions()
+    quadrants = [
+        (0, rows//2, 0, cols//2),
+        (0, rows//2, cols//2, cols),
+        (rows//2, rows, 0, cols//2),
+        (rows//2, rows, cols//2, cols)
+    ]
+    counts = [count_color_in_quadrant(grid, color, *q) for q in quadrants]
+    avg_count = sum(counts) / len(counts)
     
-    for q, data in analysis.items():
-        diff = target_per_quadrant - data['color_count']
-        r_start, r_end, c_start, c_end = quadrants[q]
+    for i, (r_start, r_end, c_start, c_end) in enumerate(quadrants):
+        diff = int(avg_count - counts[i])
         if diff > 0:
-            # Add color
-            for _ in range(diff):
-                for r in range(r_start, r_end):
-                    for c in range(c_start, c_end):
-                        if grid.get_cell(r, c) in [0, 1] and not has_adjacent_color(grid, r, c, color):
-                            grid.set_cell(r, c, color)
-                            break
-                    else:
-                        continue
-                    break
-        elif diff < 0:
-            # Remove color
-            for _ in range(-diff):
-                for r in range(r_start, r_end):
-                    for c in range(c_start, c_end):
-                        if grid.get_cell(r, c) == color and not is_critical_cell(grid, r, c, color):
-                            grid.set_cell(r, c, 0)
-                            break
-                    else:
-                        continue
-                    break
+            add_l_shapes_to_quadrant(grid, color, r_start, r_end, c_start, c_end, diff)
 
 def refine_transformation(grid: ColoredGrid, color: int):
     rows, cols = grid.get_dimensions()
     for r in range(rows):
         for c in range(cols):
-            if grid.get_cell(r, c) == color:
-                if not has_adjacent_color(grid, r, c, color):
-                    # Remove isolated color cells
-                    grid.set_cell(r, c, 0)
-                elif forms_l_shape(grid, r, c, color):
-                    # Enhance L-shapes
-                    for dr, dc in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
-                        nr, nc = r + dr, c + dc
-                        if is_valid_cell(grid, nr, nc) and grid.get_cell(nr, nc) in [0, 1]:
-                            grid.set_cell(nr, nc, color)
-                            break
+            if grid.get_cell(r, c) == color and not has_adjacent_color(grid, r, c, color):
+                if not extend_to_l_shape(grid, r, c, color):
+                    grid.set_cell(r, c, 0)  # Remove if can't extend
+
+def add_final_touches(grid: ColoredGrid, color: int):
+    rows, cols = grid.get_dimensions()
+    for r in range(rows - 1):
+        for c in range(cols - 1):
+            if all(grid.get_cell(r+dr, c+dc) in [0, 1] for dr, dc in [(0, 0), (0, 1), (1, 0), (1, 1)]):
+                grid.set_cell(r, c, color)
+                grid.set_cell(r+1, c+1, color)
 
 def is_valid_cell(grid: ColoredGrid, r: int, c: int) -> bool:
     rows, cols = grid.get_dimensions()
@@ -180,101 +125,52 @@ def is_valid_cell(grid: ColoredGrid, r: int, c: int) -> bool:
 def has_adjacent_color(grid: ColoredGrid, r: int, c: int, color: int) -> bool:
     for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
         nr, nc = r + dr, c + dc
-        if is_valid_cell(grid, nr, nc) and grid.get_cell(nr, nc) == color:
+        if is_valid_cell(grid, nr, nc) and grid.get_cell(nr, nc) in [color, -color]:
             return True
     return False
 
-def forms_l_shape(grid: ColoredGrid, r: int, c: int, color: int) -> bool:
+def forms_l_shape(grid: ColoredGrid, r1: int, c1: int, color: int, r2: int, c2: int) -> bool:
+    for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+        nr, nc = r2 + dr, c2 + dc
+        if (nr, nc) != (r1, c1) and is_valid_cell(grid, nr, nc) and grid.get_cell(nr, nc) in [color, -color]:
+            return True
+    return False
+
+def create_l_shape(grid: ColoredGrid, r: int, c: int, color: int):
     directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
     for i, (dr1, dc1) in enumerate(directions):
         for dr2, dc2 in directions[i+1:]:
-            if (is_valid_cell(grid, r+dr1, c+dc1) and grid.get_cell(r+dr1, c+dc1) == color and
-                is_valid_cell(grid, r+dr2, c+dc2) and grid.get_cell(r+dr2, c+dc2) == color):
+            if (is_valid_cell(grid, r+dr1, c+dc1) and grid.get_cell(r+dr1, c+dc1) in [0, 1] and
+                is_valid_cell(grid, r+dr2, c+dc2) and grid.get_cell(r+dr2, c+dc2) in [0, 1]):
+                grid.set_cell(r, c, color)
+                grid.set_cell(r+dr1, c+dc1, color)
+                grid.set_cell(r+dr2, c+dc2, color)
                 return True
     return False
 
-def is_critical_cell(grid: ColoredGrid, r: int, c: int, color: int) -> bool:
-    # A cell is critical if removing it would create an isolated color cell
-    for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-        nr, nc = r + dr, c + dc
-        if is_valid_cell(grid, nr, nc) and grid.get_cell(nr, nc) == color:
-            if not has_adjacent_color(grid, nr, nc, color, exclude=(r, c)):
-                return True
+def extend_to_l_shape(grid: ColoredGrid, r: int, c: int, color: int) -> bool:
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    for dr1, dc1 in directions:
+        for dr2, dc2 in directions:
+            if (dr1, dc1) != (dr2, dc2):
+                nr1, nc1 = r + dr1, c + dc1
+                nr2, nc2 = r + dr2, c + dc2
+                if (is_valid_cell(grid, nr1, nc1) and grid.get_cell(nr1, nc1) in [0, 1] and
+                    is_valid_cell(grid, nr2, nc2) and grid.get_cell(nr2, nc2) in [0, 1]):
+                    grid.set_cell(nr1, nc1, color)
+                    grid.set_cell(nr2, nc2, color)
+                    return True
     return False
 
-def has_adjacent_color(grid: ColoredGrid, r: int, c: int, color: int, exclude: Tuple[int, int] = None) -> bool:
-    for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-        nr, nc = r + dr, c + dc
-        if (nr, nc) != exclude and is_valid_cell(grid, nr, nc) and grid.get_cell(nr, nc) == color:
-            return True
-    return False
+def count_color_in_quadrant(grid: ColoredGrid, color: int, r_start: int, r_end: int, c_start: int, c_end: int) -> int:
+    return sum(1 for r in range(r_start, r_end) for c in range(c_start, c_end) if grid.get_cell(r, c) == color)
 
-def find_diagonal_paths(grid: ColoredGrid, color: int, cells: List[Tuple[int, int]]) -> List[List[Tuple[int, int]]]:
-    paths = []
-    visited = set()
-    for r, c in cells:
-        if (r, c) not in visited and grid.get_cell(r, c) == color:
-            path = []
-            dr, dc = 1, 1
-            while is_valid_cell(grid, r, c) and grid.get_cell(r, c) == color:
-                path.append((r, c))
-                visited.add((r, c))
-                r, c = r + dr, c + dc
-            if len(path) > 2:
-                paths.append(path)
-    return paths
-
-def find_clusters(grid: ColoredGrid, color: int, cells: List[Tuple[int, int]]) -> List[List[Tuple[int, int]]]:
-    clusters = []
-    visited = set()
-    for r, c in cells:
-        if (r, c) not in visited and grid.get_cell(r, c) == color:
-            cluster = []
-            stack = [(r, c)]
-            while stack:
-                cr, cc = stack.pop()
-                if (cr, cc) not in visited and grid.get_cell(cr, cc) == color:
-                    cluster.append((cr, cc))
-                    visited.add((cr, cc))
-                    for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                        nr, nc = cr + dr, cc + dc
-                        if (nr, nc) in cells and (nr, nc) not in visited:
-                            stack.append((nr, nc))
-            if len(cluster) > 1:
-                clusters.append(cluster)
-    return clusters
-
-def enhance_clusters(grid: ColoredGrid, color: int, quadrant: int):
-    rows, cols = grid.get_dimensions()
-    quadrants = {1: [0, rows//2, 0, cols//2],
-                 2: [0, rows//2, cols//2, cols],
-                 3: [rows//2, rows, 0, cols//2],
-                 4: [rows//2, rows, cols//2, cols]}
-    r_start, r_end, c_start, c_end = quadrants[quadrant]
-    
+def add_l_shapes_to_quadrant(grid: ColoredGrid, color: int, r_start: int, r_end: int, c_start: int, c_end: int, count: int):
+    added = 0
     for r in range(r_start, r_end):
         for c in range(c_start, c_end):
-            if grid.get_cell(r, c) == color:
-                for dr, dc in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
-                    nr, nc = r + dr, c + dc
-                    if is_valid_cell(grid, nr, nc) and grid.get_cell(nr, nc) in [0, 1]:
-                        grid.set_cell(nr, nc, color)
-                        break
-
-def add_diagonal_paths(grid: ColoredGrid, color: int, quadrant: int):
-    rows, cols = grid.get_dimensions()
-    quadrants = {1: [0, rows//2, 0, cols//2],
-                 2: [0, rows//2, cols//2, cols],
-                 3: [rows//2, rows, 0, cols//2],
-                 4: [rows//2, rows, cols//2, cols]}
-    r_start, r_end, c_start, c_end = quadrants[quadrant]
-    
-    for r in range(r_start, r_end - 2):
-        for c in range(c_start, c_end - 2):
-            if all(grid.get_cell(r+i, c+i) in [0, 1] for i in range(3)):
-                for i in range(3):
-                    grid.set_cell(r+i, c+i, color)
-                break
-        else:
-            continue
-        break
+            if added >= count:
+                return
+            if grid.get_cell(r, c) == 1 and not has_adjacent_color(grid, r, c, color):
+                if create_l_shape(grid, r, c, color):
+                    added += 1
