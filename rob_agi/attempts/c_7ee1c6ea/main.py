@@ -5,17 +5,16 @@ import random
 
 def solve_7ee1c6ea(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by redistributing colors within connected regions.
+    Transforms the input grid by redistributing colors within connected regions while preserving key structures.
     
-    1. Identifies key structures (frames, crosses, border-like patterns) to preserve.
+    1. Identifies and preserves key structures (frames, crosses, border-like patterns).
     2. Segments the grid into regions based on these structures.
-    3. For each region, analyzes color distribution and identifies potential cluster areas.
-    4. Iteratively expands color clusters while maintaining overall color ratios.
-    5. Preserves black (0) and gray (5) squares.
-    6. Avoids creating 2x2 squares of the same color.
-    7. Performs local refinements to merge small isolated color areas.
-    8. Balances changes across regions to maintain overall grid coherence.
-    9. Iterates the process until stability or max iterations.
+    3. For each region, redistributes colors to maintain overall ratios and create larger contiguous areas.
+    4. Preserves black (0) and gray (5) squares.
+    5. Avoids creating 2x2 squares of the same color.
+    6. Refines small isolated color areas.
+    7. Balances changes across regions to maintain overall grid coherence.
+    8. Iterates the process until stability or max iterations.
     
     Returns the transformed grid with improved color distribution and pattern coherence.
     """
@@ -29,7 +28,7 @@ def solve_7ee1c6ea(input_grid: ColoredGrid) -> ColoredGrid:
     for _ in range(max_iterations):
         changed = False
         for region in regions:
-            if redistribute_colors_in_region(new_grid, region, initial_color_ratios):
+            if redistribute_colors_in_region(new_grid, region):
                 changed = True
         if not changed:
             break
@@ -48,7 +47,7 @@ def calculate_color_ratios(grid: ColoredGrid) -> Dict[int, float]:
                 total_cells += 1
     return {color: count / total_cells for color, count in color_counts.items()}
 
-def redistribute_colors_in_region(grid: ColoredGrid, region: Set[Tuple[int, int]], initial_ratios: Dict[int, float]) -> bool:
+def redistribute_colors_in_region(grid: ColoredGrid, region: Set[Tuple[int, int]]) -> bool:
     color_areas = defaultdict(set)
     for r, c in region:
         color = grid.values[r][c]
@@ -60,29 +59,27 @@ def redistribute_colors_in_region(grid: ColoredGrid, region: Set[Tuple[int, int]
     
     changed = False
     for color, area in sorted(color_areas.items(), key=lambda x: len(x[1]), reverse=True):
-        target_size = int(len(region) * initial_ratios.get(color, 0))
-        while len(area) < target_size:
-            expansion = expand_color_area(grid, area, color)
-            if not expansion:
-                break
-            changed = True
-            area |= expansion
-            for r, c in expansion:
-                grid.values[r][c] = color
-                for other_color in color_areas:
-                    if other_color != color:
-                        color_areas[other_color].discard((r, c))
+        adjacent_colors = find_adjacent_colors(grid, area)
+        for adj_color in adjacent_colors:
+            if len(color_areas[adj_color]) < len(area):
+                expansion = expand_color_area(grid, area, adj_color)
+                if expansion:
+                    changed = True
+                    color_areas[color] -= expansion
+                    color_areas[adj_color] |= expansion
+                    for r, c in expansion:
+                        grid.values[r][c] = adj_color
     
     return changed
 
-def expand_color_area(grid: ColoredGrid, area: Set[Tuple[int, int]], color: int) -> Set[Tuple[int, int]]:
+def expand_color_area(grid: ColoredGrid, area: Set[Tuple[int, int]], target_color: int) -> Set[Tuple[int, int]]:
     expansion = set()
     rows, cols = grid.get_dimensions()
     for r, c in area:
         for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
             nr, nc = r + dr, c + dc
-            if 0 <= nr < rows and 0 <= nc < cols and grid.values[nr][nc] not in [0, 5, color]:
-                if is_valid_change(grid, (nr, nc), color):
+            if 0 <= nr < rows and 0 <= nc < cols and grid.values[nr][nc] == target_color:
+                if is_valid_change(grid, (nr, nc), grid.values[r][c]):
                     expansion.add((nr, nc))
     return expansion
 
