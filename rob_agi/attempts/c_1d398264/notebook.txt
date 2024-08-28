@@ -1,1 +1,36 @@
 Challenge 1d398264:
+
+Key observations:
+1. The challenge involves transforming a 2D grid based on color-specific expansion rules.
+2. Colors are represented by numbers from 0 to 8.
+3. The expansion rules differ for each color and should be applied in the order of appearance.
+
+Color expansion rules (based on test results):
+0: Black (no expansion)
+1: Blue - Expands diagonally up-right
+2: Red - Fills row horizontally, then expands vertically from ends
+3: Green - Expands diagonally up-left and down-right
+4: Yellow - Fills entire row horizontally
+5: Gray - No expansion
+6: Magenta - Expands diagonally up-left
+7: Orange - Expands diagonally down-right
+8: Sky Blue - Expands vertically down, then horizontally at the bottom
+
+Current issues:
+1. The red (2) expansion is incorrect. It's expanding too much horizontally and vertically.
+2. The sky blue (8) expansion is incorrect. It's expanding horizontally when it should only expand vertically.
+3. The orange (7) expansion is not stopping at boundaries or non-black cells.
+4. The green (3) expansion is not creating the correct X-shape pattern.
+
+Next steps:
+1. Revise the red expansion function to limit horizontal fill to the original row and vertical expansion to only the ends.
+2. Correct the sky blue expansion to only expand vertically downwards.
+3. Implement boundary checks for all expansion functions to stop at non-black cells.
+4. Refine the green expansion to create the correct X-shape pattern.
+5. Ensure that original non-black cells are preserved during expansion.
+6. Double-check the expansion order to match the order of appearance in the input grid.
+
+Things that don't work:
+1. Expanding red color to fill the entire row and column.
+2. Allowing expansions to overwrite original non-black cells.
+3. Applying expansions in an arbitrary order instead of the order of appearance.
