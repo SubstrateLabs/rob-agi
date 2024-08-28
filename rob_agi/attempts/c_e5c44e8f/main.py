@@ -19,20 +19,17 @@ def solve_e5c44e8f(input_grid: ColoredGrid) -> ColoredGrid:
     """
     output_grid = input_grid.deep_copy()
     initial_green = find_initial_green(output_grid)
-    if not initial_green:
-        return output_grid
-
-    left_column = find_leftmost_column(output_grid)
-    create_vertical_line(output_grid, left_column)
-    create_horizontal_lines(output_grid, left_column, initial_green)
-    ensure_two_edge_contact(output_grid, left_column)
-    optimize_e_shape(output_grid, left_column, initial_green)
+    red_cells = find_red_cells(output_grid)
+    
+    left_column = find_leftmost_column(output_grid, red_cells)
+    create_vertical_line(output_grid, left_column, red_cells)
+    create_horizontal_lines(output_grid, left_column, initial_green, red_cells)
+    ensure_two_edge_contact(output_grid, left_column, red_cells)
+    optimize_e_shape(output_grid, left_column, initial_green, red_cells)
     clean_up_e_shape(output_grid)
     connect_disconnected_parts(output_grid)
 
-    # Verify the solution
     if not verify_solution(output_grid, input_grid):
-        # If verification fails, revert to the input grid
         return input_grid
 
     return output_grid
@@ -66,50 +63,47 @@ def find_initial_green(grid: ColoredGrid) -> Tuple[int, int]:
         for c in range(grid.num_cols):
             if grid.get_cell(r, c) == 3:
                 return r, c
-    # If no green cell is found, return the center of the grid
     return grid.num_rows // 2, grid.num_cols // 2
 
-def find_leftmost_column(grid: ColoredGrid) -> int:
-    for c in range(grid.num_cols):
-        if all(grid.get_cell(r, c) != 2 for r in range(grid.num_rows)):
-            return c
-    return 0  # If no column is free of red cells, start from the leftmost column
+def find_red_cells(grid: ColoredGrid) -> Set[Tuple[int, int]]:
+    return {(r, c) for r in range(grid.num_rows) for c in range(grid.num_cols) if grid.get_cell(r, c) == 2}
 
-def create_vertical_line(grid: ColoredGrid, col: int):
+def find_leftmost_column(grid: ColoredGrid, red_cells: Set[Tuple[int, int]]) -> int:
+    for c in range(grid.num_cols):
+        if not any((r, c) in red_cells for r in range(grid.num_rows)):
+            return c
+    return 0
+
+def create_vertical_line(grid: ColoredGrid, col: int, red_cells: Set[Tuple[int, int]]):
     for r in range(grid.num_rows):
-        if grid.get_cell(r, col) == 0:
+        if (r, col) not in red_cells and grid.get_cell(r, col) == 0:
             grid.set_cell(r, col, 3)
 
-def create_horizontal_lines(grid: ColoredGrid, left_col: int, initial_green: Tuple[int, int]):
+def create_horizontal_lines(grid: ColoredGrid, left_col: int, initial_green: Tuple[int, int], red_cells: Set[Tuple[int, int]]):
     rows, cols = grid.num_rows, grid.num_cols
     initial_row, _ = initial_green
 
     # Top line
-    top_row = min(r for r in range(rows) if grid.get_cell(r, left_col) != 2)
+    top_row = min(r for r in range(rows) if grid.get_cell(r, left_col) == 3)
     for c in range(left_col + 1, cols):
-        if grid.get_cell(top_row, c) == 2:
+        if (top_row, c) in red_cells:
             break
         grid.set_cell(top_row, c, 3)
 
     # Middle line
     for c in range(left_col + 1, cols):
-        if grid.get_cell(initial_row, c) == 2:
+        if (initial_row, c) in red_cells:
             break
         grid.set_cell(initial_row, c, 3)
 
     # Bottom line
-    bottom_row = max(r for r in range(rows) if grid.get_cell(r, left_col) != 2)
+    bottom_row = max(r for r in range(rows) if grid.get_cell(r, left_col) == 3)
     for c in range(left_col + 1, cols):
-        if grid.get_cell(bottom_row, c) == 2:
+        if (bottom_row, c) in red_cells:
             break
         grid.set_cell(bottom_row, c, 3)
 
-    # Fill in the vertical line
-    for r in range(top_row, bottom_row + 1):
-        if grid.get_cell(r, left_col) == 0:
-            grid.set_cell(r, left_col, 3)
-
-def ensure_two_edge_contact(grid: ColoredGrid, left_col: int):
+def ensure_two_edge_contact(grid: ColoredGrid, left_col: int, red_cells: Set[Tuple[int, int]]):
     rows, cols = grid.num_rows, grid.num_cols
     edges_touched = sum([
         any(grid.get_cell(0, c) == 3 for c in range(cols)),
@@ -122,13 +116,13 @@ def ensure_two_edge_contact(grid: ColoredGrid, left_col: int):
         # Extend top line to right edge
         top_row = min(r for r in range(rows) if grid.get_cell(r, left_col) == 3)
         for c in range(cols-1, left_col, -1):
-            if grid.get_cell(top_row, c) == 0:
+            if (top_row, c) not in red_cells and grid.get_cell(top_row, c) == 0:
                 grid.set_cell(top_row, c, 3)
         
         # Extend bottom horizontal line to right edge
         bottom_row = max(r for r in range(rows) if grid.get_cell(r, left_col) == 3)
         for c in range(cols-1, left_col, -1):
-            if grid.get_cell(bottom_row, c) == 0:
+            if (bottom_row, c) not in red_cells and grid.get_cell(bottom_row, c) == 0:
                 grid.set_cell(bottom_row, c, 3)
 
 def connect_disconnected_parts(grid: ColoredGrid):
@@ -145,35 +139,23 @@ def connect_disconnected_parts(grid: ColoredGrid):
                         if grid.get_cell(i, c) == 0:
                             grid.set_cell(i, c, 3)
 
-def optimize_e_shape(grid: ColoredGrid, left_col: int, initial_green: Tuple[int, int]):
+def optimize_e_shape(grid: ColoredGrid, left_col: int, initial_green: Tuple[int, int], red_cells: Set[Tuple[int, int]]):
     rows, cols = grid.num_rows, grid.num_cols
-    initial_row, initial_col = initial_green
+    initial_row, _ = initial_green
 
-    # Determine the extent of the vertical line
     top_row = min(r for r in range(rows) if grid.get_cell(r, left_col) == 3)
     bottom_row = max(r for r in range(rows) if grid.get_cell(r, left_col) == 3)
 
-    # Optimize top horizontal line
-    for c in range(left_col + 1, cols):
-        if grid.get_cell(top_row, c) == 2:
-            break
-        grid.set_cell(top_row, c, 3)
-
-    # Optimize middle horizontal line
-    for c in range(left_col + 1, cols):
-        if grid.get_cell(initial_row, c) == 2:
-            break
-        grid.set_cell(initial_row, c, 3)
-
-    # Optimize bottom horizontal line
-    for c in range(left_col + 1, cols):
-        if grid.get_cell(bottom_row, c) == 2:
-            break
-        grid.set_cell(bottom_row, c, 3)
+    # Optimize horizontal lines
+    for r in [top_row, initial_row, bottom_row]:
+        for c in range(left_col + 1, cols):
+            if (r, c) in red_cells:
+                break
+            grid.set_cell(r, c, 3)
 
     # Try to extend vertical line to the right
     for c in range(left_col + 1, cols):
-        if all(grid.get_cell(r, c) in [0, 3] for r in range(top_row, bottom_row + 1)):
+        if all((r, c) not in red_cells and grid.get_cell(r, c) in [0, 3] for r in range(top_row, bottom_row + 1)):
             for r in range(top_row, bottom_row + 1):
                 if grid.get_cell(r, c-1) == 3 and grid.get_cell(r, c) == 0:
                     grid.set_cell(r, c, 3)
@@ -191,13 +173,6 @@ def clean_up_e_shape(grid: ColoredGrid):
                                 if 0 <= r + dr < rows and 0 <= c + dc < cols and grid.get_cell(r + dr, c + dc) == 3)
                 if neighbors <= 1:
                     grid.set_cell(r, c, 0)
-    
-    # Ensure clear spaces inside the 'E'
-    for r in range(1, rows - 1):
-        for c in range(1, cols - 1):
-            if (grid.get_cell(r-1, c) == 3 and grid.get_cell(r+1, c) == 3 and
-                grid.get_cell(r, c-1) == 3 and grid.get_cell(r, c+1) == 3):
-                grid.set_cell(r, c, 0)
     
     # Remove any disconnected green cells
     connected = set()
