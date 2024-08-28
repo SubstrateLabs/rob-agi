@@ -5,67 +5,50 @@ from collections import deque
 def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid based on the following rules:
-    1. Blue regions of size 2-4 pixels are changed to the target color (red or green).
-    2. Blue regions of exactly 5 pixels are changed to the target color only if they form a plus shape.
-    3. The target color (red or green) is determined by the global prevalence of these colors.
-    4. Larger blue regions, single blue pixels, and other colors remain unchanged.
+    1. Blue plus shapes (5 pixels) are changed to the target color (red or green).
+    2. The target color (red or green) is determined by the color enclosed in a gray border.
+    3. Other blue shapes and colors remain unchanged.
+    4. Gray (5) acts as a border and is not considered part of any region.
     5. All transformations are applied simultaneously.
-    6. Gray (5) acts as a border and is not considered part of any region.
-    7. Only orthogonally adjacent cells are considered part of the same region.
 
-    The solution uses a flood fill algorithm to identify connected blue regions,
-    determines the target color based on the prevalence of red and green,
-    and applies transformations to eligible blue regions simultaneously.
+    The solution identifies the target color from gray-enclosed regions,
+    detects blue plus shapes, and transforms them to the target color.
     """
     BLUE, RED, GREEN, GRAY = 1, 2, 3, 5
 
-    def count_colors():
-        red_count = sum(row.count(RED) for row in input_grid.values)
-        green_count = sum(row.count(GREEN) for row in input_grid.values)
-        return red_count, green_count
+    def find_target_color():
+        for i in range(rows):
+            for j in range(cols):
+                if input_grid.values[i][j] == GRAY:
+                    enclosed_color = find_enclosed_color(i, j)
+                    if enclosed_color in [RED, GREEN]:
+                        return enclosed_color
+        return RED  # Default to red if no enclosed color found
 
-    def flood_fill(x: int, y: int, visited: List[List[bool]]) -> List[Tuple[int, int]]:
-        region = []
-        queue = deque([(x, y)])
-        while queue:
-            cx, cy = queue.popleft()
-            if (0 <= cx < rows and 0 <= cy < cols and
-                input_grid.values[cx][cy] == BLUE and not visited[cx][cy]):
-                visited[cx][cy] = True
-                region.append((cx, cy))
-                for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                    nx, ny = cx + dx, cy + dy
-                    if 0 <= nx < rows and 0 <= ny < cols and input_grid.values[nx][ny] != GRAY:
-                        queue.append((nx, ny))
-        return region
+    def find_enclosed_color(start_x: int, start_y: int) -> int:
+        for dx, dy in [(1, 1), (1, -1), (-1, 1), (-1, -1)]:
+            x, y = start_x + dx, start_y + dy
+            if 0 <= x < rows and 0 <= y < cols and input_grid.values[x][y] in [RED, GREEN]:
+                return input_grid.values[x][y]
+        return 0
 
-    def is_plus_shape(region: List[Tuple[int, int]]) -> bool:
-        if len(region) != 5:
+    def is_plus_shape(x: int, y: int) -> bool:
+        if input_grid.values[x][y] != BLUE:
             return False
-        center = min(region, key=lambda p: abs(p[0] - rows // 2) + abs(p[1] - cols // 2))
-        orthogonal_neighbors = [(center[0]+1, center[1]), (center[0]-1, center[1]),
-                                (center[0], center[1]+1), (center[0], center[1]-1)]
-        return all(neighbor in region for neighbor in orthogonal_neighbors)
+        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nx, ny = x + dx, y + dy
+            if not (0 <= nx < rows and 0 <= ny < cols and input_grid.values[nx][ny] == BLUE):
+                return False
+        return True
 
     rows, cols = len(input_grid.values), len(input_grid.values[0])
-    red_count, green_count = count_colors()
-    target_color = RED if red_count >= green_count else GREEN
-
-    visited = [[False for _ in row] for row in input_grid.values]
-    transform_markers = [[False for _ in row] for row in input_grid.values]
-
-    for i in range(rows):
-        for j in range(cols):
-            if input_grid.values[i][j] == BLUE and not visited[i][j]:
-                region = flood_fill(i, j, visited)
-                if 2 <= len(region) <= 4 or (len(region) == 5 and is_plus_shape(region)):
-                    for x, y in region:
-                        transform_markers[x][y] = True
+    target_color = find_target_color()
 
     transformed_grid = [row[:] for row in input_grid.values]
     for i in range(rows):
         for j in range(cols):
-            if transform_markers[i][j]:
-                transformed_grid[i][j] = target_color
+            if is_plus_shape(i, j):
+                for dx, dy in [(0, 0), (0, 1), (1, 0), (0, -1), (-1, 0)]:
+                    transformed_grid[i+dx][j+dy] = target_color
 
     return ColoredGrid(values=transformed_grid)
