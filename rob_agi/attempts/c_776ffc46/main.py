@@ -49,7 +49,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
 
     rows, cols = len(input_grid.values), len(input_grid.values[0])
     red_count, green_count = count_colors()
-    target_color = RED if red_count > green_count else GREEN
+    target_color = RED if red_count >= green_count else GREEN
 
     visited = [[False for _ in row] for row in input_grid.values]
     transform_markers = [[False for _ in row] for row in input_grid.values]
