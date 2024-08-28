@@ -2,6 +2,7 @@ from rob_agi.colored_grid import ColoredGrid
 from typing import Tuple, List, Set
 from collections import deque
 import random
+import math
 
 def solve_9772c176(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -9,14 +10,13 @@ def solve_9772c176(input_grid: ColoredGrid) -> ColoredGrid:
     
     The solution follows these steps:
     1. Identify sky blue shapes using flood fill.
-    2. For each sky blue shape:
-       a. Create an expanded bounding box.
-       b. Generate a yellow shadow based on the sky blue shape, with focus on bottom and right sides.
-       c. Add irregularities and randomness to the shadow.
-    3. Create disconnected shadow elements (small dots and tendrils).
-    4. Refine shadows by removing isolated pixels and ensuring no direct contact with sky blue.
-    5. Add final touch-ups and verify the result.
-    6. Apply a directional shadow effect, emphasizing the bottom-right direction.
+    2. Create a shadow intensity map based on distance from sky blue shapes.
+    3. Generate shadows with focus on bottom and right sides of shapes.
+    4. Create bridges between shapes if multiple exist.
+    5. Add scattered shadow pixels in black space.
+    6. Refine shadow edges and ensure no direct contact with sky blue.
+    7. Convert shadow intensity map to yellow pixels.
+    8. Final cleanup to remove isolated pixels and ensure shadow continuity.
 
     Args:
     input_grid (ColoredGrid): The input grid containing sky blue shapes.
@@ -27,6 +27,7 @@ def solve_9772c176(input_grid: ColoredGrid) -> ColoredGrid:
     random.seed(42)  # Set seed for reproducibility
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
+    shadow_map = [[0.0 for _ in range(cols)] for _ in range(rows)]
 
     def get_neighbors(x: int, y: int, diagonal: bool = False) -> List[Tuple[int, int]]:
         directions = [(-1,0), (1,0), (0,-1), (0,1)]
@@ -54,91 +55,74 @@ def solve_9772c176(input_grid: ColoredGrid) -> ColoredGrid:
                     shapes.append(shape)
         return shapes
 
-    def get_bounding_box(shape: Set[Tuple[int, int]]) -> Tuple[int, int, int, int]:
-        x_coords, y_coords = zip(*shape)
-        return min(x_coords), min(y_coords), max(x_coords), max(y_coords)
+    def create_shadow_map(shapes: List[Set[Tuple[int, int]]]):
+        for x in range(rows):
+            for y in range(cols):
+                if output_grid.get_cell(x, y) != 8:
+                    min_distance = min(min(math.sqrt((x-bx)**2 + (y-by)**2) for bx, by in shape) for shape in shapes)
+                    intensity = max(0, 1 - min_distance / 10)  # Adjust the divisor to control shadow spread
+                    shadow_map[x][y] = intensity
 
-    def create_expanded_box(box: Tuple[int, int, int, int], expansion: int) -> Tuple[int, int, int, int]:
-        top, left, bottom, right = box
-        return (max(0, top - expansion), 
-                max(0, left - expansion), 
-                min(rows - 1, bottom + expansion), 
-                min(cols - 1, right + expansion))
+    def apply_directional_bias():
+        for x in range(rows):
+            for y in range(cols):
+                if shadow_map[x][y] > 0:
+                    # Increase intensity towards bottom-right
+                    shadow_map[x][y] *= 1 + (x / rows + y / cols) / 2
 
-    def generate_shadow(shape: Set[Tuple[int, int]], box: Tuple[int, int, int, int]) -> Set[Tuple[int, int]]:
-        top, left, bottom, right = box
-        shadow = set()
-        center_x, center_y = (top + bottom) // 2, (left + right) // 2
-        for x in range(top, bottom + 1):
-            for y in range(left, right + 1):
-                if (x, y) not in shape and any((nx, ny) in shape for nx, ny in get_neighbors(x, y, diagonal=True)):
-                    # Higher probability for bottom and right sides
-                    dx, dy = x - center_x, y - center_y
-                    prob = 0.9 if dx > 0 and dy > 0 else 0.7 if dx > 0 or dy > 0 else 0.5
-                    if random.random() < prob:
-                        shadow.add((x, y))
-        return shadow
+    def create_bridges(shapes: List[Set[Tuple[int, int]]]):
+        if len(shapes) < 2:
+            return
+        for i, shape1 in enumerate(shapes):
+            for shape2 in shapes[i+1:]:
+                start = min(shape1, key=lambda p: min(math.sqrt((p[0]-q[0])**2 + (p[1]-q[1])**2) for q in shape2))
+                end = min(shape2, key=lambda p: math.sqrt((p[0]-start[0])**2 + (p[1]-start[1])**2))
+                x, y = start
+                while (x, y) != end:
+                    dx = 1 if end[0] > x else -1 if end[0] < x else 0
+                    dy = 1 if end[1] > y else -1 if end[1] < y else 0
+                    x += dx
+                    y += dy
+                    if 0 <= x < rows and 0 <= y < cols and output_grid.get_cell(x, y) == 0:
+                        shadow_map[x][y] = max(shadow_map[x][y], 0.5)  # Adjust intensity as needed
 
-    def apply_shadow(shadow: Set[Tuple[int, int]]):
-        for x, y in shadow:
-            if all(output_grid.get_cell(nx, ny) != 8 for nx, ny in get_neighbors(x, y)):
-                output_grid.set_cell(x, y, 4)
+    def add_scattered_pixels():
+        for x in range(rows):
+            for y in range(cols):
+                if output_grid.get_cell(x, y) == 0 and shadow_map[x][y] == 0:
+                    if random.random() < 0.05 * (x / rows + y / cols):  # Higher probability towards bottom-right
+                        shadow_map[x][y] = 0.3  # Adjust intensity as needed
 
-    def add_irregularities(shadow: Set[Tuple[int, int]]):
-        new_shadow = shadow.copy()
-        for x, y in shadow:
-            if random.random() < 0.2:
-                for nx, ny in get_neighbors(x, y):
-                    if (nx, ny) not in shadow and output_grid.get_cell(nx, ny) == 0:
-                        new_shadow.add((nx, ny))
-        return new_shadow
+    def refine_edges():
+        for x in range(rows):
+            for y in range(cols):
+                if shadow_map[x][y] > 0:
+                    neighbors = get_neighbors(x, y, diagonal=True)
+                    avg_intensity = sum(shadow_map[nx][ny] for nx, ny in neighbors) / len(neighbors)
+                    shadow_map[x][y] = (shadow_map[x][y] + avg_intensity) / 2
 
-    def add_disconnected_elements(shape: Set[Tuple[int, int]], box: Tuple[int, int, int, int]):
-        top, left, bottom, right = box
-        center_x, center_y = (top + bottom) // 2, (left + right) // 2
-        for _ in range((bottom - top + right - left) // 4):
-            x = random.randint(center_x, bottom + 2)
-            y = random.randint(center_y, right + 2)
-            if 0 <= x < rows and 0 <= y < cols and (x, y) not in shape and output_grid.get_cell(x, y) == 0:
-                if all(output_grid.get_cell(nx, ny) != 8 for nx, ny in get_neighbors(x, y)):
-                    output_grid.set_cell(x, y, 4)
+    def convert_to_yellow():
+        for x in range(rows):
+            for y in range(cols):
+                if shadow_map[x][y] > 0.3 and output_grid.get_cell(x, y) == 0:  # Adjust threshold as needed
+                    if all(output_grid.get_cell(nx, ny) != 8 for nx, ny in get_neighbors(x, y)):
+                        output_grid.set_cell(x, y, 4)
 
-    def refine_shadow():
+    def cleanup():
         for x in range(rows):
             for y in range(cols):
                 if output_grid.get_cell(x, y) == 4:
-                    yellow_neighbors = sum(1 for nx, ny in get_neighbors(x, y) if output_grid.get_cell(nx, ny) == 4)
-                    if yellow_neighbors == 0:
+                    neighbors = sum(1 for nx, ny in get_neighbors(x, y, diagonal=True) if output_grid.get_cell(nx, ny) == 4)
+                    if neighbors == 0:
                         output_grid.set_cell(x, y, 0)
 
-    def add_directional_shadow(shape: Set[Tuple[int, int]], box: Tuple[int, int, int, int]):
-        top, left, bottom, right = box
-        center_x, center_y = (top + bottom) // 2, (left + right) // 2
-        for x in range(center_x, bottom + 3):
-            for y in range(center_y, right + 3):
-                if 0 <= x < rows and 0 <= y < cols and (x, y) not in shape and output_grid.get_cell(x, y) == 0:
-                    if any(output_grid.get_cell(nx, ny) == 8 for nx, ny in get_neighbors(x, y, diagonal=True)):
-                        if random.random() < 0.7:
-                            output_grid.set_cell(x, y, 4)
-
     blue_shapes = find_blue_shapes()
-    expansion = 3
-
-    for shape in blue_shapes:
-        box = get_bounding_box(shape)
-        expanded_box = create_expanded_box(box, expansion)
-        shadow = generate_shadow(shape, expanded_box)
-        shadow = add_irregularities(shadow)
-        apply_shadow(shadow)
-        add_disconnected_elements(shape, expanded_box)
-        add_directional_shadow(shape, expanded_box)
-
-    refine_shadow()
-
-    # Ensure no yellow pixels touch blue pixels
-    for x in range(rows):
-        for y in range(cols):
-            if output_grid.get_cell(x, y) == 4 and any(output_grid.get_cell(nx, ny) == 8 for nx, ny in get_neighbors(x, y)):
-                output_grid.set_cell(x, y, 0)
+    create_shadow_map(blue_shapes)
+    apply_directional_bias()
+    create_bridges(blue_shapes)
+    add_scattered_pixels()
+    refine_edges()
+    convert_to_yellow()
+    cleanup()
 
     return output_grid
