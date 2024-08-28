@@ -4,7 +4,7 @@ def solve_90347967(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by moving non-black cells to the top-right corner and rotating them 90 degrees clockwise.
     
-    1. Collects all non-black cells from the input grid, scanning left to right and top to bottom.
+    1. Collects all non-black cells from the input grid, scanning bottom to top, left to right.
     2. Creates a new grid with the same dimensions as the input, filled with black (0) cells.
     3. Places the collected non-black cells in the top-right corner of the new grid, starting from the top-right
        and moving left and down, giving the appearance of a 90-degree clockwise rotation.
@@ -13,8 +13,8 @@ def solve_90347967(input_grid: ColoredGrid) -> ColoredGrid:
     rows, cols = input_grid.get_dimensions()
     non_black_cells = []
 
-    # Collect non-black cells (left to right, top to bottom)
-    for row in range(rows):
+    # Collect non-black cells (bottom to top, left to right)
+    for row in range(rows - 1, -1, -1):
         for col in range(cols):
             if input_grid.values[row][col] != 0:
                 non_black_cells.append(input_grid.values[row][col])
@@ -23,10 +23,13 @@ def solve_90347967(input_grid: ColoredGrid) -> ColoredGrid:
     new_grid = [[0 for _ in range(cols)] for _ in range(rows)]
 
     # Place non-black cells in the top-right corner
-    for i, value in enumerate(non_black_cells):
-        new_row = i % rows
-        new_col = cols - 1 - (i // rows)
-        if new_col >= 0 and new_row < rows:
-            new_grid[new_row][new_col] = value
+    current_row, current_col = 0, cols - 1
+    for value in non_black_cells:
+        if current_row < rows and current_col >= 0:
+            new_grid[current_row][current_col] = value
+            current_row += 1
+            if current_row == rows:
+                current_row = 0
+                current_col -= 1
 
     return ColoredGrid(values=new_grid)
