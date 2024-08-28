@@ -1,23 +1,34 @@
 from rob_agi.colored_grid import ColoredGrid
 
-def find_smallest_repeating_pattern(sequence):
-    for i in range(1, len(sequence) // 2 + 1):
-        if len(sequence) % i == 0:
-            if sequence[:i] * (len(sequence) // i) == sequence:
-                return sequence[:i]
-    return sequence
+def find_pattern(grid: ColoredGrid) -> tuple[list[list[int]], int, int]:
+    rows, cols = grid.get_dimensions()
+    for pattern_height in range(1, rows + 1):
+        for pattern_width in range(1, cols + 1):
+            pattern = [row[:pattern_width] for row in grid.values[:pattern_height]]
+            if all(grid.values[r][c] == pattern[r % pattern_height][c % pattern_width]
+                   for r in range(rows) for c in range(cols)):
+                return pattern, pattern_height, pattern_width
+    return grid.values, rows, cols  # If no pattern found, return the entire grid
+
+def detect_phase_shift(grid: ColoredGrid, pattern: list[list[int]]) -> tuple[int, int]:
+    for r in range(len(pattern)):
+        for c in range(len(pattern[0])):
+            if grid.values[0][0] == pattern[r][c]:
+                return r, c
+    return 0, 0  # No phase shift if not found
 
 def solve_50a16a69(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by identifying the core repeating pattern and extending it to cover the entire grid.
     
     The function performs the following steps:
-    1. Extracts the pattern from the top-left quarter of the input grid.
-    2. Finds the smallest repeating subsequence in both horizontal and vertical directions.
-    3. Generates a new grid by extending the identified patterns across the entire area, starting from the top-left corner.
+    1. Identifies the smallest repeating pattern in the input grid.
+    2. Detects any phase shift in the pattern relative to the top-left corner.
+    3. Generates a new grid by extending the identified pattern across the entire area, accounting for the phase shift.
     
-    This approach works for various patterns, including checkerboard patterns, handling different grid sizes and border colors,
-    and extending the pattern to areas that were originally borders or uniform regions.
+    This approach works for various patterns, including checkerboard patterns, handling different grid sizes,
+    border colors, and extending the pattern to areas that were originally borders or uniform regions.
+    It also correctly handles cases where the pattern might start at an offset from the top-left corner.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -26,26 +37,16 @@ def solve_50a16a69(input_grid: ColoredGrid) -> ColoredGrid:
     ColoredGrid: The transformed grid with the extended pattern.
     """
     rows, cols = input_grid.get_dimensions()
+    pattern, pattern_height, pattern_width = find_pattern(input_grid)
+    shift_r, shift_c = detect_phase_shift(input_grid, pattern)
     
-    # Extract the pattern from the top-left quarter
-    pattern_rows = rows // 2
-    pattern_cols = cols // 2
-    
-    # Find the horizontal pattern
-    horizontal_pattern = find_smallest_repeating_pattern(input_grid.values[0][:pattern_cols])
-    
-    # Find the vertical pattern
-    vertical_pattern = find_smallest_repeating_pattern([input_grid.values[r][0] for r in range(pattern_rows)])
-    
-    # Generate the output grid
     output_values = []
     for r in range(rows):
         row = []
         for c in range(cols):
-            color = horizontal_pattern[c % len(horizontal_pattern)]
-            if r % 2 == 1:  # Alternate the pattern for odd rows
-                color = horizontal_pattern[(c + 1) % len(horizontal_pattern)]
-            row.append(color)
+            pattern_r = (r + shift_r) % pattern_height
+            pattern_c = (c + shift_c) % pattern_width
+            row.append(pattern[pattern_r][pattern_c])
         output_values.append(row)
     
     return ColoredGrid(values=output_values)
