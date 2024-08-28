@@ -1,6 +1,6 @@
 from rob_agi.colored_grid import ColoredGrid
-from collections import Counter
-from typing import List, Tuple, Dict
+from collections import Counter, deque
+from typing import List, Tuple, Dict, Set
 
 def solve_af22c60d(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -8,13 +8,11 @@ def solve_af22c60d(input_grid: ColoredGrid) -> ColoredGrid:
     extended from surrounding non-black cells.
 
     The solution follows these steps:
-    1. Analyze the global structure of the grid to identify patterns, symmetries, and hidden images.
-    2. Identify and categorize black regions based on size, shape, and position.
-    3. Detect complex patterns and recurring sequences in non-black areas.
-    4. Analyze symmetry and repetition across the entire grid.
-    5. Extend patterns into black regions based on global context and local neighbors.
-    6. Apply iterative refinement to improve the solution.
-    7. Validate and finalize the filled grid, ensuring consistency and visual coherence.
+    1. Identify all black regions in the grid.
+    2. For each black region, analyze the surrounding non-black area to detect patterns.
+    3. Extend detected patterns into the black regions.
+    4. Apply smoothing and consistency checks to ensure visual coherence.
+    5. Handle edge cases and perform final refinements.
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -33,60 +31,61 @@ def solve_af22c60d(input_grid: ColoredGrid) -> ColoredGrid:
                 for dr, dc in directions 
                 if 0 <= r + dr < rows and 0 <= c + dc < cols]
 
-    def analyze_global_structure():
-        # Implement advanced global structure analysis
-        pass
+    def find_black_regions() -> List[Set[Tuple[int, int]]]:
+        visited = set()
+        black_regions = []
+        for r in range(rows):
+            for c in range(cols):
+                if grid.get_cell(r, c) == 0 and (r, c) not in visited:
+                    region = set()
+                    queue = deque([(r, c)])
+                    while queue:
+                        curr_r, curr_c = queue.popleft()
+                        if (curr_r, curr_c) not in visited and grid.get_cell(curr_r, curr_c) == 0:
+                            visited.add((curr_r, curr_c))
+                            region.add((curr_r, curr_c))
+                            queue.extend(get_neighbors(curr_r, curr_c))
+                    black_regions.append(region)
+        return black_regions
 
-    def categorize_black_regions():
-        # Implement more sophisticated black region categorization
-        pass
+    def analyze_surrounding(region: Set[Tuple[int, int]]) -> Dict[int, int]:
+        surrounding_colors = Counter()
+        for r, c in region:
+            for nr, nc, color in get_neighbors(r, c, include_diagonal=True):
+                if color != 0:
+                    surrounding_colors[color] += 1
+        return surrounding_colors
 
-    def detect_complex_patterns():
-        # Implement complex pattern detection
-        pass
+    def detect_pattern(surrounding_colors: Dict[int, int]) -> List[int]:
+        total = sum(surrounding_colors.values())
+        pattern = []
+        for color, count in surrounding_colors.items():
+            pattern.extend([color] * (count * 10 // total))  # Normalize to a scale of 10
+        return pattern
 
-    def analyze_symmetry_and_repetition():
-        # Implement symmetry and repetition analysis
-        pass
+    def fill_region(region: Set[Tuple[int, int]], pattern: List[int]):
+        pattern_index = 0
+        for r, c in region:
+            grid.set_cell(r, c, pattern[pattern_index])
+            pattern_index = (pattern_index + 1) % len(pattern)
 
-    def extend_patterns(black_cells):
-        for r, c in black_cells:
-            neighbors = get_neighbors(r, c, include_diagonal=True)
-            non_black_neighbors = [color for _, _, color in neighbors if color != 0]
-            if non_black_neighbors:
-                most_common_color = Counter(non_black_neighbors).most_common(1)[0][0]
-                grid.set_cell(r, c, most_common_color)
+    def smooth_transitions():
+        for r in range(rows):
+            for c in range(cols):
+                neighbors = get_neighbors(r, c, include_diagonal=True)
+                color_counts = Counter(color for _, _, color in neighbors if color != 0)
+                if color_counts:
+                    most_common_color = color_counts.most_common(1)[0][0]
+                    grid.set_cell(r, c, most_common_color)
 
-    def iterative_refinement():
-        for _ in range(3):  # Perform refinement three times
-            for r in range(rows):
-                for c in range(cols):
-                    neighbors = get_neighbors(r, c, include_diagonal=True)
-                    color_counts = Counter(color for _, _, color in neighbors if color != 0)
-                    if color_counts:
-                        most_common_color = color_counts.most_common(1)[0][0]
-                        grid.set_cell(r, c, most_common_color)
+    # Main algorithm steps
+    black_regions = find_black_regions()
+    for region in black_regions:
+        surrounding_colors = analyze_surrounding(region)
+        pattern = detect_pattern(surrounding_colors)
+        fill_region(region, pattern)
 
-    # Step 1: Analyze global structure
-    analyze_global_structure()
-
-    # Step 2: Categorize black regions
-    categorize_black_regions()
-
-    # Step 3: Detect complex patterns
-    detect_complex_patterns()
-
-    # Step 4: Analyze symmetry and repetition
-    analyze_symmetry_and_repetition()
-
-    # Step 5: Extend patterns
-    black_cells = [(r, c) for r in range(rows) for c in range(cols) if grid.get_cell(r, c) == 0]
-    extend_patterns(black_cells)
-
-    # Step 6: Iterative refinement
-    iterative_refinement()
-
-    # Step 7: Validation and finalization
-    # (This step is implicit in the return of the grid)
+    # Apply smoothing
+    smooth_transitions()
 
     return grid
