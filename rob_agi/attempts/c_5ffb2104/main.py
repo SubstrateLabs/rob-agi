@@ -7,7 +7,7 @@ def solve_5ffb2104(input_grid: ColoredGrid) -> ColoredGrid:
     The transformation maintains the following properties:
     1. Non-zero elements are moved as far right as possible.
     2. The vertical order of elements within each column is preserved.
-    3. The relative horizontal order of elements in each row is maintained.
+    3. The relative horizontal order of elements across columns is maintained.
     4. Elements are compacted together without leaving empty spaces between them.
     
     Args:
@@ -18,19 +18,18 @@ def solve_5ffb2104(input_grid: ColoredGrid) -> ColoredGrid:
     """
     rows, cols = input_grid.get_dimensions()
     new_grid = [[0 for _ in range(cols)] for _ in range(rows)]
+    right_col = cols - 1
 
-    # Step 2: Process columns from left to right
     for col in range(cols):
-        new_row = rows - 1  # Start from the bottom of the new column
-        for row in range(rows - 1, -1, -1):  # Iterate from bottom to top
+        non_zero_elements = []
+        for row in range(rows):
             if input_grid.values[row][col] != 0:
-                new_grid[new_row][col] = input_grid.values[row][col]
-                new_row -= 1
+                non_zero_elements.append((input_grid.values[row][col], row))
+        
+        if non_zero_elements:
+            non_zero_elements.sort(key=lambda x: x[1])  # Sort by original row
+            for value, original_row in non_zero_elements:
+                new_grid[original_row][right_col] = value
+            right_col -= 1
 
-    # Step 3: Compact rows to the right
-    for row in range(rows):
-        non_zero = [val for val in new_grid[row] if val != 0]
-        new_grid[row] = [0] * (cols - len(non_zero)) + non_zero
-
-    # Step 4: Create and return the final ColoredGrid
     return ColoredGrid(values=new_grid)
