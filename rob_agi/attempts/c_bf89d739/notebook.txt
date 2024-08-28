@@ -1,1 +1,28 @@
-Challenge bf89d739:
+Challenge bf89d739: Connect red dots with green lines
+
+Key observations:
+1. The input is a grid with red dots (value 2) scattered across it.
+2. The output should connect all red dots with green lines (value 3) in a tree-like structure.
+3. The structure should have a vertical "spine" and horizontal connections to off-spine dots.
+
+Current implementation issues:
+1. The spine is not being placed in the correct column.
+2. The algorithm is creating a spine in the second leftmost column containing a red dot, which is incorrect for some test cases.
+
+Correct approach (based on example outputs):
+1. The spine should be placed in the column that contains the leftmost red dot after the first column with a red dot.
+2. All red dots should be connected to this spine, either directly or indirectly.
+3. Horizontal connections should be made from off-spine dots to the spine.
+
+Things that don't work:
+1. Using the second leftmost column containing a red dot as the spine.
+2. Creating the spine based on the mean or median of red dot columns.
+
+Next steps:
+1. Modify the find_spine_column function to correctly identify the spine column.
+2. Ensure that the vertical spine is created from the topmost to the bottommost red dot.
+3. Adjust the connect_dots_to_spine function to create proper horizontal connections.
+
+Unknowns:
+1. Whether there are edge cases not covered by the current test suite.
+2. If there are any specific rules for handling red dots that are already in the spine column.
