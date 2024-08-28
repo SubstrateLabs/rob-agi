@@ -4,18 +4,17 @@ from collections import Counter
 
 def solve_b4a43f3b(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid into an 18x18 output grid based on the following steps:
-    1. Analyzes the input grid structure, including top pattern, full-width lines, and bottom shape.
-    2. Creates a template based on the top 6x6 section.
-    3. Determines the appropriate scaling and arrangement based on the input pattern.
-    4. Constructs the output grid by repeating and scaling the template.
-    5. Incorporates full-width lines and bottom shapes into the output.
-    6. Adjusts the final pattern for balance and visual coherence.
+    Transforms the input 13x6 grid into an 18x18 output grid based on the following steps:
+    1. Analyzes the input grid structure: upper 6x6 section, full-width lines, and bottom shape.
+    2. Creates a 3x3 template from the upper 6x6 section.
+    3. Determines scaling factor and arrangement based on the template.
+    4. Constructs the main pattern by scaling and arranging the template.
+    5. Processes full-width lines and incorporates them into the pattern.
+    6. Scales and positions the bottom shape.
+    7. Centers the entire pattern in the 18x18 grid.
 
-    The function adapts to various input patterns, prioritizing visual coherence
-    and balance in the output while maintaining the essence of the input pattern.
-    It handles different scaling factors and arrangements based on the complexity
-    of the input pattern, ensuring a consistent output across various inputs.
+    The function adapts to various input patterns, ensuring consistent and visually coherent output
+    across different inputs while maintaining the essence of the original pattern.
     """
     upper_part = input_grid.values[:6]
     full_row_colors = identify_full_row_colors(input_grid.values[6:8])
@@ -23,12 +22,12 @@ def solve_b4a43f3b(input_grid: ColoredGrid) -> ColoredGrid:
 
     template = create_template(upper_part)
     scaling_factor = determine_scaling_factor(template)
-    arrangement = determine_arrangement(template, scaling_factor)
+    arrangement = determine_arrangement(template)
     output_grid = create_base_output_grid(template, arrangement, scaling_factor)
     
-    apply_full_row_colors(output_grid, full_row_colors)
-    process_bottom_shape(output_grid, lower_part, scaling_factor)
-    center_pattern(output_grid)
+    output_grid = apply_full_row_colors(output_grid, full_row_colors)
+    output_grid = process_bottom_shape(output_grid, lower_part, scaling_factor)
+    output_grid = center_pattern(output_grid)
 
     return ColoredGrid(values=output_grid)
 
@@ -54,12 +53,12 @@ def determine_scaling_factor(template: List[List[int]]) -> int:
     else:
         return 1
 
-def determine_arrangement(template: List[List[int]], scaling_factor: int) -> List[Tuple[int, int]]:
+def determine_arrangement(template: List[List[int]]) -> List[Tuple[int, int]]:
     non_zero_cells = [(r, c) for r in range(3) for c in range(3) if template[r][c] != 0]
     if len(non_zero_cells) <= 3:
         return [(0, 0), (0, 2), (2, 0), (2, 2)]
     elif len(non_zero_cells) <= 5:
-        return [(0, 0), (0, 2), (1, 1), (2, 0), (2, 2)]
+        return [(0, 1), (1, 0), (1, 1), (1, 2), (2, 1)]
     else:
         return [(r, c) for r in range(3) for c in range(3)]
 
@@ -78,22 +77,24 @@ def create_base_output_grid(template: List[List[int]], arrangement: List[Tuple[i
                                 output_grid[r][c] = value
     return output_grid
 
-def apply_full_row_colors(output_grid: List[List[int]], colors: List[int]) -> None:
+def apply_full_row_colors(output_grid: List[List[int]], colors: List[int]) -> List[List[int]]:
     non_zero_rows = [i for i, row in enumerate(output_grid) if any(cell != 0 for cell in row)]
     if non_zero_rows:
         start_row = max(non_zero_rows) + 1
     else:
-        start_row = 0
+        start_row = 9  # Middle of the grid if no pattern
+    
     for idx, color in enumerate(colors):
         if color != 0:
-            row = (start_row + idx) % 18
-            for c in range(18):
-                output_grid[row][c] = color
+            row = min(start_row + idx, 17)  # Ensure we don't go out of bounds
+            output_grid[row] = [color] * 18
+    
+    return output_grid
 
-def process_bottom_shape(output_grid: List[List[int]], lower_part: List[List[int]], scaling_factor: int) -> None:
+def process_bottom_shape(output_grid: List[List[int]], lower_part: List[List[int]], scaling_factor: int) -> List[List[int]]:
     shape = [(r, c) for r, row in enumerate(lower_part) for c, val in enumerate(row) if val != 0]
     if not shape:
-        return
+        return output_grid
     
     shape_height = max(r for r, _ in shape) - min(r for r, _ in shape) + 1
     shape_width = max(c for _, c in shape) - min(c for _, c in shape) + 1
@@ -109,13 +110,15 @@ def process_bottom_shape(output_grid: List[List[int]], lower_part: List[List[int
                 output_col = start_col + c * scaling_factor + sc
                 if 0 <= output_row < 18 and 0 <= output_col < 18:
                     output_grid[output_row][output_col] = color
+    
+    return output_grid
 
-def center_pattern(output_grid: List[List[int]]) -> None:
+def center_pattern(output_grid: List[List[int]]) -> List[List[int]]:
     rows = [r for r, row in enumerate(output_grid) if any(cell != 0 for cell in row)]
     cols = [c for c in range(18) if any(row[c] != 0 for row in output_grid)]
     
     if not rows or not cols:
-        return
+        return output_grid
     
     min_row, max_row = min(rows), max(rows)
     min_col, max_col = min(cols), max(cols)
@@ -135,4 +138,6 @@ def center_pattern(output_grid: List[List[int]]) -> None:
                     new_c = c + h_shift
                     if 0 <= new_r < 18 and 0 <= new_c < 18:
                         new_grid[new_r][new_c] = output_grid[r][c]
-        output_grid[:] = new_grid
+        return new_grid
+    
+    return output_grid
