@@ -1,1 +1,29 @@
 Challenge 1da012fc:
+
+Problem:
+The challenge involves transforming a 2D grid of colored squares. The transformation seems to follow these rules:
+1. The grid contains a gray (5) area that remains unchanged.
+2. The gray area contains a "color key" - a sequence of colors that defines the transformation order.
+3. Non-gray, non-black regions in the grid are transformed based on this color key.
+4. The transformation appears to be applied to connected regions of the same color.
+5. The order of transformation is based on the top-left coordinate of each region.
+
+What we know:
+- The color key is extracted correctly from the gray area.
+- The regions are identified and sorted correctly based on their top-left coordinates.
+- The transformation is applied cyclically using the color key.
+
+What's not working:
+- The transformation is not being applied correctly to all regions.
+- Some regions are keeping their original color instead of being transformed.
+
+Next steps:
+1. Debug the region identification and color assignment process.
+2. Ensure that all non-gray, non-black regions are being transformed.
+3. Verify that the color key is being applied cyclically and correctly to all regions.
+4. Check if there are any edge cases we're not handling, such as regions touching the gray area.
+
+Things to try:
+- Print out the identified regions and their assigned colors for debugging.
+- Implement a more robust region identification algorithm.
+- Consider using a different approach for applying the color transformation.
