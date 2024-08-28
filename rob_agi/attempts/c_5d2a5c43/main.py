@@ -6,20 +6,23 @@ def solve_5d2a5c43(input_grid: ColoredGrid) -> ColoredGrid:
     Transform the input grid by following these steps:
     1. Extract the left 4 columns from the input grid.
     2. Create a new 6x4 grid filled with sky blue (8).
-    3. Identify candidate positions for black squares based on non-yellow cells in the input.
+    3. Identify candidate positions for black squares based on non-yellow cells and "gaps" in the input.
     4. Place exactly 6 black squares in the output grid:
        - One in each column
        - No more than two in any row
        - At least one in each row
-       - Prioritize left-side placement when possible
-    5. Return the transformed 6x4 output grid.
+       - Prioritize maintaining the essence of the input pattern
+    5. Adjust placements if necessary to meet all constraints.
+    6. Return the transformed 6x4 output grid.
     """
     rows, cols = input_grid.get_dimensions()
     extracted_grid = input_grid.extract_subgrid(0, 0, rows, 4)
     output_grid = ColoredGrid(values=[[8 for _ in range(4)] for _ in range(rows)])
 
     # Create a list of candidate positions for black squares
-    candidates = [(r, c) for r in range(rows) for c in range(4) if extracted_grid.get_cell(r, c) != 4]
+    candidates = [(r, c) for r in range(rows) for c in range(4) 
+                  if extracted_grid.get_cell(r, c) == 0 or 
+                  (extracted_grid.get_cell(r, c) != 4 and extracted_grid.get_cell(r, c) != 0)]
 
     # Sort candidates by column (prioritizing left), then by row
     candidates.sort(key=lambda x: (x[1], x[0]))
@@ -32,6 +35,12 @@ def solve_5d2a5c43(input_grid: ColoredGrid) -> ColoredGrid:
         if col_candidates:
             black_positions.append(col_candidates[0])
             candidates = [pos for pos in candidates if pos != col_candidates[0]]
+        else:
+            # If no candidate in column, choose topmost position that doesn't violate row constraints
+            for row in range(rows):
+                if sum(1 for pos in black_positions if pos[0] == row) < 2:
+                    black_positions.append((row, col))
+                    break
 
     # Ensure at least one black square in each row
     for row in range(rows):
@@ -40,6 +49,12 @@ def solve_5d2a5c43(input_grid: ColoredGrid) -> ColoredGrid:
             if row_candidates:
                 black_positions.append(row_candidates[0])
                 candidates = [pos for pos in candidates if pos != row_candidates[0]]
+            else:
+                # If no candidate in row, choose leftmost position that doesn't violate column constraints
+                for col in range(4):
+                    if sum(1 for pos in black_positions if pos[1] == col) < 1:
+                        black_positions.append((row, col))
+                        break
 
     # Add remaining black squares
     while len(black_positions) < 6:
@@ -50,6 +65,28 @@ def solve_5d2a5c43(input_grid: ColoredGrid) -> ColoredGrid:
                     black_positions.append(row_candidates[0])
                     candidates = [pos for pos in candidates if pos != row_candidates[0]]
                     break
+                else:
+                    # If no candidate, choose leftmost available position
+                    for col in range(4):
+                        if sum(1 for pos in black_positions if pos[1] == col) < 1:
+                            black_positions.append((row, col))
+                            break
+
+    # Verify and adjust if necessary
+    columns_with_black = set(col for _, col in black_positions)
+    if len(columns_with_black) < 4:
+        for col in range(4):
+            if col not in columns_with_black:
+                # Find a row with only one black square and add a black square in this column
+                for row in range(rows):
+                    if sum(1 for pos in black_positions if pos[0] == row) == 1:
+                        black_positions.append((row, col))
+                        # Remove a black square from a row with two if necessary
+                        for r in range(rows):
+                            if sum(1 for pos in black_positions if pos[0] == r) > 2:
+                                black_positions = [pos for pos in black_positions if pos[0] != r or pos[1] == col]
+                                break
+                        break
 
     # Apply black squares to the output grid
     for r, c in black_positions:
