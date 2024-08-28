@@ -7,12 +7,9 @@ def solve_1c0d0a4b(input_grid: ColoredGrid) -> ColoredGrid:
     
     This function applies the following steps:
     1. Identify all sky blue (8) regions in the input grid.
-    2. For each region, find the inner corners and create a minimal spanning structure connecting them.
-    3. Mark the cells along this structure as red (2) in the output grid.
-    4. Set all originally sky blue cells to black (0) in the output grid.
-    
-    The transformation creates a "skeleton" of the original sky blue regions,
-    marking their inner diagonal structure with red.
+    2. For each region, determine its type (single cell, straight line, 2x2 square, L-shape, or complex shape).
+    3. Process each region according to its type, marking appropriate cells as red (2) in the output grid.
+    4. Ensure the resulting red markings form a minimal inner diagonal skeleton of the original sky blue regions.
     
     Args:
     input_grid (ColoredGrid): The input grid containing sky blue regions on a black background.
@@ -33,46 +30,66 @@ def solve_1c0d0a4b(input_grid: ColoredGrid) -> ColoredGrid:
     def find_inner_corners(region: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
         return [cell for cell in region if is_inner_corner(*cell)]
 
-    def manhattan_distance(a: Tuple[int, int], b: Tuple[int, int]) -> int:
-        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+    def process_single_cell(cell: Tuple[int, int]) -> None:
+        output_grid.values[cell[0]][cell[1]] = 2
 
-    def connect_corners(corners: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
-        if len(corners) <= 1:
-            return corners
-        connected = [corners[0]]
-        remaining = corners[1:]
-        while remaining:
-            current = connected[-1]
-            nearest = min(remaining, key=lambda x: manhattan_distance(current, x))
-            connected.append(nearest)
-            remaining.remove(nearest)
-        return connected
+    def process_straight_line(region: List[Tuple[int, int]]) -> None:
+        if len(region) <= 3:
+            mid = len(region) // 2
+            output_grid.values[region[mid][0]][region[mid][1]] = 2
+        else:
+            third = len(region) // 3
+            output_grid.values[region[third][0]][region[third][1]] = 2
+            output_grid.values[region[-third-1][0]][region[-third-1][1]] = 2
 
-    def draw_line(start: Tuple[int, int], end: Tuple[int, int]) -> None:
-        r1, c1 = start
-        r2, c2 = end
-        dr = 1 if r2 > r1 else -1 if r2 < r1 else 0
-        dc = 1 if c2 > c1 else -1 if c2 < c1 else 0
-        r, c = r1, c1
-        while (r, c) != (r2, c2):
-            if input_grid.values[r][c] == 8:
-                output_grid.values[r][c] = 2
-            r += dr
-            c += dc
-        if input_grid.values[r2][c2] == 8:
-            output_grid.values[r2][c2] = 2
+    def process_2x2_square(region: List[Tuple[int, int]]) -> None:
+        bottom_right = max(region, key=lambda x: x[0] + x[1])
+        output_grid.values[bottom_right[0]][bottom_right[1]] = 2
+
+    def process_l_shape(region: List[Tuple[int, int]]) -> None:
+        corners = find_inner_corners(region)
+        if corners:
+            r, c = corners[0]
+            output_grid.values[r][c] = 2
+            for dr, dc in [(0,1), (1,0), (0,-1), (-1,0)]:
+                if 0 <= r+dr < rows and 0 <= c+dc < cols and input_grid.values[r+dr][c+dc] == 8:
+                    third = len([cell for cell in region if cell[0] == r+dr or cell[1] == c+dc]) // 3
+                    cells = [cell for cell in region if cell[0] == r+dr or cell[1] == c+dc]
+                    if cells:
+                        output_grid.values[cells[third][0]][cells[third][1]] = 2
+
+    def process_complex_shape(region: List[Tuple[int, int]]) -> None:
+        corners = find_inner_corners(region)
+        if len(corners) == 2:
+            r1, c1 = corners[0]
+            r2, c2 = corners[1]
+            output_grid.values[r1][c1] = output_grid.values[r2][c2] = 2
+            if abs(r1 - r2) > 1 or abs(c1 - c2) > 1:
+                mid_r, mid_c = (r1 + r2) // 2, (c1 + c2) // 2
+                if input_grid.values[mid_r][mid_c] == 8:
+                    output_grid.values[mid_r][mid_c] = 2
+        elif len(corners) > 2:
+            for i in range(len(corners)):
+                r1, c1 = corners[i]
+                r2, c2 = corners[(i + 1) % len(corners)]
+                output_grid.values[r1][c1] = 2
+                if abs(r1 - r2) > 1 or abs(c1 - c2) > 1:
+                    mid_r, mid_c = (r1 + r2) // 2, (c1 + c2) // 2
+                    if input_grid.values[mid_r][mid_c] == 8:
+                        output_grid.values[mid_r][mid_c] = 2
 
     sky_blue_regions = input_grid.find_connected_regions(8)
     
     for region in sky_blue_regions:
-        corners = find_inner_corners(region)
-        if corners:
-            connected_corners = connect_corners(corners)
-            for i in range(len(connected_corners) - 1):
-                draw_line(connected_corners[i], connected_corners[i+1])
-        elif len(region) > 1:
-            # For regions without corners (e.g., straight lines), mark the middle cell
-            mid = len(region) // 2
-            output_grid.values[region[mid][0]][region[mid][1]] = 2
+        if len(region) == 1:
+            process_single_cell(region[0])
+        elif all(cell[0] == region[0][0] for cell in region) or all(cell[1] == region[0][1] for cell in region):
+            process_straight_line(region)
+        elif len(region) == 4 and len(set(cell[0] for cell in region)) == len(set(cell[1] for cell in region)) == 2:
+            process_2x2_square(region)
+        elif len(find_inner_corners(region)) == 1:
+            process_l_shape(region)
+        else:
+            process_complex_shape(region)
     
     return output_grid
