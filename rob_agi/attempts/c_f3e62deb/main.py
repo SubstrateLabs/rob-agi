@@ -7,8 +7,8 @@ def solve_f3e62deb(input_grid: ColoredGrid) -> ColoredGrid:
     
     The function identifies the 3x3 hollow square in the input grid and moves it
     to the right edge if possible. If the square is already at the right edge,
-    it moves to the closest vertical edge (top or bottom) while maintaining its
-    horizontal position.
+    it moves to the bottom edge while maintaining its horizontal position.
+    If it's already at the bottom edge, it moves to the top edge.
     """
     def find_hollow_square(grid: ColoredGrid) -> Tuple[int, int, int]:
         for r in range(8):
@@ -29,14 +29,10 @@ def solve_f3e62deb(input_grid: ColoredGrid) -> ColoredGrid:
     # Determine new position
     if left < 7:
         new_left, new_top = 7, top  # Move to right edge
+    elif top < 7:
+        new_left, new_top = left, 7  # Move to bottom edge
     else:
-        # Square is already at the right edge, move vertically
-        distance_to_top = top
-        distance_to_bottom = 9 - (top + 2)
-        if distance_to_top <= distance_to_bottom:
-            new_top, new_left = 0, left  # Move to top edge
-        else:
-            new_top, new_left = 7, left  # Move to bottom edge
+        new_left, new_top = left, 0  # Move to top edge
 
     # Create new grid with moved square
     new_grid = ColoredGrid(values=[[0 for _ in range(10)] for _ in range(10)])
