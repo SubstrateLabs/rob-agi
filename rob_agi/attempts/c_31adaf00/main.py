@@ -8,11 +8,14 @@ def solve_31adaf00(input_grid: ColoredGrid) -> ColoredGrid:
     
     The algorithm works as follows:
     1. Analyzes the input grid to count gray squares and calculate the target number of blue squares.
-    2. Creates a heatmap to identify optimal areas for blue square placement.
-    3. Places blue squares in phases, starting with larger blocks (3x3, 2x2) in strategic locations.
-    4. Fills remaining areas with smaller blocks and individual squares.
-    5. Performs balance checks and adjustments to ensure the correct number of blue squares.
-    6. Makes final adjustments for visual balance and symmetry.
+    2. Creates a heatmap based on proximity to gray squares and edges.
+    3. Places blue squares in phases:
+       a. Large-scale placement (3x3 squares) in large black areas.
+       b. Medium-scale placement (2x2 squares) complementing gray patterns.
+       c. Small-scale placement (individual squares) using the heatmap.
+    4. Ensures connectivity between blue regions and overall balance.
+    5. Fine-tunes the placement to match the target blue count exactly.
+    6. Performs final checks for symmetry and aesthetic balance.
     
     Returns a new grid with added blue squares while preserving the original gray squares and maintaining visual balance.
     """
@@ -22,12 +25,11 @@ def solve_31adaf00(input_grid: ColoredGrid) -> ColoredGrid:
     target_blue = (rows * cols - gray_count) // 2
     
     heatmap = create_heatmap(input_grid)
-    potential_regions = get_potential_regions(output_grid, heatmap)
-    blue_count = place_blue_regions(output_grid, potential_regions, target_blue)
+    blue_count = place_large_blue_squares(output_grid, heatmap, target_blue)
+    blue_count = place_medium_blue_squares(output_grid, heatmap, blue_count, target_blue)
+    blue_count = fill_remaining_squares(output_grid, heatmap, blue_count, target_blue)
     
-    if blue_count < target_blue:
-        blue_count = fill_remaining_squares(output_grid, heatmap, blue_count, target_blue)
-    
+    ensure_connectivity(output_grid)
     final_balance_adjustment(output_grid, target_blue)
     
     return output_grid
@@ -40,20 +42,20 @@ def create_heatmap(grid: ColoredGrid) -> List[List[float]]:
     for r in range(rows):
         for c in range(cols):
             if grid.values[r][c] == 5:  # Gray square
-                for dr in [-2, -1, 0, 1, 2]:
-                    for dc in [-2, -1, 0, 1, 2]:
+                for dr in [-3, -2, -1, 0, 1, 2, 3]:
+                    for dc in [-3, -2, -1, 0, 1, 2, 3]:
                         if 0 <= r+dr < rows and 0 <= c+dc < cols:
-                            distance = abs(dr) + abs(dc)
-                            heatmap[r+dr][c+dc] += max(0, 3 - distance)
+                            distance = max(abs(dr), abs(dc))
+                            heatmap[r+dr][c+dc] += max(0, 4 - distance)
             
             # Add edge and corner bonuses
-            edge_bonus = 1 if r == 0 or r == rows-1 or c == 0 or c == cols-1 else 0
-            corner_bonus = 1 if (r == 0 or r == rows-1) and (c == 0 or c == cols-1) else 0
+            edge_bonus = 2 if r == 0 or r == rows-1 or c == 0 or c == cols-1 else 0
+            corner_bonus = 2 if (r == 0 or r == rows-1) and (c == 0 or c == cols-1) else 0
             heatmap[r][c] += edge_bonus + corner_bonus
             
             # Consider distance from center
             center_distance = ((r - center_r)**2 + (c - center_c)**2)**0.5
-            heatmap[r][c] += 1 / (1 + center_distance)
+            heatmap[r][c] += 2 / (1 + center_distance)
     
     return heatmap
 
@@ -290,3 +292,68 @@ def place_blue_regions(grid: ColoredGrid, potential_regions: List[Tuple[float, T
         if blue_count >= target_blue * 0.8:  # Stop at 80% to avoid overfilling
             break
     return blue_count
+def place_large_blue_squares(grid: ColoredGrid, heatmap: List[List[float]], target_blue: int) -> int:
+    rows, cols = grid.get_dimensions()
+    blue_count = 0
+    large_areas = find_large_black_areas(grid, 4)
+    
+    for area in large_areas[:2]:  # Place up to two 3x3 squares
+        r, c = area[0], area[1]
+        if is_valid_blue_area(grid, r, c, 3, 3) and blue_count + 9 <= target_blue * 0.6:
+            fill_area(grid, r, c, 3, 3, 1)
+            blue_count += 9
+    
+    return blue_count
+
+def find_large_black_areas(grid: ColoredGrid, min_size: int) -> List[Tuple[int, int]]:
+    rows, cols = grid.get_dimensions()
+    large_areas = []
+    for r in range(rows - min_size + 1):
+        for c in range(cols - min_size + 1):
+            if all(grid.values[r+dr][c+dc] == 0 for dr in range(min_size) for dc in range(min_size)):
+                large_areas.append((r, c))
+    return large_areas
+
+def place_medium_blue_squares(grid: ColoredGrid, heatmap: List[List[float]], blue_count: int, target_blue: int) -> int:
+    rows, cols = grid.get_dimensions()
+    potential_areas = [(r, c) for r in range(rows-1) for c in range(cols-1) 
+                       if is_valid_blue_area(grid, r, c, 2, 2)]
+    potential_areas.sort(key=lambda pos: sum(heatmap[pos[0]+dr][pos[1]+dc] for dr in range(2) for dc in range(2)), reverse=True)
+    
+    for r, c in potential_areas:
+        if blue_count + 4 <= target_blue * 0.9:
+            fill_area(grid, r, c, 2, 2, 1)
+            blue_count += 4
+        else:
+            break
+    
+    return blue_count
+
+def ensure_connectivity(grid: ColoredGrid) -> None:
+    blue_regions = grid.find_connected_regions(1)
+    if len(blue_regions) > 1:
+        main_region = max(blue_regions, key=len)
+        for region in blue_regions:
+            if region != main_region:
+                connect_regions(grid, main_region, region)
+
+def connect_regions(grid: ColoredGrid, region1: List[Tuple[int, int]], region2: List[Tuple[int, int]]) -> None:
+    start = region1[0]
+    end = min(region2, key=lambda pos: ((pos[0]-start[0])**2 + (pos[1]-start[1])**2)**0.5)
+    path = find_path(grid, start, end)
+    for r, c in path:
+        grid.values[r][c] = 1
+
+def find_path(grid: ColoredGrid, start: Tuple[int, int], end: Tuple[int, int]) -> List[Tuple[int, int]]:
+    queue = deque([(start, [start])])
+    visited = set([start])
+    while queue:
+        (r, c), path = queue.popleft()
+        if (r, c) == end:
+            return path
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < grid.num_rows and 0 <= nc < grid.num_cols and (nr, nc) not in visited:
+                visited.add((nr, nc))
+                queue.append(((nr, nc), path + [(nr, nc)]))
+    return []
