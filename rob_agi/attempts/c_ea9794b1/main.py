@@ -9,12 +9,11 @@ def solve_ea9794b1(input_grid: ColoredGrid) -> ColoredGrid:
     
     The transformation process involves:
     1. Analyzing global and quadrant-specific color distributions in the input grid.
-    2. Identifying dominant colors and their positions.
-    3. Generating an initial output grid based on local and global color information.
-    4. Applying spatial relationship rules to maintain patterns.
+    2. Creating an initial 5x5 output grid based on 2x2 subgrids of the input.
+    3. Applying a smoothing pass to ensure color consistency.
+    4. Balancing color distribution based on input grid frequencies.
     5. Handling black (0) cells appropriately.
-    6. Balancing color distribution and adding controlled randomness.
-    7. Performing a final coherence check and adjustment.
+    6. Performing a final consistency check on 2x2 regions of the output.
     
     Args:
     input_grid (ColoredGrid): A 10x10 input grid
@@ -25,13 +24,13 @@ def solve_ea9794b1(input_grid: ColoredGrid) -> ColoredGrid:
     if input_grid.get_dimensions() != (10, 10):
         raise ValueError("Input grid must be 10x10")
 
-    def analyze_colors(grid: ColoredGrid, start_row: int, start_col: int, size: int) -> Counter:
-        return Counter(grid.values[r][c] for r in range(start_row, start_row + size) 
+    def analyze_colors(grid: List[List[int]], start_row: int, start_col: int, size: int) -> Counter:
+        return Counter(grid[r][c] for r in range(start_row, start_row + size) 
                        for c in range(start_col, start_col + size))
 
-    global_colors = analyze_colors(input_grid, 0, 0, 10)
+    global_colors = analyze_colors(input_grid.values, 0, 0, 10)
     quadrant_colors = [
-        analyze_colors(input_grid, r, c, 5)
+        analyze_colors(input_grid.values, r, c, 5)
         for r in [0, 5] for c in [0, 5]
     ]
 
@@ -39,12 +38,10 @@ def solve_ea9794b1(input_grid: ColoredGrid) -> ColoredGrid:
         return max((c for c in colors.items() if c[0] not in exclude), key=lambda x: x[1])[0]
 
     def process_region(region: List[List[int]], quad_index: int) -> int:
-        local_colors = Counter(cell for row in region for cell in row)
-        if local_colors[0] >= 3:  # If majority is black, keep it black
-            return 0
-        quad_dominant = get_dominant_color(quadrant_colors[quad_index], exclude={0})
-        local_dominant = get_dominant_color(local_colors, exclude={0})
-        return local_dominant if local_colors[local_dominant] >= 2 else quad_dominant
+        local_colors = Counter(cell for row in region for cell in row if cell != 0)
+        if not local_colors:
+            return get_dominant_color(quadrant_colors[quad_index], exclude={0})
+        return get_dominant_color(local_colors)
 
     output_values = []
     for i in range(5):
@@ -56,41 +53,52 @@ def solve_ea9794b1(input_grid: ColoredGrid) -> ColoredGrid:
             row.append(color)
         output_values.append(row)
 
-    def adjust_output(output_values: List[List[int]]) -> List[List[int]]:
+    def smooth_output(values: List[List[int]]) -> List[List[int]]:
+        new_values = [row[:] for row in values]
         for i in range(5):
             for j in range(5):
-                neighbors = [(i-1, j), (i+1, j), (i, j-1), (i, j+1)]
+                neighbors = [(i-1, j), (i+1, j), (i, j-1), (i, j+1), (i-1, j-1), (i-1, j+1), (i+1, j-1), (i+1, j+1)]
                 valid_neighbors = [(r, c) for r, c in neighbors if 0 <= r < 5 and 0 <= c < 5]
-                neighbor_colors = [output_values[r][c] for r, c in valid_neighbors]
-                
-                if output_values[i][j] == 0 and any(neighbor_colors):
-                    output_values[i][j] = max(set(neighbor_colors) - {0}, key=neighbor_colors.count)
-                
-                elif random.random() < 0.2:  # Introduce controlled randomness
-                    quad_index = (i // 3) * 2 + (j // 3)
-                    possible_colors = [c for c, count in quadrant_colors[quad_index].items() if count > 1 and c != 0]
-                    if possible_colors:
-                        output_values[i][j] = random.choice(possible_colors)
+                neighbor_colors = Counter(values[r][c] for r, c in valid_neighbors)
+                if values[i][j] not in neighbor_colors:
+                    new_values[i][j] = get_dominant_color(neighbor_colors, exclude={0})
+        return new_values
 
-        return output_values
+    output_values = smooth_output(output_values)
 
-    output_values = adjust_output(output_values)
-
-    # Balance check and adjustment
-    output_colors = Counter(color for row in output_values for color in row)
-    for color, count in global_colors.most_common(3):
-        if color != 0 and output_colors[color] < count // 4:
-            for _ in range(2):
+    def balance_colors(values: List[List[int]]) -> List[List[int]]:
+        output_colors = Counter(color for row in values for color in row)
+        for color, count in global_colors.most_common():
+            target = round(count * 25 / 100)
+            while output_colors[color] < target:
                 i, j = random.randint(0, 4), random.randint(0, 4)
-                output_values[i][j] = color
+                if values[i][j] != color and output_colors[values[i][j]] > target:
+                    output_colors[values[i][j]] -= 1
+                    values[i][j] = color
+                    output_colors[color] += 1
+        return values
 
-    # Final coherence check
-    for i in range(5):
-        for j in range(5):
-            neighbors = [(i-1, j), (i+1, j), (i, j-1), (i, j+1)]
-            valid_neighbors = [(r, c) for r, c in neighbors if 0 <= r < 5 and 0 <= c < 5]
-            neighbor_colors = [output_values[r][c] for r, c in valid_neighbors]
-            if output_values[i][j] not in neighbor_colors and len(set(neighbor_colors)) > 1:
-                output_values[i][j] = max(set(neighbor_colors), key=neighbor_colors.count)
+    output_values = balance_colors(output_values)
+
+    black_ratio = global_colors[0] / 100
+    if black_ratio > 0.25 and 0 not in (color for row in output_values for color in row):
+        i, j = random.randint(0, 4), random.randint(0, 4)
+        output_values[i][j] = 0
+    elif black_ratio > 0.5:
+        for _ in range(2):
+            i, j = random.randint(0, 4), random.randint(0, 4)
+            output_values[i][j] = 0
+
+    def ensure_consistency(values: List[List[int]]) -> List[List[int]]:
+        for i in range(4):
+            for j in range(4):
+                region = [values[i+di][j:j+2] for di in range(2)]
+                colors = set(cell for row in region for cell in row)
+                if len(colors) == 4:
+                    least_common = min(colors, key=lambda c: sum(row.count(c) for row in values))
+                    values[i+random.randint(0,1)][j+random.randint(0,1)] = get_dominant_color(Counter(cell for row in region for cell in row))
+        return values
+
+    output_values = ensure_consistency(output_values)
 
     return ColoredGrid(values=output_values)
