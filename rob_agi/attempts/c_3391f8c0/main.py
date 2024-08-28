@@ -15,7 +15,7 @@ def solve_3391f8c0(input_grid: ColoredGrid) -> ColoredGrid:
     - Other colors remain unchanged
     - Black (0) is treated as empty space
 
-    Patterns are identified, transformed, relocated to opposite corners, and adjusted to maintain 
+    Patterns are identified, transformed, relocated to opposite corners or sides, and adjusted to maintain 
     their essential shape and concept while adapting to the new grid configuration.
     """
     height, width = input_grid.get_dimensions()
@@ -28,11 +28,14 @@ def solve_3391f8c0(input_grid: ColoredGrid) -> ColoredGrid:
     output_grid = vertical_flip_and_transform(input_grid, color_map)
 
     # Step 3: Identify and transform patterns
+    patterns = []
     for color in unique_colors:
         if color != 0:
             regions = output_grid.find_connected_regions(color)
-            for region in regions:
-                transform_and_relocate_pattern(output_grid, region)
+            patterns.extend([(color, region) for region in regions])
+
+    # Step 4: Transform and relocate patterns
+    transform_and_relocate_patterns(output_grid, patterns)
 
     return output_grid
 
@@ -55,34 +58,79 @@ def vertical_flip_and_transform(grid: ColoredGrid, color_map: dict) -> ColoredGr
         new_values.append(row)
     return ColoredGrid(values=new_values)
 
-def transform_and_relocate_pattern(grid: ColoredGrid, region: List[Tuple[int, int]]):
-    """Transforms a pattern by adjusting its position and shape while maintaining its concept."""
+def transform_and_relocate_patterns(grid: ColoredGrid, patterns: List[Tuple[int, List[Tuple[int, int]]]]):
+    """Transforms and relocates all patterns in the grid."""
+    grid_center = (grid.num_rows // 2, grid.num_cols // 2)
+    
+    for color, region in patterns:
+        if not region:
+            continue
+        
+        # Calculate pattern center
+        min_row = min(r for r, _ in region)
+        max_row = max(r for r, _ in region)
+        min_col = min(c for _, c in region)
+        max_col = max(c for _, c in region)
+        pattern_center = ((min_row + max_row) // 2, (min_col + max_col) // 2)
+        
+        # Calculate new position (opposite side of the grid center)
+        new_center = (
+            2 * grid_center[0] - pattern_center[0],
+            2 * grid_center[1] - pattern_center[1]
+        )
+        
+        # Clear the original pattern
+        for r, c in region:
+            grid.set_cell(r, c, 0)
+        
+        # Move and adjust the pattern
+        new_region = move_and_adjust_pattern(grid, region, new_center, color)
+        
+        # Fill the new pattern
+        for r, c in new_region:
+            if 0 <= r < grid.num_rows and 0 <= c < grid.num_cols:
+                grid.set_cell(r, c, color)
+
+def move_and_adjust_pattern(grid: ColoredGrid, region: List[Tuple[int, int]], new_center: Tuple[int, int], color: int) -> List[Tuple[int, int]]:
+    """Moves and adjusts a pattern to fit in the new location."""
     min_row = min(r for r, _ in region)
     max_row = max(r for r, _ in region)
     min_col = min(c for _, c in region)
     max_col = max(c for _, c in region)
-
+    
     height = max_row - min_row + 1
     width = max_col - min_col + 1
-
-    # Calculate new position (opposite corner)
-    new_min_row = grid.num_rows - max_row - 1
-    new_min_col = grid.num_cols - max_col - 1
-
-    # Clear the original pattern
+    
+    new_min_row = new_center[0] - height // 2
+    new_min_col = new_center[1] - width // 2
+    
+    new_region = []
     for r, c in region:
-        grid.set_cell(r, c, 0)
+        new_r = new_min_row + (r - min_row)
+        new_c = new_min_col + (c - min_col)
+        if 0 <= new_r < grid.num_rows and 0 <= new_c < grid.num_cols:
+            new_region.append((new_r, new_c))
+    
+    # Adjust pattern if it doesn't fit
+    while not all(0 <= r < grid.num_rows and 0 <= c < grid.num_cols for r, c in new_region):
+        new_region = contract_pattern(new_region)
+    
+    return new_region
 
-    # Attempt to expand or contract the pattern
-    if can_expand(grid, new_min_row, new_min_col, height + 1, width + 1):
-        expanded_region = expand_pattern(grid, region, new_min_row, new_min_col)
-        adjust_pattern_position(grid, expanded_region)
-    elif needs_contraction(grid, new_min_row, new_min_col, height, width):
-        contracted_region = contract_pattern(grid, region, new_min_row, new_min_col)
-        adjust_pattern_position(grid, contracted_region)
-    else:
-        moved_region = move_pattern(grid, region, new_min_row - min_row, new_min_col - min_col)
-        adjust_pattern_position(grid, moved_region)
+def contract_pattern(region: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
+    """Contracts a pattern by removing outer cells."""
+    if not region:
+        return []
+    
+    min_row = min(r for r, _ in region)
+    max_row = max(r for r, _ in region)
+    min_col = min(c for _, c in region)
+    max_col = max(c for _, c in region)
+    
+    return [
+        (r, c) for r, c in region
+        if min_row < r < max_row and min_col < c < max_col
+    ]
 
 def can_expand(grid: ColoredGrid, row: int, col: int, height: int, width: int) -> bool:
     return all(grid.get_cell(r, c) == 0 
