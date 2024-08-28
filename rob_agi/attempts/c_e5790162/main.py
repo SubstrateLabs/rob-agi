@@ -11,7 +11,8 @@ def solve_e5790162(input_grid: ColoredGrid) -> ColoredGrid:
     2. Connects targets using a pathfinding algorithm, prioritizing magenta squares before sky blue.
     3. Creates a single, continuous path without branches.
     4. Extends the path to an edge if it can do so within 3 steps in the last segment's direction.
-    5. Doesn't overwrite existing colored squares.
+    5. If edge extension is not possible, backtracks to find an efficient extension point.
+    6. Doesn't overwrite existing colored squares.
     """
     def find_colored_squares() -> List[Tuple[int, int, int]]:
         return [(r, c, val) for r, row in enumerate(input_grid.values) 
@@ -51,56 +52,56 @@ def solve_e5790162(input_grid: ColoredGrid) -> ColoredGrid:
 
         return []  # No path found
 
-    def connect_targets(colored_squares: List[Tuple[int, int, int]], grid: List[List[int]]) -> None:
+    def connect_targets(colored_squares: List[Tuple[int, int, int]], grid: List[List[int]]) -> List[Tuple[int, int]]:
         start = next((sq for sq in colored_squares if sq[2] == 3), colored_squares[0])
         magenta_targets = [sq[:2] for sq in colored_squares if sq[2] == 6]
         sky_targets = [sq[:2] for sq in colored_squares if sq[2] == 8]
         
         current = start[:2]
+        path = [current]
         for target in magenta_targets + sky_targets:
-            path = a_star(current, [target], grid)
-            for r, c in path[1:-1]:  # Don't overwrite the target
+            segment = a_star(current, [target], grid)
+            path.extend(segment[1:])  # Don't duplicate the start of each segment
+            for r, c in segment[1:-1]:  # Don't overwrite the target
                 if grid[r][c] == 0:
                     grid[r][c] = 3
             current = target
+        return path
 
-    def extend_to_edge(grid: List[List[int]]) -> None:
+    def extend_to_edge(grid: List[List[int]], path: List[Tuple[int, int]]) -> None:
         rows, cols = len(grid), len(grid[0])
-        green_squares = [(r, c) for r in range(rows) for c in range(cols) if grid[r][c] == 3]
         
-        if not green_squares:
-            return
+        def try_extend(start: Tuple[int, int], direction: Tuple[int, int]) -> bool:
+            r, c = start
+            dr, dc = direction
+            for _ in range(3):
+                r, c = r + dr, c + dc
+                if r < 0 or r >= rows or c < 0 or c >= cols:
+                    return True  # Reached the edge
+                if grid[r][c] != 0:
+                    return False  # Hit a non-empty cell
+                grid[r][c] = 3
+            return False
 
-        last_green = green_squares[-1]
-        second_last_green = green_squares[-2] if len(green_squares) > 1 else None
-
-        if second_last_green:
-            dr = last_green[0] - second_last_green[0]
-            dc = last_green[1] - second_last_green[1]
-        else:
-            dr, dc = 0, 1  # Default to horizontal if only one green square
-
-        for i in range(1, 4):
-            r, c = last_green[0] + i*dr, last_green[1] + i*dc
-            if r < 0 or r >= rows or c < 0 or c >= cols:
-                break
-            if grid[r][c] != 0:
+        # Try to extend from the last point
+        last_point = path[-1]
+        second_last_point = path[-2] if len(path) > 1 else None
+        if second_last_point:
+            direction = (last_point[0] - second_last_point[0], last_point[1] - second_last_point[1])
+            if try_extend(last_point, direction):
                 return
-            grid[r][c] = 3
 
-    def get_line(r1: int, c1: int, r2: int, c2: int) -> List[Tuple[int, int]]:
-        line = []
-        if r1 == r2:  # Horizontal line
-            for c in range(min(c1, c2), max(c1, c2) + 1):
-                line.append((r1, c))
-        elif c1 == c2:  # Vertical line
-            for r in range(min(r1, r2), max(r1, r2) + 1):
-                line.append((r, c1))
-        return line
+        # Backtrack and try to extend
+        for i in range(len(path) - 2, -1, -1):
+            current = path[i]
+            next_point = path[i + 1]
+            direction = (next_point[0] - current[0], next_point[1] - current[1])
+            if try_extend(current, direction):
+                return
 
     output_grid = [row[:] for row in input_grid.values]
     colored_squares = find_colored_squares()
-    connect_targets(colored_squares, output_grid)
-    extend_to_edge(output_grid)
+    path = connect_targets(colored_squares, output_grid)
+    extend_to_edge(output_grid, path)
 
     return ColoredGrid(values=output_grid)
