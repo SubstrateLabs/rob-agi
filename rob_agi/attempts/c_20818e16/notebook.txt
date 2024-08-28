@@ -1,1 +1,34 @@
 Challenge 20818e16:
+
+Objective:
+Transform an input grid of colored shapes into a compact output grid, preserving the exact shape and size of each colored region.
+
+What we know:
+1. The background color is the most frequent color in the input grid.
+2. All non-background colored shapes must be preserved in the output.
+3. The output should be as compact as possible.
+4. The arrangement of shapes in the output matters and should match the expected output.
+
+What we've tried:
+1. Extracting shapes, sorting by area (ascending), then by color, then by original position.
+2. Placing shapes in a grid, starting from the smallest possible size and expanding as needed.
+3. Optimizing the final grid by removing empty rows and columns.
+
+What doesn't work:
+- The current implementation produces a grid that is too large (11x9 instead of 6x8).
+- The arrangement of shapes in the output is incorrect.
+
+What needs improvement:
+1. The placement algorithm needs to be more efficient in creating a compact arrangement.
+2. We need to ensure that shapes are placed adjacent to each other without gaps.
+3. The order of shape placement might need adjustment to match the expected output.
+
+Next steps:
+1. Implement a more sophisticated placement algorithm that tries to minimize gaps between shapes.
+2. Experiment with different sorting criteria for shapes before placement.
+3. Consider implementing a way to "slide" shapes closer together after initial placement.
+4. Add a step to verify that all non-background colors from the input are present in the output.
+
+Unknowns:
+- The exact rules for determining the final arrangement of shapes in the output.
+- Whether rotation of shapes is allowed or necessary.
