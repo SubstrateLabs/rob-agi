@@ -7,11 +7,11 @@ def solve_dd2401ed(input_grid: ColoredGrid) -> ColoredGrid:
     
     1. Finds the original gray line position.
     2. Calculates the new gray line position (original position + original position).
-    3. Creates a new grid with the gray line in the new position.
+    3. Creates a new grid with the same dimensions as the input grid.
     4. Processes colored dots:
-       - Blue (1) dots to the left of the original gray line remain in their positions.
-       - Blue (1) dots to the right of the original gray line transform into red (2) dots and remain in their positions.
-       - Red (2) dots are shifted left by the same amount as the gray line moved right.
+       - Blue (1) dots remain in their original positions.
+       - Red (2) dots are shifted left by the same amount as the gray line moved right,
+         wrapping around to the right side if necessary.
     5. Places the gray line in its new position.
     """
     rows, cols = input_grid.get_dimensions()
@@ -19,8 +19,8 @@ def solve_dd2401ed(input_grid: ColoredGrid) -> ColoredGrid:
     # Find the original gray line position
     original_pos = next(i for i, color in enumerate(input_grid.values[0]) if color == 5)
     
-    # Calculate the new gray line position and shift amount
-    new_pos = original_pos + original_pos
+    # Calculate the new gray line position
+    new_pos = min((original_pos * 2) % cols, cols - 1)
     shift = new_pos - original_pos
     
     # Create a new grid
@@ -30,18 +30,13 @@ def solve_dd2401ed(input_grid: ColoredGrid) -> ColoredGrid:
     for row in range(rows):
         for col in range(cols):
             color = input_grid.values[row][col]
-            if col < original_pos:
-                # Copy colors to the left of the original gray line
+            if color == 1:
+                # Blue dots remain in their original positions
                 new_grid.values[row][col] = color
-            elif col > original_pos:
-                if color == 1:
-                    # Transform blue (1) to red (2) and keep position
-                    new_grid.values[row][col] = 2
-                elif color == 2:
-                    # Shift red (2) dots left
-                    new_col = col - shift
-                    if new_col >= 0:
-                        new_grid.values[row][new_col] = color
+            elif color == 2:
+                # Shift red dots left, wrapping around if necessary
+                new_col = (col - shift) % cols
+                new_grid.values[row][new_col] = color
         
         # Place the gray line in its new position
         new_grid.values[row][new_pos] = 5
