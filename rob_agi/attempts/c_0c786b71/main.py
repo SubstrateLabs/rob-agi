@@ -6,7 +6,9 @@ def solve_0c786b71(input_grid: ColoredGrid) -> ColoredGrid:
     
     The transformation follows these steps:
     1. Fill the top-left 3x4 quadrant with the input rows in this order:
-       last row, first row, second row of the input, swapping the first and last elements of each row.
+       - Last row: swap first and last elements, keep middle elements in place
+       - First row: swap first and last elements, swap middle elements
+       - Second row: swap first and last elements, keep middle elements in place
     2. Mirror the top-left quadrant horizontally to fill the top-right quadrant.
     3. Mirror the entire top half vertically to create the bottom half.
     
@@ -16,11 +18,23 @@ def solve_0c786b71(input_grid: ColoredGrid) -> ColoredGrid:
     output = [[0 for _ in range(8)] for _ in range(6)]
     
     # Fill top-left quadrant
-    row_order = [2, 0, 1]  # Order: last, first, second row of input
-    for i, row in enumerate(row_order):
-        output[i][0] = input_grid.values[row][3]
-        output[i][1:3] = input_grid.values[row][1:3]
-        output[i][3] = input_grid.values[row][0]
+    # Last input row (becomes first output row)
+    output[0][0] = input_grid.values[2][3]
+    output[0][1] = input_grid.values[2][1]
+    output[0][2] = input_grid.values[2][2]
+    output[0][3] = input_grid.values[2][0]
+    
+    # First input row (becomes second output row)
+    output[1][0] = input_grid.values[0][3]
+    output[1][1] = input_grid.values[0][2]
+    output[1][2] = input_grid.values[0][1]
+    output[1][3] = input_grid.values[0][0]
+    
+    # Second input row (becomes third output row)
+    output[2][0] = input_grid.values[1][3]
+    output[2][1] = input_grid.values[1][1]
+    output[2][2] = input_grid.values[1][2]
+    output[2][3] = input_grid.values[1][0]
     
     # Mirror top-left quadrant horizontally
     for row in range(3):
