@@ -8,14 +8,15 @@ def solve_692cd3b6(input_grid: ColoredGrid) -> ColoredGrid:
     1. Identify the two 'C' shapes (red color 2 with gray color 5 inside).
     2. Create a minimal bounding rectangle that encompasses both C-shapes.
     3. Fill the connecting rectangle with yellow, preserving the C-shapes.
-    4. Extend yellow to grid edges only if a C-shape touches an edge within the bounding rectangle.
-    5. Clean up any disconnected yellow areas.
-    6. Preserve the original 'C' shapes and all areas outside the connecting rectangle.
-    7. Ensure yellow forms a single connected region.
+    4. Extend yellow to edges if a C-shape touches an edge within the bounding rectangle.
+    5. Fill open parts of C-shapes with yellow.
+    6. Clean up any disconnected yellow areas.
+    7. Preserve the original layout outside the connecting area.
+    8. Ensure yellow forms a single connected region.
     
-    This approach ensures the correct yellow path between the C-shapes
-    and extends to the appropriate grid edges only when necessary, while
-    preserving the original layout outside the connecting area.
+    This approach creates the correct yellow path between the C-shapes,
+    extends to appropriate grid edges when necessary, and preserves
+    the original layout outside the connecting area.
     """
     # Step 1: Identify 'C' shapes
     c_shapes = find_c_shapes(input_grid)
@@ -28,13 +29,16 @@ def solve_692cd3b6(input_grid: ColoredGrid) -> ColoredGrid:
     fill_yellow(new_grid, *connecting_rectangle)
     
     # Step 4: Extend to edges if necessary
-    extend_to_edges(new_grid, c_shapes[0], c_shapes[1])
+    extend_to_edges(new_grid, c_shapes[0], c_shapes[1], connecting_rectangle)
     
-    # Step 5 & 7: Clean up disconnected yellow areas and ensure single connected region
+    # Step 5: Fill open parts of C-shapes
+    fill_open_parts(new_grid, c_shapes)
+    
+    # Step 6 & 8: Clean up disconnected yellow areas and ensure single connected region
     clean_up_yellow(new_grid, connecting_rectangle)
     
-    # Step 6: Preserve original 'C' shapes
-    preserve_c_shapes(new_grid, c_shapes)
+    # Step 7: Preserve original layout outside connecting area
+    preserve_original_layout(new_grid, input_grid, connecting_rectangle)
     
     return new_grid
 
@@ -157,3 +161,20 @@ def preserve_original_layout(new_grid: ColoredGrid, input_grid: ColoredGrid, con
         for c in range(cols):
             if not (top <= r <= bottom and left <= c <= right):
                 new_grid.values[r][c] = input_grid.values[r][c]
+def fill_open_parts(grid: ColoredGrid, c_shapes: List[List[Tuple[int, int]]]):
+    for shape in c_shapes:
+        # Find the open part of the C-shape
+        open_cell = find_open_part(grid, shape)
+        if open_cell:
+            r, c = open_cell
+            grid.values[r][c] = 4  # Fill with yellow
+
+def find_open_part(grid: ColoredGrid, shape: List[Tuple[int, int]]) -> Optional[Tuple[int, int]]:
+    rows, cols = grid.get_dimensions()
+    for r, c in shape:
+        if grid.values[r][c] == 2:  # Red cell
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < rows and 0 <= nc < cols and (nr, nc) not in shape and grid.values[nr][nc] == 0:
+                    return nr, nc
+    return None
