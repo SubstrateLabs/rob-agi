@@ -2,12 +2,12 @@ Challenge 776ffc46: Transform blue plus shapes in a grid
 
 Key observations:
 1. Only blue plus shapes (5 pixels in a + configuration) are transformed.
-2. The target color for transformation is determined by the color enclosed in a gray border.
+2. The target color for transformation is determined by the color enclosed in or adjacent to a gray border.
 3. Gray (5) acts as a border and is not part of any region to be transformed.
 4. All transformations are applied simultaneously.
 
 Rules:
-1. Find the target color by looking for a color (red or green) enclosed by a gray border.
+1. Find the target color by looking for a color (red or green) enclosed by or adjacent to a gray border.
 2. Identify all blue plus shapes in the grid.
 3. Transform these blue plus shapes to the target color.
 4. Other blue shapes and colors remain unchanged.
@@ -17,19 +17,21 @@ Things that don't work:
 - Using the prevalence of red or green to determine the target color.
 - Transforming shapes based on their size (2-4 pixels).
 - Assuming the target color is always red (2).
-
-Unknowns:
-- How to handle cases where multiple colors are enclosed by gray borders.
-- Whether the gray border must be complete or can have gaps.
+- Only checking for colors enclosed within gray borders.
 
 Lessons learned:
 1. The target color can be either red (2) or green (3), not just red.
-2. The current implementation is not correctly identifying the target color in all cases.
-3. The transformation of blue plus shapes is not working correctly in some scenarios.
+2. The target color may be adjacent to a gray border, not necessarily enclosed by it.
+3. The current implementation is not correctly identifying the target color in all cases.
+4. The transformation of blue plus shapes is working correctly, but the target color identification is the main issue.
 
 Next steps:
-1. Revise the function to find the target color, ensuring it can identify both red and green.
-2. Double-check the implementation of blue plus shape identification.
-3. Verify that the transformation is applied correctly to all identified blue plus shapes.
-4. Implement a more robust method to handle different gray border configurations.
-5. Add more test cases to cover edge cases and different scenarios.
+1. Revise the function to find the target color, ensuring it checks for colors both enclosed by and adjacent to gray borders.
+2. Implement a more robust method to handle different gray border configurations, including incomplete or open borders.
+3. Add a check to ensure that only valid blue plus shapes are transformed, not other blue configurations.
+4. Verify that the transformation is applied correctly to all identified blue plus shapes after fixing the target color identification.
+5. Add more test cases to cover edge cases, especially for different gray border configurations and target color placements.
+
+Unknowns:
+- How to prioritize if multiple potential target colors are found (e.g., both red and green adjacent to gray).
+- Whether the order of scanning the grid for the target color matters.
