@@ -1,1 +1,32 @@
 Challenge aa300dc3:
+
+Pattern Observed:
+1. The goal is to create a diagonal path of exactly 8 sky blue (8) squares through the black (0) region of the grid.
+2. The path should start from one of the top corners of the black region and end at the opposite bottom corner.
+3. The path must avoid gray (5) obstacles.
+
+What We Know:
+1. The grid is always 10x10 with a gray border.
+2. The path must be exactly 8 steps long.
+3. The path should prioritize diagonal moves but can use orthogonal moves when necessary.
+
+What We've Tried:
+1. Implemented a depth-first search (DFS) algorithm to find the path.
+2. Used a fixed starting point (top-left or top-right corner) based on the initial black cell.
+
+What Doesn't Work:
+1. Assuming the path always starts from the absolute top-left or top-right corner of the grid.
+
+What Needs Improvement:
+1. The algorithm fails for example 3, where the starting point is not at the absolute corner of the grid.
+2. We need to identify the correct starting point within the black region, not just the grid corners.
+
+Next Steps:
+1. Modify the algorithm to find all potential starting points along the top edge of the black region.
+2. Implement a function to identify the top-left and top-right corners of the black region.
+3. Try finding paths from both potential starting corners and choose the best one.
+4. Allow more flexibility in the path direction, especially for the first few steps.
+
+Unknowns:
+1. Whether the path can start from any black cell along the top edge of the black region.
+2. If there are cases where the path needs to go "backwards" (up or left) at any point.
