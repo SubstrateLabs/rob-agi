@@ -4,16 +4,16 @@ from typing import List, Tuple, Optional
 def solve_9f27f097(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the grid transformation challenge by identifying a source region with diverse colors,
-    finding a target region (usually single-color or empty), and copying the source to the target
-    with a 180-degree rotation.
+    finding a target region, and applying a transformation (usually a 180-degree rotation).
     
     1. Identify the border color
     2. Find the source region (area with the most diverse colors)
-    3. Find the target region (empty or uniform color region)
-    4. Determine the size of the source region
-    5. Apply 180-degree rotation from source to target
-    6. Handle target region expansion if necessary
+    3. Find the target region (preferably black, single-color, or largest non-border region)
+    4. Determine the transformation type (rotation, reflection, or translation)
+    5. Apply the transformation from source to target
+    6. Handle size differences between source and target regions
     7. If no suitable target region is found, create one in the opposite corner
+    8. Ensure the border and grid size remain unchanged
     """
     # Step 1: Identify border color
     border_color = identify_border_color(input_grid)
@@ -40,11 +40,27 @@ def apply_transformation(input_grid: ColoredGrid, source_region: List[Tuple[int,
     source_bounds = get_region_bounds(source_region)
     target_bounds = get_region_bounds(target_region)
     
-    for i, (sy, sx) in enumerate(source_region):
-        ty, tx = transform(sy, sx, source_bounds, target_bounds, "rotate_180")
-        output_grid.values[ty][tx] = input_grid.values[sy][sx]
+    transformation = determine_transformation(source_bounds, target_bounds)
+    
+    for sy, sx in source_region:
+        ty, tx = transform(sy, sx, source_bounds, target_bounds, transformation)
+        if 0 <= ty < input_grid.num_rows and 0 <= tx < input_grid.num_cols:
+            output_grid.values[ty][tx] = input_grid.values[sy][sx]
     
     return output_grid
+
+def determine_transformation(source_bounds: Tuple[int, int, int, int], target_bounds: Tuple[int, int, int, int]) -> str:
+    sy_min, sx_min, sy_max, sx_max = source_bounds
+    ty_min, tx_min, ty_max, tx_max = target_bounds
+    
+    if (sy_min + sy_max) // 2 < (ty_min + ty_max) // 2 and (sx_min + sx_max) // 2 < (tx_min + tx_max) // 2:
+        return "rotate_180"
+    elif sy_min == ty_min and sx_min != tx_min:
+        return "horizontal_flip"
+    elif sy_min != ty_min and sx_min == tx_min:
+        return "vertical_flip"
+    else:
+        return "translate"
 
 def find_most_diverse_region(grid: ColoredGrid, border_color: int) -> List[Tuple[int, int]]:
     regions = grid.find_connected_regions(lambda x: x != border_color)
@@ -99,12 +115,18 @@ def transform(y: int, x: int, source_bounds: Tuple[int, int, int, int], target_b
     if transformation == "rotate_180":
         new_y = sy_max - (y - sy_min)
         new_x = sx_max - (x - sx_min)
-    else:  # no_change
+    elif transformation == "horizontal_flip":
+        new_y = y - sy_min
+        new_x = sx_max - (x - sx_min)
+    elif transformation == "vertical_flip":
+        new_y = sy_max - (y - sy_min)
+        new_x = x - sx_min
+    else:  # translate
         new_y = y - sy_min
         new_x = x - sx_min
     
-    ty = ty_min + (new_y - sy_min)
-    tx = tx_min + (new_x - sx_min)
+    ty = ty_min + new_y
+    tx = tx_min + new_x
     
     return ty, tx
 
