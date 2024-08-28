@@ -1,1 +1,29 @@
 Challenge 12997ef3:
+
+Observations:
+1. The challenge involves transforming a 2D grid of colors into a new grid with specific patterns for each unique color.
+2. Unique colors are those that appear only once in their row and column in the input grid.
+3. The output grid is always 3 cells wide, with a height that's a multiple of 3.
+4. Each unique color is represented by a 3x3 pattern in the output grid.
+
+Pattern for each color:
+[0, color, color]
+[color, color, color]
+[0, color, 0]
+
+What we know:
+- The order of colors in the output is based on their first appearance in the input grid (top-left to bottom-right).
+- The orientation (vertical or horizontal) depends on the arrangement of unique colors in the input.
+
+What we got wrong:
+- Our previous implementation used a 3x2 pattern instead of the correct 3x3 pattern.
+- We didn't fill the entire 3x3 pattern correctly for each color.
+
+Next steps:
+1. Modify the create_output_grid function to use the correct 3x3 pattern for each color.
+2. Ensure that the entire 3x3 pattern is filled for each color, not just a 3x2 portion.
+3. Double-check the scanning process to make sure we're correctly identifying unique colors.
+
+Open questions:
+- Are there any edge cases we haven't considered yet?
+- How do we handle inputs where all unique colors are in a single row or column?
