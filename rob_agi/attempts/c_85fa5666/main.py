@@ -1,6 +1,7 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Set, Dict
 from collections import deque
+import math
 
 def solve_85fa5666(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -11,16 +12,19 @@ def solve_85fa5666(input_grid: ColoredGrid) -> ColoredGrid:
     2. Colors transform when they interact: Green can become Magenta, Orange can become Green,
        Magenta can become Sky Blue.
     3. Red (2) 2x2 blocks remain unchanged and block color flow.
-    4. Colors flow around obstacles and can coexist in adjacent cells.
+    4. Colors flow diagonally around obstacles and can coexist in adjacent cells.
     5. The final grid aims for balance and often symmetry.
+    6. Colors have different strengths and can overpower each other based on their position and interactions.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
     red_blocks = identify_red_blocks(output_grid)
     colored_cells = identify_colored_cells(output_grid, red_blocks)
     
-    for color in [8, 3, 7, 6]:
-        flow_color(output_grid, colored_cells, color, red_blocks)
+    for _ in range(max(rows, cols)):  # Iterate enough times to allow colors to flow across the grid
+        for color in [8, 3, 7, 6]:
+            flow_color(output_grid, colored_cells, color, red_blocks)
+        update_colored_cells(output_grid, colored_cells, red_blocks)
     
     balance_grid(output_grid, red_blocks)
     return output_grid
@@ -59,6 +63,7 @@ def get_target_corner(color: int, dimensions: Tuple[int, int]) -> Tuple[int, int
     }[color]
 
 def flow_from_cell(grid: ColoredGrid, r: int, c: int, color: int, target: Tuple[int, int], red_blocks: Set[Tuple[int, int]]):
+    rows, cols = grid.get_dimensions()
     queue = deque([(r, c)])
     visited = set()
     while queue:
@@ -71,8 +76,9 @@ def flow_from_cell(grid: ColoredGrid, r: int, c: int, color: int, target: Tuple[
             nr, nc = r + dr, c + dc
             if is_valid_cell(nr, nc, grid) and (nr, nc) not in red_blocks:
                 cell_color = grid.get_cell(nr, nc)
-                if cell_color == 0 or should_transform(color, cell_color):
-                    new_color = transform_color(color, cell_color)
+                strength = calculate_strength(color, (r, c), target, (rows, cols))
+                if cell_color == 0 or should_transform(color, cell_color, strength):
+                    new_color = transform_color(color, cell_color, strength)
                     grid.set_cell(nr, nc, new_color)
                     queue.append((nr, nc))
                 elif cell_color == color:
@@ -82,24 +88,46 @@ def is_valid_cell(row: int, col: int, grid: ColoredGrid) -> bool:
     rows, cols = grid.get_dimensions()
     return 0 <= row < rows and 0 <= col < cols
 
-def should_transform(color1: int, color2: int) -> bool:
-    transformations = {(3, 6), (7, 3), (6, 8)}
-    return (color1, color2) in transformations
+def calculate_strength(color: int, position: Tuple[int, int], target: Tuple[int, int], dimensions: Tuple[int, int]) -> float:
+    r, c = position
+    tr, tc = target
+    rows, cols = dimensions
+    distance = math.sqrt((r - tr)**2 + (c - tc)**2)
+    max_distance = math.sqrt(rows**2 + cols**2)
+    base_strength = 1 - (distance / max_distance)
+    color_strength = {8: 1.2, 3: 1.0, 7: 0.8, 6: 1.1}[color]
+    return base_strength * color_strength
 
-def transform_color(color1: int, color2: int) -> int:
-    if (color1, color2) == (3, 6) or color2 == 6:
-        return 6
-    elif (color1, color2) == (7, 3) or color2 == 3:
-        return 3
-    elif (color1, color2) == (6, 8) or color2 == 8:
-        return 8
-    return color1
+def should_transform(color1: int, color2: int, strength: float) -> bool:
+    transformations = {(3, 6): 0.6, (7, 3): 0.7, (6, 8): 0.8}
+    return (color1, color2) in transformations and strength > transformations[(color1, color2)]
+
+def transform_color(color1: int, color2: int, strength: float) -> int:
+    if should_transform(color1, color2, strength):
+        if (color1, color2) == (3, 6):
+            return 6
+        elif (color1, color2) == (7, 3):
+            return 3
+        elif (color1, color2) == (6, 8):
+            return 8
+    return color1 if strength > 0.5 else color2
+
+def update_colored_cells(grid: ColoredGrid, colored_cells: Dict[int, List[Tuple[int, int]]], red_blocks: Set[Tuple[int, int]]):
+    rows, cols = grid.get_dimensions()
+    for color in colored_cells:
+        colored_cells[color] = []
+    for r in range(rows):
+        for c in range(cols):
+            if (r, c) not in red_blocks:
+                color = grid.get_cell(r, c)
+                if color in colored_cells:
+                    colored_cells[color].append((r, c))
 
 def balance_grid(grid: ColoredGrid, red_blocks: Set[Tuple[int, int]]):
     rows, cols = grid.get_dimensions()
     for r in range(rows):
         for c in range(cols):
-            if (r, c) not in red_blocks:
+            if (r, c) not in red_blocks and grid.get_cell(r, c) == 0:
                 balance_cell(grid, r, c, red_blocks)
 
 def balance_cell(grid: ColoredGrid, r: int, c: int, red_blocks: Set[Tuple[int, int]]):
