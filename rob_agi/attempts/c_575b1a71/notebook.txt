@@ -1,1 +1,27 @@
 Challenge 575b1a71:
+
+Key Points:
+1. The challenge involves transforming a 10x10 grid by replacing black (0) squares with colored squares (1-4).
+2. Colors must be assigned to maintain vertical alignment where possible.
+3. Adjacent squares (horizontally and vertically) cannot have the same color.
+4. All colors (1-4) must be present in the output.
+5. The number of squares for each color should be balanced as much as possible.
+
+Current Implementation:
+- We're using a step-by-step approach to assign colors, starting with special cases (isolated, edge, corner squares).
+- Vertical lines are identified and colored to maintain alignment.
+- We then fill remaining squares, ensure all colors are present, balance colors, resolve conflicts, and enhance vertical alignment.
+
+Issues Encountered:
+1. The `get_best_color()` function is missing a required argument `target_count`.
+   This suggests we need to calculate and pass the target count for each color.
+
+Next Steps:
+1. Update the `get_best_color()` function to include the `target_count` parameter.
+2. Modify calls to `get_best_color()` throughout the code to include this parameter.
+3. Calculate the `target_count` at the beginning of the `solve_575b1a71()` function.
+
+Things to Keep in Mind:
+- The balance between maintaining vertical alignment and ensuring color balance.
+- The importance of handling special cases (isolated, edge, corner squares) differently.
+- The need for multiple passes to refine the solution and satisfy all conditions.
