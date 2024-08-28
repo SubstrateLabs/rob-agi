@@ -1,1 +1,35 @@
 Challenge e1d2900e:
+
+Key observations:
+1. The challenge involves transforming a grid with black (0), blue (1), and red (2) squares.
+2. Red squares always appear in 2x2 blocks.
+3. Blue dots are placed in relation to red squares.
+4. Some existing blue dots need to be preserved, while others are removed.
+
+Rules (confirmed):
+1. Blue dots should be placed to the left of the leftmost red square in each row containing red squares.
+2. Blue dots should be placed to the right of the rightmost red square in each row containing red squares.
+3. Blue dots on the edges of the grid should be preserved.
+
+Rules (need confirmation):
+1. Blue dots should be placed between adjacent red squares in the same row if there's exactly one cell between them.
+2. All non-edge blue dots not associated with red squares should be removed.
+
+Current implementation issues:
+1. The algorithm is incorrectly placing blue dots in some cases.
+2. Some blue dots that should be preserved are being removed.
+3. The edge case for blue dots on the grid edges is not handled correctly.
+
+Next steps:
+1. Refine the logic for placing blue dots in relation to red squares.
+2. Implement a more robust method for preserving valid blue dots.
+3. Add specific handling for edge blue dots.
+4. Review and adjust the criteria for removing blue dots.
+
+Things tried that didn't work:
+1. Simply adding blue dots to the left and right of all red squares without considering their position in the row.
+2. Removing all non-edge blue dots that aren't directly adjacent to red squares.
+
+Open questions:
+1. Are there any special rules for blue dots that are not on the edges but are in the same row as red squares?
+2. How should we handle cases where red squares are at the edge of the grid?
