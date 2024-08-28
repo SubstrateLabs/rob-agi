@@ -5,14 +5,14 @@ def solve_e9b4f6fc(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by identifying the largest non-black region,
     expanding it to include adjacent colored cells, extracting it,
-    and transforming its colors based on their frequency.
+    and transforming its colors based on their frequency in the entire input grid.
     
     The transformation includes:
     1. Identifying the largest non-black region and expanding it
     2. Extracting the expanded region
     3. Identifying the border color (most frequent on the edges)
-    4. Ordering interior colors based on their frequency in the extracted region
-    5. Transforming colors: border color remains unchanged, interior colors mapped from 1 to n-1
+    4. Ordering all non-black colors based on their frequency in the entire input grid
+    5. Transforming colors: border color remains unchanged, other colors mapped from 1 to n-1
     6. Preserving the shape and border of the extracted region
     """
     # Step 1: Identify and expand the main colored region
@@ -24,9 +24,9 @@ def solve_e9b4f6fc(input_grid: ColoredGrid) -> ColoredGrid:
     # Step 3: Identify border color
     border_color = identify_border_color(extracted_grid)
     
-    # Step 4: Order interior colors based on frequency
-    interior_colors = get_interior_colors(extracted_grid, border_color)
-    ordered_colors = order_colors_by_frequency(extracted_grid, interior_colors)
+    # Step 4: Order all non-black colors based on frequency in the entire input grid
+    all_colors = get_all_colors(input_grid)
+    ordered_colors = order_colors_by_frequency(input_grid, all_colors - {0, border_color})
     
     # Step 5: Create color transformation mapping
     color_map = create_color_map(ordered_colors, border_color)
@@ -108,8 +108,8 @@ def identify_border_color(grid: ColoredGrid) -> int:
     border_colors = [grid.get_cell(r, c) for r, c in border_cells if grid.get_cell(r, c) != 0]
     return max(set(border_colors), key=border_colors.count)
 
-def get_interior_colors(grid: ColoredGrid, border_color: int) -> Set[int]:
-    return set(cell for row in grid.values for cell in row if cell != border_color and cell != 0)
+def get_all_colors(grid: ColoredGrid) -> Set[int]:
+    return set(cell for row in grid.values for cell in row)
 
 def order_colors_by_frequency(grid: ColoredGrid, colors: Set[int]) -> List[int]:
     color_freq = {color: 0 for color in colors}
@@ -124,7 +124,7 @@ def order_colors_by_frequency(grid: ColoredGrid, colors: Set[int]) -> List[int]:
     return sorted(colors, key=lambda color: (-color_freq[color], color))
 
 def create_color_map(ordered_colors: List[int], border_color: int) -> Dict[int, int]:
-    color_map = {border_color: border_color, 0: 0}  # Keep border color and black unchanged
+    color_map = {0: 0, border_color: border_color}  # Keep black and border color unchanged
     for new_color, old_color in enumerate(ordered_colors, start=1):
         color_map[old_color] = new_color
     return color_map
