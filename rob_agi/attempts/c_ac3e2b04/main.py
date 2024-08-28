@@ -9,10 +9,10 @@ def solve_ac3e2b04(input_grid: ColoredGrid) -> ColoredGrid:
 
     1. Identifies green squares (3x3 areas with a red center)
     2. Creates initial blue structure based on green squares and red lines
-    3. Ensures symmetry across both vertical and horizontal axes
-    4. Extends blue structure to create a connected network
-    5. Handles intersections and fills gaps in the blue structure
-    6. Performs final symmetry check and preserves original red and green cells
+    3. Extends blue lines to connect green squares and red lines
+    4. Ensures symmetry across both vertical and horizontal axes
+    5. Fills gaps and ensures continuity of blue structures
+    6. Preserves original red and green cells
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed
@@ -24,13 +24,10 @@ def solve_ac3e2b04(input_grid: ColoredGrid) -> ColoredGrid:
     green_squares = find_green_squares(output_grid)
     
     create_initial_blue_structure(output_grid, green_squares)
-    ensure_symmetry(output_grid)
     extend_blue_structure(output_grid)
-    handle_intersections(output_grid)
+    ensure_symmetry(output_grid)
     fill_gaps(output_grid)
-    final_symmetry_check(output_grid)
     preserve_original_colors(output_grid, input_grid)
-    connect_blue_networks(output_grid)
     
     return output_grid
 
@@ -47,59 +44,55 @@ def find_green_squares(grid: ColoredGrid) -> List[Tuple[int, int]]:
 def create_initial_blue_structure(grid: ColoredGrid, green_squares: List[Tuple[int, int]]):
     rows, cols = grid.get_dimensions()
     for r, c in green_squares:
-        # Vertical lines from green squares
-        for row in range(rows):
-            if grid.get_cell(row, c) == 0:
-                grid.set_cell(row, c, 1)
-        
-        # Horizontal lines from green squares
-        for col in range(cols):
-            if grid.get_cell(r, col) == 0:
-                grid.set_cell(r, col, 1)
-    
-    # Add horizontal blue lines along red lines
-    for r in range(rows):
-        if any(grid.get_cell(r, c) == 2 for c in range(cols)):
-            for c in range(cols):
-                if grid.get_cell(r, c) == 0:
-                    grid.set_cell(r, c, 1)
+        # Extend blue lines to nearest red lines or edges
+        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+            nr, nc = r + dr, c + dc
+            while 0 <= nr < rows and 0 <= nc < cols:
+                if grid.get_cell(nr, nc) == 2:  # Stop at red line
+                    break
+                if grid.get_cell(nr, nc) == 0:
+                    grid.set_cell(nr, nc, 1)
+                nr, nc = nr + dr, nc + dc
 
 def ensure_symmetry(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
     for r in range(rows):
         for c in range(cols):
             if grid.get_cell(r, c) == 1:
-                grid.set_cell(r, cols - 1 - c, 1)
-                grid.set_cell(rows - 1 - r, c, 1)
-                grid.set_cell(rows - 1 - r, cols - 1 - c, 1)
+                if grid.get_cell(r, cols - 1 - c) == 0:
+                    grid.set_cell(r, cols - 1 - c, 1)
+                if grid.get_cell(rows - 1 - r, c) == 0:
+                    grid.set_cell(rows - 1 - r, c, 1)
+                if grid.get_cell(rows - 1 - r, cols - 1 - c) == 0:
+                    grid.set_cell(rows - 1 - r, cols - 1 - c, 1)
 
 def extend_blue_structure(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
     for r in range(rows):
-        if 1 in [grid.get_cell(r, c) for c in range(cols)]:
-            left = next((c for c in range(cols) if grid.get_cell(r, c) == 1), None)
-            right = next((c for c in range(cols-1, -1, -1) if grid.get_cell(r, c) == 1), None)
-            if left is not None and right is not None:
-                for c in range(left, right + 1):
-                    if grid.get_cell(r, c) == 0:
-                        grid.set_cell(r, c, 1)
-    
-    for c in range(cols):
-        if 1 in [grid.get_cell(r, c) for r in range(rows)]:
-            top = next((r for r in range(rows) if grid.get_cell(r, c) == 1), None)
-            bottom = next((r for r in range(rows-1, -1, -1) if grid.get_cell(r, c) == 1), None)
-            if top is not None and bottom is not None:
-                for r in range(top, bottom + 1):
-                    if grid.get_cell(r, c) == 0:
-                        grid.set_cell(r, c, 1)
+        for c in range(cols):
+            if grid.get_cell(r, c) == 1:
+                # Extend horizontally
+                left = next((i for i in range(c-1, -1, -1) if grid.get_cell(r, i) in [1, 2, 3]), -1)
+                right = next((i for i in range(c+1, cols) if grid.get_cell(r, i) in [1, 2, 3]), cols)
+                for i in range(left+1, right):
+                    if grid.get_cell(r, i) == 0:
+                        grid.set_cell(r, i, 1)
+                
+                # Extend vertically
+                top = next((i for i in range(r-1, -1, -1) if grid.get_cell(i, c) in [1, 2, 3]), -1)
+                bottom = next((i for i in range(r+1, rows) if grid.get_cell(i, c) in [1, 2, 3]), rows)
+                for i in range(top+1, bottom):
+                    if grid.get_cell(i, c) == 0:
+                        grid.set_cell(i, c, 1)
 
 def fill_gaps(grid: ColoredGrid):
     rows, cols = grid.get_dimensions()
-    for r in range(1, rows-1):
-        for c in range(1, cols-1):
+    for r in range(rows):
+        for c in range(cols):
             if grid.get_cell(r, c) == 0:
-                neighbors = sum(1 for dr, dc in [(-1,0),(1,0),(0,-1),(0,1)] if grid.get_cell(r+dr, c+dc) == 1)
-                if neighbors >= 3:
+                neighbors = sum(1 for dr, dc in [(-1,0),(1,0),(0,-1),(0,1)] 
+                                if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.get_cell(r+dr, c+dc) == 1)
+                if neighbors >= 2:
                     grid.set_cell(r, c, 1)
 
 def handle_intersections(grid: ColoredGrid):
