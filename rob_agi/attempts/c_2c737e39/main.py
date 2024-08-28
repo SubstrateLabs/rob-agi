@@ -8,8 +8,8 @@ def solve_2c737e39(input_grid: ColoredGrid) -> ColoredGrid:
 
     1. Identify the main pattern using flood-fill from the top-left.
     2. Determine the bounding box of the main pattern.
-    3. Calculate the shift for duplication (both horizontal and vertical).
-    4. Create a duplicate of the pattern with the calculated shift.
+    3. Analyze available space and determine the best direction for duplication.
+    4. Create a duplicate of the pattern in the chosen direction.
     5. Identify and remove isolated gray squares.
     6. Adjust the duplicate pattern if it extends beyond grid boundaries.
 
@@ -43,18 +43,10 @@ def solve_2c737e39(input_grid: ColoredGrid) -> ColoredGrid:
 
     def is_isolated_gray(grid: List[List[int]], r: int, c: int) -> bool:
         rows, cols = len(grid), len(grid[0])
-        stack = [(r, c)]
-        visited = set()
-
-        while stack:
-            r, c = stack.pop()
-            if (r, c) not in visited and 0 <= r < rows and 0 <= c < cols:
-                visited.add((r, c))
-                if grid[r][c] not in [0, 5]:
-                    return False
-                if grid[r][c] == 5:
-                    for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                        stack.append((r + dr, c + dc))
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols and grid[nr][nc] != 0:
+                return False
         return True
 
     input_values = input_grid.values
@@ -67,15 +59,30 @@ def solve_2c737e39(input_grid: ColoredGrid) -> ColoredGrid:
     output_values = output_grid.values
     rows, cols = len(output_values), len(output_values[0])
 
-    # Calculate shift
-    shift_r = pattern_height
-    shift_c = pattern_width
+    # Determine duplication direction
+    space_down = rows - max_r - 1
+    space_right = cols - max_c - 1
+    space_left = min_c
+    space_up = min_r
+
+    if space_down >= pattern_height:
+        shift_r, shift_c = pattern_height, 0
+    elif space_right >= pattern_width:
+        shift_r, shift_c = 0, pattern_width
+    elif space_left >= pattern_width:
+        shift_r, shift_c = 0, -pattern_width
+    elif space_up >= pattern_height:
+        shift_r, shift_c = -pattern_height, 0
+    else:
+        # If no space available, don't duplicate
+        shift_r, shift_c = 0, 0
 
     # Create duplicate pattern
     for r, c, color in pattern:
-        new_r, new_c = r + shift_r, c + shift_c
-        if 0 <= new_r < rows and 0 <= new_c < cols:
-            output_values[new_r][new_c] = color
+        if color != 5:  # Don't duplicate gray squares
+            new_r, new_c = r + shift_r, c + shift_c
+            if 0 <= new_r < rows and 0 <= new_c < cols:
+                output_values[new_r][new_c] = color
 
     # Remove isolated gray squares
     for r in range(rows):
