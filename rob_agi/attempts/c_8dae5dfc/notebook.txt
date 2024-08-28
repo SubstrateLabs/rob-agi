@@ -1,1 +1,40 @@
-Challenge 8dae5dfc:
+Challenge 8dae5dfc: Color Shifting in Connected Regions
+
+Problem:
+- Transform a 2D grid by shifting colors within connected regions of non-black cells.
+- Black (0) cells remain unchanged and represent empty space.
+- The overall structure and position of shapes are maintained.
+
+Transformation Process:
+1. Identify distinct structures (connected regions of non-black cells).
+2. For each structure, determine color layers from outer to inner.
+3. Create a color mapping that shifts colors:
+   - The innermost color becomes the new outermost color.
+   - All other colors shift inward by one position.
+4. Apply the color mapping to each structure in the new grid.
+
+Key Observations:
+- The current implementation is close but not entirely correct.
+- In example_1, the outermost color (1: blue) should become (2: red), not (8: sky).
+- The color shifting seems to be reversed in the current implementation.
+
+Attempted Solution:
+- Used flood-fill to identify connected regions.
+- Determined color layers using BFS.
+- Created color mapping by shifting colors.
+- Applied color mapping to each structure.
+
+Issues:
+- The direction of color shifting is incorrect.
+- The outermost color is not being correctly identified or mapped.
+
+Next Steps:
+1. Review and correct the color layer determination process.
+2. Ensure the outermost color is correctly identified for each structure.
+3. Reverse the direction of color shifting in the create_color_mapping function.
+4. Double-check the application of color mapping to ensure it's consistent for all structures.
+
+Remember:
+- Black (0) cells should always remain unchanged.
+- The overall shape and position of structures should not change.
+- Each distinct structure in the grid should be processed independently.
