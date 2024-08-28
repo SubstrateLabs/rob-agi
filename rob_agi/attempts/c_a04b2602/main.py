@@ -1,6 +1,7 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 import random
+import math
 
 def solve_a04b2602(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -8,16 +9,14 @@ def solve_a04b2602(input_grid: ColoredGrid) -> ColoredGrid:
     
     The transformation follows these steps:
     1. Identify contiguous green (3) regions using flood fill.
-    2. Categorize regions as small (<25 cells) or large.
-    3. For small regions:
-       a. Create simple blue patterns, filling about half the region.
-       b. Ensure at least one green cell remains if possible.
-    4. For large regions:
-       a. Create blue patterns around red dots, expanding organically.
-       b. Adjust blue formation based on distance from red dots and edges.
-       c. Preserve some green cells, especially near edges and as islands.
-    5. Fine-tune patterns to reduce isolated cells and improve appearance.
-    6. Preserve original red dots and areas outside green regions.
+    2. Categorize regions as small (<25 cells), medium (25-100 cells), or large (>100 cells).
+    3. Create distance maps for each region (distance to red dots and edges).
+    4. Generate blue patterns based on region size and distance maps:
+       a. For small regions: Create simple blue patterns, filling about half the region.
+       b. For medium and large regions: Use probability function based on distances to create organic patterns.
+    5. Implement a "vein" system for medium and large regions to maintain green structures.
+    6. Apply pattern smoothing to reduce isolated cells and improve appearance.
+    7. Preserve original red dots and areas outside green regions.
     
     Returns a new ColoredGrid with the transformed pattern.
     """
@@ -50,15 +49,37 @@ def solve_a04b2602(input_grid: ColoredGrid) -> ColoredGrid:
                     regions.append(region)
         return regions
 
-    def create_blue_pattern(region: List[Tuple[int, int]]):
-        red_dots = [(r, c) for r, c in region if input_grid.get_cell(r, c) == 2]
-        region_size = len(region)
+    def categorize_region(region: List[Tuple[int, int]]) -> str:
+        size = len(region)
+        if size < 25:
+            return "small"
+        elif size < 100:
+            return "medium"
+        else:
+            return "large"
+
+    def create_distance_map(region: List[Tuple[int, int]], red_dots: List[Tuple[int, int]]) -> Dict[Tuple[int, int], Tuple[float, float]]:
+        distance_map = {}
+        max_distance = math.sqrt(rows**2 + cols**2)
         
-        if region_size < 25:  # Small region
-            blue_cells = set()
-            target_blue = region_size // 2  # Fill about half the region with blue
+        for r, c in region:
+            # Distance to nearest red dot
+            red_distance = min((abs(r-rr) + abs(c-cc) for rr, cc in red_dots), default=max_distance)
             
-            # Start from red dots or random cells
+            # Distance to nearest edge
+            edge_distance = min(r, c, rows-1-r, cols-1-c)
+            
+            distance_map[(r, c)] = (red_distance / max_distance, edge_distance / max(rows, cols))
+        
+        return distance_map
+
+    def create_blue_pattern(region: List[Tuple[int, int]], category: str, distance_map: Dict[Tuple[int, int], Tuple[float, float]]):
+        red_dots = [(r, c) for r, c in region if input_grid.get_cell(r, c) == 2]
+        
+        if category == "small":
+            blue_cells = set()
+            target_blue = len(region) // 2  # Fill about half the region with blue
+            
             start_points = red_dots if red_dots else [random.choice(region)]
             
             for start_r, start_c in start_points:
@@ -71,62 +92,64 @@ def solve_a04b2602(input_grid: ColoredGrid) -> ColoredGrid:
                         queue.extend(get_neighbors(r, c))
             
             # Ensure at least one green cell remains
-            if len(blue_cells) == region_size:
+            if len(blue_cells) == len(region):
                 r, c = random.choice(list(blue_cells))
                 output_grid.set_cell(r, c, 3)
         
-        else:  # Large region
-            blue_cells = set()
-            queue = []
+        else:  # Medium or Large region
+            base_probability = 0.6 if category == "medium" else 0.7
             
-            # Initialize parameters
-            base_probability = 0.7
-            influence_radius = max(3, region_size // 20)
-            edge_preservation_factor = 0.5
-            
-            # Initialize blue patterns around red dots
-            for r, c in red_dots:
-                neighbors = get_neighbors(r, c, diagonal=True)
-                for nr, nc in neighbors:
-                    if (nr, nc) in region and input_grid.get_cell(nr, nc) != 2:
-                        output_grid.set_cell(nr, nc, 1)
-                        blue_cells.add((nr, nc))
-                        queue.append((nr, nc))
-            
-            # Expand blue patterns
-            while queue:
-                r, c = queue.pop(0)
-                neighbors = get_neighbors(r, c)
-                for nr, nc in neighbors:
-                    if (nr, nc) in region and (nr, nc) not in blue_cells and input_grid.get_cell(nr, nc) != 2:
-                        # Calculate distances
-                        edge_distance = min(nr, nc, rows-1-nr, cols-1-nc)
-                        red_dot_distance = min(abs(nr-rr) + abs(nc-cc) for rr, cc in red_dots) if red_dots else 0
-                        
-                        # Adjust probability
-                        prob = base_probability
-                        if red_dots:
-                            prob *= (1 - (red_dot_distance / influence_radius))
-                        prob *= (1 + (edge_distance / influence_radius) * edge_preservation_factor)
-                        
-                        if random.random() < prob:
-                            output_grid.set_cell(nr, nc, 1)
-                            blue_cells.add((nr, nc))
-                            queue.append((nr, nc))
-            
-            # Fine-tune patterns
             for r, c in region:
-                if output_grid.get_cell(r, c) == 1:
-                    green_neighbors = sum(1 for nr, nc in get_neighbors(r, c) if output_grid.get_cell(nr, nc) == 3)
-                    if green_neighbors > 5 and random.random() < 0.3:
-                        output_grid.set_cell(r, c, 3)
-                elif output_grid.get_cell(r, c) == 3:
-                    blue_neighbors = sum(1 for nr, nc in get_neighbors(r, c) if output_grid.get_cell(nr, nc) == 1)
-                    if blue_neighbors > 6 and random.random() < 0.7:
+                if input_grid.get_cell(r, c) != 2:  # Don't change red dots
+                    red_dist, edge_dist = distance_map[(r, c)]
+                    prob = base_probability * (1 - red_dist) * (1 + edge_dist)
+                    
+                    if random.random() < prob:
                         output_grid.set_cell(r, c, 1)
+
+    def create_green_veins(region: List[Tuple[int, int]], category: str):
+        if category == "small":
+            return
+        
+        num_veins = 2 if category == "medium" else 4
+        for _ in range(num_veins):
+            start = random.choice(region)
+            end = random.choice(region)
+            path = [start]
+            current = start
+            while current != end:
+                neighbors = get_neighbors(*current)
+                next_cell = min(neighbors, key=lambda n: ((n[0]-end[0])**2 + (n[1]-end[1])**2))
+                path.append(next_cell)
+                current = next_cell
+            
+            for r, c in path:
+                if random.random() < 0.7:  # 70% chance to keep the cell green
+                    output_grid.set_cell(r, c, 3)
+
+    def smooth_pattern(region: List[Tuple[int, int]]):
+        for _ in range(2):  # Apply smoothing twice
+            changes = []
+            for r, c in region:
+                neighbors = get_neighbors(r, c)
+                blue_neighbors = sum(1 for nr, nc in neighbors if output_grid.get_cell(nr, nc) == 1)
+                green_neighbors = sum(1 for nr, nc in neighbors if output_grid.get_cell(nr, nc) == 3)
+                
+                if output_grid.get_cell(r, c) == 1 and green_neighbors > 5:
+                    changes.append((r, c, 3))
+                elif output_grid.get_cell(r, c) == 3 and blue_neighbors > 5:
+                    changes.append((r, c, 1))
+            
+            for r, c, color in changes:
+                output_grid.set_cell(r, c, color)
 
     green_regions = find_green_regions()
     for region in green_regions:
-        create_blue_pattern(region)
+        category = categorize_region(region)
+        red_dots = [(r, c) for r, c in region if input_grid.get_cell(r, c) == 2]
+        distance_map = create_distance_map(region, red_dots)
+        create_blue_pattern(region, category, distance_map)
+        create_green_veins(region, category)
+        smooth_pattern(region)
 
     return output_grid
