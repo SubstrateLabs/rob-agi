@@ -12,7 +12,7 @@ def solve_52fd389e(input_grid: ColoredGrid) -> ColoredGrid:
        - Border size is 1 for small regions (<=4x4) in top-left quadrant, 
          2 for larger regions in top-left quadrant, and 3 for regions in other quadrants.
     3. Apply borders to yellow regions or replace with sky blue.
-    4. Fill all remaining black (0) areas with sky blue (8).
+    4. Keep all remaining black (0) areas as they are.
     """
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
@@ -96,8 +96,6 @@ def solve_52fd389e(input_grid: ColoredGrid) -> ColoredGrid:
             for c in range(cols):
                 if transformation_map[r][c] != 0:
                     grid.set_cell(r, c, transformation_map[r][c])
-                elif grid.get_cell(r, c) == 0:
-                    grid.set_cell(r, c, 8)
 
     yellow_regions = find_yellow_regions()
     process_yellow_regions(yellow_regions)
