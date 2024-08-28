@@ -1,6 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Set
-from collections import deque
+from typing import List, Tuple
 
 def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -13,45 +12,40 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     6. Only orthogonally adjacent cells are considered part of the same region.
     """
     BLUE, RED, GREEN, GRAY = 1, 2, 3, 5
-    output_grid = input_grid.deep_copy()
-    rows, cols = output_grid.get_dimensions()
-    visited = set()
+    rows, cols = input_grid.get_dimensions()
+    visited = [[False for _ in range(cols)] for _ in range(rows)]
 
-    def is_valid(r: int, c: int) -> bool:
-        return 0 <= r < rows and 0 <= c < cols and input_grid.values[r][c] != GRAY
-
-    def flood_fill(start_row: int, start_col: int) -> List[Tuple[int, int]]:
-        queue = deque([(start_row, start_col)])
+    def flood_fill(start_row: int, start_col: int) -> Tuple[int, List[Tuple[int, int]]]:
+        stack = [(start_row, start_col)]
         region = []
-        while queue:
-            row, col = queue.popleft()
-            if (row, col) in visited or input_grid.values[row][col] != BLUE:
-                continue
-            visited.add((row, col))
-            region.append((row, col))
-            for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                new_row, new_col = row + dr, col + dc
-                if is_valid(new_row, new_col) and input_grid.values[new_row][new_col] == BLUE and (new_row, new_col) not in visited:
-                    queue.append((new_row, new_col))
-        return region
+        while stack:
+            r, c = stack.pop()
+            if (0 <= r < rows and 0 <= c < cols and
+                not visited[r][c] and input_grid.values[r][c] == BLUE):
+                visited[r][c] = True
+                region.append((r, c))
+                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                    stack.append((r + dr, c + dc))
+        return len(region), region
 
-    def determine_target_color() -> int:
-        red_count = sum(row.count(RED) for row in input_grid.values)
-        green_count = sum(row.count(GREEN) for row in input_grid.values)
-        return GREEN if green_count > red_count else RED
+    # Determine target color
+    red_count = sum(row.count(RED) for row in input_grid.values)
+    green_count = sum(row.count(GREEN) for row in input_grid.values)
+    target_color = RED if red_count >= green_count else GREEN
 
-    target_color = determine_target_color()
+    # Identify regions to transform
     regions_to_transform = []
-
-    for row in range(rows):
-        for col in range(cols):
-            if input_grid.values[row][col] == BLUE and (row, col) not in visited:
-                region = flood_fill(row, col)
-                if 2 <= len(region) <= 8:
+    for r in range(rows):
+        for c in range(cols):
+            if input_grid.values[r][c] == BLUE and not visited[r][c]:
+                size, region = flood_fill(r, c)
+                if 2 <= size <= 8:
                     regions_to_transform.append(region)
 
+    # Apply transformations
+    result_grid = input_grid.deep_copy()
     for region in regions_to_transform:
         for r, c in region:
-            output_grid.values[r][c] = target_color
+            result_grid.values[r][c] = target_color
 
-    return output_grid
+    return result_grid
