@@ -1,55 +1,66 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple
 
-def identify_sequences(grid: ColoredGrid) -> List[List[int]]:
-    """Identify unique color sequences in the grid."""
+def extract_sequences(grid: ColoredGrid) -> List[List[int]]:
+    """Extract unique color sequences from the bottom row of the grid."""
+    bottom_row = grid.values[-1]
     sequences = []
-    for row in grid.values:
-        if 0 not in row:
-            sequence = [color for color in row if color != 0]
-            if sequence and sequence not in sequences:
-                sequences.append(sequence)
+    current_sequence = []
+    for color in bottom_row:
+        if color != 0:
+            current_sequence.append(color)
+        elif current_sequence:
+            if current_sequence not in sequences:
+                sequences.append(current_sequence)
+            current_sequence = []
+    if current_sequence and current_sequence not in sequences:
+        sequences.append(current_sequence)
     return sequences
 
 def is_original_sequence(row: List[int], sequences: List[List[int]]) -> bool:
-    """Check if a row is an original sequence."""
-    return 0 not in row and row in sequences
+    """Check if a row matches any of the original sequences."""
+    row_sequence = [color for color in row if color != 0]
+    return row_sequence in sequences
+
+def expand_sequence(row: List[int], start: int, sequence: List[int]) -> None:
+    """Expand a sequence to the right, filling zeros."""
+    seq_index = 0
+    for i in range(start + 1, len(row)):
+        if row[i] != 0:
+            break
+        row[i] = sequence[seq_index % len(sequence)]
+        seq_index += 1
 
 def solve_5af49b42(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by expanding colored dots based on multiple sequences.
+    Transforms the input grid by expanding colored dots based on sequences from the bottom row.
     
-    1. Identifies all unique color sequences in the grid.
-    2. For each non-zero cell not part of an original sequence:
-       a. Selects the next expansion sequence.
-       b. Expands to the right, filling zero cells with colors from the sequence.
-       c. Stops expansion at non-zero cells or the end of the row.
-    3. Alternates between sequences for each expansion.
-    4. Keeps original sequences unchanged.
+    1. Extracts unique color sequences from the bottom row of the grid.
+    2. For each row (except the bottom row):
+       a. If the row matches an original sequence, it's left unchanged.
+       b. Otherwise, for each non-zero cell:
+          - Expands to the right using the next available sequence.
+          - Stops expansion at non-zero cells or the end of the row.
+    3. Alternates between sequences for each expansion within a row.
+    4. Keeps the bottom row (original sequences) unchanged.
     5. Returns the transformed grid.
     """
-    sequences = identify_sequences(input_grid)
+    sequences = extract_sequences(input_grid)
     if not sequences:
         return input_grid  # No sequences to expand
 
     new_grid = input_grid.deep_copy()
     rows, cols = new_grid.get_dimensions()
 
-    sequence_counter = 0
-    for row in range(rows):
+    for row in range(rows - 1):  # Exclude the bottom row
         if is_original_sequence(new_grid.values[row], sequences):
             continue  # Skip rows that are original sequences
+        
+        sequence_index = 0
         for col in range(cols):
             if new_grid.values[row][col] != 0:
-                expansion_sequence = sequences[sequence_counter % len(sequences)]
-                sequence_counter += 1
-                
-                # Perform the expansion
-                index = 0
-                for i in range(col + 1, cols):
-                    if new_grid.values[row][i] != 0:
-                        break  # Stop at non-zero cell
-                    new_grid.values[row][i] = expansion_sequence[index % len(expansion_sequence)]
-                    index += 1
+                expansion_sequence = sequences[sequence_index % len(sequences)]
+                expand_sequence(new_grid.values[row], col, expansion_sequence)
+                sequence_index += 1
 
     return new_grid
