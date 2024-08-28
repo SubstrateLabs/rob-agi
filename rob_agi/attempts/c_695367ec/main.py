@@ -8,7 +8,7 @@ def solve_695367ec(input_grid: ColoredGrid) -> ColoredGrid:
     3. In each 5x5 square:
        - For 3x3 inputs: Fill the entire 5x5 square with the input color.
        - For 1x1 or 2x2 inputs: Center the input pattern.
-       - For 4x4 or 5x5 inputs: Place a single cell of the input color in the center.
+       - For 4x4 or larger inputs: Draw only the separating lines.
     4. Fill the rest of the grid with black (0).
     """
     output_grid = [[0 for _ in range(15)] for _ in range(15)]
@@ -45,8 +45,6 @@ def solve_695367ec(input_grid: ColoredGrid) -> ColoredGrid:
                 for i in range(input_height):
                     for j in range(input_width):
                         output_grid[start_row + offset + i][start_col + offset + j] = input_grid.values[i][j]
-            else:
-                # Place a single cell of the input color in the center for 4x4 or 5x5 inputs
-                output_grid[start_row + 2][start_col + 2] = color
+            # For 4x4 or larger inputs, we don't need to do anything extra here
 
     return ColoredGrid(values=output_grid)
