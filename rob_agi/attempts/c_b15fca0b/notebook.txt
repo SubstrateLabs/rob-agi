@@ -1,1 +1,28 @@
 Challenge b15fca0b:
+
+Problem Description:
+The challenge involves transforming a 2D grid by filling enclosed areas with yellow (4) while leaving areas connected to the edges as black (0). Blue (1) lines and red (2) squares remain unchanged.
+
+Key Observations:
+1. Enclosed areas are defined by blue lines, red squares, and grid edges.
+2. Areas connected to the grid edges (including diagonally) should remain black.
+3. The flood fill algorithm should start from the edges and mark reachable areas.
+4. After flood fill, unmarked black areas should be filled with yellow.
+
+Current Implementation Issues:
+- The algorithm is not correctly identifying all enclosed areas, particularly in complex cases like example_3.
+- It's possible that our flood fill is not considering diagonal connections properly.
+
+Attempted Solutions:
+1. Flood fill from edges, marking visited cells.
+2. Fill unmarked black cells with yellow.
+
+Next Steps:
+1. Revise the flood fill algorithm to ensure it considers diagonal connections correctly.
+2. Double-check the conditions for starting flood fill from edges.
+3. Consider implementing a two-pass algorithm: first to mark reachable areas, then to fill enclosed areas.
+
+Things to Keep in Mind:
+- The solution should work for grids of various sizes (up to 30x30).
+- Pay attention to corner cases, such as when blue lines touch the grid edges.
+- Ensure that the algorithm handles all color combinations correctly (0, 1, 2, 4).
