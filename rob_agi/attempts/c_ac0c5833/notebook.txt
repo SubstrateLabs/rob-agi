@@ -1,1 +1,42 @@
 Challenge ac0c5833:
+
+Observations:
+1. The challenge involves transforming a grid with yellow (4) and red (2) cells on a black (0) background.
+2. Yellow cells remain in their original positions.
+3. Red cells expand around yellow cells, forming 3x3 patterns with one corner left black.
+4. Existing red structures (like the 'L' shape in example 1) should be preserved.
+5. New red expansions should not overlap with existing structures.
+6. The solution should work for various grid sizes (up to 30x30).
+
+Current implementation issues:
+1. The algorithm is over-expanding red cells, filling almost the entire grid.
+2. It's not preserving the existing red structures.
+3. The 3x3 pattern around yellow cells is not being correctly implemented.
+
+Things that don't work:
+1. Expanding red cells without constraints leads to overfilling.
+2. Current pattern recognition and replication approach is too aggressive.
+
+Next steps:
+1. Implement a more controlled expansion around yellow cells:
+   - Ensure only a 3x3 area around each yellow cell is affected.
+   - Always leave one corner of this 3x3 area black.
+2. Preserve existing red structures:
+   - Before expanding, identify and store all existing red structures.
+   - Don't overwrite these structures during expansion.
+3. Implement a check to prevent 2x2 red squares:
+   - Before placing a red cell, check if it would create a 2x2 red square.
+   - If so, leave that cell black.
+4. Improve connectivity:
+   - After initial expansion, connect nearby red regions without creating 2x2 squares.
+5. Clean up isolated red cells:
+   - Remove any red cells that are not connected to a larger structure.
+
+Certainties:
+- Yellow cells must remain unchanged.
+- The 3x3 pattern around yellow cells is a key feature.
+- Existing red structures should be preserved.
+
+Unknowns:
+- The exact rules for connecting red regions.
+- How to handle overlapping expansions from multiple yellow cells.
