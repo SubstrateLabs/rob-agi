@@ -11,7 +11,8 @@ def solve_d017b73f(input_grid: ColoredGrid) -> ColoredGrid:
     by removing columns that contain only black cells, while preserving the vertical alignment,
     appropriate horizontal spacing of color groups, and the original number of rows.
     Color groups are placed in their original vertical positions if possible, otherwise they are
-    moved to the nearest available space below their original position.
+    moved to the nearest available space below their original position. Single-cell groups are
+    placed more flexibly to achieve better compression. Empty rows between non-empty rows are preserved.
     """
     rows, cols = input_grid.get_dimensions()
     
@@ -46,7 +47,7 @@ def solve_d017b73f(input_grid: ColoredGrid) -> ColoredGrid:
     new_grid = [[0 for _ in range(cols)] for _ in range(rows)]
     
     # Step 4: Place color groups
-    rightmost_col = [0] * rows
+    occupied_cells = set()
     for group, color in color_groups:
         min_r = min(r for r, _ in group)
         max_r = max(r for r, _ in group)
@@ -56,19 +57,19 @@ def solve_d017b73f(input_grid: ColoredGrid) -> ColoredGrid:
         # Find the nearest available space
         placed = False
         for start_r in range(min_r, rows - group_height + 1):
-            if all(rightmost_col[r] == 0 for r in range(start_r, start_r + group_height)):
-                min_c = 0
-            else:
-                min_c = max(rightmost_col[r] for r in range(start_r, start_r + group_height)) + 1
-            
-            if min_c + group_width <= cols:
-                # Place the group
-                for r, c in group:
-                    new_r = start_r + (r - min_r)
-                    new_c = min_c + (c - min(c for _, c in group))
-                    new_grid[new_r][new_c] = color
-                    rightmost_col[new_r] = max(rightmost_col[new_r], new_c + 1)
-                placed = True
+            for start_c in range(cols - group_width + 1):
+                if all((r, c) not in occupied_cells 
+                       for r in range(start_r, start_r + group_height)
+                       for c in range(start_c, start_c + group_width)):
+                    # Place the group
+                    for r, c in group:
+                        new_r = start_r + (r - min_r)
+                        new_c = start_c + (c - min(c for _, c in group))
+                        new_grid[new_r][new_c] = color
+                        occupied_cells.add((new_r, new_c))
+                    placed = True
+                    break
+            if placed:
                 break
         
         if not placed:
@@ -80,7 +81,7 @@ def solve_d017b73f(input_grid: ColoredGrid) -> ColoredGrid:
     
     compressed_grid = compress_horizontally(new_grid)
     
-    # Step 6: Preserve vertical structure
+    # Step 6: Preserve vertical structure and empty rows
     final_grid = []
     for input_row, compressed_row in zip(input_grid.values, compressed_grid):
         if all(cell == 0 for cell in input_row):
@@ -88,8 +89,15 @@ def solve_d017b73f(input_grid: ColoredGrid) -> ColoredGrid:
         else:
             final_grid.append(compressed_row)
     
-    # Step 7: Final cleanup
-    final_grid = compress_horizontally(final_grid)
+    # Step 7: Remove empty rows at the edges
+    while final_grid and all(cell == 0 for cell in final_grid[0]):
+        final_grid.pop(0)
+    while final_grid and all(cell == 0 for cell in final_grid[-1]):
+        final_grid.pop()
     
-    # Step 8: Create and return the output
+    # Step 8: Ensure all rows have the same length
+    max_length = max(len(row) for row in final_grid) if final_grid else 0
+    final_grid = [row + [0] * (max_length - len(row)) for row in final_grid]
+    
+    # Step 9: Create and return the output
     return ColoredGrid(values=final_grid)
