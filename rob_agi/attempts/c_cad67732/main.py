@@ -6,11 +6,12 @@ def solve_cad67732(input_grid: ColoredGrid) -> ColoredGrid:
     
     The function:
     1. Creates a new grid double the size of the input.
-    2. Treats the input grid as an infinitely repeating pattern.
-    3. Fills the new grid by mapping each cell to the corresponding cell in the infinitely repeating pattern.
+    2. Copies the input grid to the top-left quadrant of the new grid.
+    3. Extends the pattern diagonally to fill the remaining space.
     
-    This approach works for all cases by extending the pattern of the input grid,
-    maintaining the relative positions and spacings of all elements.
+    This approach works for all cases by preserving the original pattern
+    in the top-left and extending it diagonally, maintaining the relative
+    positions and spacings of all elements.
     """
     input_height, input_width = input_grid.get_dimensions()
     new_height = input_height * 2
@@ -18,10 +19,18 @@ def solve_cad67732(input_grid: ColoredGrid) -> ColoredGrid:
     
     new_grid = ColoredGrid(values=[[0 for _ in range(new_width)] for _ in range(new_height)])
     
+    # Copy the input grid to the top-left quadrant
+    for row in range(input_height):
+        for col in range(input_width):
+            new_grid.values[row][col] = input_grid.values[row][col]
+    
+    # Extend the pattern diagonally
     for row in range(new_height):
         for col in range(new_width):
-            pattern_row = row % input_height
-            pattern_col = col % input_width
-            new_grid.values[row][col] = input_grid.values[pattern_row][pattern_col]
+            if row < input_height and col < input_width:
+                continue  # Skip the already filled top-left quadrant
+            source_row = row - input_height if row >= input_height else row
+            source_col = col - input_width if col >= input_width else col
+            new_grid.values[row][col] = new_grid.values[source_row][source_col]
     
     return new_grid
