@@ -22,7 +22,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     def flood_fill(start_row: int, start_col: int) -> List[Tuple[int, int]]:
         queue = deque([(start_row, start_col)])
         region = []
-        while queue and len(region) <= 8:
+        while queue:
             row, col = queue.popleft()
             if visited[row][col] or input_grid.values[row][col] != 1:
                 continue
