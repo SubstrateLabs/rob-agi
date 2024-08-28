@@ -8,20 +8,22 @@ def solve_e74e1818(input_grid: ColoredGrid) -> ColoredGrid:
     
     The solution involves the following steps:
     1. Identify distinct shapes in the grid
-    2. Analyze each shape's characteristics (weight distribution, bounds, position)
-    3. Determine if each shape should be flipped based on its position relative to the grid center
-    4. Flip the shapes that improve the overall composition
-    5. Reconstruct the grid with the flipped shapes while maintaining vertical order and horizontal positions
+    2. Determine the vertical trisection points of the grid
+    3. Process each shape based on its position in the grid:
+       - Shapes in the top third are flipped vertically
+       - Shapes in the middle third remain unchanged
+       - Shapes in the bottom third are flipped vertically and moved upward
+    4. Reconstruct the grid with the transformed shapes while maintaining horizontal positions
     
     This function improves vertical symmetry and balance of the image while preserving
-    the vertical ordering and horizontal positions of shapes.
+    the horizontal positions and widths of shapes.
     """
     shapes = identify_shapes(input_grid)
-    flipped_shapes = determine_flips(shapes, input_grid.num_rows)
-    return reconstruct_grid(shapes, flipped_shapes, input_grid)
+    transformed_shapes = transform_shapes(shapes, input_grid.num_rows)
+    return reconstruct_grid(transformed_shapes, input_grid)
 
-def identify_shapes(grid: ColoredGrid) -> Dict[int, List[Tuple[int, int]]]:
-    shapes = {}
+def identify_shapes(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
+    shapes = []
     visited = set()
     
     for r in range(grid.num_rows):
@@ -41,44 +43,49 @@ def identify_shapes(grid: ColoredGrid) -> Dict[int, List[Tuple[int, int]]]:
                             if 0 <= nr < grid.num_rows and 0 <= nc < grid.num_cols:
                                 stack.append((nr, nc))
                 
-                if color not in shapes:
-                    shapes[color] = []
-                shapes[color].append(shape)
+                shapes.append(shape)
     
     return shapes
 
-def determine_flips(shapes: Dict[int, List[List[Tuple[int, int]]]], grid_height: int) -> Dict[int, List[bool]]:
-    flipped_shapes = {}
-    grid_center = grid_height / 2
+def transform_shapes(shapes: List[List[Tuple[int, int]]], grid_height: int) -> List[List[Tuple[int, int]]]:
+    transformed_shapes = []
+    trisection1 = grid_height // 3
+    trisection2 = 2 * grid_height // 3
     
-    for color, color_shapes in shapes.items():
-        flipped_shapes[color] = []
-        for shape in color_shapes:
-            min_r = min(r for r, _ in shape)
-            max_r = max(r for r, _ in shape)
-            shape_center = (min_r + max_r) / 2
-            
-            if shape_center < grid_center:
-                flipped_shapes[color].append(True)
-            else:
-                flipped_shapes[color].append(False)
+    for shape in shapes:
+        min_r = min(r for r, _ in shape)
+        max_r = max(r for r, _ in shape)
+        shape_center = (min_r + max_r) / 2
+        
+        if shape_center < trisection1:
+            transformed_shape = flip_shape_vertically(shape)
+        elif shape_center < trisection2:
+            transformed_shape = shape  # No change for middle third
+        else:
+            transformed_shape = flip_shape_vertically(shape)
+            # Move the shape upward
+            shift = max_r - trisection2
+            transformed_shape = [(r - shift, c) for r, c in transformed_shape]
+        
+        transformed_shapes.append(transformed_shape)
     
-    return flipped_shapes
+    return transformed_shapes
 
 def flip_shape_vertically(shape: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
     min_r = min(r for r, _ in shape)
     max_r = max(r for r, _ in shape)
     return [(max_r - (r - min_r), c) for r, c in shape]
 
-def reconstruct_grid(shapes: Dict[int, List[List[Tuple[int, int]]]], flipped_shapes: Dict[int, List[bool]], original_grid: ColoredGrid) -> ColoredGrid:
+def reconstruct_grid(shapes: List[List[Tuple[int, int]]], original_grid: ColoredGrid) -> ColoredGrid:
     new_grid = [[0 for _ in range(original_grid.num_cols)] for _ in range(original_grid.num_rows)]
     
-    for color, color_shapes in shapes.items():
-        for shape, should_flip in zip(color_shapes, flipped_shapes[color]):
-            if should_flip:
-                shape = flip_shape_vertically(shape)
-            
-            for r, c in shape:
+    # Sort shapes based on their original vertical position (top to bottom)
+    shapes.sort(key=lambda shape: min(r for r, _ in shape))
+    
+    for shape in shapes:
+        color = original_grid.values[shape[0][0]][shape[0][1]]  # Get color from original grid
+        for r, c in shape:
+            if 0 <= r < original_grid.num_rows and 0 <= c < original_grid.num_cols:
                 new_grid[r][c] = color
     
     return ColoredGrid(values=new_grid)
