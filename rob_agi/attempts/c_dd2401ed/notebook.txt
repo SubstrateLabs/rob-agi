@@ -1,1 +1,32 @@
 Challenge dd2401ed:
+
+Key observations:
+1. The gray (5) line moves to the right, doubling its distance from the left edge.
+2. Blue (1) dots remain in their original positions.
+3. Red (2) dots shift left by the same amount as the gray line moved right.
+
+What we know:
+- The gray line's new position is calculated correctly.
+- The shifting of red dots is implemented, but not correctly.
+
+What's not working:
+- Blue dots are being transformed into red dots in some cases, which is incorrect.
+- The shifting of red dots is not preserving their relative positions correctly.
+
+Attempted solution:
+- Tried to shift red dots left by the amount the gray line moved right.
+- Attempted to keep blue dots in their original positions.
+
+Next steps:
+1. Ensure blue dots remain blue and in their original positions.
+2. Revise the shifting mechanism for red dots:
+   - Calculate the shift amount correctly.
+   - Ensure red dots wrap around to the right side if they would move past the left edge.
+3. Double-check the placement of the gray line in its new position.
+
+Unknown:
+- The exact rule for how red dots should wrap around when shifted.
+
+To try:
+- Implement a more precise wrapping mechanism for red dots.
+- Add debug prints to track the movement of each dot type.
