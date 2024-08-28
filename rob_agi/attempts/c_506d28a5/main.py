@@ -8,7 +8,7 @@ def solve_506d28a5(input_grid: ColoredGrid) -> ColoredGrid:
     3. For each column:
        - If there's any red cell in the column:
          - Fill the column with green.
-         - Preserve black cells from the top and bottom edges, even if not contiguous.
+         - Preserve all black cells from the input, regardless of position.
        - If there's no red cell, the column remains unchanged.
     4. Returns the transformed grid as a new ColoredGrid object.
     """
@@ -29,19 +29,10 @@ def solve_506d28a5(input_grid: ColoredGrid) -> ColoredGrid:
             # Start with a green column
             output_column = [3, 3, 3, 3]
             
-            # Preserve black cells from the top
+            # Preserve all black cells
             for row in range(4):
                 if input_column[row] == 0:
                     output_column[row] = 0
-                else:
-                    break
-            
-            # Preserve black cells from the bottom
-            for row in range(3, -1, -1):
-                if input_column[row] == 0:
-                    output_column[row] = 0
-                else:
-                    break
         else:
             # Copy input column if no red
             output_column = input_column
