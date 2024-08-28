@@ -16,6 +16,7 @@ def solve_12eac192(input_grid: ColoredGrid) -> ColoredGrid:
     6. Adapts behavior based on grid size, with more complete coverage for smaller grids.
     7. Ensures all blue cells are connected, even if it means creating a less snake-like path.
     8. Preserves blue cells that are not part of the main path.
+    9. Avoids creating isolated green cells or unnecessary branches.
 
     Args:
         input_grid (ColoredGrid): The input grid to be transformed.
@@ -46,7 +47,8 @@ def solve_12eac192(input_grid: ColoredGrid) -> ColoredGrid:
                     x in blue_cells - visited,
                     x in corners,
                     get_cell_priority(grid[x[0]][x[1]]),
-                    x not in visited
+                    x not in visited,
+                    -sum(1 for n in get_neighbors(*x) if n in visited and n != current)  # Avoid creating loops
                 )
             )
             if next_cell in visited:
@@ -54,12 +56,22 @@ def solve_12eac192(input_grid: ColoredGrid) -> ColoredGrid:
                 unvisited_blue = blue_cells - visited
                 if unvisited_blue:
                     next_cell = min(unvisited_blue, key=lambda x: abs(x[0]-current[0]) + abs(x[1]-current[1]))
+                    # Create a direct path to the next blue cell
+                    while current != next_cell:
+                        r, c = current
+                        dr = 1 if next_cell[0] > r else -1 if next_cell[0] < r else 0
+                        dc = 1 if next_cell[1] > c else -1 if next_cell[1] < c else 0
+                        current = (r + dr, c + dc)
+                        if current not in visited:
+                            path.append(current)
+                            visited.add(current)
                 else:
                     break
-            path.append(next_cell)
-            visited.add(next_cell)
-            current = next_cell
-            corners.discard(next_cell)
+            else:
+                path.append(next_cell)
+                visited.add(next_cell)
+                current = next_cell
+                corners.discard(next_cell)
 
         return path
 
@@ -77,15 +89,12 @@ def solve_12eac192(input_grid: ColoredGrid) -> ColoredGrid:
         if grid[r][c] not in [1, 7]:  # Preserve blue and orange cells
             grid.set_cell(r, c, 3)
 
-    # Ensure all blue cells are connected
-    for br, bc in blue_cells:
-        if grid[br][bc] == 1:
-            nearest_green = min((abs(br-r) + abs(bc-c), (r, c)) for r, c in path if grid[r][c] == 3)
-            r, c = nearest_green[1]
-            while (r, c) != (br, bc):
-                if grid[r][c] not in [1, 3, 7]:
-                    grid.set_cell(r, c, 3)
-                r += 1 if br > r else -1 if br < r else 0
-                c += 1 if bc > c else -1 if bc < c else 0
+    # Remove unnecessary green cells (those not connecting blue cells)
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] == 3:
+                neighbors = get_neighbors(r, c)
+                if sum(1 for nr, nc in neighbors if grid[nr][nc] in [1, 3]) <= 1:
+                    grid.set_cell(r, c, 0)  # Change isolated green cells back to black
 
     return grid
