@@ -9,10 +9,11 @@ def solve_358ba94e(input_grid: ColoredGrid) -> ColoredGrid:
     and creates a new 5x5 grid with the most common 'S' shape configuration.
     
     Steps:
-    1. Identify the target color and locate all 'S' shapes.
+    1. Identify the target color and locate all valid 'S' shapes.
     2. Analyze hole configurations in valid 'S' shapes.
-    3. Create a new 5x5 grid with the most common 'S' shape configuration.
-    4. Ensure the output is a valid 'S' shape with appropriate holes.
+    3. Determine the most common hole configuration, using priority order for ties.
+    4. Create a new 5x5 grid with the standardized 'S' shape and hole configuration.
+    5. Ensure the output is a valid 'S' shape with appropriate holes.
     
     Returns a 5x5 ColoredGrid representing the standardized 'S' shape.
     """
@@ -54,18 +55,21 @@ def solve_358ba94e(input_grid: ColoredGrid) -> ColoredGrid:
         return ColoredGrid(values=[[target_color]*5 for _ in range(5)])
 
     hole_frequencies = count_hole_frequencies(s_shapes)
-    sorted_holes = sorted(hole_frequencies.items(), key=lambda x: x[1], reverse=True)
+    priority_order = [(2, 1), (2, 3), (1, 2), (3, 2)]
+    sorted_holes = sorted(hole_frequencies.items(), key=lambda x: (-x[1], priority_order.index(x[0]) if x[0] in priority_order else len(priority_order)))
 
     output = ColoredGrid(values=[[target_color]*5 for _ in range(5)])
     
     # Add first hole
-    first_hole = (2, 1) if (2, 1) in hole_frequencies else (2, 3)
+    first_hole = sorted_holes[0][0]
     output.values[first_hole[0]][first_hole[1]] = 0
 
-    # Add second hole if majority of shapes have two holes
-    if len(sorted_holes) > 1 and sum(freq for _, freq in sorted_holes[:2]) > len(s_shapes) // 2:
-        second_hole = next((hole for hole, _ in sorted_holes if hole != first_hole), None)
-        if second_hole:
-            output.values[second_hole[0]][second_hole[1]] = 0
+    # Add second hole if majority of shapes have two or more holes
+    shapes_with_multiple_holes = sum(1 for shape in s_shapes if len(find_holes(shape)) >= 2)
+    if shapes_with_multiple_holes > len(s_shapes) // 2:
+        for hole, _ in sorted_holes[1:]:
+            if hole != first_hole:
+                output.values[hole[0]][hole[1]] = 0
+                break
 
     return output
