@@ -7,55 +7,92 @@ Region = namedtuple('Region', ['id', 'color', 'cells', 'centroid', 'quadrant'])
 def solve_fea12743(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the fea12743 challenge by:
-    1. Analyzing the grid to find all red regions
-    2. Scoring quadrants based on the size and complexity of red shapes
-    3. Determining the starting quadrant for color transformation
+    1. Analyzing the grid to find all colored regions
+    2. Scoring quadrants based on the size and complexity of shapes
+    3. Determining the transformation order based on quadrant scores
     4. Applying color transformations in a counterclockwise cycle:
-       - Starting quadrant remains red (2)
+       - Highest scoring quadrant remains its original color
        - Next quadrant becomes green (3)
        - Following quadrant becomes sky blue (8)
        - Last quadrant follows the cycle, but bottom-right is never sky blue
     5. Preserving black cells (0)
     """
-    # Step 1-2: Analyze grid and score quadrants
-    quadrant_scores = analyze_and_score_quadrants(input_grid)
-    
-    # Step 3: Determine starting quadrant
-    ranked_quadrants = rank_quadrants(quadrant_scores)
-    
-    # Step 4-5: Apply color transformation
-    regions = find_regions(input_grid)
-    color_order = get_color_transformation_order(ranked_quadrants[0])
-    new_grid = apply_color_transformation(input_grid, regions, color_order)
-    
-    # Handle bottom-right special case
-    handle_bottom_right_special_case(new_grid, input_grid.num_rows // 2, input_grid.num_cols // 2)
-    
+    mid_row, mid_col = calculate_midpoints(input_grid)
+    regions = find_regions(input_grid, mid_row, mid_col)
+    quadrant_scores = score_quadrants(regions)
+    color_assignment = determine_transformation_order(quadrant_scores)
+    new_grid = apply_transformation(input_grid, color_assignment, mid_row, mid_col)
     return new_grid
 
-def analyze_and_score_quadrants(grid: ColoredGrid) -> Dict[str, float]:
-    regions = find_regions(grid)
-    quadrant_scores = {'top-left': 0, 'top-right': 0, 'bottom-left': 0, 'bottom-right': 0}
-    for region in regions:
-        size = len(region.cells)
-        complexity = calculate_complexity(region.cells)
-        quadrant_scores[region.quadrant] += size * 0.7 + complexity * 0.3
-    return quadrant_scores
+def calculate_midpoints(grid: ColoredGrid) -> Tuple[int, int]:
+    return grid.num_rows // 2, grid.num_cols // 2
 
-def find_regions(grid: ColoredGrid) -> List[Region]:
+def get_quadrant(row: int, col: int, mid_row: int, mid_col: int) -> str:
+    if row < mid_row:
+        return 'top-left' if col < mid_col else 'top-right'
+    else:
+        return 'bottom-left' if col < mid_col else 'bottom-right'
+
+def find_regions(grid: ColoredGrid, mid_row: int, mid_col: int) -> List[Region]:
     regions = []
     visited = set()
     for r in range(grid.num_rows):
         for c in range(grid.num_cols):
-            if grid.values[r][c] == 2 and (r, c) not in visited:
-                cells = flood_fill(grid, r, c, 2)
-                size = len(cells)
-                complexity = calculate_complexity(cells)
+            if grid.values[r][c] != 0 and (r, c) not in visited:
+                cells = flood_fill(grid, r, c, grid.values[r][c])
                 centroid = calculate_centroid(cells)
-                quadrant = get_quadrant(centroid, grid.num_rows // 2, grid.num_cols // 2)
-                regions.append(Region(len(regions), 2, cells, centroid, quadrant))
+                quadrant = get_quadrant(centroid[0], centroid[1], mid_row, mid_col)
+                regions.append(Region(len(regions), grid.values[r][c], cells, centroid, quadrant))
                 visited.update(cells)
     return regions
+
+def flood_fill(grid: ColoredGrid, r: int, c: int, color: int) -> Set[Tuple[int, int]]:
+    cells = set()
+    stack = [(r, c)]
+    while stack:
+        r, c = stack.pop()
+        if (r, c) not in cells and 0 <= r < grid.num_rows and 0 <= c < grid.num_cols and grid.values[r][c] == color:
+            cells.add((r, c))
+            stack.extend([(r+1, c), (r-1, c), (r, c+1), (r, c-1)])
+    return cells
+
+def calculate_centroid(cells: Set[Tuple[int, int]]) -> Tuple[float, float]:
+    return sum(r for r, _ in cells) / len(cells), sum(c for _, c in cells) / len(cells)
+
+def score_quadrants(regions: List[Region]) -> Dict[str, float]:
+    scores = {'top-left': 0, 'top-right': 0, 'bottom-left': 0, 'bottom-right': 0}
+    for region in regions:
+        size = len(region.cells)
+        complexity = calculate_complexity(region.cells)
+        scores[region.quadrant] += size * 0.7 + complexity * 0.3
+    return scores
+
+def calculate_complexity(cells: Set[Tuple[int, int]]) -> float:
+    return len([cell for cell in cells if any((cell[0]+dr, cell[1]+dc) not in cells for dr, dc in [(0,1),(1,0),(0,-1),(-1,0)])])
+
+def determine_transformation_order(quadrant_scores: Dict[str, float]) -> Dict[str, int]:
+    ranked_quadrants = sorted(quadrant_scores, key=quadrant_scores.get, reverse=True)
+    color_cycle = [2, 3, 8, 2]  # Red, Green, Sky Blue, Red
+    color_assignment = {quad: color for quad, color in zip(ranked_quadrants, color_cycle)}
+    
+    # Handle bottom-right special case
+    if color_assignment['bottom-right'] == 8:
+        bottom_right_index = ranked_quadrants.index('bottom-right')
+        prev_quadrant = ranked_quadrants[bottom_right_index - 1]
+        color_assignment['bottom-right'], color_assignment[prev_quadrant] = color_assignment[prev_quadrant], color_assignment['bottom-right']
+    
+    return color_assignment
+
+def apply_transformation(grid: ColoredGrid, color_assignment: Dict[str, int], mid_row: int, mid_col: int) -> ColoredGrid:
+    new_grid = ColoredGrid(values=[[0 for _ in range(grid.num_cols)] for _ in range(grid.num_rows)])
+    for r in range(grid.num_rows):
+        for c in range(grid.num_cols):
+            if grid.values[r][c] != 0:
+                quadrant = get_quadrant(r, c, mid_row, mid_col)
+                new_grid.values[r][c] = color_assignment[quadrant]
+            else:
+                new_grid.values[r][c] = 0
+    return new_grid
 
 def calculate_complexity(region: Set[Tuple[int, int]]) -> int:
     return sum(1 for r, c in region if any((r+dr, c+dc) not in region for dr, dc in [(0,1),(1,0),(0,-1),(-1,0)]))
