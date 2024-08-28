@@ -21,8 +21,8 @@ def solve_95a58926(input_grid: ColoredGrid) -> ColoredGrid:
     ColoredGrid: The transformed grid according to the identified pattern.
     """
     rows, cols = input_grid.get_dimensions()
-    gray_rows = find_full_color_rows(input_grid, 5)
-    gray_cols = find_full_color_cols(input_grid, 5)
+    gray_rows = find_gray_rows(input_grid)
+    gray_cols = find_gray_cols(input_grid)
     scattered_color = identify_scattered_color(input_grid)
     intersection_color = min(scattered_color, 5)
 
@@ -42,12 +42,13 @@ def solve_95a58926(input_grid: ColoredGrid) -> ColoredGrid:
 
     return new_grid
 
-def find_full_color_rows(grid: ColoredGrid, color: int) -> Set[int]:
-    return {row for row, row_values in enumerate(grid.values) if all(cell == color for cell in row_values)}
-
-def find_full_color_cols(grid: ColoredGrid, color: int) -> Set[int]:
+def find_gray_rows(grid: ColoredGrid) -> List[int]:
     rows, cols = grid.get_dimensions()
-    return {col for col in range(cols) if all(grid.values[row][col] == color for row in range(rows))}
+    return [row for row in range(rows) if sum(1 for cell in grid.values[row] if cell == 5) > cols // 2]
+
+def find_gray_cols(grid: ColoredGrid) -> List[int]:
+    rows, cols = grid.get_dimensions()
+    return [col for col in range(cols) if sum(1 for row in range(rows) if grid.values[row][col] == 5) > rows // 2]
 
 def identify_scattered_color(grid: ColoredGrid) -> int:
     color_counts = Counter(cell for row in grid.values for cell in row if cell not in {0, 5})
