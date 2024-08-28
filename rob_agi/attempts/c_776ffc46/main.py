@@ -8,6 +8,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     2. The target color (red or green) is determined by the global prevalence of these colors.
     3. Larger blue regions, single blue pixels, and other colors remain unchanged.
     4. All transformations are applied simultaneously.
+    5. Gray (5) acts as a border and is not considered part of any region.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -17,15 +18,18 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         stack = [(row, col)]
         while stack:
             r, c = stack.pop()
-            if 0 <= r < rows and 0 <= c < cols and output_grid.values[r][c] == color and (r, c) not in visited:
+            if (0 <= r < rows and 0 <= c < cols and 
+                output_grid.values[r][c] == color and 
+                (r, c) not in visited and
+                output_grid.values[r][c] != 5):  # Don't cross gray borders
                 region.append((r, c))
                 visited.add((r, c))
                 stack.extend([(r-1, c), (r+1, c), (r, c-1), (r, c+1)])
         return region
 
     def count_color_prevalence():
-        red_count = sum(row.count(2) for row in output_grid.values)
-        green_count = sum(row.count(3) for row in output_grid.values)
+        red_count = sum(row.count(2) for row in input_grid.values)
+        green_count = sum(row.count(3) for row in input_grid.values)
         return 2 if red_count >= green_count else 3
 
     def is_transformable(region: List[Tuple[int, int]]) -> bool:
