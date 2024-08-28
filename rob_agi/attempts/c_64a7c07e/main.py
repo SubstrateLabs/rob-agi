@@ -8,6 +8,7 @@ def solve_64a7c07e(input_grid: ColoredGrid) -> ColoredGrid:
     The function identifies connected shapes, calculates their optimal positions,
     and shifts them horizontally while maintaining their vertical positions and internal structure.
     Shapes are distributed evenly across the available space, preserving their left-to-right order.
+    The overall arrangement is centered within the grid.
     """
     height, width = input_grid.get_dimensions()
     new_grid = ColoredGrid(values=[[0 for _ in range(width)] for _ in range(height)])
@@ -44,13 +45,16 @@ def solve_64a7c07e(input_grid: ColoredGrid) -> ColoredGrid:
     available_space = width - total_shape_width
     ideal_gap = available_space // (len(shapes) + 1) if shapes else 0
     
-    left_boundary = 0
+    # Calculate the starting position to center the entire arrangement
+    start_position = (available_space - (len(shapes) - 1) * ideal_gap) // 2
+    
+    left_boundary = start_position
     for shape in shapes:
         shape_left = min(c for _, c in shape)
         shape_right = max(c for _, c in shape)
         shape_width = shape_right - shape_left + 1
         
-        new_left = left_boundary + ideal_gap
+        new_left = left_boundary
         
         # Ensure the shape doesn't go beyond the right edge of the grid
         if new_left + shape_width > width:
@@ -65,6 +69,6 @@ def solve_64a7c07e(input_grid: ColoredGrid) -> ColoredGrid:
             new_grid.values[r][new_c] = input_grid.values[r][c]
         
         # Update the left boundary for the next shape
-        left_boundary = new_left + shape_width
+        left_boundary = new_left + shape_width + ideal_gap
     
     return new_grid
