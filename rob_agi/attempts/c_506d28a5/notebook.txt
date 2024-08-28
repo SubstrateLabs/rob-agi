@@ -1,1 +1,28 @@
 Challenge 506d28a5:
+
+Observations:
+1. The transformation only considers the top 4 rows of the input grid.
+2. The output grid is always 4x5.
+3. The transformation is applied column-wise.
+4. If a column contains any red (2) cells, it's transformed; otherwise, it remains unchanged.
+5. When a column is transformed:
+   - Green (3) replaces red (2) and other non-black colors.
+   - Black (0) cells are preserved, but their position might change.
+
+Updated Rule (based on latest test failure):
+- In columns with red, all black cells should be preserved in their original positions.
+- The remaining cells in these columns should be filled with green (3).
+- Columns without red should remain unchanged.
+
+Things that don't work:
+- Preserving only contiguous black cells from the edges.
+- Filling the entire column with green and then adding black cells back.
+
+Remaining questions:
+- Are there any special cases we haven't considered yet?
+- Is there a pattern to how black cells are treated in columns with red that we're missing?
+
+Next steps:
+1. Modify the implementation to preserve all black cells in their exact positions for columns with red.
+2. Re-run tests to verify if this solves all cases.
+3. If not, analyze the differences between expected and actual outputs to identify any missed patterns.
