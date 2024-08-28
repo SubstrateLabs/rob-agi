@@ -48,7 +48,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     target_color = RED if red_count >= green_count else GREEN
 
     visited = [[False for _ in row] for row in input_grid.values]
-    transformed_grid = [row[:] for row in input_grid.values]
+    transform_markers = [[False for _ in row] for row in input_grid.values]
 
     for i in range(rows):
         for j in range(cols):
@@ -56,6 +56,12 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
                 region = flood_fill(i, j, visited)
                 if 2 <= len(region) <= 4 or (len(region) == 5 and is_plus_shape(region)):
                     for x, y in region:
-                        transformed_grid[x][y] = target_color
+                        transform_markers[x][y] = True
+
+    transformed_grid = [row[:] for row in input_grid.values]
+    for i in range(rows):
+        for j in range(cols):
+            if transform_markers[i][j]:
+                transformed_grid[i][j] = target_color
 
     return ColoredGrid(values=transformed_grid)
