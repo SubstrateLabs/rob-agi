@@ -1,1 +1,40 @@
 Challenge 2c737e39:
+
+Pattern Identification:
+- The main pattern is located in the top-left corner of the input grid.
+- The pattern includes non-black (non-zero) squares that are connected.
+- Gray (5) squares are part of the pattern but are treated differently.
+
+Duplication Rules:
+- The pattern should be duplicated once.
+- The duplicate should be shifted either down or to the side, depending on available space.
+- Gray squares are not duplicated in the new pattern.
+
+Gray Square Handling:
+- Isolated gray squares (those surrounded by black/zero squares) should be removed.
+- Gray squares that are part of the main pattern should remain.
+
+Duplication Direction:
+- The duplication direction is not always the same (can be down-right, down-left, or potentially other directions).
+- The direction seems to depend on available space in the grid.
+
+Current Issues:
+- The algorithm is not correctly identifying the best direction for duplication in all cases.
+- The duplication is not happening in some cases, particularly when it should be down and to the left.
+
+Next Steps:
+- Refine the logic for determining the duplication direction.
+- Ensure that the duplication happens even when the space is tight.
+- Double-check the handling of gray squares in both the original and duplicated patterns.
+
+Certainties:
+- The main pattern should always be duplicated once.
+- Isolated gray squares should be removed.
+
+Uncertainties:
+- The exact priority order for choosing duplication direction when multiple options are available.
+- Whether there are edge cases we haven't considered in the current test set.
+
+Failed Attempts:
+- Simply duplicating the pattern downwards or to the right doesn't work for all cases.
+- Ignoring gray squares completely in the duplication process is incorrect.
