@@ -1,1 +1,27 @@
 Challenge 93b4f4b3:
+
+Observations:
+1. The input grid is 12x10, and the output grid is 6x10.
+2. The left 6 columns of the input form a frame (blue in example_0, gray in example_1) that is preserved in the output.
+3. Colored shapes from the right side of the input are moved into the frame in the output.
+4. The order of the shapes in the output is important and doesn't match their original vertical order.
+
+What we know:
+1. We need to extract the frame from the left 6 columns of the input.
+2. We need to identify and extract the colored shapes from the right side of the input.
+3. The shapes need to be inverted vertically when placed in the output.
+4. The placement order of shapes is not strictly bottom-to-top or top-to-bottom based on their original positions.
+
+What we've tried:
+1. Sorting shapes from bottom to top based on their original position - this didn't work.
+
+What we need to figure out:
+1. The correct ordering logic for placing the shapes in the output grid.
+2. Whether there's a pattern to the placement that we're missing (e.g., based on color, size, or position relative to other shapes).
+
+Next steps:
+1. Analyze the example inputs and outputs more closely to determine the exact rules for shape placement.
+2. Consider implementing a more complex sorting or placement algorithm that takes into account multiple factors (original position, shape size, color, etc.).
+3. Test with additional examples if possible to gather more data on the pattern.
+
+Remember: The solution should be general enough to work for all possible inputs, not just the given examples.
