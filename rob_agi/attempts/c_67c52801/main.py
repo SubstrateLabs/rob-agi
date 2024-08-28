@@ -35,12 +35,12 @@ def solve_67c52801(input_grid: ColoredGrid) -> ColoredGrid:
     # Sort color groups
     color_groups.sort(key=lambda g: (-max(r for r, _, _ in g), min(c for _, c, _ in g)))
     
+    # Handle single cells in second-to-last row
+    handle_single_cells(input_grid, output_grid)
+    
     # Place color groups
     for group in color_groups:
         place_group(output_grid, group)
-    
-    # Handle single cells in second-to-last row
-    handle_single_cells(input_grid, output_grid)
     
     return output_grid
 
@@ -49,7 +49,7 @@ def identify_color_groups(grid: ColoredGrid) -> List[List[Tuple[int, int, int]]]
     visited = set()
     groups = []
     
-    for r in range(rows - 1):  # Exclude bottom row
+    for r in range(rows - 2):  # Exclude bottom two rows
         for c in range(cols):
             if (r, c) not in visited and grid.values[r][c] != 0:
                 group = []
@@ -59,7 +59,7 @@ def identify_color_groups(grid: ColoredGrid) -> List[List[Tuple[int, int, int]]]
     return groups
 
 def dfs(grid: ColoredGrid, r: int, c: int, color: int, visited: set, group: List[Tuple[int, int, int]]):
-    if r < 0 or r >= grid.num_rows - 1 or c < 0 or c >= grid.num_cols or (r, c) in visited or grid.values[r][c] != color:
+    if r < 0 or r >= grid.num_rows - 2 or c < 0 or c >= grid.num_cols or (r, c) in visited or grid.values[r][c] != color:
         return
     
     visited.add((r, c))
@@ -104,7 +104,7 @@ def handle_single_cells(input_grid: ColoredGrid, output_grid: ColoredGrid):
     second_last_row = rows - 2
     
     for c in range(cols):
-        if input_grid.values[second_last_row][c] != 0 and output_grid.values[second_last_row][c] == 0:
+        if input_grid.values[second_last_row][c] != 0:
             color = input_grid.values[second_last_row][c]
             for new_c in range(cols):
                 if output_grid.values[second_last_row][new_c] == 0:
