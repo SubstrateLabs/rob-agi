@@ -1,6 +1,4 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
-from collections import deque
 
 def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -11,26 +9,31 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     4. Gray (5) acts as a border and is not considered part of any region.
     5. All transformations are applied simultaneously.
 
-    The solution identifies the target color from gray-enclosed regions,
-    detects blue plus shapes, and transforms them to the target color.
+    The solution scans for a gray-enclosed target color, identifies blue plus shapes,
+    and transforms them to the target color in a single pass.
     """
     BLUE, RED, GREEN, GRAY = 1, 2, 3, 5
+    rows, cols = len(input_grid.values), len(input_grid.values[0])
+    result_grid = [row[:] for row in input_grid.values]
+    target_color = None
 
-    def find_target_color():
-        for i in range(rows):
-            for j in range(cols):
-                if input_grid.values[i][j] == GRAY:
-                    enclosed_color = find_enclosed_color(i, j)
-                    if enclosed_color in [RED, GREEN]:
-                        return enclosed_color
-        return RED  # Default to red if no enclosed color found
+    # Find the target color
+    for i in range(rows):
+        for j in range(cols):
+            if input_grid.values[i][j] == GRAY:
+                for di, dj in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                    ni, nj = i + di, j + dj
+                    if 0 <= ni < rows and 0 <= nj < cols:
+                        if input_grid.values[ni][nj] in [RED, GREEN]:
+                            target_color = input_grid.values[ni][nj]
+                            break
+                if target_color:
+                    break
+        if target_color:
+            break
 
-    def find_enclosed_color(start_x: int, start_y: int) -> int:
-        for dx, dy in [(1, 1), (1, -1), (-1, 1), (-1, -1)]:
-            x, y = start_x + dx, start_y + dy
-            if 0 <= x < rows and 0 <= y < cols and input_grid.values[x][y] in [RED, GREEN]:
-                return input_grid.values[x][y]
-        return 0
+    if target_color is None:
+        return input_grid  # No transformation needed
 
     def is_plus_shape(x: int, y: int) -> bool:
         if input_grid.values[x][y] != BLUE:
@@ -41,14 +44,11 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
                 return False
         return True
 
-    rows, cols = len(input_grid.values), len(input_grid.values[0])
-    target_color = find_target_color()
-
-    transformed_grid = [row[:] for row in input_grid.values]
+    # Transform blue plus shapes
     for i in range(rows):
         for j in range(cols):
             if is_plus_shape(i, j):
-                for dx, dy in [(0, 0), (0, 1), (1, 0), (0, -1), (-1, 0)]:
-                    transformed_grid[i+dx][j+dy] = target_color
+                for di, dj in [(0, 0), (0, 1), (1, 0), (0, -1), (-1, 0)]:
+                    result_grid[i+di][j+dj] = target_color
 
-    return ColoredGrid(values=transformed_grid)
+    return ColoredGrid(values=result_grid)
