@@ -20,7 +20,7 @@ def solve_bbb1b8b6(input_grid: ColoredGrid) -> ColoredGrid:
     shapes = identify_shapes(right_half)
     
     for color, shape in shapes:
-        expand_shape(result_grid, right_half, shape, color)
+        expand_shape(result_grid, shape, color)
     
     return ColoredGrid(values=result_grid)
 
@@ -54,27 +54,26 @@ def identify_shapes(right_half: List[List[int]]) -> List[Tuple[int, Set[Tuple[in
     
     return shapes
 
-def expand_shape(result_grid: List[List[int]], right_half: List[List[int]], shape: Set[Tuple[int, int]], color: int) -> None:
+def expand_shape(result_grid: List[List[int]], shape: Set[Tuple[int, int]], color: int) -> None:
     left_edge = min(c for _, c in shape)
     top_edge = min(r for r, _ in shape)
+    bottom_edge = max(r for r, _ in shape)
+    shape_height = bottom_edge - top_edge + 1
     
-    for r in range(4):
-        if (r, left_edge) in shape and result_grid[r][3] == 0:
-            queue = deque([(r, 3)])
-            visited = set()
-            
-            while queue:
-                cr, cc = queue.popleft()
-                if (cr, cc) in visited or result_grid[cr][cc] != 0:
-                    continue
-                
-                visited.add((cr, cc))
-                if (cr - top_edge, cc - 3 + left_edge) in shape:
-                    result_grid[cr][cc] = color
-                
-                    for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                        nr, nc = cr + dr, cc + dc
-                        if 0 <= nr < 4 and 0 <= nc < 4:
-                            queue.append((nr, nc))
-            
+    for start_col in range(3, -1, -1):
+        if can_expand(result_grid, shape, top_edge, start_col):
+            for r, c in shape:
+                new_r = r - top_edge
+                new_c = start_col + (c - left_edge)
+                if 0 <= new_r < 4 and 0 <= new_c < 4:
+                    result_grid[new_r][new_c] = color
             break
+
+def can_expand(result_grid: List[List[int]], shape: Set[Tuple[int, int]], top_edge: int, start_col: int) -> bool:
+    left_edge = min(c for _, c in shape)
+    for r, c in shape:
+        new_r = r - top_edge
+        new_c = start_col + (c - left_edge)
+        if new_r < 0 or new_r >= 4 or new_c < 0 or new_c >= 4 or result_grid[new_r][new_c] != 0:
+            return False
+    return True
