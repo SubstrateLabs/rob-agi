@@ -5,21 +5,21 @@ def solve_94be5b80(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by converting vertical lines at the top into horseshoe shapes,
     while preserving existing horseshoes. The process involves:
-    1. Extracting unique colors from the top area (first 3 rows) in order.
+    1. Analyzing the input grid to identify unique colors and their positions.
     2. Identifying existing horseshoes in the input grid.
-    3. Creating a layout plan for all horseshoes (existing and new).
-    4. Generating the output grid with horseshoes in their determined positions.
-    5. Maintaining a 2-row gap between horseshoes when possible, but allowing flexibility.
-    6. Preserving existing horseshoes in their original positions.
-    7. Ensuring vertical alignment of all horseshoes.
-    8. Filling remaining space with black (0).
-    9. Limiting the output grid to a maximum of 30 rows or the input grid height, whichever is larger.
+    3. Calculating available space and adjusting horseshoe parameters if necessary.
+    4. Creating new horseshoes for colors that don't have one.
+    5. Placing all horseshoes (existing and new) in the output grid.
+    6. Maintaining the order of colors from top to bottom.
+    7. Adjusting horizontal positioning to center horseshoes if there's excess space.
+    8. Ensuring all horseshoes fit within the grid boundaries.
+    9. Preserving the input grid dimensions in the output.
     """
     rows, cols = input_grid.get_dimensions()
 
-    def extract_top_colors() -> List[int]:
+    def extract_colors() -> List[int]:
         unique_colors = []
-        for r in range(3):
+        for r in range(rows):
             for c in range(cols):
                 color = input_grid.get_cell(r, c)
                 if color != 0 and color not in unique_colors:
@@ -54,56 +54,47 @@ def solve_94be5b80(input_grid: ColoredGrid) -> ColoredGrid:
                     horseshoes.append((input_grid.get_cell(r, c), r, c))
         return horseshoes
 
-    # Step 1: Extract top colors
-    top_colors = extract_top_colors()
+    # Step 1: Extract colors
+    colors = extract_colors()
 
     # Step 2: Identify existing horseshoes
     existing_horseshoes = find_existing_horseshoes()
     existing_colors = set(color for color, _, _ in existing_horseshoes)
 
-    # Step 3: Create layout plan
-    layout = existing_horseshoes[:]
-    for color in top_colors:
-        if color not in existing_colors:
-            layout.append((color, -1, -1))  # -1 indicates a new horseshoe
+    # Step 3: Calculate available space and adjust parameters
+    new_horseshoes = [color for color in colors if color not in existing_colors]
+    total_horseshoes = len(existing_horseshoes) + len(new_horseshoes)
+    ideal_space = total_horseshoes * 5 - 2  # 3 rows per horseshoe + 2 rows gap, minus 2 for no gap at the end
+    available_space = rows
 
-    # Sort layout, preserving order of colors from top
-    def sort_key(x):
-        if x[1] != -1:  # Existing horseshoe
-            return (x[1], top_colors.index(x[0]) if x[0] in top_colors else len(top_colors))
-        else:  # New horseshoe
-            return (float('inf'), top_colors.index(x[0]))
+    if ideal_space > available_space:
+        gap = max(0, (available_space - total_horseshoes * 3) // (total_horseshoes - 1))
+    else:
+        gap = 2
 
-    layout.sort(key=sort_key)
-
-    # Calculate output grid size
-    output_rows = max(rows, min(len(layout) * 5, 30))  # Use input height or up to 30 rows
-    output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(output_rows)])
-
-    # Step 4: Determine positions and create horseshoes
+    # Step 4 & 5: Create and place horseshoes
+    output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
     current_row = 0
-    for color, top, left in layout:
-        if top != -1:  # Existing horseshoe
-            create_horseshoe(output_grid, color, top, left)
-        else:  # New horseshoe
+
+    for color, top, left in existing_horseshoes:
+        create_horseshoe(output_grid, color, top, left)
+
+    for color in new_horseshoes:
+        if current_row + 3 <= rows:
             create_horseshoe(output_grid, color, current_row, 3)
-            current_row += 5
+            current_row += 3 + gap
 
-        # Ensure we don't exceed the output grid size
-        if current_row >= output_rows:
-            break
+    # Step 6: Maintain color order (already done by the order of processing)
 
-    # Step 5: Adjust spacing
-    horseshoe_rows = [r for r in range(output_rows) if any(output_grid.get_cell(r, c) != 0 for c in range(cols))]
-    for i in range(len(horseshoe_rows) - 1):
-        gap = horseshoe_rows[i+1] - horseshoe_rows[i] - 3
-        if gap > 2:
-            # Move the lower horseshoe up
-            shift = min(gap - 2, 2)  # Try to get 2-row gap, but don't overlap
-            for r in range(horseshoe_rows[i+1], min(horseshoe_rows[i+1]+3, output_rows)):
-                for c in range(cols):
-                    output_grid.set_cell(r-shift, c, output_grid.get_cell(r, c))
-                    output_grid.set_cell(r, c, 0)
-            horseshoe_rows[i+1] -= shift
+    # Step 7: Adjust horizontal positioning
+    left_margin = (cols - 7) // 2
+    if left_margin > 3:
+        for r in range(rows):
+            row = [output_grid.get_cell(r, c) for c in range(cols)]
+            shifted_row = [0] * left_margin + row[3:-3] + [0] * (cols - 7 - left_margin)
+            for c in range(cols):
+                output_grid.set_cell(r, c, shifted_row[c])
+
+    # Step 8 & 9: Ensure fit within boundaries and preserve dimensions (already done)
 
     return output_grid
