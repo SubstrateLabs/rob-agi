@@ -6,13 +6,12 @@ def solve_981571dc(input_grid: ColoredGrid) -> ColoredGrid:
     
     The function performs the following steps:
     1. Create a deep copy of the input grid.
-    2. Iterate through each cell from left to right, top to bottom.
-    3. If a black cell (value 0) is found:
-       a. If it's in the first column, set its value to the cell above (if exists).
-       b. Otherwise, set its value to the cell to its left.
-    4. After processing all rows, fill any remaining black cells in the first row.
+    2. Iterate through the grid, filling black cells based on neighbors.
+    3. Handle the top-left corner and first row/column separately.
+    4. Perform a final check to ensure no black cells remain.
     
-    This approach ensures consistent pattern extension, prioritizing left-to-right filling.
+    This approach ensures consistent pattern extension, prioritizing left-to-right
+    and top-to-bottom filling, while handling edge cases and ensuring complete filling.
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed.
@@ -23,17 +22,47 @@ def solve_981571dc(input_grid: ColoredGrid) -> ColoredGrid:
     grid = input_grid.deep_copy()
     rows, cols = len(grid.values), len(grid.values[0])
 
+    # Main filling process
     for r in range(rows):
         for c in range(cols):
             if grid.values[r][c] == 0:
-                if c == 0 and r > 0:
-                    grid.values[r][c] = grid.values[r-1][c]
-                elif c > 0:
+                if c > 0:
                     grid.values[r][c] = grid.values[r][c-1]
+                elif r > 0:
+                    grid.values[r][c] = grid.values[r-1][c]
 
-    # Handle remaining black cells in the first row
+    # Handle top-left corner
+    if grid.values[0][0] == 0:
+        for r in range(rows):
+            for c in range(cols):
+                if grid.values[r][c] != 0:
+                    grid.values[0][0] = grid.values[r][c]
+                    break
+            if grid.values[0][0] != 0:
+                break
+
+    # Handle first row and column
     for c in range(1, cols):
         if grid.values[0][c] == 0:
             grid.values[0][c] = grid.values[0][c-1]
+    for r in range(1, rows):
+        if grid.values[r][0] == 0:
+            grid.values[r][0] = grid.values[r-1][0]
+
+    # Final check
+    for r in range(rows):
+        for c in range(cols):
+            if grid.values[r][c] == 0:
+                neighbors = []
+                if c > 0:
+                    neighbors.append(grid.values[r][c-1])
+                if r > 0:
+                    neighbors.append(grid.values[r-1][c])
+                if c < cols - 1:
+                    neighbors.append(grid.values[r][c+1])
+                if r < rows - 1:
+                    neighbors.append(grid.values[r+1][c])
+                if neighbors:
+                    grid.values[r][c] = next(filter(lambda x: x != 0, neighbors), 1)
 
     return grid
