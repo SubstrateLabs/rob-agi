@@ -1,1 +1,31 @@
 Challenge 84db8fc4:
+
+Problem Description:
+The challenge involves transforming a 2D grid of colored squares. The main task is to find the longest continuous path of black squares (0) connecting any two edge points on different edges, turn this path gray (5), and change all other black squares to red (2). Other colored squares should remain unchanged.
+
+What We Know:
+1. The input is a ColoredGrid object with values representing different colors (0-9).
+2. The grid size can vary but is always rectangular.
+3. The longest path must start and end on different edges of the grid.
+4. If multiple longest paths exist, choose the most centrally located one.
+5. If no valid path is found, all black squares should be changed to red.
+
+Current Implementation Issues:
+1. The algorithm is not consistently finding the correct longest path.
+2. There might be an issue with the centrality calculation or path selection.
+
+What We've Tried:
+1. Depth-First Search (DFS) to find paths between edges.
+2. Calculating path centrality using Manhattan distance.
+
+Next Steps:
+1. Review the DFS implementation to ensure it's exploring all possible paths.
+2. Double-check the logic for selecting the most central path.
+3. Implement a visualization function to better understand the paths being found.
+4. Consider alternative pathfinding algorithms (e.g., Breadth-First Search) for comparison.
+
+Unknowns:
+1. Whether the current centrality calculation is the most appropriate method.
+2. If there are edge cases we haven't considered in the path selection process.
+
+Remember: The solution must work for all test cases, not just the failing one.
