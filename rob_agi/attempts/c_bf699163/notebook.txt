@@ -1,1 +1,32 @@
 Challenge bf699163:
+
+Observations:
+1. The challenge involves finding a specific 3x3 pattern within a larger grid.
+2. Valid patterns have a gray (5) center surrounded by cells of the same non-gray color.
+3. The optimal pattern is not always the one with the lowest color value.
+4. Centrality (proximity to the grid center) seems to play a role in determining the optimal pattern.
+
+Current implementation:
+- Prioritizes patterns with lower color values.
+- Uses centrality as a tiebreaker for patterns with the same color.
+
+Issues:
+- The implementation fails for example_1, selecting a blue (1) pattern instead of the expected yellow (4) pattern.
+- This suggests that our current prioritization method is incorrect.
+
+Hypotheses:
+1. The optimal pattern might be determined by a combination of color value and centrality, rather than prioritizing one over the other.
+2. There might be additional factors we haven't considered yet, such as the size of the grid or the number of occurrences of each pattern.
+
+Next steps:
+1. Analyze the visual descriptions of the examples to gain more insights.
+2. Experiment with different scoring methods that combine color value and centrality.
+3. Consider implementing a visualization tool to better understand the pattern selection process.
+
+Things that don't work:
+- Prioritizing color value over centrality.
+- Using centrality only as a tiebreaker.
+
+Unknowns:
+- The exact formula or method for determining the optimal pattern.
+- Whether there are additional factors beyond color and centrality that influence the selection.
