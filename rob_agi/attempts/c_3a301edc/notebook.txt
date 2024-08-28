@@ -1,1 +1,33 @@
 Challenge 3a301edc:
+
+Pattern Observations:
+1. The challenge involves adding a border around a shape in a grid.
+2. The border color is not always the most frequent color in the shape.
+3. The border thickness is 1 for shapes with largest dimension <= 5, and 2 for larger shapes.
+4. The original shape must be preserved exactly as it is in the input.
+5. The result should be centered in the original grid size.
+
+Key Issues:
+1. Border color selection: The current method of choosing the most frequent color is incorrect.
+2. Shape preservation: The current implementation is expanding the shape instead of adding a border.
+
+What We Know:
+- The border thickness calculation (1 for dimension <= 5, 2 otherwise) is correct.
+- The centering logic appears to be working correctly.
+
+What We Need to Fix:
+1. Border color selection: We need to find a new method to determine the border color.
+   Possible approach: Use the color of the outermost non-black cells of the shape.
+2. Shape preservation: We need to modify the algorithm to add a border around the shape
+   without changing the shape itself.
+
+Next Steps:
+1. Implement a new method for border color selection.
+2. Modify the shape copying process to add a border around the shape instead of expanding it.
+3. Ensure that the original shape remains unchanged within the new bordered shape.
+4. Double-check the centering logic to make sure it works for all cases.
+
+Things to Keep in Mind:
+- The solution should work for all examples and potential edge cases.
+- Maintain the original grid size and center the new shape within it.
+- Preserve all black space outside of the new bordered shape.
