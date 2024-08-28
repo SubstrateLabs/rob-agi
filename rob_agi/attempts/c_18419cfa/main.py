@@ -10,7 +10,8 @@ def solve_18419cfa(input_grid: ColoredGrid) -> ColoredGrid:
     from the red pattern, which is then repeated to fill the sky blue region. The expansion 
     maintains symmetry and is contained within the bounds of each sky blue region. 
     Non-sky blue areas are preserved. The pattern is centered vertically if there's 
-    remaining space after repetitions.
+    remaining space after repetitions. Small regions are handled by scaling down the template
+    if necessary.
     """
     grid = input_grid.deep_copy()
     sky_blue_regions = find_connected_regions(grid, 8)
@@ -58,6 +59,10 @@ def expand_region(grid: ColoredGrid, region: Set[Tuple[int, int]]):
     template = create_symmetrical_template(red_pixels, min_r, min_c, max_r, max_c)
     
     template_height = len(template)
+    if template_height > height:
+        template = scale_template(template, height)
+        template_height = height
+
     repetitions = height // template_height
     extra_space = height % template_height
     
@@ -100,6 +105,19 @@ def create_symmetrical_template(red_pixels: Set[Tuple[int, int]], min_r: int, mi
     # If the original height is odd, add an extra row in the middle
     if height % 2 == 1:
         middle_row = [2 if template[height-1][c] == 2 or template[0][c] == 2 else 0 for c in range(width)]
-        mirrored_template.insert(height, middle_row)
+        mirrored_template.insert(len(template), middle_row)
     
     return mirrored_template
+
+def scale_template(template: List[List[int]], target_height: int) -> List[List[int]]:
+    current_height = len(template)
+    if current_height <= target_height:
+        return template
+
+    scale_factor = target_height / current_height
+    new_template = []
+    for i in range(target_height):
+        source_row = int(i / scale_factor)
+        new_template.append(template[source_row])
+    
+    return new_template
