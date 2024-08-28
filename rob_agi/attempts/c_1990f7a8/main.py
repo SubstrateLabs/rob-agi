@@ -10,11 +10,12 @@ def solve_1990f7a8(input_grid: ColoredGrid) -> ColoredGrid:
     
     Steps:
     1. Divide input into quadrants
-    2. Extract and simplify the pattern from each quadrant
+    2. Extract and simplify the pattern from each quadrant, considering the center of mass
     3. Create a 3x3 representation for each quadrant, preserving exact patterns when possible
     4. Assemble the 3x3 representations into a 7x7 output grid
     5. Handle the middle column to connect patterns across quadrants
     6. Ensure the middle row (row 3) remains black as a separator
+    7. Make final adjustments to ensure pattern representation and connectivity
     
     Args:
     input_grid (ColoredGrid): The input grid to be transformed
@@ -33,22 +34,30 @@ def solve_1990f7a8(input_grid: ColoredGrid) -> ColoredGrid:
         if not red_cells:
             return pattern
         
-        min_r, min_c = min(red_cells)
-        max_r, max_c = max(red_cells)
-        height, width = max_r - min_r + 1, max_c - min_c + 1
+        # Calculate center of mass
+        center_r = sum(r for r, _ in red_cells) / len(red_cells)
+        center_c = sum(c for _, c in red_cells) / len(red_cells)
+        
+        height, width = bottom - top + 1, right - left + 1
         
         if height <= 3 and width <= 3:
             # If pattern fits within 3x3, preserve it exactly
             for r, c in red_cells:
-                pattern[r - min_r][c - min_c] = 2
+                pattern[r][c] = 2
         else:
             # Simplify larger patterns
-            for r in range(min_r, max_r + 1):
-                for c in range(min_c, max_c + 1):
-                    if subgrid.get_cell(r, c) == 2:
-                        pattern_r = min(2, (r - min_r) * 3 // height)
-                        pattern_c = min(2, (c - min_c) * 3 // width)
-                        pattern[pattern_r][pattern_c] = 2
+            for r in range(3):
+                for c in range(3):
+                    r_start, r_end = top + r * height // 3, top + (r + 1) * height // 3
+                    c_start, c_end = left + c * width // 3, left + (c + 1) * width // 3
+                    if any(r_start <= rr < r_end and c_start <= cc < c_end for rr, cc in red_cells):
+                        pattern[r][c] = 2
+        
+        # Ensure at least one red cell if original had red cells
+        if sum(sum(row) for row in pattern) == 0 and red_cells:
+            nearest_r = min(range(3), key=lambda r: abs(r - center_r * 3 / height))
+            nearest_c = min(range(3), key=lambda c: abs(c - center_c * 3 / width))
+            pattern[nearest_r][nearest_c] = 2
         
         return pattern
 
@@ -70,13 +79,21 @@ def solve_1990f7a8(input_grid: ColoredGrid) -> ColoredGrid:
 
     # Handle middle column
     for r in range(3):
-        if output_values[r][2] == 2 and output_values[r][4] == 2:
+        if output_values[r][2] == 2 or output_values[r][4] == 2:
             output_values[r][3] = 2
     for r in range(4, 7):
-        if output_values[r][2] == 2 and output_values[r][4] == 2:
+        if output_values[r][2] == 2 or output_values[r][4] == 2:
             output_values[r][3] = 2
 
     # Ensure middle row is black
     output_values[3] = [0, 0, 0, 0, 0, 0, 0]
+
+    # Final adjustments
+    for r in range(7):
+        if r != 3 and sum(output_values[r]) == 0:
+            if r < 3 and sum(sum(row) for row in quadrants[0 if r < 3 else 2]) > 0:
+                output_values[r][1] = 2
+            elif r > 3 and sum(sum(row) for row in quadrants[1 if r < 3 else 3]) > 0:
+                output_values[r][5] = 2
 
     return ColoredGrid(values=output_values)
