@@ -1,5 +1,6 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Set
+from typing import List, Tuple
+from collections import deque
 
 def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -16,13 +17,13 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     visited = [[False for _ in range(cols)] for _ in range(rows)]
 
     def is_valid(r: int, c: int) -> bool:
-        return 0 <= r < rows and 0 <= c < cols
+        return 0 <= r < rows and 0 <= c < cols and input_grid.values[r][c] != 5
 
     def flood_fill(start_row: int, start_col: int) -> List[Tuple[int, int]]:
-        stack = [(start_row, start_col)]
+        queue = deque([(start_row, start_col)])
         region = []
-        while stack and len(region) <= 8:
-            row, col = stack.pop()
+        while queue and len(region) <= 8:
+            row, col = queue.popleft()
             if visited[row][col] or input_grid.values[row][col] != 1:
                 continue
             visited[row][col] = True
@@ -30,13 +31,13 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
             for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                 new_row, new_col = row + dr, col + dc
                 if is_valid(new_row, new_col) and input_grid.values[new_row][new_col] == 1 and not visited[new_row][new_col]:
-                    stack.append((new_row, new_col))
+                    queue.append((new_row, new_col))
         return region if 2 <= len(region) <= 8 else []
 
     def determine_target_color() -> int:
         red_count = sum(row.count(2) for row in input_grid.values)
         green_count = sum(row.count(3) for row in input_grid.values)
-        return 2 if red_count >= green_count else 3
+        return 3 if green_count > red_count else 2
 
     target_color = determine_target_color()
     regions_to_transform = []
