@@ -1,1 +1,38 @@
 Challenge ba9d41b8:
+
+Problem Description:
+- Transform a 2D grid by applying a checkerboard pattern to non-black regions.
+- The outer border of each region remains unchanged.
+- The bottom row and rightmost column of each region remain unchanged.
+- Interior cells are filled with a checkerboard pattern using the original color and black (0).
+- The checkerboard pattern is based on absolute grid positions.
+
+Key Observations:
+1. The checkerboard pattern is consistent across all regions, regardless of their position.
+2. Cells where the sum of row and column indices is even should be set to black (0).
+3. The bottom row and rightmost column of each region should remain the original color.
+
+Current Implementation:
+- We use flood fill to identify connected regions of the same color.
+- We process each region separately, applying the checkerboard pattern.
+- We preserve the outer border, bottom row, and rightmost column of each region.
+
+Issues Identified:
+1. The checkerboard pattern in the top-left (green) region is incorrect.
+   - The pattern starts with the original color instead of black.
+2. The yellow region (bottom-left) has an incorrect first row of the pattern.
+
+Next Steps:
+1. Modify the `process_region` function to start the checkerboard pattern correctly.
+2. Double-check the logic for determining which cells should be black.
+3. Ensure that the absolute grid position is used for the checkerboard pattern, not the relative position within the region.
+
+Things Tried That Didn't Work:
+- Simply changing the condition from odd to even in the checkerboard pattern application.
+
+Certainties:
+- The overall approach of flood fill and region processing is correct.
+- The preservation of borders and specific rows/columns is working as intended.
+
+Uncertainties:
+- The exact implementation of how to apply the checkerboard pattern based on absolute grid positions.
