@@ -6,9 +6,9 @@ def solve_72207abc(input_grid: ColoredGrid) -> ColoredGrid:
     
     The pattern:
     1. Extracts the initial sequence from the middle row, including non-zero elements and the first zero after them.
-    2. Repeats this sequence across the row with increasing spacing between repetitions.
-    3. The spacing starts at 0 and increases by 1 after each non-zero element in the sequence.
-    4. The spacing resets to 0 when the sequence restarts.
+    2. Repeats this sequence across the row with increasing spacing between non-zero elements.
+    3. The spacing starts at 0 and increases by 1 after each repetition of the sequence.
+    4. Non-zero elements are placed immediately after the spacing.
     5. The top and bottom rows remain unchanged (all zeros).
     
     Args:
@@ -21,7 +21,7 @@ def solve_72207abc(input_grid: ColoredGrid) -> ColoredGrid:
     initial_sequence = []
     for color in input_grid.values[1]:  # Middle row
         initial_sequence.append(color)
-        if color == 0 and initial_sequence[-2:] != [0, 0]:  # Stop after first zero following non-zero
+        if color == 0 and len(initial_sequence) > 1:  # Stop after first zero following non-zero
             break
     
     # Create a new grid
@@ -31,28 +31,26 @@ def solve_72207abc(input_grid: ColoredGrid) -> ColoredGrid:
     current_position = 0
     width = len(input_grid.values[1])
     spacing = 0
-    sequence_index = 0
     
     while current_position < width:
-        # Add the next color from the sequence
-        new_grid.values[1][current_position] = initial_sequence[sequence_index]
-        current_position += 1
-        
-        # Add zeros for spacing after non-zero elements
-        if initial_sequence[sequence_index] != 0:
+        for color in initial_sequence:
+            if current_position >= width:
+                break
+            
+            # Add spacing zeros
             for _ in range(spacing):
                 if current_position < width:
                     new_grid.values[1][current_position] = 0
                     current_position += 1
                 else:
                     break
-            spacing += 1
+            
+            # Add the color from the sequence
+            if current_position < width:
+                new_grid.values[1][current_position] = color
+                current_position += 1
         
-        sequence_index += 1
-        
-        # Reset if we've used all elements in the sequence
-        if sequence_index == len(initial_sequence):
-            sequence_index = 0
-            spacing = 0
+        # Increase spacing after each repetition of the sequence
+        spacing += 1
     
     return new_grid
