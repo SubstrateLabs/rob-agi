@@ -19,7 +19,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         stack = [(start_row, start_col)]
         region = []
         visited = set()
-        while stack:
+        while stack and len(region) <= 8:
             row, col = stack.pop()
             if (row, col) in visited:
                 continue
@@ -29,7 +29,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
                 for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                     new_row, new_col = row + dr, col + dc
                     if 0 <= new_row < rows and 0 <= new_col < cols:
-                        if input_grid.values[new_row][new_col] != 5:  # Not gray
+                        if input_grid.values[new_row][new_col] == color:
                             stack.append((new_row, new_col))
         return region
 
