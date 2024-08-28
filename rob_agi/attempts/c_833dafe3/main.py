@@ -9,7 +9,7 @@ def solve_833dafe3(input_grid: ColoredGrid) -> ColoredGrid:
     The edges are then filled to create a symmetrical frame-like structure.
     Special handling is applied to corners and the second/second-to-last rows and columns.
     The result is a symmetrical pattern that expands on the input grid's design while
-    maintaining specific rules for the outer frame.
+    maintaining specific rules for the outer frame, including mirroring of elements.
     """
     height, width = input_grid.get_dimensions()
     new_grid = ColoredGrid(values=[[0 for _ in range(2*width)] for _ in range(2*height)])
@@ -21,38 +21,24 @@ def solve_833dafe3(input_grid: ColoredGrid) -> ColoredGrid:
             new_grid.values[2*i][2*j] = new_grid.values[2*i][2*j+1] = value
             new_grid.values[2*i+1][2*j] = new_grid.values[2*i+1][2*j+1] = value
     
-    # Handle the first and last columns
+    # Handle the frame
     for i in range(height):
+        # Left and right columns
         new_grid.values[2*i][0] = new_grid.values[2*i+1][0] = input_grid.values[i][0]
         new_grid.values[2*i][-1] = new_grid.values[2*i+1][-1] = input_grid.values[i][-1]
+        # Mirror for second and second-to-last columns
+        new_grid.values[2*i][1] = new_grid.values[2*i][-2] = input_grid.values[i][1] if j > 0 else input_grid.values[i][0]
+        new_grid.values[2*i+1][1] = new_grid.values[2*i+1][-2] = input_grid.values[i][0]
     
-    # Handle the first and last rows
     for j in range(width):
+        # Top and bottom rows
         new_grid.values[0][2*j] = new_grid.values[0][2*j+1] = input_grid.values[0][j]
         new_grid.values[-1][2*j] = new_grid.values[-1][2*j+1] = input_grid.values[-1][j]
-    
-    # Handle the second and second-to-last columns
-    for i in range(2*height):
-        if i % 2 == 0:
-            new_grid.values[i][1] = new_grid.values[i][0]
-            new_grid.values[i][-2] = new_grid.values[i][-1]
-        else:
-            new_grid.values[i][1] = new_grid.values[i][2]
-            new_grid.values[i][-2] = new_grid.values[i][-3]
-    
-    # Handle the second and second-to-last rows
-    for j in range(2*width):
-        if j % 2 == 0:
-            new_grid.values[1][j] = new_grid.values[0][j]
-            new_grid.values[-2][j] = new_grid.values[-1][j]
-        else:
-            new_grid.values[1][j] = new_grid.values[2][j]
-            new_grid.values[-2][j] = new_grid.values[-3][j]
+        # Mirror for second and second-to-last rows
+        new_grid.values[1][2*j] = new_grid.values[-2][2*j] = input_grid.values[1][j] if i > 0 else input_grid.values[0][j]
+        new_grid.values[1][2*j+1] = new_grid.values[-2][2*j+1] = input_grid.values[0][j]
     
     # Handle the corners
-    new_grid.values[0][0] = input_grid.values[0][0]
-    new_grid.values[0][-1] = input_grid.values[0][-1]
-    new_grid.values[-1][0] = input_grid.values[-1][0]
-    new_grid.values[-1][-1] = input_grid.values[-1][-1]
+    new_grid.values[0][0] = new_grid.values[0][-1] = new_grid.values[-1][0] = new_grid.values[-1][-1] = input_grid.values[0][0]
     
     return new_grid
