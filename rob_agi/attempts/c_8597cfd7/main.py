@@ -22,6 +22,8 @@ def solve_8597cfd7(input_grid: ColoredGrid) -> ColoredGrid:
     above_counts = defaultdict(int)
     below_counts = defaultdict(int)
     rightmost_positions = {}
+    total_above = 0
+    total_below = 0
 
     # Scan the grid
     for col in range(cols):
@@ -30,19 +32,25 @@ def solve_8597cfd7(input_grid: ColoredGrid) -> ColoredGrid:
             if color != 0 and color != 5:
                 if row < gray_line_index:
                     above_counts[color] += 1
+                    total_above += 1
                 elif row > gray_line_index:
                     below_counts[color] += 1
+                    total_below += 1
                 rightmost_positions[color] = col
 
-    # Evaluate color significance
-    max_significance = (-1, -1, -1)
-    chosen_color = 0
-
+    # Calculate significance scores
+    color_scores = []
     for color in set(above_counts.keys()) & set(below_counts.keys()):
-        significance = (below_counts[color], above_counts[color], rightmost_positions[color])
-        if significance > max_significance:
-            max_significance = significance
-            chosen_color = color
+        below_ratio = below_counts[color] / total_below if total_below > 0 else 0
+        above_ratio = above_counts[color] / total_above if total_above > 0 else 0
+        score = below_ratio - above_ratio
+        color_scores.append((score, rightmost_positions[color], color))
+
+    # Determine the most significant color
+    if color_scores:
+        chosen_color = max(color_scores, key=lambda x: (x[0], x[1]))[2]
+    else:
+        chosen_color = 0
 
     # Create the output grid
     return ColoredGrid(values=[[chosen_color] * 2 for _ in range(2)])
