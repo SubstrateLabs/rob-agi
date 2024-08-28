@@ -1,1 +1,30 @@
-Challenge 9c1e755f:
+Challenge 9c1e755f: Grid Transformation
+
+Key Observations:
+1. The challenge involves transforming a 10x10 grid based on seed patterns found on the edges.
+2. Edge priority matters: left > top > right > bottom.
+3. Pattern length is also a factor in priority.
+
+Current Understanding:
+- Vertical seeds expand horizontally.
+- Horizontal seeds expand vertically.
+- Longer patterns take precedence over shorter ones.
+- Empty spaces (0) should be filled based on neighboring non-zero values.
+
+Issues Identified:
+1. The current implementation is over-expanding patterns, particularly for the left edge.
+2. The top edge pattern is not being preserved correctly.
+3. The filling of remaining cells is not following the correct priority.
+
+Attempted Solutions:
+- Implemented edge priority and pattern length sorting.
+- Modified expansion logic to respect existing non-zero cells.
+
+Next Steps:
+1. Refine the expansion logic to stop at existing non-zero cells or grid boundaries.
+2. Ensure that original seed patterns are preserved in their initial positions.
+3. Implement a more precise filling mechanism for remaining cells, respecting edge priorities.
+
+Unknowns:
+- Exact rules for handling conflicts between different edge patterns.
+- Whether patterns should wrap around or stop at grid boundaries.
