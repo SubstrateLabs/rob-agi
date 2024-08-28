@@ -1,1 +1,27 @@
 Challenge 88207623:
+
+Pattern observed:
+1. The grid contains yellow shapes (4) with red borders (2).
+2. Unique color pixels (e.g., 8, 3) expand around their nearest yellow shape.
+3. Expansion starts from the edge of the yellow shape, not from the unique color pixel itself.
+4. Expansion fills available black space (0) in all 8 directions, including diagonals.
+5. Expansion stops at existing colors, other expanded territories, or grid edges.
+6. Closer unique color pixels to a yellow shape take precedence in expansion.
+7. Multiple unique colors can be associated with a single yellow shape.
+
+Current implementation issues:
+1. The expansion is not happening at all. The output grid is identical to the input grid.
+2. The unique color pixels (8 and 3) are not expanding around their respective yellow shapes.
+
+Next steps:
+1. Debug the expand_territory function to ensure it's being called correctly.
+2. Verify that the unique color pixels are correctly associated with their nearest yellow shapes.
+3. Ensure that the expansion starts from the border of the yellow shape, not from the unique color pixel.
+4. Implement a distance-based priority for expansion to handle multiple unique colors per shape.
+
+Things tried that didn't work:
+1. Starting expansion from the unique color pixel itself.
+
+Unknowns:
+1. How to handle ties when a unique color is equidistant from multiple yellow shapes.
+2. Whether the expansion should prioritize filling empty space closer to the yellow shape first.
