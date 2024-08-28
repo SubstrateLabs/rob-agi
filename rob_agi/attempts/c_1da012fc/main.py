@@ -33,17 +33,6 @@ def get_sorted_regions(grid):
     
     return [region for _, region in sorted(regions)]
 
-def transform_grid(input_grid, color_key):
-    sorted_regions = get_sorted_regions(input_grid)
-    new_grid = [row[:] for row in input_grid]  # Create a deep copy of the input grid
-    
-    for i, region in enumerate(sorted_regions):
-        new_color = color_key[i % len(color_key)]
-        for r, c in region:
-            new_grid[r][c] = new_color
-    
-    return new_grid
-
 def solve_1da012fc(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the grid transformation challenge by:
@@ -58,5 +47,13 @@ def solve_1da012fc(input_grid: ColoredGrid) -> ColoredGrid:
     color_key = extract_color_key(input_grid.values)
     if not color_key:
         return input_grid  # Return unchanged if no color key is found
-    transformed_values = transform_grid(input_grid.values, color_key)
-    return ColoredGrid(values=transformed_values)
+    
+    sorted_regions = get_sorted_regions(input_grid.values)
+    new_grid = [row[:] for row in input_grid.values]  # Create a deep copy
+    
+    for i, region in enumerate(sorted_regions):
+        new_color = color_key[i % len(color_key)]
+        for r, c in region:
+            new_grid[r][c] = new_color
+    
+    return ColoredGrid(values=new_grid)
