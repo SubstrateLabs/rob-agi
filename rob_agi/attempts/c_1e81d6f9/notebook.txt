@@ -1,1 +1,29 @@
 Challenge 1e81d6f9:
+
+Key Observations:
+1. The gray (5) T-shaped object in the top-left corner must be preserved exactly.
+2. Each color present in the input should appear at least once in the output.
+3. Generally, colors should be limited to 3-4 occurrences, but with some flexibility.
+4. Isolated cells and significant clusters should be prioritized for preservation.
+5. Spatial distribution across the grid should be maintained.
+
+Current Implementation Issues:
+1. The algorithm is not correctly limiting the number of occurrences for some colors.
+2. Some isolated cells that should be preserved are being removed.
+3. The spatial distribution is not being maintained as expected.
+
+Attempted Strategies:
+1. Using connected regions analysis to identify clusters.
+2. Calculating isolation scores for each cell.
+3. Prioritizing cells based on isolation and cluster size.
+4. Applying a randomization factor for occasional color removal or extra preservation.
+
+Next Steps:
+1. Refine the cell selection process to better balance isolation and cluster preservation.
+2. Implement a stricter limit on color occurrences while ensuring at least one cell per color.
+3. Improve the spatial distribution logic, possibly by using a grid sector approach.
+4. Add a final pass to remove excess color occurrences if needed.
+
+Unknown Factors:
+1. The exact balance between preserving isolated cells and maintaining color limits.
+2. The optimal method for ensuring spatial distribution while adhering to other constraints.
