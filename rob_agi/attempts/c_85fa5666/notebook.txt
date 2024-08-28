@@ -1,1 +1,29 @@
 Challenge 85fa5666:
+
+Key Observations:
+1. Colors flow towards specific corners: Sky Blue (8) to top-left, Green (3) to top-right, Orange (7) to bottom-left, Magenta (6) to bottom-right.
+2. Colors transform when interacting: Green can become Magenta, Orange can become Green, Magenta can become Sky Blue.
+3. Red (2) 2x2 blocks remain unchanged and block color flow.
+4. Colors flow diagonally around obstacles and can coexist in adjacent cells.
+5. The final grid aims for balance and often symmetry.
+
+What Works:
+- Identifying red blocks and initial colored cells
+- Basic color flow mechanics
+
+What Doesn't Work:
+- Current implementation overfills the grid, especially with Sky Blue (8)
+- Color transformations are not balanced correctly
+- The grid is not maintaining enough empty space (0)
+
+Unknowns:
+- Exact rules for color strength and dominance
+- Precise mechanics of color transformations
+- How to maintain a balance between filled and empty spaces
+
+Next Steps:
+1. Implement a more controlled color flow mechanism
+2. Refine color transformation rules
+3. Introduce a way to limit color spread and maintain empty spaces
+4. Adjust the balance between different colors
+5. Implement a symmetry check and correction mechanism
