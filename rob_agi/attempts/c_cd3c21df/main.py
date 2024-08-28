@@ -3,66 +3,81 @@ from typing import Tuple, List, Dict, Set
 
 def solve_cd3c21df(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Find the unique, contiguous pattern with the highest structural significance in the input grid.
+    Find the most significant unique pattern in the input grid.
     
-    This function scans the input grid for all possible subgrids, identifying unique contiguous patterns.
-    It prioritizes larger patterns and those that are not black (empty space). The function returns the
-    pattern that is both unique within the grid and has the highest structural significance.
-    
-    The structural significance is determined by the size of the pattern, its colors, and its uniqueness.
+    This function identifies contiguous regions of non-black cells,
+    evaluates their significance based on size, color diversity,
+    compactness, and uniqueness, and returns the most significant
+    unique pattern.
     
     Args:
     input_grid (ColoredGrid): The input grid to analyze
 
     Returns:
-    ColoredGrid: The unique contiguous pattern with the highest structural significance
+    ColoredGrid: The most significant unique pattern
     """
     rows, cols = input_grid.get_dimensions()
     
-    def is_contiguous(subgrid: ColoredGrid) -> bool:
-        height, width = subgrid.get_dimensions()
+    def find_contiguous_regions():
         visited = set()
-        stack = [(0, 0)]
-        while stack:
-            r, c = stack.pop()
-            if (r, c) not in visited:
-                visited.add((r, c))
-                for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                    nr, nc = r + dr, c + dc
-                    if 0 <= nr < height and 0 <= nc < width and subgrid.values[nr][nc] != 0:
-                        stack.append((nr, nc))
-        return len(visited) == sum(1 for row in subgrid.values for cell in row if cell != 0)
-    
-    def is_unique_subgrid(subgrid: ColoredGrid, orig_top: int, orig_left: int) -> bool:
-        subgrid_height, subgrid_width = subgrid.get_dimensions()
-        for top in range(rows - subgrid_height + 1):
-            for left in range(cols - subgrid_width + 1):
-                if top == orig_top and left == orig_left:
-                    continue
-                if all(input_grid.values[top+i][left+j] == subgrid.values[i][j]
-                       for i in range(subgrid_height)
-                       for j in range(subgrid_width)):
+        regions = []
+        for r in range(rows):
+            for c in range(cols):
+                if (r, c) not in visited and input_grid.values[r][c] != 0:
+                    region = []
+                    stack = [(r, c)]
+                    while stack:
+                        cr, cc = stack.pop()
+                        if (cr, cc) not in visited:
+                            visited.add((cr, cc))
+                            region.append((cr, cc))
+                            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                                nr, nc = cr + dr, cc + dc
+                                if 0 <= nr < rows and 0 <= nc < cols and input_grid.values[nr][nc] != 0:
+                                    stack.append((nr, nc))
+                    regions.append(region)
+        return regions
+
+    def extract_pattern(region):
+        min_r = min(r for r, _ in region)
+        max_r = max(r for r, _ in region)
+        min_c = min(c for _, c in region)
+        max_c = max(c for _, c in region)
+        pattern = []
+        for r in range(min_r, max_r + 1):
+            row = []
+            for c in range(min_c, max_c + 1):
+                row.append(input_grid.values[r][c] if (r, c) in region else 0)
+            pattern.append(row)
+        return ColoredGrid(values=pattern)
+
+    def is_unique(pattern):
+        pattern_height, pattern_width = pattern.get_dimensions()
+        for r in range(rows - pattern_height + 1):
+            for c in range(cols - pattern_width + 1):
+                if all(input_grid.values[r+i][c+j] == pattern.values[i][j]
+                       for i in range(pattern_height)
+                       for j in range(pattern_width)):
                     return False
         return True
 
-    def calculate_significance(subgrid: ColoredGrid) -> float:
-        height, width = subgrid.get_dimensions()
-        non_zero_cells = sum(1 for row in subgrid.values for cell in row if cell != 0)
-        unique_colors = len(set(cell for row in subgrid.values for cell in row if cell != 0))
-        return height * width * non_zero_cells * unique_colors
+    def calculate_significance(pattern):
+        height, width = pattern.get_dimensions()
+        non_zero_cells = sum(1 for row in pattern.values for cell in row if cell != 0)
+        unique_colors = len(set(cell for row in pattern.values for cell in row if cell != 0))
+        compactness = non_zero_cells / (height * width)
+        return non_zero_cells * unique_colors * compactness
 
-    best_subgrid = None
+    regions = find_contiguous_regions()
+    best_pattern = None
     best_score = float('-inf')
 
-    for height in range(rows, 0, -1):
-        for width in range(cols, 0, -1):
-            for top in range(rows - height + 1):
-                for left in range(cols - width + 1):
-                    subgrid = input_grid.extract_subgrid(top, left, height, width)
-                    if is_contiguous(subgrid) and is_unique_subgrid(subgrid, top, left):
-                        score = calculate_significance(subgrid)
-                        if score > best_score:
-                            best_score = score
-                            best_subgrid = subgrid
+    for region in regions:
+        pattern = extract_pattern(region)
+        if is_unique(pattern):
+            score = calculate_significance(pattern)
+            if score > best_score:
+                best_score = score
+                best_pattern = pattern
 
-    return best_subgrid
+    return best_pattern if best_pattern else ColoredGrid(values=[[0]])
