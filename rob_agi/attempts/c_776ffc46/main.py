@@ -13,8 +13,6 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
-    visited = set()
-    regions_to_transform = []
 
     def is_valid(r: int, c: int) -> bool:
         return 0 <= r < rows and 0 <= c < cols
@@ -23,9 +21,10 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         color = input_grid.values[start_row][start_col]
         stack = [(start_row, start_col)]
         region = []
+        visited = set()
         while stack:
             row, col = stack.pop()
-            if (row, col) in visited or input_grid.values[row][col] != color:
+            if (row, col) in visited or input_grid.values[row][col] != color or input_grid.values[row][col] == 5:
                 continue
             visited.add((row, col))
             region.append((row, col))
@@ -43,16 +42,15 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         return 2 if red_count >= green_count else 3
 
     target_color = determine_target_color()
+    global_visited = set()
 
     for row in range(rows):
         for col in range(cols):
-            if input_grid.values[row][col] == 1 and (row, col) not in visited:
+            if input_grid.values[row][col] == 1 and (row, col) not in global_visited:
                 region = flood_fill(row, col)
                 if region:
-                    regions_to_transform.append(region)
-
-    for region in regions_to_transform:
-        for r, c in region:
-            output_grid.values[r][c] = target_color
+                    for r, c in region:
+                        output_grid.values[r][c] = target_color
+                        global_visited.add((r, c))
 
     return output_grid
