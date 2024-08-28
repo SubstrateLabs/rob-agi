@@ -10,7 +10,7 @@ def solve_7e02026e(input_grid: ColoredGrid) -> ColoredGrid:
     4. Color the best 'L' shape green (3).
 
     The 'L' shape is defined by its bottom-right corner (which must be black),
-    extending upwards and to the left as far as possible, potentially including non-black cells.
+    extending upwards and to the left, including all cells regardless of their original color.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -22,12 +22,10 @@ def solve_7e02026e(input_grid: ColoredGrid) -> ColoredGrid:
                 vertical_length = 1
                 while r - vertical_length >= 0:
                     vertical_length += 1
-                vertical_length -= 1
 
                 horizontal_length = 1
                 while c - horizontal_length >= 0:
                     horizontal_length += 1
-                horizontal_length -= 1
 
                 l_size = vertical_length + horizontal_length - 1
                 if l_size > best_l[0] or (l_size == best_l[0] and (r, c) > best_l[1]):
