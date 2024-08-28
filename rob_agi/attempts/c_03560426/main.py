@@ -2,53 +2,41 @@ from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Dict
 from collections import deque
 
-from typing import List, Tuple, Dict
-from collections import deque
-
 class Shape:
     def __init__(self, color: int, coords: List[Tuple[int, int]], order: int):
         self.color = color
         self.coords = coords
         self.order = order
+        self.area = len(coords)
+        self.width = max(x for x, _ in coords) - min(x for x, _ in coords) + 1
+        self.height = max(y for _, y in coords) - min(y for _, y in coords) + 1
 
     def rotate(self):
         self.coords = [(y, -x) for x, y in self.coords]
         min_x = min(x for x, _ in self.coords)
         min_y = min(y for _, y in self.coords)
         self.coords = [(x - min_x, y - min_y) for x, y in self.coords]
-
-class Column:
-    def __init__(self):
-        self.shapes = []
-        self.width = 0
-        self.height = 0
-
-    def add_shape(self, shape: Shape, rotated: bool):
-        if rotated:
-            shape.rotate()
-        self.shapes.append(shape)
-        self.width = max(self.width, max(x for x, _ in shape.coords) + 1)
-        self.height += max(y for _, y in shape.coords) + 1
+        self.width, self.height = self.height, self.width
 
 def solve_03560426(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by rearranging colored shapes into a compact arrangement.
     
     1. Extracts shapes from bottom to top, left to right.
-    2. Creates columns of shapes, rotating only when necessary to fit.
-    3. Aligns shapes within columns to the bottom.
-    4. Moves all shapes in each column up as much as possible.
-    5. Compacts columns horizontally to the left.
-    6. Places shapes in the output grid according to their new positions.
+    2. Analyzes shapes for area and dimensions.
+    3. Sorts shapes by area and original order.
+    4. Places shapes in a compact arrangement, allowing rotations and slight overlaps.
+    5. Optimizes the arrangement by shifting shapes left and up where possible.
+    6. Ensures all shapes are connected.
     7. Fills remaining space with black (0).
     
     Returns the transformed grid with shapes arranged compactly in the top-left quadrant.
     """
     shapes = extract_shapes(input_grid)
-    columns = create_columns(shapes)
-    align_columns_to_top(columns)
-    compact_columns_horizontally(columns)
-    output_grid = create_output_grid(columns)
+    shapes.sort(key=lambda s: (-s.area, s.order))
+    output_grid = place_shapes(shapes)
+    optimize_arrangement(output_grid)
+    ensure_connectivity(output_grid)
     return output_grid
 
 def extract_shapes(grid: ColoredGrid) -> List[Shape]:
@@ -87,45 +75,80 @@ def bfs(grid: ColoredGrid, start_r: int, start_c: int, visited: set) -> List[Tup
     
     return [(r - min_r, c - min_c) for r, c in shape]  # Store relative coordinates
 
-def create_columns(shapes: List[Shape]) -> List[Column]:
-    columns = []
-    for shape in shapes:
-        placed = False
-        for column in columns:
-            if column.width + max(x for x, _ in shape.coords) + 1 <= 10:
-                column.add_shape(shape, False)
-                placed = True
-                break
-            elif column.width + max(y for _, y in shape.coords) + 1 <= 10:
-                column.add_shape(shape, True)
-                placed = True
-                break
-        if not placed:
-            new_column = Column()
-            new_column.add_shape(shape, False)
-            columns.append(new_column)
-    return columns
-
-def align_columns_to_top(columns: List[Column]) -> None:
-    for column in columns:
-        max_height = sum(max(y for _, y in shape.coords) + 1 for shape in column.shapes)
-        current_height = 0
-        for shape in column.shapes:
-            shape_height = max(y for _, y in shape.coords) + 1
-            shape.coords = [(x, y + (10 - max_height) + current_height) for x, y in shape.coords]
-            current_height += shape_height
-
-def compact_columns_horizontally(columns: List[Column]) -> None:
-    current_x = 0
-    for column in columns:
-        for shape in column.shapes:
-            shape.coords = [(x + current_x, y) for x, y in shape.coords]
-        current_x += column.width
-
-def create_output_grid(columns: List[Column]) -> ColoredGrid:
+def place_shapes(shapes: List[Shape]) -> ColoredGrid:
     output_grid = ColoredGrid(values=[[0 for _ in range(10)] for _ in range(10)])
-    for column in columns:
-        for shape in column.shapes:
-            for x, y in shape.coords:
-                output_grid.values[y][x] = shape.color
+    for shape in shapes:
+        best_score = float('inf')
+        best_placement = None
+        for rotated in [False, True]:
+            if rotated:
+                shape.rotate()
+            for r in range(10):
+                for c in range(10):
+                    if can_place_shape(output_grid, shape, r, c):
+                        score = r + c + (1 if rotated else 0)
+                        if score < best_score:
+                            best_score = score
+                            best_placement = (r, c, rotated)
+            if rotated:
+                shape.rotate()  # Rotate back
+        
+        if best_placement:
+            r, c, rotated = best_placement
+            if rotated:
+                shape.rotate()
+            place_shape(output_grid, shape, r, c)
+    
     return output_grid
+
+def can_place_shape(grid: ColoredGrid, shape: Shape, r: int, c: int) -> bool:
+    overlap = 0
+    for x, y in shape.coords:
+        nr, nc = r + y, c + x
+        if nr < 0 or nr >= 10 or nc < 0 or nc >= 10:
+            return False
+        if grid.values[nr][nc] != 0:
+            overlap += 1
+            if overlap > 1:
+                return False
+    return True
+
+def place_shape(grid: ColoredGrid, shape: Shape, r: int, c: int) -> None:
+    for x, y in shape.coords:
+        nr, nc = r + y, c + x
+        grid.values[nr][nc] = shape.color
+
+def optimize_arrangement(grid: ColoredGrid) -> None:
+    changed = True
+    while changed:
+        changed = False
+        for r in range(9, -1, -1):
+            for c in range(10):
+                if grid.values[r][c] != 0:
+                    color = grid.values[r][c]
+                    if r > 0 and grid.values[r-1][c] == 0:
+                        grid.values[r-1][c] = color
+                        grid.values[r][c] = 0
+                        changed = True
+                    elif c > 0 and grid.values[r][c-1] == 0:
+                        grid.values[r][c-1] = color
+                        grid.values[r][c] = 0
+                        changed = True
+
+def ensure_connectivity(grid: ColoredGrid) -> None:
+    visited = set()
+    start = next((r, c) for r in range(10) for c in range(10) if grid.values[r][c] != 0)
+    stack = [start]
+    while stack:
+        r, c = stack.pop()
+        if (r, c) not in visited and grid.values[r][c] != 0:
+            visited.add((r, c))
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < 10 and 0 <= nc < 10:
+                    stack.append((nr, nc))
+    
+    for r in range(10):
+        for c in range(10):
+            if grid.values[r][c] != 0 and (r, c) not in visited:
+                grid.values[r][c] = 0
