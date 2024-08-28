@@ -7,8 +7,8 @@ def solve_dc2aa30b(input_grid: ColoredGrid) -> ColoredGrid:
     while maintaining a specific pattern in the middle section. The solution:
     1. Makes the top section predominantly blue with 2-3 specific red cells
     2. Makes the bottom section predominantly red with one specific blue cell
-    3. Inverts color dominance in the middle section while maintaining a balanced mix
-    4. Preserves the black (0) dividing lines and some of the original patterns
+    3. Inverts color dominance in the middle section while preserving some original patterns
+    4. Preserves the black (0) dividing lines throughout the grid
     5. Ensures a connection to the original input while meeting the challenge criteria
     """
     rows, cols = input_grid.get_dimensions()
@@ -45,24 +45,29 @@ def solve_dc2aa30b(input_grid: ColoredGrid) -> ColoredGrid:
         red_count = sum(cell == 2 for row in input_grid.values[4:7] for cell in row if cell != 0)
         total_non_black = blue_count + red_count
         
-        dominant_color = 2 if blue_count > red_count else 1
-        target_non_dominant = int(total_non_black * 0.6)  # Aim for 60% of previously non-dominant color
-        current_non_dominant = 0
+        original_dominant = 2 if red_count > blue_count else 1
+        new_dominant = 3 - original_dominant
+        
+        # Calculate inversion ratio
+        original_dominance = max(red_count, blue_count) / total_non_black
+        if original_dominance > 0.7:
+            inversion_ratio = 0.75
+        elif 0.6 <= original_dominance <= 0.7:
+            inversion_ratio = 0.7
+        else:
+            inversion_ratio = 0.65
         
         for i in range(4, 7):
             for j in range(11):
                 if output_grid.values[i][j] != 0:
-                    if current_non_dominant < target_non_dominant:
-                        output_grid.values[i][j] = 3 - dominant_color  # Invert dominance
-                        current_non_dominant += 1
+                    if input_grid.values[i][j] == original_dominant:
+                        if random.random() < inversion_ratio:
+                            output_grid.values[i][j] = new_dominant
                     else:
-                        output_grid.values[i][j] = dominant_color
-                    
-                    # Preserve some of the original pattern
-                    if input_grid.values[i][j] == output_grid.values[i][j]:
-                        continue
-                    elif j > 0 and input_grid.values[i][j-1] == output_grid.values[i][j]:
-                        output_grid.values[i][j], output_grid.values[i][j-1] = output_grid.values[i][j-1], output_grid.values[i][j]
+                        if random.random() < 0.3:  # 30% chance to keep original non-dominant color
+                            output_grid.values[i][j] = input_grid.values[i][j]
+                        else:
+                            output_grid.values[i][j] = new_dominant
     
     process_top_section()
     process_middle_section()
