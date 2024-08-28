@@ -2,7 +2,6 @@ from rob_agi.colored_grid import ColoredGrid
 
 # Global variables
 color_cycle = [3, 6, 4, 8]
-blue_shape_counter = 0
 color_index = 0
 
 def get_next_color():
@@ -20,7 +19,6 @@ def solve_604001fa(input_grid: ColoredGrid) -> ColoredGrid:
     4. Cycling through colors (green (3), magenta (6), yellow (4), sky (8)) for each new input grid
     The color sequence is maintained across multiple function calls.
     """
-    global blue_shape_counter
     grid = input_grid.deep_copy()
     
     # Identify blue shapes
