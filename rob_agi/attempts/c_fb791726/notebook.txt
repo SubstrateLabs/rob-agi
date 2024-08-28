@@ -1,1 +1,29 @@
 Challenge fb791726:
+
+The challenge involves transforming an input grid into an output grid with the following rules:
+
+1. The output grid size is (2n) x (2n), where n is the input grid size.
+2. A single green (3) separator row and column is added in the middle of the output grid.
+3. Non-black cells from the input grid are copied to the output grid with the following transformations:
+   - Top-left quadrant stays in place
+   - Top-right quadrant moves to bottom-left
+   - Bottom-left quadrant moves to top-right
+   - Bottom-right quadrant stays in place
+4. The rest of the grid is filled with black (0)
+
+Current implementation issues:
+1. The green separator column is incorrectly placed in the middle of the left half, instead of the center of the entire grid.
+2. The transformation of non-black cells is incorrect, particularly for the bottom-right quadrant.
+
+Things to fix:
+1. Adjust the placement of the green separator column to be at index n-1 (where n is the input grid size).
+2. Revise the coordinate mapping function to correctly handle all quadrants, especially the bottom-right quadrant.
+
+Known working aspects:
+1. The output grid size is correct (2n x 2n).
+2. The horizontal green separator row is correctly placed.
+
+Next steps:
+1. Update the `map_coordinates` function to correctly transform all quadrants.
+2. Adjust the placement of the vertical green separator.
+3. Ensure that non-black cells are correctly copied to their new positions in all quadrants.
