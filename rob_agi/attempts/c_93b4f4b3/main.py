@@ -8,8 +8,8 @@ def solve_93b4f4b3(input_grid: ColoredGrid) -> ColoredGrid:
     1. Extracts the border from the left 6 columns of the input grid.
     2. Identifies and extracts shapes from the right side of the input grid.
     3. Inverts the extracted shapes vertically.
-    4. Places inverted shapes in empty spaces within the border, maintaining their relative horizontal position.
-    5. Sorts shapes from top to bottom based on their original position.
+    4. Sorts shapes from bottom to top based on their original position.
+    5. Places inverted shapes in empty spaces within the border, maintaining their relative horizontal position.
     6. Fills any remaining empty space with the border color.
     
     Returns the transformed ColoredGrid.
@@ -37,10 +37,10 @@ def solve_93b4f4b3(input_grid: ColoredGrid) -> ColoredGrid:
         height, width = max_r - min_r + 1, max_c - min_c + 1
         right_distance = cols - max_c - 1
         inverted_shape = [((rows - 1 - r, c - min_c), color) for r, c in shape]
-        processed_shapes.append((inverted_shape, height, width, right_distance, min_r))
+        processed_shapes.append((inverted_shape, height, width, right_distance, max_r))
     
-    # Sort shapes by their original vertical position (top to bottom)
-    processed_shapes.sort(key=lambda x: x[4])
+    # Sort shapes by their original vertical position (bottom to top)
+    processed_shapes.sort(key=lambda x: x[4], reverse=True)
     
     # Place shapes in empty spaces
     for shape, height, width, right_distance, _ in processed_shapes:
