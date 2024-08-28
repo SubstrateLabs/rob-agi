@@ -1,1 +1,32 @@
 Challenge 770cc55f:
+
+Key Observations:
+1. The challenge involves creating a yellow (4) rectangle that connects colored lines at the top and bottom of the grid, passing through a red (2) horizontal line in the middle.
+
+2. The yellow rectangle should span from just below the red line to just above the bottom of the grid.
+
+3. The width and position of the yellow rectangle are determined by the overlap between the top and bottom colored lines.
+
+4. The current implementation fails for example_0, where the yellow rectangle should be a single column wide.
+
+What works:
+- Identifying the top and bottom colored lines
+- Finding the red line in the middle
+- Determining the overlapping columns
+
+What doesn't work:
+- The current implementation doesn't create the yellow rectangle for single-column overlaps
+
+To fix:
+1. Modify the logic to handle single-column overlaps correctly.
+2. Ensure the yellow rectangle starts immediately below the red line.
+3. The yellow rectangle should extend to the row just above the bottom colored line, not necessarily to the bottom of the grid.
+
+Next steps:
+1. Update the solve_770cc55f function to handle single-column overlaps.
+2. Adjust the end_row calculation to stop just above the bottom colored line.
+3. Refine the logic for determining the left and right columns of the yellow rectangle.
+
+Unknown:
+- Whether there are any edge cases we haven't considered yet.
+- If the red line is always present in all valid inputs.
