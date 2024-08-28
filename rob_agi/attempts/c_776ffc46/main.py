@@ -12,41 +12,42 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     5. Gray (5) acts as a border and is not considered part of any region.
     6. Only orthogonally adjacent cells are considered part of the same region.
     """
+    BLUE, RED, GREEN, GRAY = 1, 2, 3, 5
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
     visited = [[False for _ in range(cols)] for _ in range(rows)]
 
     def is_valid(r: int, c: int) -> bool:
-        return 0 <= r < rows and 0 <= c < cols and input_grid.values[r][c] != 5
+        return 0 <= r < rows and 0 <= c < cols and input_grid.values[r][c] != GRAY
 
     def flood_fill(start_row: int, start_col: int) -> List[Tuple[int, int]]:
         queue = deque([(start_row, start_col)])
         region = []
         while queue:
             row, col = queue.popleft()
-            if visited[row][col] or input_grid.values[row][col] != 1:
+            if visited[row][col] or input_grid.values[row][col] != BLUE:
                 continue
             visited[row][col] = True
             region.append((row, col))
             for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                 new_row, new_col = row + dr, col + dc
-                if is_valid(new_row, new_col) and input_grid.values[new_row][new_col] == 1 and not visited[new_row][new_col]:
+                if is_valid(new_row, new_col) and input_grid.values[new_row][new_col] == BLUE and not visited[new_row][new_col]:
                     queue.append((new_row, new_col))
-        return region if 2 <= len(region) <= 8 else []
+        return region
 
     def determine_target_color() -> int:
-        red_count = sum(row.count(2) for row in input_grid.values)
-        green_count = sum(row.count(3) for row in input_grid.values)
-        return 3 if green_count > red_count else 2
+        red_count = sum(row.count(RED) for row in input_grid.values)
+        green_count = sum(row.count(GREEN) for row in input_grid.values)
+        return GREEN if green_count > red_count else RED
 
     target_color = determine_target_color()
     regions_to_transform = []
 
     for row in range(rows):
         for col in range(cols):
-            if input_grid.values[row][col] == 1 and not visited[row][col]:
+            if input_grid.values[row][col] == BLUE and not visited[row][col]:
                 region = flood_fill(row, col)
-                if region:
+                if 2 <= len(region) <= 8:
                     regions_to_transform.append(region)
 
     for region in regions_to_transform:
