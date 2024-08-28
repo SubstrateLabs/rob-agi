@@ -1,1 +1,35 @@
 Challenge e4075551:
+
+Pattern Observations:
+1. The output grid creates a rectangular frame using non-black (0) and non-red (2) colors from the input.
+2. Frame dimensions: width = number of unique colors + 6, height = width + 1
+3. Frame position: Starts at row 1 if there's enough space, otherwise centered vertically.
+4. Color assignment (clockwise from top): first, second, last, third unique color found.
+5. Frame interior is filled with gray (5).
+6. A horizontal red (2) line is drawn in the middle of the frame.
+7. The frame should maintain the relative positions of colors from the input.
+
+Current Implementation Issues:
+- The frame size calculation is correct (frame_height = len(unique_colors) + 7, frame_width = frame_height - 1).
+- The start row calculation (start_row = 1 if rows - frame_height >= 1 else (rows - frame_height) // 2) is correct.
+- Color assignment for the frame borders is correct.
+
+Remaining Problems:
+1. The frame is not maintaining the relative positions of colors from the input.
+2. The interior gray fill and red line placement seem to be incorrect.
+
+Next Steps:
+1. Revise the frame drawing function to maintain relative color positions.
+2. Double-check the interior fill and red line placement logic.
+3. Ensure that the frame is centered horizontally correctly.
+
+Things Tried That Don't Work:
+- Simply assigning colors based on their order of appearance doesn't maintain their relative positions.
+
+Certainties:
+- The frame size and starting position calculations are correct.
+- The color assignment logic for the frame borders is correct.
+
+Uncertainties:
+- The exact method to maintain relative color positions while drawing the frame.
+- Whether the current interior fill and red line placement logic is fundamentally flawed or just needs minor adjustments.
