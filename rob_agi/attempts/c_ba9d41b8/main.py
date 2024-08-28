@@ -4,12 +4,12 @@ from typing import List, Tuple, Set
 def solve_ba9d41b8(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by applying a checkerboard pattern to non-black regions.
-    The outer border of each region remains unchanged, as well as the bottom-right cell of each region.
+    The outer border of each region remains unchanged, as well as the bottom row and rightmost column of each region.
     The inner part is filled with a checkerboard pattern using the original color and black (0).
     
     The checkerboard pattern is applied based on the absolute position within the grid,
     ensuring consistent patterning for all regions regardless of their position.
-    Interior cells where the sum of row and column indices is odd are set to black (0).
+    Interior cells where the sum of row and column indices is even are set to black (0).
     """
     if not input_grid.is_valid:
         raise ValueError("Invalid input grid")
@@ -64,7 +64,7 @@ def process_region(grid: ColoredGrid, color: int, region: List[Tuple[int, int]])
     for r, c in region:
         if r == top or r == bottom or c == left or c == right:
             continue  # Leave border cells unchanged
-        if r == bottom and c == right:
-            continue  # Leave bottom-right cell unchanged
-        if (r + c) % 2 == 1:
-            grid.set_cell(r, c, 0)  # Set to black for odd sum of coordinates
+        if r == bottom or c == right:
+            continue  # Leave bottom row and rightmost column unchanged
+        if (r + c) % 2 == 0:
+            grid.set_cell(r, c, 0)  # Set to black for even sum of coordinates
