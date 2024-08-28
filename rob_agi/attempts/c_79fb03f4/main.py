@@ -1,17 +1,18 @@
 from rob_agi.colored_grid import ColoredGrid
+from typing import List, Tuple
 
 def solve_79fb03f4(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the grid transformation challenge by:
     1. Identifying initial blue cells and barriers.
-    2. Determining expansion zones for each blue cell.
-    3. Creating the largest possible blue rectangles within these zones.
-    4. Merging overlapping or adjacent blue rectangles.
+    2. Determining expansion zones for each blue cell, respecting horizontal and vertical constraints.
+    3. Merging overlapping or adjacent expansion zones.
+    4. Creating blue rectangles within these zones, respecting barriers.
     5. Ensuring all cells within blue rectangles are blue, except for barriers.
-    6. Validating that the transformation adheres to all rules.
+    6. Performing a final pass to guarantee rectangular shapes.
 
-    The function expands blue cells into rectangular regions, respecting barriers
-    and the constraint of expanding up to two rows vertically from any initial blue cell.
+    The function expands blue cells into rectangular regions, respecting barriers (gray and sky blue cells),
+    and the constraints of expanding up to one cell horizontally and up to two rows vertically from any initial blue cell.
     """
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
@@ -19,15 +20,27 @@ def solve_79fb03f4(input_grid: ColoredGrid) -> ColoredGrid:
     def is_barrier(r: int, c: int) -> bool:
         return 0 <= r < rows and 0 <= c < cols and grid.get_cell(r, c) in [5, 8]
 
-    def find_expansion_zone(r: int, c: int) -> tuple[int, int, int, int]:
-        left = right = c
-        while left > 0 and not is_barrier(r, left - 1):
-            left -= 1
-        while right < cols - 1 and not is_barrier(r, right + 1):
-            right += 1
+    def find_expansion_zone(r: int, c: int) -> Tuple[int, int, int, int]:
+        left = max(0, c - 1)
+        right = min(cols - 1, c + 1)
         top = max(0, r - 2)
         bottom = min(rows - 1, r + 2)
         return top, left, bottom, right
+
+    def merge_zones(zones: List[Tuple[int, int, int, int]]) -> List[Tuple[int, int, int, int]]:
+        zones.sort()
+        merged = []
+        for zone in zones:
+            if not merged or zone[0] > merged[-1][2] + 1 or zone[1] > merged[-1][3] + 1:
+                merged.append(zone)
+            else:
+                merged[-1] = (
+                    min(merged[-1][0], zone[0]),
+                    min(merged[-1][1], zone[1]),
+                    max(merged[-1][2], zone[2]),
+                    max(merged[-1][3], zone[3])
+                )
+        return merged
 
     def create_rectangle(top: int, left: int, bottom: int, right: int) -> None:
         for rr in range(top, bottom + 1):
@@ -39,8 +52,11 @@ def solve_79fb03f4(input_grid: ColoredGrid) -> ColoredGrid:
     blue_cells = [(r, c) for r in range(rows) for c in range(cols) if grid.get_cell(r, c) == 1]
     expansion_zones = [find_expansion_zone(r, c) for r, c in blue_cells]
 
-    # Create and merge rectangles
-    for zone in expansion_zones:
+    # Merge overlapping zones
+    merged_zones = merge_zones(expansion_zones)
+
+    # Create rectangles for merged zones
+    for zone in merged_zones:
         create_rectangle(*zone)
 
     # Final pass to ensure rectangular shapes
