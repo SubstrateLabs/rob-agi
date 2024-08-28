@@ -1,1 +1,38 @@
 Challenge 1acc24af:
+
+Problem Description:
+- Transform a grid by changing gray (5) regions to red (2) if they meet specific criteria.
+- The grid is represented as a 2D list of integers, where each integer represents a color.
+
+Transformation Criteria:
+1. The region contains at least 4 connected gray cells.
+2. The region's bounding box is at least 2x2 in size.
+3. The region is either not a perfect rectangle OR it's larger than 2x2.
+
+Current Implementation:
+- Uses a flood fill algorithm to identify connected gray regions.
+- Applies transformation if all criteria are met.
+
+Observations:
+- The current implementation is not correctly transforming the 2x2 gray square in the bottom-left of example_0.
+- All other gray cells remain unchanged as expected.
+
+Possible Issues:
+- The condition for transforming perfect rectangles might be too strict.
+- There might be an issue with how we're checking the bounding box size or cell count.
+
+Next Steps:
+1. Review and possibly adjust the transformation criteria in the code.
+2. Double-check the flood fill implementation to ensure it's correctly identifying all connected cells.
+3. Add more detailed logging or debugging to understand why the 2x2 square is not being transformed.
+
+Things to Try:
+- Simplify the transformation condition to see if it resolves the issue.
+- Implement a separate check for 2x2 squares to ensure they're always transformed.
+
+Known Working Parts:
+- The flood fill algorithm correctly identifies connected regions.
+- The overall structure of the solution appears correct.
+
+Unknowns:
+- Exact reason why the 2x2 square is not being transformed in example_0.
