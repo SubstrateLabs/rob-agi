@@ -41,5 +41,31 @@ def test_horizontal_line():
     for row in result.values:
         print(row)
 
+def test_size_constraints():
+    input_grid = [
+        [0, 1, 0, 1, 1, 0, 1, 1, 1, 1],
+        [0, 0, 0, 0, 1, 0, 1, 1, 1, 1],
+        [0, 1, 1, 0, 0, 0, 1, 1, 1, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [2, 2, 2, 0, 3, 3, 3, 0, 0, 0],
+        [2, 2, 2, 0, 3, 3, 3, 0, 0, 0],
+        [2, 2, 2, 0, 3, 3, 3, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ]
+    grid = ColoredGrid(values=input_grid)
+    result = solve_776ffc46(grid)
+
+    print("\nSize Constraints Test")
+    print("Input grid:")
+    for row in input_grid:
+        print(row)
+
+    print("\nOutput grid:")
+    for row in result.values:
+        print(row)
+
 test_vertical_line()
 test_horizontal_line()
+test_size_constraints()
