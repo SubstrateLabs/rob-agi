@@ -29,8 +29,8 @@ def solve_bf32578f(input_grid: ColoredGrid) -> ColoredGrid:
             return [[color for _ in range(4)] for _ in range(4)]
         else:
             shape = [[0 for _ in range(4)] for _ in range(4)]
+            shape[1][1:3] = shape[2][1:3] = [color, color]
             for i in range(4):
-                shape[1][i] = shape[2][i] = color
                 shape[i][1] = shape[i][2] = color
             return shape
 
