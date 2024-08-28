@@ -1,1 +1,40 @@
 Challenge b7999b51:
+
+Objective:
+Transform a 2D grid of colored squares into a compressed representation.
+
+Key Observations:
+1. The output grid is smaller than the input, with each column representing a unique non-black color.
+2. Colors in the output are ordered based on their appearance in the input grid.
+3. The height of each color column in the output represents its vertical extent in the input.
+
+Current Understanding:
+- We correctly identify and compress each color into a single column.
+- The height of each column is correctly calculated.
+- The order of colors is still incorrect.
+
+What's Working:
+- Identifying non-black colors and their properties (top, bottom, left positions).
+- Compressing colors into single columns.
+- Calculating the correct height for each color column.
+
+What's Not Working:
+- The order of colors in the output is reversed from what it should be.
+- Sky blue (8) and orange (7) are swapped in the output.
+
+Hypothesis:
+The current sorting method (-x[1]["bottom"], x[1]["left"]) is not correctly capturing the intended order. We may need to consider the topmost occurrence of each color instead of the bottommost.
+
+Next Steps:
+1. Modify the sorting key to prioritize the topmost occurrence of each color.
+2. If that doesn't work, we may need to consider the leftmost occurrence regardless of vertical position.
+
+Attempted Solutions:
+1. Sorting by bottommost occurrence and leftmost appearance (didn't work).
+
+To Try:
+1. Sort by topmost occurrence and then by leftmost appearance.
+2. Sort purely by leftmost appearance, ignoring vertical position.
+
+Unknown:
+The exact criteria for determining the order of colors in the output grid.
