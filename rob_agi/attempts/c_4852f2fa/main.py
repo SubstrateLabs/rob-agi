@@ -9,8 +9,8 @@ def solve_4852f2fa(input_grid: ColoredGrid) -> ColoredGrid:
     1. Count yellow (4) squares in the input grid.
     2. Find the largest connected region of sky blue (8) squares.
     3. Transform the largest region into a 3xN pattern.
-    4. Adjust the pattern to fit the width determined by yellow squares count.
-    5. Create the final 3xN output grid where N = yellow_count * 3.
+    4. Create the final 3xN output grid where N = yellow_count * 3.
+    5. Fill the output grid with the transformed pattern, offsetting each repetition.
     
     Returns a new ColoredGrid object with the transformed grid.
     """
@@ -19,12 +19,15 @@ def solve_4852f2fa(input_grid: ColoredGrid) -> ColoredGrid:
     
     largest_region = find_largest_sky_blue_region(input_grid)
     pattern = transform_to_pattern(largest_region)
-    adjusted_pattern = adjust_pattern(pattern, output_width)
     
     output = [[0 for _ in range(output_width)] for _ in range(3)]
+    pattern_width = len(pattern[0])
+    
     for i in range(output_width):
+        col = i % pattern_width
+        offset = (i // pattern_width) % 3
         for j in range(3):
-            output[j][i] = adjusted_pattern[j][i % len(adjusted_pattern[0])]
+            output[j][i] = pattern[(j - offset) % 3][col]
     
     return ColoredGrid(values=output)
 
@@ -65,15 +68,9 @@ def transform_to_pattern(region: List[List[int]]) -> List[List[int]]:
     pattern = [[0 for _ in range(width)] for _ in range(3)]
     for c in range(width):
         if any(region[r][c] == 8 for r in range(len(region))):
-            for r in range(3):
-                pattern[r][c] = 8
-    return pattern
-
-def adjust_pattern(pattern: List[List[int]], target_width: int) -> List[List[int]]:
-    pattern_width = len(pattern[0])
-    if pattern_width > target_width:
-        return [row[:target_width] for row in pattern]
-    elif pattern_width < target_width:
-        repetitions = target_width // pattern_width + 1
-        return [row * repetitions for row in pattern]
+            pattern[0][c] = 8
+            pattern[1][c] = 8
+            pattern[2][c] = 8
+        else:
+            pattern[1][c] = 8
     return pattern
