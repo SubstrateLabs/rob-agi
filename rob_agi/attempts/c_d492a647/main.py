@@ -23,11 +23,12 @@ def solve_d492a647(input_grid: ColoredGrid) -> ColoredGrid:
     # Step 2: Create a deep copy of the input grid
     output_grid = input_grid.deep_copy()
 
-    # Step 3: Apply the checkerboard pattern to black cells
-    for row_index, row in enumerate(output_grid.values):
-        for col_index, cell in enumerate(row):
-            if cell == 0 and (row_index + col_index) % 2 == 1:
-                output_grid.values[row_index][col_index] = fill_color
+    # Step 3: Apply the checkerboard pattern to black cells only
+    rows, cols = output_grid.get_dimensions()
+    for row in range(rows):
+        for col in range(cols):
+            if output_grid.values[row][col] == 0 and (row + col) % 2 == 1:
+                output_grid.values[row][col] = fill_color
 
     # Step 4: Return the modified grid
     return output_grid
