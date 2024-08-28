@@ -34,7 +34,7 @@ def solve_b7999b51(input_grid: ColoredGrid) -> ColoredGrid:
             color = input_grid.values[r][c]
             if color != 0:  # Non-black color
                 if color not in color_info:
-                    color_info[color] = {"left": c, "top": r, "bottom": r, "first_row": r}
+                    color_info[color] = {"left": c, "top": r, "bottom": r}
                 else:
                     info = color_info[color]
                     info["left"] = min(info["left"], c)
@@ -42,7 +42,7 @@ def solve_b7999b51(input_grid: ColoredGrid) -> ColoredGrid:
                     info["bottom"] = max(info["bottom"], r)
 
     # Step 2: Sort colors based on bottommost occurrence and leftmost appearance
-    sorted_colors = sorted(color_info.items(), key=lambda x: (-x[1]["first_row"], x[1]["left"]))
+    sorted_colors = sorted(color_info.items(), key=lambda x: (-x[1]["bottom"], x[1]["left"]))
 
     # Step 3 & 4: Create and fill the output grid
     output_width = len(sorted_colors)
