@@ -5,8 +5,8 @@ from collections import deque
 def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid based on the following rules:
-    1. Blue regions of size 2-5 pixels are changed to red or green.
-    2. Blue regions of size 6-8 pixels are changed only if they form a plus shape.
+    1. Blue regions of size 2-4 pixels are changed to the target color (red or green).
+    2. Blue regions of exactly 5 pixels are changed to the target color only if they form a plus shape.
     3. The target color (red or green) is determined by the global prevalence of these colors.
     4. Larger blue regions, single blue pixels, and other colors remain unchanged.
     5. All transformations are applied simultaneously.
@@ -29,12 +29,11 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         return region
 
     def is_plus_shape(region: Set[Tuple[int, int]]) -> bool:
-        if len(region) not in [5, 6, 7, 8]:
+        if len(region) != 5:
             return False
-        center = min(region, key=lambda p: sum((x-p[0])**2 + (y-p[1])**2 for x, y in region))
+        center = next(iter(region))  # Get any point from the region
         arms = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-        arm_lengths = [sum(1 for i in range(1, 4) if (center[0] + dx * i, center[1] + dy * i) in region) for dx, dy in arms]
-        return all(length > 0 for length in arm_lengths) and max(arm_lengths) - min(arm_lengths) <= 1
+        return all((center[0] + dx, center[1] + dy) in region for dx, dy in arms)
 
     rows, cols = len(input_grid.values), len(input_grid.values[0])
     red_count = sum(row.count(RED) for row in input_grid.values)
@@ -48,13 +47,12 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
             if input_grid.values[i][j] == BLUE and (i, j) not in visited:
                 region = flood_fill(i, j)
                 visited.update(region)
-                if 2 <= len(region) <= 8:
-                    blue_regions.append(region)
+                blue_regions.append(region)
 
     new_grid = [row[:] for row in input_grid.values]
     for region in blue_regions:
         size = len(region)
-        if 2 <= size <= 5 or (6 <= size <= 8 and is_plus_shape(region)):
+        if 2 <= size <= 4 or (size == 5 and is_plus_shape(region)):
             for x, y in region:
                 new_grid[x][y] = target_color
 
