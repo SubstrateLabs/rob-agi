@@ -1,1 +1,33 @@
 Challenge e88171ec:
+
+Problem Description:
+- Input: A grid of colored squares (0-9)
+- Task: Find the largest contiguous region of black (0) squares and fill it with the largest possible sky blue (8) rectangle
+- The sky blue rectangle must have even dimensions (width and height must be even numbers)
+- The sky blue rectangle should be surrounded by at least one layer of black squares if possible
+
+Observations:
+1. The largest black region is not always in the center of the grid
+2. The sky blue rectangle should be as large as possible within the black region
+3. The placement of the sky blue rectangle is crucial and should respect the surrounding black border
+
+Current Implementation Issues:
+- The algorithm is finding the correct largest black region but is not placing the sky blue rectangle correctly
+- It's creating a larger sky blue rectangle than expected, overwriting non-black squares
+
+Next Steps:
+1. Modify the find_largest_rectangle function to ensure it respects the black border requirement
+2. Implement a check to ensure the sky blue rectangle is surrounded by at least one layer of black squares
+3. Add a constraint to prevent the sky blue rectangle from overwriting non-black squares
+
+Things to Try:
+- Implement a shrinking mechanism for the rectangle if it doesn't fit perfectly within the black region
+- Add a validation step after finding the largest rectangle to ensure it meets all requirements
+
+Known Constraints:
+- The sky blue rectangle must have even dimensions
+- The sky blue rectangle must be entirely within the largest black region
+- The sky blue rectangle should be surrounded by black squares if possible
+
+Unknown:
+- The exact criteria for choosing between multiple possible placements of the sky blue rectangle if there are multiple options of the same size
