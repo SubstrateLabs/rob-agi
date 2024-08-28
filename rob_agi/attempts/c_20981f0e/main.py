@@ -1,17 +1,17 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple, Dict
-from collections import defaultdict
+from typing import List, Tuple
 
 def solve_20981f0e(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Rearrange blue cells (1) in each section between red dot (2) rows to form vertically aligned columns.
     The solution maintains the same number of blue cells in each section, preserves the positions of red dots,
-    and attempts to maintain the original distribution and shape of blue cells within each section.
+    and aligns blue cells both vertically and horizontally across all sections.
     Steps:
     1. Analyze the input grid and identify sections between red dot rows
-    2. For each section, rearrange blue cells to form columns while preserving their original distribution
-    3. Ensure at least one empty row between blue cells and red dots where possible
-    4. Construct the output grid with the new arrangements
+    2. Determine the leftmost and rightmost columns for blue cells in each section
+    3. Calculate the number of blue cells for left and right columns in each section
+    4. Rearrange blue cells in each section, ensuring vertical alignment and proper spacing
+    5. Construct the output grid with the new arrangements
     """
     rows, cols = input_grid.get_dimensions()
     output_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
@@ -26,37 +26,68 @@ def solve_20981f0e(input_grid: ColoredGrid) -> ColoredGrid:
     # Define sections
     sections = list(zip([-1] + red_dot_rows, red_dot_rows + [rows]))
     
+    # Analyze all sections
+    section_info = analyze_sections(input_grid, sections)
+    
     # Rearrange blue cells in each section
-    for start, end in sections:
+    for (start, end), info in zip(sections, section_info):
         if end - start > 2:
-            rearrange_section(input_grid, output_grid, start, end)
+            rearrange_section(output_grid, start, end, info)
     
     return output_grid
 
-def rearrange_section(input_grid: ColoredGrid, output_grid: ColoredGrid, start: int, end: int):
-    section_height = end - start - 1
-    cols = input_grid.get_dimensions()[1]
+def analyze_sections(input_grid: ColoredGrid, sections: List[Tuple[int, int]]) -> List[dict]:
+    section_info = []
+    max_left_count = 0
     
-    # Analyze blue cell distribution
-    column_counts = [sum(input_grid.values[r][c] == 1 for r in range(start + 1, end)) for c in range(cols)]
-    blue_columns = [c for c, count in enumerate(column_counts) if count > 0]
+    for start, end in sections:
+        if end - start <= 2:
+            section_info.append(None)
+            continue
+        
+        blue_count = sum(input_grid.values[r][c] == 1 
+                         for r in range(start + 1, end) 
+                         for c in range(input_grid.get_dimensions()[1]))
+        left_col = min((c for r in range(start + 1, end) 
+                        for c in range(input_grid.get_dimensions()[1]) 
+                        if input_grid.values[r][c] == 1), default=None)
+        right_col = max((c for r in range(start + 1, end) 
+                         for c in range(input_grid.get_dimensions()[1]) 
+                         if input_grid.values[r][c] == 1), default=None)
+        
+        if left_col is not None and right_col is not None:
+            max_left_count = max(max_left_count, blue_count // 2 + blue_count % 2)
+            section_info.append({
+                'blue_count': blue_count,
+                'left_col': left_col,
+                'right_col': right_col
+            })
+        else:
+            section_info.append(None)
     
-    # Rearrange blue cells
-    for c in blue_columns:
-        blue_cells = [input_grid.values[r][c] for r in range(start + 1, end)].count(1)
-        start_row = max(end - blue_cells - 1, start + 1)
-        for r in range(start_row, end):
-            output_grid.values[r][c] = 1 if blue_cells > 0 else 0
-            blue_cells -= 1
+    # Update left counts
+    for info in section_info:
+        if info:
+            info['left_count'] = min(max_left_count, info['blue_count'])
+            info['right_count'] = info['blue_count'] - info['left_count']
+    
+    return section_info
 
-def ensure_empty_rows(grid: ColoredGrid, red_dot_rows: List[int]):
-    rows, cols = grid.get_dimensions()
+def rearrange_section(output_grid: ColoredGrid, start: int, end: int, info: dict):
+    if not info:
+        return
     
-    for red_row in red_dot_rows:
-        if red_row > 0 and any(grid.values[red_row - 1][c] == 1 for c in range(cols)):
-            # Shift blue cells up if possible
-            for row in range(red_row - 1, 0, -1):
-                if all(grid.values[row - 1][c] == 0 for c in range(cols)):
-                    grid.values[row - 1] = grid.values[row]
-                    grid.values[row] = [0] * cols
-                    break
+    available_space = end - start - 1
+    rows_needed = max(info['left_count'], info['right_count'])
+    empty_rows = available_space - rows_needed
+    top_empty = empty_rows // 2
+    bottom_empty = empty_rows - top_empty
+    
+    left_start = start + 1 + top_empty + rows_needed - info['left_count']
+    right_start = start + 1 + top_empty + rows_needed - info['right_count']
+    
+    for i in range(info['left_count']):
+        output_grid.values[left_start + i][info['left_col']] = 1
+    
+    for i in range(info['right_count']):
+        output_grid.values[right_start + i][info['right_col']] = 1
