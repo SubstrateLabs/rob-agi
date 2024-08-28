@@ -34,12 +34,14 @@ def solve_4b6b68e5(input_grid: ColoredGrid) -> ColoredGrid:
         return True
 
     def flood_fill(r: int, c: int, old_color: int, new_color: int):
-        if (r < 0 or r >= rows or c < 0 or c >= cols or
-            output_grid.get_cell(r, c) != old_color):
-            return
-        output_grid.set_cell(r, c, new_color)
-        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            flood_fill(r + dr, c + dc, old_color, new_color)
+        stack = [(r, c)]
+        while stack:
+            r, c = stack.pop()
+            if (0 <= r < rows and 0 <= c < cols and
+                output_grid.get_cell(r, c) == old_color):
+                output_grid.set_cell(r, c, new_color)
+                for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                    stack.append((r + dr, c + dc))
 
     def get_highest_color(region: Set[Tuple[int, int]], color: int) -> int:
         highest_color = color
@@ -55,7 +57,7 @@ def solve_4b6b68e5(input_grid: ColoredGrid) -> ColoredGrid:
 
     colors = set(color for row in input_grid.values for color in row if color != 0)
     
-    for color in colors:
+    for color in sorted(colors, reverse=True):
         regions = input_grid.find_connected_regions(color)
         for region in regions:
             if is_enclosed(region, color):
