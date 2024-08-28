@@ -9,16 +9,16 @@ def solve_e0fb7511(input_grid: ColoredGrid) -> ColoredGrid:
 
     The function performs the following steps:
     1. Analyze the input grid to create a heat map of black square density
-    2. Choose a random starting point on an edge, biased towards higher density areas
+    2. Choose a starting point on an edge with high black square density
     3. Grow a sky blue structure using a probability-based growth algorithm
     4. Implement branching for a more organic structure
-    5. Control growth direction based on the black square heat map
-    6. Ensure connectivity of all sky blue cells
+    5. Ensure the pattern reaches at least 3 edges
+    6. Preserve some original black squares
     7. Smooth and refine the structure
-    8. Preserve some original black squares
-    9. Balance the final composition by ensuring the pattern reaches multiple edges
-    10. Fine-tune the pattern by converting some sky blue cells back to blue
-    11. Validate and adjust the result to meet size and connectivity requirements
+    8. Balance the composition by adding small branches in large blue areas
+    9. Ensure connectivity of all sky blue cells
+    10. Fine-tune the pattern to meet coverage requirements
+    11. Validate the final result
 
     Args:
     input_grid (ColoredGrid): The input grid to be transformed
@@ -178,99 +178,154 @@ def solve_e0fb7511(input_grid: ColoredGrid) -> ColoredGrid:
     # Main algorithm
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
-    heat_map = create_heat_map()
-    max_heat = max(max(row) for row in heat_map)
-    
-    total_cells = rows * cols
-    target_size = int(total_cells * random.uniform(0.3, 0.4))  # Reduced target size
-    branching_probability = 0.15  # Increased branching probability
 
-    start = get_random_edge_start()
-    structure = grow_structure(start)
-    smooth_structure(structure)
-    ensure_connectivity(structure)
-    preserve_black_squares(structure)
-    balance_composition(structure)
-    fine_tune_pattern(structure)
+    def create_heat_map():
+        heat_map = [[0 for _ in range(cols)] for _ in range(rows)]
+        for r in range(rows):
+            for c in range(cols):
+                if grid.get_cell(r, c) == 0:
+                    for dr in range(-2, 3):
+                        for dc in range(-2, 3):
+                            if 0 <= r+dr < rows and 0 <= c+dc < cols:
+                                heat_map[r+dr][c+dc] += 1 / (1 + math.sqrt(dr**2 + dc**2))
+        return heat_map
 
-    return grid
-    # Create a deep copy of the input grid
-    grid = input_grid.deep_copy()
-    rows, cols = grid.get_dimensions()
-
-    # Helper functions
-    def get_neighbors(r: int, c: int) -> List[Tuple[int, int]]:
+    def get_neighbors(r, c):
         return [(r+dr, c+dc) for dr, dc in [(-1,0), (1,0), (0,-1), (0,1)]
                 if 0 <= r+dr < rows and 0 <= c+dc < cols]
 
-    def is_black(r: int, c: int) -> bool:
-        return grid.get_cell(r, c) == 0
+    def get_edge_start():
+        edges = [(0, c) for c in range(cols)] + [(rows-1, c) for c in range(cols)] + \
+                [(r, 0) for r in range(1, rows-1)] + [(r, cols-1) for r in range(1, rows-1)]
+        return max(edges, key=lambda x: heat_map[x[0]][x[1]])
 
-    def set_sky_blue(r: int, c: int):
-        grid.set_cell(r, c, 8)
+    def grow_structure(start):
+        structure = set([start])
+        queue = deque([start])
+        grid.set_cell(*start, 8)
+        edges_reached = set()
+        
+        while queue and len(structure) < target_size:
+            r, c = queue.popleft()
+            for nr, nc in get_neighbors(r, c):
+                if (nr, nc) not in structure:
+                    if grid.get_cell(nr, nc) in [0, 1]:
+                        prob = 0.7 * heat_map[nr][nc] / max_heat + 0.3 * random.random()
+                        if prob > 0.5:
+                            structure.add((nr, nc))
+                            queue.append((nr, nc))
+                            grid.set_cell(nr, nc, 8)
+                            if nr in [0, rows-1] or nc in [0, cols-1]:
+                                edges_reached.add((nr, nc))
+            
+            if random.random() < 0.1:  # Branching
+                queue.append(random.choice(list(structure)))
+        
+        return structure, edges_reached
 
-    # Analyze black square distribution
-    black_squares = [(r, c) for r in range(rows) for c in range(cols) if is_black(r, c)]
-    total_black = len(black_squares)
+    def ensure_edge_coverage(structure, edges_reached):
+        while len(edges_reached) < 3:
+            start = random.choice(list(structure))
+            target_edge = random.choice([(0, c) for c in range(cols)] + [(rows-1, c) for c in range(cols)] + 
+                                        [(r, 0) for r in range(rows)] + [(r, cols-1) for r in range(rows)])
+            path = []
+            while start != target_edge:
+                r, c = start
+                dr = (target_edge[0] - r) // max(1, abs(target_edge[0] - r))
+                dc = (target_edge[1] - c) // max(1, abs(target_edge[1] - c))
+                start = (r + dr, c + dc)
+                if start not in structure:
+                    structure.add(start)
+                    grid.set_cell(*start, 8)
+                    path.append(start)
+                if start[0] in [0, rows-1] or start[1] in [0, cols-1]:
+                    edges_reached.add(start)
+                    break
+            if path:
+                structure.update(path)
 
-    # Choose a starting point
-    start = max(black_squares, key=lambda x: sum(1 for nr, nc in get_neighbors(*x) if is_black(nr, nc)))
-    path = [start]
-    set_sky_blue(*start)
-
-    # Grow the path
-    target_length = int(total_black * random.uniform(0.5, 0.8))
-    while len(path) < target_length:
-        r, c = path[-1]
-        neighbors = get_neighbors(r, c)
-        valid_moves = [
-            (nr, nc) for nr, nc in neighbors
-            if grid.get_cell(nr, nc) in [0, 1] and (nr, nc) not in path
-        ]
-        if not valid_moves:
-            # Implement jumping mechanism
-            unvisited_black = [sq for sq in black_squares if sq not in path]
-            if not unvisited_black:
-                break
-            jump_to = min(unvisited_black, key=lambda x: abs(x[0]-r) + abs(x[1]-c))
-            while (r, c) != jump_to:
-                r += (jump_to[0] - r) // max(1, abs(jump_to[0] - r))
-                c += (jump_to[1] - c) // max(1, abs(jump_to[1] - c))
-                set_sky_blue(r, c)
-                path.append((r, c))
-        else:
-            next_move = max(valid_moves, key=lambda x: 2 if is_black(*x) else 1)
-            set_sky_blue(*next_move)
-            path.append(next_move)
-
-    # Preserve original black squares
-    black_to_keep = random.sample(black_squares, k=int(total_black * random.uniform(0.2, 0.4)))
-    for r, c in black_to_keep:
-        if (r, c) not in path:
+    def preserve_black_squares(structure):
+        black_squares = [(r, c) for r in range(rows) for c in range(cols) if grid.get_cell(r, c) == 0]
+        to_preserve = random.sample(black_squares, k=int(len(black_squares) * 0.3))
+        for r, c in to_preserve:
+            if (r, c) in structure:
+                structure.remove((r, c))
             grid.set_cell(r, c, 0)
 
-    # Fine-tune the pattern
-    for r in range(rows):
-        for c in range(cols):
-            if grid.get_cell(r, c) == 8:
-                neighbors = get_neighbors(r, c)
-                sky_blue_neighbors = sum(1 for nr, nc in neighbors if grid.get_cell(nr, nc) == 8)
-                if sky_blue_neighbors <= 1:
-                    grid.set_cell(r, c, 1)  # Convert isolated sky blue to blue
+    def smooth_structure(structure):
+        to_remove = set()
+        to_add = set()
+        for r, c in structure:
+            neighbors = get_neighbors(r, c)
+            sky_blue_neighbors = sum(1 for nr, nc in neighbors if (nr, nc) in structure)
+            if sky_blue_neighbors <= 1:
+                to_remove.add((r, c))
+        for r in range(rows):
+            for c in range(cols):
+                if (r, c) not in structure:
+                    neighbors = get_neighbors(r, c)
+                    sky_blue_neighbors = sum(1 for nr, nc in neighbors if (nr, nc) in structure)
+                    if sky_blue_neighbors >= 3:
+                        to_add.add((r, c))
+        structure.difference_update(to_remove)
+        structure.update(to_add)
+        for r, c in to_remove:
+            grid.set_cell(r, c, 1)
+        for r, c in to_add:
+            grid.set_cell(r, c, 8)
 
-    # Final connectivity check
-    sky_blue_regions = grid.find_connected_regions(8)
-    if len(sky_blue_regions) > 1:
-        main_region = max(sky_blue_regions, key=len)
-        for region in sky_blue_regions:
-            if region != main_region:
-                start = region[0]
-                end = min(main_region, key=lambda x: abs(x[0]-start[0]) + abs(x[1]-start[1]))
-                while start != end:
-                    r, c = start
-                    r += (end[0] - r) // max(1, abs(end[0] - r))
-                    c += (end[1] - c) // max(1, abs(end[1] - c))
-                    set_sky_blue(r, c)
-                    start = (r, c)
+    def balance_composition(structure):
+        blue_regions = grid.find_connected_regions(1)
+        for region in blue_regions:
+            if len(region) > 0.2 * rows * cols:
+                start = random.choice(region)
+                for _ in range(3):  # Add small branches
+                    current = start
+                    for _ in range(random.randint(2, 5)):
+                        neighbors = [n for n in get_neighbors(*current) if n not in structure]
+                        if not neighbors:
+                            break
+                        next_cell = random.choice(neighbors)
+                        structure.add(next_cell)
+                        grid.set_cell(*next_cell, 8)
+                        current = next_cell
+
+    def ensure_connectivity(structure):
+        regions = grid.find_connected_regions(8)
+        if len(regions) > 1:
+            main_region = max(regions, key=len)
+            for region in regions:
+                if region != main_region:
+                    start = region[0]
+                    end = min(main_region, key=lambda x: abs(x[0]-start[0]) + abs(x[1]-start[1]))
+                    while start != end:
+                        r, c = start
+                        dr = (end[0] - r) // max(1, abs(end[0] - r))
+                        dc = (end[1] - c) // max(1, abs(end[1] - c))
+                        start = (r + dr, c + dc)
+                        if start not in structure:
+                            structure.add(start)
+                            grid.set_cell(*start, 8)
+
+    heat_map = create_heat_map()
+    max_heat = max(max(row) for row in heat_map)
+    total_cells = rows * cols
+    target_size = int(total_cells * random.uniform(0.2, 0.3))
+
+    start = get_edge_start()
+    structure, edges_reached = grow_structure(start)
+    ensure_edge_coverage(structure, edges_reached)
+    preserve_black_squares(structure)
+    smooth_structure(structure)
+    balance_composition(structure)
+    ensure_connectivity(structure)
+
+    # Fine-tune coverage
+    current_coverage = len(structure) / total_cells
+    if current_coverage > 0.3:
+        to_remove = random.sample(list(structure), k=int((current_coverage - 0.3) * total_cells))
+        for r, c in to_remove:
+            structure.remove((r, c))
+            grid.set_cell(r, c, 1)
 
     return grid
