@@ -1,6 +1,8 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Set
 
+from typing import List, Tuple, Set
+
 def solve_84db8fc4(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by finding the longest continuous path of black squares
@@ -52,7 +54,7 @@ def solve_84db8fc4(input_grid: ColoredGrid) -> ColoredGrid:
         for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
             nr, nc = r + dr, c + dc
             new_path = dfs(nr, nc, start_edge, visited.copy())
-            if len(new_path) > 0:
+            if new_path:
                 return current_path + new_path
         
         return []
