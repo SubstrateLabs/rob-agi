@@ -1,1 +1,28 @@
-Challenge 90347967:
+Challenge 90347967: Rotate and Reposition Colored Grid
+
+Observations:
+1. The challenge involves rotating non-black cells 90 degrees clockwise and moving them to the top-right corner of the grid.
+2. Black cells (0) are treated as empty space and remain in place.
+3. The grid size remains the same after transformation.
+
+Current Understanding:
+1. We need to collect non-black cells from bottom to top, left to right.
+2. The collected cells should be placed in the new grid starting from the top-right corner, moving left and down.
+
+What Works:
+- The basic logic of collecting non-black cells and placing them in a new grid.
+
+What Doesn't Work:
+- The current implementation is not correctly positioning the cells in larger grids (9x9).
+- The rotation seems correct, but the placement is off.
+
+Next Steps:
+1. Revise the placement logic to ensure cells are positioned correctly in the top-right corner.
+2. Pay special attention to how cells wrap when reaching the left edge of the grid.
+3. Consider the differences between smaller grids (3x3) and larger grids (9x9) in terms of cell placement.
+
+Unknowns:
+- The exact logic for determining where each cell should be placed in larger grids.
+
+To Try:
+- Implement a more sophisticated placement algorithm that takes into account the grid size and ensures correct wrapping behavior.
