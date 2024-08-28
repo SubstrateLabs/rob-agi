@@ -1,1 +1,31 @@
 Challenge 12422b43:
+
+Pattern Observed:
+- The first column remains unchanged.
+- For each subsequent column, we need to identify a pattern and extend it vertically.
+- The pattern starts from the top of the column and continues until we hit a zero or the end of the column.
+- If a pattern is found, it should be repeated to fill the entire column height.
+- If no pattern is found (i.e., the column starts with zero), the column should remain unchanged.
+
+Current Implementation Issues:
+- The current implementation is not correctly handling the pattern extension for each column.
+- It's extending patterns across columns instead of treating each column independently.
+
+What Works:
+- The helper functions get_column_pattern() and extend_pattern() seem to be correctly implemented.
+- The main loop structure in solve_12422b43() is correct, iterating through columns starting from the second one.
+
+What Doesn't Work:
+- The current implementation is not preserving zero-filled columns.
+- It's not correctly identifying where patterns should start and end within each column.
+
+Next Steps:
+1. Modify the get_column_pattern() function to return both the pattern and the start index of the pattern.
+2. Update the main loop in solve_12422b43() to:
+   a. Only apply the pattern extension if a non-zero pattern is found.
+   b. Preserve the original column contents above the pattern start index.
+   c. Fill the rest of the column with the extended pattern.
+
+Unknowns:
+- Whether there are any edge cases we haven't considered yet.
+- If the pattern repetition should wrap around to the top of the column or stop at the bottom.
