@@ -1,1 +1,32 @@
-Challenge 0d87d2a6:
+Challenge 0d87d2a6: Transform input grid by connecting blue dots with a path and filling areas
+
+Key observations:
+1. The challenge involves connecting blue (1) dots with a path and filling areas.
+2. The path should prioritize left and top movements.
+3. Areas to the left of the blue path should be filled with blue.
+4. Original red (2) blocks and blue (1) dots must be preserved.
+5. Enclosed areas created by the blue path should also be filled.
+
+Current implementation issues:
+1. The path is not correctly prioritizing left and top movements.
+2. The filling algorithm is overfilling areas, including those to the right of the path.
+3. The implementation is not correctly handling the preservation of original elements.
+
+Things that don't work:
+1. Simply connecting dots vertically and filling from the left.
+2. Flood-filling enclosed areas without considering the path's direction.
+
+Next steps:
+1. Implement a pathfinding algorithm that prioritizes left and top movements.
+2. Revise the filling algorithm to only fill areas to the left of the path.
+3. Ensure that the original red blocks and blue dots are preserved throughout the process.
+4. Handle edge cases such as blue dots on the edges of the grid.
+
+Unknowns:
+1. The exact rules for handling multiple blue dots in complex configurations.
+2. How to determine the "inside" of the path when it forms loops or complex shapes.
+
+Certainties:
+1. The solution must connect all blue dots with a continuous path.
+2. The area to the left of the path must be filled with blue.
+3. Original red blocks and blue dots must remain unchanged.
