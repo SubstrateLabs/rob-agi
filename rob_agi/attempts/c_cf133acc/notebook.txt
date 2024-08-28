@@ -1,1 +1,31 @@
 Challenge cf133acc:
+
+Problem Description:
+- Transform a 2D grid by extending non-black colors upwards within each column.
+- The grid size can range from 1x1 to 30x30.
+- Colors are represented by integers from 0 to 9 (0 is black, others are different colors).
+
+Key Observations:
+1. Colors should extend upwards only through black (0) cells.
+2. The original positions of non-black colors must be preserved.
+3. When extending upwards, a color should stop when it encounters another non-black color.
+4. The order of colors in a column is important and should be maintained from bottom to top.
+
+Current Implementation Issues:
+- The algorithm is not correctly preserving the order of colors when extending upwards.
+- It's overwriting some existing non-black colors, which should be preserved.
+
+Approach to Fix:
+1. Scan each column from bottom to top, storing the positions and colors of non-black cells.
+2. Process the stored colors from bottom to top, extending each color upwards until:
+   a) It reaches another non-black color
+   b) It reaches the top of the grid
+3. Ensure that the original non-black colors are not overwritten during this process.
+
+Things to Avoid:
+- Don't extend colors beyond their nearest non-black neighbor above.
+- Don't overwrite existing non-black colors.
+
+Next Steps:
+- Revise the implementation to correctly handle the order and preservation of colors.
+- Add more detailed comments to explain the logic of each step in the algorithm.
