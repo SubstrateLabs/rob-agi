@@ -5,12 +5,13 @@ def solve_c62e2108(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the c62e2108 challenge by expanding patterns across the grid.
     
-    The function identifies non-black, non-blue shapes in the input grid,
-    expands them based on their position in the grid:
-    - Top-left shapes are expanded to fill the entire top-left quadrant.
-    - Bottom-left shapes are expanded vertically, repeating the pattern four times.
-    - Top-right shapes are expanded downwards, doubling the original height.
-    - Bottom-right shapes are expanded to fill the entire bottom-right quadrant.
+    The function identifies non-black, non-blue shapes in the input grid and expands them
+    based on their relative position. The expansion pattern varies gradually:
+    - Horizontal expansion increases from 3 to 4 units moving from left to right.
+    - Vertical expansion increases from 2 to 4 units moving from top to bottom.
+    - Shapes in the upper half create a continuous top line connecting all expanded units.
+    - Shapes in the lower half expand vertically, with the leftmost expanding 4 times.
+    - Bottom-right shapes expand to fill available space, mirroring top-left patterns.
     Blue areas are removed, and black areas outside expansions are preserved.
     
     Args:
@@ -61,37 +62,24 @@ def get_shape(grid: ColoredGrid, start_r: int, start_c: int, visited: set) -> Di
 def expand_shape(grid: List[List[int]], shape: Dict, rows: int, cols: int):
     r, c = shape['row'], shape['col']
     color = shape['color']
-    mid_row, mid_col = rows // 2, cols // 2
+    rel_row, rel_col = r / rows, c / cols
     
-    if r < mid_row and c < mid_col:  # Top-left quadrant
-        expand_top_left(grid, color, mid_row, mid_col)
-    elif r >= mid_row and c < mid_col:  # Bottom-left quadrant
-        expand_bottom_left(grid, color, r, c, rows, mid_col)
-    elif r < mid_row and c >= mid_col:  # Top-right quadrant
-        expand_top_right(grid, color, r, c, mid_row, cols)
-    else:  # Bottom-right quadrant
-        expand_bottom_right(grid, color, mid_row, mid_col, rows, cols)
+    h_expand = int(3 + rel_col)
+    v_expand = int(2 + 2 * rel_row)
+    
+    pattern = get_pattern(shape['pixels'], r, c)
+    
+    for i in range(v_expand):
+        for j in range(h_expand):
+            for pr, pc in pattern:
+                nr, nc = r + i * (pr - r), c + j * (pc - c)
+                if 0 <= nr < rows and 0 <= nc < cols:
+                    grid[nr][nc] = color
+    
+    # Create continuous top line
+    if rel_row < 0.5:
+        for j in range(c, min(cols, c + h_expand * (pattern[-1][1] - pattern[0][1] + 1))):
+            grid[r][j] = color
 
-def expand_top_left(grid: List[List[int]], color: int, mid_row: int, mid_col: int):
-    for i in range(mid_row):
-        for j in range(mid_col):
-            grid[i][j] = color
-
-def expand_bottom_left(grid: List[List[int]], color: int, r: int, c: int, rows: int, mid_col: int):
-    pattern_height = (rows - r) // 4
-    for i in range(r, rows):
-        for j in range(mid_col):
-            if grid[i % pattern_height + r][j] != 0:
-                grid[i][j] = color
-
-def expand_top_right(grid: List[List[int]], color: int, r: int, c: int, mid_row: int, cols: int):
-    pattern_height = mid_row - r
-    for i in range(r, mid_row * 2):
-        for j in range(c, cols):
-            if grid[i % pattern_height + r][j] != 0:
-                grid[i][j] = color
-
-def expand_bottom_right(grid: List[List[int]], color: int, mid_row: int, mid_col: int, rows: int, cols: int):
-    for i in range(mid_row, rows):
-        for j in range(mid_col, cols):
-            grid[i][j] = color
+def get_pattern(pixels: List[Tuple[int, int]], r: int, c: int) -> List[Tuple[int, int]]:
+    return [(pr - r, pc - c) for pr, pc in pixels]
