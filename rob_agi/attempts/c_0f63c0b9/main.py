@@ -7,13 +7,12 @@ def solve_0f63c0b9(input_grid: ColoredGrid) -> ColoredGrid:
     The transformation follows these rules:
     1. Colors are processed from top to bottom based on their first appearance.
     2. Each color creates a frame-like structure:
-       - The topmost color fills the top three rows and extends down.
-       - Middle colors (if any) fill three rows: one full row in the middle and two partial rows.
-       - The bottommost color fills the bottom three rows and extends up.
-    3. Vertical lines for each color extend from its start to its end boundary.
-    4. The frame structure adapts to the spacing between colors in the input.
-    5. The interior of each frame remains black, except for the full rows.
-    6. Colors are given balanced space, with preference to top and bottom colors.
+       - The topmost color fills the top two rows completely and extends down with vertical lines.
+       - Middle colors (if any) have one full row in the middle and vertical lines extending to their boundaries.
+       - The bottommost color fills the bottom two rows completely and extends up with vertical lines.
+    3. There's always at least one black row between color sections.
+    4. Each color section has a minimum height of 3 rows.
+    5. Space is distributed evenly among colors, with preference given to top and bottom colors.
     
     Args:
     input_grid (ColoredGrid): The input 15x15 grid with scattered colored squares.
@@ -36,15 +35,14 @@ def solve_0f63c0b9(input_grid: ColoredGrid) -> ColoredGrid:
         return ColoredGrid(values=[[colors[0][0] for _ in range(15)] for _ in range(15)])
     
     # Calculate space distribution
-    total_space = 15
     num_colors = len(colors)
     min_space_per_color = 3
-    remaining_space = total_space - num_colors * min_space_per_color
-    extra_space = [0] * num_colors
+    total_space = 15 - (num_colors - 1)  # Reserve space for black separators
+    base_height = max(min_space_per_color, total_space // num_colors)
+    extra_space = total_space % num_colors
     
-    # Distribute extra space
-    for i in range(remaining_space):
-        extra_space[i % num_colors] += 1
+    # Distribute space
+    color_spaces = [base_height + (1 if i < extra_space else 0) for i in range(num_colors)]
     
     # Process each color
     current_row = 0
@@ -54,15 +52,15 @@ def solve_0f63c0b9(input_grid: ColoredGrid) -> ColoredGrid:
         
         # Determine boundaries
         top_boundary = current_row
-        color_space = min_space_per_color + extra_space[i]
-        bottom_boundary = current_row + color_space - 1
+        bottom_boundary = current_row + color_spaces[i] - 1
         
         # Fill horizontal rows
-        output_grid[top_boundary] = [color] * 15
-        output_grid[bottom_boundary] = [color] * 15
-        if is_first or is_last:
+        if is_first:
+            output_grid[top_boundary] = [color] * 15
             output_grid[top_boundary + 1] = [color] * 15
+        elif is_last:
             output_grid[bottom_boundary - 1] = [color] * 15
+            output_grid[bottom_boundary] = [color] * 15
         else:
             mid_row = (top_boundary + bottom_boundary) // 2
             output_grid[mid_row] = [color] * 15
@@ -72,6 +70,6 @@ def solve_0f63c0b9(input_grid: ColoredGrid) -> ColoredGrid:
             output_grid[row][0] = color
             output_grid[row][14] = color
         
-        current_row = bottom_boundary + 1
+        current_row = bottom_boundary + 2  # +2 to include the black separator row
     
     return ColoredGrid(values=output_grid)
