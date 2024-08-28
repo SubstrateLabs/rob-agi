@@ -17,15 +17,22 @@ Current Implementation Issues:
 What We've Tried:
 1. Depth-First Search (DFS) to find paths between edges.
 2. Calculating path centrality using Manhattan distance.
+3. Implemented a visualization function in experiment.py to better understand the paths being found.
 
 Next Steps:
-1. Review the DFS implementation to ensure it's exploring all possible paths.
-2. Double-check the logic for selecting the most central path.
-3. Implement a visualization function to better understand the paths being found.
+1. Analyze the visualizations from experiment.py to identify any patterns or issues in path selection.
+2. Review the DFS implementation to ensure it's exploring all possible paths.
+3. Double-check the logic for selecting the most central path.
 4. Consider alternative pathfinding algorithms (e.g., Breadth-First Search) for comparison.
+5. Implement additional test cases in experiment.py to cover edge cases.
 
 Unknowns:
 1. Whether the current centrality calculation is the most appropriate method.
 2. If there are edge cases we haven't considered in the path selection process.
+3. How the algorithm performs on larger or more complex grids.
 
 Remember: The solution must work for all test cases, not just the failing one.
+
+Progress:
+- Added visualization function to experiment.py to help debug path finding issues.
+- Next, we'll analyze the visualizations and refine our algorithm based on the insights gained.
