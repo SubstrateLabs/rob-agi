@@ -12,6 +12,10 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     5. All transformations are applied simultaneously.
     6. Gray (5) acts as a border and is not considered part of any region.
     7. Only orthogonally adjacent cells are considered part of the same region.
+
+    The solution uses a flood fill algorithm to identify connected blue regions,
+    determines the target color based on the prevalence of red and green,
+    and applies transformations to eligible blue regions simultaneously.
     """
     BLUE, RED, GREEN, GRAY = 1, 2, 3, 5
 
