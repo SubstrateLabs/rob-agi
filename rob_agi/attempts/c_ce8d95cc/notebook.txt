@@ -1,1 +1,37 @@
 Challenge ce8d95cc:
+
+Observations:
+1. The challenge involves compressing a grid while preserving vertical and horizontal lines.
+2. The output grid should have empty spaces (black, 0) between lines and at the edges.
+3. Vertical lines should be preserved in their relative positions.
+4. Horizontal lines should span the entire width of the output grid.
+5. Intersections between vertical and horizontal lines should prioritize the horizontal line color.
+
+Current Implementation:
+- Identifies vertical and horizontal lines in the input grid.
+- Creates a new grid with dimensions based on the number of lines, ensuring at least one column/row of empty space between lines.
+- Places vertical lines first, then horizontal lines.
+
+Issues:
+- The current implementation fails on test_ce8d95cc_example_3.
+- It's not correctly handling the intersection of vertical and horizontal lines.
+- Horizontal lines are losing their continuity when intersecting with vertical lines.
+
+Next Steps:
+1. Modify the algorithm to ensure horizontal lines maintain continuity across the entire width, even when intersecting with vertical lines.
+2. Review the placement of vertical lines to ensure they don't overwrite horizontal lines at intersections.
+3. Double-check the dimensions of the output grid to ensure they match the expected output.
+
+Things to avoid:
+- Don't lose the vertical line information when placing horizontal lines.
+- Avoid creating output grids that are too large or too small.
+
+Certainties:
+- The basic approach of identifying lines and recreating a compressed grid is correct.
+- We need to preserve both vertical and horizontal lines in their relative positions.
+
+Unknowns:
+- The exact order of operations that will correctly handle all intersection cases.
+
+Next attempt:
+- Modify the placement of horizontal lines to overwrite vertical lines at intersections, but preserve vertical lines elsewhere.
