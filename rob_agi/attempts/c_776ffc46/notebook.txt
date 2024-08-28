@@ -2,40 +2,39 @@ Challenge 776ffc46: Transform blue plus shapes in a grid
 
 Key observations:
 1. Only blue plus shapes (5 pixels in a + configuration) are transformed.
-2. The target color for transformation is determined by the color enclosed in or adjacent to a gray border.
+2. The target color for transformation is determined by the color most frequently adjacent to or enclosed by gray borders.
 3. Gray (5) acts as a border and is not part of any region to be transformed.
 4. All transformations are applied simultaneously.
 
 Rules:
-1. Find the target color by looking for a color (red or green) enclosed by or adjacent to a gray border.
-2. Identify all blue plus shapes in the grid.
-3. Transform these blue plus shapes to the target color.
-4. Other blue shapes and colors remain unchanged.
+1. Find the target color by counting occurrences of red (2) and green (3) adjacent to or enclosed by gray borders.
+2. Choose the color with the higher count as the target color.
+3. If counts are equal, use red as the target color.
+4. Identify all blue plus shapes in the grid.
+5. Transform these blue plus shapes to the target color.
+6. Other blue shapes and colors remain unchanged.
 
 Things that don't work:
 - Transforming all blue regions of any shape.
-- Using the prevalence of red or green to determine the target color.
-- Transforming shapes based on their size (2-4 pixels).
-- Assuming the target color is always red (2).
-- Only checking for colors enclosed within gray borders.
+- Using only the first encountered color as the target color.
+- Checking only for colors enclosed within gray borders.
 - Transforming blue plus shapes without considering the target color.
+- Returning the input grid unchanged when a target color is found but no blue plus shapes exist.
 
 Lessons learned:
-1. The target color can be either red (2) or green (3), not just red.
-2. The target color may be adjacent to a gray border, not necessarily enclosed by it.
-3. The current implementation is not correctly identifying the target color in all cases.
-4. The transformation of blue plus shapes is working correctly, but the target color identification is the main issue.
-5. The function should return the input grid unchanged if no target color is found.
+1. The target color determination needs to consider all gray borders in the grid.
+2. Counting occurrences of red and green is necessary to determine the target color.
+3. The transformation of blue plus shapes is working correctly, but the target color identification was the main issue.
+4. The function should only return the input grid unchanged if no red or green color is found adjacent to gray borders.
+5. Diagonal adjacency should be considered when counting color occurrences near gray borders.
 
 Next steps:
-1. Revise the function to find the target color, ensuring it checks for colors both enclosed by and adjacent to gray borders.
-2. Implement a more robust method to handle different gray border configurations, including incomplete or open borders.
-3. Add a check to ensure that only valid blue plus shapes are transformed, not other blue configurations.
-4. Verify that the transformation is applied correctly to all identified blue plus shapes after fixing the target color identification.
-5. Add a condition to return the input grid unchanged if no target color is found.
-6. Double-check the logic for transforming blue plus shapes to ensure it's using the correct target color.
+1. Implement a more robust method to count occurrences of red and green adjacent to all gray borders.
+2. Ensure the counting method considers all 8 adjacent cells (including diagonals) for each gray border cell.
+3. Verify that the target color selection uses the correct counting method and tiebreaker rule.
+4. Double-check the logic for identifying and transforming blue plus shapes.
+5. Add a condition to return the input grid unchanged only if no red or green is found adjacent to any gray border.
 
 Unknowns:
-- How to prioritize if multiple potential target colors are found (e.g., both red and green adjacent to gray).
-- Whether the order of scanning the grid for the target color matters.
-- If there are any edge cases where the current definition of a blue plus shape might not be sufficient.
+- Whether there are any edge cases where the current definition of adjacency to gray borders might not be sufficient.
+- If there are any scenarios where the order of processing gray border cells matters.
