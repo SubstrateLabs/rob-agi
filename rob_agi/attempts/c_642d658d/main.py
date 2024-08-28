@@ -5,82 +5,154 @@ import math
 
 def solve_642d658d(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the 642d658d challenge by identifying the most significant pattern in the input grid.
+    Solve the 642d658d challenge by identifying the most significant color in the input grid.
     
     The solution follows these steps:
-    1. Analyze the background and identify non-background colors
-    2. Find connected components for each non-background color
-    3. Calculate various significance scores for each color:
-       - Coverage
-       - Component count and sizes
-       - Shape complexity
-       - Contrast with background
-       - Pattern/symmetry
-       - Multi-scale significance
-       - Contextual significance (centrality)
-       - Color relationships
-       - Structural importance
-    4. Compute overall significance scores
-    5. Select the color with the highest significance score
-    6. Return a 1x1 grid with the selected color
+    1. Analyze the input grid to determine background color and non-background colors
+    2. For each non-background color, calculate a comprehensive score based on:
+       - Frequency
+       - Structural importance (connected components)
+       - Pattern formation (lines, symmetry, shapes)
+       - Color interactions
+       - Distribution across the grid
+       - Positional importance
+       - Multi-scale presence
+    3. Combine the scores using weighted sum
+    4. Select the color with the highest combined score
+    5. Return a 1x1 grid with the selected color
     
-    This approach captures complex patterns by considering multiple aspects of color significance,
-    from low-level details to high-level patterns, allowing for a comprehensive analysis of the input grid.
+    This approach considers multiple aspects of color significance, allowing for a
+    comprehensive analysis of the input grid to determine the most important color.
     """
     color_counts = Counter(cell for row in input_grid.values for cell in row)
     background_color = max(color_counts, key=color_counts.get)
     total_cells = sum(color_counts.values())
     
     non_background_colors = set(color_counts.keys()) - {background_color}
-    color_components = {color: find_connected_components(input_grid, color) for color in non_background_colors}
     
-    color_scores = calculate_color_scores(input_grid, color_components, background_color, total_cells)
+    if not non_background_colors:
+        return ColoredGrid(values=[[background_color]])
     
-    if color_scores:
-        selected_color = max(color_scores, key=color_scores.get)
-    else:
-        selected_color = background_color  # Fallback if no non-background colors
+    color_scores = {}
+    for color in non_background_colors:
+        frequency_score = color_counts[color] / total_cells
+        structural_score = calculate_structural_score(input_grid, color)
+        pattern_score = calculate_pattern_score(input_grid, color)
+        interaction_score = calculate_interaction_score(input_grid, color, background_color)
+        distribution_score = calculate_distribution_score(input_grid, color)
+        position_score = calculate_position_score(input_grid, color)
+        multi_scale_score = calculate_multi_scale_score(input_grid, color)
+        
+        # Combine scores with weights
+        color_scores[color] = (
+            frequency_score * 0.15 +
+            structural_score * 0.2 +
+            pattern_score * 0.15 +
+            interaction_score * 0.15 +
+            distribution_score * 0.1 +
+            position_score * 0.15 +
+            multi_scale_score * 0.1
+        )
     
+    selected_color = max(color_scores, key=color_scores.get)
     return ColoredGrid(values=[[selected_color]])
 
 def find_connected_components(grid: ColoredGrid, color: int) -> List[List[Tuple[int, int]]]:
     """Find all connected components of a given color in the grid."""
     return grid.find_connected_regions(color)
 
-def calculate_color_scores(grid: ColoredGrid, color_components: Dict[int, List[List[Tuple[int, int]]]], 
-                           background_color: int, total_cells: int) -> Dict[int, float]:
-    """Calculate comprehensive significance scores for each color."""
-    scores = {}
-    grid_dimensions = grid.get_dimensions()
+def calculate_structural_score(grid: ColoredGrid, color: int) -> float:
+    """Calculate the structural importance score for a color."""
+    components = grid.find_connected_regions(color)
+    if not components:
+        return 0
     
-    for color, components in color_components.items():
-        if not components:
-            continue
-        
-        coverage_score = sum(len(comp) for comp in components) / total_cells
-        component_score = calculate_component_score(components)
-        shape_score = calculate_shape_score(components, grid_dimensions)
-        contrast_score = calculate_contrast_score(color, background_color)
-        pattern_score = calculate_pattern_score(components, grid_dimensions)
-        multi_scale_score = calculate_multi_scale_score(grid, color, grid_dimensions)
-        centrality_score = calculate_centrality_score(components, grid_dimensions)
-        relationship_score = calculate_relationship_score(grid, color, background_color)
-        structural_score = calculate_structural_score(grid, color, background_color)
-        
-        # Combine scores with weights
-        scores[color] = (
-            coverage_score * 0.15 +
-            component_score * 0.1 +
-            shape_score * 0.1 +
-            contrast_score * 0.1 +
-            pattern_score * 0.15 +
-            multi_scale_score * 0.1 +
-            centrality_score * 0.1 +
-            relationship_score * 0.1 +
-            structural_score * 0.1
-        )
+    avg_size = sum(len(comp) for comp in components) / len(components)
+    max_size = max(len(comp) for comp in components)
     
-    return scores
+    return (avg_size + max_size) / (2 * grid.num_rows * grid.num_cols)
+
+def calculate_pattern_score(grid: ColoredGrid, color: int) -> float:
+    """Calculate the pattern formation score for a color."""
+    rows, cols = grid.get_dimensions()
+    horizontal_lines = sum(1 for row in grid.values if any(cell == color for cell in row))
+    vertical_lines = sum(1 for c in range(cols) if any(grid.values[r][c] == color for r in range(rows)))
+    diagonal_lines = sum(1 for i in range(rows + cols - 1) if any(grid.values[r][c] == color for r, c in zip(range(rows), range(i, -1, -1)) if c < cols))
+    
+    symmetry_score = calculate_symmetry_score(grid, color)
+    
+    return (horizontal_lines / rows + vertical_lines / cols + diagonal_lines / (rows + cols) + symmetry_score) / 4
+
+def calculate_symmetry_score(grid: ColoredGrid, color: int) -> float:
+    """Calculate the symmetry score for a color."""
+    rows, cols = grid.get_dimensions()
+    horizontal_symmetry = sum(grid.values[r] == grid.values[rows - 1 - r] for r in range(rows // 2)) / (rows // 2)
+    vertical_symmetry = sum(all(grid.values[r][c] == grid.values[r][cols - 1 - c] for r in range(rows)) for c in range(cols // 2)) / (cols // 2)
+    return (horizontal_symmetry + vertical_symmetry) / 2
+
+def calculate_interaction_score(grid: ColoredGrid, color: int, background_color: int) -> float:
+    """Calculate the color interaction score."""
+    rows, cols = grid.get_dimensions()
+    interactions = 0
+    color_cells = 0
+    for r in range(rows):
+        for c in range(cols):
+            if grid.values[r][c] == color:
+                color_cells += 1
+                for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                    nr, nc = r + dr, c + dc
+                    if 0 <= nr < rows and 0 <= nc < cols and grid.values[nr][nc] not in [color, background_color]:
+                        interactions += 1
+    return interactions / (4 * color_cells) if color_cells > 0 else 0
+
+def calculate_distribution_score(grid: ColoredGrid, color: int) -> float:
+    """Calculate the distribution score for a color."""
+    rows, cols = grid.get_dimensions()
+    sector_size = max(rows, cols) // 3
+    sectors = set()
+    for r in range(rows):
+        for c in range(cols):
+            if grid.values[r][c] == color:
+                sectors.add((r // sector_size, c // sector_size))
+    return len(sectors) / 9  # 9 is the maximum number of sectors
+
+def calculate_position_score(grid: ColoredGrid, color: int) -> float:
+    """Calculate the positional importance score for a color."""
+    rows, cols = grid.get_dimensions()
+    center_r, center_c = rows // 2, cols // 2
+    total_distance = 0
+    color_cells = 0
+    for r in range(rows):
+        for c in range(cols):
+            if grid.values[r][c] == color:
+                color_cells += 1
+                distance = ((r - center_r) ** 2 + (c - center_c) ** 2) ** 0.5
+                total_distance += 1 - (distance / max(center_r, center_c))
+    return total_distance / color_cells if color_cells > 0 else 0
+
+def calculate_multi_scale_score(grid: ColoredGrid, color: int) -> float:
+    """Calculate the multi-scale presence score for a color."""
+    rows, cols = grid.get_dimensions()
+    scales = [1, 2, 4]
+    scale_scores = []
+    
+    for scale in scales:
+        block_rows = rows // scale
+        block_cols = cols // scale
+        blocks_with_color = 0
+        total_blocks = 0
+        
+        for r in range(0, rows, scale):
+            for c in range(0, cols, scale):
+                total_blocks += 1
+                if any(grid.values[rr][cc] == color 
+                       for rr in range(r, min(r + scale, rows)) 
+                       for cc in range(c, min(c + scale, cols))):
+                    blocks_with_color += 1
+        
+        scale_scores.append(blocks_with_color / total_blocks if total_blocks > 0 else 0)
+    
+    return sum(scale_scores) / len(scales)
 
 def calculate_component_score(components: List[List[Tuple[int, int]]]) -> float:
     """Calculate a score based on the number and size of components."""
