@@ -1,1 +1,33 @@
 Challenge 4b6b68e5:
+
+Problem:
+- Transform a 2D grid by filling enclosed regions with the highest-valued color present within the region or adjacent to it, excluding black (0).
+- The grid contains colored shapes (represented by numbers 1-9) surrounded by black (0) space.
+
+What we know:
+1. The overall structure and outlines of the shapes should be preserved.
+2. Enclosed regions should be filled with the highest color value found within or adjacent to the region.
+3. Black (0) is considered empty space and should not be filled or considered for the highest color.
+
+Current implementation issues:
+- The algorithm is not correctly identifying or filling enclosed regions.
+- It's not considering adjacent colors when determining the highest color to fill with.
+
+Next steps:
+1. Improve the is_enclosed function to correctly identify enclosed regions.
+2. Modify the get_highest_color function to consider both internal and adjacent colors.
+3. Ensure the flood_fill function is correctly filling the entire enclosed region.
+4. Process colors in descending order to handle nested enclosed regions correctly.
+
+Things to try:
+- Implement a more robust flood fill algorithm that can identify complex enclosed shapes.
+- Use a two-pass approach: first identify all enclosed regions, then fill them with the highest color.
+- Consider using a different method to determine adjacency, possibly including diagonal neighbors.
+
+What doesn't work:
+- Simply filling based on the immediate surrounding colors without considering the entire enclosed region.
+- Treating each color independently without considering how they interact in nested structures.
+
+Unknowns:
+- The exact definition of an "enclosed" region in complex shapes.
+- How to handle cases where an enclosed region touches the edge of the grid.
