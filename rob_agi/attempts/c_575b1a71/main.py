@@ -9,8 +9,9 @@ def solve_575b1a71(input_grid: ColoredGrid) -> ColoredGrid:
     2. Avoids adjacent same-colored squares horizontally and vertically.
     3. Ensures all colors (1-4) are present in the output.
     4. Balances the number of squares for each color as much as possible.
-    5. Handles edge, corner, and isolated squares specially.
-    6. Performs multiple passes to refine the solution, improving vertical alignment and color balance.
+    5. Handles isolated, edge, and corner squares specially.
+    6. Enhances vertical alignment while maintaining color balance.
+    7. Resolves conflicts and performs final adjustments to satisfy all conditions.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = output_grid.get_dimensions()
@@ -18,24 +19,31 @@ def solve_575b1a71(input_grid: ColoredGrid) -> ColoredGrid:
     target_count = total_black // 4
     color_counter = {1: 0, 2: 0, 3: 0, 4: 0}
 
-    # First pass - Vertical alignment and initial color assignment
-    assign_vertical_colors(output_grid, color_counter, target_count)
-    
-    # Fill remaining squares and ensure all colors are present
-    fill_remaining_squares(output_grid, color_counter, target_count)
+    # Identify special squares
+    isolated_squares, edge_squares, corner_squares = identify_special_squares(output_grid)
+    vertical_lines = identify_vertical_lines(output_grid)
+
+    # Initial color assignment
+    assign_colors_to_special_squares(output_grid, isolated_squares, edge_squares, corner_squares, color_counter)
+    assign_colors_to_vertical_lines(output_grid, vertical_lines, color_counter)
+
+    # Fill remaining squares
+    fill_remaining_squares(output_grid, color_counter)
+
+    # Ensure all colors are present
     ensure_all_colors_present(output_grid, color_counter)
-    
-    # Balance color distribution
-    balance_colors(output_grid, color_counter, target_count)
-    
-    # Handle edge and corner cases
-    handle_edge_corner_cases(output_grid, color_counter, target_count)
-    
-    # Fine-tuning
-    fine_tune_solution(output_grid, color_counter, target_count)
-    
-    # Final conflict resolution
+
+    # Balance adjustment
+    balance_colors(output_grid, color_counter)
+
+    # Conflict resolution
     resolve_conflicts(output_grid, color_counter)
+
+    # Enhance vertical alignment
+    enhance_vertical_alignment(output_grid, color_counter)
+
+    # Final check and adjustment
+    final_check_and_adjust(output_grid, color_counter)
 
     return output_grid
 
@@ -234,3 +242,99 @@ def resolve_conflicts(grid: ColoredGrid, color_counter: Dict[int, int]):
                             color_counter[grid.values[nr][nc]] -= 1
                             grid.values[nr][nc] = new_color
                             color_counter[new_color] += 1
+def identify_special_squares(grid: ColoredGrid) -> Tuple[List[Tuple[int, int]], List[Tuple[int, int]], List[Tuple[int, int]]]:
+    rows, cols = grid.get_dimensions()
+    isolated = []
+    edge = []
+    corner = []
+    
+    for r in range(rows):
+        for c in range(cols):
+            if grid.values[r][c] == 0:
+                if is_isolated(grid, r, c):
+                    isolated.append((r, c))
+                elif r in (0, rows-1) or c in (0, cols-1):
+                    if (r in (0, rows-1) and c in (0, cols-1)):
+                        corner.append((r, c))
+                    else:
+                        edge.append((r, c))
+    
+    return isolated, edge, corner
+
+def identify_vertical_lines(grid: ColoredGrid) -> List[List[Tuple[int, int]]]:
+    rows, cols = grid.get_dimensions()
+    vertical_lines = []
+    
+    for c in range(cols):
+        line = []
+        for r in range(rows):
+            if grid.values[r][c] == 0:
+                line.append((r, c))
+            elif line:
+                if len(line) > 1:
+                    vertical_lines.append(line)
+                line = []
+        if line and len(line) > 1:
+            vertical_lines.append(line)
+    
+    return vertical_lines
+
+def assign_colors_to_special_squares(grid: ColoredGrid, isolated: List[Tuple[int, int]], 
+                                     edge: List[Tuple[int, int]], corner: List[Tuple[int, int]], 
+                                     color_counter: Dict[int, int]):
+    for r, c in isolated + corner + edge:
+        if grid.values[r][c] == 0:
+            color = get_best_color(grid, [(r, c)], color_counter)
+            grid.values[r][c] = color
+            color_counter[color] += 1
+
+def assign_colors_to_vertical_lines(grid: ColoredGrid, vertical_lines: List[List[Tuple[int, int]]], 
+                                    color_counter: Dict[int, int]):
+    for line in vertical_lines:
+        if len(line) > 2:
+            colors = [1, 2] if sum(color_counter.values()) % 2 == 0 else [3, 4]
+        else:
+            colors = [get_best_color(grid, line, color_counter)]
+        
+        for i, (r, c) in enumerate(line):
+            color = colors[i % len(colors)]
+            if not has_conflict(grid, r, c, color):
+                grid.values[r][c] = color
+                color_counter[color] += 1
+
+def enhance_vertical_alignment(grid: ColoredGrid, color_counter: Dict[int, int]):
+    rows, cols = grid.get_dimensions()
+    for c in range(cols):
+        prev_color = None
+        for r in range(rows):
+            if grid.values[r][c] != 5:
+                if prev_color and not has_conflict(grid, r, c, prev_color):
+                    old_color = grid.values[r][c]
+                    grid.values[r][c] = prev_color
+                    color_counter[old_color] -= 1
+                    color_counter[prev_color] += 1
+                prev_color = grid.values[r][c]
+
+def final_check_and_adjust(grid: ColoredGrid, color_counter: Dict[int, int]):
+    rows, cols = grid.get_dimensions()
+    for r in range(rows):
+        for c in range(cols):
+            if grid.values[r][c] != 5:
+                if has_conflict(grid, r, c, grid.values[r][c]):
+                    new_color = get_best_color(grid, [(r, c)], color_counter)
+                    color_counter[grid.values[r][c]] -= 1
+                    grid.values[r][c] = new_color
+                    color_counter[new_color] += 1
+
+    missing_colors = [color for color in range(1, 5) if color_counter[color] == 0]
+    for color in missing_colors:
+        for r in range(rows):
+            for c in range(cols):
+                if grid.values[r][c] != 5 and not has_conflict(grid, r, c, color):
+                    old_color = grid.values[r][c]
+                    grid.values[r][c] = color
+                    color_counter[old_color] -= 1
+                    color_counter[color] += 1
+                    break
+            if color_counter[color] > 0:
+                break
