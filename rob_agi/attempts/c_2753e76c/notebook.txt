@@ -1,1 +1,35 @@
 Challenge 2753e76c:
+
+Observations:
+1. The challenge involves transforming a 16x16 input grid into a smaller output grid that represents the most frequent colors.
+2. The output grid should have 4 rows, but the width can vary.
+3. Colors are represented by integers from 0 to 9, with 0 being black (empty space).
+4. The most frequent color should occupy the entire top row of the output grid.
+5. Other colors should be represented in descending order of frequency in the subsequent rows.
+6. Colors should be right-aligned in their respective rows.
+
+Current Implementation:
+- We count the frequency of non-black colors in the input grid.
+- We select the top 4 most frequent colors.
+- We calculate relative frequencies and determine the output grid width.
+- We fill the grid from right to left for each color.
+- We ensure the top row (most frequent color) fills the entire width.
+- We right-align all color sections in each row.
+
+Issues:
+1. The output grid width is too large in some cases. Our current implementation is producing an 11x4 grid instead of the expected 4x4 grid for example_1.
+2. The relative proportions of colors in the output don't match the expected output exactly.
+
+Next Steps:
+1. Adjust the width calculation to produce a more compact output grid.
+2. Fine-tune the relative frequency calculation to better match the expected proportions.
+3. Consider implementing a maximum width limit for the output grid.
+4. Ensure that the order of colors in the output matches the frequency order in the input.
+
+Things to avoid:
+- Don't use a fixed multiplication factor (like 5) for relative frequencies, as it leads to overly wide grids.
+- Avoid filling the entire top row with the most frequent color if it skews the proportions too much.
+
+Unknowns:
+- The exact algorithm for determining the output grid width.
+- The precise method for calculating relative color frequencies that matches the expected output.
