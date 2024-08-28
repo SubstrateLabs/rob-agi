@@ -9,7 +9,7 @@ def solve_f83cb3f6(input_grid: ColoredGrid) -> ColoredGrid:
     1. Identifies the base line structure of color 8 (sky blue).
     2. Determines the most frequent non-zero, non-8 color as the color to be moved.
     3. Creates new line(s) adjacent to the base line:
-       - For horizontal base line: one line below, and if needed, one line above.
+       - For horizontal base line: one line above, and if needed, one line below.
        - For vertical base line: one line to the right.
     4. Distributes the moved color along the new line(s), prioritizing:
        - Placement adjacent to the base line segments
@@ -56,9 +56,6 @@ def create_output_grid(input_grid: ColoredGrid, base_line_structure: List[Tuple[
 
 def distribute_dots_horizontal(grid: ColoredGrid, base_row: int, total_dots: int, color: int):
     cols = grid.num_cols
-    adjacent_positions = []
-    
-    # Find segments and adjacent positions
     segments = []
     segment_start = -1
     for c in range(cols):
@@ -71,36 +68,22 @@ def distribute_dots_horizontal(grid: ColoredGrid, base_row: int, total_dots: int
     if segment_start != -1:
         segments.append((segment_start, cols - 1))
     
-    # Create list of adjacent positions
-    for start, end in segments:
-        adjacent_positions.extend([(base_row - 1, c) for c in range(start, end + 1)])
-        adjacent_positions.extend([(base_row + 1, c) for c in range(start, end + 1)])
-    
-    # Place dots
     dots_placed = 0
-    for r, c in adjacent_positions:
+    # Place dots above the base line
+    for start, end in segments:
+        dots_placed += place_dots_in_range(grid, base_row - 1, start, end, color, total_dots - dots_placed)
         if dots_placed >= total_dots:
-            break
-        grid.set_cell(r, c, color)
-        dots_placed += 1
+            return
     
-    # If there are more dots, place them in additional rows
+    # If there are more dots, place them below the base line
     if dots_placed < total_dots:
-        additional_row = base_row - 2
-        while dots_placed < total_dots:
-            for start, end in segments:
-                for c in range(start, end + 1):
-                    if dots_placed >= total_dots:
-                        break
-                    grid.set_cell(additional_row, c, color)
-                    dots_placed += 1
-            additional_row = base_row + 2 if additional_row == base_row - 2 else additional_row - 1
+        for start, end in segments:
+            dots_placed += place_dots_in_range(grid, base_row + 1, start, end, color, total_dots - dots_placed)
+            if dots_placed >= total_dots:
+                return
 
 def distribute_dots_vertical(grid: ColoredGrid, base_col: int, total_dots: int, color: int):
     rows = grid.num_rows
-    adjacent_positions = []
-    
-    # Find segments and adjacent positions
     segments = []
     segment_start = -1
     for r in range(rows):
@@ -113,26 +96,36 @@ def distribute_dots_vertical(grid: ColoredGrid, base_col: int, total_dots: int, 
     if segment_start != -1:
         segments.append((segment_start, rows - 1))
     
-    # Create list of adjacent positions
-    for start, end in segments:
-        adjacent_positions.extend([(r, base_col + 1) for r in range(start, end + 1)])
-    
-    # Place dots
     dots_placed = 0
-    for r, c in adjacent_positions:
-        if dots_placed >= total_dots:
-            break
-        grid.set_cell(r, c, color)
+    # Place dots to the right of the base line
+    for start, end in segments:
+        for r in range(start, end + 1):
+            if dots_placed >= total_dots:
+                return
+            grid.set_cell(r, base_col + 1, color)
+            dots_placed += 1
+
+def place_dots_in_range(grid: ColoredGrid, row: int, start: int, end: int, color: int, dots_left: int) -> int:
+    dots_placed = 0
+    # Place at the start of the segment
+    if dots_left > 0:
+        grid.set_cell(row, start, color)
         dots_placed += 1
+        dots_left -= 1
     
-    # If there are more dots, place them in additional columns
-    if dots_placed < total_dots:
-        additional_col = base_col + 2
-        while dots_placed < total_dots:
-            for start, end in segments:
-                for r in range(start, end + 1):
-                    if dots_placed >= total_dots:
-                        break
-                    grid.set_cell(r, additional_col, color)
-                    dots_placed += 1
-            additional_col += 1
+    # Place at the end of the segment if it's different from the start
+    if dots_left > 0 and end > start:
+        grid.set_cell(row, end, color)
+        dots_placed += 1
+        dots_left -= 1
+    
+    # Fill the rest of the segment
+    for c in range(start + 1, end):
+        if dots_left > 0:
+            grid.set_cell(row, c, color)
+            dots_placed += 1
+            dots_left -= 1
+        else:
+            break
+    
+    return dots_placed
