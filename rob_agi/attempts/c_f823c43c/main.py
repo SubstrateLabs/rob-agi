@@ -1,33 +1,49 @@
 from rob_agi.colored_grid import ColoredGrid
-from collections import Counter
+from collections import Counter, defaultdict
 
 def solve_f823c43c(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by identifying the background color and the pattern color,
     then creates a new grid with a regular pattern based on these colors.
     
-    1. Analyzes the input grid to find the background color (most common) and pattern color (second most common, excluding 6).
-    2. Creates a new grid filled with the background color.
-    3. Applies the pattern color in a regular grid:
-       - On every other row, starting from the second row (index 1 if 0-indexed)
-       - Every other column in these rows, starting from the second column (index 1 if 0-indexed)
-    4. Returns the new grid as a ColoredGrid object.
+    1. Analyzes the input grid to find color frequencies and patterns.
+    2. Determines the background color (most frequent) and pattern color (most consistent pattern).
+    3. Creates a new grid filled with the background color.
+    4. Applies the pattern color in a regular grid based on the identified intervals.
+    5. Returns the new grid as a ColoredGrid object.
     """
-    # Analyze the input grid
-    color_counts = Counter(cell for row in input_grid.values for cell in row if cell != 6)
-    background_color = color_counts.most_common(1)[0][0]
-    
-    # Find the pattern color (second most common, excluding 6)
-    pattern_color = next(color for color, _ in color_counts.most_common() if color != background_color)
-
-    # Create a new grid
     rows, cols = input_grid.get_dimensions()
+    color_counts = Counter(cell for row in input_grid.values for cell in row)
+    
+    def analyze_pattern(color):
+        occurrences = [(r, c) for r in range(rows) for c in range(cols) if input_grid.values[r][c] == color]
+        row_intervals = defaultdict(int)
+        col_intervals = defaultdict(int)
+        for i in range(len(occurrences)):
+            for j in range(i+1, len(occurrences)):
+                r1, c1 = occurrences[i]
+                r2, c2 = occurrences[j]
+                if r1 == r2:
+                    row_intervals[c2 - c1] += 1
+                if c1 == c2:
+                    col_intervals[r2 - r1] += 1
+        row_interval = max(row_intervals, key=row_intervals.get, default=1)
+        col_interval = max(col_intervals, key=col_intervals.get, default=1)
+        consistency = (row_intervals[row_interval] + col_intervals[col_interval]) / (len(occurrences) * (len(occurrences) - 1) / 2) if occurrences else 0
+        return consistency, row_interval, col_interval, occurrences[0] if occurrences else None
+
+    color_patterns = {color: analyze_pattern(color) for color in color_counts}
+    pattern_color = max(color_patterns, key=lambda x: (color_patterns[x][0], color_counts[x]))
+    background_color = max(color_counts, key=lambda x: color_counts[x] if x != pattern_color else 0)
+
     new_grid = [[background_color for _ in range(cols)] for _ in range(rows)]
+    
+    _, row_interval, col_interval, start = color_patterns[pattern_color]
+    if start:
+        start_row, start_col = start
+        for r in range(rows):
+            for c in range(cols):
+                if (r - start_row) % row_interval == 0 and (c - start_col) % col_interval == 0:
+                    new_grid[r][c] = pattern_color
 
-    # Apply the pattern color
-    for row in range(1, rows, 2):
-        for col in range(1, cols, 2):
-            new_grid[row][col] = pattern_color
-
-    # Convert to ColoredGrid and return
     return ColoredGrid(values=new_grid)
