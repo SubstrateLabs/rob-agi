@@ -41,35 +41,36 @@ def modify_line(grid, line_type, index=None):
 
     if line_type == 'main_diagonal':
         line = [grid.values[i][i] for i in range(min(rows, cols))]
-        original_twos = [i for i, val in enumerate(line) if val == 2]
     elif line_type == 'other_diagonal':
         line = [grid.values[i][cols-1-i] for i in range(min(rows, cols))]
-        original_twos = [i for i, val in enumerate(line) if val == 2]
     elif line_type == 'row':
         line = grid.values[index]
-        original_twos = [i for i, val in enumerate(line) if val == 2]
     else:  # column
         line = [row[index] for row in grid.values]
-        original_twos = [i for i, val in enumerate(line) if val == 2]
 
-    current_color = 3
+    original_twos = [i for i, val in enumerate(line) if val == 2]
+
+    new_line = line.copy()
     for i in range(len(line)):
         if i in original_twos:
-            current_color = 3
+            new_line[i] = 2
+        elif i > 0 and new_line[i-1] == 2:
+            new_line[i] = 3
+        elif i < len(line) - 1 and line[i+1] == 2:
+            new_line[i] = 3
         else:
-            line[i] = current_color
-            current_color = 5 - current_color  # Toggle between 2 and 3
+            new_line[i] = 2 if i % 2 == 1 else 3
 
     if line_type == 'main_diagonal':
-        for i, val in enumerate(line):
+        for i, val in enumerate(new_line):
             grid.values[i][i] = val
     elif line_type == 'other_diagonal':
-        for i, val in enumerate(line):
+        for i, val in enumerate(new_line):
             grid.values[i][cols-1-i] = val
     elif line_type == 'row':
-        grid.values[index] = line
+        grid.values[index] = new_line
     else:  # column
-        for i, val in enumerate(line):
+        for i, val in enumerate(new_line):
             grid.values[i][index] = val
 
 def solve_bcb3040b(input_grid: ColoredGrid) -> ColoredGrid:
@@ -77,9 +78,9 @@ def solve_bcb3040b(input_grid: ColoredGrid) -> ColoredGrid:
     Solves the bcb3040b challenge by identifying the line (row, column, or diagonal)
     with the most red (2) values and modifying it to create an alternating pattern
     of red (2) and green (3) squares. The original red squares are preserved, and
-    the alternating pattern starts with a green square next to each original red square.
-    If there's a tie for the line with the most red squares, it prioritizes in the order:
-    main diagonal, other diagonal, topmost row, leftmost column.
+    the alternating pattern is adjusted to ensure green squares are adjacent to the
+    original red squares. If there's a tie for the line with the most red squares,
+    it prioritizes in the order: main diagonal, other diagonal, topmost row, leftmost column.
     The rest of the grid remains unchanged.
     """
     line_type, index = find_line_with_most_twos(input_grid)
