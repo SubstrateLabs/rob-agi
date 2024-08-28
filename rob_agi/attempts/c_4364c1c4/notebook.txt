@@ -1,1 +1,34 @@
-Challenge 4364c1c4:
+Challenge 4364c1c4: Transform input grid by redistributing shapes
+
+Key observations:
+1. The background color (8 in the example) should form a frame around the entire grid.
+2. Shapes should be moved towards the edges while maintaining their vertical order.
+3. The first shape (magenta, 6) should move left, touching the left edge of the grid.
+4. The second shape (green, 3) should move right and down, touching the right edge of the grid.
+5. Shapes should maintain their original form and size.
+6. There should be at least one column/row of background color between shapes and grid edges.
+
+Current implementation issues:
+1. The magenta shape (6) is not moving left as expected.
+2. The green shape (3) is not moving right and down as expected.
+3. The background color frame is not being properly maintained.
+
+Attempted solutions:
+1. Implementing alternating left/right movement for shapes based on their index.
+2. Adjusting vertical positions to close gaps while maintaining order.
+3. Ensuring a background color frame after placing all shapes.
+
+Next steps:
+1. Modify the move_shape_left and move_shape_right functions to ensure shapes touch the grid edges.
+2. Implement a function to shift shapes vertically while maintaining their order.
+3. Refine the logic for maintaining the background color frame.
+4. Consider implementing a function to detect shape boundaries for more precise movement.
+
+Unknown factors:
+1. How to handle cases where shapes might overlap after movement.
+2. Whether there are specific rules for shapes with internal features (like the gap in the green shape).
+
+Certainties:
+1. The background color is the most frequent color in the grid.
+2. Shapes need to maintain their original size and form.
+3. The order of shapes from top to bottom should be preserved.
