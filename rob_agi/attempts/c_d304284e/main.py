@@ -43,14 +43,14 @@ def extract_pattern(grid, start_row, start_col, color):
 def create_replicated_grid(grid: ColoredGrid, pattern, original_color, start_row, start_col):
     new_grid = [[0 for _ in range(grid.num_cols)] for _ in range(grid.num_rows)]
     pattern_height, pattern_width = len(pattern), len(pattern[0])
-    horizontal_spacing = 8  # Fixed horizontal spacing between pattern starts
+    horizontal_spacing = pattern_width + 1  # Spacing between patterns horizontally
 
     for r in range(start_row, grid.num_rows, pattern_height + 1):
-        col_index = 0
+        color_toggle = True
         for c in range(start_col, grid.num_cols, horizontal_spacing):
-            color = original_color if col_index % 2 == 0 else 6
+            color = original_color if color_toggle else 6
             stamp_pattern(new_grid, pattern, r, c, color)
-            col_index += 1
+            color_toggle = not color_toggle
 
     return new_grid
 
@@ -59,7 +59,8 @@ def stamp_pattern(grid, pattern, start_row, start_col, color):
         if start_row + r < len(grid):
             for c in range(len(pattern[0])):
                 if start_col + c < len(grid[0]):
-                    grid[start_row + r][start_col + c] = color
+                    if pattern[r][c] != 0:  # Only stamp non-zero cells
+                        grid[start_row + r][start_col + c] = color
 
 def preserve_original_input(input_grid, new_grid):
     for r in range(input_grid.num_rows):
