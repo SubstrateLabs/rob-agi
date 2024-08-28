@@ -105,3 +105,27 @@ test_horizontal_line()
 test_size_constraints()
 test_gray_border()
 test_color_prevalence()
+
+def test_complex_shapes():
+    input_grid = [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 1, 1, 1, 0, 1, 1, 1, 1, 0],
+        [0, 1, 0, 1, 0, 1, 0, 0, 1, 0],
+        [0, 1, 1, 1, 0, 1, 1, 1, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 1, 0, 1, 0, 1, 1, 1, 0, 0],
+        [0, 1, 1, 1, 0, 1, 0, 1, 0, 0],
+        [0, 1, 0, 1, 0, 1, 1, 1, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ]
+    grid = ColoredGrid(values=input_grid)
+    result = solve_776ffc46(grid)
+
+    print("\nComplex Shapes Test")
+    print("Input grid:")
+    print_grid(input_grid)
+    print("\nOutput grid:")
+    print_grid(result.values)
+
+test_complex_shapes()
