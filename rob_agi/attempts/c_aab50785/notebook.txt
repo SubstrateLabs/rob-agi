@@ -1,1 +1,27 @@
 Challenge aab50785:
+
+Problem Description:
+- The task is to find the largest rectangular region in a grid that is bordered by continuous 8's on exactly two sides and doesn't contain any 8's inside.
+
+What we know:
+1. The input is a ColoredGrid object representing a 2D grid of colored squares (0-9).
+2. The output should be a ColoredGrid object containing the largest valid region.
+3. A valid region must be bordered by continuous 8's on exactly two sides.
+4. The valid region must not contain any 8's inside it.
+5. If multiple valid regions of the same size exist, we should return the topmost and leftmost one.
+
+Current Implementation Issues:
+- Our solution is finding smaller regions than expected in some cases (e.g., example_3).
+- We might be too restrictive in our definition of "bordered by 8's".
+
+Possible improvements to explore:
+1. Revise the is_bordered_by_eights function to allow for partial bordering by 8's on two sides.
+2. Consider allowing regions that are bordered by 8's on more than two sides, as long as at least two sides are fully bordered.
+3. Implement a more efficient algorithm to find the largest rectangle, possibly using dynamic programming or a stack-based approach.
+
+Next steps:
+1. Analyze example_3 in detail to understand why our current implementation is failing.
+2. Revise the is_bordered_by_eights function based on the findings.
+3. If necessary, modify the main solve_aab50785 function to accommodate the new understanding of the problem.
+
+Remember: The goal is to find the largest valid region, not just any valid region.
