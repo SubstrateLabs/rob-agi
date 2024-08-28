@@ -1,5 +1,6 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List, Tuple, Set
+from collections import deque
 
 def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -12,32 +13,35 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     6. Gray (5) acts as a border and is not considered part of any region.
     7. Only orthogonally adjacent cells are considered part of the same region.
     """
-    BLUE, RED, GREEN = 1, 2, 3
+    BLUE, RED, GREEN, GRAY = 1, 2, 3, 5
 
-    def flood_fill(grid, x, y):
-        region = []
-        stack = [(x, y)]
-        while stack:
-            cx, cy = stack.pop()
+    def flood_fill(grid: List[List[int]], x: int, y: int) -> Set[Tuple[int, int]]:
+        region = set()
+        queue = deque([(x, y)])
+        while queue:
+            cx, cy = queue.popleft()
             if (cx, cy) not in region and 0 <= cx < len(grid) and 0 <= cy < len(grid[0]) and grid[cx][cy] == BLUE:
-                region.append((cx, cy))
+                region.add((cx, cy))
                 for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                    stack.append((cx + dx, cy + dy))
+                    nx, ny = cx + dx, cy + dy
+                    if 0 <= nx < len(grid) and 0 <= ny < len(grid[0]) and grid[nx][ny] != GRAY:
+                        queue.append((nx, ny))
         return region
 
-    def is_plus_shape(region):
-        if len(region) not in [5, 7]:  # Plus shapes can only have 5 or 7 cells
+    def is_plus_shape(region: Set[Tuple[int, int]]) -> bool:
+        if len(region) not in [5, 7]:
             return False
-        center = region[len(region) // 2]
+        center = next(iter(region))  # Get any point from the set
         arms = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-        return all((center[0] + dx, center[1] + dy) in region for dx, dy in arms)
+        arm_lengths = [sum(1 for i in range(1, 4) if (center[0] + dx * i, center[1] + dy * i) in region) for dx, dy in arms]
+        return all(length > 0 for length in arm_lengths) and len(set(arm_lengths)) == 1
 
-    def apply_transformations(grid, regions_to_transform, target_color):
-        new_grid = grid.deep_copy()
+    def apply_transformations(grid: List[List[int]], regions_to_transform: List[Set[Tuple[int, int]]], target_color: int) -> ColoredGrid:
+        new_grid = [row[:] for row in grid]
         for region in regions_to_transform:
             for x, y in region:
-                new_grid.values[x][y] = target_color
-        return new_grid
+                new_grid[x][y] = target_color
+        return ColoredGrid(values=new_grid)
 
     red_count = sum(row.count(RED) for row in input_grid.values)
     green_count = sum(row.count(GREEN) for row in input_grid.values)
@@ -58,4 +62,4 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         if 2 <= size <= 5 or (6 <= size <= 8 and is_plus_shape(region)):
             regions_to_transform.append(region)
 
-    return apply_transformations(input_grid, regions_to_transform, target_color)
+    return apply_transformations(input_grid.values, regions_to_transform, target_color)
