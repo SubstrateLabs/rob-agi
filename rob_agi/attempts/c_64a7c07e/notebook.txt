@@ -1,1 +1,37 @@
-Challenge 64a7c07e:
+Challenge 64a7c07e: Grid Transformation
+
+Objective:
+- Transform input grid by horizontally shifting shapes while maintaining vertical positions.
+- Preserve the relative order of shapes from left to right.
+- Center the overall arrangement of shapes within the grid.
+
+Key Observations:
+1. The algorithm successfully centers larger shapes (example_0 and example_2 pass).
+2. Smaller grids with shapes close to the edge (example_1) are not correctly centered.
+
+Current Implementation:
+- Uses DFS to identify connected shapes.
+- Calculates ideal gaps between shapes based on available space.
+- Attempts to center the entire arrangement.
+
+Issue Identified:
+- The centering calculation doesn't work correctly for smaller grids or when shapes are close to the grid edges.
+
+Next Steps:
+1. Refine the centering calculation to work for all grid sizes.
+2. Ensure that shapes are moved to the right even in small grids.
+3. Consider edge cases where shapes are already at the rightmost position.
+
+Things Tried That Didn't Work:
+- Simple distribution of shapes across available space without considering grid size.
+
+Certainties:
+- The algorithm correctly identifies and preserves shape structures.
+- The relative order of shapes is maintained.
+
+Uncertainties:
+- The exact formula for calculating the optimal starting position for different grid sizes.
+
+To Investigate:
+- How to adjust the centering calculation for different ratios of shape size to grid size.
+- Whether a different approach is needed for grids smaller than a certain threshold.
