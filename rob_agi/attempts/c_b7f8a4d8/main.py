@@ -79,6 +79,18 @@ def solve_b7f8a4d8(input_grid: ColoredGrid) -> ColoredGrid:
                 if output_grid.values[r][col] == 0:
                     output_grid.values[r][col] = 3
     
+    # Connect horizontal yellow expansions
+    for row in range(supercell_size // 2, height, supercell_size):
+        yellow_cells = []
+        for col in range(width):
+            if output_grid.values[row][col] == 4:
+                yellow_cells.append(col)
+        for i in range(len(yellow_cells) - 1):
+            start, end = yellow_cells[i], yellow_cells[i + 1]
+            for c in range(start + 1, end):
+                if output_grid.values[row][c] == 0:
+                    output_grid.values[row][c] = 4
+    
     # Preserve grid structure
     for row in range(height):
         for col in range(width):
