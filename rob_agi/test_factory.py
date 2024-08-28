@@ -34,7 +34,7 @@ def _run(arg_list: list[str]) -> TestOutput:
         return TestOutput(success=False, output="", error=str(e) + trace_str, returncode=-1)
 
 
-def run_pytest(test_file: Path, run_all: bool = True):
+def run_pytest(test_file: Path, run_all: bool = False):
     args = [sys.executable, "-m", "pytest", "-vv", "--no-header", "--random-order"]
     if not run_all:
         args.append("-x")
