@@ -100,12 +100,6 @@ def test_color_prevalence():
     print("\nOutput grid:")
     print_grid(result.values)
 
-test_vertical_line()
-test_horizontal_line()
-test_size_constraints()
-test_gray_border()
-test_color_prevalence()
-
 def test_complex_shapes():
     input_grid = [
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -128,4 +122,32 @@ def test_complex_shapes():
     print("\nOutput grid:")
     print_grid(result.values)
 
+def test_3x3_blue_square():
+    input_grid = [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+        [0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+        [0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 2, 2, 2, 0, 3, 3, 3, 0, 0],
+        [0, 2, 2, 2, 0, 3, 3, 3, 0, 0],
+        [0, 2, 2, 2, 0, 3, 3, 3, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ]
+    grid = ColoredGrid(values=input_grid)
+    result = solve_776ffc46(grid)
+
+    print("\n3x3 Blue Square Test")
+    print("Input grid:")
+    print_grid(input_grid)
+    print("\nOutput grid:")
+    print_grid(result.values)
+
+test_vertical_line()
+test_horizontal_line()
+test_size_constraints()
+test_gray_border()
+test_color_prevalence()
 test_complex_shapes()
+test_3x3_blue_square()
