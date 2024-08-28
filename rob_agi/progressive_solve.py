@@ -20,7 +20,7 @@ from rob_agi.arc_util import load_task_set
 from rob_agi.computed_result import ComputedResult
 from rob_agi.grid_problem import GridProblem
 from rob_agi.solver_functions import problem_setup_aider, get_test_case_descriptions
-from rob_agi.test_factory import run_pytest, setup_files, read_meta_file, write_meta_file, TestOutput
+from rob_agi.test_factory import run_pytest, setup_files, read_meta_file, write_meta_file, TestOutput, run_experiment
 
 project_root = Path(__file__).parent.parent
 ignore_template = project_root / ".aiderignore"
@@ -94,18 +94,36 @@ class Solver:
 
     def get_ask_coder(self, fnames=None):
         if fnames is None:
-            fnames = [self.file_paths["main"], self.file_paths["test"], self.file_paths["distilled"]]
-        return self.get_coder(edit_format="ask", fnames=fnames)
-
-    def get_modify_coder(self, fnames=None):
-        if fnames is None:
             fnames = [
                 self.file_paths["main"],
+                self.file_paths["test"],
+                self.file_paths["distilled"],
+                self.file_paths["notebook"],
+                self.file_paths["experiment"],
+            ]
+        return self.get_coder(edit_format="ask", fnames=fnames)
+
+    def get_reflect_coder(self, from_coder=None, fnames=None):
+        if fnames is None:
+            fnames = [
                 self.file_paths["visual_descriptions"],
                 self.file_paths["notebook"],
                 self.file_paths["experiment"],
             ]
         read_only_fnames = [
+            self.file_paths["main"],
+            self.file_paths["test"],
+            self.file_paths["distilled"],
+        ]
+        return self.get_coder(
+            from_coder=from_coder, fnames=fnames, read_only_fnames=read_only_fnames, auto_commits=True
+        )
+
+    def get_modify_coder(self, fnames=None):
+        if fnames is None:
+            fnames = [self.file_paths["main"]]
+        read_only_fnames = [
+            self.file_paths["visual_descriptions"],
             self.file_paths["test"],
             self.file_paths["colored_grid"],
             self.file_paths["distilled"],
@@ -132,12 +150,22 @@ class Solver:
             f"{prefix}\n\n<VALIDATION_OUTPUT>\n{current_result.error}\n{current_result.output}</VALIDATION_OUTPUT>\n"
         )
         prompt += f"\n<VISUAL_DESCRIPTIONS>\n{desc}\n</VISUAL_DESCRIPTIONS>\n"
-        prompt += "Examine all the information you have, state your understanding of the challenge, and propose a detailed solution to the challenge in words. Any solution must always apply to every case, not just the failing exception here.\n"
-        # ask_coder.run(prompt)
-        prompt = "Then reflect on your idea. Look very closely and notice if there are any other patterns or discrepancies worth noting. Remember this is about identifying abstract, intuitive ideas about what is happening. This takes humility, be honest, give it good effort and avoid over confidence; don't ever apologize, think hard and creatively.\n"
-        prompt += f"Explicitly consider how your idea applies to each of the examples and test cases in attempts/{self.challenge_id}/test.py. To check your thinking, illustrate how your idea either works or doesn't for each case.\n"
-        prompt += f"If the rule(s) you came up with does not apply to any specific case, call it out and think about a more general idea that does apply in every case. Be meticulous and careful in your reflection. Sometimes you need to zoom out to see how a single idea can apply to all cases.\n"
+        exp = run_experiment(self.file_paths["experiment"])
+        if exp:
+            prompt += f"\n<EXPERIMENT_OUTPUT>\nSTDOUT:{exp.output}\nSTDERR:{exp.error}\n</EXPERIMENT_OUTPUT>\n"
+        prompt += "Before we try to come up with a new solution let's take in all of this information, notice what may be important, and ask ourselves some relevant questions to help us introspect and explore the problem more completely.\n"
+        prompt += "Look at all the cases you've been presented with. Come up with 3-5 questions that you think are important to ask yourself. These questions should help you understand the challenge better and guide you to a better, more general solution that solves the challenge. Maybe they are about discrepancies, or patterns, or specific failure cases. Do not answer the questions yet.\n"
         ask_coder.run(prompt)
+        ask_coder.run(
+            "Now, think carefully and answer the questions you came up with. But don't propose a solution quite yet.\n"
+        )
+
+        solution = "Examine all the information you have, state your understanding of the challenge, and propose a detailed solution to the challenge in words. Any solution must always apply to every case, so always try to generalize over all cases rather than only replicating individual cases.\n"
+        # ask_coder.run(prompt)
+        solution = "Then reflect on your idea. Look very closely and notice if there are any other patterns or discrepancies worth noting. Remember this is about identifying abstract, intuitive ideas about what is happening. This takes humility, be honest, give it good effort and avoid over confidence; don't ever apologize, think hard and creatively.\n"
+        solution += f"Explicitly consider how your idea applies to each of the examples and test cases in attempts/{self.challenge_id}/test.py. To check your thinking, illustrate how your idea either works or doesn't for each case.\n"
+        solution += f"If the rule(s) you came up with does not apply to any specific case, call it out and think about a more general idea that does apply in every case. Be meticulous and careful in your reflection. Sometimes you need to zoom out to see how a single idea can apply to all cases.\n"
+        ask_coder.run(solution)
 
         res = ask_coder.run("Based on that reflection detail a step by step plan for how to solve the challenge\n")
         return res
@@ -150,11 +178,19 @@ class Solver:
         prompt += f"Use that latest planning and solve the challenge by modifying the implementation file. Always ensure that the docstring to solve_{self.challenge_id} includes a correct summary of the solution in words.\n"
         prompt += "Make sure your code changes are in the SEARCH/REPLACE format."
         modifications = modify_coder.run(prompt)
-        logger.info(f"\n~~~~~~~~~EDITED~~~~~~~~~~~\n{modify_coder.aider_edited_files}")
+        logger.info(f"\n~~~~~~~~~CODE_EDIT~~~~~~~~~~~\n{modify_coder.aider_edited_files}")
         res = self.run_tests()
-        if update_visual_desc:
-            update_prompt = "If the visual_descriptions.yaml can be improved (more detail, more accurate, better intuitive abstractions, cutting irrelevant info, clarity, etc), include those changes too. This file is purely for descriptions of the grid images. It should not have any information about the code or the solution. These descriptions should help someone trying to solve this problem though, so it should include language that is relevant for solving the problem.\n"
-            modify_coder.run(update_prompt)
+        reflect_coder = self.get_reflect_coder(modify_coder)
+        if not res.success:
+            reflect = f"The output of the tests after your changes is:\n\n<STDERR>\n{res.error}</STDERR>\n\n<STDOUT>{res.output}</STDOUT>\n"
+            reflect += "Based on the output of the tests, reflect on what you have learned. notebook.txt is where you keep the latest notes for solving the challenge. This file should always contain accurate and up-to-date information about the challenge, and over time it will help future versions of you solve it. Revise it or append to it according to what you've learned. It should be well maintained and never be more than 3 pages long, ideally shorter. Make sure you use the SEARCH/REPLACE format\n"
+            reflect_coder.run(reflect)
+            experiment = "Also if you want to run an experiment in python to help you find out more pointed information, you can write code in experiment.py. This file will be run immediately and the stdout and stderr will be available in the next pass at solving. Make sure you use the SEARCH/REPLACE format"
+            reflect_coder.run(experiment)
+            if update_visual_desc:
+                update_prompt = "If the visual_descriptions.yaml can be improved (more detail, more accurate, better intuitive abstractions, cutting irrelevant info, clarity, etc), include those changes too. This file is purely for descriptions of the grid images. It should not have any information about the code or the solution. These descriptions should help someone trying to solve this problem though, so it should include language that is relevant for solving the problem. Make sure you use the SEARCH/REPLACE format.\n"
+                modify_coder.run(update_prompt)
+            logger.info(f"\n~~~~~~~~~REFLECT_EDIT~~~~~~~~~~~\n{modify_coder.aider_edited_files}")
         return modifications
 
     def get_visual_descriptions(self, overwrite: bool = False) -> str:
@@ -242,6 +278,7 @@ if __name__ == "__main__":
     task_set = "training"
     challenges, solutions = load_task_set(task_set_name=task_set)
     c = challenges[challenge_id]
+    print(c)
     sln = solutions.get(challenge_id)
     solver = Solver(c, sln)
     solver.run_solve()

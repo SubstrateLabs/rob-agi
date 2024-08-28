@@ -41,6 +41,26 @@ def run_pytest(test_file: Path):
         return {"success": False, "output": "", "error": str(e) + trace_str, "returncode": -1}
 
 
+def run_experiment(exp_file: Path):
+    if not exp_file.exists():
+        return None
+    try:
+        result = subprocess.run(
+            [sys.executable, str(exp_file.resolve())],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        output = result.stdout
+        test_output = TestOutput(
+            success=result.returncode == 0, output=output, error=result.stderr, returncode=result.returncode
+        )
+        return test_output
+    except Exception as e:
+        trace_str = traceback.format_exc()
+        return {"success": False, "output": "", "error": str(e) + trace_str, "returncode": -1}
+
+
 def get_pytest_error(test_file):
     result = run_pytest(test_file)
     if not result["success"]:
@@ -55,6 +75,8 @@ def setup_files(gp: GridProblem, cr: Optional[ComputedResult], path: Path):
     write_test_file(gp, path, cr)
     write_main_file(gp, path)
     ensure_meta_file(path)
+    write_notebook_file(gp, path)
+    write_experiment_file(gp, path)
     # write_init_file(path)
 
 
@@ -95,6 +117,27 @@ def read_meta_file(base_path: Path) -> tuple[bool, Optional[str], int]:
     latest_plan = namespace.get("latest_plan", None)
     total_attempts = namespace.get("total_attempts", 0)
     return solved, latest_plan, total_attempts
+
+
+def write_notebook_file(gp: GridProblem, path: Path):
+    target_file = path / "notebook.txt"
+    if target_file.exists():
+        return
+    template = f"""Challenge {gp.id}:
+"""
+    with open(target_file, "w") as f:
+        f.write(template)
+
+
+def write_experiment_file(gp: GridProblem, path: Path):
+    target_file = path / "notebook.txt"
+    if target_file.exists():
+        return
+    template = f"""from rob_agi.colored_grid import ColoredGrid
+from rob_agi.attempts.c_{gp.id}.main import solve_{gp.id}
+"""
+    with open(target_file, "w") as f:
+        f.write(template)
 
 
 def write_main_file(gp: GridProblem, path: Path):
