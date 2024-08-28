@@ -16,13 +16,20 @@ Things that don't work:
 - Transforming all blue regions of any shape.
 - Using the prevalence of red or green to determine the target color.
 - Transforming shapes based on their size (2-4 pixels).
+- Assuming the target color is always red (2).
 
 Unknowns:
 - How to handle cases where multiple colors are enclosed by gray borders.
 - Whether the gray border must be complete or can have gaps.
 
+Lessons learned:
+1. The target color can be either red (2) or green (3), not just red.
+2. The current implementation is not correctly identifying the target color in all cases.
+3. The transformation of blue plus shapes is not working correctly in some scenarios.
+
 Next steps:
-1. Implement a function to find the target color by searching for gray-enclosed regions.
-2. Create a function to identify blue plus shapes.
-3. Apply the transformation only to blue plus shapes, changing them to the target color.
-4. Ensure all transformations are applied simultaneously by creating a new grid for the result.
+1. Revise the function to find the target color, ensuring it can identify both red and green.
+2. Double-check the implementation of blue plus shape identification.
+3. Verify that the transformation is applied correctly to all identified blue plus shapes.
+4. Implement a more robust method to handle different gray border configurations.
+5. Add more test cases to cover edge cases and different scenarios.
