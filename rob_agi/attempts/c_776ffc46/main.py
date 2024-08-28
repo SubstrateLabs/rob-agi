@@ -24,17 +24,17 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
                 region.add((cx, cy))
                 for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                     nx, ny = cx + dx, cy + dy
-                    if 0 <= nx < len(grid) and 0 <= ny < len(grid[0]) and grid[nx][ny] != GRAY:
+                    if 0 <= nx < len(grid) and 0 <= ny < len(grid[0]) and grid[nx][ny] == BLUE:
                         queue.append((nx, ny))
         return region
 
     def is_plus_shape(region: Set[Tuple[int, int]]) -> bool:
-        if len(region) not in [5, 7]:
+        if len(region) not in [5, 6, 7, 8]:
             return False
-        center = next(iter(region))  # Get any point from the set
+        center = min(region, key=lambda p: sum((x-p[0])**2 + (y-p[1])**2 for x, y in region))
         arms = [(-1, 0), (1, 0), (0, -1), (0, 1)]
         arm_lengths = [sum(1 for i in range(1, 4) if (center[0] + dx * i, center[1] + dy * i) in region) for dx, dy in arms]
-        return all(length > 0 for length in arm_lengths) and len(set(arm_lengths)) == 1
+        return all(length > 0 for length in arm_lengths) and max(arm_lengths) - min(arm_lengths) <= 1
 
     def apply_transformations(grid: List[List[int]], regions_to_transform: List[Set[Tuple[int, int]]], target_color: int) -> ColoredGrid:
         new_grid = [row[:] for row in grid]
@@ -45,7 +45,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
 
     red_count = sum(row.count(RED) for row in input_grid.values)
     green_count = sum(row.count(GREEN) for row in input_grid.values)
-    target_color = RED if red_count >= green_count else GREEN
+    target_color = GREEN if green_count > red_count else RED
 
     blue_regions = []
     visited = set()
