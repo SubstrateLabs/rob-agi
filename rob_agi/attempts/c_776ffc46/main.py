@@ -2,52 +2,46 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid based on the following rules:
-    1. Blue plus shapes (5 pixels) are changed to the target color (red or green).
-    2. The target color (red or green) is determined by the color enclosed in a gray border.
-    3. Other blue shapes and colors remain unchanged.
-    4. Gray (5) acts as a border and is not considered part of any region.
-    5. All transformations are applied simultaneously.
+    Transforms the input grid by changing blue plus shapes to a target color.
+    The target color (red or green) is determined by the color adjacent to gray borders.
+    Only valid blue plus shapes (5 pixels in a + configuration) are transformed.
+    Other blue shapes and colors remain unchanged.
+    All transformations are applied simultaneously.
 
-    The solution scans for a gray-enclosed target color, identifies blue plus shapes,
-    and transforms them to the target color in a single pass.
+    1. Find the target color adjacent to gray borders.
+    2. Identify all blue plus shapes in the grid.
+    3. Transform these blue plus shapes to the target color.
+    4. Return the modified grid.
     """
     BLUE, RED, GREEN, GRAY = 1, 2, 3, 5
     rows, cols = len(input_grid.values), len(input_grid.values[0])
     result_grid = [row[:] for row in input_grid.values]
     target_color = None
 
-    # Find the target color
-    for i in range(rows):
-        for j in range(cols):
-            if input_grid.values[i][j] == GRAY:
-                for di, dj in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                    ni, nj = i + di, j + dj
-                    if 0 <= ni < rows and 0 <= nj < cols:
-                        if input_grid.values[ni][nj] in [RED, GREEN]:
-                            target_color = input_grid.values[ni][nj]
-                            break
-                if target_color:
-                    break
-        if target_color:
-            break
+    def is_valid_cell(r: int, c: int) -> bool:
+        return 0 <= r < rows and 0 <= c < cols
 
-    if target_color is None:
-        return input_grid  # No transformation needed
-
-    def is_plus_shape(x: int, y: int) -> bool:
-        if input_grid.values[x][y] != BLUE:
+    def is_plus_shape(r: int, c: int) -> bool:
+        if result_grid[r][c] != BLUE:
             return False
-        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            nx, ny = x + dx, y + dy
-            if not (0 <= nx < rows and 0 <= ny < cols and input_grid.values[nx][ny] == BLUE):
+        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nr, nc = r + dr, c + dc
+            if not is_valid_cell(nr, nc) or result_grid[nr][nc] != BLUE:
                 return False
         return True
 
-    # Transform blue plus shapes
+    # Find the target color and transform blue plus shapes in a single pass
     for i in range(rows):
         for j in range(cols):
-            if is_plus_shape(i, j):
+            if result_grid[i][j] == GRAY and target_color is None:
+                for di, dj in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                    ni, nj = i + di, j + dj
+                    if is_valid_cell(ni, nj) and result_grid[ni][nj] in [RED, GREEN]:
+                        target_color = result_grid[ni][nj]
+                        break
+                if target_color:
+                    break
+            elif is_plus_shape(i, j) and target_color is not None:
                 for di, dj in [(0, 0), (0, 1), (1, 0), (0, -1), (-1, 0)]:
                     result_grid[i+di][j+dj] = target_color
 
