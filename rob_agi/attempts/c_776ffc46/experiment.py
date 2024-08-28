@@ -66,6 +66,27 @@ def test_size_constraints():
     for row in result.values:
         print(row)
 
+def test_gray_border():
+    input_grid = [
+        [5, 5, 5, 5, 5],
+        [5, 1, 1, 1, 5],
+        [5, 1, 0, 1, 5],
+        [5, 1, 1, 1, 5],
+        [5, 5, 5, 5, 5]
+    ]
+    grid = ColoredGrid(values=input_grid)
+    result = solve_776ffc46(grid)
+
+    print("\nGray Border Test")
+    print("Input grid:")
+    for row in input_grid:
+        print(row)
+
+    print("\nOutput grid:")
+    for row in result.values:
+        print(row)
+
 test_vertical_line()
 test_horizontal_line()
 test_size_constraints()
+test_gray_border()
