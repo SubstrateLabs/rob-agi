@@ -6,7 +6,7 @@ def solve_3979b1a8(input_grid: ColoredGrid) -> ColoredGrid:
     1. Copying the input to the top-left quadrant
     2. Creating a vertical stripe pattern on the right side
     3. Creating a horizontal stripe pattern on the bottom
-    4. Filling the bottom-right quadrant with a specific pattern
+    4. Filling the bottom-right quadrant with a diagonal pattern
     
     The pattern uses the corner color, center color, and a special color from the input grid.
     """
@@ -23,13 +23,18 @@ def solve_3979b1a8(input_grid: ColoredGrid) -> ColoredGrid:
         for j in range(5):
             new_grid[i][j] = input_grid.values[i][j]
 
+    # Create the stripe pattern
+    stripe_pattern = [corner_color, center_color, special_color, corner_color, center_color]
+
     # Fill the right side with vertical stripes (columns 5-9)
     for i in range(10):
-        new_grid[i][5:] = [corner_color, center_color, special_color, corner_color, center_color]
+        for j in range(5, 10):
+            new_grid[i][j] = stripe_pattern[j - 5]
 
     # Fill the bottom with horizontal stripes (rows 5-9)
     for i in range(5, 10):
-        new_grid[i][:5] = [corner_color, center_color, special_color, corner_color, center_color]
+        for j in range(5):
+            new_grid[i][j] = stripe_pattern[i - 5]
 
     # Fill the bottom-right quadrant (rows 5-9, columns 5-9)
     for i in range(5, 10):
