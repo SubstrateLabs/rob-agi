@@ -6,18 +6,18 @@ def solve_14754a24(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solves the grid transformation challenge by creating optimal L-shaped patterns around yellow squares.
     
-    1. Creates a deep copy of the input grid to modify.
-    2. Identifies all yellow (4) squares in the grid.
-    3. Generates and scores all possible L-shapes for each yellow square.
-    4. Applies L-shapes using a priority queue based on scores.
-    5. Connects nearby L-shapes and fills gaps to create larger patterns.
-    6. Handles isolated yellow squares with partial L-shapes.
-    7. Optimizes coverage by extending existing red regions.
-    8. Performs multiple optimization passes to improve the solution.
-    9. Validates the final grid to ensure all red squares are part of valid L-shapes.
-    10. Falls back to the original grid if validation fails.
+    1. Analyzes the input grid to identify yellow squares and their distribution.
+    2. Generates possible L-shapes of varying sizes for each yellow square.
+    3. Scores L-shapes based on coverage, efficiency, and adaptability.
+    4. Places L-shapes prioritizing higher scores and yellow square coverage.
+    5. Optimizes for clusters by considering interlocking L-shapes.
+    6. Handles linear patterns of yellow squares with connected smaller L-shapes.
+    7. Covers isolated yellow squares by extending nearby L-shapes or creating minimal new ones.
+    8. Performs global optimization to improve overall coverage and efficiency.
+    9. Cleans up the solution by removing invalid red squares and ensuring L-shape validity.
+    10. Makes a final pass to maximize yellow square coverage.
     
-    Returns a new ColoredGrid with the transformed values or the original grid if transformation fails.
+    Returns a new ColoredGrid with the transformed values.
     """
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
@@ -27,8 +27,8 @@ def solve_14754a24(input_grid: ColoredGrid) -> ColoredGrid:
     
     def get_possible_l_shapes(r: int, c: int) -> List[List[Tuple[int, int]]]:
         shapes = []
-        for length1 in range(2, 7):  # First arm of L-shape
-            for length2 in range(2, 7):  # Second arm of L-shape
+        for length1 in range(2, 8):  # Increased max length
+            for length2 in range(2, 8):  # Increased max length
                 for dr1, dc1 in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
                     for dr2, dc2 in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
                         if (dr1, dc1) != (dr2, dc2) and (dr1, dc1) != (-dr2, -dc2):
@@ -39,15 +39,12 @@ def solve_14754a24(input_grid: ColoredGrid) -> ColoredGrid:
                                     shapes.append(shape)
         return shapes
     
-    def score_l_shape(shape: List[Tuple[int, int]]) -> int:
-        score = len(shape)  # Base score is the size of the shape
+    def score_l_shape(shape: List[Tuple[int, int]]) -> float:
         yellow_count = sum(1 for r, c in shape if grid.values[r][c] == 4)
-        adjacent_red = sum(1 for r, c in shape for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
-                           if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 2)
-        connected_yellows = len(set((r, c) for r, c in shape if grid.values[r][c] == 4))
-        adjacent_yellows = sum(1 for r, c in shape for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
-                               if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 4)
-        return score + yellow_count * 5 + adjacent_red * 2 + connected_yellows * 3 + adjacent_yellows * 2
+        efficiency = yellow_count / len(shape)
+        adaptability = sum(1 for r, c in shape for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                           if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 4)
+        return yellow_count * 10 + efficiency * 5 + adaptability * 2
     
     def apply_l_shape(shape: List[Tuple[int, int]]) -> None:
         for r, c in shape:
@@ -72,67 +69,68 @@ def solve_14754a24(input_grid: ColoredGrid) -> ColoredGrid:
                     apply_l_shape(shape)
                     covered_yellows.update(yellows_in_shape)
     
-    def optimize_pattern() -> None:
-        for _ in range(5):  # Increased optimization passes
-            for r in range(rows):
-                for c in range(cols):
-                    if grid.values[r][c] == 2:
-                        neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
-                                        if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] in [2, 4])
-                        if neighbors == 0:
-                            grid.values[r][c] = 0  # Remove isolated red squares
-            
-            # Try to extend L-shapes
+    def optimize_clusters() -> None:
+        for r in range(rows):
+            for c in range(cols):
+                if grid.values[r][c] == 4:
+                    cluster = [(r, c)]
+                    stack = [(r, c)]
+                    while stack:
+                        cr, cc = stack.pop()
+                        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                            nr, nc = cr + dr, cc + dc
+                            if 0 <= nr < rows and 0 <= nc < cols and grid.values[nr][nc] == 4 and (nr, nc) not in cluster:
+                                cluster.append((nr, nc))
+                                stack.append((nr, nc))
+                    if len(cluster) > 1:
+                        optimize_cluster(cluster)
+    
+    def optimize_cluster(cluster: List[Tuple[int, int]]) -> None:
+        best_shapes = []
+        for r, c in cluster:
+            shapes = get_possible_l_shapes(r, c)
+            best_shape = max(shapes, key=score_l_shape)
+            best_shapes.append(best_shape)
+        
+        covered = set()
+        for shape in best_shapes:
+            yellows = set((r, c) for r, c in shape if grid.values[r][c] == 4)
+            if yellows - covered:
+                apply_l_shape(shape)
+                covered.update(yellows)
+    
+    def handle_linear_patterns() -> None:
+        for direction in [(0, 1), (1, 0), (1, 1), (1, -1)]:
             for r in range(rows):
                 for c in range(cols):
                     if grid.values[r][c] == 4:
-                        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                            if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] in [0, 5]:
-                                if any(grid.values[r+dr+dr2][c+dc+dc2] in [2, 4] for dr2, dc2 in [(0, 1), (1, 0), (0, -1), (-1, 0)]
-                                       if 0 <= r+dr+dr2 < rows and 0 <= c+dc+dc2 < cols):
-                                    grid.values[r+dr][c+dc] = 2  # Extend L-shape
+                        line = [(r, c)]
+                        nr, nc = r + direction[0], c + direction[1]
+                        while 0 <= nr < rows and 0 <= nc < cols and grid.values[nr][nc] == 4:
+                            line.append((nr, nc))
+                            nr, nc = nr + direction[0], nc + direction[1]
+                        if len(line) > 2:
+                            handle_line(line)
     
-    def verify_and_extend_l_shapes() -> bool:
-        valid = True
-        for r in range(rows):
-            for c in range(cols):
-                if grid.values[r][c] == 2:
-                    if not any(grid.values[r+dr][c+dc] == 4 for dr in [-1, 0, 1] for dc in [-1, 0, 1]
-                               if 0 <= r+dr < rows and 0 <= c+dc < cols):
-                        valid = False
-                        grid.values[r][c] = 0  # Remove invalid red square
-                elif grid.values[r][c] in [0, 5]:
-                    # Try to extend L-shapes
-                    red_neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
-                                        if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 2)
-                    yellow_neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
-                                           if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 4)
-                    if red_neighbors >= 1 and yellow_neighbors >= 1:
-                        grid.values[r][c] = 2  # Extend L-shape
-        return valid
-
-    def connect_nearby_l_shapes() -> None:
-        for r in range(rows):
-            for c in range(cols):
-                if grid.values[r][c] in [0, 5]:
-                    red_neighbors = [(r+dr, c+dc) for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
-                                     if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 2]
-                    if len(red_neighbors) >= 2:
-                        yellow_nearby = any(grid.values[nr+dr][nc+dc] == 4
-                                            for nr, nc in red_neighbors
-                                            for dr in [-1, 0, 1] for dc in [-1, 0, 1]
-                                            if 0 <= nr+dr < rows and 0 <= nc+dc < cols)
-                        if yellow_nearby:
-                            grid.values[r][c] = 2  # Connect nearby L-shapes
+    def handle_line(line: List[Tuple[int, int]]) -> None:
+        for i in range(0, len(line) - 1, 2):
+            r1, c1 = line[i]
+            r2, c2 = line[i + 1]
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                if 0 <= r1 + dr < rows and 0 <= c1 + dc < cols and grid.values[r1 + dr][c1 + dc] in [0, 5]:
+                    grid.values[r1 + dr][c1 + dc] = 2
+                    break
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                if 0 <= r2 + dr < rows and 0 <= c2 + dc < cols and grid.values[r2 + dr][c2 + dc] in [0, 5]:
+                    grid.values[r2 + dr][c2 + dc] = 2
+                    break
     
     def handle_isolated_yellows() -> None:
         for r in range(rows):
             for c in range(cols):
                 if grid.values[r][c] == 4:
-                    red_neighbors = sum(1 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
-                                        if 0 <= r+dr < rows and 0 <= c+dc < cols and grid.values[r+dr][c+dc] == 2)
-                    if red_neighbors == 0:
-                        # Create a partial L-shape
+                    if not any(grid.values[r+dr][c+dc] == 2 for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]
+                               if 0 <= r+dr < rows and 0 <= c+dc < cols):
                         for dr1, dc1 in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
                             for dr2, dc2 in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
                                 if (dr1, dc1) != (dr2, dc2) and (dr1, dc1) != (-dr2, -dc2):
@@ -140,18 +138,29 @@ def solve_14754a24(input_grid: ColoredGrid) -> ColoredGrid:
                                         0 <= r+dr2 < rows and 0 <= c+dc2 < cols and grid.values[r+dr2][c+dc2] in [0, 5]):
                                         grid.values[r+dr1][c+dc1] = 2
                                         grid.values[r+dr2][c+dc2] = 2
-                                        break  # Only create one partial L-shape per isolated yellow
+                                        break
+    
+    def global_optimization() -> None:
+        for r in range(rows):
+            for c in range(cols):
+                if grid.values[r][c] == 2:
+                    if not any(grid.values[r+dr][c+dc] == 4 for dr in [-1, 0, 1] for dc in [-1, 0, 1]
+                               if 0 <= r+dr < rows and 0 <= c+dc < cols):
+                        grid.values[r][c] = 0  # Remove red square if it's not part of a valid L-shape
+    
+    def cleanup_and_validate() -> None:
+        for r in range(rows):
+            for c in range(cols):
+                if grid.values[r][c] == 2:
+                    if not any(grid.values[r+dr][c+dc] == 4 for dr in [-1, 0, 1] for dc in [-1, 0, 1]
+                               if 0 <= r+dr < rows and 0 <= c+dc < cols):
+                        grid.values[r][c] = 0  # Remove invalid red square
     
     process_yellow_squares()
-    optimize_pattern()
+    optimize_clusters()
+    handle_linear_patterns()
+    handle_isolated_yellows()
+    global_optimization()
+    cleanup_and_validate()
     
-    for _ in range(5):  # Multiple optimization passes
-        verify_and_extend_l_shapes()
-        connect_nearby_l_shapes()
-        handle_isolated_yellows()
-        optimize_pattern()
-    
-    if verify_and_extend_l_shapes():
-        return grid
-    else:
-        return input_grid  # Return original grid if verification fails
+    return grid
