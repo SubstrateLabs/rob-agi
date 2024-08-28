@@ -1,1 +1,31 @@
-Challenge 13713586:
+Challenge 13713586: Expand colored regions in a grid
+
+Key observations:
+1. Expansion occurs column-wise, from left to right.
+2. Within each column, vertical expansion happens first, then horizontal.
+3. Colors should not overwrite each other during expansion.
+4. Gray (5) borders remain unchanged and limit expansion.
+
+Algorithm outline:
+1. Process columns from left to right.
+2. For each column:
+   a. Expand colors vertically within the column.
+   b. Expand colors horizontally to the right, limited by vertical expansions and previous column expansions.
+3. Preserve original non-black colors and gray borders.
+
+Current issues:
+1. Horizontal expansion is not respecting the order of colors from top to bottom.
+2. Vertical expansion is occurring in all columns simultaneously, rather than column by column.
+3. Colors are overwriting each other, especially in later columns.
+
+Next steps:
+1. Modify the algorithm to process one column at a time, completing both vertical and horizontal expansions before moving to the next column.
+2. Implement a mechanism to prevent colors from overwriting each other during horizontal expansion.
+3. Ensure that the order of colors within a column is preserved during expansion.
+
+Things tried that didn't work:
+1. Expanding all colors vertically first, then horizontally - this led to incorrect overwriting of colors.
+
+Unknowns:
+1. The exact rules for resolving conflicts when multiple colors could expand into the same space.
+2. Whether there are any special cases or exceptions to the general expansion rules.
