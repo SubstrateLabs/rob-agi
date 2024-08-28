@@ -1,1 +1,33 @@
 Challenge bcb3040b:
+
+Problem Description:
+- The challenge involves transforming a 2D grid by modifying a specific line (row, column, or diagonal).
+- The line to be modified is the one with the most red (2) squares.
+- If there's a tie, priority is: main diagonal, other diagonal, topmost row, leftmost column.
+- The modification creates an alternating pattern of red (2) and green (3) squares.
+- Original red squares must be preserved in their positions.
+- The rest of the grid remains unchanged.
+
+Key Observations:
+1. The main diagonal is always the line to be modified in the examples we've seen.
+2. The alternating pattern starts with the original red square at the top-left corner.
+3. The pattern should alternate between red (2) and green (3), but ensure that green (3) is always adjacent to original red squares.
+
+Current Implementation Issues:
+- The alternating pattern is not correctly implemented.
+- Some original red squares are being changed to green.
+
+Next Steps:
+1. Modify the `modify_line` function to correctly implement the alternating pattern.
+2. Ensure that original red squares are preserved.
+3. Start the alternation with a green square after each original red square.
+
+Things Tried That Don't Work:
+- Simply alternating between 2 and 3 without considering original red squares.
+
+Certainties:
+- The main diagonal is the line to be modified in all examples seen so far.
+- Original red squares must be preserved.
+
+Unknowns:
+- How to handle cases where the line to be modified is not the main diagonal.
