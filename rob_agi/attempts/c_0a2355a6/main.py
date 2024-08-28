@@ -5,20 +5,18 @@ import math
 def solve_0a2355a6(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Solve the grid transformation challenge by identifying distinct shapes,
-    analyzing their properties, and assigning colors based on shape characteristics and relationships.
+    analyzing their properties, and assigning colors based on shape characteristics and size.
     
     1. Identify distinct contiguous shapes of sky blue (8) in the input grid using flood-fill.
-    2. Analyze shapes for size, form, complexity, and relative position.
-    3. Create a hierarchy of shapes, identifying nested relationships.
-    4. Rank shapes based on their characteristics and global patterns.
-    5. Assign colors to shapes based on their rank, ensuring consistency and visual distinction.
-    6. Handle nested shapes by assigning contrasting colors.
-    7. Balance color distribution across the grid.
-    8. Create and return a new grid with transformed colors, maintaining black (0) as empty space.
+    2. Analyze shapes for size, complexity, and position.
+    3. Rank shapes based primarily on their size, with complexity as a secondary factor.
+    4. Assign colors to shapes based on their rank:
+       - The largest shape always gets the highest available color (4 if 4+ shapes, else 3).
+       - Remaining shapes are assigned colors in descending order of size and color number.
+    5. Create and return a new grid with transformed colors, maintaining black (0) as empty space.
     
-    The function ensures consistent color assignment based on shape properties, their relationships,
-    and global patterns, prioritizing larger and more complex shapes while maintaining visual clarity
-    and pattern consistency across different grid layouts.
+    This approach ensures consistent color assignment across different grid layouts,
+    prioritizing the largest shapes and maintaining visual distinction between shapes.
     """
     # Step 1: Identify distinct shapes
     shapes = find_contiguous_shapes(input_grid)
@@ -136,40 +134,26 @@ def calculate_position(min_r: int, max_r: int, min_c: int, max_c: int, rows: int
 def rank_shapes(analyzed_shapes: List[Dict]) -> List[Dict]:
     def rank_key(shape):
         return (
-            shape["size"],
-            shape["complexity"],
-            -abs(int(shape["position"].split("-")[0] == "middle")),  # Prefer shapes in the middle
-            -abs(int(shape["position"].split("-")[1] == "center")),  # Prefer shapes in the center
-            shape["has_hole"],
+            shape["size"] * 1000 + shape["complexity"],  # Prioritize size heavily
+            -abs(int(shape["position"].split("-")[0] == "top")),  # Slight preference for top shapes
+            -abs(int(shape["position"].split("-")[1] == "left")),  # Slight preference for left shapes
         )
     
     return sorted(analyzed_shapes, key=rank_key, reverse=True)
 
 def assign_colors_to_shapes(ranked_shapes: List[Dict]) -> List[Tuple[List[Tuple[int, int]], int]]:
-    colors = [1, 2, 3]
+    num_shapes = len(ranked_shapes)
+    colors = [1, 2, 3, 4] if num_shapes >= 4 else list(range(1, num_shapes + 1))
     colored_shapes = []
-    used_colors = set()
     
     for i, shape_info in enumerate(ranked_shapes):
         shape = shape_info["shape"]
-        
-        if i < 3:
-            color = colors[i]
+        if i == 0:  # Largest shape
+            color = colors[-1]  # Assign the highest available color
         else:
-            # For shapes beyond the top 3, assign colors based on similarity to top shapes
-            similarities = [shape_similarity(shape_info, ranked_shapes[j]) for j in range(3)]
-            color = colors[similarities.index(max(similarities))]
+            color = colors[i - 1] if i < len(colors) else colors[-1]
         
         colored_shapes.append((shape, color))
-        used_colors.add(color)
-    
-    # Ensure all three colors are used if there are enough shapes
-    if len(colored_shapes) >= 3 and len(used_colors) < 3:
-        for unused_color in set(colors) - used_colors:
-            for i, (shape, color) in enumerate(colored_shapes):
-                if color != unused_color:
-                    colored_shapes[i] = (shape, unused_color)
-                    break
     
     return colored_shapes
 
