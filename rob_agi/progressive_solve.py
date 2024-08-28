@@ -51,20 +51,22 @@ class Solver:
         self.solved, self.latest_plan, self.total_attempts = read_meta_file(self.challenge_root)
         self.goal = problem_setup_aider(challenge)
 
-    def setup(self):
+    def setup(self, symlink_image=False):
         self.challenge_root.mkdir(parents=True, exist_ok=True)
         with open(ignore_template, "r") as tf:
             with open(self.adhoc_ignore, "w") as f:
                 f.write(tf.read())
                 f.write("\n")
-                f.write(f"rob_agi/attempts/c_{self.challenge.id}/image.png\n")
+                if symlink_image:
+                    f.write(f"rob_agi/attempts/c_{self.challenge.id}/image.png\n")
                 f.write(f"!rob_agi/attempts/c_{self.challenge.id}\n")
                 f.write(f"!.adhoc-aiderignore-{self.challenge.id}\n")
         setup_files(self.challenge, self.solution, self.challenge_root)
-        try:
-            (self.challenge_root / f"image.png").symlink_to(self.file_paths["image"])
-        except FileExistsError:
-            pass
+        if symlink_image:
+            try:
+                (self.challenge_root / f"image.png").symlink_to(self.file_paths["image"])
+            except FileExistsError:
+                pass
 
     def get_coder(self, **kwargs):
         ef = ""
