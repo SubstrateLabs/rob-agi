@@ -5,14 +5,14 @@ def solve_f3cdc58f(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by creating a pattern of colored columns in the bottom-left corner.
     
     The solution follows these steps:
-    1. Count the occurrences of colors 1 (blue), 2 (red), 3 (green), and 4 (yellow) in the input grid.
-    2. Calculate column heights based on color proportions and grid height.
-    3. Determine the position of each column, creating a "staircase" pattern.
-    4. Create the new grid with the calculated column positions and heights.
-    5. The rest of the grid is filled with 0 (black/empty).
+    1. Analyze the input grid to count occurrences of colors 1 (blue), 2 (red), 3 (green), and 4 (yellow).
+    2. Calculate initial column heights based on color proportions.
+    3. Adjust column heights to ensure they fit within the grid and maintain minimum visibility.
+    4. Create the new grid with colored columns in the order blue, red, green, yellow from left to right.
+    5. Fill the columns from bottom to top, leaving the rest of the grid black (0).
 
-    This approach creates a stair-step pattern of colored columns in the order blue, red, green, yellow
-    from left to right, while maintaining the relative proportions of colors from the input grid.
+    This approach creates a pattern of colored columns that represent the relative proportions
+    of colors from the input grid, while ensuring all present colors are visible.
     """
     height, width = input_grid.get_dimensions()
     
@@ -27,30 +27,34 @@ def solve_f3cdc58f(input_grid: ColoredGrid) -> ColoredGrid:
     if total_colored == 0:
         return ColoredGrid(values=[[0 for _ in range(width)] for _ in range(height)])
     
-    # Step 2: Calculate column heights
-    max_height = height - 1  # Leave room for rounding
-    heights = {color: max(1, int((count / total_colored) * max_height)) for color, count in color_counts.items()}
+    # Step 2: Calculate initial column heights
+    heights = {color: max(1, int((count / total_colored) * height)) for color, count in color_counts.items()}
     
-    # Adjust heights if they exceed the grid height
+    # Step 3: Adjust column heights
     while sum(heights.values()) > height:
-        max_color = max(heights, key=heights.get)
-        heights[max_color] -= 1
+        tallest = max(heights, key=heights.get)
+        if heights[tallest] > 1:
+            heights[tallest] -= 1
+        else:
+            # If we can't reduce further, break to avoid infinite loop
+            break
     
-    # Step 3: Determine column positions
-    positions = {}
-    current_bottom = height
-    for color in [4, 3, 2, 1]:  # Yellow, Green, Red, Blue
-        top = current_bottom
-        bottom = max(top - heights[color], 0)
-        positions[color] = (bottom, top)
-        current_bottom = bottom
+    # Ensure all present colors have at least one row
+    for color, count in color_counts.items():
+        if count > 0 and heights[color] == 0:
+            heights[color] = 1
+            # Reduce the tallest column to make room
+            tallest = max(heights, key=heights.get)
+            if heights[tallest] > 1:
+                heights[tallest] -= 1
     
-    # Step 4: Create the new grid
+    # Step 4 & 5: Create the new grid and fill the columns
     new_grid = [[0 for _ in range(width)] for _ in range(height)]
-    for col, color in enumerate([1, 2, 3, 4]):
-        bottom, top = positions[color]
-        for row in range(bottom, top):
-            new_grid[row][col] = color
+    current_row = height - 1
+    for color in [1, 2, 3, 4]:  # Blue, Red, Green, Yellow
+        for _ in range(heights[color]):
+            if current_row >= 0:
+                new_grid[current_row][color - 1] = color
+                current_row -= 1
     
-    # Step 5: Return the new grid
     return ColoredGrid(values=new_grid)
