@@ -9,11 +9,11 @@ def solve_e6de6e8f(input_grid: ColoredGrid) -> ColoredGrid:
     2. Identify decision points as red squares in the top input row.
     3. Start the path from the top center.
     4. For each decision point:
-       a. Move diagonally down-right until reaching the decision point's column or the grid boundary.
-       b. If the corresponding position in the bottom row is red, continue moving diagonally.
-    5. After processing all decision points or reaching the rightmost column, continue the path to the bottom-right.
-    6. Ensure the path ends at the bottom of the grid in the rightmost possible column.
-    7. Return the completed output grid.
+       a. Move diagonally down-right until reaching the decision point's column.
+       b. If the corresponding position in the bottom row is red, continue the path straight down.
+       c. Otherwise, branch to the right.
+    5. After processing all decision points, continue the path straight down to the bottom.
+    6. Return the completed output grid.
     """
     output = [[0 for _ in range(7)] for _ in range(8)]
     output[0][3] = 3  # Green square at top center
@@ -22,7 +22,8 @@ def solve_e6de6e8f(input_grid: ColoredGrid) -> ColoredGrid:
     current_row, current_col = 1, 3
 
     for decision_point in decision_points:
-        while current_row < 7 and current_col < min(decision_point, 6):
+        # Move diagonally to the decision point
+        while current_col < min(decision_point, 6) and current_row < 7:
             output[current_row][current_col] = 2
             current_row += 1
             current_col += 1
@@ -30,16 +31,15 @@ def solve_e6de6e8f(input_grid: ColoredGrid) -> ColoredGrid:
         if current_col >= 6:  # Stop if we've reached the rightmost valid column
             break
 
-        if input_grid.values[1][decision_point] == 2 and current_row < 7 and current_col < 6:
-            output[current_row][current_col] = 2
-            current_row += 1
-            current_col += 1
-
-    # Complete the path to the bottom-right
-    while current_row < 7 and current_col < 6:
-        output[current_row][current_col] = 2
-        current_row += 1
-        current_col += 1
+        # Check if we should continue straight down or branch right
+        if input_grid.values[1][decision_point] == 2:
+            while current_row < 7:
+                output[current_row][current_col] = 2
+                current_row += 1
+        else:
+            if current_col < 6:
+                output[current_row][current_col] = 2
+                current_col += 1
 
     # Ensure the path reaches the bottom
     while current_row < 8:
