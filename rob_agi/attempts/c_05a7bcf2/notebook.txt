@@ -1,1 +1,26 @@
 Challenge 05a7bcf2:
+
+Key observations:
+1. The grid is divided into sections by a sky blue (8) barrier.
+2. Yellow (4) and red (2) regions expand in specific directions.
+3. Green (3) fills empty spaces in the top/left section.
+4. Sky blue (8) fills remaining spaces in the bottom/right section.
+
+Current implementation issues:
+1. Overfilling with green (3) in the top section.
+2. Not preserving original black (0) spaces correctly.
+3. Incorrect expansion of yellow (4) and red (2) regions.
+
+Attempted solutions:
+1. Using center of mass to determine barrier placement - partially successful.
+2. Respecting original positions during color expansion - needs refinement.
+
+Next steps:
+1. Refine the barrier detection algorithm.
+2. Improve color expansion logic to respect original black spaces.
+3. Adjust green filling to only occur in specific areas.
+4. Ensure sky blue filling is correct in the bottom/right section.
+
+Unknown factors:
+1. Exact rules for when to use horizontal vs vertical barriers.
+2. Precise conditions for green filling in top/left section.
