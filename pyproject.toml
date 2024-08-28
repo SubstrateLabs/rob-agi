@@ -10,7 +10,7 @@ include = ["data/**/*"]
 [tool.ruff]
 line-length = 120
 output-format = "grouped"
-target-version = "py37"
+target-version = "py310"
 
 [tool.poetry.dependencies]
 python = "^3.10"
