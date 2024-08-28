@@ -16,6 +16,9 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     visited = set()
     regions_to_transform = []
 
+    def is_valid(r: int, c: int) -> bool:
+        return 0 <= r < rows and 0 <= c < cols
+
     def flood_fill(start_row: int, start_col: int) -> List[Tuple[int, int]]:
         color = input_grid.values[start_row][start_col]
         stack = [(start_row, start_col)]
@@ -26,11 +29,13 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
                 continue
             visited.add((row, col))
             region.append((row, col))
+            if len(region) > 8:
+                return []
             for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                 new_row, new_col = row + dr, col + dc
-                if 0 <= new_row < rows and 0 <= new_col < cols and input_grid.values[new_row][new_col] == color:
+                if is_valid(new_row, new_col) and input_grid.values[new_row][new_col] == color:
                     stack.append((new_row, new_col))
-        return region
+        return region if 2 <= len(region) <= 8 else []
 
     def determine_target_color() -> int:
         red_count = sum(row.count(2) for row in input_grid.values)
@@ -43,7 +48,7 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         for col in range(cols):
             if input_grid.values[row][col] == 1 and (row, col) not in visited:
                 region = flood_fill(row, col)
-                if 2 <= len(region) <= 8:
+                if region:
                     regions_to_transform.append(region)
 
     for region in regions_to_transform:
