@@ -6,13 +6,12 @@ def solve_2546ccf6(input_grid: ColoredGrid) -> ColoredGrid:
     Transforms the input grid by applying vertical mirroring within sections.
     
     1. Identifies horizontal dividing lines (color 2 or 6) in the grid.
-    2. Divides the grid into sections based on these dividing lines.
-    3. Pairs corresponding top and bottom sections.
-    4. For each pair of sections:
-       a. If the top section contains a non-zero, non-divider pattern:
-          - Mirrors the pattern vertically from the top section to the bottom section.
-       b. If the top section is empty, leaves both sections unchanged.
-    5. Preserves all dividing lines and unaffected sections.
+    2. Divides the grid into vertical sections based on these dividing lines.
+    3. For each vertical section:
+       a. Analyzes the pattern complexity in the top and bottom halves.
+       b. Mirrors the more complex pattern to the less complex half.
+       c. If one half is empty, mirrors the non-empty half's pattern.
+    4. Preserves all dividing lines.
     
     Returns a new grid with the transformed patterns.
     """
@@ -22,12 +21,8 @@ def solve_2546ccf6(input_grid: ColoredGrid) -> ColoredGrid:
     dividing_lines = find_dividing_lines(grid)
     sections = create_sections(dividing_lines, rows)
     
-    n = len(sections) // 2
-    for i in range(n):
-        top_section = sections[i]
-        bottom_section = sections[-(i+1)]
-        if not is_empty_section(grid, top_section, cols):
-            mirror_section(grid, top_section, bottom_section, cols)
+    for section in sections:
+        mirror_vertical_section(grid, section, cols)
     
     return grid
 
@@ -37,19 +32,41 @@ def find_dividing_lines(grid: ColoredGrid) -> List[int]:
 
 def create_sections(dividing_lines: List[int], rows: int) -> List[Tuple[int, int]]:
     sections = []
-    for i in range(len(dividing_lines) - 1):
-        sections.append((dividing_lines[i] + 1, dividing_lines[i+1] - 1))
+    start = 0
+    for line in dividing_lines:
+        if line > start:
+            sections.append((start, line - 1))
+        start = line + 1
+    if start < rows:
+        sections.append((start, rows - 1))
     return sections
 
-def is_empty_section(grid: ColoredGrid, section: Tuple[int, int], cols: int) -> bool:
+def mirror_vertical_section(grid: ColoredGrid, section: Tuple[int, int], cols: int):
     start, end = section
-    return all(grid.values[r][c] == 0 for r in range(start, end+1) for c in range(cols))
-
-def mirror_section(grid: ColoredGrid, top_section: Tuple[int, int], bottom_section: Tuple[int, int], cols: int):
-    top_start, top_end = top_section
-    bottom_start, bottom_end = bottom_section
+    mid = (start + end) // 2
     
-    for r in range(top_end - top_start + 1):
+    top_half = (start, mid)
+    bottom_half = (mid + 1, end)
+    
+    top_complexity = analyze_complexity(grid, top_half, cols)
+    bottom_complexity = analyze_complexity(grid, bottom_half, cols)
+    
+    if top_complexity >= bottom_complexity:
+        mirror_half(grid, top_half, bottom_half, cols)
+    else:
+        mirror_half(grid, bottom_half, top_half, cols)
+
+def analyze_complexity(grid: ColoredGrid, half: Tuple[int, int], cols: int) -> int:
+    start, end = half
+    non_zero_count = sum(1 for r in range(start, end + 1) for c in range(cols) if grid.values[r][c] not in [0, 2, 6])
+    unique_colors = len(set(grid.values[r][c] for r in range(start, end + 1) for c in range(cols) if grid.values[r][c] not in [0, 2, 6]))
+    return non_zero_count + unique_colors
+
+def mirror_half(grid: ColoredGrid, source: Tuple[int, int], target: Tuple[int, int], cols: int):
+    source_start, source_end = source
+    target_start, target_end = target
+    
+    for r in range(source_end - source_start + 1):
         for c in range(cols):
-            if grid.values[top_end - r][c] not in [0, 2, 6]:
-                grid.values[bottom_start + r][c] = grid.values[top_end - r][c]
+            if grid.values[source_end - r][c] not in [0, 2, 6]:
+                grid.values[target_start + r][c] = grid.values[source_end - r][c]
