@@ -13,39 +13,37 @@ def solve_b15fca0b(input_grid: ColoredGrid) -> ColoredGrid:
     
     Algorithm:
     1. Create a deep copy of the input grid.
-    2. Initialize an 'open' grid to track cells that can be reached from any edge.
+    2. Initialize a 'visited' grid to track cells that can be reached from any edge.
     3. Perform flood fill from all edge cells that are not blue or red, including diagonal movements.
-    4. Fill unreachable black cells with yellow.
+    4. Fill unvisited black cells with yellow.
     5. Return the modified grid.
     """
     grid = input_grid.deep_copy()
     rows, cols = grid.get_dimensions()
-    open_grid = [[False for _ in range(cols)] for _ in range(rows)]
+    visited = [[False for _ in range(cols)] for _ in range(rows)]
 
     def flood_fill(r, c):
         stack = [(r, c)]
         while stack:
             r, c = stack.pop()
-            if not (0 <= r < rows and 0 <= c < cols) or open_grid[r][c] or grid.values[r][c] in [BLUE, RED]:
+            if not (0 <= r < rows and 0 <= c < cols) or visited[r][c] or grid.values[r][c] in [BLUE, RED]:
                 continue
-            open_grid[r][c] = True
+            visited[r][c] = True
             for dr in [-1, 0, 1]:
                 for dc in [-1, 0, 1]:
-                    if dr == 0 and dc == 0:
-                        continue
                     stack.append((r + dr, c + dc))
 
     # Perform flood fill from all edges
     for r in range(rows):
         for c in range(cols):
             if r == 0 or r == rows-1 or c == 0 or c == cols-1:
-                if grid.values[r][c] not in [BLUE, RED]:
+                if grid.values[r][c] == BLACK:
                     flood_fill(r, c)
 
     # Fill enclosed areas
     for r in range(rows):
         for c in range(cols):
-            if grid.values[r][c] == BLACK and not open_grid[r][c]:
+            if grid.values[r][c] == BLACK and not visited[r][c]:
                 grid.values[r][c] = YELLOW
 
     return grid
