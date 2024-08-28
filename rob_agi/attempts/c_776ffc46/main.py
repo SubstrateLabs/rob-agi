@@ -15,6 +15,11 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     """
     BLUE, RED, GREEN, GRAY = 1, 2, 3, 5
 
+    def count_colors():
+        red_count = sum(row.count(RED) for row in input_grid.values)
+        green_count = sum(row.count(GREEN) for row in input_grid.values)
+        return red_count, green_count
+
     def flood_fill(x: int, y: int) -> Set[Tuple[int, int]]:
         region = set()
         queue = deque([(x, y)])
@@ -31,14 +36,13 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     def is_plus_shape(region: Set[Tuple[int, int]]) -> bool:
         if len(region) != 5:
             return False
-        center = next(iter(region))  # Get any point from the region
+        center = next(iter(region))
         arms = [(-1, 0), (1, 0), (0, -1), (0, 1)]
         return all((center[0] + dx, center[1] + dy) in region for dx, dy in arms)
 
     rows, cols = len(input_grid.values), len(input_grid.values[0])
-    red_count = sum(row.count(RED) for row in input_grid.values)
-    green_count = sum(row.count(GREEN) for row in input_grid.values)
-    target_color = GREEN if green_count > red_count else RED
+    red_count, green_count = count_colors()
+    target_color = RED if red_count >= green_count else GREEN
 
     blue_regions = []
     visited = set()
