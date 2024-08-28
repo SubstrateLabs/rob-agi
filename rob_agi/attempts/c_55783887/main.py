@@ -32,6 +32,11 @@ def solve_55783887(input_grid: ColoredGrid) -> ColoredGrid:
             r, c = dots[0]
             output_grid.set_cell(r, c, color)
     
+    # Ensure all original dots are preserved
+    for color, dots in colored_dots.items():
+        for r, c in dots:
+            output_grid.set_cell(r, c, color)
+    
     return output_grid
 
 def find_background_color(grid: ColoredGrid) -> int:
@@ -95,4 +100,7 @@ def sign(x: int) -> int:
 
 def draw_path(grid: ColoredGrid, path: List[Tuple[int, int]], color: int):
     for r, c in path:
-        grid.set_cell(r, c, color)
+        if 0 <= r < grid.num_rows and 0 <= c < grid.num_cols:
+            current_color = grid.get_cell(r, c)
+            if current_color == grid.get_color_frequencies().get(current_color, 0):
+                grid.set_cell(r, c, color)
