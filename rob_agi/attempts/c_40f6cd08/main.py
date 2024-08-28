@@ -1,7 +1,55 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Optional
 
-def analyze_quadrant(grid: ColoredGrid, top: int, left: int, bottom: int, right: int) -> List[Tuple[int, int, int, int, int]]:
+def solve_40f6cd08(input_grid: ColoredGrid) -> ColoredGrid:
+    """
+    Solve the challenge by analyzing patterns in non-empty quadrants, identifying transformations,
+    and applying them to create a symmetric output.
+    
+    1. Parse the input grid and identify quadrants
+    2. Analyze each quadrant to identify colored regions and their properties
+    3. Identify the source pattern with the most complex structure
+    4. Process the source pattern to extract shapes and their properties
+    5. Replicate the pattern in other non-empty quadrants with appropriate transformations
+    6. Preserve the central cross and entirely black quadrants
+    7. Perform final checks and return the transformed grid
+    
+    Returns a new 30x30 ColoredGrid with the transformed pattern.
+    """
+    # Define quadrants
+    quadrants = [
+        ((0, 0), (13, 13)),    # Top-left
+        ((0, 16), (13, 29)),   # Top-right
+        ((16, 0), (29, 13)),   # Bottom-left
+        ((16, 16), (29, 29))   # Bottom-right
+    ]
+    
+    # Analyze quadrants
+    quadrant_patterns = []
+    for (top, left), (bottom, right) in quadrants:
+        pattern = analyze_quadrant(input_grid, top, left, bottom, right)
+        quadrant_patterns.append(pattern)
+    
+    # Identify source pattern
+    source_pattern = identify_source_pattern(quadrant_patterns)
+    
+    # Create output grid
+    output = ColoredGrid(values=[[0 for _ in range(30)] for _ in range(30)])
+    
+    # Replicate pattern
+    for i, ((top, left), (bottom, right)) in enumerate(quadrants):
+        if quadrant_patterns[i]:
+            replicate_pattern(output, source_pattern, quadrant_patterns[i], top, left, bottom, right)
+    
+    # Preserve central cross
+    preserve_central_cross(input_grid, output)
+    
+    # Final checks
+    final_checks(output)
+    
+    return output
+
+def analyze_quadrant(grid: ColoredGrid, top: int, left: int, bottom: int, right: int) -> List[Dict]:
     """Analyze a quadrant and return a list of colored regions."""
     regions = []
     for i in range(top, bottom + 1):
@@ -116,6 +164,67 @@ def analyze_quadrant(grid: ColoredGrid, top: int, left: int, bottom: int, right:
                 }
                 regions = merge_adjacent_regions(regions, region)
     return regions
+
+def merge_adjacent_regions(regions: List[Dict], new_region: Dict) -> List[Dict]:
+    """Merge the new region with adjacent regions of the same color."""
+    for i, region in enumerate(regions):
+        if region['color'] == new_region['color'] and regions_are_adjacent(region, new_region):
+            regions[i] = merge_regions(region, new_region)
+            return regions
+    regions.append(new_region)
+    return regions
+
+def regions_are_adjacent(r1: Dict, r2: Dict) -> bool:
+    """Check if two regions are adjacent."""
+    return (r1['left'] <= r2['right'] + 1 and r2['left'] <= r1['right'] + 1 and
+            r1['top'] <= r2['bottom'] + 1 and r2['top'] <= r1['bottom'] + 1)
+
+def merge_regions(r1: Dict, r2: Dict) -> Dict:
+    """Merge two regions."""
+    return {
+        'color': r1['color'],
+        'top': min(r1['top'], r2['top']),
+        'left': min(r1['left'], r2['left']),
+        'bottom': max(r1['bottom'], r2['bottom']),
+        'right': max(r1['right'], r2['right'])
+    }
+
+def identify_source_pattern(quadrant_patterns: List[List[Dict]]) -> List[Dict]:
+    """Identify the source pattern with the most complex structure."""
+    return max(quadrant_patterns, key=lambda x: len(x) + sum(r['right'] - r['left'] + r['bottom'] - r['top'] for r in x))
+
+def replicate_pattern(output: ColoredGrid, source_pattern: List[Dict], target_pattern: List[Dict], top: int, left: int, bottom: int, right: int):
+    """Replicate the source pattern in the target quadrant with appropriate transformations."""
+    source_width = max(r['right'] for r in source_pattern) - min(r['left'] for r in source_pattern) + 1
+    source_height = max(r['bottom'] for r in source_pattern) - min(r['top'] for r in source_pattern) + 1
+    target_width = right - left + 1
+    target_height = bottom - top + 1
+    
+    scale_x = target_width / source_width
+    scale_y = target_height / source_height
+    
+    for region in source_pattern:
+        new_top = int(region['top'] * scale_y) + top
+        new_left = int(region['left'] * scale_x) + left
+        new_bottom = int(region['bottom'] * scale_y) + top
+        new_right = int(region['right'] * scale_x) + left
+        
+        for i in range(new_top, new_bottom + 1):
+            for j in range(new_left, new_right + 1):
+                if 0 <= i < 30 and 0 <= j < 30:
+                    output.values[i][j] = region['color']
+
+def preserve_central_cross(input_grid: ColoredGrid, output_grid: ColoredGrid):
+    """Preserve the central cross from the input grid."""
+    for i in range(30):
+        output_grid.values[14][i] = input_grid.values[14][i]
+        output_grid.values[15][i] = input_grid.values[15][i]
+        output_grid.values[i][14] = input_grid.values[i][14]
+        output_grid.values[i][15] = input_grid.values[i][15]
+
+def final_checks(grid: ColoredGrid):
+    """Perform final checks on the output grid."""
+    assert len(grid.values) == 30 and all(len(row) == 30 for row in grid.values), "Output grid must be 30x30"
 
 def merge_adjacent_regions(regions: List[Dict], new_region: Dict) -> List[Dict]:
     """Merge the new region with adjacent regions of the same color."""
