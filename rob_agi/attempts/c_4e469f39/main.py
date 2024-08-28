@@ -1,57 +1,50 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
 
 def solve_4e469f39(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Solve the challenge by identifying gray (5) shapes and adding a red (2) outline.
+    Solve the challenge by identifying gray (5) shapes and adding a red (2) outline and fill.
     
     The function performs the following steps:
-    1. Identify all gray shapes in the input grid.
-    2. Determine the overall bounding box for all gray shapes.
-    3. Create a continuous top red line above all shapes, spanning only the width of the shapes.
-    4. Draw vertical red lines on both sides of each shape.
-    5. Fill the insides of all gray regions with red, preserving the gray outline.
+    1. Analyze the grid to find the bounding box of all gray shapes.
+    2. Create a continuous top red line above all shapes, extending to the right edge of the grid.
+    3. Draw vertical red lines on both sides of the gray shapes and fill the inside with red.
+    4. Handle the area below gray shapes by extending red fill downwards.
     
     Args:
     input_grid (ColoredGrid): The input grid containing gray shapes.
     
     Returns:
-    ColoredGrid: A new grid with a red outline added around all gray shapes.
+    ColoredGrid: A new grid with a red outline and fill added around and within all gray shapes.
     """
     output_grid = input_grid.deep_copy()
     rows, cols = input_grid.get_dimensions()
-    gray_regions = input_grid.find_connected_regions(5)
     
-    if not gray_regions:
+    # Find bounding box of all gray shapes
+    gray_cells = [(r, c) for r in range(rows) for c in range(cols) if input_grid.values[r][c] == 5]
+    if not gray_cells:
         return output_grid
     
-    # Determine overall bounding box
-    top = min(min(row for row, _ in region) for region in gray_regions)
-    left = min(min(col for _, col in region) for region in gray_regions)
-    right = max(max(col for _, col in region) for region in gray_regions)
+    top = min(r for r, _ in gray_cells)
+    left = min(c for _, c in gray_cells)
+    right = max(c for _, c in gray_cells)
     
-    # Create continuous top red line
-    for col in range(left, right + 1):
+    # Create top red line
+    for col in range(left, cols):
         output_grid.values[top-1][col] = 2
     
-    # Process each region
-    for region in gray_regions:
-        region_left = min(col for _, col in region)
-        region_right = max(col for _, col in region)
-        region_top = min(row for row, _ in region)
-        region_bottom = max(row for row, _ in region)
+    # Process columns
+    for col in range(left, right + 1):
+        inside = False
+        top_gray = min(r for r in range(rows) if input_grid.values[r][col] == 5)
+        bottom_gray = max(r for r in range(rows) if input_grid.values[r][col] == 5)
         
-        # Draw vertical lines
-        for row in range(top-1, region_bottom+1):
-            if output_grid.values[row][region_left-1] == 0:
-                output_grid.values[row][region_left-1] = 2
-            if output_grid.values[row][region_right+1] == 0:
-                output_grid.values[row][region_right+1] = 2
-        
-        # Fill inside of region
-        for row in range(region_top, region_bottom+1):
-            for col in range(region_left, region_right+1):
-                if input_grid.values[row][col] == 0:
+        for row in range(top - 1, rows):
+            if input_grid.values[row][col] == 5:
+                inside = not inside
+            elif row < bottom_gray:
+                if col == left or col == right or inside:
                     output_grid.values[row][col] = 2
+            elif row > bottom_gray:
+                output_grid.values[row][col] = 2
     
     return output_grid
