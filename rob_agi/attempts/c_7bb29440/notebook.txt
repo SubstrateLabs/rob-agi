@@ -1,1 +1,30 @@
-Challenge 7bb29440:
+Challenge 7bb29440: Find the largest blue rectangle with the most special squares
+
+What we know:
+1. The challenge involves finding a blue (1) rectangle within the grid.
+2. Special squares are yellow (4) and magenta (6).
+3. The goal is to find the rectangle with the most special squares.
+4. If there's a tie in special square count, choose the largest area.
+5. If there's still a tie, choose the most top-left rectangle.
+
+What we've learned:
+1. Our current implementation is finding too large of a rectangle.
+2. The correct solution for example_2 is a 4x5 rectangle, but we're finding a 10x6 rectangle.
+3. We're correctly identifying blue areas and special squares.
+
+What doesn't work:
+1. Simply expanding the rectangle from a blue cell to its maximum size.
+
+What to try next:
+1. Implement a more sophisticated rectangle finding algorithm that considers all possible blue rectangles, not just the largest one from each starting point.
+2. Add a step to check all sub-rectangles within each found rectangle to ensure we're not missing a smaller rectangle with a higher concentration of special squares.
+3. Implement a sliding window approach to consider all possible rectangles within the blue areas.
+
+Unknowns:
+1. The exact distribution of special squares in the optimal solution.
+2. Whether there are any edge cases we haven't considered yet.
+
+Next steps:
+1. Modify the expand_rectangle function to return all valid rectangles instead of just the largest one.
+2. Implement a function to calculate the "score" of a rectangle based on special square count and area.
+3. Update the main function to consider all these rectangles and choose the optimal one based on our criteria.
