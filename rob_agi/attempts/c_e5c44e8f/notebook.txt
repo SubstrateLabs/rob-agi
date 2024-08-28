@@ -1,1 +1,25 @@
-Challenge e5c44e8f:
+Challenge e5c44e8f: Create an 'E' shape in the grid
+
+What we know:
+1. The input is an 11x11 grid with a single green (3) cell in the center.
+2. The output should be an 'E' shape made of green (3) cells.
+3. The 'E' shape should touch at least two edges of the grid.
+4. The 'E' shape should be as large as possible while maintaining its shape.
+
+What we've tried:
+1. Creating a vertical line and three horizontal lines for the 'E' shape.
+2. Optimizing the 'E' shape by expanding it where possible.
+3. Cleaning up unnecessary green cells.
+
+What doesn't work:
+1. Our current implementation fills the entire grid with green (3) cells instead of creating an 'E' shape.
+
+Next steps:
+1. Debug the create_vertical_line and create_horizontal_lines functions to ensure they're not overfilling the grid.
+2. Implement stricter checks in the optimize_e_shape function to maintain the 'E' shape.
+3. Revise the clean_up_e_shape function to remove excess green cells while preserving the 'E' structure.
+4. Add a final verification step to ensure the output matches the 'E' shape requirements.
+
+Unknowns:
+1. The exact dimensions of the 'E' shape (how far it should extend horizontally and vertically).
+2. How to handle cases where red cells might interfere with the ideal 'E' shape.
