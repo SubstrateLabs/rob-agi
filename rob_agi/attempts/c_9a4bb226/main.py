@@ -1,7 +1,7 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List
+from typing import List, Optional
 
-def solve_9a4bb226(input_grid: ColoredGrid) -> ColoredGrid:
+def solve_9a4bb226(input_grid: ColoredGrid) -> Optional[ColoredGrid]:
     """
     Finds a 3x3 subgrid within the input grid that contains exactly three colors,
     where one color appears 5 times and the other two colors appear 2 times each.
@@ -10,6 +10,9 @@ def solve_9a4bb226(input_grid: ColoredGrid) -> ColoredGrid:
     It returns the first valid subgrid found as a new ColoredGrid.
     
     If no valid subgrid is found, returns None.
+    
+    The search includes all possible 3x3 subgrids, even those that span across
+    visually distinct regions. Background color (0) is ignored in the color counting.
     """
     def is_valid_subgrid(subgrid: List[List[int]]) -> bool:
         color_counts = {}
