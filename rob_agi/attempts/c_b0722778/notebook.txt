@@ -1,1 +1,26 @@
 Challenge b0722778:
+
+Observations:
+1. The input grid is divided into sections separated by all-black rows.
+2. The output grid always has 2 columns and the same number of rows as the input.
+3. All-black rows in the input remain all-black ([0, 0]) in the output.
+
+Current understanding of the transformation:
+- For each non-black section in the input, we need to extract two columns.
+- These two columns should be the rightmost non-black columns of that section.
+- The values from these two columns are used for all rows in that section in the output.
+
+What doesn't work:
+- Processing each row independently doesn't give the correct result.
+- Using the two rightmost non-black columns of the entire grid for all sections is incorrect.
+
+What remains uncertain:
+- The exact criteria for selecting the two columns for each section.
+- Whether there's any special handling for the bottommost section.
+
+Next steps:
+1. Analyze the example inputs more closely, particularly focusing on how the rightmost columns are selected for each section.
+2. Implement a solution that processes the grid section by section, selecting the appropriate columns for each.
+3. Pay special attention to the bottommost section, as it might have different rules.
+
+Remember: The key seems to be identifying the correct columns for each section, not just for the entire grid or for individual rows.
