@@ -10,7 +10,7 @@ def solve_e9c9d9a1(input_grid: ColoredGrid) -> ColoredGrid:
     2. Fills sections based on their position relative to the frames:
        - Outermost corners: red (2), yellow (4), blue (1), sky blue (8)
        - Inside frames: orange (7)
-       - On frame boundaries: remains black (0)
+       - Outside frames: remains black (0)
     3. Preserves all green (3) lines and any non-black (0) cells from the input.
     4. Handles complex cases with multiple nested frames and disconnected sections.
     
@@ -50,10 +50,10 @@ def solve_e9c9d9a1(input_grid: ColoredGrid) -> ColoredGrid:
     def is_inside_frame(r: int, c: int, frame: Tuple[int, int, int, int]) -> bool:
         return frame[0] < r < frame[2] and frame[1] < c < frame[3]
 
-    def fill_section(grid: ColoredGrid, frame: Tuple[int, int, int, int], color: int, exclude: Set[Tuple[int, int]]):
-        for r in range(frame[0], frame[2] + 1):
-            for c in range(frame[1], frame[3] + 1):
-                if (r, c) not in exclude and grid.values[r][c] == 0:
+    def fill_section(grid: ColoredGrid, frame: Tuple[int, int, int, int], color: int):
+        for r in range(frame[0] + 1, frame[2]):
+            for c in range(frame[1] + 1, frame[3]):
+                if grid.values[r][c] == 0:
                     grid.values[r][c] = color
 
     # Create a copy of the input grid
@@ -69,16 +69,20 @@ def solve_e9c9d9a1(input_grid: ColoredGrid) -> ColoredGrid:
     frames.sort(key=lambda f: (f[2] - f[0]) * (f[3] - f[1]), reverse=True)
 
     # Fill outermost corners
-    corners = [(0, 0, 2), (0, cols - 1, 4), (rows - 1, 0, 1), (rows - 1, cols - 1, 8)]
+    outermost_frame = frames[0]
+    corners = [
+        (outermost_frame[0], outermost_frame[1], 2),  # Top-left: red
+        (outermost_frame[0], outermost_frame[3], 4),  # Top-right: yellow
+        (outermost_frame[2], outermost_frame[1], 1),  # Bottom-left: blue
+        (outermost_frame[2], outermost_frame[3], 8)   # Bottom-right: sky blue
+    ]
     for r, c, color in corners:
         if output_grid.values[r][c] == 0:
             output_grid.values[r][c] = color
 
     # Process frames
-    exclude = set()
     for frame in frames:
-        fill_section(output_grid, frame, 7, exclude)
-        exclude.update((r, c) for r in range(frame[0], frame[2] + 1) for c in range(frame[1], frame[3] + 1))
+        fill_section(output_grid, frame, 7)
 
     # Preserve original elements
     for r in range(rows):
