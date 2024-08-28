@@ -22,52 +22,42 @@ class TestOutput:
     returncode: int
 
 
-def run_pytest(test_file: Path):
+def _run(arg_list: list[str]) -> TestOutput:
+    result = subprocess.run(arg_list, capture_output=True, text=True, timeout=10)
     try:
-        result = subprocess.run(
-            [sys.executable, "-m", "pytest", "-x", "-vv", "--no-header", "--random-order", str(test_file.resolve())],
-            # [sys.executable, "-m", "pytest", "-vv", "--no-header", "--random-order", str(test_file.resolve())],
-            capture_output=True,
-            text=True,
-            timeout=10,
-        )
-        output = result.stdout.replace(to_replace, "")
         test_output = TestOutput(
-            success=result.returncode == 0, output=output, error=result.stderr, returncode=result.returncode
+            success=result.returncode == 0, output=result.stdout, error=result.stderr, returncode=result.returncode
         )
         return test_output
     except Exception as e:
         trace_str = traceback.format_exc()
-        return {"success": False, "output": "", "error": str(e) + trace_str, "returncode": -1}
+        return TestOutput(success=False, output="", error=str(e) + trace_str, returncode=-1)
+
+
+def run_pytest(test_file: Path, run_all: bool = False):
+    args = [sys.executable, "-m", "pytest", "-vv", "--no-header", "--random-order"]
+    if not run_all:
+        args.append("-x")
+    args.append(str(test_file.resolve()))
+    result = _run(args)
+    result.output = result.output.replace(to_replace, "")
+    return result
 
 
 def run_experiment(exp_file: Path):
     if not exp_file.exists():
         return None
-    try:
-        result = subprocess.run(
-            [sys.executable, str(exp_file.resolve())],
-            capture_output=True,
-            text=True,
-            timeout=10,
-        )
-        output = result.stdout
-        test_output = TestOutput(
-            success=result.returncode == 0, output=output, error=result.stderr, returncode=result.returncode
-        )
-        return test_output
-    except Exception as e:
-        trace_str = traceback.format_exc()
-        return {"success": False, "output": "", "error": str(e) + trace_str, "returncode": -1}
+    arg_list = [sys.executable, str(exp_file.resolve())]
+    return _run(arg_list)
 
 
 def get_pytest_error(test_file):
     result = run_pytest(test_file)
-    if not result["success"]:
-        err = result["error"] or ""
-        out = result["output"] or ""
+    if not result.success:
+        err = result.error or ""
+        out = result.output or ""
         return err + out
-    return result["error"]
+    return result.error
 
 
 def setup_files(gp: GridProblem, cr: Optional[ComputedResult], path: Path):
