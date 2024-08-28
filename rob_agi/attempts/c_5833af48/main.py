@@ -4,35 +4,31 @@ from typing import List, Tuple
 def solve_5833af48(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transform the input grid into a symmetrical pattern based on the following steps:
-    1. Remove the black border and identify the non-border area.
-    2. Determine the background color (dominant color in the large rectangle).
-    3. Analyze the pattern in the top-left corner.
-    4. Calculate the output grid size based on the complexity of the input pattern.
-    5. Create an initial output grid filled with the background color.
-    6. Generate a symmetrical sky blue (8) pattern based on the input pattern.
-    7. Apply the pattern to the output grid, ensuring symmetry and edge/corner touching.
-    8. Refine and balance the pattern for visual appeal and perfect symmetry.
+    1. Analyze the input grid to identify the background color and extract the L-shape pattern.
+    2. Calculate the output grid size based on the input pattern and grid dimensions.
+    3. Create an initial output grid filled with the background color.
+    4. Place L-shape patterns in the corners, ensuring they touch the edges.
+    5. Add edge connections and central elements to create a symmetrical pattern.
+    6. Refine the pattern to ensure perfect symmetry and balance.
 
     The output grid will contain only two colors: the background color and sky blue (8),
     arranged in a symmetrical pattern that represents a simplified, transformed version of the input.
     """
-    non_border = remove_border(input_grid.values)
-    background_color = get_background_color(non_border)
-    pattern = analyze_pattern(non_border)
-    out_rows, out_cols = calculate_output_size(pattern)
+    background_color = get_background_color(input_grid.values)
+    pattern = extract_l_shape(input_grid.values)
+    out_rows, out_cols = calculate_output_size(input_grid.values, pattern)
     output = [[background_color for _ in range(out_cols)] for _ in range(out_rows)]
-    apply_symmetrical_pattern(output, pattern)
+    apply_corner_patterns(output, pattern)
+    add_edge_connections(output)
+    add_central_elements(output)
     refine_pattern(output)
     return ColoredGrid(values=output)
 
 def get_background_color(grid: List[List[int]]) -> int:
-    return max(set(cell for row in grid for cell in row if cell != 0 and cell != 8), 
-               key=lambda x: sum(row.count(x) for row in grid))
+    colors = [cell for row in grid for cell in row if cell != 0 and cell != 8]
+    return max(set(colors), key=colors.count)
 
-def remove_border(grid: List[List[int]]) -> List[List[int]]:
-    return [row[1:-1] for row in grid[1:-1] if any(cell != 0 for cell in row)]
-
-def analyze_pattern(grid: List[List[int]]) -> List[Tuple[int, int]]:
+def extract_l_shape(grid: List[List[int]]) -> List[Tuple[int, int]]:
     pattern = []
     for r in range(min(5, len(grid))):
         for c in range(min(5, len(grid[0]))):
@@ -40,61 +36,52 @@ def analyze_pattern(grid: List[List[int]]) -> List[Tuple[int, int]]:
                 pattern.append((r, c))
     return pattern
 
-def calculate_output_size(pattern: List[Tuple[int, int]]) -> Tuple[int, int]:
-    complexity = len(pattern)
-    size = max(9, min(15, complexity * 2 + 1))
-    return size, size  # Make it square for perfect symmetry
+def calculate_output_size(grid: List[List[int]], pattern: List[Tuple[int, int]]) -> Tuple[int, int]:
+    input_rows, input_cols = len(grid), len(grid[0])
+    pattern_size = max(max(r for r, _ in pattern), max(c for _, c in pattern)) + 1
+    base_size = pattern_size * 2 + 1
+    rows = max(base_size, 9)
+    cols = max(base_size, 9)
+    if input_cols > input_rows:
+        cols += 2
+    elif input_rows > input_cols:
+        rows += 2
+    return rows + (rows % 2 == 0), cols + (cols % 2 == 0)
 
-def apply_symmetrical_pattern(output: List[List[int]], pattern: List[Tuple[int, int]]):
+def apply_corner_patterns(output: List[List[int]], pattern: List[Tuple[int, int]]):
     rows, cols = len(output), len(output[0])
-    center_row, center_col = rows // 2, cols // 2
-
-    # Apply pattern to corners
     for r, c in pattern:
-        dr, dc = r - 2, c - 2  # Adjust for centering
-        for sr, sc in [(1, 1), (1, -1), (-1, 1), (-1, -1)]:
-            nr, nc = center_row + sr * dr, center_col + sc * dc
-            if 0 <= nr < rows and 0 <= nc < cols:
-                output[nr][nc] = 8
+        output[r][c] = output[r][cols-1-c] = output[rows-1-r][c] = output[rows-1-r][cols-1-c] = 8
 
-    # Ensure pattern touches all edges and corners
-    output[0][0] = output[0][-1] = output[-1][0] = output[-1][-1] = 8
-    output[0][center_col] = output[-1][center_col] = 8
-    output[center_row][0] = output[center_row][-1] = 8
+def add_edge_connections(output: List[List[int]]):
+    rows, cols = len(output), len(output[0])
+    mid_row, mid_col = rows // 2, cols // 2
+    output[0][mid_col] = output[rows-1][mid_col] = output[mid_row][0] = output[mid_row][cols-1] = 8
 
-    # Add central feature
-    output[center_row][center_col] = 8
+def add_central_elements(output: List[List[int]]):
+    rows, cols = len(output), len(output[0])
+    mid_row, mid_col = rows // 2, cols // 2
+    output[mid_row][mid_col] = 8
+    if rows >= 9 and cols >= 9:
+        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+            output[mid_row+dr][mid_col+dc] = 8
 
 def refine_pattern(output: List[List[int]]):
     rows, cols = len(output), len(output[0])
-
-    # Connect edge patterns
-    for r in range(1, rows - 1):
-        if output[r][0] == 8 and output[r][-1] == 8:
-            output[r][cols // 3] = output[r][2 * cols // 3] = 8
-    for c in range(1, cols - 1):
-        if output[0][c] == 8 and output[-1][c] == 8:
-            output[rows // 3][c] = output[2 * rows // 3][c] = 8
-
-    # Ensure symmetry
     for r in range(rows):
         for c in range(cols):
             if output[r][c] == 8:
-                output[rows - r - 1][c] = output[r][cols - c - 1] = output[rows - r - 1][cols - c - 1] = 8
+                output[rows-1-r][c] = output[r][cols-1-c] = output[rows-1-r][cols-1-c] = 8
 
-    # Remove isolated cells and add connecting cells
-    for r in range(1, rows - 1):
-        for c in range(1, cols - 1):
+    # Remove isolated cells
+    for r in range(1, rows-1):
+        for c in range(1, cols-1):
             neighbors = sum(output[r+dr][c+dc] == 8 for dr, dc in [(0,1),(1,0),(0,-1),(-1,0)])
             if output[r][c] == 8 and neighbors < 2:
                 output[r][c] = output[0][0]  # Change to background color
-            elif output[r][c] != 8 and neighbors >= 3:
-                output[r][c] = 8  # Add connecting cell
 
     # Ensure perfect symmetry
     for r in range(rows // 2 + 1):
         for c in range(cols):
             if output[r][c] == 8:
-                output[rows - r - 1][c] = 8
-                output[r][cols - c - 1] = 8
-                output[rows - r - 1][cols - c - 1] = 8
+                output[rows-1-r][c] = output[r][cols-1-c] = output[rows-1-r][cols-1-c] = 8
