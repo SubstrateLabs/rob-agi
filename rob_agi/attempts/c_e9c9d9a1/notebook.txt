@@ -1,1 +1,32 @@
 Challenge e9c9d9a1:
+
+Key observations:
+1. The input grid consists of black (0) and green (3) cells.
+2. The output grid should have specific color patterns based on the green lines.
+
+Rules (confirmed):
+1. Green lines (3) form frames in the grid.
+2. The outermost frame defines the boundaries for corner colors.
+3. Corner colors are: top-left (2, red), top-right (4, yellow), bottom-left (1, blue), bottom-right (8, sky blue).
+4. Inside the frames should be filled with orange (7).
+5. Areas outside frames should remain black (0).
+6. All green lines (3) from the input must be preserved.
+
+Current issues:
+1. The algorithm is not correctly identifying the outermost frame.
+2. Corner colors are not extending to fill their respective areas.
+3. Orange (7) is being filled in areas that should remain black.
+
+Next steps:
+1. Improve frame detection to correctly identify the outermost frame.
+2. Implement a method to fill corner areas correctly.
+3. Refine the orange filling logic to only fill inside frames.
+4. Ensure that areas outside frames remain black.
+
+Things tried that didn't work:
+1. Simple frame detection based on the first encountered green lines.
+2. Filling all non-green areas inside the grid with orange.
+
+Unknowns:
+1. How to handle nested frames efficiently.
+2. The exact rules for determining the size of corner color areas.
