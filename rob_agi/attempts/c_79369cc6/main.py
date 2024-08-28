@@ -3,83 +3,65 @@ from typing import List, Tuple
 
 def solve_79369cc6(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transforms the input grid by creating a new yellow-magenta formation in the quadrant that results in the most balanced distribution.
-    
-    The function divides the grid into four quadrants and analyzes each for the presence of yellow (4) and magenta (6) cells.
-    It simulates adding a new formation (either 2x2 or 3x3) to each quadrant and chooses the one that results in the most balanced distribution.
+    Transforms the input grid by adding a new yellow-magenta formation in the quadrant that results in the most balanced distribution of yellow (4) and magenta (6) cells.
+
+    The function divides the grid into four quadrants and analyzes each for the presence of yellow and magenta cells.
+    It simulates adding a new formation (either 2x2 or 3x3) to each quadrant and chooses the one that results in the most balanced distribution across the entire grid.
     The new formation is placed in the corner of the chosen quadrant closest to the grid center.
-    The formation consists of yellow (4) and magenta (6) cells in a specific pattern.
+    The formation consists of yellow (4) and magenta (6) cells in a specific pattern, avoiding overwriting existing yellow or magenta cells.
     Only one such transformation is applied per grid, and the rest of the grid remains unchanged.
     """
-    def divide_into_quadrants(grid):
+    def count_yellow_magenta(grid):
+        return sum(cell in [4, 6] for row in grid.values for cell in row)
+
+    def get_formation_space(grid, row, col):
         rows, cols = grid.get_dimensions()
-        mid_row, mid_col = rows // 2, cols // 2
-        return [
-            grid.extract_subgrid(0, 0, mid_row, mid_col),
-            grid.extract_subgrid(0, mid_col, mid_row, cols - mid_col),
-            grid.extract_subgrid(mid_row, 0, rows - mid_row, mid_col),
-            grid.extract_subgrid(mid_row, mid_col, rows - mid_row, cols - mid_col)
-        ]
+        if row + 2 < rows and col + 2 < cols:
+            return 3
+        elif row + 1 < rows and col + 1 < cols:
+            return 2
+        return 0
 
-    def count_yellow_magenta(quadrant):
-        return sum(cell in [4, 6] for row in quadrant.values for cell in row)
+    def simulate_addition(grid, row, col, size):
+        new_grid = grid.deep_copy()
+        add_formation(new_grid, row, col, size)
+        return count_yellow_magenta(new_grid)
 
-    def get_formation_space(quadrant):
-        rows, cols = quadrant.get_dimensions()
-        return 3 if rows >= 3 and cols >= 3 else 2 if rows >= 2 and cols >= 2 else 0
-
-    def simulate_addition(grid, quadrant_index, formation_size):
-        quadrants = divide_into_quadrants(grid)
-        quadrants[quadrant_index] = add_formation(quadrants[quadrant_index], formation_size)
-        return [count_yellow_magenta(q) for q in quadrants]
-
-    def add_formation(quadrant, size):
-        new_quadrant = quadrant.deep_copy()
-        rows, cols = new_quadrant.get_dimensions()
+    def add_formation(grid, row, col, size):
         if size == 3:
-            new_quadrant.set_cell(rows - 3, cols - 3, 4)
-            new_quadrant.set_cell(rows - 3, cols - 2, 4)
-            new_quadrant.set_cell(rows - 2, cols - 3, 4)
-            new_quadrant.set_cell(rows - 1, cols - 1, 6)
+            cells = [(row, col), (row, col+1), (row+1, col), (row+1, col+1), (row+1, col+2), (row+2, col+1), (row+2, col+2)]
+            for r, c in cells:
+                if grid.get_cell(r, c) not in [4, 6]:
+                    grid.set_cell(r, c, 4 if (r, c) in cells[:3] else 6)
         elif size == 2:
-            new_quadrant.set_cell(rows - 2, cols - 2, 4)
-            new_quadrant.set_cell(rows - 1, cols - 1, 6)
-        return new_quadrant
+            cells = [(row, col), (row, col+1), (row+1, col), (row+1, col+1)]
+            for r, c in cells:
+                if grid.get_cell(r, c) not in [4, 6]:
+                    grid.set_cell(r, c, 4 if (r, c) in [(row, col), (row+1, col+1)] else 6)
 
-    def get_corner_position(quadrant_index, grid_size):
-        rows, cols = grid_size
-        if quadrant_index == 0: return (0, 0)
-        elif quadrant_index == 1: return (0, cols // 2)
-        elif quadrant_index == 2: return (rows // 2, 0)
-        else: return (rows // 2, cols // 2)
+    rows, cols = input_grid.get_dimensions()
+    mid_row, mid_col = rows // 2, cols // 2
+    quadrants = [(0, 0), (0, mid_col), (mid_row, 0), (mid_row, mid_col)]
 
-    # Analyze quadrants
-    quadrants = divide_into_quadrants(input_grid)
-    spaces = [get_formation_space(q) for q in quadrants]
+    initial_count = count_yellow_magenta(input_grid)
+    best_score = float('inf')
+    best_quadrant = None
+    best_size = None
 
-    # Simulate additions and calculate balance
-    balance_scores = []
-    for i, space in enumerate(spaces):
-        if space > 0:
-            distribution = simulate_addition(input_grid, i, space)
-            balance_score = max(distribution) - min(distribution)
-            balance_scores.append((balance_score, -i))  # Negative i for consistent tie-breaking
-        else:
-            balance_scores.append((float('inf'), -i))
+    for i, (row, col) in enumerate(quadrants):
+        size = get_formation_space(input_grid, row, col)
+        if size > 0:
+            new_count = simulate_addition(input_grid, row, col, size)
+            score = abs(new_count - initial_count)
+            if score < best_score or (score == best_score and size > best_size):
+                best_score = score
+                best_quadrant = i
+                best_size = size
 
-    # Select target quadrant
-    target_quad = min(range(4), key=lambda i: balance_scores[i])
-
-    # Determine formation size and position
-    size = spaces[target_quad]
-    row, col = get_corner_position(target_quad, input_grid.get_dimensions())
-
-    # Create new grid and apply transformation
-    new_grid = input_grid.deep_copy()
-    new_grid.set_cell(row, col, 4)  # Yellow
-    new_grid.set_cell(row + size - 1, col + size - 1, 6)  # Magenta
-    if size == 3:
-        new_grid.set_cell(row, col + 1, 4)  # Additional Yellow for 3x3
-        new_grid.set_cell(row + 1, col, 4)  # Additional Yellow for 3x3
-
-    return new_grid
+    if best_quadrant is not None:
+        new_grid = input_grid.deep_copy()
+        row, col = quadrants[best_quadrant]
+        add_formation(new_grid, row, col, best_size)
+        return new_grid
+    else:
+        return input_grid
