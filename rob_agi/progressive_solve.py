@@ -282,7 +282,7 @@ if __name__ == "__main__":
     print(c)
     sln = solutions.get(challenge_id)
     solver = Solver(c, sln)
-    solver.run_solve(max_tries=3)
+    solver.run_solve(max_tries=8)
 
 """
 Process should be:
