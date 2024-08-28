@@ -8,9 +8,9 @@ def solve_baf41dbf(input_grid: ColoredGrid) -> ColoredGrid:
 
     1. Analyzes the input grid to find green cells and magenta dots.
     2. Determines the bounding box of the original green shape.
-    3. Finds the maximum possible expansion in all directions.
+    3. Calculates the maximum possible expansion in all directions.
     4. Creates a new grid with the original dimensions.
-    5. Fills the new rectangle with green, preserving the internal structure.
+    5. Maps the original green shape to the new expanded area, preserving internal structure.
     6. Restores the original magenta dots.
     7. Returns the transformed grid.
     """
@@ -32,32 +32,34 @@ def solve_baf41dbf(input_grid: ColoredGrid) -> ColoredGrid:
     min_c = min(c for _, c in green_cells)
     max_c = max(c for _, c in green_cells)
 
-    # 3. Find maximum possible expansion
-    def find_boundary(coord, step, limit):
+    # 3. Calculate maximum possible expansion
+    def find_boundary(coord, step, limit, axis):
         while 0 <= coord + step < limit:
-            if any((coord + step == r and step != 0) or (coord + step == c and step == 0) for r, c in magenta_dots):
+            if any((coord + step == r and axis == 'row') or (coord + step == c and axis == 'col') for r, c in magenta_dots):
                 break
             coord += step
         return coord
 
-    left = find_boundary(min_c, -1, cols)
-    right = find_boundary(max_c, 1, cols)
-    top = find_boundary(min_r, -1, rows)
-    bottom = find_boundary(max_r, 1, rows)
+    left = find_boundary(min_c, -1, cols, 'col')
+    right = find_boundary(max_c, 1, cols, 'col')
+    top = find_boundary(min_r, -1, rows, 'row')
+    bottom = find_boundary(max_r, 1, rows, 'row')
 
     # 4. Create new grid with original dimensions
-    new_grid = input_grid.deep_copy()
+    new_grid = ColoredGrid(values=[[0 for _ in range(cols)] for _ in range(rows)])
 
-    # 5. Fill the new rectangle and preserve internal structure
+    # 5. Map and fill the new expanded area
+    orig_width = max_c - min_c + 1
+    orig_height = max_r - min_r + 1
+    new_width = right - left + 1
+    new_height = bottom - top + 1
+
     for r in range(top, bottom + 1):
         for c in range(left, right + 1):
-            if left <= c <= right and top <= r <= bottom:
-                orig_r = min_r + (r - top) * (max_r - min_r) // (bottom - top)
-                orig_c = min_c + (c - left) * (max_c - min_c) // (right - left)
-                if (orig_r, orig_c) in green_cells:
-                    new_grid.set_cell(r, c, 3)
-                else:
-                    new_grid.set_cell(r, c, 0)
+            orig_r = min_r + (r - top) * orig_height // new_height
+            orig_c = min_c + (c - left) * orig_width // new_width
+            if (orig_r, orig_c) in green_cells:
+                new_grid.set_cell(r, c, 3)
 
     # 6. Restore magenta dots
     for r, c in magenta_dots:
