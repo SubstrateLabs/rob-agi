@@ -14,12 +14,13 @@ def solve_cfb2ce5a(input_grid: ColoredGrid) -> ColoredGrid:
     3. Create pattern templates for each color based on their initial arrangement.
     4. Perform a multi-stage expansion process:
        a. Pattern-based Expansion: Expand each color according to its template.
-       b. Boundary Interaction: Handle color interactions at boundaries.
-       c. Fill Empty Spaces: Use pattern extension and weighted random filling.
-       d. Check and Adjust: Adjust expansion priorities based on current vs target frequencies.
-    5. Maintain the black border throughout the process.
-    6. Make final adjustments for symmetry and color balance.
-    7. Enhance connectivity for isolated color instances.
+       b. Special handling for isolated colors: Create small clusters or streaks.
+       c. Boundary Interaction: Handle color interactions at boundaries.
+       d. Fill Empty Spaces: Use pattern extension and weighted random filling.
+       e. Check and Adjust: Adjust expansion priorities based on current vs target frequencies.
+    5. Enhance connectivity for isolated color instances using pathfinding.
+    6. Maintain the black border throughout the process.
+    7. Make final adjustments for symmetry and color balance.
     8. Perform iterative refinement to balance color distribution.
     9. Return the transformed grid.
 
@@ -170,34 +171,70 @@ def solve_cfb2ce5a(input_grid: ColoredGrid) -> ColoredGrid:
     def expand_color(color):
         positions = get_color_positions(color)
         new_positions = []
-        for r, c in positions:
-            for dr, dc in pattern_templates[color]:
+        if len(positions) == 1:  # Special handling for isolated colors
+            r, c = positions[0]
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]:
                 nr, nc = r + dr, c + dc
                 if 1 <= nr < rows - 1 and 1 <= nc < cols - 1 and grid.values[nr][nc] == 0:
                     grid.values[nr][nc] = color
                     new_positions.append((nr, nc))
+        else:
+            for r, c in positions:
+                for dr, dc in pattern_templates[color]:
+                    nr, nc = r + dr, c + dc
+                    if 1 <= nr < rows - 1 and 1 <= nc < cols - 1 and grid.values[nr][nc] == 0:
+                        grid.values[nr][nc] = color
+                        new_positions.append((nr, nc))
         return new_positions
 
     def fill_empty_spaces():
         empty_cells = [(r, c) for r in range(1, rows - 1) for c in range(1, cols - 1) if grid.values[r][c] == 0]
+        weights = [initial_frequencies[color] for color in colors]
         for r, c in empty_cells:
             neighbors = [grid.values[r+dr][c+dc] for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)] if 0 < r+dr < rows-1 and 0 < c+dc < cols-1]
             non_zero_neighbors = [color for color in neighbors if color != 0]
             if non_zero_neighbors:
                 grid.values[r][c] = max(set(non_zero_neighbors), key=non_zero_neighbors.count)
             else:
-                grid.values[r][c] = random.choice(colors)
+                grid.values[r][c] = random.choices(colors, weights=weights)[0]
+
+    def enhance_connectivity():
+        for color in colors:
+            positions = get_color_positions(color)
+            if len(positions) > 1:
+                for i in range(len(positions) - 1):
+                    start, end = positions[i], positions[i + 1]
+                    path = find_path(start, end)
+                    for r, c in path:
+                        if grid.values[r][c] == 0:
+                            grid.values[r][c] = color
+
+    def find_path(start, end):
+        queue = deque([(start, [start])])
+        visited = set([start])
+        while queue:
+            (r, c), path = queue.popleft()
+            if (r, c) == end:
+                return path
+            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                nr, nc = r + dr, c + dc
+                if 1 <= nr < rows - 1 and 1 <= nc < cols - 1 and (nr, nc) not in visited:
+                    visited.add((nr, nc))
+                    queue.append(((nr, nc), path + [(nr, nc)]))
+        return []
 
     for _ in range(5):  # Perform multiple iterations of expansion
         for color in sorted(colors, key=lambda x: -initial_frequencies[x]):
             expand_color(color)
         fill_empty_spaces()
+        enhance_connectivity()
         maintain_border()
 
     # Final adjustments
     for color in colors:
         preserve_original_pattern(color)
     fill_empty_spaces()
+    enhance_connectivity()
     maintain_border()
 
     return grid
