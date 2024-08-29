@@ -73,6 +73,22 @@ def test_edge_cases():
     print(visualize_grid(result4))
     assert result4.values[1][1] == 2 and result4.values[1][3] == 2 and result4.values[2][4] == 2, f"Expected all plus shapes to be red (2), but got {result4.values[1][1]}, {result4.values[1][3]}, and {result4.values[2][4]}"
 
+    # Test case 5: Complex grid with multiple gray borders
+    input_grid5 = ColoredGrid(values=[
+        [5, 5, 5, 5, 5, 0, 0, 0],
+        [5, 1, 0, 2, 5, 0, 3, 0],
+        [5, 0, 1, 0, 5, 0, 0, 0],
+        [5, 3, 0, 1, 5, 0, 2, 0],
+        [5, 5, 5, 5, 5, 0, 0, 0],
+        [0, 0, 0, 0, 0, 5, 5, 5],
+        [0, 1, 0, 2, 0, 5, 1, 5],
+        [0, 0, 1, 0, 0, 5, 5, 5]
+    ])
+    print("\nTest case 5 - Complex grid with multiple gray borders:")
+    result5 = solve_776ffc46(input_grid5)
+    print(visualize_grid(result5))
+    assert result5.values[2][2] == 2 and result5.values[7][2] == 2, f"Expected red (2) for both plus shapes, but got {result5.values[2][2]} and {result5.values[7][2]}"
+
 if __name__ == "__main__":
     test_simple_case()
     test_edge_cases()
