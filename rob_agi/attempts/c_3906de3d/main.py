@@ -12,6 +12,7 @@ def solve_3906de3d(input_grid: ColoredGrid) -> ColoredGrid:
     3. Move red cells upwards, filling gaps from bottom to top, but not higher than the 4th row from the top.
     4. Clear any remaining red cells in the bottom three rows.
     5. Ensure red cells do not pass through blue cells.
+    6. Maintain the position of existing blue cells.
     """
     grid = input_grid.deep_copy()
     height, width = grid.get_dimensions()
@@ -38,7 +39,7 @@ def solve_3906de3d(input_grid: ColoredGrid) -> ColoredGrid:
         red_count = len(red_cells)
         for start, end in reversed(gaps):
             for row in range(end - 1, max(start, 3) - 1, -1):  # Stop at 4th row from top or start of gap
-                if red_count > 0 and row < height - 3:
+                if red_count > 0 and row < height - 3 and grid.get_cell(row, col) != 1:
                     grid.set_cell(row, col, 2)
                     red_count -= 1
                 if red_count == 0:
@@ -49,5 +50,11 @@ def solve_3906de3d(input_grid: ColoredGrid) -> ColoredGrid:
     # Process each column
     for col in range(width):
         process_column(col)
+    
+    # Clear any red cells in bottom 3 rows
+    for row in range(height - 3, height):
+        for col in range(width):
+            if grid.get_cell(row, col) == 2:
+                grid.set_cell(row, col, 0)
     
     return grid
