@@ -1,29 +1,39 @@
 Challenge 25ff71a9:
 
 Pattern observed:
-- The non-zero elements in the grid should move down by one row.
+- All non-zero elements in the grid should move down by one row.
 - The top row should always become all zeros.
-- If there's only one row with non-zero elements, it should move to the second row from the top.
+- If there are non-zero elements in the bottom row, they should wrap around to the second row from the top.
+- The relative positions of non-zero elements within each row should be preserved.
 
 What we know:
 1. The current implementation is not correctly handling all cases.
-2. The test case [[0, 0, 0], [1, 1, 1], [0, 0, 0]] should become [[0, 0, 0], [0, 0, 0], [1, 1, 1]].
+2. The test case [[0, 0, 0], [1, 1, 1], [0, 0, 0]] becomes [[0, 0, 0], [0, 0, 0], [1, 1, 1]] correctly.
+3. The test case [[0, 1, 0], [1, 1, 0], [0, 0, 0]] should become [[0, 0, 0], [0, 1, 0], [1, 1, 0]], but our current implementation produces [[0, 0, 0], [0, 0, 0], [1, 1, 0]].
 
 What doesn't work:
-- Simply moving each row down by one position and setting the top row to zeros.
+- Simply moving all non-zero elements to the bottom of the grid.
 - Treating the case of a single non-zero row differently from multiple non-zero rows.
+- Wrapping only the bottom row to the second row from the top.
 
 What needs investigation:
-1. How to handle cases where there are multiple non-zero rows, ensuring all of them move down.
-2. How to properly handle the case where the bottom row is non-zero.
+1. How to handle cases where there are multiple non-zero rows with gaps between them.
+2. How to preserve the relative vertical positions of non-zero elements while shifting everything down.
 
 Next steps:
-1. Modify the implementation to move ALL non-zero rows down, not just the top ones.
-2. Ensure that when moving rows down, we don't lose information from the bottom row.
-3. Implement a solution that works for all cases without special handling for single non-zero row.
+1. Modify the implementation to move ALL non-zero elements down by one row, preserving their relative positions.
+2. Ensure that elements in the bottom row wrap around to the second row from the top.
+3. Implement a solution that works for all cases without special handling for different scenarios.
 
 Proposed solution outline:
 1. Create a new empty grid.
-2. Iterate through the input grid from bottom to top.
-3. For each non-zero row encountered, place it in the lowest available position in the new grid.
-4. Return the new grid with all rows shifted down and top row(s) set to zero.
+2. Iterate through the input grid from top to bottom.
+3. For each non-zero element encountered:
+   - If it's in the bottom row, place it in the second row from the top of the new grid.
+   - Otherwise, place it one row below its current position in the new grid.
+4. Return the new grid with all elements shifted down and the top row set to zero.
+
+Key points to remember:
+- The transformation should be applied uniformly to all elements, regardless of their initial positions.
+- The top row of the output should always be all zeros.
+- The relative horizontal positions of elements within each row should remain unchanged.
