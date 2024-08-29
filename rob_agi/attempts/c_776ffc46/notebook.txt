@@ -14,32 +14,30 @@ Rules:
 5. Transform these blue plus shapes to the target color.
 6. Other blue shapes and colors remain unchanged.
 
-Things that don't work:
-- Transforming all blue regions of any shape.
-- Using only the first encountered color as the target color.
-- Checking only for colors enclosed within gray borders.
-- Considering only orthogonally adjacent cells when counting colors near gray borders.
-- Returning the input grid unchanged when a target color is found but no blue plus shapes exist.
-
-Lessons learned:
-1. The target color determination must consider all gray borders in the grid collectively.
-2. Counting occurrences of red and green must include diagonally adjacent cells to gray borders.
-3. The transformation of blue plus shapes is working correctly, but the target color identification is still incorrect.
-4. The function should only return the input grid unchanged if no red or green color is found adjacent to any gray border.
-5. Using a set to store unique adjacent cells prevents double-counting when gray borders are adjacent to each other.
-
 Current issues:
 1. The target color is not being correctly identified in all cases.
 2. The function is not transforming blue plus shapes to the correct target color consistently.
 
+Lessons learned:
+1. The target color determination must consider all gray borders in the grid collectively.
+2. Counting occurrences of red and green must include diagonally adjacent cells to gray borders.
+3. The transformation of blue plus shapes is working correctly, but the target color identification is incorrect.
+4. The function should only return the input grid unchanged if no red or green color is found adjacent to any gray border.
+5. Using a set to store unique adjacent cells prevents double-counting when gray borders are adjacent to each other.
+
 Next steps:
-1. Implement a debug mode to print the counts of red and green adjacent to gray borders.
+1. Implement debug logging to print the counts of red and green adjacent to gray borders.
 2. Verify that the counting logic includes all 8 adjacent cells (including diagonals) for each gray border cell.
 3. Double-check the implementation of the tiebreaker rule: use red if counts are equal.
-4. Review the blue plus shape identification and transformation logic.
+4. Review the blue plus shape identification logic to ensure it's correct.
 5. Test the function with simpler grids to isolate the issue with target color identification.
 
 Unknowns:
 - Whether there are any edge cases in the grid that are not being handled correctly.
 - If there are any off-by-one errors in the adjacent cell checking logic.
 - Whether the current implementation correctly handles grids of different sizes.
+
+Things to implement:
+1. Add debug logging to print red and green counts.
+2. Implement a helper function to visualize the grid for debugging purposes.
+3. Add more test cases with simpler grids to isolate the target color identification issue.
