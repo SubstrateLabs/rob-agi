@@ -291,7 +291,7 @@ if __name__ == "__main__":
     print(c)
     sln = solutions.get(challenge_id)
     solver = Solver(c, sln)
-    print(c.test_cases[0].human_print())
+    print("\n\n" + c.test_cases[0].human_print() + "\n\n")
     # solver.run_solve(max_tries=4)
 
 """
