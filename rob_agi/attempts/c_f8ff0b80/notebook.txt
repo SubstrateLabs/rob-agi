@@ -15,26 +15,43 @@ Current Implementation:
 5. Format the sorted colors as a list of single-element lists.
 
 Test Results:
-The implementation is failing the first test case:
+The implementation is still failing the first test case:
 - Expected output: [[3], [2], [8]]
 - Actual output: [[8], [3], [2]]
 
 Analysis:
-- The sorting logic is incorrect, as it's not producing the expected order of colors.
-- The reverse sort added to the sorting function is causing the colors to be sorted in the wrong order.
+- The sorting logic is still incorrect, despite the changes made.
+- Adding reverse=True to the sorted() function did not solve the issue.
 
 What we know:
 - The largest contiguous block detection seems to be working correctly.
-- The issue is in the final sorting of the colors.
+- The issue persists in the final sorting of the colors.
 
 What we need to fix:
-- Remove the reverse=True parameter from the sorted() function.
-- Adjust the sorting key to ensure the correct order of colors.
+- Revise the sorting logic to correctly prioritize the criteria.
 
 Next steps:
 1. Remove the reverse=True parameter from the sorted() function.
-2. Modify the sorting key to: key=lambda x: (-color_info[x][0], -color_info[x][1], -color_info[x][2])
-3. Re-run the tests to verify if this fixes the issue.
+2. Modify the sorting key to ensure the correct order of colors.
+3. Consider using a custom sorting function instead of relying solely on the key parameter.
+
+Proposed solution:
+def custom_sort(color):
+    size, row, col = color_info[color]
+    return (-size, -row, -col)
+
+sorted_colors = sorted(color_info.keys(), key=custom_sort)
+
+This should sort colors by:
+1. Largest block size (descending)
+2. If sizes are equal, lower rows (closer to bottom)
+3. If sizes and rows are equal, rightmost columns
+
+4. Re-run the tests to verify if this fixes the issue.
+
+Things that don't work:
+- Adding reverse=True to the sorted() function
+- Using a tuple of negated values directly in the key function
 
 Possible Improvements:
 1. Add more test cases to cover a wider range of scenarios.
