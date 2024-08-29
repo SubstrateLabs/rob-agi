@@ -5,7 +5,7 @@ def solve_a2fd1cf0(input_grid: ColoredGrid) -> ColoredGrid:
     Solve the a2fd1cf0 challenge by creating an 'L'-shaped path of '8's connecting '2' and '3'.
     
     The function finds the positions of '2' and '3' in the input grid, then creates a path:
-    1. A horizontal line of '8's from the column of '2' to the column just before '3'.
+    1. A horizontal line of '8's from the column after '2' to the column of '3'.
     2. A vertical line of '8's in the column of '3' from the row of the horizontal line to the row just above '3'.
     
     The path is created regardless of whether '2' is to the left or right of '3', or above or below '3'.
@@ -34,13 +34,13 @@ def solve_a2fd1cf0(input_grid: ColoredGrid) -> ColoredGrid:
     # Create horizontal path
     start_col, end_col = start[1], end[1]
     step = 1 if start_col < end_col else -1
-    for col in range(start_col, end_col, step):
+    for col in range(start_col + step, end_col + step, step):
         grid.set_cell(start[0], col, 8)
 
     # Create vertical path
     start_row, end_row = start[0], end[0]
     step = 1 if start_row < end_row else -1
-    for row in range(start_row + step, end_row, step):
+    for row in range(start_row, end_row, step):
         grid.set_cell(row, end_col, 8)
 
     return grid
