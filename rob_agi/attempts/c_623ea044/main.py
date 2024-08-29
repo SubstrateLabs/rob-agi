@@ -8,7 +8,7 @@ def solve_623ea044(input_grid: ColoredGrid) -> ColoredGrid:
     1. Find the colored cell in the input grid.
     2. Create a diamond pattern outline centered on the colored cell.
     3. Extend diagonal lines from the corners of the diamond to the edges of the grid.
-    4. Fill in the diagonal lines from the center to the diamond corners.
+    4. Ensure only the outline of the diamond and the extended diagonals are colored.
     """
     def find_colored_cell(grid):
         for i, row in enumerate(grid.values):
@@ -27,15 +27,18 @@ def solve_623ea044(input_grid: ColoredGrid) -> ColoredGrid:
     # Create diamond pattern outline
     diamond_size = min(height, width) // 2
     for d in range(diamond_size + 1):
-        output.set_cell(start_row - d, start_col, color)  # Top
-        output.set_cell(start_row + d, start_col, color)  # Bottom
-        output.set_cell(start_row, start_col - d, color)  # Left
-        output.set_cell(start_row, start_col + d, color)  # Right
+        if d == 0:
+            output.set_cell(start_row, start_col, color)
+        else:
+            output.set_cell(start_row - d, start_col, color)  # Top
+            output.set_cell(start_row + d, start_col, color)  # Bottom
+            output.set_cell(start_row, start_col - d, color)  # Left
+            output.set_cell(start_row, start_col + d, color)  # Right
 
-    # Extend diagonal lines from diamond corners to grid edges and fill in
+    # Extend diagonal lines from diamond corners to grid edges
     directions = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
     for direction in directions:
-        current_row, current_col = start_row, start_col
+        current_row, current_col = start_row + direction[0] * diamond_size, start_col + direction[1] * diamond_size
         while 0 <= current_row < height and 0 <= current_col < width:
             output.set_cell(current_row, current_col, color)
             current_row += direction[0]
