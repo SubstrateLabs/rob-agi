@@ -115,6 +115,31 @@ def test_edge_cases():
     print(visualize_grid(result7))
     assert result7 == input_grid7, f"Expected no change, but got:\n{visualize_grid(result7)}"
 
+def test_simple_border_case():
+    input_grid = ColoredGrid(values=[
+        [5, 5, 5, 5, 5],
+        [5, 0, 0, 0, 5],
+        [5, 0, 1, 0, 5],
+        [5, 2, 0, 3, 5],
+        [5, 5, 5, 5, 5]
+    ])
+    expected = ColoredGrid(values=[
+        [5, 5, 5, 5, 5],
+        [5, 0, 0, 0, 5],
+        [5, 0, 2, 0, 5],
+        [5, 2, 0, 3, 5],
+        [5, 5, 5, 5, 5]
+    ])
+    print("\nSimple border case - Input grid:")
+    print(visualize_grid(input_grid))
+    actual = solve_776ffc46(input_grid)
+    print("\nSimple border case - Actual output:")
+    print(visualize_grid(actual))
+    print("\nSimple border case - Expected output:")
+    print(visualize_grid(expected))
+    assert actual == expected, f"Expected:\n{visualize_grid(expected)}\n\nActual:\n{visualize_grid(actual)}"
+
 if __name__ == "__main__":
     test_simple_case()
     test_edge_cases()
+    test_simple_border_case()
