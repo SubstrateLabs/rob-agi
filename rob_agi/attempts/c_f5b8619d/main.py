@@ -7,11 +7,10 @@ def solve_f5b8619d(input_grid: ColoredGrid) -> ColoredGrid:
     and vertical symmetry.
     
     The transformation follows these steps:
-    1. Initialize an output grid with dimensions twice that of the input.
+    1. Initialize an output grid with dimensions twice that of the input, filled with sky color (8).
     2. Process each cell of the input grid:
        a. Replicate non-zero values in 2x2 blocks in the output.
        b. Preserve zero values in their corresponding positions.
-       c. Fill remaining spaces with sky color (8).
     3. Create horizontal symmetry by mirroring the left half to the right half.
     4. Create vertical symmetry by mirroring the top half to the bottom half.
     """
@@ -22,12 +21,8 @@ def solve_f5b8619d(input_grid: ColoredGrid) -> ColoredGrid:
     for row in range(height):
         for col in range(width):
             value = input_grid.get_cell(row, col)
-            if value != 0:
-                output[row*2][col*2] = output[row*2][col*2+1] = value
-                output[row*2+1][col*2] = output[row*2+1][col*2+1] = value
-            else:
-                output[row*2][col*2] = output[row*2][col*2+1] = 0
-                output[row*2+1][col*2] = output[row*2+1][col*2+1] = 0
+            output[row*2][col*2] = output[row*2][col*2+1] = value
+            output[row*2+1][col*2] = output[row*2+1][col*2+1] = value
 
     # Create horizontal symmetry
     for row in range(height*2):
