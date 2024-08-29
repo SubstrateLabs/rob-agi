@@ -5,7 +5,7 @@ def solve_496994bd(input_grid: ColoredGrid) -> ColoredGrid:
     Solve the 496994bd challenge by mirroring non-zero rows from the top to the bottom of the grid.
     
     The function identifies consecutive non-zero rows at the top of the input grid,
-    and then mirrors these rows to the bottom of the grid in the same order.
+    and then mirrors these rows to the bottom of the grid in the same order they appear at the top.
     The middle section of the grid remains unchanged.
     
     Args:
