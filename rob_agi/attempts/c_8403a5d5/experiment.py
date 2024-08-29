@@ -102,3 +102,25 @@ expected_output_3 = [
 ]
 
 run_test_case(input_grid_3, expected_output_3, 3)
+
+# Test Case 4: Empty input grid
+input_grid_4 = [[]]
+expected_output_4 = [[]]
+run_test_case(input_grid_4, expected_output_4, 4)
+
+# Test Case 5: Grid with no anchor value
+input_grid_5 = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+expected_output_5 = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+run_test_case(input_grid_5, expected_output_5, 5)
+
+# Test Case 6: Grid with multiple anchor values
+input_grid_6 = [[0, 0, 0], [0, 0, 0], [1, 2, 3]]
+expected_output_6 = [[1, 0, 1], [1, 0, 1], [1, 0, 1]]
+run_test_case(input_grid_6, expected_output_6, 6)
+
+# Test Case 7: Maximum size grid (30x30)
+input_grid_7 = [[0] * 30 for _ in range(29)] + [[0] * 29 + [1]]
+expected_output_7 = [[0] * 29 + [1] for _ in range(30)]
+expected_output_7[0][29] = 2
+expected_output_7[-1][29] = 2
+run_test_case(input_grid_7, expected_output_7, 7)
