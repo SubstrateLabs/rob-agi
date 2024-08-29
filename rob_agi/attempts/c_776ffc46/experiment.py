@@ -23,7 +23,7 @@ def test_simple_case():
     print(visualize_grid(actual))
     print("\nSimple case - Expected output:")
     print(visualize_grid(expected))
-    assert actual == expected
+    assert actual == expected, f"Expected:\n{visualize_grid(expected)}\n\nActual:\n{visualize_grid(actual)}"
 
 def test_edge_cases():
     # Test case 1: Only red adjacent to gray
@@ -33,7 +33,9 @@ def test_edge_cases():
         [5, 2, 5]
     ])
     print("\nTest case 1 - Only red adjacent to gray:")
-    print(visualize_grid(solve_776ffc46(input_grid1)))
+    result1 = solve_776ffc46(input_grid1)
+    print(visualize_grid(result1))
+    assert result1.values[1][1] == 2, f"Expected red (2), but got {result1.values[1][1]}"
 
     # Test case 2: Only green adjacent to gray
     input_grid2 = ColoredGrid(values=[
@@ -42,7 +44,9 @@ def test_edge_cases():
         [5, 3, 5]
     ])
     print("\nTest case 2 - Only green adjacent to gray:")
-    print(visualize_grid(solve_776ffc46(input_grid2)))
+    result2 = solve_776ffc46(input_grid2)
+    print(visualize_grid(result2))
+    assert result2.values[1][1] == 3, f"Expected green (3), but got {result2.values[1][1]}"
 
     # Test case 3: Equal red and green adjacent to gray
     input_grid3 = ColoredGrid(values=[
@@ -52,7 +56,9 @@ def test_edge_cases():
         [5, 5, 5, 5]
     ])
     print("\nTest case 3 - Equal red and green adjacent to gray:")
-    print(visualize_grid(solve_776ffc46(input_grid3)))
+    result3 = solve_776ffc46(input_grid3)
+    print(visualize_grid(result3))
+    assert result3.values[1][1] == 2 and result3.values[2][2] == 2, f"Expected red (2) for both plus shapes, but got {result3.values[1][1]} and {result3.values[2][2]}"
 
     # Test case 4: Multiple blue plus shapes
     input_grid4 = ColoredGrid(values=[
@@ -63,7 +69,9 @@ def test_edge_cases():
         [5, 5, 5, 5, 5, 5, 5]
     ])
     print("\nTest case 4 - Multiple blue plus shapes:")
-    print(visualize_grid(solve_776ffc46(input_grid4)))
+    result4 = solve_776ffc46(input_grid4)
+    print(visualize_grid(result4))
+    assert result4.values[1][1] == 2 and result4.values[1][3] == 2 and result4.values[2][4] == 2, f"Expected all plus shapes to be red (2), but got {result4.values[1][1]}, {result4.values[1][3]}, and {result4.values[2][4]}"
 
 if __name__ == "__main__":
     test_simple_case()
