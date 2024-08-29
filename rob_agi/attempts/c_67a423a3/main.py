@@ -24,11 +24,8 @@ def solve_67a423a3(input_grid: ColoredGrid) -> ColoredGrid:
             for c in range(max(0, col - 1), min(cols, col + 2)):
                 if grid.get_cell(r, c) == 0:
                     result.set_cell(r, c, 4)
-                elif (r == row and c == col):
-                    # Preserve the intersection point
-                    continue
-                elif (r == row or c == col):
-                    # Preserve the original non-zero values in the lines
+                else:
+                    # Preserve all non-zero values
                     result.set_cell(r, c, grid.get_cell(r, c))
         
         return result
