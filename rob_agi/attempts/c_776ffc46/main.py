@@ -1,5 +1,5 @@
 from rob_agi.colored_grid import ColoredGrid
-from typing import List, Tuple
+from typing import List, Tuple, Set
 
 def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     """
@@ -20,36 +20,29 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     """
     GRAY, BLUE, RED, GREEN = 5, 1, 2, 3
     rows, cols = len(input_grid.values), len(input_grid.values[0])
-    result_grid = [row[:] for row in input_grid.values]
 
     def is_valid_cell(r: int, c: int) -> bool:
         return 0 <= r < rows and 0 <= c < cols
 
-    def get_adjacent_cells(r: int, c: int) -> List[Tuple[int, int]]:
-        return [(r+dr, c+dc) for dr in [-1, 0, 1] for dc in [-1, 0, 1] if (dr != 0 or dc != 0) and is_valid_cell(r+dr, c+dc)]
+    def get_adjacent_cells(r: int, c: int) -> Set[Tuple[int, int]]:
+        return {(r+dr, c+dc) for dr in [-1, 0, 1] for dc in [-1, 0, 1] 
+                if (dr != 0 or dc != 0) and is_valid_cell(r+dr, c+dc)}
 
     def is_blue_plus(r: int, c: int) -> bool:
-        if result_grid[r][c] != BLUE:
+        if input_grid.values[r][c] != BLUE:
             return False
-        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            nr, nc = r + dr, c + dc
-            if not is_valid_cell(nr, nc) or result_grid[nr][nc] != BLUE:
-                return False
-        return True
+        return all(is_valid_cell(r+dr, c+dc) and input_grid.values[r+dr][c+dc] == BLUE 
+                   for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)])
 
     # Step 1 & 2: Identify gray borders and count adjacent colors
-    red_count, green_count = 0, 0
     adjacent_cells = set()
     for r in range(rows):
         for c in range(cols):
             if input_grid.values[r][c] == GRAY:
                 adjacent_cells.update(get_adjacent_cells(r, c))
 
-    for r, c in adjacent_cells:
-        if input_grid.values[r][c] == RED:
-            red_count += 1
-        elif input_grid.values[r][c] == GREEN:
-            green_count += 1
+    red_count = sum(1 for r, c in adjacent_cells if input_grid.values[r][c] == RED)
+    green_count = sum(1 for r, c in adjacent_cells if input_grid.values[r][c] == GREEN)
 
     # Step 3: Determine the target color
     if red_count == 0 and green_count == 0:
@@ -57,12 +50,14 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
 
     target_color = RED if red_count >= green_count else GREEN
 
-    # Step 4 & 5: Find and transform blue plus shapes
-    for r in range(rows):
-        for c in range(cols):
-            if is_blue_plus(r, c):
-                for dr, dc in [(0, 0), (0, 1), (1, 0), (0, -1), (-1, 0)]:
-                    result_grid[r+dr][c+dc] = target_color
+    # Step 4: Find all blue plus shapes
+    blue_plus_centers = [(r, c) for r in range(rows) for c in range(cols) if is_blue_plus(r, c)]
+
+    # Step 5: Transform blue plus shapes
+    result_grid = [row[:] for row in input_grid.values]
+    for r, c in blue_plus_centers:
+        for dr, dc in [(0, 0), (0, 1), (1, 0), (0, -1), (-1, 0)]:
+            result_grid[r+dr][c+dc] = target_color
 
     # Step 6: Return the modified grid
     return ColoredGrid(values=result_grid)
