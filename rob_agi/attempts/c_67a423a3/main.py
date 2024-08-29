@@ -3,10 +3,10 @@ from rob_agi.colored_grid import ColoredGrid
 def solve_67a423a3(input_grid: ColoredGrid) -> ColoredGrid:
     """
     Transforms the input grid by identifying the intersection of vertical and horizontal non-zero lines,
-    and applying a yellow (4) 3x3 square around it, preserving all original non-zero values.
+    and applying a yellow (4) 3x3 square around it, preserving only the central vertical and horizontal lines.
     
     1. Find the intersection point of the main vertical and horizontal non-zero lines.
-    2. Apply a 3x3 yellow (4) square around the intersection, preserving all original non-zero values.
+    2. Apply a 3x3 yellow (4) square around the intersection, preserving only the central vertical and horizontal lines.
     3. Return the transformed grid.
     """
     def find_intersection(grid: ColoredGrid) -> tuple[int, int]:
@@ -19,14 +19,15 @@ def solve_67a423a3(input_grid: ColoredGrid) -> ColoredGrid:
         result = grid.deep_copy()
         rows, cols = grid.get_dimensions()
         
-        # Apply 3x3 yellow square, preserving non-zero values
+        # Apply 3x3 yellow square, preserving only central vertical and horizontal lines
         for r in range(max(0, row - 1), min(rows, row + 2)):
             for c in range(max(0, col - 1), min(cols, col + 2)):
-                if grid.get_cell(r, c) == 0:
-                    result.set_cell(r, c, 4)
-                else:
-                    # Preserve all non-zero values
+                if r == row or c == col:
+                    # Preserve the central vertical and horizontal lines
                     result.set_cell(r, c, grid.get_cell(r, c))
+                else:
+                    # Set other cells in the 3x3 area to yellow (4)
+                    result.set_cell(r, c, 4)
         
         return result
 
