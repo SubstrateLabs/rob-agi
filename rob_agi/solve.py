@@ -891,7 +891,7 @@ async def bootstrap_solved():
             logger.info("Challenge not found:", v.metadata["task_id"])
             continue
         previous_solution = approach + "\n\nPython Function:\n" + py_fn
-        attempt(c, prev_solution=previous_solution)
+        attempt(c, previous_solution=previous_solution)
 
 
 def distill_solved():

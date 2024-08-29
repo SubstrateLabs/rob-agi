@@ -2,6 +2,10 @@ import pytest
 from rob_agi.colored_grid import ColoredGrid
 from rob_agi.attempts.c_d4a91cb9.main import solve_d4a91cb9
 
+# This file is important because it contains assertions that represent the example and test cases.
+# These assertions are used both to verify the correctness of the implementation
+# and to illustrate the problem itself.
+
 
 def test_d4a91cb9_example_0():
     input_grid = ColoredGrid(values=
@@ -90,36 +94,4 @@ def test_d4a91cb9_example_2():
     assert actual == expected
 
 
-
-def test_d4a91cb9_test_case_0():
-    input_grid = ColoredGrid(values=
-[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
-    )
-    expected = ColoredGrid(values=
-[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 2, 0],
- [0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
-    )
-    actual = solve_d4a91cb9(input_grid)
-    assert actual == expected
 

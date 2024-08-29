@@ -123,9 +123,8 @@ class Solver:
 
     def get_modify_coder(self, fnames=None):
         if fnames is None:
-            fnames = [self.file_paths["main"]]
+            fnames = [self.file_paths["main"], self.file_paths["visual_descriptions"]]
         read_only_fnames = [
-            self.file_paths["visual_descriptions"],
             self.file_paths["notebook"],
             self.file_paths["test"],
             self.file_paths["colored_grid"],

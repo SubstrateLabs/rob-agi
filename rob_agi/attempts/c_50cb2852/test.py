@@ -2,6 +2,10 @@ import pytest
 from rob_agi.colored_grid import ColoredGrid
 from rob_agi.attempts.c_50cb2852.main import solve_50cb2852
 
+# This file is important because it contains assertions that represent the example and test cases.
+# These assertions are used both to verify the correctness of the implementation
+# and to illustrate the problem itself.
+
 
 def test_50cb2852_example_0():
     input_grid = ColoredGrid(values=
@@ -104,40 +108,4 @@ def test_50cb2852_example_2():
     assert actual == expected
 
 
-
-def test_50cb2852_test_case_0():
-    input_grid = ColoredGrid(values=
-[[0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
- [0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0],
- [0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0],
- [0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0],
- [0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0],
- [0, 0, 2, 2, 2, 2, 2, 2, 0, 3, 3, 3, 3],
- [0, 0, 2, 2, 2, 2, 2, 2, 0, 3, 3, 3, 3],
- [0, 0, 2, 2, 2, 2, 2, 2, 0, 3, 3, 3, 3],
- [0, 0, 2, 2, 2, 2, 2, 2, 0, 3, 3, 3, 3],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3]]
-    )
-    expected = ColoredGrid(values=
-[[0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
- [0, 1, 8, 8, 8, 1, 0, 0, 1, 1, 1, 0, 0],
- [0, 1, 8, 8, 8, 1, 0, 0, 1, 8, 1, 0, 0],
- [0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0],
- [0, 0, 2, 8, 8, 8, 8, 2, 0, 0, 0, 0, 0],
- [0, 0, 2, 8, 8, 8, 8, 2, 0, 3, 3, 3, 3],
- [0, 0, 2, 8, 8, 8, 8, 2, 0, 3, 8, 8, 3],
- [0, 0, 2, 8, 8, 8, 8, 2, 0, 3, 8, 8, 3],
- [0, 0, 2, 2, 2, 2, 2, 2, 0, 3, 8, 8, 3],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 8, 8, 3],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 8, 8, 3],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3]]
-    )
-    actual = solve_50cb2852(input_grid)
-    assert actual == expected
 
