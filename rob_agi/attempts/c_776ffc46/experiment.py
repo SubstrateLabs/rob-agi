@@ -89,6 +89,32 @@ def test_edge_cases():
     print(visualize_grid(result5))
     assert result5.values[2][2] == 2 and result5.values[7][2] == 2, f"Expected red (2) for both plus shapes, but got {result5.values[2][2]} and {result5.values[7][2]}"
 
+    # Test case 6: Diagonal adjacency
+    input_grid6 = ColoredGrid(values=[
+        [5, 5, 5, 5, 5],
+        [5, 2, 0, 3, 5],
+        [5, 0, 1, 0, 5],
+        [5, 3, 0, 2, 5],
+        [5, 5, 5, 5, 5]
+    ])
+    print("\nTest case 6 - Diagonal adjacency:")
+    result6 = solve_776ffc46(input_grid6)
+    print(visualize_grid(result6))
+    assert result6.values[2][2] == 2, f"Expected red (2), but got {result6.values[2][2]}"
+
+    # Test case 7: No red or green adjacent to gray
+    input_grid7 = ColoredGrid(values=[
+        [5, 5, 5, 5, 5],
+        [5, 0, 1, 0, 5],
+        [5, 1, 1, 1, 5],
+        [5, 0, 1, 0, 5],
+        [5, 5, 5, 5, 5]
+    ])
+    print("\nTest case 7 - No red or green adjacent to gray:")
+    result7 = solve_776ffc46(input_grid7)
+    print(visualize_grid(result7))
+    assert result7 == input_grid7, f"Expected no change, but got:\n{visualize_grid(result7)}"
+
 if __name__ == "__main__":
     test_simple_case()
     test_edge_cases()
