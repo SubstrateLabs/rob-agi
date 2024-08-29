@@ -14,10 +14,10 @@ def solve_496994bd_experiment(input_grid: ColoredGrid) -> ColoredGrid:
     # Create a deep copy of the input grid
     output = input_grid.deep_copy()
     
-    # Mirror the non-zero rows to the bottom, starting from the bottom
+    # Mirror the non-zero rows to the bottom
     for i in range(non_zero_rows):
-        source_row = non_zero_rows - 1 - i
-        target_row = height - 1 - i
+        source_row = i
+        target_row = height - non_zero_rows + i
         for col in range(width):
             value = input_grid.get_cell(source_row, col)
             output.set_cell(target_row, col, value)
@@ -49,6 +49,21 @@ test_cases = [
         [0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0]
+    ]),
+    ColoredGrid(values=[
+        [1, 1, 1],
+        [2, 2, 2],
+        [3, 3, 3],
+        [4, 4, 4],
+        [0, 0, 0],
+        [0, 0, 0]
+    ]),
+    ColoredGrid(values=[
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
+        [0, 0, 0],
+        [0, 0, 0]
     ])
 ]
 
@@ -76,6 +91,21 @@ expected_outputs = [
         [0, 0, 0, 0, 0],
         [8, 8, 8, 8, 8],
         [2, 2, 2, 2, 2]
+    ]),
+    ColoredGrid(values=[
+        [1, 1, 1],
+        [2, 2, 2],
+        [3, 3, 3],
+        [4, 4, 4],
+        [3, 3, 3],
+        [4, 4, 4]
+    ]),
+    ColoredGrid(values=[
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
+        [1, 2, 3],
+        [4, 5, 6]
     ])
 ]
 
