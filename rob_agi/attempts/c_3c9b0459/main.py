@@ -7,6 +7,7 @@ def solve_3c9b0459(input_grid: ColoredGrid) -> ColoredGrid:
     2. For the first and last rows:
        a. Move the largest number to the middle
        b. Place the smaller of the remaining numbers on the left, and the larger on the right
+    3. Preserve the middle row(s) as they are after rotation
     
     This solution works for grids of any size and preserves the original color values
     while applying the specific transformations required by the puzzle.
@@ -21,6 +22,7 @@ def solve_3c9b0459(input_grid: ColoredGrid) -> ColoredGrid:
     
     # Step 2: Process first and last rows
     rotated.values[0] = process_row(rotated.values[0])
-    rotated.values[-1] = process_row(rotated.values[-1])
+    if len(rotated.values) > 1:  # Only process last row if it's different from the first
+        rotated.values[-1] = process_row(rotated.values[-1])
     
     return ColoredGrid(values=rotated.values)
