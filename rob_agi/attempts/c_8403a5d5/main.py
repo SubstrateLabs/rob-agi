@@ -7,8 +7,8 @@ def solve_8403a5d5(input_grid: ColoredGrid) -> ColoredGrid:
     2. Creates a new grid with the same dimensions, filled with zeros.
     3. Starting from the anchor column, fills every other column with the anchor value.
     4. Adds special pattern (5's) to the top and bottom rows:
-       - Top row: First filled column after anchor, then every third filled column.
-       - Bottom row: Second filled column after anchor, then every third filled column.
+       - Top row: Second filled column after anchor, then every third filled column.
+       - Bottom row: Fourth filled column after anchor, then every third filled column.
     5. Preserves all columns to the left of the anchor as zeros.
     6. Keeps the original anchor value in its position in the last row.
     """
@@ -30,14 +30,14 @@ def solve_8403a5d5(input_grid: ColoredGrid) -> ColoredGrid:
         
         # Add special pattern (5's) to top and bottom rows
         filled_cols = [col for col in range(anchor_col, cols, 2)]
-        if len(filled_cols) >= 1:
-            new_grid[0][filled_cols[0]] = 5
         if len(filled_cols) >= 2:
-            new_grid[-1][filled_cols[1]] = 5
-        for i in range(3, len(filled_cols), 3):
+            new_grid[0][filled_cols[1]] = 5
+        if len(filled_cols) >= 4:
+            new_grid[-1][filled_cols[3]] = 5
+        for i in range(4, len(filled_cols), 3):
             if i < len(filled_cols):
                 new_grid[0][filled_cols[i]] = 5
-            if i + 1 < len(filled_cols):
-                new_grid[-1][filled_cols[i + 1]] = 5
+            if i + 2 < len(filled_cols):
+                new_grid[-1][filled_cols[i + 2]] = 5
     
     return ColoredGrid(values=new_grid)
