@@ -18,18 +18,20 @@ def solve_49d1d64f(input_grid: ColoredGrid) -> ColoredGrid:
     """
     input_values = input_grid.values
     n, m = len(input_values), len(input_values[0])
-    output_values = [[0 for _ in range(m+2)] for _ in range(2*n+2)]
+    output_values = [[0 for _ in range(m*2+2)] for _ in range(2*n+2)]
     
-    # Replicate input cells
+    # Replicate input cells horizontally and double rows
     for i in range(n):
         for j in range(m):
             val = input_values[i][j]
-            output_values[2*i+1][j+1] = val
-            output_values[2*i+2][j+1] = val
+            output_values[2*i+1][2*j+1] = val
+            output_values[2*i+1][2*j+2] = val
+            output_values[2*i+2][2*j+1] = val
+            output_values[2*i+2][2*j+2] = val
     
     # Handle edge columns
     for i in range(1, 2*n+1):
-        output_values[i][0] = output_values[i][1]
-        output_values[i][-1] = output_values[i][-2]
+        output_values[i][1] = input_values[i//2][0]
+        output_values[i][-2] = input_values[i//2][-1]
     
     return ColoredGrid(values=output_values)
