@@ -1,1 +1,33 @@
-Challenge f8ff0b80:
+Challenge f8ff0b80: Sort colors based on largest contiguous block size and position
+
+Key observations:
+1. The challenge requires sorting colors based on:
+   a) Largest contiguous block size (descending)
+   b) Row position of the block (descending, i.e., lower rows first)
+   c) Column position of the block (descending, i.e., rightmost columns first)
+
+2. Current implementation:
+   - Uses BFS to find the largest contiguous block for each color
+   - Traverses the grid from bottom-right to top-left
+   - Sorts colors using: sorted(color_info.keys(), key=lambda x: (-color_info[x][0], -color_info[x][1], -color_info[x][2]), reverse=True)
+
+3. Test results:
+   - Two tests pass, but test_f8ff0b80_example_2 fails
+   - Expected output: [[4], [2], [1]]
+   - Actual output:   [[1], [2], [4]]
+
+Analysis:
+- The current sorting logic is incorrect, as it's reversing the entire order instead of maintaining the descending order for each criterion
+- The reverse=True parameter is causing the colors to be sorted in ascending order of their values, which is opposite of what we want
+
+Next steps:
+1. Remove the reverse=True parameter from the sorting function
+2. Verify that the largest block sizes are correctly calculated
+3. Double-check the row and column values stored for each color
+4. Ensure that the sorting key function correctly prioritizes larger blocks, lower rows, and rightmost columns
+
+Hypothesis:
+The correct sorting logic should be:
+sorted(color_info.keys(), key=lambda x: (-color_info[x][0], -color_info[x][1], -color_info[x][2]))
+
+This should maintain the descending order for block size, row, and column without reversing the final result.
