@@ -15,26 +15,31 @@ Rules:
    - Between vertical dividers: Fill with 6s (magenta)
    - Right of last vertical divider: Fill with 3s (green)
 
-Observations from latest test:
-1. The first and last rows are not being preserved correctly
-2. The first two columns are preserved correctly, but the last two are not
-3. The middle section is not correctly identifying the left and right boundaries
+Latest Observations:
+1. The first and last rows are now being preserved correctly
+2. The first two columns are preserved correctly
+3. The last two columns are not being handled correctly:
+   - They should remain 0s if they were originally 0s
+   - They should be filled with the appropriate color if they were not 0s
+4. The middle section is not correctly identifying the left boundary (should be 4s)
 
 Things that don't work:
-- Skipping the first and last rows entirely
 - Using a fixed range (2 to cols - 3) for column processing
+- Treating all cells in the last two columns as boundary cells
 
 Certainties:
-- The vertical dividers are correctly identified
-- The horizontal dividers are correctly identified
+- The vertical and horizontal dividers are correctly identified
 - The middle section filling (6s) is working correctly
+- The top and bottom section filling (2s and 1s) is working correctly for non-boundary cells
 
 Uncertainties:
 - How to correctly handle the last two columns while still filling the middle section
-- How to preserve the first and last rows while still filling the top and bottom sections
+- How to determine if a cell in the last two columns should be filled or preserved
 
 Next steps:
-1. Modify the row processing to include the first and last rows, but preserve their original values
-2. Adjust the column processing to correctly handle the last two columns
-3. Refine the logic for identifying left and right boundaries in the middle section
-4. Implement a more flexible approach to preserve boundary values while still filling sections
+1. Refine the logic for identifying left and right boundaries in the middle section
+2. Implement a more flexible approach for the last two columns:
+   - Preserve 0s
+   - Fill with appropriate color if not 0
+3. Double-check the logic for preserving the first two columns to ensure consistency
+4. Ensure that the 4s (yellow) are correctly placed in the left part of the middle section
