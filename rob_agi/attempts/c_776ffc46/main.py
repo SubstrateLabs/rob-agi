@@ -28,6 +28,14 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         return {(r+dr, c+dc) for dr in [-1, 0, 1] for dc in [-1, 0, 1] 
                 if (dr != 0 or dc != 0) and is_valid_cell(r+dr, c+dc)}
 
+    def get_border_cells() -> Set[Tuple[int, int]]:
+        border_cells = set()
+        for r in range(rows):
+            for c in range(cols):
+                if input_grid.values[r][c] == GRAY:
+                    border_cells.add((r, c))
+        return border_cells
+
     def is_blue_plus(r: int, c: int) -> bool:
         if input_grid.values[r][c] != BLUE:
             return False
@@ -35,11 +43,12 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
                    for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)])
 
     # Step 1 & 2: Identify gray borders and count adjacent colors
+    border_cells = get_border_cells()
     adjacent_cells = set()
-    for r in range(rows):
-        for c in range(cols):
-            if input_grid.values[r][c] == GRAY:
-                adjacent_cells.update(get_adjacent_cells(r, c))
+    for r, c in border_cells:
+        adjacent_cells.update(get_adjacent_cells(r, c))
+    
+    adjacent_cells -= border_cells  # Remove gray cells from adjacent cells
 
     red_count = sum(1 for r, c in adjacent_cells if input_grid.values[r][c] == RED)
     green_count = sum(1 for r, c in adjacent_cells if input_grid.values[r][c] == GREEN)
