@@ -9,22 +9,34 @@ Key Points:
 1. The diamond pattern should be an outline, not filled.
 2. Diagonal lines should extend beyond the diamond corners to the grid edges.
 3. The original colored cell should remain in its position.
+4. The horizontal and vertical lines through the center should not be filled.
 
 Current Implementation Issues:
-1. The diamond is being filled instead of just outlining.
-2. Diagonal lines are not extending correctly to the grid edges.
-3. The horizontal line through the center is incorrectly filled.
+1. The diamond is still being filled instead of just outlining.
+2. Diagonal lines are extending correctly to the grid edges, but they're too thick.
+3. The horizontal and vertical lines through the center are incorrectly filled.
 
 Next Steps:
 1. Modify the diamond creation to only create the outline.
-2. Adjust the diagonal line extension to continue beyond the diamond corners.
-3. Ensure that only the necessary cells are colored, maintaining the original pattern.
+2. Adjust the diagonal line extension to be single-cell wide.
+3. Remove the horizontal and vertical lines through the center, except for the diamond outline.
 
 Things to Avoid:
 1. Filling the entire diamond shape.
-2. Stopping the diagonal lines at the diamond corners.
-3. Creating a solid horizontal line through the center.
+2. Creating thick diagonal lines.
+3. Creating solid horizontal or vertical lines through the center.
+
+Certainties:
+1. The colored cell in the input grid determines the center of the pattern.
+2. The pattern should extend to the edges of the grid.
 
 Uncertainties:
-1. The exact method for determining which cells should be colored in the extended diagonals.
-2. How to handle cases where the diamond pattern might exceed the grid boundaries.
+1. The exact method for determining which cells should be colored in the extended diagonals while keeping them one cell wide.
+
+Attempted Solutions:
+1. Creating a diamond outline and filling diagonal lines - Result: Incorrect, creates filled diamond and thick diagonals.
+
+Next Implementation Approach:
+1. Create the diamond outline first.
+2. For each corner of the diamond, draw a single-cell wide line to the grid edge.
+3. Ensure no filling occurs inside the diamond or along the center lines.
