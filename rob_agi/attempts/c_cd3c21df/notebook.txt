@@ -18,16 +18,20 @@ Possible improvements:
 2. Adjust the significance calculation to give more weight to longer continuous lines of the same color.
 3. Consider the orientation of patterns (vertical vs horizontal) in the significance calculation.
 
-Next steps:
-1. Modify the is_unique function to be less strict, possibly allowing for partial matches elsewhere in the grid.
-2. Update the calculate_significance function to prioritize longer continuous lines of the same color.
-3. Add a check for pattern orientation (vertical vs horizontal) and factor this into the significance calculation.
-4. Ensure that the algorithm considers all possible contiguous regions, including single-width lines.
+Changes made:
+1. Modified the is_unique function to be less strict, allowing for partial matches elsewhere in the grid as long as the exact pattern doesn't appear in another location.
+2. Updated the calculate_significance function to give more weight to vertical patterns.
+3. Ensured that the algorithm considers all possible contiguous regions, including single-width lines, by tracking the top and left coordinates of each pattern.
 
-Things that don't work:
-1. Treating uniqueness as a binary property (completely unique or not unique).
-2. Ignoring the orientation of patterns in significance calculations.
+Next steps:
+1. Run the updated algorithm against the test cases to see if it resolves the issues, particularly with the first test case.
+2. If issues persist, consider further refinements to the significance calculation, such as giving more weight to continuous lines of the same color.
+3. Explore additional ways to balance uniqueness, size, and color continuity in determining the most significant pattern.
+
+Things to watch out for:
+1. Ensure that the new uniqueness check doesn't allow for too many false positives.
+2. Monitor whether the increased weight for vertical patterns doesn't overly bias the results in other test cases.
 
 Unknowns:
-1. The exact balance of factors (size, uniqueness, color continuity) that determines the "most significant" pattern.
-2. Whether there are additional test cases with different pattern types that we haven't considered yet.
+1. Whether these changes will be sufficient to pass all test cases or if further refinements will be needed.
+2. If there are edge cases or pattern types we haven't considered that might challenge our current approach.
