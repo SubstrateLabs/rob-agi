@@ -2,32 +2,31 @@ from rob_agi.colored_grid import ColoredGrid
 
 def solve_f5b8619d(input_grid: ColoredGrid) -> ColoredGrid:
     """
-    Transform the input grid by doubling its size, replicating values in 2x2 blocks,
-    filling empty spaces with sky color (8), and creating both horizontal and vertical symmetry.
+    Transform the input grid by doubling its size, replicating non-zero values in 2x2 blocks,
+    preserving zero values, filling empty spaces with sky color (8), and creating both horizontal
+    and vertical symmetry.
     
     The transformation follows these steps:
     1. Initialize an output grid with dimensions twice that of the input.
     2. Process each cell of the input grid:
-       a. Replicate all values (including zeros) in 2x2 blocks in the output.
-       b. Fill empty spaces (zeros) with sky color (8).
+       a. Replicate non-zero values in 2x2 blocks in the output.
+       b. Preserve zero values in their corresponding positions.
+       c. Fill remaining spaces with sky color (8).
     3. Create horizontal symmetry by mirroring the left half to the right half.
     4. Create vertical symmetry by mirroring the top half to the bottom half.
     """
     height, width = input_grid.get_dimensions()
-    output = [[0 for _ in range(width*2)] for _ in range(height*2)]
+    output = [[8 for _ in range(width*2)] for _ in range(height*2)]
 
     # Process each cell of the input grid
     for row in range(height):
         for col in range(width):
             value = input_grid.get_cell(row, col)
-            output[row*2][col*2] = output[row*2][col*2+1] = value
-            output[row*2+1][col*2] = output[row*2+1][col*2+1] = value
-
-    # Fill empty spaces with sky color (8)
-    for row in range(height*2):
-        for col in range(width*2):
-            if output[row][col] == 0:
-                output[row][col] = 8
+            if value != 0:
+                output[row*2][col*2] = output[row*2][col*2+1] = value
+                output[row*2+1][col*2] = output[row*2+1][col*2+1] = value
+            else:
+                output[row*2][col*2] = 0
 
     # Create horizontal symmetry
     for row in range(height*2):
