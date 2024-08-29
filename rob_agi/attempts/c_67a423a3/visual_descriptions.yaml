@@ -1,0 +1,29 @@
+transformation_process:
+  - Find the intersection point of the main vertical and horizontal non-zero lines
+  - Apply a 3x3 yellow (4) square around the intersection point
+  - Preserve the central vertical and horizontal lines of the original grid
+  - Overwrite other cells within the 3x3 area with yellow (4)
+
+example:
+  input: |
+    0 0 1 0 0 0
+    0 0 1 0 0 0
+    9 9 1 9 9 9
+    0 0 1 0 0 0
+    0 0 1 0 0 0
+    0 0 1 0 0 0
+
+  output: |
+    0 0 1 0 0 0
+    0 4 4 4 0 0
+    9 4 1 4 9 9
+    0 4 4 4 0 0
+    0 0 1 0 0 0
+    0 0 1 0 0 0
+
+  explanation: |
+    - The intersection point is at (2, 2) where the vertical 1's meet the horizontal 9's
+    - A 3x3 yellow (4) square is applied around this point
+    - The central vertical line of 1's is preserved
+    - The central horizontal line of 9's is partially overwritten, preserving only the center 9
+    - Other cells within the 3x3 area are set to 4 (yellow)
