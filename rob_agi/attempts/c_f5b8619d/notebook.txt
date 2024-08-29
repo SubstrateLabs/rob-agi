@@ -4,23 +4,23 @@ Observations:
 1. The output grid is twice the size of the input grid in both dimensions.
 2. Non-zero values from the input are replicated in 2x2 blocks in the output.
 3. Zero values in the input are preserved in their corresponding positions in the output.
-4. The color 8 (sky) fills areas around non-zero and zero values, creating a pattern.
+4. The color 8 (sky) fills areas around non-zero values, creating a pattern.
 5. The pattern has both horizontal and vertical symmetry.
 
 Current implementation issues:
-1. The function is not correctly handling the filling of sky color (8).
+1. The function is not correctly handling non-zero values in the input grid.
 2. The symmetry creation is not preserving the correct values.
-3. The current implementation is overpreserving zero values, resulting in a grid filled mostly with zeros.
+3. The current implementation is overpreserving zero values, resulting in a grid filled entirely with zeros.
 
 Things that don't work:
 1. Filling the entire output grid with sky color (8) and then replacing values.
 2. Creating horizontal symmetry before vertical symmetry.
-3. Preserving all zero values without considering the sky color filling.
+3. Preserving all zero values without considering the non-zero values and sky color filling.
 
 Next steps:
-1. Revise the implementation to correctly fill sky color (8) around non-zero values.
+1. Revise the implementation to correctly handle non-zero values in the input grid.
 2. Implement a method to determine which zero values should be preserved and which should be replaced with sky color.
-3. Ensure the symmetry creation maintains the correct balance of zero values and sky color.
+3. Ensure the symmetry creation maintains the correct balance of zero values, non-zero values, and sky color.
 
 Unknowns:
 1. The exact rule for determining which zero values should be preserved vs. replaced with sky color.
@@ -31,4 +31,9 @@ Certainties:
 2. Non-zero values must be replicated in 2x2 blocks.
 3. Both horizontal and vertical symmetry must be implemented.
 4. Some, but not all, zero values must be preserved.
-5. Sky color (8) must fill areas around non-zero values and some zero values.
+5. Sky color (8) must fill areas around non-zero values.
+6. The pattern repeats vertically, with the second and fourth rows being identical, containing sky color (8) where the first and third rows have non-zero values.
+
+New insights:
+1. The sky color (8) appears in alternating rows with non-zero values.
+2. The zero values in the input grid are preserved in their corresponding positions in the output grid, but they do not expand to 2x2 blocks like non-zero values.
