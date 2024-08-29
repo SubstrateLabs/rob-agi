@@ -8,22 +8,27 @@ Observations:
 5. The pattern has both horizontal and vertical symmetry.
 
 Current implementation issues:
-1. The function is not correctly handling the replication of non-zero values.
+1. The function is not correctly handling the filling of sky color (8).
 2. The symmetry creation is not preserving the correct values.
+3. The current implementation is overpreserving zero values, resulting in a grid filled mostly with zeros.
 
 Things that don't work:
 1. Filling the entire output grid with sky color (8) and then replacing values.
 2. Creating horizontal symmetry before vertical symmetry.
+3. Preserving all zero values without considering the sky color filling.
 
 Next steps:
-1. Revise the implementation to correctly replicate non-zero values in 2x2 blocks.
-2. Ensure zero values are preserved in their exact positions.
-3. Implement symmetry creation that maintains the correct values.
+1. Revise the implementation to correctly fill sky color (8) around non-zero values.
+2. Implement a method to determine which zero values should be preserved and which should be replaced with sky color.
+3. Ensure the symmetry creation maintains the correct balance of zero values and sky color.
 
 Unknowns:
-1. The exact order of operations that will produce the correct output for all cases.
+1. The exact rule for determining which zero values should be preserved vs. replaced with sky color.
+2. The precise order of operations that will produce the correct output for all cases.
 
 Certainties:
 1. The output grid size is always double the input grid size.
-2. Both horizontal and vertical symmetry must be implemented.
-3. Zero values must be preserved, not replaced with sky color.
+2. Non-zero values must be replicated in 2x2 blocks.
+3. Both horizontal and vertical symmetry must be implemented.
+4. Some, but not all, zero values must be preserved.
+5. Sky color (8) must fill areas around non-zero values and some zero values.
