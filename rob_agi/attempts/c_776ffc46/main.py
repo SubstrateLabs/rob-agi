@@ -44,14 +44,19 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     red_count = sum(1 for r, c in adjacent_cells if input_grid.values[r][c] == RED)
     green_count = sum(1 for r, c in adjacent_cells if input_grid.values[r][c] == GREEN)
 
+    # Debug logging
+    print(f"Red count: {red_count}, Green count: {green_count}")
+
     # Step 3: Determine the target color
     if red_count == 0 and green_count == 0:
         return input_grid
 
     target_color = RED if red_count >= green_count else GREEN
+    print(f"Target color: {target_color}")
 
     # Step 4: Find all blue plus shapes
     blue_plus_centers = [(r, c) for r in range(rows) for c in range(cols) if is_blue_plus(r, c)]
+    print(f"Number of blue plus shapes: {len(blue_plus_centers)}")
 
     # Step 5: Transform blue plus shapes
     result_grid = [row[:] for row in input_grid.values]
