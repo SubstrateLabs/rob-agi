@@ -38,6 +38,6 @@ def solve_8403a5d5(input_grid: ColoredGrid) -> ColoredGrid:
             if i < len(filled_cols):
                 new_grid[0][filled_cols[i]] = 5
             if i + 2 < len(filled_cols):
-                new_grid[-1][filled_cols[i + 2]] = 5
+                new_grid[-1][filled_cols[i]] = 5
     
     return ColoredGrid(values=new_grid)
