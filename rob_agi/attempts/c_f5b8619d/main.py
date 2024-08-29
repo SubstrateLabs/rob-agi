@@ -26,15 +26,18 @@ def solve_f5b8619d(input_grid: ColoredGrid) -> ColoredGrid:
                 output[row*2][col*2] = output[row*2][col*2+1] = value
                 output[row*2+1][col*2] = output[row*2+1][col*2+1] = value
             else:
-                output[row*2][col*2] = 0
+                output[row*2][col*2] = output[row*2][col*2+1] = 0
+                output[row*2+1][col*2] = output[row*2+1][col*2+1] = 0
 
     # Create horizontal symmetry
     for row in range(height*2):
         for col in range(width):
             output[row][width*2-col-1] = output[row][col]
+            output[row][width*2-col-2] = output[row][col+1]
 
     # Create vertical symmetry
     for row in range(height):
         output[height*2-row-1] = output[row].copy()
+        output[height*2-row-2] = output[row+1].copy()
 
     return ColoredGrid(values=output)
