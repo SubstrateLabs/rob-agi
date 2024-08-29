@@ -15,18 +15,26 @@ Rules:
    - Between vertical dividers: Fill with 6s (magenta)
    - Right of last vertical divider: Fill with 3s (green)
 
-Observations from failed tests:
-1. The current implementation is not preserving the first and last two columns correctly
-2. The top and bottom rows are not being filled as expected
-3. The middle section is not extending to the full width of the grid
+Observations from latest test:
+1. The first and last rows are not being preserved correctly
+2. The first two columns are preserved correctly, but the last two are not
+3. The middle section is not correctly identifying the left and right boundaries
 
 Things that don't work:
-- Using a simple boundary check (i == 0 or i == rows - 1 or j <= 1 or j >= cols - 2) to preserve outer 0s
+- Skipping the first and last rows entirely
+- Using a fixed range (2 to cols - 3) for column processing
 
-Next steps:
-1. Modify the boundary preservation logic to correctly handle the first and last two columns
-2. Ensure that the top and bottom sections are filled completely, except for the preserved boundaries
-3. Adjust the middle section logic to extend to the full width of the grid, respecting the vertical dividers
+Certainties:
+- The vertical dividers are correctly identified
+- The horizontal dividers are correctly identified
+- The middle section filling (6s) is working correctly
 
 Uncertainties:
-- How to handle cases where there might be multiple vertical dividers in the middle section
+- How to correctly handle the last two columns while still filling the middle section
+- How to preserve the first and last rows while still filling the top and bottom sections
+
+Next steps:
+1. Modify the row processing to include the first and last rows, but preserve their original values
+2. Adjust the column processing to correctly handle the last two columns
+3. Refine the logic for identifying left and right boundaries in the middle section
+4. Implement a more flexible approach to preserve boundary values while still filling sections
