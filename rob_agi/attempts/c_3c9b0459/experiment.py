@@ -22,12 +22,16 @@ def analyze_transformation(input_grid, output_grid):
         if len(set(output_row)) == 1:
             print("All numbers are identical")
         else:
-            middle = output_row[1]
-            left = output_row[0]
-            right = output_row[2]
-            print(f"Middle: {middle}, Left: {left}, Right: {right}")
-            print(f"Is middle the largest: {middle == max(output_row)}")
-            print(f"Is left smaller than right: {left <= right}")
+            for i, (input_num, output_num) in enumerate(zip(input_row, output_row)):
+                position = ["left", "middle", "right"][i]
+                if input_num == output_num:
+                    print(f"{input_num} stayed in {position}")
+                else:
+                    print(f"{input_num} moved from {position} to {['left', 'middle', 'right'][output_row.index(input_num)]}")
+            
+            print(f"Largest number: {max(output_row)}")
+            print(f"Smallest number: {min(output_row)}")
+            print(f"Order: {'ascending' if output_row == sorted(output_row) else 'descending' if output_row == sorted(output_row, reverse=True) else 'neither'}")
     
     print("\n" + "="*40 + "\n")
 
