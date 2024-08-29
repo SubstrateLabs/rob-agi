@@ -76,7 +76,7 @@ remote_pip_deps = [
     "git+https://github.com/SubstrateLabs/rob-agi.git@673d3e5",
     "numpy",
 ]
-max_tries_per_challenge = 1
+max_tries_per_challenge = 3
 
 all_challenges = list(challenges.values())
 random.shuffle(all_challenges)
@@ -927,7 +927,7 @@ async def main():
     # random_challenge = random.choice(all_challenges)
     # await attempt(random_challenge, verbose=True, run_remote=True)
 
-    # await bootstrap_solved()
+    await bootstrap_solved()
 
     # so, rec, su, rel = await get_previous_tries(random_challenge)
     # print("Previous Solution:", so.metadata if so else "None")
@@ -950,8 +950,8 @@ async def main():
     # distill_research()
     # distill_solved()
 
-    for i in range(1):
-        await solve_loop(max_concurrent=12)
+    # for i in range(1):
+    #     await solve_loop(max_concurrent=12)
     # await solve_loop(max_concurrent=4, max_challenges=8)
 
 

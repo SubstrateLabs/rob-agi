@@ -161,16 +161,18 @@ class Solver:
         prompt += f"This is attempt number {self.total_attempts + 1} to solve the challenge.\n"
         if self.total_attempts > 16:
             prompt += "This means that this is either especially difficult or you've likely been going down the wrong path. Feel free to relinquish a lot of what you think you know about this problem and try to zoom out and see it with fresh eyes.\n"
-        prompt += "Before we try to come up with a new solution let's take in all of this information, notice what may be important, and ask ourselves some relevant questions to help us introspect and explore the problem more completely.\n"
-        prompt += "Look at all the cases you've been presented with. Come up with 3-5 questions that you think are important to ask yourself. These questions should help you understand the challenge better and guide you to a better, more general solution that solves the challenge. Maybe they are about discrepancies, new things you've noticed that might be important, your own assumptions, specific failure cases, conspicuous patterns, things you are unsure about, etc. Do not answer the questions yet.\n"
-        ask_coder.run(prompt)
-
-        ask_coder.run(
-            "Now, think carefully and answer the questions you came up with. But don't propose a solution quite yet.\n"
-        )
-
+        if self.total_attempts > 2:
+            prompt += "Before we try to come up with a new solution let's take in all of this information, notice what may be important, and ask ourselves some relevant questions to help us introspect and explore the problem more completely.\n"
+            prompt += "Look at all the cases you've been presented with. Come up with 3-5 questions that you think are important to ask yourself. These questions should help you understand the challenge better and guide you to a better, more general solution that solves the challenge. Maybe they are about discrepancies, new things you've noticed that might be important, your own assumptions, specific failure cases, conspicuous patterns, things you are unsure about, etc. Do not answer the questions yet.\n"
+            ask_coder.run(prompt)
+            ask_coder.run(
+                "Now, think carefully and answer the questions you came up with. But don't propose a solution quite yet.\n"
+            )
+            solution = ""
+        else:
+            solution = prompt
         # ask_coder.run(prompt)
-        solution = "Next, examine all the information you have, state your understanding of the challenge, and propose a detailed solution to the challenge in words. Any solution must always apply to every case, so always try to generalize over all cases rather than only replicating individual cases.\n"
+        solution += "Next, examine all the information you have, state your understanding of the challenge, and propose a detailed solution to the challenge in words. Any solution must always apply to every case, so always try to generalize over all cases rather than only replicating individual cases.\n"
         solution += "Then reflect on your idea. Look very closely and notice if there are any other patterns or discrepancies worth noting. Remember this is about identifying abstract, intuitive ideas about what is happening. This takes humility, be honest, give it good effort and avoid over confidence; don't ever apologize, think hard and creatively.\n"
         solution += f"Explicitly consider how your idea applies to each of the examples and test cases in attempts/{self.challenge_id}/test.py. To check your thinking, illustrate how your idea either works or doesn't for each case.\n"
         solution += f"If the rule(s) you came up with does not apply to any specific case, call it out and think about a more general idea that does apply in every case. Be meticulous and careful in your reflection. Sometimes you need to zoom out to see how a single idea can apply to all cases.\n"
