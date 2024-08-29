@@ -12,6 +12,15 @@ def extract_pattern(grid, start_row):
         pattern.append(pattern[-1][:] if pattern else [0] * len(grid[0]))
     return pattern
 
+def align_pattern(pattern):
+    width = len(pattern[0])
+    aligned_pattern = []
+    for row in pattern:
+        first_non_zero = next((i for i, x in enumerate(row) if x != 0), 0)
+        aligned_row = row[first_non_zero:] + row[:first_non_zero]
+        aligned_pattern.append(aligned_row)
+    return aligned_pattern
+
 # Test case 0 input
 input_grid = ColoredGrid(values=[
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -39,6 +48,12 @@ print(f"First non-zero row: {start_row}")
 pattern = extract_pattern(input_grid.values, start_row)
 print("Extracted pattern:")
 for row in pattern:
+    print(row)
+
+# Align the pattern
+aligned_pattern = align_pattern(pattern)
+print("\nAligned pattern:")
+for row in aligned_pattern:
     print(row)
 
 # Solve the grid
