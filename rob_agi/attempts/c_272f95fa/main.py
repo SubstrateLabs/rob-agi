@@ -18,8 +18,6 @@ def solve_272f95fa(input_grid: ColoredGrid) -> ColoredGrid:
         return horizontal, vertical
 
     def transform_section(row, col, section, left_div, right_div):
-        if grid.get_cell(row, col) == 8:
-            return 8
         if section == 'top':
             return 2
         if section == 'bottom':
@@ -51,9 +49,7 @@ def solve_272f95fa(input_grid: ColoredGrid) -> ColoredGrid:
                 left_div = right_div = -1
             
             # Preserve outer boundary 0s (including first and last two columns) and all 8s
-            if (i == 0 or i == rows - 1 or j <= 1 or j >= cols - 2) and grid.get_cell(i, j) == 0:
-                continue
-            if grid.get_cell(i, j) == 8:
+            if (i == 0 or i == rows - 1 or j <= 1 or j >= cols - 2) or grid.get_cell(i, j) == 8:
                 continue
             
             new_value = transform_section(i, j, section, left_div, right_div)
