@@ -34,9 +34,9 @@ def solve_272f95fa(input_grid: ColoredGrid) -> ColoredGrid:
     
     rows, cols = grid.get_dimensions()
     
-    for i in range(1, rows - 1):  # Skip first and last rows
-        for j in range(2, cols - 2):  # Skip first two and last two columns
-            if grid.get_cell(i, j) == 8:
+    for i in range(rows):
+        for j in range(cols):
+            if grid.get_cell(i, j) == 8 or (i == 0 or i == rows - 1 or j < 2 or j >= cols - 2):
                 continue
             
             if i < h_dividers[0]:
