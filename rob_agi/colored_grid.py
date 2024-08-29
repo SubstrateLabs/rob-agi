@@ -610,3 +610,10 @@ class ColoredGrid(BaseModel):
                         new_grid.values[rr][cc] = new_color
 
         return new_grid
+
+    def human_print(self):
+        """
+        Helper function for humans to viz the grid / debug.
+        """
+        color_map = {0: "⬛", 1: "🟦", 2: "🟥", 3: "🟩", 4: "🟨", 5: "⬜", 6: "🟪", 7: "🟧", 8: "🏙️", 9: "🟫"}
+        return "\n".join(["".join([color_map[cell] for cell in row]) for row in grid.values])

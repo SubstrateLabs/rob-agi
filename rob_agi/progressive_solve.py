@@ -158,7 +158,7 @@ class Solver:
         if exp:
             prompt += f"\n<EXPERIMENT_OUTPUT>\nSTDOUT:{exp.output}\nSTDERR:{exp.error}\n</EXPERIMENT_OUTPUT>\n"
         prompt += f"This is attempt number {self.total_attempts + 1} to solve the challenge.\n"
-        if self.total_attempts > 16:
+        if self.total_attempts > 7:
             prompt += "This means that this is either especially difficult or you've likely been going down the wrong path. Feel free to relinquish a lot of what you think you know about this problem and try to zoom out and see it with fresh eyes.\n"
         if self.total_attempts > 2:
             prompt += "Before we try to come up with a new solution let's take in all of this information, notice what may be important, and ask ourselves some relevant questions to help us introspect and explore the problem more completely.\n"
@@ -291,7 +291,8 @@ if __name__ == "__main__":
     print(c)
     sln = solutions.get(challenge_id)
     solver = Solver(c, sln)
-    solver.run_solve(max_tries=8)
+    print(c.test_cases[0].human_print())
+    # solver.run_solve(max_tries=4)
 
 """
 Process should be:
