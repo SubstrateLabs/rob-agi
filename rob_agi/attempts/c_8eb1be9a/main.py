@@ -30,7 +30,7 @@ def solve_8eb1be9a(input_grid: ColoredGrid) -> ColoredGrid:
         for i in range(start_row, min(start_row + 3, len(grid))):
             pattern.append(grid[i][:])
         while len(pattern) < 3:
-            pattern.append([0] * len(grid[0]))
+            pattern.append(pattern[-1][:] if pattern else [0] * len(grid[0]))
         return pattern
 
     start_row = find_first_non_zero_row(input_grid.values)
@@ -38,8 +38,6 @@ def solve_8eb1be9a(input_grid: ColoredGrid) -> ColoredGrid:
         return input_grid  # Return original grid if it's all zeros
 
     pattern = extract_pattern(input_grid.values, start_row)
-    output_values = []
-    for i in range(len(input_grid.values)):
-        output_values.append(pattern[i % 3][:])
+    output_values = [pattern[i % 3][:] for i in range(len(input_grid.values))]
 
     return ColoredGrid(values=output_values)
