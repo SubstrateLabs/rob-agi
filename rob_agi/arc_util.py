@@ -11,7 +11,7 @@ from rob_agi.grid_problem import GridProblem
 def get_data_path(filename):
     try:
         # Try to get the path using importlib.resources (Python 3.7+)
-        with resources.path("arcagi.data", filename) as path:
+        with resources.path("rob_agi.data", filename) as path:
             return str(path)
     except ImportError:
         # Fallback for older Python versions or if the above fails

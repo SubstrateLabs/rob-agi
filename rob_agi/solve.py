@@ -6,6 +6,7 @@ import random
 import time
 import traceback
 import logging
+import subprocess
 from typing import List, Optional, Union, Tuple
 from concurrent.futures import ThreadPoolExecutor
 
@@ -808,6 +809,15 @@ Respond with a single new object with keys: current_total_knowledge, ordered_con
     logger.info(json.dumps(res.json, indent=2))
 
 
+def make_git_worktree(branch_name: str, expire="1.day"):
+    repo_root = get_repo_root()
+    worktree_path = os.path.join(repo_root, branch_name)
+    if os.path.exists(worktree_path):
+        shutil.rmtree(worktree_path)
+    os.makedirs(worktree_path)
+    subprocess.run(["git", "worktree", "add", worktree_path, branch_name], cwd=repo_root)
+
+
 def attempt(challenge: GridProblem, previous_solution: Optional[str] = None):
     global attempted, successful, errored_count
     logger.info(f"Starting {challenge.id}")
@@ -915,6 +925,10 @@ def distill_solved():
         f.write(res)
 
 
+def get_repo_root():
+    return subprocess.check_output(["git", "rev-parse", "--show-toplevel"]).decode("utf-8").strip()
+
+
 async def main():
     # ensure_db()
     # id = "1f876c06"
@@ -924,10 +938,11 @@ async def main():
     # print("Skipping previously solved:", len(verified_ids))
 
     # to_process = [c for c in all_challenges if c.id not in verified_ids]
-    # random_challenge = random.choice(all_challenges)
+    random_challenge = random.choice(all_challenges)
+    make_git_worktree(f"try_000_{random_challenge.id}")
     # await attempt(random_challenge, verbose=True, run_remote=True)
 
-    await bootstrap_solved()
+    # await bootstrap_solved()
 
     # so, rec, su, rel = await get_previous_tries(random_challenge)
     # print("Previous Solution:", so.metadata if so else "None")

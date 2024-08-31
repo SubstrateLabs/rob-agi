@@ -3,3 +3,4 @@ __pycache__/
 dist/
 rob_agi/moa-out/
 .aider*
+!.aiderignore

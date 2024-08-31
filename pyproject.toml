@@ -5,7 +5,7 @@ description = ""
 authors = ["Rob Cheung <kousun12@gmail.com>"]
 readme = "README.md"
 packages = [{include = "rob_agi"}]
- include = ["data/**/*"]
+include = ["data/**/*"]
 
 [tool.ruff]
 line-length = 120
