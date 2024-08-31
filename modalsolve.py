@@ -3,10 +3,12 @@ import modal
 image = (
     modal.Image.debian_slim(python_version="3.10")
     .apt_install("git")
-    .pip_install("pytest", "pydantic==2.8.2", "substrate", "numpy", "aider-chat==0.54.0")
+    .copy_local_file("~/.ssh/id_rsa", "/root/.ssh/id_rsa")
+    .pip_install("pytest", "pydantic==2.8.2", "substrate", "numpy", "aider-chat==0.54.0", "pytest-random-order")
     # .pip_install("git+https://github.com/SubstrateLabs/rob-agi.git@main")
-    .run_commands("git clone https://github.com/SubstrateLabs/rob-agi.git /app/rob_agi")
+    .run_commands("git clone https://github.com/SubstrateLabs/rob-agi /app/rob_agi")
     .run_commands('pip install -e "/app/rob_agi"')
+    .run_commands("git config --global user.email 'kousun12@gmail.com'", "git config --global user.name 'aider-rob'")
 )
 app = modal.App("arc_solver", image=image)
 
@@ -27,11 +29,9 @@ def foo():
     task_set = "training"
     challenges, solutions = load_task_set(task_set_name=task_set)
     c = challenges[challenge_id]
-    print(c)
     sln = solutions.get(challenge_id)
     solver = Solver(c, sln)
-
-    print("\n\n" + c.test_cases[0].human_print() + "\n\n")
+    solver.run_solve(max_tries=1)
     return "hello"
 
 
