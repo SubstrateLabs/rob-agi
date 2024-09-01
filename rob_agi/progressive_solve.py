@@ -53,6 +53,8 @@ class Solver:
         self.setup()
         self.solved, self.latest_plan, self.total_attempts = read_meta_file(self.challenge_root)
         self.goal = problem_setup_aider(challenge)
+        self.repo = git.Repo(project_root)
+        self.branch = self.checkout_branch()
 
     def setup(self, symlink_image=False):
         self.challenge_root.mkdir(parents=True, exist_ok=True)
@@ -295,24 +297,21 @@ class Solver:
     def __del__(self):
         self.teardown()
 
+    def checkout_branch(self):
+        branch_name = f"challenge_{self.challenge_id}"
+        if branch_name not in self.repo.heads:
+            branch = self.repo.create_head(branch_name)
+        else:
+            branch = self.repo.heads[branch_name]
+        branch.checkout()
+        return branch
+
     def commit_attempt(self, prefix="attempt"):
-        time_sec = str(int(time.time()))
-        tag_name = f"{prefix}_{self.challenge_id}_{time_sec}"
-        branch_name = f"{prefix}_{self.challenge_id}_{time_sec}"
-
-        repo = git.Repo(project_root)
-
-        new_branch = repo.create_head(branch_name)
-        new_branch.checkout()
-
         commit_message = f"{prefix} {self.challenge_id} // attempt #{self.total_attempts}"
-        repo.index.add([str(self.challenge_root)])
-        repo.index.commit(commit_message, author=git.Actor(name="solver-rob", email="kousun12@gmail.com"))
-
-        # new_tag = repo.create_tag(tag_name, ref=commit.hexsha)
-        origin = repo.remote("origin")
-        # origin.push(new_tag)
-        origin.push(new_branch)
+        self.repo.index.add([str(self.challenge_root)])
+        self.repo.index.commit(commit_message, author=git.Actor(name="solver-rob", email="kousun12@gmail.com"))
+        origin = self.repo.remote("origin")
+        origin.push(self.branch)
 
     def teardown(self):
         # delete the adhoc ignore file:
