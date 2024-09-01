@@ -1,0 +1,23 @@
+example_0:
+  input: |
+    A 3x3 grid with a mix of colors. The top-left and bottom-right corners are black (0). The middle row and middle column are entirely gray (5). There's a blue (1) square in the top-right corner and a red (2) square in the bottom-left corner.
+  output: |
+    A 6x6 grid that appears to be an expanded version of the input. Each cell from the input has been doubled in both width and height. The black corners are now 2x2 squares in the top-left and bottom-right. The gray cross has expanded to cover most of the grid, forming a thick cross shape. The blue square is now a 2x2 square in the top-right, and the red square is a 2x2 square in the bottom-left.
+
+example_1:
+  input: |
+    A small 2x2 grid. The top row contains red (2) on the left and blue (1) on the right. The bottom row has green (3) on the left and blue (1) on the right.
+  output: |
+    A 4x4 grid that looks like an expanded version of the input. Each cell from the input has been doubled in both dimensions. The top-left quadrant is now a 2x2 red square. The entire right half of the grid is blue. The bottom-left quadrant is a 2x2 green square.
+
+example_2:
+  input: |
+    A 4x4 grid with various colors. The left column alternates between red (2) and black (0). The second column has black (0) in the top two rows and blue (1) in the third row. The third column is entirely green (3). The right column has black (0) in the top three rows and gray (5) in the bottom row.
+  output: |
+    An 8x8 grid that appears to be an expanded version of the input. Each cell from the input has been doubled in both width and height. The left two columns alternate between 2x2 red squares and 2x2 black squares. The next two columns have 2x2 black squares in the top half, then a 2x2 blue square, then another 2x2 black square. The middle two columns are entirely green. The right two columns have 2x2 black squares for the top three-quarters, with a 2x2 gray square in the bottom-right corner.
+
+test_case_0:
+  input: |
+    A 5x5 grid with a complex mix of colors. The top-left corner is red (2). Below it is another red square, then a black square (0). The second column starts with black (0), then blue (1), then gray (5). The middle column has black (0), blue (1), magenta (6), magenta (6), and gray (5) from top to bottom. The fourth column starts with orange (7), then two black squares (0), and ends with a black square (0). The right column begins with sky blue (8), then two black squares (0), and ends with two more black squares (0).
+  output: |
+    A 10x10 grid that appears to be an expanded version of the input. Each cell from the input has been doubled in both width and height. The top-left corner is now a 2x2 red square, below it is another 2x2 red square, followed by a 2x2 black square. The second two columns start with a 2x2 black square, then a 2x2 blue square, then two 2x2 gray squares. The middle two columns have a complex pattern: 2x2 black, 2x2 blue, two 2x2 magenta squares, and ending with a 2x2 gray square. The fourth two columns begin with a 2x2 orange square, followed by three 2x2 black squares. The right two columns start with a 2x2 sky blue square, followed by four 2x2 black squares.
