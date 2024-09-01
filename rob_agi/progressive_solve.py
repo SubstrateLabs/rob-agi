@@ -275,8 +275,8 @@ class Solver:
                 total_attempts=self.total_attempts,
             )
         logger.info(f"Total time: {time.perf_counter() - t0:.2f}s")
-        if not is_failing:
-            self.commit_attempt(prefix="success")
+        prefix = "success" if current_result.success else "attempt"
+        self.commit_attempt(prefix=prefix)
         return current_result.success
 
     def __del__(self):
@@ -286,10 +286,7 @@ class Solver:
         time_sec = str(int(time.time()))
         tag_name = f"{prefix}_{self.challenge_id}_{time_sec}"
         repo = git.Repo(project_root)
-        # repo.git.add(self.challenge_root)
         commit_message = f"{prefix} {self.challenge_id} // attempt #{self.total_attempts}"
-        cmd = ["-m", commit_message, "--no-verify", "--", self.challenge_root]
-        # repo.git.commit(cmd)
         repo.index.add([str(self.challenge_root)])
         commit = repo.index.commit(commit_message, author=git.Actor(name="solver-rob", email="kousun12@gmail.com"))
         new_tag = repo.create_tag(tag_name, ref=commit.hexsha)
