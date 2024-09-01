@@ -183,6 +183,20 @@ class Solver:
         res = ask_coder.run("Based on that reflection detail a step by step plan for how to solve the challenge\n")
         return res
 
+    def _setup_experiment(self, coder, max_retries=2):
+        retries = 0
+        experiment = "Also if you want to run an experiment in python to help you find out more pointed information, you can write code in `experiment.py`. This file will be run immediately and the stdout and stderr will be available in the next pass at solving. Make sure you use the SEARCH/REPLACE format"
+        coder.run(experiment)
+        while retries < max_retries:
+            res = run_experiment(self.file_paths["experiment"])
+            if res and res.success:
+                return res
+            elif res and not res.success:
+                logger.info(f"Experiment setup failed. Retrying... ({retries})")
+                retry_prompt = f"The experiment failed to run:\n\nSTDOUT:{res.output}\nSTDERR:{res.error}\n\nPlease fix the experiment code in `experiment.py`"
+                coder.run(retry_prompt)
+            retries += 1
+
     def get_edit(self, current_result: TestOutput, plan, is_first=True, update_visual_desc=False) -> str:
         modify_coder = self.get_modify_coder()
         prefix = self.get_prefix(is_first)
@@ -198,8 +212,7 @@ class Solver:
             reflect = f"The output of the tests after your changes is:\n\n<STDERR>\n{res.error}</STDERR>\n\n<STDOUT>{res.output}</STDOUT>\n"
             reflect += "Based on the output of the tests, reflect on what you have learned. `notebook.txt` is where you keep the latest notes for solving the challenge. This file should always contain accurate and up-to-date information about the challenge, and over time it will help future versions of you solve it. Revise it or append to it according to what you've learned. It should be well maintained and never be more than 3 pages long, ideally shorter. It's often useful to explicitly keep track of things that you have tried that do not work, since it prevents your thinking from going in circles. What are you absolutely certain about? What are you guessing about? What remains unknown? Make sure you use the SEARCH/REPLACE format\n"
             reflect_coder.run(reflect)
-            experiment = "Also if you want to run an experiment in python to help you find out more pointed information, you can write code in `experiment.py`. This file will be run immediately and the stdout and stderr will be available in the next pass at solving. Make sure you use the SEARCH/REPLACE format"
-            reflect_coder.run(experiment)
+            self._setup_experiment(reflect_coder)
             if update_visual_desc:
                 update_prompt = "If the `visual_descriptions.yaml` can be improved (more detail, more accurate, better intuitive abstractions, cutting irrelevant info, clarity, etc), include those changes too. This file is purely for descriptions of the grid images. It should not have any information about the code or the solution. These descriptions should help someone trying to solve this problem though, so it should include language that is relevant for solving the problem. Make sure you use the SEARCH/REPLACE format.\n"
                 modify_coder.run(update_prompt)
