@@ -32,8 +32,6 @@ def foo():
     sln = solutions.get(challenge_id)
     solver = Solver(c, sln)
     solver.run_solve(max_tries=1)
-    repo = git.Repo(Path(rob_agi.__file__).parent.parent)
-    print(repo.git.status())
     # git tag and push:
 
     return "hello"

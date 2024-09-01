@@ -298,13 +298,21 @@ class Solver:
     def commit_attempt(self, prefix="attempt"):
         time_sec = str(int(time.time()))
         tag_name = f"{prefix}_{self.challenge_id}_{time_sec}"
+        branch_name = f"{prefix}_{self.challenge_id}_{time_sec}"
+
         repo = git.Repo(project_root)
+
+        new_branch = repo.create_head(branch_name)
+        new_branch.checkout()
+
         commit_message = f"{prefix} {self.challenge_id} // attempt #{self.total_attempts}"
         repo.index.add([str(self.challenge_root)])
-        commit = repo.index.commit(commit_message, author=git.Actor(name="solver-rob", email="kousun12@gmail.com"))
-        new_tag = repo.create_tag(tag_name, ref=commit.hexsha)
+        repo.index.commit(commit_message, author=git.Actor(name="solver-rob", email="kousun12@gmail.com"))
+
+        # new_tag = repo.create_tag(tag_name, ref=commit.hexsha)
         origin = repo.remote("origin")
-        origin.push(new_tag)
+        # origin.push(new_tag)
+        origin.push(new_branch)
 
     def teardown(self):
         # delete the adhoc ignore file:
