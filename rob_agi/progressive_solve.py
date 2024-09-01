@@ -283,7 +283,7 @@ class Solver:
 
     def commit_attempt(self, prefix="attempt"):
         original_dir = Path.cwd()
-        time_sec = str(time.time())
+        time_sec = str(int(time.time()))
         tag_name = f"{prefix}_{self.challenge_id}_{time_sec}"
         try:
             os.chdir(self.challenge_root)
@@ -316,7 +316,7 @@ if __name__ == "__main__":
     sln = solutions.get(challenge_id)
     solver = Solver(c, sln)
     print("\n\n" + c.test_cases[0].human_print() + "\n\n")
-    # solver.run_solve(max_tries=4)
+    solver.run_solve(max_tries=2)
 
 """
 Process should be:
