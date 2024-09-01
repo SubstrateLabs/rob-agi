@@ -1,3 +1,5 @@
+import os
+import subprocess
 import time
 from pathlib import Path
 from typing import Optional
@@ -276,6 +278,21 @@ class Solver:
 
     def __del__(self):
         self.teardown()
+
+    def commit_attempt(self):
+        original_dir = Path.cwd()
+        try:
+            os.chdir(self.challenge_root)
+            subprocess.run(["git", "add", str(self.challenge_root)], check=True)
+            subprocess.run(["git", "commit", "-m", "solve " + challenge_id], check=True)
+            subprocess.run(["git", "tag", "test_" + challenge_id], check=True)
+            subprocess.run(["git", "push", "origin", "test_" + challenge_id], check=True)
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Git operation failed: {e}")
+        except Exception as e:
+            logger.error(f"An unexpected error occurred: {e}")
+        finally:
+            os.chdir(original_dir)
 
     def teardown(self):
         # delete the adhoc ignore file:
