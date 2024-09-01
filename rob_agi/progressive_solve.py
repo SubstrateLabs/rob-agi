@@ -274,19 +274,26 @@ class Solver:
                 total_attempts=self.total_attempts,
             )
         logger.info(f"Total time: {time.perf_counter() - t0:.2f}s")
+        if not is_failing:
+            self.commit_attempt(prefix="success")
         return current_result.success
 
     def __del__(self):
         self.teardown()
 
-    def commit_attempt(self):
+    def commit_attempt(self, prefix="attempt"):
         original_dir = Path.cwd()
+        time_sec = str(time.time())
+        tag_name = f"{prefix}_{self.challenge_id}_{time_sec}"
         try:
             os.chdir(self.challenge_root)
             subprocess.run(["git", "add", str(self.challenge_root)], check=True)
-            subprocess.run(["git", "commit", "-m", "solve " + challenge_id], check=True)
-            subprocess.run(["git", "tag", "test_" + challenge_id], check=True)
-            subprocess.run(["git", "push", "origin", "test_" + challenge_id], check=True)
+            subprocess.run(
+                ["git", "commit", "-m", f"{prefix} {self.challenge_id} // attempt #{self.total_attempts}"], check=True
+            )
+
+            subprocess.run(["git", "tag", tag_name], check=True)
+            subprocess.run(["git", "push", "origin", tag_name], check=True)
         except subprocess.CalledProcessError as e:
             logger.error(f"Git operation failed: {e}")
         except Exception as e:
@@ -300,8 +307,8 @@ class Solver:
 
 
 if __name__ == "__main__":
-    # challenge_id = "c59eb873"  # easy
-    challenge_id = "776ffc46"  # hard
+    challenge_id = "c59eb873"  # easy
+    # challenge_id = "776ffc46"  # hard
     task_set = "training"
     challenges, solutions = load_task_set(task_set_name=task_set)
     c = challenges[challenge_id]

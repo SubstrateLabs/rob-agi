@@ -26,11 +26,6 @@ def foo():
     from rob_agi.arc_util import load_task_set
     from rob_agi.progressive_solve import Solver
 
-    # change workdir to rob_agi:
-    import os
-
-    os.chdir("/app/rob_agi")
-
     # challenge_id = "c59eb873"  # easy
     challenge_id = "776ffc46"  # hard
     task_set = "training"
@@ -39,7 +34,6 @@ def foo():
     sln = solutions.get(challenge_id)
     solver = Solver(c, sln)
     solver.run_solve(max_tries=1)
-    solver.commit_attempt()
     # git tag and push:
 
     return "hello"
