@@ -3,7 +3,6 @@ import modal
 image = (
     modal.Image.debian_slim(python_version="3.10")
     .apt_install("git")
-    .pip_install("pytest", "pydantic==2.8.2", "substrate", "numpy", "aider-chat==0.54.0", "pytest-random-order")
     .copy_local_file("/Users/robcheung/.ssh/id_rsa", "/root/.ssh/id_rsa")
     .run_commands("chmod 600 /root/.ssh/id_rsa", "ssh-keyscan -t rsa github.com >> /root/.ssh/known_hosts")
     .run_commands("git clone git@github.com:SubstrateLabs/rob-agi.git /app/rob_agi")

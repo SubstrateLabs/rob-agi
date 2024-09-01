@@ -12,8 +12,19 @@ line-length = 120
 output-format = "grouped"
 target-version = "py310"
 
+#pip_install("pytest", "pydantic==2.8.2", "substrate", "numpy", "aider-chat==0.54.0", "pytest-random-order")
 [tool.poetry.dependencies]
 python = "^3.10"
+pydantic = "^2.8.2"
+substrate = "^220240509.0.0"
+numpy = "^1.26.4"
+aider-chat = "^0.54.0"
+pytest = "^8.3.2"
+pytest-random-order = "^1.1.1"
+GitPython = "^3.1.43"
+
+
+
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.5.6"
