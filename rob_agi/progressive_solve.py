@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Optional
 import logging
 import yaml
+import git
 
 from aider.coders import Coder
 from aider.io import InputOutput
@@ -282,24 +283,18 @@ class Solver:
         self.teardown()
 
     def commit_attempt(self, prefix="attempt"):
-        original_dir = Path.cwd()
         time_sec = str(int(time.time()))
         tag_name = f"{prefix}_{self.challenge_id}_{time_sec}"
-        try:
-            os.chdir(self.challenge_root)
-            subprocess.run(["git", "add", str(self.challenge_root)], check=True)
-            subprocess.run(
-                ["git", "commit", "-m", f"{prefix} {self.challenge_id} // attempt #{self.total_attempts}"], check=True
-            )
-
-            subprocess.run(["git", "tag", tag_name], check=True)
-            subprocess.run(["git", "push", "origin", tag_name], check=True)
-        except subprocess.CalledProcessError as e:
-            logger.error(f"Git operation failed: {e}")
-        except Exception as e:
-            logger.error(f"An unexpected error occurred: {e}")
-        finally:
-            os.chdir(original_dir)
+        repo = git.Repo(project_root)
+        # repo.git.add(self.challenge_root)
+        commit_message = f"{prefix} {self.challenge_id} // attempt #{self.total_attempts}"
+        cmd = ["-m", commit_message, "--no-verify", "--", self.challenge_root]
+        # repo.git.commit(cmd)
+        repo.index.add([str(self.challenge_root)])
+        commit = repo.index.commit(commit_message, author=git.Actor(name="solver-rob", email="kousun12@gmail.com"))
+        new_tag = repo.create_tag(tag_name, ref=commit.hexsha)
+        origin = repo.remote("origin")
+        origin.push(new_tag)
 
     def teardown(self):
         # delete the adhoc ignore file:
@@ -316,7 +311,8 @@ if __name__ == "__main__":
     sln = solutions.get(challenge_id)
     solver = Solver(c, sln)
     print("\n\n" + c.test_cases[0].human_print() + "\n\n")
-    solver.run_solve(max_tries=2)
+    # solver.run_solve(max_tries=2)
+    solver.commit_attempt()
 
 """
 Process should be:
