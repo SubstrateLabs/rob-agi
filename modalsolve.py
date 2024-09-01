@@ -3,10 +3,11 @@ import modal
 image = (
     modal.Image.debian_slim(python_version="3.10")
     .apt_install("git")
-    .copy_local_file("~/.ssh/id_rsa", "/root/.ssh/id_rsa")
     .pip_install("pytest", "pydantic==2.8.2", "substrate", "numpy", "aider-chat==0.54.0", "pytest-random-order")
+    .copy_local_file("/Users/robcheung/.ssh/id_rsa", "/root/.ssh/id_rsa")
+    .run_commands("chmod 600 /root/.ssh/id_rsa", "ssh-keyscan -t rsa github.com >> /root/.ssh/known_hosts")
     # .pip_install("git+https://github.com/SubstrateLabs/rob-agi.git@main")
-    .run_commands("git clone https://github.com/SubstrateLabs/rob-agi /app/rob_agi")
+    .run_commands("git clone git@github.com:SubstrateLabs/rob-agi.git /app/rob_agi")
     .run_commands('pip install -e "/app/rob_agi"')
     .run_commands("git config --global user.email 'kousun12@gmail.com'", "git config --global user.name 'aider-rob'")
 )
@@ -40,8 +41,8 @@ def foo():
     solver = Solver(c, sln)
     # solver.run_solve(max_tries=1)
     # git tag and push:
-    subprocess.run(["git", "tag", "test_" + challenge_id])
-    subprocess.run(["git", "push", "origin", "test_" + challenge_id])
+    subprocess.run(["git", "tag", "test_" + challenge_id], check=True)
+    subprocess.run(["git", "push", "origin", "test_" + challenge_id], check=True)
 
     return "hello"
 
