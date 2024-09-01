@@ -316,6 +316,7 @@ class Solver:
     def teardown(self):
         # delete the adhoc ignore file:
         self.adhoc_ignore.unlink(missing_ok=True)
+        self.repo.heads["master"].checkout()
 
 
 if __name__ == "__main__":
