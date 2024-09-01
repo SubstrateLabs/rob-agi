@@ -15,10 +15,6 @@ import subprocess
 
 
 @app.function(
-    mounts=[
-        # modal.Mount.from_local_dir("data/", remote_path="/app/data"),
-        # modal.Mount.from_local_dir("rob_agi/", remote_path="/app/rob_agi"),
-    ],
     secrets=[modal.Secret.from_name("llm-keys")],
 )
 def foo():
