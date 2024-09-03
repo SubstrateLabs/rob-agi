@@ -221,6 +221,27 @@ class Solver:
             logger.info(f"\n~~~~~~~~~REFLECT_EDIT~~~~~~~~~~~\n{modify_coder.aider_edited_files}")
         return modifications
 
+    def get_recent_changes(self) -> str:
+        cmd = [
+            "git",
+            "log",
+            "-n",
+            "5",
+            "--pretty=format:%h - %an, %ar : %s",
+            "--stat",
+            "--patch-with-stat",
+            "--shortstat",
+            "--",
+            str(self.file_paths["main"]),
+        ]
+        output = subprocess.run(
+            cmd,
+            text=True,
+            shell=True,
+            capture_output=True,
+        )
+        return output.stdout
+
     def get_visual_descriptions(self, overwrite: bool = False) -> str:
         target_file = self.file_paths["visual_descriptions"]
         if not overwrite and target_file.exists():
@@ -330,7 +351,8 @@ if __name__ == "__main__":
     solver = Solver(c, sln)
     print("\n\n" + c.test_cases[0].human_print() + "\n\n")
     # solver.run_solve(max_tries=2)
-    solver.commit_attempt()
+    # solver.commit_attempt()
+    print(solver.get_recent_changes())
 
 """
 Process should be:
