@@ -237,7 +237,6 @@ class Solver:
         output = subprocess.run(
             cmd,
             text=True,
-            shell=True,
             capture_output=True,
             cwd=project_root,
             check=True,
@@ -279,6 +278,13 @@ class Solver:
                 return None
 
     def run_solve(self, max_tries=default_max_tries, prev_solution=None) -> bool:
+        try:
+            return self._run_solve(max_tries, prev_solution)
+        finally:
+            self.teardown()
+
+    def _run_solve(self, max_tries=default_max_tries, prev_solution=None) -> bool:
+        self.branch = self.checkout_branch()
         t0 = time.perf_counter()
         current_result = self.run_tests()
         if current_result.success:
@@ -317,9 +323,6 @@ class Solver:
         self.commit_attempt(prefix=prefix)
         return current_result.success
 
-    def __del__(self):
-        self.teardown()
-
     def checkout_branch(self):
         branch_name = f"challenge_{self.challenge_id}"
         if branch_name not in self.repo.heads:
@@ -337,9 +340,8 @@ class Solver:
         origin.push(self.branch)
 
     def teardown(self):
-        # delete the adhoc ignore file:
         self.adhoc_ignore.unlink(missing_ok=True)
-        self.repo.heads["master"].checkout()
+        self.repo.git.checkout("master")
 
 
 if __name__ == "__main__":
