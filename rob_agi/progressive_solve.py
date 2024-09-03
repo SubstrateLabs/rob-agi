@@ -56,8 +56,11 @@ class Solver:
         self.repo = git.Repo(project_root)
         self.branch = self.checkout_branch()
 
-    def setup(self, symlink_image=False):
+    def setup(self):
         self.challenge_root.mkdir(parents=True, exist_ok=True)
+        setup_files(self.challenge, self.solution, self.challenge_root)
+
+    def create_temp_ignore(self, symlink_image=False):
         with open(ignore_template, "r") as tf:
             with open(self.adhoc_ignore, "w") as f:
                 f.write(tf.read())
@@ -66,7 +69,6 @@ class Solver:
                     f.write(f"rob_agi/attempts/c_{self.challenge.id}/image.png\n")
                 f.write(f"!rob_agi/attempts/c_{self.challenge.id}\n")
                 f.write(f"!.adhoc-aiderignore-{self.challenge.id}\n")
-        setup_files(self.challenge, self.solution, self.challenge_root)
         if symlink_image:
             try:
                 (self.challenge_root / f"image.png").symlink_to(self.file_paths["image"])
@@ -278,6 +280,7 @@ class Solver:
                 return None
 
     def run_solve(self, max_tries=default_max_tries, prev_solution=None) -> bool:
+        self.create_temp_ignore(symlink_image=False)
         try:
             return self._run_solve(max_tries, prev_solution)
         finally:
