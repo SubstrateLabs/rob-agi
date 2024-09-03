@@ -54,7 +54,7 @@ class Solver:
         self.solved, self.latest_plan, self.total_attempts = read_meta_file(self.challenge_root)
         self.goal = problem_setup_aider(challenge)
         self.repo = git.Repo(project_root)
-        self.branch = self.checkout_branch()
+        self.branch = None
 
     def setup(self):
         self.challenge_root.mkdir(parents=True, exist_ok=True)
