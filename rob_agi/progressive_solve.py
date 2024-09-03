@@ -53,7 +53,6 @@ class Solver:
         self.solved, self.latest_plan, self.total_attempts = read_meta_file(self.challenge_root)
         self.goal = problem_setup_aider(challenge)
         self.repo = git.Repo(project_root)
-        self.branch = None
 
     def setup(self):
         self.challenge_root.mkdir(parents=True, exist_ok=True)
@@ -286,7 +285,6 @@ class Solver:
             self.teardown()
 
     def _run_solve(self, max_tries=default_max_tries, prev_solution=None) -> bool:
-        self.branch = self.checkout_branch()
         t0 = time.perf_counter()
         current_result = self.run_tests()
         if current_result.success:
@@ -325,8 +323,7 @@ class Solver:
         self.commit_attempt(prefix=prefix)
         return current_result.success
 
-    def checkout_branch(self):
-        branch_name = f"challenge_{self.challenge_id}"
+    def checkout_branch(self, branch_name: str):
         if branch_name not in self.repo.heads:
             branch = self.repo.create_head(branch_name)
         else:
@@ -335,11 +332,13 @@ class Solver:
         return branch
 
     def commit_attempt(self, prefix="attempt"):
+        branch_name = f"{prefix}_challenge_{self.challenge_id}"
+        branch = self.checkout_branch(branch_name)
         commit_message = f"{prefix} {self.challenge_id} // attempt #{self.total_attempts}"
         self.repo.index.add([str(self.challenge_root)])
         self.repo.index.commit(commit_message, author=git.Actor(name="solver-rob", email="kousun12@gmail.com"))
         origin = self.repo.remote("origin")
-        origin.push(self.branch)
+        origin.push(branch)
 
     def teardown(self):
         self.adhoc_ignore.unlink(missing_ok=True)
