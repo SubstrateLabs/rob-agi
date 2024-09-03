@@ -239,6 +239,8 @@ class Solver:
             text=True,
             shell=True,
             capture_output=True,
+            cwd=project_root,
+            check=True,
         )
         return output.stdout
 
