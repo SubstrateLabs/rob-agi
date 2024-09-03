@@ -234,13 +234,7 @@ class Solver:
             "--",
             str(self.file_paths["main"]),
         ]
-        output = subprocess.run(
-            cmd,
-            text=True,
-            capture_output=True,
-            cwd=project_root,
-            check=True,
-        )
+        output = subprocess.run(cmd, text=True, capture_output=True, cwd=project_root, check=True)
         return output.stdout
 
     def get_visual_descriptions(self, overwrite: bool = False) -> str:
