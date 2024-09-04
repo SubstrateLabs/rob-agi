@@ -87,6 +87,34 @@ class ColoredGrid(BaseModel):
     def __getitem__(self, key):
         return self.values[key]
 
+    def to_mono(self) -> "ColoredGrid":
+        """Convert the grid to a monochromatic version."""
+        return ColoredGrid(values=[[1 if cell != 0 else 0 for cell in row] for row in self.values])
+
+    def get_color_counts(self, use_color_names: bool = False) -> Dict[int, int]:
+        """Return a dictionary of color counts."""
+        counts = {color: 0 for color in range(10)}
+        for row in self.values:
+            for color in row:
+                counts[color] += 1
+        if use_color_names:
+            return {self.value_to_color(color): count for color, count in counts.items()}
+        return counts
+
+    def get_x_freqency(self, color: int, row: int) -> int:
+        """Return the frequency of a specific color in a row"""
+        return self.values[row].count(color)
+
+    def get_x_frequency_list(self, color: int) -> List[int]:
+        """Return the frequency of a specific color in each row"""
+        return [row.count(color) for row in self.values]
+
+    def get_x_frequencies(self, use_color_names: bool = False) -> Dict[int, List[int]]:
+        """Return the frequency of all colors in each row"""
+        if use_color_names:
+            return {self.value_to_color(color): self.get_x_frequency_list(color) for color in range(10)}
+        return {color: self.get_x_frequency_list(color) for color in range(10)}
+
     def validate_report(self, expected: "ColoredGrid") -> str:
         result = ""
         result += f"Output:\n"

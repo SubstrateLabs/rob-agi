@@ -351,7 +351,10 @@ if __name__ == "__main__":
     print("\n\n" + c.test_cases[0].human_print() + "\n\n")
     # solver.run_solve(max_tries=2)
     # solver.commit_attempt()
-    print(solver.get_recent_changes())
+    # print(solver.get_recent_changes())
+    print(c.test_cases[0].get_color_counts())
+    print(c.test_cases[0].to_mono())
+    print(c.test_cases[0].get_x_frequencies())
 
 """
 Process should be:
