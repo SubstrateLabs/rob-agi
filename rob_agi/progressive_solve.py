@@ -353,14 +353,14 @@ def local_fn():
     sln = solutions.get(challenge_id)
     solver = Solver(c, sln)
     print("\n\n" + c.test_cases[0].human_print() + "\n\n")
-    # solver.run_solve(max_tries=2)
+    solver.run_solve(max_tries=1)
     # solver.commit_attempt()
     # print(solver.get_recent_changes())
     # print(c.test_cases[0].get_color_counts())
     # print(c.test_cases[0].to_mono())
     # print(c.test_cases[0].get_x_frequencies())
-    cr = solver.run_tests()
-    solver.get_plan(cr, is_first=True)
+    # cr = solver.run_tests()
+    # solver.get_plan(cr, is_first=True)
 
 
 if __name__ == "__main__":
