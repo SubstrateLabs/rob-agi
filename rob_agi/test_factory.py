@@ -35,9 +35,11 @@ def _run(arg_list: list[str]) -> TestOutput:
 
 
 def run_pytest(test_file: Path, run_all: bool = False) -> TestOutput:
-    args = [sys.executable, "-m", "pytest", "-vv", "--no-header", "--random-order"]
+    args = [sys.executable, "-m", "pytest", "-vv", "--no-header"]
     if not run_all:
         args.append("-x")
+    else:
+        args.append("--random-order")
     args.append(str(test_file.resolve()))
     result = _run(args)
     result.output = result.output.replace(to_replace, "")

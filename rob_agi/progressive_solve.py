@@ -205,6 +205,10 @@ class Solver:
         prompt = f"{prefix}\n\n<TEST_OUTPUT>\n{current_result.error}\n{current_result.output}</TEST_OUTPUT>\n"
         prompt += f"\nYour most recent plan is:\n<RECENT_PLANNING>\n{plan}\n</RECENT_PLANNING>\n"
         prompt += f"Use that latest planning and solve the challenge by modifying the implementation file. Always ensure that the docstring to solve_{self.challenge_id} includes a correct summary of the solution in words.\n"
+        if self.total_attempts > 2:
+            prompt += (
+                "You may leave print statements, which can help you debug in the future if you don't get it right.\n"
+            )
         prompt += "Make sure your code changes are in the SEARCH/REPLACE format."
         modifications = modify_coder.run(prompt)
         logger.info(f"\n~~~~~~~~~CODE_EDIT~~~~~~~~~~~\n{modify_coder.aider_edited_files}")
@@ -340,8 +344,8 @@ class Solver:
 
 
 if __name__ == "__main__":
-    challenge_id = "c59eb873"  # easy
-    # challenge_id = "776ffc46"  # hard
+    # challenge_id = "c59eb873"  # easy
+    challenge_id = "776ffc46"  # hard
     task_set = "training"
     challenges, solutions = load_task_set(task_set_name=task_set)
     c = challenges[challenge_id]
@@ -352,9 +356,11 @@ if __name__ == "__main__":
     # solver.run_solve(max_tries=2)
     # solver.commit_attempt()
     # print(solver.get_recent_changes())
-    print(c.test_cases[0].get_color_counts())
-    print(c.test_cases[0].to_mono())
-    print(c.test_cases[0].get_x_frequencies())
+    # print(c.test_cases[0].get_color_counts())
+    # print(c.test_cases[0].to_mono())
+    # print(c.test_cases[0].get_x_frequencies())
+    current_result = solver.run_tests()
+    solver.get_plan(current_result, is_first=True)
 
 """
 Process should be:
