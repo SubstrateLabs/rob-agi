@@ -33,7 +33,7 @@ default_max_tries = 1
 
 
 class Solver:
-    def __init__(self, challenge: GridProblem, solution: Optional[ComputedResult] = None):
+    def __init__(self, challenge: GridProblem, solution: Optional[ComputedResult] = None, starting_commit=None):
         self.challenge_id = challenge.id
         self.challenge = challenge
         self.solution = solution
@@ -53,6 +53,10 @@ class Solver:
         self.solved, self.latest_plan, self.total_attempts = read_meta_file(self.challenge_root)
         self.goal = problem_setup_aider(challenge)
         self.repo = git.Repo(project_root)
+        # TODO
+        if starting_commit:
+            cmt = self.repo.commit(starting_commit)
+            self.repo.git.checkout(cmt)
 
     def setup(self):
         self.challenge_root.mkdir(parents=True, exist_ok=True)
