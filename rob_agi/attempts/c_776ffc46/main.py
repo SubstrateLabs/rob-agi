@@ -65,14 +65,19 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     target_color = RED if red_count >= green_count else GREEN
     logger.info(f"Target color: {target_color}")
 
-    # Step 4 & 5: Find and transform blue plus shapes
-    result_grid = copy.deepcopy(input_grid.values)
+    # Step 4: Find all blue plus shapes
+    blue_plus_centers = []
     for r in range(rows):
         for c in range(cols):
             if is_blue_plus(r, c):
-                for dr, dc in [(0, 0), (0, 1), (1, 0), (0, -1), (-1, 0)]:
-                    result_grid[r+dr][c+dc] = target_color
-                logger.debug(f"Transformed blue plus at ({r}, {c}) to color {target_color}")
+                blue_plus_centers.append((r, c))
+
+    # Step 5: Transform blue plus shapes
+    result_grid = copy.deepcopy(input_grid.values)
+    for r, c in blue_plus_centers:
+        for dr, dc in [(0, 0), (0, 1), (1, 0), (0, -1), (-1, 0)]:
+            result_grid[r+dr][c+dc] = target_color
+        logger.debug(f"Transformed blue plus at ({r}, {c}) to color {target_color}")
 
     # Step 6: Return the modified grid
     return ColoredGrid(values=result_grid)
