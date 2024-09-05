@@ -1,4 +1,6 @@
-from pathlib import Path
+import importlib
+import subprocess
+import sys
 
 import modal
 
@@ -15,14 +17,27 @@ image = (
 app = modal.App("arc_solver", image=image)
 
 
+def reload_repo():
+    repo_path = "/app/rob_agi"
+    try:
+        subprocess.run(["git", "-C", repo_path, "pull", "origin", "master"], check=True)
+        print("Git pull successful")
+    except subprocess.CalledProcessError as e:
+        print(f"Git pull failed: {e}")
+        sys.exit(1)
+    if "mymodule" in sys.modules:
+        importlib.reload(sys.modules["mymodule"])
+
+
 @app.function(
     secrets=[modal.Secret.from_name("llm-keys")],
+    timeout=60 * 10,
 )
 def foo():
+    reload_repo()
     import rob_agi
     from rob_agi.arc_util import load_task_set
     from rob_agi.progressive_solve import Solver
-    import git
 
     # challenge_id = "c59eb873"  # easy
     challenge_id = "776ffc46"  # hard
