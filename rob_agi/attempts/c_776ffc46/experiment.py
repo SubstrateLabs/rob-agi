@@ -197,3 +197,18 @@ if __name__ == "__main__":
     simple_result = solve_776ffc46(simple_input)
     print("\nResult grid:")
     print(visualize_grid(simple_result))
+
+    # New experiment: Test a simple case with clear border and adjacent colors
+    print("\nSimple border experiment:")
+    simple_input = ColoredGrid(values=[
+        [5, 5, 5, 5, 5],
+        [5, 2, 0, 3, 5],
+        [5, 0, 1, 0, 5],
+        [5, 3, 0, 2, 5],
+        [5, 5, 5, 5, 5]
+    ])
+    print("Input grid:")
+    print(visualize_grid(simple_input))
+    simple_result = solve_776ffc46(simple_input)
+    print("\nResult grid:")
+    print(visualize_grid(simple_result))
