@@ -252,3 +252,46 @@ if __name__ == "__main__":
     # Verify that no transformation occurred
     assert no_adjacent_result == no_adjacent_input, "Expected no transformation when no red or green is adjacent to gray"
     print("\nNo red or green adjacent to gray experiment assertion passed. The grid remained unchanged as expected.")
+
+    # New experiment: Test multiple blue plus shapes with different adjacent colors
+    print("\nMultiple blue plus shapes with different adjacent colors experiment:")
+    multiple_plus_input = ColoredGrid(values=[
+        [5, 5, 5, 5, 5, 5, 5],
+        [5, 2, 0, 1, 0, 3, 5],
+        [5, 0, 1, 1, 1, 0, 5],
+        [5, 1, 1, 1, 1, 1, 5],
+        [5, 0, 1, 1, 1, 0, 5],
+        [5, 3, 0, 1, 0, 2, 5],
+        [5, 5, 5, 5, 5, 5, 5]
+    ])
+    print("Input grid:")
+    print(visualize_grid(multiple_plus_input))
+    multiple_plus_result = solve_776ffc46(multiple_plus_input)
+    print("\nResult grid:")
+    print(visualize_grid(multiple_plus_result))
+
+    # Verify the transformation
+    expected_color = 2  # Red, since it's the most frequent adjacent to gray
+    for r, c in [(2, 2), (2, 3), (2, 4), (3, 1), (3, 3), (3, 5)]:
+        assert multiple_plus_result.values[r][c] == expected_color, f"Expected color {expected_color} at ({r}, {c}), but got {multiple_plus_result.values[r][c]}"
+    print("\nMultiple blue plus shapes with different adjacent colors experiment assertions passed. The transformation is working as expected.")
+
+    # New experiment: Test edge case with only one color adjacent to gray
+    print("\nOnly one color adjacent to gray experiment:")
+    one_color_input = ColoredGrid(values=[
+        [5, 5, 5, 5, 5],
+        [5, 2, 0, 1, 5],
+        [5, 0, 1, 0, 5],
+        [5, 1, 0, 1, 5],
+        [5, 5, 5, 5, 5]
+    ])
+    print("Input grid:")
+    print(visualize_grid(one_color_input))
+    one_color_result = solve_776ffc46(one_color_input)
+    print("\nResult grid:")
+    print(visualize_grid(one_color_result))
+
+    # Verify the transformation
+    expected_color = 2  # Red, since it's the only color adjacent to gray
+    assert one_color_result.values[2][2] == expected_color, f"Expected color {expected_color} at (2, 2), but got {one_color_result.values[2][2]}"
+    print("\nOnly one color adjacent to gray experiment assertion passed. The transformation is working as expected.")
