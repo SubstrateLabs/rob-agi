@@ -206,17 +206,7 @@ if __name__ == "__main__":
     print("\nResult grid:")
     print(visualize_grid(simple_result))
 
-    # New experiment: Test a simple case with clear border and adjacent colors
-    print("\nSimple border experiment:")
-    simple_input = ColoredGrid(values=[
-        [5, 5, 5, 5, 5],
-        [5, 2, 0, 3, 5],
-        [5, 0, 1, 0, 5],
-        [5, 3, 0, 2, 5],
-        [5, 5, 5, 5, 5]
-    ])
-    print("Input grid:")
-    print(visualize_grid(simple_input))
-    simple_result = solve_776ffc46(simple_input)
-    print("\nResult grid:")
-    print(visualize_grid(simple_result))
+    # Verify the transformation
+    expected_color = 2  # Red, since it's the most frequent adjacent to gray
+    assert simple_result.values[2][2] == expected_color, f"Expected color {expected_color} at (2, 2), but got {simple_result.values[2][2]}"
+    print("\nSimple border experiment assertion passed. The transformation is working as expected.")
