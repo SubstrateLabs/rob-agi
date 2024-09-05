@@ -1,6 +1,7 @@
 from rob_agi.colored_grid import ColoredGrid
 from typing import List, Tuple, Set
 import logging
+import copy
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -32,15 +33,6 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
         return {(r+dr, c+dc) for dr in [-1, 0, 1] for dc in [-1, 0, 1] 
                 if (dr != 0 or dc != 0) and is_valid_cell(r+dr, c+dc)}
 
-    def get_border_cells() -> Set[Tuple[int, int]]:
-        border_cells = set()
-        for r in range(rows):
-            for c in range(cols):
-                if input_grid.values[r][c] == GRAY:
-                    border_cells.add((r, c))
-        logger.debug(f"Gray border cells: {border_cells}")
-        return border_cells
-
     def is_blue_plus(r: int, c: int) -> bool:
         if input_grid.values[r][c] != BLUE:
             return False
@@ -48,16 +40,20 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
                    for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)])
 
     # Step 1 & 2: Identify gray borders and count adjacent colors
-    border_cells = get_border_cells()
+    border_cells = set()
     adjacent_cells = set()
-    for r, c in border_cells:
-        adjacent_cells.update(get_adjacent_cells(r, c))
-    
+    for r in range(rows):
+        for c in range(cols):
+            if input_grid.values[r][c] == GRAY:
+                border_cells.add((r, c))
+                adjacent_cells.update(get_adjacent_cells(r, c))
+
     adjacent_cells -= border_cells  # Remove gray cells from adjacent cells
 
     red_count = sum(1 for r, c in adjacent_cells if input_grid.values[r][c] == RED)
     green_count = sum(1 for r, c in adjacent_cells if input_grid.values[r][c] == GREEN)
 
+    logger.debug(f"Gray border cells: {border_cells}")
     logger.debug(f"Adjacent cells: {adjacent_cells}")
     logger.debug(f"Red count: {red_count}, Green count: {green_count}")
 
@@ -69,16 +65,14 @@ def solve_776ffc46(input_grid: ColoredGrid) -> ColoredGrid:
     target_color = RED if red_count >= green_count else GREEN
     logger.info(f"Target color: {target_color}")
 
-    # Step 4: Find all blue plus shapes
-    blue_plus_centers = [(r, c) for r in range(rows) for c in range(cols) if is_blue_plus(r, c)]
-    logger.debug(f"Blue plus shapes: {blue_plus_centers}")
-
-    # Step 5: Transform blue plus shapes
-    result_grid = [row[:] for row in input_grid.values]
-    for r, c in blue_plus_centers:
-        for dr, dc in [(0, 0), (0, 1), (1, 0), (0, -1), (-1, 0)]:
-            result_grid[r+dr][c+dc] = target_color
-        logger.debug(f"Transformed blue plus at ({r}, {c}) to color {target_color}")
+    # Step 4 & 5: Find and transform blue plus shapes
+    result_grid = copy.deepcopy(input_grid.values)
+    for r in range(rows):
+        for c in range(cols):
+            if is_blue_plus(r, c):
+                for dr, dc in [(0, 0), (0, 1), (1, 0), (0, -1), (-1, 0)]:
+                    result_grid[r+dr][c+dc] = target_color
+                logger.debug(f"Transformed blue plus at ({r}, {c}) to color {target_color}")
 
     # Step 6: Return the modified grid
     return ColoredGrid(values=result_grid)
