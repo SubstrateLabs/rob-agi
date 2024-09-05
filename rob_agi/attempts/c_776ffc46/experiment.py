@@ -1,5 +1,9 @@
 from rob_agi.colored_grid import ColoredGrid
-from rob_agi.attempts.c_776ffc46.main import solve_776ffc46, visualize_grid
+from rob_agi.attempts.c_776ffc46.main import solve_776ffc46
+
+def visualize_grid(grid):
+    color_map = {0: '⬛', 1: '🟦', 2: '🟥', 3: '🟩', 4: '🟨', 5: '⬜'}
+    return '\n'.join(''.join(color_map.get(cell, '❓') for cell in row) for row in grid.values)
 
 def test_simple_case():
     input_grid = ColoredGrid(values=[
