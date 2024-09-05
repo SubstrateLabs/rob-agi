@@ -35,7 +35,6 @@ def reload_repo():
 )
 def foo():
     reload_repo()
-    import rob_agi
     from rob_agi.arc_util import load_task_set
     from rob_agi.progressive_solve import Solver
 
@@ -47,7 +46,6 @@ def foo():
     sln = solutions.get(challenge_id)
     solver = Solver(c, sln)
     solver.run_solve(max_tries=1)
-    # git tag and push:
 
     return "hello"
 
