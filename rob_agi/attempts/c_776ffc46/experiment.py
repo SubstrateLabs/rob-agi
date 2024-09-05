@@ -159,6 +159,30 @@ if __name__ == "__main__":
     print("\nResult grid:")
     print(visualize_grid(simple_result))
 
+    # New experiment: Test multiple blue plus shapes
+    print("\nMultiple blue plus shapes experiment:")
+    multiple_plus_input = ColoredGrid(values=[
+        [5, 5, 5, 5, 5, 5, 5],
+        [5, 2, 0, 0, 0, 3, 5],
+        [5, 0, 1, 0, 1, 0, 5],
+        [5, 0, 0, 1, 0, 0, 5],
+        [5, 0, 1, 0, 1, 0, 5],
+        [5, 3, 0, 0, 0, 2, 5],
+        [5, 5, 5, 5, 5, 5, 5]
+    ])
+    print("Input grid:")
+    print(visualize_grid(multiple_plus_input))
+    multiple_plus_result = solve_776ffc46(multiple_plus_input)
+    print("\nResult grid:")
+    print(visualize_grid(multiple_plus_result))
+
+    # Verify the transformation
+    expected_color = 2  # Red, since it's the most frequent adjacent to gray
+    center_coords = [(2, 2), (2, 4)]
+    for r, c in center_coords:
+        assert multiple_plus_result.values[r][c] == expected_color, f"Expected color {expected_color} at ({r}, {c}), but got {multiple_plus_result.values[r][c]}"
+    print("\nAll assertions passed. The transformation is working as expected.")
+
     # New experiment: Test a simple case with clear border and adjacent colors
     print("\nSimple border experiment:")
     simple_input = ColoredGrid(values=[
