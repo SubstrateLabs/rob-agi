@@ -210,3 +210,45 @@ if __name__ == "__main__":
     expected_color = 2  # Red, since it's the most frequent adjacent to gray
     assert simple_result.values[2][2] == expected_color, f"Expected color {expected_color} at (2, 2), but got {simple_result.values[2][2]}"
     print("\nSimple border experiment assertion passed. The transformation is working as expected.")
+
+    # New experiment: Test multiple blue plus shapes with different adjacent colors
+    print("\nMultiple blue plus shapes experiment:")
+    multiple_plus_input = ColoredGrid(values=[
+        [5, 5, 5, 5, 5, 5, 5],
+        [5, 2, 0, 1, 0, 3, 5],
+        [5, 0, 1, 1, 1, 0, 5],
+        [5, 1, 1, 1, 1, 1, 5],
+        [5, 0, 1, 1, 1, 0, 5],
+        [5, 3, 0, 1, 0, 2, 5],
+        [5, 5, 5, 5, 5, 5, 5]
+    ])
+    print("Input grid:")
+    print(visualize_grid(multiple_plus_input))
+    multiple_plus_result = solve_776ffc46(multiple_plus_input)
+    print("\nResult grid:")
+    print(visualize_grid(multiple_plus_result))
+
+    # Verify the transformation
+    expected_color = 2  # Red, since it's the most frequent adjacent to gray
+    for r, c in [(2, 2), (2, 3), (2, 4), (3, 1), (3, 3), (3, 5)]:
+        assert multiple_plus_result.values[r][c] == expected_color, f"Expected color {expected_color} at ({r}, {c}), but got {multiple_plus_result.values[r][c]}"
+    print("\nMultiple blue plus shapes experiment assertions passed. The transformation is working as expected.")
+
+    # New experiment: Test edge case with no red or green adjacent to gray
+    print("\nNo red or green adjacent to gray experiment:")
+    no_adjacent_input = ColoredGrid(values=[
+        [5, 5, 5, 5, 5],
+        [5, 0, 1, 0, 5],
+        [5, 1, 1, 1, 5],
+        [5, 0, 1, 0, 5],
+        [5, 5, 5, 5, 5]
+    ])
+    print("Input grid:")
+    print(visualize_grid(no_adjacent_input))
+    no_adjacent_result = solve_776ffc46(no_adjacent_input)
+    print("\nResult grid:")
+    print(visualize_grid(no_adjacent_result))
+
+    # Verify that no transformation occurred
+    assert no_adjacent_result == no_adjacent_input, "Expected no transformation when no red or green is adjacent to gray"
+    print("\nNo red or green adjacent to gray experiment assertion passed. The grid remained unchanged as expected.")
