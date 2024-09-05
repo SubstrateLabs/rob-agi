@@ -334,7 +334,8 @@ class Solver:
         return branch
 
     def commit_attempt(self, prefix="attempt"):
-        branch_name = f"{prefix}_challenge_{self.challenge_id}"
+        current_sha = self.repo.head.commit.hexsha[:7]
+        branch_name = f"{prefix}_challenge_{self.challenge_id}_{current_sha}"
         branch = self.checkout_branch(branch_name)
         commit_message = f"{prefix} {self.challenge_id} // attempt #{self.total_attempts}"
         self.repo.index.add([str(self.challenge_root)])
