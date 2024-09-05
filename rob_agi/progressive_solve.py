@@ -343,7 +343,7 @@ class Solver:
         self.repo.git.checkout("master")
 
 
-if __name__ == "__main__":
+def local_fn():
     # challenge_id = "c59eb873"  # easy
     challenge_id = "776ffc46"  # hard
     task_set = "training"
@@ -359,17 +359,9 @@ if __name__ == "__main__":
     # print(c.test_cases[0].get_color_counts())
     # print(c.test_cases[0].to_mono())
     # print(c.test_cases[0].get_x_frequencies())
-    current_result = solver.run_tests()
-    solver.get_plan(current_result, is_first=True)
+    cr = solver.run_tests()
+    solver.get_plan(cr, is_first=True)
 
-"""
-Process should be:
-- think about it, make a plan
-- try to implement the plan in code
-- run the tests
-- if the tests fail
-  - diagnose the issue
-  - make a plan to fix it
-  - implement the plan as diff
-  - run the tests
-"""
+
+if __name__ == "__main__":
+    local_fn()
