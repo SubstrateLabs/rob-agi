@@ -52,5 +52,5 @@ def foo():
 
 @app.local_entrypoint()
 def localfn():
-    h = foo.spawn()
+    h = foo.remote()
     print("res", h)
