@@ -295,3 +295,22 @@ if __name__ == "__main__":
     expected_color = 2  # Red, since it's the only color adjacent to gray
     assert one_color_result.values[2][2] == expected_color, f"Expected color {expected_color} at (2, 2), but got {one_color_result.values[2][2]}"
     print("\nOnly one color adjacent to gray experiment assertion passed. The transformation is working as expected.")
+
+    # New experiment: Test edge case with no valid blue plus shapes
+    print("\nNo valid blue plus shapes experiment:")
+    no_plus_input = ColoredGrid(values=[
+        [5, 5, 5, 5, 5],
+        [5, 2, 1, 3, 5],
+        [5, 1, 1, 1, 5],
+        [5, 3, 1, 2, 5],
+        [5, 5, 5, 5, 5]
+    ])
+    print("Input grid:")
+    print(visualize_grid(no_plus_input))
+    no_plus_result = solve_776ffc46(no_plus_input)
+    print("\nResult grid:")
+    print(visualize_grid(no_plus_result))
+
+    # Verify that no transformation occurred
+    assert no_plus_result == no_plus_input, "Expected no transformation when there are no valid blue plus shapes"
+    print("\nNo valid blue plus shapes experiment assertion passed. The grid remained unchanged as expected.")
