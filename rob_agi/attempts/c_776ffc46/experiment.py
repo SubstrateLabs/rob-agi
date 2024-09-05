@@ -1,5 +1,9 @@
+import logging
 from rob_agi.colored_grid import ColoredGrid
 from rob_agi.attempts.c_776ffc46.main import solve_776ffc46
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 def visualize_grid(grid):
     color_map = {0: '⬛', 1: '🟦', 2: '🟥', 3: '🟩', 4: '🟨', 5: '⬜'}
